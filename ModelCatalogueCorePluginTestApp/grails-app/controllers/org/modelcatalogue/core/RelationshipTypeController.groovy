@@ -55,7 +55,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
     @Override
     @Transactional
     def update() {
-        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR', getDataModel())) {
+        if (!allowSaveAndEdit()) {
             unauthorized()
             return
         }

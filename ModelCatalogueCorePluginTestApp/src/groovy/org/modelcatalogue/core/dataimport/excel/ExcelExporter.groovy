@@ -1,0 +1,333 @@
+package org.modelcatalogue.core.dataimport.excel
+
+import com.google.common.collect.ImmutableMap
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.modelcatalogue.core.*
+import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
+import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
+import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
+import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
+import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
+
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
+
+/**
+ * Excel.groovy
+ * Purpose: Generate an excel report from a data model, including metadata using the required format
+ *
+ * @author Adam Milward
+ * @version 31/03/2017
+ */
+class ExcelExporter {
+
+    final CatalogueElement element
+    final DataClassService dataClassService
+    final GrailsApplication grailsApplication
+    final int depth
+
+    static ExcelExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
+        return new ExcelExporter(element, dataClassService, grailsApplication,  depth)
+    }
+
+
+    ExcelExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3){
+        this.element = element
+        this.dataClassService = dataClassService
+        this.grailsApplication = grailsApplication
+        this.depth = depth
+    }
+
+    protected Closure standardCellStyle = {
+        wrap text
+        border top, {
+            color black
+            style medium
+        }
+    }
+    List<DataClass> getDataClasses() {
+        return getDataClassesFromModel(element as DataModel)
+    }
+    List<DataClass> getDataClassesFromModel(DataModel dataModel) {
+        return dataClassService.getTopLevelDataClasses(DataModelFilter.includes(dataModel), ImmutableMap.of('status', 'active'), true).items
+    }
+    protected List<String> excelHeaders = [
+            'Parent Data Class ID','Parent Data Class Name','Data Class ID', 'Data Class Name',
+            'Data Element ID', 'Data Element Name', 'Multiplicity', 'Data Element Description',
+            'Data Type ID', 'Data Type Name', 'Data Type Enumerations', 'Data Type Rule',
+            'Measurement Unit ID', 'Measurement Unit Name', 'Metadata']
+
+    Map<String, Closure> sheetsAfterMainSheetExport() {}
+
+    void export(OutputStream outputStream) {
+        SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
+        List<DataClass> dataClasses = Collections.emptyList()
+        dataClasses = getDataClasses()
+
+        builder.build(outputStream) {
+            apply ModelCatalogueStyles
+            sheet("$element.name $element.dataModelSemanticVersion" ) { SheetDefinition sheetDefinition ->
+                row {
+                    excelHeaders.each{ header ->
+                        cell {
+                            value header
+                            width auto
+                            style H1
+                        }
+                    }
+                }
+                dataClasses.each{ dataClass->
+                    buildRows(sheetDefinition, dataClass, 2)
+                }
+
+            }
+            sheetsAfterMainSheetExport().each{name, instructions ->
+                sheet(name, instructions)
+            }
+        }
+
+    }
+
+    /**
+     * Renders rows for each data class passed in children collection.
+     * @param sheet the current sheet
+     * @param children data classes to be rendered
+     * @param currentDepth the current depth starting with one
+     */
+    private Integer buildRows(SheetDefinition sheet, DataClass parent, int rowDepth) {
+
+        Collection<Relationship> children = parent.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
+        children.each { Relationship relationship ->
+            CatalogueElement child = relationship.destination
+            rowDepth = printClass(parent, child, sheet, rowDepth)
+        }
+        rowDepth
+    }
+
+
+    private Integer printClass(DataClass parent, DataClass child, SheetDefinition sheet, int rowDepth) {
+        Collection<Relationship> dataElements = child.getOutgoingRelationshipsByType(RelationshipType.containmentType)
+        sheet.with { SheetDefinition sheetDefinition ->
+            row { RowDefinition rowDefinition ->
+                    for (Relationship dataElementRelationship in dataElements) {
+
+                        row(rowDepth) { RowDefinition rd ->
+                            printDataElement(parent, child, rd, dataElementRelationship)
+                        }
+                        rowDepth++
+                    }
+                }
+            rowDepth = buildRows(sheetDefinition, child, rowDepth)
+            rowDepth
+            }
+        }
+
+    void printDataElement(DataClass parent, DataClass child, RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
+        DataElement dataElement = dataElementRelationship.destination
+        Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
+        if(relatedTo.empty && dataElement?.dataType) relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
+        rowDefinition.with {
+            cell {
+                value getModelCatalogueIdToPrint(parent)
+                link to url "${parent.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + parent.defaultModelCatalogueId}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+            cell {
+                value parent.name
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+            cell {
+                value getModelCatalogueIdToPrint(child)
+                link to url "${child.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + child.defaultModelCatalogueId}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+            cell {
+                value child.name
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell() {
+                value getModelCatalogueIdToPrint(dataElement)
+                link to url "${dataElement.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataElement.defaultModelCatalogueId}"
+
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell() {
+                    value dataElement.name
+                    link to url "${getLoadURL(dataElement)}"
+                    style {
+                        wrap text
+                        border top, left, {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+            cell{
+                value "${getMultiplicity(dataElementRelationship)}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+            cell{
+                value "${dataElement.description}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+            cell{
+                value dataElement?.dataType.id
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+            cell{
+                value "${(dataElement?.dataType) ? getModelCatalogueIdToPrint(dataElement?.dataType.name) : ''}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+            cell{
+                value "${dataElement?.dataType.name}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+            cell{
+                value "${(dataElement?.dataType) ? printEnumeratedType(dataElement?.dataType) : ""}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+            cell{
+                value "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+//                [ ,
+//                  ,
+//                  ,
+//                  "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}",
+//                  "${(dataElement?.ext.get("LabKey Field Name")) ?: ""}",
+//                  "${(dataElement?.ext.get("Additional Review")) ?: ""}",
+//                  "${(dataElement?.ext.get("Additional Rule")) ?: ""}",
+//                  "${(dataElement?.ext.get("Additional Rule Dependency")) ?: ""}"].
+//                    each{cellValue ->
+//                        cell {
+//                            value cellValue
+//                            style standardCellStyle
+//                        }
+//                    }
+            }
+        }
+
+
+
+    String printEnumeratedType(DataType dataType){
+
+        if(dataType.instanceOf(EnumeratedType)){
+            return dataType.prettyPrint()
+        }
+
+        return " "
+
+    }
+
+    String getMultiplicity(Relationship dataElementRelationship){
+        String multiplicityText = " "
+
+        if(dataElementRelationship?.ext.get("Min Occurs")=="0"){
+            multiplicityText += "Optional "
+        }else if(dataElementRelationship?.ext.get("Min Occurs")=="1"){
+            multiplicityText += "Mandatory "
+        }
+
+        if(dataElementRelationship?.ext.get("Max Occurs")=="*"){
+            multiplicityText += "Multiple "
+        }
+
+        if(dataElementRelationship.source.ext.get("http://xsd.modelcatalogue.org/section#type")=="choice"){
+            multiplicityText += " CHOICE "
+        }
+
+        if(dataElementRelationship?.ext.get("Max Occurs") && dataElementRelationship?.ext.get("Min Occurs")){
+         multiplicityText += "(" + dataElementRelationship?.ext.get("Min Occurs") + ".." + dataElementRelationship?.ext.get("Max Occurs") + ")"
+        }
+
+
+        multiplicityText
+    }
+
+    String printBusRule(List<ValidationRule> rules){
+        return rules.collect{ it.name }.join('\n')
+    }
+    String getLoadURL(CatalogueElement ce){
+        ce?.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + ce.defaultModelCatalogueId
+    }
+
+
+    protected static String getModelCatalogueIdToPrint(CatalogueElement element) {
+        element.hasModelCatalogueId() && !element.modelCatalogueId.startsWith('http') ? element.modelCatalogueId : element.combinedVersion
+    }
+
+}

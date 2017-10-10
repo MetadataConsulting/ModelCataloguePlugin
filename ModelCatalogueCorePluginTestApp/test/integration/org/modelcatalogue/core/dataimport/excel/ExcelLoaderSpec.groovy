@@ -6,8 +6,11 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.custommonkey.xmlunit.DetailedDiff
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.AbstractIntegrationSpec
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import spock.lang.Shared
 import spock.lang.Unroll
 
@@ -16,13 +19,15 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
     StringWriter stringWriter
     XmlCatalogueBuilder builder
     ExcelLoader excelLoader
+    CatalogueBuilder catalogueBuilder
+    def dataModelService, elementService
 
     def setup() {
         XMLUnit.ignoreWhitespace = true
         XMLUnit.ignoreComments = true
         XMLUnit.ignoreAttributeOrder = true
         stringWriter = new StringWriter()
-        //builder = new XmlCatalogueBuilder(stringWriter, true)
+        catalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
         excelLoader = new ExcelLoader()
     }
 
@@ -40,6 +45,26 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         file << ['test.xlsx', 'legacy.xlsx']
 
     }
+
+    def "test default catalogue builder imports dataset"(){
+
+        when: "I load the Excel file"
+
+        excelLoader.buildModelFromStandardWorkbookSheet(
+                HeadersMap.createForStandardExcelLoader(),
+                WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'test.xlsx'))),
+                catalogueBuilder,
+                0)
+
+        then: "new model is created"
+
+        DataModel.findByName("MET-522")
+
+
+    }
+
+
+
     String standardExcelLoaderXmlResult(String sampleFile, Map<String,String> headersMap, int index = 0) {
         return excelLoader.buildXmlFromStandardWorkbookSheet(headersMap,
             WorkbookFactory.create(

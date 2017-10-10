@@ -5,6 +5,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportExcelLoaderDirect
 import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader
@@ -138,9 +139,14 @@ class DataImportController  {
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             executeInBackground(id, "Imported from XML ZIP") {
-                loadGridSpreadsheet(wb)
+                try {
+                    ExcelLoader parser = new ExcelLoader()
+                    parser.buildModelFromStandardWorkbookSheet(HeadersMap.createForStandardExcelLoader(), wb, defaultCatalogueBuilder)
+                    finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
+                } catch (Exception e) {
+                    logError(id, e)
+                }
             }
-            finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
             redirectToAsset(id)
             return
         }
@@ -313,10 +319,10 @@ class DataImportController  {
     }
 
     @Async
-    protected void loadGridSpreadsheet(Workbook wb){
+    protected void loadSpreadsheet(Workbook wb){
         auditService.mute {
             try {
-                GMCGridReportExcelLoaderDirect loader = new GMCGridReportExcelLoaderDirect()
+                ExcelLoader loader = new ExcelLoader()
                 loader.updateFromWorkbookSheet(wb, 0)
 
             } catch (Exception e) {
