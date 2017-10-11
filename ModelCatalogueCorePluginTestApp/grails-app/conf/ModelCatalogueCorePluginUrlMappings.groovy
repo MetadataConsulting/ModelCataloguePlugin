@@ -103,6 +103,7 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$elementName/$id/newVersion"(controller: controllerName, action: 'newVersion', method: HttpMethod.POST)
                     "/api/modelCatalogue/core/$elementName/$id/inventorySpreadsheet"(controller: controllerName, action: 'inventorySpreadsheet', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/gridSpreadsheet"(controller: controllerName, action: 'gridSpreadsheet', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$elementName/$id/excelExporterSpreadsheet"(controller: controllerName, action: 'excelExporterSpreadsheet', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/inventoryDoc"(controller: controllerName, action: 'inventoryDoc', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/dependents"(controller: controllerName, action: 'dependents', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/reindex"(controller: controllerName, action: 'reindex', method: HttpMethod.POST)

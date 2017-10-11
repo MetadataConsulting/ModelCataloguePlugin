@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 import grails.util.GrailsNameUtils
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataimport.excel.ExcelExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.policy.VerificationPhase
@@ -508,6 +509,46 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
             GridReportXlsxExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+        }
+
+        response.setHeader("X-Asset-ID", assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+        return
+    }
+
+    /**
+     * Export using "ExcelExporter" to file with suffix .mc.xlsx
+     * @param name
+     * @param depth
+     * @return
+     */
+    def excelExporterSpreadsheet(String name, Integer depth) {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
+        DataModel dataModel = DataModel.get(params.id)
+
+        def dataModelId = dataModel.id
+
+        if (!dataModel) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        def assetId = assetService.storeReportAsAsset(
+                dataModel,
+                name: name ? name : "${dataModel.name} report as MS Excel Document",
+                originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.mc.xlsx",
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ) { OutputStream outputStream ->
+            // reload domain class as this is called in separate thread
+            ExcelExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
