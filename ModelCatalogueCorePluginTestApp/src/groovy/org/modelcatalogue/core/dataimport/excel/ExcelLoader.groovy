@@ -376,14 +376,19 @@ class ExcelLoader {
                                                 tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap),
                                                 tryHeader(HeadersMap.measurementUnitCode, headersMap, rowMap)
                                         )
-                                    }
+                                    }/*
                                     List<String> metadataKeys = rowMap.keySet().toList().dropWhile({header ->
                                         header != headersMap.get(HeadersMap.metadata)
                                     })
                                     for (String key: metadataKeys) {
                                         if (key != "" && key != "null") {
-                                            ext(key, rowMap.get(key).take(2000).toString())
+                                            //ext(key, rowMap.get(key).take(2000).toString())
                                         }
+                                    }*/
+                                    // metadata:
+                                    Map<String,String> metadata = parseMapString(tryHeader(HeadersMap.metadata, headersMap, rowMap) ?: '')
+                                    metadata.each {k,v ->
+                                        ext(k,v)
                                     }
                                 }
                             }
@@ -441,7 +446,7 @@ class ExcelLoader {
     static void importDataTypesFromExcelExporterFormat(CatalogueBuilder catalogueBuilder,
             String dataTypeName, String dataTypeCode, String dataTypeEnumerations, String dataTypeRule, String measurementUnitName, String measurementUnitCode){
         String[] lines = dataTypeEnumerations?.split("\\r?\\n");
-        Map<String,String> enumerations = dataTypeEnumerations ? parseEnumeration(lines) : [:]
+        Map<String,String> enumerations = dataTypeEnumerations ? parseMapStringLines(lines) : [:]
         if (enumerations) {
             catalogueBuilder.dataType(name: dataTypeName, enumerations: enumerations, rule: dataTypeRule, id: dataTypeCode) //TODO: get dataModel, which used to be dataTypeClassification, from data type code.
         }
@@ -482,7 +487,7 @@ class ExcelLoader {
             return catalogueBuilder.dataType(name: "String", dataModel: dataTypeClassification, id: dataTypeCode)
         }
 
-        def enumerations = lines.size() == 1 ? [:] : parseEnumeration(lines)
+        def enumerations = lines.size() == 1 ? [:] : parseMapStringLines(lines)
 
         if(!enumerations){
             if (measurementUnitName) {
@@ -496,8 +501,15 @@ class ExcelLoader {
         return catalogueBuilder.dataType(name: dataElementName, enumerations: enumerations, dataModel: dataTypeClassification, id: dataTypeCode)
     }
 
-    static Map<String,String> parseEnumeration(String[] lines){
-        Map enumerations = new HashMap()
+    static Map<String,String> parseMapString(String mapString) {
+        return parseMapStringLines(mapString.split(/\r?\n/))
+    }
+
+    /**
+    For colon-separated key-value lines which are usually enumerations or metadata.
+     */
+    static Map<String,String> parseMapStringLines(String[] lines){
+        Map map = new HashMap()
 
         lines.each { enumeratedValues ->
 
@@ -515,9 +527,9 @@ class ExcelLoader {
                 value = value.trim()
 
 
-                enumerations.put(key, value)
+                map.put(key, value)
             }
         }
-        return enumerations
+        return map
     }
 }
