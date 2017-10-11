@@ -88,7 +88,7 @@ class DataImportController  {
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             executeInBackground(id, "Imported from Excel") {
-                loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id)
+                loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
             }
             redirectToAsset(id)
             return
@@ -388,17 +388,21 @@ class DataImportController  {
     @Async
     protected void loadOpenEhrSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
         Pair<String,String> modelDetails = getModelDetails(suffix)
-        auditService.mute {
-            try{
-                OpenEhrExcelLoader loader = new OpenEhrExcelLoader(false)
-                String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_openEHR')
-                List<String> modelNames = loader.loadModel(wb,dataOwner)
-                DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
-                loader.addRelationshipsToModels(referenceModel, modelNames)
-                finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
+        executorService.submit {
+            auditService.mute {
+                try {
+                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader(false)
+                    String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_openEHR')
+                    List<String> modelNames = loader.loadModel(wb, dataOwner)
+                    DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
+                    loader.addRelationshipsToModels(referenceModel, modelNames)
+                    finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {
+                        it.instanceOf(DataModel)
+                    } ?: defaultCatalogueBuilder.created.find { it.dataModel }?.dataModel), userId)
 
-            } catch (Exception e) {
-                logError(id, e)
+                } catch (Exception e) {
+                    logError(id, e)
+                }
             }
         }
     }
