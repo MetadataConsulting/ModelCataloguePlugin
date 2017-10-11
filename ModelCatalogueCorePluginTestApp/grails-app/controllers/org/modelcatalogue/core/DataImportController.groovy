@@ -88,7 +88,7 @@ class DataImportController  {
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             executeInBackground(id, "Imported from Excel") {
-                loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id)
+                loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
             }
             redirectToAsset(id)
             return
