@@ -1,4 +1,3 @@
-import grails.rest.render.RenderContext
 import grails.util.Environment
 import groovy.util.logging.Log
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -7,7 +6,6 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
-import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.reports.ReportsRegistry
@@ -21,8 +19,6 @@ import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Metadata
-import org.modelcatalogue.core.util.lists.ListWrapper
-import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod
 
 @Log
@@ -66,8 +62,7 @@ class BootStrap {
 
         println 'completed:initCatalogueService'
         log.info "completed:initCatalogueService"
-//        modelCatalogueSearchService.reindex(true)
-
+        modelCatalogueSearchService.reindex(true)
 
         initCatalogueService.setupStoredProcedures()
         println 'completed:setupStoredProcedures'
