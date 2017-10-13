@@ -26,7 +26,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
     static transactional = false
 
-    SpringSecurityService springSecurityService
+    def springSecurityService
 
     Cache<String, Long> lastSeenCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1, TimeUnit.DAYS).build()
 

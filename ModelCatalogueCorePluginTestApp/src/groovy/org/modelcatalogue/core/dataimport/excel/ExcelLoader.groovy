@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.dataimport.excel
 
+import groovy.util.logging.Log
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.usermodel.Row
@@ -12,7 +13,12 @@ import org.modelcatalogue.core.DataModel
  * future NT Excel Loaders, so that they can access similar methods.
  * This may not be the best way
  */
+@Log
 class ExcelLoader {
+
+
+    def dataModelService, elementService
+
 
     static String getOwnerAndGelModelFromFileName(String sampleFile, String bitInBetween) {
         sampleFile.find(/(.*)$bitInBetween.*/){ match, firstcapture ->
@@ -20,7 +26,8 @@ class ExcelLoader {
         }.toUpperCase()
     }
     static protected Map<String, String> createRowMap(Row row, List<String> headers) {
-        Map<String, String> rowMap = [:]
+        Map<String, String> rowMap = new LinkedHashMap<>()
+        // Important that it's LinkedHashMap, for order to be kept, to get the last section which is metadata!
         for (Cell cell : row) {
             rowMap = updateRowMap(rowMap, cell, headers)
         }
@@ -51,6 +58,7 @@ class ExcelLoader {
         Iterator<Row> rowIt = sheet.rowIterator()
         Row row = rowIt.next()
         List<String> headers = getRowData(row)
+        log.info("Headers are ${headers as String}")
         List<Map<String, String>> rowMaps = []
         while (rowIt.hasNext()) {
             row = rowIt.next()
@@ -121,11 +129,111 @@ class ExcelLoader {
 
         Writer stringWriter = new StringWriter()
         CatalogueBuilder catalogueBuilder = new XmlCatalogueBuilder(stringWriter, true)
+
+        buildModelFromWorkbookSheet(headersMap, workbook, index, catalogueBuilder)
+
+        return stringWriter.toString()
+    }
+
+
+    /**
+     * "Standard" refers to an old way of importing excel files...
+     * This thing with headersMap is done in a particular way to generically handle a few excel formats
+     * regardless of the order of the headers.. and handle legacy "Classifications/Models" instead of "Data Models/Data Classes"
+     * in future we will prefer to use a list of headers which exactly matches the headers in the file
+     * @param headersMap
+     * @param workbook
+     * @param catalogueBuilder
+     * @param index
+     */
+    String buildModelFromStandardWorkbookSheet(Map<String, String> headersMap, Workbook workbook, CatalogueBuilder catalogueBuilder, int index=0) {
+
+        buildModelFromWorkbookSheet(headersMap, workbook, index, catalogueBuilder)
+
+    }
+
+
+    /**
+     * This function can take multiple catalogue builders i.e. XML or default
+     * This thing with headersMap is done in a particular way to generically handle a few excel formats;
+     * regardless of the order of the headers.. and handle legacy "Classifications/Models" instead of "Data Models/Data Classes";
+     * in future we will prefer to use a list of headers which exactly matches the headers in the file;
+     * The headersMap maps internal header names to actual header names used in the spreadsheet. There is a default setting.
+     * @param headersMap
+     * @param workbook
+     * @param catalogueBuilder
+     * @param index
+     */
+    String buildModelFromWorkbookSheet(Map<String, String> headersMap, Workbook workbook, int index = 0, CatalogueBuilder catalogueBuilder){
+
+        log.info("Using headersMap ${headersMap as String}")
+        // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
         if(!workbook) {
             throw new IllegalArgumentException("Excel file contains no worksheet!")
         }
         Sheet sheet = workbook.getSheetAt(index);
+        List<Map<String,String>> rowMaps = getRowMaps(sheet)
 
+        catalogueBuilder.build {
+            copy relationships
+            rowMaps.each { Map<String, String> rowMap ->
+                dataModel(name: tryHeader(HeadersMap.classification, headersMap, rowMap) ?: tryHeader(HeadersMap.dataModel, headersMap, rowMap)) {
+                    globalSearchFor dataType
+
+                    def createChildModel = {
+                        def createDataElement = {
+                            if(tryHeader(HeadersMap.dataElementName, headersMap, rowMap)) {
+                                dataElement(name: tryHeader(HeadersMap.dataElementName, headersMap, rowMap),
+                                        description: tryHeader(HeadersMap.dataElementDescription, headersMap, rowMap),
+                                        id: tryHeader(HeadersMap.dataElementCode, headersMap, rowMap)) {
+                                    if (tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap) ||
+                                            tryHeader(HeadersMap.dataTypeName, headersMap, rowMap)) {
+                                        importDataTypes(catalogueBuilder,
+                                                tryHeader(HeadersMap.dataElementName, headersMap, rowMap),
+                                                tryHeader(HeadersMap.dataTypeName, headersMap, rowMap),
+                                                tryHeader(HeadersMap.dataTypeCode, headersMap, rowMap),
+                                                tryHeader(HeadersMap.dataTypeClassification, headersMap, rowMap) ?: tryHeader(HeadersMap.dataTypeDataModel, headersMap, rowMap),
+                                                tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap),
+                                                tryHeader(HeadersMap.measurementSymbol, headersMap, rowMap))
+                                    }
+                                    List<String> metadataKeys = rowMap.keySet().toList().dropWhile({header ->
+                                        header != headersMap.get(HeadersMap.metadata)
+                                    })
+                                    for (String key: metadataKeys) {
+                                        if (key != "" && key != "null") {
+                                            ext(key, rowMap.get(key).take(2000).toString())
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+
+                        def modelName = tryHeader(HeadersMap.containingModelName, headersMap, rowMap) ?: tryHeader(HeadersMap.containingDataClassName, headersMap, rowMap)
+                        def modelId = tryHeader(HeadersMap.containingModelCode, headersMap, rowMap) ?: tryHeader(HeadersMap.containingDataClassCode, headersMap, rowMap)
+
+                        if (modelName || modelId) {
+                            dataClass(name: modelName, id: modelId, createDataElement)
+                        } else {
+                            catalogueBuilder.with createDataElement
+                        }
+                    }
+
+                    def parentModelName = tryHeader(HeadersMap.parentModelName, headersMap, rowMap) ?: tryHeader(HeadersMap.parentDataClassName, headersMap, rowMap)
+                    def parentModelCode = tryHeader(HeadersMap.parentModelCode, headersMap, rowMap) ?: tryHeader(HeadersMap.parentDataClassCode, headersMap, rowMap)
+
+                    if (parentModelName || parentModelCode) {
+                        dataClass(name: parentModelName, id: parentModelCode, createChildModel)
+                    } else {
+                        catalogueBuilder.with createChildModel
+                    }
+
+                }
+            }
+        }
+        // old way of using headerMaps:
+        Closure oldWay = {
+            /*
         Iterator<Row> rowIt = sheet.rowIterator()
         List<String> headers = getRowData(rowIt.next())
 
@@ -133,8 +241,10 @@ class ExcelLoader {
         while(rowIt.hasNext()) {
             List<String> rowDataList =getRowData(rowIt.next())
             rowDataLists << rowDataList
-        }
-        //get indexes of the appropriate sections
+        }*/
+
+/*
+            //get indexes of the appropriate sections
         def dataItemNameIndex = headers.indexOf(headersMap.get('dataElementName'))
         def dataItemCodeIndex = headers.indexOf(headersMap.get('dataElementCode'))
         def dataItemDescriptionIndex = headers.indexOf(headersMap.get('dataElementDescription'))
@@ -205,14 +315,151 @@ class ExcelLoader {
 
                 }
             }
+        }*/
         }
+    }
+
+
+    String buildXmlFromSpreadsheetFromExcelExporter(Map<String, String> headersMap = HeadersMap.createForSpreadsheetFromExcelExporter(), Workbook workbook, int index=0, String modelName = '') {
+
+        Writer stringWriter = new StringWriter()
+        CatalogueBuilder catalogueBuilder = new XmlCatalogueBuilder(stringWriter, true)
+
+        buildModelFromSpreadsheetFromExcelExporter(headersMap, workbook, index, catalogueBuilder, modelName)
+
         return stringWriter.toString()
+    }
+    // Based on buildModelFromWorkbookSheet
+    String buildModelFromSpreadsheetFromExcelExporter(Map<String, String> headersMap = HeadersMap.createForSpreadsheetFromExcelExporter(), Workbook workbook, int index = 0, CatalogueBuilder catalogueBuilder, String modelName = ''){
+
+        log.info("Using headersMap ${headersMap as String}")
+        // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
+        if(!workbook) {
+            throw new IllegalArgumentException("Excel file contains no worksheet!")
+        }
+        if (modelName == '') {modelName = workbook.getSheetName(index)}
+        Sheet sheet = workbook.getSheetAt(index)
+
+        List<Map<String,String>> rowMaps = getRowMaps(sheet)
+
+
+        // for the spreadsheet exported by ExcelExporter
+        catalogueBuilder.build {
+            copy relationships
+            // data model name provided rather than gotten from sheet
+            dataModel(name: modelName) {
+                rowMaps.each { Map<String, String> rowMap ->
+                    globalSearchFor dataType
+
+                    // TODO: IDs might need some processing to be usable? Like stripping off the first bit?
+                    Closure createChildDataClass = {
+                        def createDataElement = {
+                            if(tryHeader(HeadersMap.dataElementName, headersMap, rowMap)) {
+                                dataElement(name: tryHeader(HeadersMap.dataElementName, headersMap, rowMap),
+                                        description: tryHeader(HeadersMap.dataElementDescription, headersMap, rowMap),
+                                        id: tryHeader(HeadersMap.dataElementCode, headersMap, rowMap)) {
+                                    // Relationship metadata: Multiplicity
+                                    String[] multiplicity = tryHeader(HeadersMap.multiplicity, headersMap, rowMap).split(/\.\./)
+                                    relationship {
+                                        ext "Min Occurs", outOfBoundsWith({multiplicity[0]})
+                                        ext "Max Occurs", outOfBoundsWith({multiplicity[1]})
+                                    }
+                                    // Data Type
+                                    if (tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap) ||
+                                            tryHeader(HeadersMap.dataTypeName, headersMap, rowMap)) {
+                                        importDataTypesFromExcelExporterFormat(
+                                                catalogueBuilder,
+                                                tryHeader(HeadersMap.dataTypeName, headersMap, rowMap),
+                                                tryHeader(HeadersMap.dataTypeCode, headersMap, rowMap),
+                                                tryHeader(HeadersMap.dataTypeEnumerations, headersMap, rowMap),
+                                                tryHeader(HeadersMap.dataTypeRule, headersMap, rowMap),
+                                                tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap),
+                                                tryHeader(HeadersMap.measurementUnitCode, headersMap, rowMap)
+                                        )
+                                    }/*
+                                    List<String> metadataKeys = rowMap.keySet().toList().dropWhile({header ->
+                                        header != headersMap.get(HeadersMap.metadata)
+                                    })
+                                    for (String key: metadataKeys) {
+                                        if (key != "" && key != "null") {
+                                            //ext(key, rowMap.get(key).take(2000).toString())
+                                        }
+                                    }*/
+                                    // metadata:
+                                    Map<String,String> metadata = parseMapString(tryHeader(HeadersMap.metadata, headersMap, rowMap) ?: '')
+                                    metadata.each {k,v ->
+                                        ext(k,v)
+                                    }
+                                }
+                            }
+                        }
+
+
+                        def containingDataClassName = tryHeader(HeadersMap.containingModelName, headersMap, rowMap) ?: tryHeader(HeadersMap.containingDataClassName, headersMap, rowMap)
+                        def containingDataClassID = tryHeader(HeadersMap.containingModelCode, headersMap, rowMap) ?: tryHeader(HeadersMap.containingDataClassCode, headersMap, rowMap)
+
+                        if (containingDataClassName || containingDataClassID) {
+                            dataClass(name: containingDataClassName, id: containingDataClassID, createDataElement)
+                        } else {
+                            catalogueBuilder.with createDataElement
+                        }
+                    }
+
+                    def parentDataClassName = tryHeader(HeadersMap.parentModelName, headersMap, rowMap) ?: tryHeader(HeadersMap.parentDataClassName, headersMap, rowMap)
+                    def parentDataClassID = tryHeader(HeadersMap.parentModelCode, headersMap, rowMap) ?: tryHeader(HeadersMap.parentDataClassCode, headersMap, rowMap)
+
+                    if (parentDataClassName || parentDataClassID) {
+                        dataClass(name: parentDataClassName, id: parentDataClassID, createChildDataClass)
+                    } else {
+                        catalogueBuilder.with createChildDataClass
+                    }
+
+
+                }
+            }
+        }
+
+    }
+    String outOfBoundsWith(Closure<String> c, String s = '') {
+        try {
+            return c()
+        }
+        catch (ArrayIndexOutOfBoundsException a) {
+            return s
+        }
+    }
+    String tryHeader(String internalHeaderName, Map<String,String> headersMap, Map<String, String> rowMap) {
+        // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
+        String entry = rowMap.get(headersMap.get(internalHeaderName))
+        if (entry) return entry
+        else {
+            /*log.info("Trying to use internalHeaderName '$internalHeaderName', which headersMap corresponds to " +
+                "header ${headersMap.get(internalHeaderName)}, from rowMap ${rowMap as String}, nothing found.")*/
+            return null}
     }
 
     static String getRowValue(List<String> rowDataList, index){
+        // was used in old way of using headersMap in buildModelFromWorkbookSheet
         (index!=-1)?rowDataList[index]:null
     }
 
+    static void importDataTypesFromExcelExporterFormat(CatalogueBuilder catalogueBuilder,
+            String dataTypeName, String dataTypeCode, String dataTypeEnumerations, String dataTypeRule, String measurementUnitName, String measurementUnitCode){
+        String[] lines = dataTypeEnumerations?.split("\\r?\\n");
+        Map<String,String> enumerations = dataTypeEnumerations ? parseMapStringLines(lines) : [:]
+        if (enumerations) {
+            catalogueBuilder.dataType(name: dataTypeName, enumerations: enumerations, rule: dataTypeRule, id: dataTypeCode) //TODO: get dataModel, which used to be dataTypeClassification, from data type code.
+        }
+
+        else if (measurementUnitName) {
+            catalogueBuilder.dataType(name: dataTypeName, rule: dataTypeRule, id: dataTypeCode) {
+                measurementUnit(name: measurementUnitName, id: measurementUnitCode)
+            }
+        }
+        else {
+            catalogueBuilder.dataType(name: dataTypeName, rule: dataTypeRule, id: dataTypeCode)
+        }
+    }
 
     /**
      *
@@ -220,7 +467,7 @@ class ExcelLoader {
      * @param dataTypeNameOrEnum - Column F - content of - either blank or an enumeration or a named datatype.
      * @return
      */
-    static importDataTypes(CatalogueBuilder catalogueBuilder, dataElementName, dataTypeNameOrEnum, dataTypeCode, dataTypeClassification, measurementUnitName, measurementUnitSymbol) {
+    static importDataTypes(CatalogueBuilder catalogueBuilder, String dataElementName, dataTypeNameOrEnum, String dataTypeCode, String dataTypeClassification, String measurementUnitName, String measurementUnitSymbol) {
         if (!dataTypeNameOrEnum) {
             if (measurementUnitName) {
                 return catalogueBuilder.dataType(id: dataTypeCode, dataModel: dataTypeClassification, name: 'String') {
@@ -240,7 +487,7 @@ class ExcelLoader {
             return catalogueBuilder.dataType(name: "String", dataModel: dataTypeClassification, id: dataTypeCode)
         }
 
-        def enumerations = lines.size() == 1 ? [:] : parseEnumeration(lines)
+        def enumerations = lines.size() == 1 ? [:] : parseMapStringLines(lines)
 
         if(!enumerations){
             if (measurementUnitName) {
@@ -254,16 +501,23 @@ class ExcelLoader {
         return catalogueBuilder.dataType(name: dataElementName, enumerations: enumerations, dataModel: dataTypeClassification, id: dataTypeCode)
     }
 
-    static Map<String,String> parseEnumeration(String[] lines){
-        Map enumerations = new HashMap()
+    static Map<String,String> parseMapString(String mapString) {
+        return parseMapStringLines(mapString.split(/\r?\n/))
+    }
+
+    /**
+    For colon-separated key-value lines which are usually enumerations or metadata.
+     */
+    static Map<String,String> parseMapStringLines(String[] lines){
+        Map map = new HashMap()
 
         lines.each { enumeratedValues ->
 
-            def EV = enumeratedValues.split(":")
+            String[] EV = enumeratedValues.split(":")
 
-            if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
-                def key = EV[0]
-                def value = EV[1]
+            if (EV?.size() == 2) {
+                String key = EV[0]
+                String value = EV[1]
 
                 if (value.size() > 244) {
                     value = value[0..244]
@@ -273,9 +527,9 @@ class ExcelLoader {
                 value = value.trim()
 
 
-                enumerations.put(key, value)
+                map.put(key, value)
             }
         }
-        return enumerations
+        return map
     }
 }

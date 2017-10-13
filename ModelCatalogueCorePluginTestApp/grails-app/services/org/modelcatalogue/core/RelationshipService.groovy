@@ -275,7 +275,7 @@ class RelationshipService {
         unlink source, destination, relationshipType, null, ignoreRules
     }
 
-    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, DataModel dataModel, boolean ignoreRules = false, Map<String, String> expectedMetadata = null) {
+    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, DataModel dataModel, boolean ignoreRules = false, Map<String, String> expectedMetadata = null, boolean ignoreBidirectional = false) {
 
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withOptionalDataModel(dataModel).definition)
@@ -355,8 +355,8 @@ class RelationshipService {
                 source.removeInheritedAssociations(source, metadata)
             }
 
-            if (relationshipType.bidirectional) {
-                unlink relationshipInstance.destination, relationshipInstance.source, relationshipType, dataModel, ignoreRules, expectedMetadata
+            if (relationshipType.bidirectional && !ignoreBidirectional) {
+                unlink destination, source, relationshipType, dataModel, ignoreRules, expectedMetadata, true
             }
 
             return relationshipInstance

@@ -19,9 +19,10 @@ class PrimitiveTypeController extends DataTypeController<PrimitiveType> {
 
 
         ListWithTotalAndType<Map> list = Lists.lazy(params, Map) {
-            if (type.measurementUnit) {
+            if (type?.measurementUnit) {
                 return [type.measurementUnit]
             }
+
             return []
         }
 

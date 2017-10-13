@@ -439,7 +439,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 //TODO: REMOVE PUT INTO SERVICE AND CLASSES
     protected DataModel getDataModel(){
         DataModel dataModel
-        if(resource!=DataModel && resource && params?.id){
+        if(resource!=DataModel && resource!=RelationshipType && resource && params?.id){
             dataModel = (resource.get(params.id)?.dataModel)
         }else if(resource == DataModel && params?.id){
             dataModel = (resource.get(params.id))

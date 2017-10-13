@@ -13,9 +13,9 @@ environments {
             driverClassName = "com.mysql.jdbc.Driver"
             dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
 
-            url = "jdbc:mysql://localhost:3306/ntroletest"
-            username = 'mdradmin'
-            password = 'mdradmin123'
+            url = "jdbc:mysql://localhost:3306/nhs_dd_rbma"
+            username = 'root'
+            password = ''
             dbCreate = "update"
             properties {
                 maxActive = -1

@@ -5,7 +5,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportExcelLoaderDirect
+import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
@@ -78,17 +78,33 @@ class DataImportController  {
 
         Long userId = modelCatalogueSecurityService.currentUser?.id
 
-        //North Thames GMC specific import type for cancer data
-        String suffix = "ca_nt_rawimport.xls"
-        if (checkFileNameContainsAndType(file,suffix)) {
+        // "General Excel file"-- "THE MC Excel file" -- actually the format from ExcelExporter
+        String suffix = "mc.xls"
+        if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
-            def id = asset.id
+            Long id = asset.id
             InputStream inputStream = file.inputStream
             String filename = file.originalFilename
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            executeInBackground(id, "Imported from XML ZIP") {
-                loadSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+            executeInBackground(id, "Imported from Excel") {
+                loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
+            }
+            redirectToAsset(id)
+            return
+        }
+
+        //North Thames GMC specific import type for cancer data
+        suffix = "ca_nt_rawimport.xls"
+        if (checkFileNameTypeAndContainsString(file,suffix)) {
+            Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+            Long id = asset.id
+            InputStream inputStream = file.inputStream
+            String filename = file.originalFilename
+            Workbook wb = WorkbookFactory.create(inputStream)
+            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+            executeInBackground(id, "Imported from Excel") {
+                loadNTSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
             }
             redirectToAsset(id)
             return
@@ -96,15 +112,15 @@ class DataImportController  {
 
         //North Thames GMC specific import type for rare disease data
         suffix = "rd_nt_rawimport.xls"
-        if (checkFileNameContainsAndType(file,suffix)) {
+        if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
-            def id = asset.id
+            Long id = asset.id
             InputStream inputStream = file.inputStream
             String filename = file.originalFilename
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            executeInBackground(id, "Imported from XML ZIP") {
-                loadSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+            executeInBackground(id, "Imported from Excel") {
+                loadNTSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
             }
             redirectToAsset(id)
             return
@@ -112,14 +128,14 @@ class DataImportController  {
 
         //Default excel import - which assumes data is in the 'Grid data' format
         suffix = "openEHR.xls"
-        if (checkFileNameContainsAndType(file,suffix)) {
+        if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
-            def id = asset.id
+            Long id = asset.id
             InputStream inputStream = file.inputStream
             String filename = file.originalFilename
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            executeInBackground(id, "Imported from XML ZIP") {
+            executeInBackground(id, "Imported from Excel") {
                 loadOpenEhrSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
             }
             finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
@@ -129,24 +145,29 @@ class DataImportController  {
 
         //Default excel import - which assumes data is in the 'Grid data' format
         suffix = "xls"
-        if (checkFileNameContainsAndType(file,suffix)) {
+        if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
-            def id = asset.id
+            Long id = asset.id
             InputStream inputStream = file.inputStream
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            executeInBackground(id, "Imported from XML ZIP") {
-                loadGridSpreadsheet(wb)
+            executeInBackground(id, "Imported from Excel") {
+                try {
+                    ExcelLoader parser = new ExcelLoader()
+                    parser.buildModelFromStandardWorkbookSheet(HeadersMap.createForStandardExcelLoader(), inputStream, )
+                    finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
+                } catch (Exception e) {
+                    logError(id, e)
+                }
             }
-            finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
             redirectToAsset(id)
             return
         }
 
 
-        if (checkFileNameContainsAndType(file, '.zip')) {
+        if (checkFileNameTypeAndContainsString(file, '.zip')) {
             Asset asset = assetService.storeAsset(params, file, 'application/zip')
-            def id = asset.id
+            Long id = asset.id
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing archive $file.originalFilename", id)
             InputStream inputStream = file.inputStream
             executeInBackground(id, "Imported from XML ZIP") {
@@ -171,9 +192,9 @@ class DataImportController  {
             return
         }
 
-        if (checkFileNameContainsAndType(file, '.xml')) {
+        if (checkFileNameTypeAndContainsString(file, '.xml')) {
             Asset asset = assetService.storeAsset(params, file, 'application/xml')
-            def id = asset.id
+            Long id = asset.id
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
             executeInBackground(id, "Imported from XML") {
@@ -189,9 +210,9 @@ class DataImportController  {
             return
         }
 
-        if (checkFileNameEndsWith('.obo')) {
+        if (checkFileNameEndsWith(file, '.obo')) {
             Asset asset = assetService.storeAsset(params, file, 'text/obo')
-            def id = asset.id
+            Long id = asset.id
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
             String name = params?.name
@@ -209,9 +230,10 @@ class DataImportController  {
             return
         }
 
-        if (checkFileNameEndsWith('c.csv')) {
+
+        if (checkFileNameEndsWith(file, '.csv')) {
             Asset asset = assetService.storeAsset(params, file, 'application/model-catalogue')
-            def id = asset.id
+            Long id = asset.id
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
 
@@ -228,9 +250,9 @@ class DataImportController  {
             return
         }
 
-        if (checkFileNameEndsWith('.mc')) {
+        if (checkFileNameEndsWith(file, '.mc')) {
             Asset asset = assetService.storeAsset(params, file, 'application/model-catalogue')
-            def id = asset.id
+            Long id = asset.id
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
 
@@ -255,7 +277,7 @@ class DataImportController  {
 
         file.size > 0 && file.originalFilename.endsWith(suffix)
     }
-    protected static boolean checkFileNameContainsAndType(MultipartFile file, String suffix) {
+    protected static boolean checkFileNameTypeAndContainsString(MultipartFile file, String suffix) {
         CONTENT_TYPES.contains(file.getContentType()) &&
             file.size > 0 &&
             file.originalFilename.contains(suffix)
@@ -311,10 +333,10 @@ class DataImportController  {
     }
 
     @Async
-    protected void loadGridSpreadsheet(Workbook wb){
+    protected void loadNTSpreadsheet(Workbook wb){
         auditService.mute {
             try {
-                GMCGridReportExcelLoaderDirect loader = new GMCGridReportExcelLoaderDirect()
+                ExcelLoader loader = new ExcelLoader()
                 loader.updateFromWorkbookSheet(wb, 0)
 
             } catch (Exception e) {
@@ -324,7 +346,7 @@ class DataImportController  {
     }
 
     @Async
-    protected void loadSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
+    protected void loadNTSpreadsheet(Workbook wb, String filename, DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
         Pair<String,String> modelDetails = getModelDetails(suffix)
         auditService.mute {
             try{
@@ -341,21 +363,46 @@ class DataImportController  {
         }
     }
 
+    @Async
+    protected void loadMCSpreadsheet(Workbook wb, String filename, DefaultCatalogueBuilder defaultCatalogueBuilder, Long id, Long userId) {
+        auditService.mute {
+            try {
+                ExcelLoader loader = new ExcelLoader()
+                loader.buildModelFromSpreadsheetFromExcelExporter(
+                        HeadersMap.createForSpreadsheetFromExcelExporter(),
+                        wb,
+                        0,
+                        defaultCatalogueBuilder,
+                        filename.split(/\.mc\.xls/)[0]
+                )
+                finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
+
+            }
+            catch (Exception e) {
+                logError(id, e)
+            }
+        }
+    }
+
 
     @Async
     protected void loadOpenEhrSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
         Pair<String,String> modelDetails = getModelDetails(suffix)
-        auditService.mute {
-            try{
-                OpenEhrExcelLoader loader = new OpenEhrExcelLoader(false)
-                String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_openEHR')
-                List<String> modelNames = loader.loadModel(wb,dataOwner)
-                DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
-                loader.addRelationshipsToModels(referenceModel, modelNames)
-                finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
+        executorService.submit {
+            auditService.mute {
+                try {
+                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader(false)
+                    String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_openEHR')
+                    List<String> modelNames = loader.loadModel(wb, dataOwner)
+                    DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
+                    loader.addRelationshipsToModels(referenceModel, modelNames)
+                    finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {
+                        it.instanceOf(DataModel)
+                    } ?: defaultCatalogueBuilder.created.find { it.dataModel }?.dataModel), userId)
 
-            } catch (Exception e) {
-                logError(id, e)
+                } catch (Exception e) {
+                    logError(id, e)
+                }
             }
         }
     }

@@ -334,6 +334,9 @@ log4j.main = {
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
 
+
+
+
 //    if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
 //        trace 'org.hibernate.type'
 //        trace 'org.hibernate.stat'
@@ -363,6 +366,9 @@ grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatal
 grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.security.Role'
 grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
+
+//this is so that spring econtext can be accessed in seperate threads i.e. in the executer service
+grails.plugin.springsecurity.sch.strategyName = org.springframework.security.core.context.SecurityContextHolder.MODE_INHERITABLETHREADLOCAL
 
 
 // this doesn't work properly, only reliable way is to his in setup-frontend.sh script
@@ -455,15 +461,15 @@ mc.welcome.jumbo = """
 """
 
 mc.welcome.info = """
-        <div class="lead" style="text-align: center">
-            <h2>North Thames Metadata Sandbox</h2>
-            
-            <p width=50% style="text-align: center" >This is a sandbox instance of the metadata exchange, in short we are aiming to do the following: </p>
-                <li>Import site specific mappings from current spreadsheets</li>
-                <li>Create models for each system and placeholder within the catalogue for each site including site specific metadata</li>
-                <li>Assign dataset owners and users</li>
-                <li>Update missing metadata (where possible)</li>
-                <li>Track progress of metadata integration using summary reports</li>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">NHS Digital Sandbox</div>
+          <div class="panel-body">
+            <p width=50% style="text-align: center" >This is a sandbox instance of the metadata exchange, in short we are aiming to demo the following: </p>
+                <li>Metadata Data Management</li>
+                <li>Modelling</li>
+                <li>Master Data Management</li>
+                <li>Rules Management</li>
             </p>
             <p>User documentation is available <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages">here</a>:
 
@@ -474,8 +480,9 @@ mc.welcome.info = """
             <p>and <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/45419911/Editing+Metadata">here</a>
 
             </p>
-            <p></p>
-         </div>
+          </div>
+        </div>
+
 """
 
 grails.plugin.springsecurity.ui.register.defaultRoleNames = [] // no roles

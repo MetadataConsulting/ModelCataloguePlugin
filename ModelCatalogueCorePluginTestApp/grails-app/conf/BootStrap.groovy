@@ -1,4 +1,3 @@
-import grails.rest.render.RenderContext
 import grails.util.Environment
 import groovy.util.logging.Log
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -7,7 +6,6 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
-import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.reports.ReportsRegistry
@@ -21,8 +19,6 @@ import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Metadata
-import org.modelcatalogue.core.util.lists.ListWrapper
-import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod
 
 @Log
@@ -51,23 +47,22 @@ class BootStrap {
             null
         }
 
-        if (Environment.current in [ Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
-            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
-                initCatalogueService.initCatalogue(false)
-                initPoliciesAndTags()
-                initSecurity(false)
-                setupDevTestStuff()
-            }
-        } else {
+//        if (Environment.current in [ Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
+//            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+//                initCatalogueService.initCatalogue(false)
+//                initPoliciesAndTags()
+//                initSecurity(false)
+//                setupDevTestStuff()
+//            }
+//        } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initPoliciesAndTags()
             initSecurity(!System.getenv('MC_BLANK_DEV'))
-        }
+//        }
 
         println 'completed:initCatalogueService'
         log.info "completed:initCatalogueService"
-        //modelCatalogueSearchService.reindex(true)
-
+        modelCatalogueSearchService.reindex(true)
 
         initCatalogueService.setupStoredProcedures()
         println 'completed:setupStoredProcedures'
@@ -126,6 +121,18 @@ class BootStrap {
 //            }
 //            link controller: 'dataModel', action: 'gridSpreadsheet', id: true
 //        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "MC Excel Export" }
+            defaultName { "${it.name} report as MS Excel Document Grid" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.countDeclares() > 0
+            }
+            link controller: 'dataModel', action: 'excelExporterSpreadsheet', id: true
+        }
 
         List<String> northThamesHospitalNames = ['GOSH', 'LNWH', 'MEH', 'UCLH'] // not sure if this should be defined here. Maybe it would be better in a source file, or perhaps a config file.
         List<String> gelSourceModelNames = ['Cancer Model', 'Rare Diseases']
