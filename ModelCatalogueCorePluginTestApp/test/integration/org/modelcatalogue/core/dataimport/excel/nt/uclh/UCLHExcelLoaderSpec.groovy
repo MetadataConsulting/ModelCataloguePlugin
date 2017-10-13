@@ -10,13 +10,12 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter
+import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
-import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 import spock.lang.Shared
 
 import java.nio.charset.StandardCharsets

@@ -19,7 +19,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter
+import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 
 /**
  * Created by david on 04/08/2017.
@@ -197,54 +197,52 @@ class UCLHExcelLoader extends ExcelLoader{
 
 
         Date start = new Date()
-        log.info("Start import to mc" + ownerAndGELModelSuffix )
-        timed("Start import to mc for $ownerAndGELModelSuffix", {
+        log.info("Start import to mc" + ownerSuffix )
         //Iterate through the modelMaps to build new DataModel
         modelMaps.each { String name, List<Map<String, String>> rowMapsForModel ->
 
-           // timed(
-           // "Start import of model $name",
-           // {
             DataModel newModel = getDataModel(name)
-            newModel.addExtension(GMCGridReportXlsxExporter.organizationMetadataKey, organization)
+            Date startModelImport = new Date()
+            log.info("Start import of model" + name )
             //Iterate through each row to build an new DataElement
             rowMapsForModel.each{ Map<String, String> rowMap ->
                 String ntname = getNTElementName(rowMap)
                 String ntdescription = rowMap['Description'] ?: rowMap['DE Description']
-
-               // timed(
-               // "Start import of element $ntname",
-               // {
+                Date startElementInport = new Date()
+                log.info("Start import of model" + name )
                 DataElement newElement = new DataElement(name: ntname, description:  ntdescription , DataModel: newModel ).save(flush:true, failOnError: true)
+                Date stage1ElementImport = new Date()
+                TimeDuration tdElementImport1 = TimeCategory.minus( stage1ElementImport, startElementInport )
+                log.info("Stage1 import, element= " + newElement.name + "duration:" + tdElementImport1 )
 
                 newElement.setDataModel(newModel)
+                Date stage2ElementImport = new Date()
+                TimeDuration tdElementImport2 = TimeCategory.minus( stage2ElementImport, startElementInport )
+                log.info("Stage2 import, element= " + newElement.name + "duration:" + tdElementImport2 )
+
                 //Add in metadata
                 metadataHeaders.each { k, v ->
                     newElement.addExtension(v, rowMap[k])
                 }
+                Date stage3ElementImport = new Date()
+                TimeDuration tdElementImport3 = TimeCategory.minus( stage3ElementImport, startElementInport )
+                log.info("Stage3 import, element= " + newElement.name + "duration:" + tdElementImport3 )
+
                 Long ref = getMCIdFromSpreadSheet(rowMap)
                 //Add metadata for adding in relationship to reference model
                 newElement.addExtension("represents", ref as String)
-                return newElement.name
-                //},
-               // {String newElementName ->
-               //     "Complete element import, element = $newElementName"
-               // })
-
+                Date stopElementImport = new Date()
+                TimeDuration tdElementImport = TimeCategory.minus( stopElementImport, startElementInport )
+                log.info("Complete element import, element= " + newElement.name + "duration:" + tdElementImport )
             }
-            return newModel.name
-           // },
-          //  {String newModelName ->
-          //      "Complete model import, model = $newModelName"
-          //  })
-
+            Date stopModelImport = new Date()
+            TimeDuration tdModelImport = TimeCategory.minus( stopModelImport, startModelImport )
+            log.info("Complete model import, model= " + newModel.name + "duration:" + tdModelImport )
 
         }
-        return ''
-        },
-        {String unused ->
-            "Completed import to mc for $ownerAndGELModelSuffix"
-        })
+        Date stop = new Date()
+        TimeDuration td = TimeCategory.minus( stop, start )
+        log.info("Complete import, " + ownerSuffix  +  "duration:" + td )
         return modelNames
     }
     void timed(String startMessage, Closure<String> block, Closure<String> endMessageFromResultOfBlock) {

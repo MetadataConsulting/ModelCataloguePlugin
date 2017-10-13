@@ -115,17 +115,17 @@ class BootStrap {
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
 
-        reportsRegistry.register {
-            creates asset
-            title { "Grid Report Spreadsheet" }
-            defaultName { "${it.name} report as MS Excel Document Grid" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.countDeclares() > 0
-            }
-            link controller: 'dataModel', action: 'gridSpreadsheet', id: true
-        }
+//        reportsRegistry.register {
+//            creates asset
+//            title { "Grid Report Spreadsheet" }
+//            defaultName { "${it.name} report as MS Excel Document Grid" }
+//            depth 3
+//            type DataModel
+//            when { DataModel dataModel ->
+//                dataModel.countDeclares() > 0
+//            }
+//            link controller: 'dataModel', action: 'gridSpreadsheet', id: true
+//        }
 
         List<String> northThamesHospitalNames = ['GOSH', 'LNWH', 'MEH', 'UCLH'] // not sure if this should be defined here. Maybe it would be better in a source file, or perhaps a config file.
         List<String> gelSourceModelNames = ['Cancer Model', 'Rare Diseases']

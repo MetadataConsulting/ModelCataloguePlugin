@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.norththames
 
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter
+import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 
 import org.springframework.http.HttpStatus
 
