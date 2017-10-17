@@ -112,6 +112,7 @@ class InitCatalogueService {
             log.info "Importing MC file ${resource.URI}"
             Set<CatalogueElement> lastCreated = importMCFile(resource.inputStream, true)
             for (CatalogueElement element in lastCreated) {
+                element.refresh()
                 if (element.status == ElementStatus.DRAFT) {
                     elementService.finalizeElement(element)
                 }

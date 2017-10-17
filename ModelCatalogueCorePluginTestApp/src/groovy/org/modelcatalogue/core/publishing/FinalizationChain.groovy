@@ -38,6 +38,7 @@ class FinalizationChain extends PublishingChain {
         }
 
         published.status = ElementStatus.PENDING
+        published.merge()
         published.save()
 
         for (CatalogueElement element in publishedDataModel.declares) {
