@@ -177,8 +177,7 @@ grails.project.dependency.resolution = {
 
         runtime ":angular-template-asset-pipeline:2.3.0"
 
-//        runtime ":hibernate4:4.3.5.5"
-        runtime  ":hibernate:3.6.10.18"
+        runtime ":hibernate4:4.3.10" // or ":hibernate:3.6.10.18"
 
         compile ":executor:0.3"
 
