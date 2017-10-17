@@ -10,7 +10,10 @@ interface Auditor {
 
     Long getParentChangeId()
     void setParentChangeId(Long id)
-
+    /**
+     * The auditor should be muted when, and only when, getSystem() returns true.
+     * @return
+     */
     Boolean getSystem()
     void setSystem(Boolean system)
 

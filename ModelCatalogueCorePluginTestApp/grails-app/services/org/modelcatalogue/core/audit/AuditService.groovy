@@ -34,7 +34,7 @@ class AuditService {
 
     static Callable<Auditor> auditorFactory = { throw new IllegalStateException("Application is not initialized yet") }
 
-    private static ThreadLocal<Auditor> auditor = new ThreadLocal<Auditor>() {
+    private static ThreadLocal<Auditor> auditorThreadLocalVar = new ThreadLocal<Auditor>() {
         protected Auditor initialValue() {
             return auditorFactory()
         }
@@ -59,7 +59,7 @@ class AuditService {
      */
     public <R> R mute(Closure<R> noAuditBlock) {
         SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
-        Auditor auditor = auditor.get()
+        Auditor auditor = auditorThreadLocalVar.get()
         Boolean currentSystem = auditor.system
         auditor.system = true
         sessionFactory.currentSession?.flush()
@@ -79,7 +79,7 @@ class AuditService {
      */
     public <R> R withDefaultAuthorId(Long defaultAuthorId, Closure<R> withDefaultAuthorBlock) {
         SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
-        Auditor auditor = auditor.get()
+        Auditor auditor = auditorThreadLocalVar.get()
         Long currentDefault = auditor.defaultAuthorId
         auditor.defaultAuthorId = defaultAuthorId
         sessionFactory.currentSession?.flush()
@@ -100,7 +100,7 @@ class AuditService {
      */
     public <R> R withParentId(Long parentId, Closure<R> withParentBlock) {
         SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
-        Auditor auditor = auditor.get()
+        Auditor auditor = auditorThreadLocalVar.get()
         Long currentParent = auditor.parentChangeId
         auditor.parentChangeId = parentId
         sessionFactory.currentSession?.flush()
@@ -112,7 +112,7 @@ class AuditService {
 
     public <R> R withDefaultAuthorAndParentAction(Long defaultAuthorId, Long parentId, Closure<R> withDefaultAuthorBlock) {
         SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
-        Auditor auditor = auditor.get()
+        Auditor auditor = auditorThreadLocalVar.get()
 
         Long currentDefault = auditor.defaultAuthorId
         auditor.defaultAuthorId = defaultAuthorId
@@ -326,102 +326,127 @@ class AuditService {
     }
 
     CatalogueElement logNewVersionCreated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        Long changeId = auditor.get().logNewVersionCreated(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first()
-        CatalogueElement ce = withParentId(changeId, createDraftBlock)
-        if (!ce) {
-            return ce
+        Auditor auditor = auditorThreadLocalVar.get()
+        if (auditor.getSystem()) { // muted
+            return createDraftBlock()
         }
-        if (changeId) {
-            Change change = Change.get(changeId)
-            if (!change) {
-                Change.withSession {
-                    it.flush()
-                }
-                change = Change.get(changeId)
-                if (!change) {
-                    log.error("Cannot bind changedId to Change[$changeId] - not found")
-                    return ce
-                }
+        else {
+            Long changeId = auditor.logNewVersionCreated(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first()
+            CatalogueElement ce = withParentId(changeId, createDraftBlock)
+            if (!ce) {
+                return ce
             }
-            change.changedId = ce.id
-            change.dateCreated = new Date()
-            FriendlyErrors.failFriendlySave(change)
+            if (changeId) {
+                Change change = Change.get(changeId)
+                if (!change) {
+                    Change.withSession {
+                        it.flush()
+                    }
+                    change = Change.get(changeId)
+                    if (!change) {
+                        log.error("Cannot bind changedId to Change[$changeId] - not found")
+                        return ce
+                    }
+                }
+                change.changedId = ce.id
+                change.dateCreated = new Date()
+                FriendlyErrors.failFriendlySave(change)
+            }
+            ce
         }
-        ce
     }
 
-    CatalogueElement logElementFinalized(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        withParentId(auditor.get().logElementFinalized(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), createDraftBlock)
+    CatalogueElement logElementFinalized(CatalogueElement element, Closure<CatalogueElement> finalizeElementBlock) {
+        Auditor auditor = auditorThreadLocalVar.get()
+        if (auditor.getSystem()) { // muted
+            return finalizeElementBlock()
+        }
+        else {
+            withParentId(auditor.logElementFinalized(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), finalizeElementBlock)
+        }
     }
 
 
-    CatalogueElement logElementDeprecated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        withParentId(auditor.get().logElementDeprecated(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), createDraftBlock)
+    CatalogueElement logElementDeprecated(CatalogueElement element, Closure<CatalogueElement> deprecateElementBlock) {
+        Auditor auditor = auditorThreadLocalVar.get()
+        if (auditor.getSystem()) { // muted
+            return deprecateElementBlock()
+        }
+        else {
+            withParentId(auditor.logElementDeprecated(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), deprecateElementBlock)
+        }
     }
 
-    CatalogueElement logExternalChange(CatalogueElement source, Long authorId, String message, Closure<CatalogueElement> createDraftBlock) {
-        withDefaultAuthorAndParentAction(authorId ,auditor.get().logExternalChange(source, message, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), createDraftBlock)
+    CatalogueElement logExternalChange(CatalogueElement source, Long authorId, String message, Closure<CatalogueElement> externalChangeBlock) {
+        Auditor auditor = auditorThreadLocalVar.get()
+        if (auditor.getSystem()) { // muted
+            return externalChangeBlock()
+        }
+        else {
+            withDefaultAuthorAndParentAction(authorId ,auditor.logExternalChange(source, message, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), externalChangeBlock)
+        }
+
     }
 
 
     void logNewMetadata(ExtensionValue extension) {
-        auditor.get().logNewMetadata(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logNewMetadata(extension, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logMetadataUpdated(ExtensionValue extension) {
-        auditor.get().logMetadataUpdated(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logMetadataUpdated(extension, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logMetadataDeleted(ExtensionValue extension) {
-        auditor.get().logMetadataDeleted(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logMetadataDeleted(extension, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logNewRelationshipMetadata(RelationshipMetadata extension) {
-        auditor.get().logNewRelationshipMetadata(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logNewRelationshipMetadata(extension, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logRelationshipMetadataUpdated(RelationshipMetadata extension) {
-        auditor.get().logRelationshipMetadataUpdated(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logRelationshipMetadataUpdated(extension, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logRelationshipMetadataDeleted(RelationshipMetadata extension) {
-        auditor.get().logRelationshipMetadataDeleted(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logRelationshipMetadataDeleted(extension, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logElementCreated(CatalogueElement element) {
-        auditor.get().logElementCreated(element, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logElementCreated(element, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logElementDeleted(CatalogueElement element) {
-        auditor.get().logElementDeleted(element, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logElementDeleted(element, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logElementUpdated(CatalogueElement element) {
-        auditor.get().logElementUpdated(element, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logElementUpdated(element, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logMappingCreated(Mapping mapping) {
-        auditor.get().logMappingCreated(mapping, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logMappingCreated(mapping, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logMappingDeleted(Mapping mapping) {
-        auditor.get().logMappingDeleted(mapping, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logMappingDeleted(mapping, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logMappingUpdated(Mapping mapping) {
-        auditor.get().logMappingUpdated(mapping, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logMappingUpdated(mapping, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logNewRelation(Relationship relationship) {
-        auditor.get().logNewRelation(relationship, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logNewRelation(relationship, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logRelationRemoved(Relationship relationship) {
-        auditor.get().logRelationRemoved(relationship, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logRelationRemoved(relationship, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logRelationArchived(Relationship relationship) {
-        auditor.get().logRelationArchived(relationship, modelCatalogueSecurityService.currentUser?.id)
+        auditorThreadLocalVar.get().logRelationArchived(relationship, modelCatalogueSecurityService.currentUser?.id)
     }
 
 
