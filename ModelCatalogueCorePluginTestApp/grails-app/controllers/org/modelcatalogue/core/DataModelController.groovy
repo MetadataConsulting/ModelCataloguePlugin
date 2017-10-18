@@ -46,6 +46,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
     ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy
 
+    FavouriteService favouriteService
+
     AclService aclService
 
 	DataModelController() {
@@ -143,7 +145,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
 
         if (favoriteAfterUpdate && modelCatalogueSecurityService.userLoggedIn && instance) {
-            modelCatalogueSecurityService.currentUser?.createLinkTo(instance, RelationshipType.favouriteType)
+            favouriteService.favouriteModel(instance)
         }
 
         ObjectIdentity objectIdentity = objectIdentityRetrievalStrategy.getObjectIdentity(instance)

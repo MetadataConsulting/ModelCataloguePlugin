@@ -27,7 +27,7 @@ class DataModelGormService {
     @PreAuthorize("hasPermission(#id, 'org.modelcatalogue.core.DataModel', read) or hasPermission(#id, 'org.modelcatalogue.core.DataModel', admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
     @Transactional(readOnly = true)
     DataModel read(long id) {
-        DataModel.read(id)
+        DataModel.get(id)
     }
 
     @PreAuthorize("hasPermission(#id, 'org.modelcatalogue.core.DataModel', admin)  or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")

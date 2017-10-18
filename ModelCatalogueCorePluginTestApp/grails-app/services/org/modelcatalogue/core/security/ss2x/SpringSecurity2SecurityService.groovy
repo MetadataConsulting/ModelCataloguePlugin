@@ -8,7 +8,9 @@ import grails.util.Holders
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.LogoutListeners
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.SecurityService
+import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
@@ -40,14 +42,10 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if (!authority) {
             return false
         }
-        String translated = getRolesFromAuthority(authority)
-        Set<Role> roles = []
-        translated.split(",").each{
-            Role role = Role.findByAuthority(it)
-            if(role) roles.add(role)
+        Collection<String> roles = MetadataRolesUtils.getRolesFromAuthority(authority)
+        if ( !SpringSecurityUtils.ifAnyGranted(roles.join(',')) ) {
+            return false
         }
-
-        if(roles.size()==0) false
 
         //find if the user has a role for a model, i.e. if they are authorised, for any of the roles
         return isAuthorised(dataModel, roles)
@@ -61,24 +59,8 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if (!authority) {
             return false
         }
-        String translated = getRolesFromAuthority(authority)
-        return SpringSecurityUtils.ifAnyGranted(translated)
-    }
-
-    private String getRolesFromAuthority(String authority){
-        String translated = authority
-        if (authority == "VIEWER") {
-            translated = "ROLE_USER,ROLE_METADATA_CURATOR,ROLE_ADMIN,ROLE_SUPERVISOR"
-        }  else if (authority == "CURATOR") {
-            translated = "ROLE_METADATA_CURATOR,ROLE_ADMIN,ROLE_SUPERVISOR"
-        } else if (authority == "ADMIN") {
-            translated = "ROLE_ADMIN,ROLE_SUPERVISOR"
-        } else if (authority == "SUPERVISOR") {
-            translated = "ROLE_SUPERVISOR"
-        } else if (!translated.startsWith('ROLE_')) {
-            translated = "ROLE_${translated}"
-        }
-        translated
+        String roles = MetadataRolesUtils.getRolesFromAuthority(authority).join(',')
+        return SpringSecurityUtils.ifAnyGranted(roles)
     }
 
     String encodePassword(String password) {
@@ -131,7 +113,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     }
 
     //check if a user has the a specific role for a data model
-    boolean isAuthorised(DataModel dataModel, Set<Role> roles) {
+    boolean isAuthorised(DataModel dataModel, Collection<String> roles) {
 
         //check if the user is a supervisor - if they are, they are authorised to do everything
         if(isSupervisor()) return true
@@ -142,12 +124,12 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
         // if a user has any of the roles included then they are authorised
         boolean hasRole = false
-        roles.any { Role role ->
-            if (UserRole.findAllByUserAndDataModelAndRole(getCurrentUser(), dataModel, role)) {
-                hasRole = true
-                return true
-            }
-        }
+//        roles.any { Role role ->
+//            if (UserRole.findAllByUserAndDataModelAndRole(getCurrentUser(), dataModel, role)) {
+//                hasRole = true
+//                return true
+//            }
+//        }
         return hasRole
     }
 

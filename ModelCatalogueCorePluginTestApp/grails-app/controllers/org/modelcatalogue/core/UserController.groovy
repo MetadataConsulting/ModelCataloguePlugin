@@ -2,7 +2,9 @@ package org.modelcatalogue.core
 
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
@@ -15,6 +17,8 @@ class UserController extends AbstractCatalogueElementController<User> {
 
     SpringSecurityService springSecurityService
 
+    FavouriteService favouriteService
+
     UserController() {
         super(User, false)
     }
@@ -25,14 +29,17 @@ class UserController extends AbstractCatalogueElementController<User> {
      * @param id The id of the resource
      * @return The rendered resource or a 404 if it doesn't exist
      */
-    def show() {
+    def show(Long id) {
 
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+        List<String> roles = MetadataRolesUtils.getRolesFromAuthority('ADMIN')
+        boolean requestedIdIsForTheLoggedUser = id == springSecurityService.principal.id
+
+        if ( !(requestedIdIsForTheLoggedUser || SpringSecurityUtils.ifAnyGranted(roles.join(','))) ) {
             notFound()
             return
         }
 
-        User element = queryForResource(params.id)
+        User element = queryForResource(id)
 
         if (!element) {
             notFound()
@@ -84,12 +91,14 @@ class UserController extends AbstractCatalogueElementController<User> {
         respond modelCatalogueSecurityService.usersLastSeen.sort { it.value }.collect { [username: it.key, lastSeen: new Date(it.value)] }.reverse()
     }
 
-    def addFavourite(Long id) {
-        addRelation(id, 'favourite', true)
+    def addFavourite() {
+        Long dataModelId = request.JSON.id
+        favouriteService.favouriteModelById(dataModelId)
     }
 
-    def removeFavourite(Long id) {
-        removeRelation(id, 'favourite', true)
+    def removeFavourite() {
+        Long dataModelId = request.JSON.id
+        favouriteService.unfavouriteModelById(dataModelId)
     }
 
     def enable() {
