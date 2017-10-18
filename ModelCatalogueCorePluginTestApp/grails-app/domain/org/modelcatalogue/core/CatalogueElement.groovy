@@ -457,13 +457,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     void afterInsert() {
         auditService.logElementCreated(this)
-        User currentUser = modelCatalogueSecurityService.getCurrentUser()
-        //if this is a data model add this data model, otherwise add the data model of the class.
-        if(this.instanceOf(DataModel) && currentUser) {
-            modelCatalogueSecurityService.addUserRoleModel(currentUser, Role.findByAuthority('ROLE_SUPERVISOR'), this)
-            //modelCatalogueSecurityService.addUserRoleModel(currentUser, Role.findByAuthority('ROLE_METADATA_CURATOR'), this)
-        }
-
     }
 
     void beforeInsert() {

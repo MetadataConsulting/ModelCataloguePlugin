@@ -32,6 +32,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def auditService
     def dataModelService
     def dataClassService
+    DataModelGormService dataModelGormService
 
     //used to run reports in background thread
     ExecutorService executorService
@@ -44,22 +45,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         super(resource, false)
     }
 
-
-
-    /**
-     * All requests are intercepted and the users role is checked against the required data model
-     * if they do not have the correct access they are requested to loginurl
-     */
-
-    def beforeInterceptor = {
-//        println "Tracing action ${actionUri}, tracing resource ${resource}"
-       if(resource!=User && getDataModel()) {
-            if(!modelCatalogueSecurityService.isSubscribed(getDataModel())){
-                response.sendError HttpServletResponse.SC_UNAUTHORIZED
-                return false
-            }
-        }
-    }
 
     /**
      * get all incoming relationships for a catalogue element
@@ -444,7 +429,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        DataModel destinationDataModel = DataModel.get(params.destinationDataModelId)
+        DataModel destinationDataModel = dataModelGormService.read(params.long('destinationDataModelId'))
 
         if (!modelCatalogueSecurityService.hasRole('CURATOR', destinationDataModel)) {
             unauthorized()
@@ -736,7 +721,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             }
 
             def dataModelObject = otherSide.dataModel ?: otherSide.classification
-            DataModel dataModel = dataModelObject ? DataModel.get(dataModelObject.id) : null
+            DataModel dataModel = dataModelObject ? dataModelGormService.get(dataModelObject.id as Long) : null
 
             Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType, dataModel) :  relationshipService.unlink(destination, source, relationshipType, dataModel)
             if (!old) {
@@ -784,13 +769,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             def newDataModel = objectToBind['__dataModel'] ?: objectToBind['__classification']
             Long dataModelId = newDataModel instanceof Map ? newDataModel.id as Long : null
 
-            DataModel dataModel = dataModelId ? DataModel.get(dataModelId) : null
+            DataModel dataModel = dataModelId ? dataModelGormService.get(dataModelId) : null
 
 
             def oldDataModel = objectToBind['__oldDataModel'] ?: objectToBind['__oldClassification']
             Long oldDataModelId = oldDataModel instanceof Map ? oldDataModel.id as Long : null
 
-            DataModel oldDataModelInstance = oldDataModelId ? DataModel.get(oldDataModelId) : null
+            DataModel oldDataModelInstance = oldDataModelId ? dataModelGormService.get(oldDataModelId) : null
 
             if (dataModelId && !dataModel) {
                 notFound()
@@ -1051,7 +1036,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
         for (domain in dataModels) {
-            DataModel dataModel = DraftContext.userFriendly().findExisting(DataModel.get(domain.id as Long)) as DataModel
+            DataModel dataModel = DraftContext.userFriendly().findExisting(dataModelGormService.get(domain.id as Long)) as DataModel
             if (!dataModel) {
                 log.error "No data model exists for $domain"
                 continue
@@ -1082,7 +1067,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         DataModel effectiveDataModel = instance.dataModel
         def dataModels = objectToBind.classifications ?: objectToBind.dataModels
         if (dataModels) {
-            effectiveDataModel = DataModel.get(dataModels.first().id as Long)
+            effectiveDataModel = dataModelGormService.get(dataModels.first().id as Long)
         }
 
         if (!effectiveDataModel && resource == DataModel) {
@@ -1101,7 +1086,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     //TODO: not sure what this does
     protected DataModelFilter getOverridableDataModelFilter() {
         if (params.dataModel) {
-            DataModel dataModel = DataModel.get(params.long('dataModel'))
+            DataModel dataModel = dataModelGormService.get(params.long('dataModel'))
             if (dataModel) {
                 return DataModelFilter.includes(dataModel)
             }

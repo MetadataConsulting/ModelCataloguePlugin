@@ -14,12 +14,15 @@ class DataClassService {
     SecurityService modelCatalogueSecurityService
     DataModelService dataModelService
     PerformanceUtilService performanceUtilService
+    DataModelGormService dataModelGormService
 
     ListWithTotalAndType<DataClass> getTopLevelDataClasses(Map params = [:]) {
         getTopLevelDataClasses(dataModelService.dataModelFilter, params)
     }
 
-    ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter, Map params = [:], boolean canViewDrafts = modelCatalogueSecurityService.isSubscribed(dataModelFilter.includes)) {
+    ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter,
+                                                           Map params = [:],
+                                                           boolean canViewDrafts = dataModelGormService.hasAccessToEveryDataModelInFilterIncludes(dataModelFilter) ) {
         RelationshipType hierarchy = RelationshipType.hierarchyType
         List<ElementStatus> status = ElementService.getStatusFromParams(params, canViewDrafts)
 

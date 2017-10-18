@@ -3,6 +3,7 @@ package org.modelcatalogue.core.genomics
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.DataModelGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.gel.GenomicsService
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
@@ -15,9 +16,10 @@ class GenomicsController {
 
     DataClassService dataClassService
     GenomicsService genomicsService
+    DataModelGormService dataModelGormService
 
     def exportRareDiseaseHPOAndClinicalTestsAsJson() {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -38,7 +40,7 @@ class GenomicsController {
     }
 
     def exportRareDiseaseListAsJson() {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -66,7 +68,7 @@ class GenomicsController {
     }
 
     def exportRareDiseaseHPOEligibilityCriteriaAsJson() {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -91,7 +93,7 @@ class GenomicsController {
     }
 
     def exportRareDiseaseCsv(def docType) {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -112,7 +114,7 @@ class GenomicsController {
     }
 
     def exportRareDiseaseDisorderListAsCsv() {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -146,7 +148,7 @@ class GenomicsController {
 
 
     private void exportEligibilityOrPhenotypesAndTests(boolean eligibilityMode) {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -169,7 +171,7 @@ class GenomicsController {
 
     def exportRareDiseaseSplitDocs() {
 
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -199,7 +201,7 @@ class GenomicsController {
 
 
     def exportCancerTypesAsJson() {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -220,7 +222,7 @@ class GenomicsController {
     }
 
     def exportCancerTypesAsCsv() {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -241,7 +243,7 @@ class GenomicsController {
     }
 
     def exportRareDiseaseHPOAndClinicalTestsAsXls() {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -262,7 +264,7 @@ class GenomicsController {
     }
 
     def exportRareDiseaseEligibilityChangeLogAsXls() {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -282,7 +284,7 @@ class GenomicsController {
     }
 
     def exportChangeLogDocument(String name, Integer depth, Boolean includeMetadata) {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -303,8 +305,7 @@ class GenomicsController {
     }
 
     def exportDataSpecChangeLogAsXls() {
-
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -318,8 +319,7 @@ class GenomicsController {
     }
 
     def exportAllRareDiseaseReports() {
-
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -343,8 +343,7 @@ class GenomicsController {
     }
 
     def exportAllCancerReports() {
-
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND
@@ -366,7 +365,7 @@ class GenomicsController {
     }
 
     def exportRareDiseasesWebsite() {
-        DataModel model = DataModel.get(params.id)
+        DataModel model = dataModelGormService.read(params.long('id'))
 
         if (!model) {
             respond status: HttpStatus.NOT_FOUND

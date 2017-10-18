@@ -24,7 +24,7 @@ class DataArchitectService {
     def actionService
     def dataModelService
     def sessionFactory
-
+    DataModelGormService dataModelGormService
 
     //commented out the functions that are no longer relevant or don't work
     //TODO: finish these functions
@@ -361,8 +361,8 @@ class DataArchitectService {
     }
 
     private void generatePossibleEnumDuplicatesAndSynonyms(String dataModelAID, String dataModelBID){
-        DataModel dataModelA = DataModel.get(dataModelAID)
-        DataModel dataModelB = DataModel.get(dataModelBID)
+        DataModel dataModelA = dataModelGormService.read(dataModelAID as Long)
+        DataModel dataModelB = dataModelGormService.read(dataModelBID as Long)
         Batch.findAllByNameIlike("Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
         Batch batch = Batch.findOrSaveByName("Generating Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
         def matchingDataElements = elementService.findDuplicateEnumerationsSuggestions(dataModelA.id, dataModelB.id)
@@ -396,8 +396,8 @@ class DataArchitectService {
      *
      */
     private void generateDataElementSuggestionsExact(String dataModelAID, String dataModelBID){
-        DataModel dataModelA = DataModel.get(dataModelAID)
-        DataModel dataModelB = DataModel.get(dataModelBID)
+        DataModel dataModelA = dataModelGormService.read(dataModelAID as Long)
+        DataModel dataModelB = dataModelGormService.read(dataModelBID as Long)
         Batch.findAllByNameIlike("Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
         Batch batch = Batch.findOrSaveByName("Generating Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
         def matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
@@ -435,8 +435,8 @@ class DataArchitectService {
      */
 
     private void generateDataElementSuggestionsFuzzy(String dataModelAID, String dataModelBID, String minScore){
-        DataModel dataModelA = DataModel.get(dataModelAID)
-        DataModel dataModelB = DataModel.get(dataModelBID)
+        DataModel dataModelA = dataModelGormService.read(dataModelAID as Long)
+        DataModel dataModelB = dataModelGormService.read(dataModelBID as Long)
         Batch.findAllByNameIlike("Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
         Batch batch = Batch.findOrSaveByName("Generating suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
         def score

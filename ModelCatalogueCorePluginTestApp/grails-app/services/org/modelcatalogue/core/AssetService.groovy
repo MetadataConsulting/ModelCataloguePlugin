@@ -19,7 +19,7 @@ import java.security.DigestOutputStream
 import java.security.MessageDigest
 import java.util.concurrent.ExecutorService
 
-@CompileStatic
+//@CompileStatic
 class AssetService {
 
     StorageService modelCatalogueStorageService
@@ -27,6 +27,7 @@ class AssetService {
     ExecutorService executorService
     SecurityService modelCatalogueSecurityService
     AuditService auditService
+    DataModelGormService dataModelGormService
 
     private static final long GIGA = 1024 * 1024 * 1024
     private static final long MEGA = 1024 * 1024
@@ -44,7 +45,7 @@ class AssetService {
     }
 
     Asset upload(Long id, Long dataModelId, String name, String description, MultipartFile file, String filename = file.originalFilename) {
-        Asset asset = dataModelId ? new Asset(dataModel: DataModel.get(dataModelId)) : new Asset()
+        Asset asset = dataModelId ? new Asset(dataModel: dataModelGormService.read(dataModelId)) : new Asset()
 
         if (file.size > modelCatalogueStorageService.maxFileSize) {
             asset.errors.rejectValue('md5', 'asset.uploadfailed', "You cannot upload files greater than ${toBytes(modelCatalogueStorageService.maxFileSize)}")

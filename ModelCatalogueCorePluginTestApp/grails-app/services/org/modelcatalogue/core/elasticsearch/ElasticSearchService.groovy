@@ -91,6 +91,8 @@ class ElasticSearchService implements SearchCatalogue {
     DataModelService dataModelService
     ElementService elementService
     SecurityService modelCatalogueSecurityService
+    DataModelGormService dataModelGormService
+
     Node node
     Client client
 
@@ -433,7 +435,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     //get all of the indicies associated with a data model
     private List<String> collectDataModelIndicies(Map params, List<Class> types) {
-        DataModelFilter filter = getOverridableDataModelFilter(params, modelCatalogueSecurityService.getSubscribed())
+        DataModelFilter filter = getOverridableDataModelFilter(params, dataModelGormService.findAll())
 
         if (!filter) {
             return types.collect { ElasticSearchService.getGlobalIndexName(it) }
@@ -926,7 +928,7 @@ class ElasticSearchService implements SearchCatalogue {
                 // and check that you should include the results for the imports as well in search results
                 if (dataModelId) {
                         if (subscribedModels.findResults { it.id }.contains(dataModelId)) {
-                            DataModel dataModel = DataModel.get(dataModelId)
+                            DataModel dataModel = dataModelGormService.read(dataModelId)
                             if (dataModel) {
                                 if(params.get('searchImports')!="false") {
                                     return DataModelFilter.includes(dataModel).withImports(subscribedModels)

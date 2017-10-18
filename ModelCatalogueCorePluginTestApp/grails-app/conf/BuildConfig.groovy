@@ -198,6 +198,8 @@ grails.project.dependency.resolution = {
         compile ':spring-security-oauth-google:0.1'
         compile ':spring-security-oauth-twitter:0.1'
         compile ':spring-security-oauth-facebook:0.1'
+
+        compile ':spring-security-acl:2.0.1'
     }
 }
 

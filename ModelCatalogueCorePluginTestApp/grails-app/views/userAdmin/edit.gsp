@@ -63,46 +63,14 @@ if (isOpenId) {
 		</table>
 	</s2ui:tab>
 
-	<s2ui:tab name='roles' height='auto'>
-
-		<h2>General Roles</h2>
-		<p>These roles determine general access, such as whether you can view a list of all the draft models in the application or administer users.</p>
-
-		<g:each var="entry" in="${generalRoles}">
+	<s2ui:tab name='roles' height='275'>
+		<g:each var="entry" in="${roleMap}">
 		<div>
 			<g:checkBox name="${entry.key.authority}" value="${entry.value}"/>
 			<g:link controller='role' action='edit' id='${entry.key.id}'>${entry.key.authority.encodeAsHTML()}</g:link>
 		</div>
 		</g:each>
-
-		</br>
-
-		<h2>Specific Roles</h2>
-		<p>These roles are specific to a model - a user could be a curator on one model but not have access to view the elements of another model</p>
-		<p>NOTE: by aware of imports - if a model imports another model you should give the users ROLE_USER access, otherwise they may not be able to view some elements</p>
-		<table>
-			<tr>
-				<th>&nbsp;</th>
-				<g:each var="roles" in="${specificRoles}">
-					<th>${roles.authority}</th>
-				</g:each>
-			</tr>
-
-			<g:each var="model" in="${userRoles}">
-				<tr>
-					<th>${model?.value?.name}</th>
-
-					<g:each var="role" in="${model.value?.roleList}">
-						<td>
-							<g:checkBox name="${model?.key}-${role.key?.authority}" value="${role.value}"/>
-						</td>
-					</g:each>
-				</tr>
-			</g:each>
-
-		</table>
 	</s2ui:tab>
-
 
 	<g:if test='${isOpenId}'>
 	<s2ui:tab name='openIds' height='275'>

@@ -115,7 +115,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
 
        String resourceName = "/${resourceName}/"
 
-       DataModel dataModel = DataModel.get(params.long('dataModel'))
+       DataModel dataModel = dataModelGormService.read(params.long('dataModel'))
 
        ListWithTotalAndType<DataType>  typeListing = dataTypeService.findAllDataTypesInModel(params, dataModel)
 

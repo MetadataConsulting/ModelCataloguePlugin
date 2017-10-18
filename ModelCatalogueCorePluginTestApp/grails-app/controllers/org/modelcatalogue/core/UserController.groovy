@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.converters.JSON
+import grails.plugin.springsecurity.SpringSecurityService
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
@@ -11,6 +12,8 @@ import org.modelcatalogue.core.util.DataModelFilter
 class UserController extends AbstractCatalogueElementController<User> {
 
     UserService userService
+
+    SpringSecurityService springSecurityService
 
     UserController() {
         super(User, false)
@@ -56,20 +59,21 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def current() {
-        if (!modelCatalogueSecurityService.currentUser) {
+        if ( !springSecurityService.isLoggedIn() ) {
             render([success: false, username: null, roles: [], id: null, classifications: []] as JSON)
             return
         }
+        User currentUser = modelCatalogueSecurityService.currentUser
+        DataModelFilter filter = DataModelFilter.from(currentUser)
 
-        DataModelFilter filter = DataModelFilter.from(modelCatalogueSecurityService.currentUser)
-
-        render([
+        Map m = [
                 success: true,
-                username: modelCatalogueSecurityService.currentUser.username,
-                roles: modelCatalogueSecurityService.getRoles(params?.dataModelId),
-                id: modelCatalogueSecurityService.currentUser.hasProperty('id') ? modelCatalogueSecurityService.currentUser.id : null,
+                username: currentUser.username,
+                roles: currentUser.getAuthorities()*.authority,
+                id: currentUser.hasProperty('id') ? currentUser.id : null,
                 dataModels: filter.toMap()
-        ] as JSON)
+        ]
+        render(m as JSON)
     }
 
     def lastSeen() {

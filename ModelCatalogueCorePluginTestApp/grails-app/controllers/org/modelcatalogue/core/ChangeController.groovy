@@ -18,6 +18,7 @@ class ChangeController extends RestfulController<Change> {
 
     def auditService
     def dataModelService
+    DataModelGormService dataModelGormService
 
     def undo() {
         Change change = Change.get(params.id)
@@ -63,7 +64,7 @@ class ChangeController extends RestfulController<Change> {
 
     def dataModelActivity(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        DataModel element = DataModel.get(params.id)
+        DataModel element = dataModelGormService.read(params.long('id'))
         if (!element) {
             notFound()
             return
@@ -85,7 +86,7 @@ class ChangeController extends RestfulController<Change> {
 
     protected DataModelFilter getOverridableDataModelFilter() {
         if (params.dataModel) {
-            DataModel dataModel = DataModel.get(params.long('dataModel'))
+            DataModel dataModel = dataModelGormService.read(params.long('dataModel'))
             if (dataModel) {
                 return DataModelFilter.includes(dataModel)
             }

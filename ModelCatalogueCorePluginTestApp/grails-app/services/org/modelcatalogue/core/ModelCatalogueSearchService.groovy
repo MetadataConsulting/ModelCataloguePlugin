@@ -21,6 +21,8 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     def modelCatalogueSecurityService
     def elementService
 
+    DataModelGormService dataModelGormService
+
     @Override
     boolean isIndexingManually() {
         return false
@@ -33,7 +35,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
 
-        Set<DataModel> subscribedModels = modelCatalogueSecurityService.getSubscribed()
+        Set<DataModel> subscribedModels = dataModelGormService.findAll()
 
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params, modelCatalogueSecurityService.isSubscribed(element)), getOverridableDataModelFilter(params, subscribedModels))
 
@@ -62,9 +64,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
     public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
 
-        //find the data models that the user is subscribed to and only search those
-        Set<DataModel> subscribedModels = modelCatalogueSecurityService.getSubscribed()
-
+        Set<DataModel> subscribedModels = dataModelGormService.findAll()
 
         // if the user doesn't have at least VIEWER role, don't return other elements than finalized
 //        if (!params.status && !false /*modelCatalogueSecurityService.hasRole('VIEWER')*/) {
@@ -216,12 +216,12 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     protected DataModelFilter getOverridableDataModelFilter(Map params, List<DataModel> subscribedModels) {
         if (params.dataModel) {
             if(subscribedModels.find{it.id}==params.dataModel) {
-                DataModel dataModel = DataModel.get(params.long('dataModel'))
+                DataModel dataModel = dataModelGormService.read(params.long('dataModel'))
                 if (dataModel) {
                     return DataModelFilter.includes(dataModel)
                 }
             }
-        }else{
+        } else{
             return DataModelFilter.includes(subscribedModels)
         }
         dataModelService.dataModelFilter

@@ -26,6 +26,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     SecurityService modelCatalogueSecurityService
     CatalogueElementService catalogueElementService
     ElementService elementService
+    DataModelGormService dataModelGormService
 
     private Random random = new Random()
 
@@ -442,11 +443,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if(resource!=DataModel && resource!=RelationshipType && resource && params?.id){
             dataModel = (resource.get(params.id)?.dataModel)
         }else if(resource == DataModel && params?.id){
-            dataModel = (resource.get(params.id))
+            dataModel = (dataModelGormService.get(params.long('id')))
         }else if(getObjectToBind()?.dataModels){
-            dataModel = DataModel.get(getObjectToBind().dataModels.first()?.id)
+            dataModel = dataModelGormService.get(getObjectToBind().dataModels.first()?.id as Long)
         }else if(params?.dataModel){
-            dataModel = DataModel.get(params.dataModel)
+            dataModel = dataModelGormService.get(params.long('dataModel'))
         }
         dataModel
     }

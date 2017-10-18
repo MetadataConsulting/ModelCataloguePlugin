@@ -11,6 +11,7 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
 
     DataElementService dataElementService
     SessionFactory sessionFactory
+    DataModelGormService dataModelGormService
 
     DataElementController() {
         super(DataElement, false)
@@ -45,7 +46,7 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
         if (isDatabaseFallback()) {
             return super.getAllEffectiveItems(max)
         }
-        return Lists.wrap(params, "/${resourceName}/", dataElementService.findAllDataElementsInModel(params, DataModel.get(params.long('dataModel'))))
+        return Lists.wrap(params, "/${resourceName}/", dataElementService.findAllDataElementsInModel(params, dataModelGormService.read(params.long('dataModel'))))
     }
 
     private boolean isDatabaseFallback() {
@@ -82,15 +83,4 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
             }
         }
     }
-
-
-    protected boolean allowSaveAndEdit() {
-        DataType dataType = DataType.get(getObjectToBind()?.dataType?.id)
-        if(dataType && !modelCatalogueSecurityService.isSubscribed(dataType)) return false
-        //if the user is a "general" curator they can create data models
-//        if(resource == DataModel) return modelCatalogueSecurityService.hasRole('CURATOR')
-        //but if they are trying to create something within the context of a data model they must have curator access to the specific model (not just general curator access)
-        modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())
-    }
-
 }

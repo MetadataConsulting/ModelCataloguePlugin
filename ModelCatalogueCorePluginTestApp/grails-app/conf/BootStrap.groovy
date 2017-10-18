@@ -1,3 +1,4 @@
+import grails.plugin.springsecurity.acl.AclService
 import grails.util.Environment
 import groovy.util.logging.Log
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -20,6 +21,14 @@ import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Metadata
 import org.springframework.http.HttpMethod
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.acls.model.Acl
+import org.springframework.security.acls.model.ObjectIdentity
+import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
+import grails.plugin.springsecurity.acl.AclService
 
 @Log
 class BootStrap {
@@ -33,6 +42,8 @@ class BootStrap {
     def modelCatalogueSearchService
     def userService
     GrailsApplication grailsApplication
+    AclService aclService
+    ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy
 
     def init = { servletContext ->
         log.info "BootStrap:addExtensionModules()"
@@ -83,6 +94,34 @@ class BootStrap {
         ReportsRegistry reportsRegistry = grailsApplication.mainContext.getBean(ReportsRegistry)
         setUpReports(reportsRegistry)
         log.info "completed:inviteAdmins"
+
+        loginAsSupervisor()
+        configureAcl()
+    }
+
+    private void configureAcl() {
+        List<DataModel> dataModelList = DataModel.findAll()
+        for ( DataModel dataModel : dataModelList ) {
+            ObjectIdentity objectIdentity = objectIdentityRetrievalStrategy.getObjectIdentity(dataModel)
+            Acl acl = aclService.readAclById(objectIdentity)
+            if ( !acl ) {
+                aclService.createAcl(objectIdentity)
+            }
+
+        }
+    }
+
+    private void loginAsSupervisor() {
+        String authority = 'ROLE_SUPERVISOR'
+        List<User> users = UserRole.findAllByRole(Role.findByAuthority(authority))?.user
+        if ( users ) {
+            User user = users.get(0)
+            // have to be authenticated as an admin to create ACLs
+            List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(authority)
+            SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(user.username,
+                    user.password,
+                    authorityList)
+        }
 
     }
 
