@@ -186,7 +186,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param max - number of results
      * @param id, the id of th catalogue element source of the relationship
      */
-
     def removeMapping() {
         addOrRemoveMapping(false)
     }
@@ -199,11 +198,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param id, the id of th catalogue element source of the relationship
      *
      */
-
     def addMapping() {
         addOrRemoveMapping(true)
     }
-
 
 
     /**
@@ -241,12 +238,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 }
             }
         }
-
-
         respond items
-
     }
-
 
     /**
      * Shows a single resource
@@ -254,7 +247,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @return The rendered resource or a 404 if it doesn't exist
      */
     def show() {
-
         T element = queryForResource(params.id)
 
         if (!element) {
@@ -264,9 +256,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         respond element
     }
-
-
-
 
     /**
      * Updates a resource for the given id
@@ -353,12 +342,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             modelCatalogueSecurityService.currentUser?.createLinkTo(instance, RelationshipType.favouriteType)
         }
 
-
         instance.save flush:true
 
         respond instance, [status: OK]
     }
-
 
     /**
      * Merge an element with another element i.e. if two elements have been created for the same item
@@ -535,14 +522,11 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond instance, [status: OK]
     }
 
-
-
     /**
      * Return all the changes assocaited with a catalouge element
      * @param id, if of the catalogue element
      * @param max, maximum results
      */
-
     //TODO: this needs some work - not sure why we need this and the below
     def changes(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -555,13 +539,11 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond Lists.wrap(params, "/${resourceName}/${params.id}/changes", auditService.getChanges(params, element))
     }
 
-
     /**
      * Return all the history of a element
      * @param id, if of the catalogue element
      * @param max, maximum results
      */
-
     //TODO: this needs some work - not sure why we need this and the above
     def history(Integer max) {
         CatalogueElement element = queryForResource(params.id)
@@ -571,18 +553,14 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         params.max = Math.min(max ?: 10, 100)
-
-
         respond Lists.wrap(params,  "/${resourceName}/${params.id}/history", auditService.getElementChanges(params, element.latestVersionId ?: element.id))
     }
-
 
     /**
      * Return all the elements that this inherits ?
      * @param id,        id of the catalogue element
      * @param max, maximum results
      */
-
     def typeHierarchy(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         CatalogueElement element = queryForResource(params.id)
@@ -594,14 +572,12 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond Lists.wrap(params, "/${resourceName}/${params.id}/typeHierarchy", elementService.getTypeHierarchy(params, element))
     }
 
-
     /**
      * Get the path for a catalogue element - this is used in the ui to open an element in context
      * For example        id a data element appears in two classes this will give you the specific path within one of the classes
      * @param id, id of the catalogue element
      * @param max, maximum results
      */
-
     def path() {
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
@@ -612,10 +588,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond new PathFinder().findPath(element)
     }
 
-
-
-
-
     /**
      * GENERAL reorder relationships METHOD used for internal and external relationships i.e. if you want one data element contained in a class to come before another
      *security checked in the reorder method
@@ -623,9 +595,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param type,type of relationship
      * @param max, maximum results
      */
-
     //TODO: this should all go into a service
-
     private reorderInternal(RelationshipDirection direction, Long id, String type) {
         // begin sanity checks
         //check the user has the minimum role needed
@@ -680,11 +650,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: rel.source, relation: rel.destination, direction: 'sourceToDestination', removeLink: RelationshipsMarshaller.getDeleteLink(rel.source, rel), archived: rel.archived, elementType: Relationship.name)
     }
 
-
     //TODO: this should all go into a service
     //general remove any relation from a catalogue element based on the relationship type
     // used by the directional remove relation methods
-
     private void removeRelation(Long id, String type, boolean outgoing) {
         withRetryingTransaction {
             //check the user has the minimum role needed
@@ -739,11 +707,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
     }
 
-
     //TODO: this should all go into a service
     //general add any relation from a catalogue element based on the relationship type
     // used by the directional add relation methods
-
     private void addRelation(Long id, String type, boolean outgoing) {
 
         withRetryingTransaction {
@@ -832,7 +798,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected parseOtherSide() {
         request.getJSON()
     }
-
 
     /**
      * returns a list of internal relationships
