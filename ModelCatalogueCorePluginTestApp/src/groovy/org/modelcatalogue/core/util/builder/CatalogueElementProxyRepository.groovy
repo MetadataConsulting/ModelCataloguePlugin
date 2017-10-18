@@ -104,9 +104,7 @@ class CatalogueElementProxyRepository {
 
         return equals(a.classification, b.classification) && a.name == b.name
     }
-    Closure reconnectAfterClear = {CatalogueElement catalogueElement, String failureMessage ->
-        //} // temporarily disable
-        //public blah(CatalogueElement catalogueElement, String failureMessage) {
+    public void reconnectAfterClear(CatalogueElement catalogueElement, String failureMessage) {
         if (!catalogueElement.readyForQueries) {
             catalogueElement = catalogueElement.merge()
             catalogueElement.refresh()
@@ -122,6 +120,19 @@ class CatalogueElementProxyRepository {
         }
 
     }
+    public void periodicFlushClear (int count, int batchSize, Session session) {
+        if (++count % batchSize == 0) {
+            try{
+                session.flush()
+                session.clear() // aggressive, but needed for bulk loading.
+            }
+            catch(Exception e) {
+                log.error(session)
+                log.error(" error: ${e.message}")
+                throw e
+            }
+        }
+    }
     public Set<CatalogueElement> resolveAllProxies(boolean skipDirtyChecking) {
         SessionFactory sessionFactory = (SessionFactory) applicationContext.getBean('sessionFactory')
         Session session = sessionFactory.getCurrentSession()
@@ -134,23 +145,7 @@ class CatalogueElementProxyRepository {
 
         int count = 0
         int batchSize = 20
-        Closure periodicFlushClear = {
-        //}// temporarily disable
-            //Closure x = {
-            if (++count % batchSize == 0) {
-                try{
-                    session.flush()
-                }
-                catch(Exception e) {
-                    log.error(session)
-                    log.error(" error: ${e.message}")
-                    throw e
-                }
 
-                session.clear() // aggressive, but needed for bulk loading.
-
-            }
-        }
 
 
 
@@ -263,35 +258,10 @@ class CatalogueElementProxyRepository {
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
             logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
             try {
-                //periodicFlushClear()
-                if (++count % batchSize == 0) {
-                    try{
-                        session.flush()
-                    }
-                    catch(Exception e) {
-                        log.error(session)
-                        log.error(" error: ${e.message}")
-                        throw e
-                    }
+                periodicFlushClear(count, batchSize, session)
 
-                    session.clear() // aggressive, but needed for bulk loading.
-
-                }
                 CatalogueElement resolved = element.resolve() as CatalogueElement
-                //reconnectAfterClear(resolved, "Catalogue element $resolved is not ready to be queried")
-                if (!resolved.readyForQueries) {
-                    resolved = resolved.merge()
-                    resolved.refresh()
-                    try {
-                        resolved = resolved.merge()
-                    }
-                    catch (OptimisticLockingFailureException olfe) {
-                        resolved = CatalogueElement.get(resolved.id)
-                    }
-                    if (!resolved.readyForQueries) {
-                        throw new IllegalStateException("Catalogue element $resolved is not ready to be queried")
-                    }
-                }
+                reconnectAfterClear(resolved, "Catalogue element $resolved is not ready to be queried")
                 created.add(resolved)
                 relationshipProxiesToBeResolved.addAll element.pendingRelationships
                 if (element.pendingPolicies) {
@@ -321,20 +291,7 @@ class CatalogueElementProxyRepository {
         relationshipProxiesToBeResolved.eachWithIndex { RelationshipProxy relationshipProxy, i ->
             logDebug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
             try {
-                //periodicFlushClear()
-                if (++count % batchSize == 0) {
-                    try{
-                        session.flush()
-                    }
-                    catch(Exception e) {
-                        log.error(session)
-                        log.error(" error: ${e.message}")
-                        throw e
-                    }
-
-                    session.clear() // aggressive, but needed for bulk loading.
-
-                }
+                periodicFlushClear(count, batchSize, session)
                 if (relationshipProxy.source.resolve() == relationshipProxy.destination.resolve()) {
                     logWarn "Ignoring self reference: $relationshipProxy"
                     return
@@ -354,35 +311,10 @@ class CatalogueElementProxyRepository {
                 if (!element.underControl) {
                     return
                 }
-                //periodicFlushClear()
-                if (++count % batchSize == 0) {
-                    try{
-                        session.flush()
-                    }
-                    catch(Exception e) {
-                        log.error(session)
-                        log.error(" error: ${e.message}")
-                        throw e
-                    }
+                periodicFlushClear(count, batchSize, session)
 
-                    session.clear() // aggressive, but needed for bulk loading.
-
-                }
                 CatalogueElement catalogueElement = element.resolve() as CatalogueElement
-                //reconnectAfterClear(catalogueElement, "Catalogue element $catalogueElement is not ready to be queried")
-                if (!catalogueElement.readyForQueries) {
-                    catalogueElement = catalogueElement.merge()
-                    catalogueElement.refresh()
-                    try {
-                        catalogueElement = catalogueElement.merge()
-                    }
-                    catch (OptimisticLockingFailureException olfe) {
-                        catalogueElement = CatalogueElement.get(catalogueElement.id)
-                    }
-                    if (!catalogueElement.readyForQueries) {
-                        throw new IllegalStateException("Catalogue element $catalogueElement is not ready to be queried")
-                    }
-                }
+                reconnectAfterClear(catalogueElement, "Catalogue element $catalogueElement is not ready to be queried")
                 Set<Long> relations = []
                 relations.addAll catalogueElement.incomingRelationships*.getId()
                 relations.addAll catalogueElement.outgoingRelationships*.getId()
@@ -406,36 +338,9 @@ class CatalogueElementProxyRepository {
             ElementStatus status = element.getParameter('status') as ElementStatus
 
             try {
-                //periodicFlushClear()
-                if (++count % batchSize == 0) {
-                    try{
-                        session.flush()
-                    }
-                    catch(Exception e) {
-                        log.error(session)
-                        log.error(" error: ${e.message}")
-                        throw e
-                    }
-
-                    session.clear() // aggressive, but needed for bulk loading.
-
-                }
+                periodicFlushClear(count, batchSize, session)
                 CatalogueElement catalogueElement = element.resolve() as CatalogueElement
-                //reconnectAfterClear(catalogueElement, "Catalogue element $catalogueElement is not ready to be queried")
-                if (!catalogueElement.readyForQueries) {
-                    catalogueElement = catalogueElement.merge()
-                    catalogueElement.refresh()
-                    try {
-                        catalogueElement = catalogueElement.merge()
-                    }
-                    catch (OptimisticLockingFailureException olfe) {
-                        catalogueElement = CatalogueElement.get(catalogueElement.id)
-                    }
-                    if (!catalogueElement.readyForQueries) {
-                        throw new IllegalStateException("Catalogue element $catalogueElement is not ready to be queried")
-                    }
-                }
-
+                reconnectAfterClear(catalogueElement, "Catalogue element $catalogueElement is not ready to be queried")
 
                 if (status && catalogueElement.status != status) {
                     if (status == ElementStatus.FINALIZED) {
@@ -713,42 +618,13 @@ class CatalogueElementProxyRepository {
             throw new IllegalStateException(FriendlyErrors.printErrors("Source element $sourceElement contains errors and is not ready to be part of the relationship ${proxy.toString()}", sourceElement.errors))
         }
 
-        //reconnectAfterClear(sourceElement, "Source element $sourceElement is not ready to be part of the relationship ${proxy.toString()}")
-
-        if (!sourceElement.readyForQueries) {
-            sourceElement = sourceElement.merge()
-            sourceElement.refresh()
-            try {
-                sourceElement = sourceElement.merge()
-            }
-            catch (OptimisticLockingFailureException olfe) {
-                sourceElement = CatalogueElement.get(sourceElement.id)
-            }
-            if (!sourceElement.readyForQueries) {
-                throw new IllegalStateException("Source element $sourceElement is not ready to be part of the relationship ${proxy.toString()}")
-            }
-        }
-
-
+        reconnectAfterClear(sourceElement, "Source element $sourceElement is not ready to be part of the relationship ${proxy.toString()}")
 
         if (destinationElement.hasErrors()) {
             throw new IllegalStateException(FriendlyErrors.printErrors("Destination element $destinationElement contains errors and is not ready to be part of the relationship ${proxy.toString()}", destinationElement.errors))
         }
 
-        //reconnectAfterClear(destinationElement, "Destination element $destinationElement is not ready to be part of the relationship ${proxy.toString()}")
-        if (!destinationElement.readyForQueries) {
-            destinationElement = destinationElement.merge()
-            destinationElement.refresh()
-            try {
-                destinationElement = destinationElement.merge()
-            }
-            catch (OptimisticLockingFailureException olfe) {
-                destinationElement = CatalogueElement.get(destinationElement.id)
-            }
-            if (!destinationElement.readyForQueries) {
-                throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${proxy.toString()}")
-            }
-        }
+        reconnectAfterClear(destinationElement, "Destination element $destinationElement is not ready to be part of the relationship ${proxy.toString()}")
 
         String hash = PublishingContext.hashForRelationship(sourceElement, destinationElement, type)
 
