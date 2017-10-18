@@ -115,7 +115,15 @@ class CatalogueController {
             params.max = params.long('max')
         }
         render(Lists.lazy(params, ProgressMonitor, '/feedback', {
-            CacheService.MONITORS_CACHE.asMap().entrySet().sort{ a, b -> -(a.value.lastUpdated <=> b.value.lastUpdated) }.collect { [key: it.key, name: it.value.name, status: it.value.status.toElementStatusEquivalent().toString(), ] }
+            CacheService.MONITORS_CACHE.asMap().entrySet().sort{ a, b ->
+                -(a.value.lastUpdated <=> b.value.lastUpdated)
+            }.collect {
+                [
+                        key: it.key,
+                        name: it.value.name,
+                        status: it.value.status.toElementStatusEquivalent().toString(),
+                ]
+            }
         }, {
             CacheService.MONITORS_CACHE.size()
         }) as JSON)
