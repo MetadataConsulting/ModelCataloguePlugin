@@ -4,6 +4,7 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.acl.AclUtilService
 import grails.util.Holders
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
@@ -13,7 +14,9 @@ import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserGormService
 import org.modelcatalogue.core.security.UserRole
+import org.springframework.security.acls.domain.BasePermission
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.logout.LogoutHandler
 import javax.servlet.http.HttpServletRequest
@@ -28,6 +31,10 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     static transactional = false
 
     SpringSecurityService springSecurityService
+
+    UserGormService userGormService
+
+    AclUtilService aclUtilService
 
     Cache<String, Long> lastSeenCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1, TimeUnit.DAYS).build()
 
@@ -47,8 +54,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
             return false
         }
 
-        //find if the user has a role for a model, i.e. if they are authorised, for any of the roles
-        return isAuthorised(dataModel, roles)
+        aclUtilService.hasPermission(springSecurityService.principal, dataModel, BasePermission.READ)
     }
 
     //check if a user a general role
@@ -78,7 +84,8 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) {
         def id = authentication?.principal?.id
         if (id) {
-            userLoggedOut(User.get(id as Long))
+            User user = userGormService.findById(id as Long)
+            userLoggedOut(user)
         }
     }
 
@@ -94,14 +101,12 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
 //check if the user is subscribed to a catalogueElement
     boolean isSubscribed(CatalogueElement ce){
-
-        //check if the user is a supervisor - if they are, they are subscribed to everything
-        if(isSupervisor()) return true
-
         //if the catalogue element doesn't have a data model it is an orphan and you can't be subscribed to it.
-        if(!ce?.dataModel) return false
+        if(!ce?.dataModel) {
+            return false
+        }
 
-        isSubscribed(ce?.dataModel)
+        aclUtilService.hasPermission(springSecurityService.principal, ce?.dataModel, BasePermission.READ)
     }
 
     //check if the user is a supervisor
@@ -110,27 +115,6 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     boolean isSupervisor(){
         if(UserRole.findByUserAndRole(getCurrentUser(), Role.findByAuthority('ROLE_SUPERVISOR'))) return true
         return false
-    }
-
-    //check if a user has the a specific role for a data model
-    boolean isAuthorised(DataModel dataModel, Collection<String> roles) {
-
-        //check if the user is a supervisor - if they are, they are authorised to do everything
-        if(isSupervisor()) return true
-
-        //if there isn't a data model they cannot be authorised
-        if(!dataModel) return false
-
-
-        // if a user has any of the roles included then they are authorised
-        boolean hasRole = false
-//        roles.any { Role role ->
-//            if (UserRole.findAllByUserAndDataModelAndRole(getCurrentUser(), dataModel, role)) {
-//                hasRole = true
-//                return true
-//            }
-//        }
-        return hasRole
     }
 
     void addUserRoleModel(User user, Role role, DataModel model, boolean flush = false){
