@@ -9,14 +9,12 @@ class ReferenceType extends DataType {
     DataClass dataClass
 
     static constraints = {
-        dataClass nullable: true, fetch: 'join'
+        dataClass nullable: true
     }
 
     static mapping = {
-        dataClass lazy: false
+        dataClass fetch: 'join'
     }
-
-    static fetchMode = [dataClass: 'eager']
 
 
     @Override

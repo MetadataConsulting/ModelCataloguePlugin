@@ -8,14 +8,12 @@ class PrimitiveType extends DataType {
     MeasurementUnit measurementUnit
 
     static constraints = {
-        measurementUnit nullable: true, fetch: 'join'
+        measurementUnit nullable: true
     }
 
     static mapping = {
-        measurementUnit lazy: false
+        measurementUnit fetch: 'join'
     }
-
-    static fetchMode = [measurementUnit: 'eager']
 
     Iterable<String> getInheritedAssociationsNames() { Iterables.concat(super.inheritedAssociationsNames, ImmutableSet.of('measurementUnit')) }
 

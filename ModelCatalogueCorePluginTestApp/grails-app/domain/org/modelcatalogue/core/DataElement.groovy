@@ -17,7 +17,11 @@ class DataElement extends CatalogueElement {
     DataType dataType
 
     static constraints = {
-        dataType nullable: true, fetch: 'join'
+        dataType nullable: true
+    }
+
+    static mapping = {
+        dataType fetch: 'join'
     }
 
     static relationships = [
