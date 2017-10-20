@@ -4,6 +4,7 @@ import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
@@ -78,6 +79,7 @@ class DraftChain extends PublishingChain {
     }
 
     private <T extends CatalogueElement> T createDraft(T element, DataModel draftDataModel, Publisher<CatalogueElement> archiver, Observer<String> monitor) {
+        element = (T) GrailsHibernateUtil.unwrapIfProxy(element)
         if (!element.latestVersionId) {
             element.latestVersionId = element.id
             FriendlyErrors.failFriendlySave(element)
