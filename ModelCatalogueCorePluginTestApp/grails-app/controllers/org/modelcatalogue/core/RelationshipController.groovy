@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.plugin.springsecurity.annotation.Secured
 import org.springframework.http.HttpStatus
 
 class RelationshipController {
@@ -12,13 +13,9 @@ class RelationshipController {
     //not sure that we do
     //only allowing supervisors to do this
 
+
+    @Secured(['ROLE_SUPERVISOR'])
     def restore() {
-
-        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
-            render status: HttpStatus.UNAUTHORIZED
-            return
-        }
-
         Long id = params.long('id')
 
         if (!id) {

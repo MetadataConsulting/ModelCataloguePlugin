@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.actions
 
+import grails.plugin.springsecurity.annotation.Secured
 import org.modelcatalogue.core.AbstractRestfulController
 import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.util.lists.Lists
@@ -19,11 +20,8 @@ class BatchController extends AbstractRestfulController<Batch> {
         super(Batch)
     }
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def archive() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            unauthorized()
-            return
-        }
 
         if (!params.id) {
             notFound()
@@ -42,11 +40,8 @@ class BatchController extends AbstractRestfulController<Batch> {
         respond batch
     }
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def runAll() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            unauthorized()
-            return
-        }
 
         if (!params.id) {
             notFound()
@@ -71,12 +66,10 @@ class BatchController extends AbstractRestfulController<Batch> {
         batchGormService.findById(id)
     }
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     @Override
     def index(Integer max) {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            unauthorized()
-            return
-        }
+
         handleParams(max)
         respond Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'archived', params.boolean('archived') || params.status == 'archived'
@@ -84,12 +77,9 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def updateActionParameters() {
 
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            unauthorized()
-            return
-        }
 
         if (!params.actionId) {
             notFound()
@@ -116,11 +106,9 @@ class BatchController extends AbstractRestfulController<Batch> {
         respond action
     }
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def listActions(Integer max) {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            unauthorized()
-            return
-        }
+
         handleParams(max)
 
         if (!params.id) {
@@ -140,11 +128,9 @@ class BatchController extends AbstractRestfulController<Batch> {
         respond Lists.wrap(params, "/${resourceName}/${batch.id}/actions/${params?.state ?: ''}", actionService.list(params, batch, state))
     }
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def dismiss() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            unauthorized()
-            return
-        }
+
 
         if (!params.actionId) {
             notFound()
@@ -162,11 +148,9 @@ class BatchController extends AbstractRestfulController<Batch> {
         ok()
     }
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def reactivate() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            unauthorized()
-            return
-        }
+
         if (!params.actionId) {
             notFound()
             return
@@ -184,11 +168,8 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def run() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            unauthorized()
-            return
-        }
 
         if (!params.actionId) {
             notFound()
@@ -206,11 +187,8 @@ class BatchController extends AbstractRestfulController<Batch> {
         ok()
     }
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def addDependency() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            unauthorized()
-            return
-        }
 
         if (!params.actionId || !params.providerId || !params.role) {
             notFound()
@@ -243,11 +221,8 @@ class BatchController extends AbstractRestfulController<Batch> {
         respond action
     }
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def removeDependency() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            unauthorized()
-            return
-        }
 
         if (!params.actionId || !params.role) {
             notFound()

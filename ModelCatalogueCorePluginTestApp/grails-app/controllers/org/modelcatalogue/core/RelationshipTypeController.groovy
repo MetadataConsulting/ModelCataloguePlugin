@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import org.modelcatalogue.core.persistence.RelationshipTypeGormService
 import org.modelcatalogue.core.util.CatalogueElementFinder

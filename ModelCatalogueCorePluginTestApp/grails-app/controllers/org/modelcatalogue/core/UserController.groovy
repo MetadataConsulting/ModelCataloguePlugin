@@ -90,11 +90,8 @@ class UserController extends AbstractCatalogueElementController<User> {
         render(m as JSON)
     }
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def lastSeen() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            notFound()
-            return
-        }
         respond modelCatalogueSecurityService.usersLastSeen.sort { it.value }.collect { [username: it.key, lastSeen: new Date(it.value)] }.reverse()
     }
 
@@ -108,19 +105,18 @@ class UserController extends AbstractCatalogueElementController<User> {
         favouriteService.unfavouriteModelById(dataModelId)
     }
 
+    @Secured(['ROLE_SUPERVISOR'])
     def enable() {
         switchEnabled(true)
     }
 
+    @Secured(['ROLE_SUPERVISOR'])
     def disable() {
         switchEnabled(false)
     }
 
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def role() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            notFound()
-            return
-        }
 
         User user = User.get(params.id)
         if (!user) {
@@ -151,10 +147,6 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     private switchEnabled(boolean enabled) {
-        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
-            notFound()
-            return
-        }
 
         User user = User.get(params.id)
         if (!user) {
