@@ -8,6 +8,7 @@ import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.hibernate.StaleStateException
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.security.MetadataRolesUtils
@@ -30,7 +31,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     SecurityService modelCatalogueSecurityService
     CatalogueElementService catalogueElementService
     ElementService elementService
-    def dataModelGormService
+    DataModelGormService dataModelGormService
     AclUtilService aclUtilService
     SpringSecurityService springSecurityService
 
