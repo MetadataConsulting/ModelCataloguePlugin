@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.security
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class MetadataRolesUtils {
 
     static List<String> getRolesFromAuthority(String authority){
