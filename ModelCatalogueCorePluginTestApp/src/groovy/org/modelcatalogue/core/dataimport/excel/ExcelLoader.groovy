@@ -319,7 +319,6 @@ class ExcelLoader {
         }
     }
 
-
     String buildXmlFromSpreadsheetFromExcelExporter(Map<String, String> headersMap = HeadersMap.createForSpreadsheetFromExcelExporter(), Workbook workbook, int index=0, String modelName = '') {
 
         Writer stringWriter = new StringWriter()
@@ -329,7 +328,35 @@ class ExcelLoader {
 
         return stringWriter.toString()
     }
-    // Based on buildModelFromWorkbookSheet
+    /**
+     * Processes an id string which is possibly versioned.
+     * If there are no occurrences of @, the string is returned untouched.
+     * If there is exactly one occurrence of @, then the string is of form /([^@]*)@([^@]*)/, which is two strings separated by @, where the two strings don't have any occurrence of @.
+     * If there are more than one occurrences of @, then throw an exception.
+     * @param versionedId
+     * @return
+     */
+    String processVersionedId(String versionedId) {
+        if (!versionedId) return null
+        int numAts = versionedId.count("@")
+        switch (numAts) {
+            case 0: return versionedId
+            case 1: return versionedId.split(/@/)[0]
+            default: throw new IllegalArgumentException("MCID String has more than one @")
+        }
+
+    }
+
+    /**
+     * Create/update model from spreadsheet from ExcelExporter, which is to say "mc.xls" files
+     * Based on buildModelFromWorkbookSheet
+     * @param headersMap
+     * @param workbook
+     * @param index
+     * @param catalogueBuilder
+     * @param modelName
+     * @return
+     */
     String buildModelFromSpreadsheetFromExcelExporter(Map<String, String> headersMap = HeadersMap.createForSpreadsheetFromExcelExporter(), Workbook workbook, int index = 0, CatalogueBuilder catalogueBuilder, String modelName = ''){
 
         log.info("Using headersMap ${headersMap as String}")
@@ -353,11 +380,11 @@ class ExcelLoader {
 
                     // TODO: IDs might need some processing to be usable? Like stripping off the first bit?
                     Closure createChildDataClass = {
-                        def createDataElement = {
+                        Closure createDataElement = {
                             if(tryHeader(HeadersMap.dataElementName, headersMap, rowMap)) {
                                 dataElement(name: tryHeader(HeadersMap.dataElementName, headersMap, rowMap),
                                         description: tryHeader(HeadersMap.dataElementDescription, headersMap, rowMap),
-                                        id: tryHeader(HeadersMap.dataElementCode, headersMap, rowMap)) {
+                                        id: processVersionedId(tryHeader(HeadersMap.dataElementCode, headersMap, rowMap))) {
                                     // Relationship metadata: Multiplicity
                                     String[] multiplicity = tryHeader(HeadersMap.multiplicity, headersMap, rowMap).split(/\.\./)
                                     relationship {
@@ -370,11 +397,11 @@ class ExcelLoader {
                                         importDataTypesFromExcelExporterFormat(
                                                 catalogueBuilder,
                                                 tryHeader(HeadersMap.dataTypeName, headersMap, rowMap),
-                                                tryHeader(HeadersMap.dataTypeCode, headersMap, rowMap),
+                                                processVersionedId(tryHeader(HeadersMap.dataTypeCode, headersMap, rowMap)),
                                                 tryHeader(HeadersMap.dataTypeEnumerations, headersMap, rowMap),
                                                 tryHeader(HeadersMap.dataTypeRule, headersMap, rowMap),
                                                 tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap),
-                                                tryHeader(HeadersMap.measurementUnitCode, headersMap, rowMap)
+                                                processVersionedId(tryHeader(HeadersMap.measurementUnitCode, headersMap, rowMap))
                                         )
                                     }/*
                                     List<String> metadataKeys = rowMap.keySet().toList().dropWhile({header ->
@@ -395,21 +422,29 @@ class ExcelLoader {
                         }
 
 
-                        def containingDataClassName = tryHeader(HeadersMap.containingModelName, headersMap, rowMap) ?: tryHeader(HeadersMap.containingDataClassName, headersMap, rowMap)
-                        def containingDataClassID = tryHeader(HeadersMap.containingModelCode, headersMap, rowMap) ?: tryHeader(HeadersMap.containingDataClassCode, headersMap, rowMap)
+                        String containingDataClassName =
+                                tryHeader(HeadersMap.containingModelName, headersMap, rowMap) ?:
+                                tryHeader(HeadersMap.containingDataClassName, headersMap, rowMap)
+                        String containingDataClassID =
+                                tryHeader(HeadersMap.containingModelCode, headersMap, rowMap) ?:
+                                tryHeader(HeadersMap.containingDataClassCode, headersMap, rowMap)
 
                         if (containingDataClassName || containingDataClassID) {
-                            dataClass(name: containingDataClassName, id: containingDataClassID, createDataElement)
+                            dataClass(name: containingDataClassName, id: processVersionedId(containingDataClassID), createDataElement)
                         } else {
                             catalogueBuilder.with createDataElement
                         }
                     }
 
-                    def parentDataClassName = tryHeader(HeadersMap.parentModelName, headersMap, rowMap) ?: tryHeader(HeadersMap.parentDataClassName, headersMap, rowMap)
-                    def parentDataClassID = tryHeader(HeadersMap.parentModelCode, headersMap, rowMap) ?: tryHeader(HeadersMap.parentDataClassCode, headersMap, rowMap)
+                    String parentDataClassName =
+                            tryHeader(HeadersMap.parentModelName, headersMap, rowMap) ?:
+                            tryHeader(HeadersMap.parentDataClassName, headersMap, rowMap)
+                    String parentDataClassID =
+                            tryHeader(HeadersMap.parentModelCode, headersMap, rowMap) ?:
+                            tryHeader(HeadersMap.parentDataClassCode, headersMap, rowMap)
 
                     if (parentDataClassName || parentDataClassID) {
-                        dataClass(name: parentDataClassName, id: parentDataClassID, createChildDataClass)
+                        dataClass(name: parentDataClassName, id: processVersionedId(parentDataClassID), createChildDataClass)
                     } else {
                         catalogueBuilder.with createChildDataClass
                     }
@@ -430,12 +465,8 @@ class ExcelLoader {
     }
     String tryHeader(String internalHeaderName, Map<String,String> headersMap, Map<String, String> rowMap) {
         // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
-        String entry = rowMap.get(headersMap.get(internalHeaderName))
-        if (entry) return entry
-        else {
-            /*log.info("Trying to use internalHeaderName '$internalHeaderName', which headersMap corresponds to " +
-                "header ${headersMap.get(internalHeaderName)}, from rowMap ${rowMap as String}, nothing found.")*/
-            return null}
+        return rowMap.get(headersMap.get(internalHeaderName))
+        // null may result from either of the two gets...
     }
 
     static String getRowValue(List<String> rowDataList, index){
