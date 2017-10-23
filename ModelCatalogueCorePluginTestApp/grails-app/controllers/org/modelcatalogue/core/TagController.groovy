@@ -33,7 +33,7 @@ class TagController extends AbstractCatalogueElementController<Tag> {
             return
         }
 
-        final DataModel dataModel = dataModelGormService.read(dataModelId)
+        final DataModel dataModel = dataModelGormService.get(dataModelId)
 
         if (!dataModel) {
             notFound()
@@ -41,7 +41,7 @@ class TagController extends AbstractCatalogueElementController<Tag> {
         }
 
         respond Lists.wrap(params, "/${resourceName}/forDataModel/${dataModelId}", Lists.lazy([:], Map, {
-            DataModel model = dataModelGormService.read(dataModelId)
+            DataModel model = dataModelGormService.get(dataModelId)
             List<Tag> tags =  sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL' ? DataModelService.allTags(model) : dataModelService.allTagsMySQL(model)
 
             List<Map<String, Object>> ret = [createAllDataElementsDescriptor(model), createUntaggedDescriptor(model)]

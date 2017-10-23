@@ -57,7 +57,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     @CompileStatic
     @Override
     protected DataModel queryForResource(Serializable id) {
-        dataModelGormService.read(id as Long)
+        dataModelGormService.get(id as Long)
     }
 
     //can be used in the future
@@ -274,7 +274,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     */
     def containsOrImports() {
 
-        DataModel dataModel = dataModelGormService.read(params.long('id'))
+        DataModel dataModel = dataModelGormService.get(params.long('id'))
         if (!dataModel) {
             notFound()
             return
@@ -343,7 +343,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     //TODO: needs work, counts etc are confusing and have been removed from the ui but they should at some point be update properly
 
     def content() {
-        DataModel dataModel = dataModelGormService.read(params.long('id'))
+        DataModel dataModel = dataModelGormService.get(params.long('id'))
         if (!dataModel) {
             notFound()
             return
@@ -393,7 +393,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      */
 
     def dependents() {
-        DataModel dataModel = dataModelGormService.read(params.long('id'))
+        DataModel dataModel = dataModelGormService.get(params.long('id'))
         if (!dataModel) {
             notFound()
             return
@@ -468,7 +468,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            CatalogueElementToXlsxExporter.forDataModel(dataModelGormService.read(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            CatalogueElementToXlsxExporter.forDataModel(dataModelGormService.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -502,7 +502,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
            // GridReportXlsxExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
-            GMCGridReportXlsxExporter.create(dataModelGormService.read(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            GMCGridReportXlsxExporter.create(dataModelGormService.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
 
         }
 
@@ -539,7 +539,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            ExcelExporter.create(dataModelGormService.read(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            ExcelExporter.create(dataModelGormService.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())

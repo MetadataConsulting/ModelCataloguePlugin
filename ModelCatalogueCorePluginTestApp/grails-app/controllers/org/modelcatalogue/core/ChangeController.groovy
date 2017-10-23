@@ -64,7 +64,7 @@ class ChangeController extends RestfulController<Change> {
 
     def dataModelActivity(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        DataModel element = dataModelGormService.read(params.long('id'))
+        DataModel element = dataModelGormService.get(params.long('id'))
         if (!element) {
             notFound()
             return
@@ -86,7 +86,7 @@ class ChangeController extends RestfulController<Change> {
 
     protected DataModelFilter getOverridableDataModelFilter() {
         if (params.dataModel) {
-            DataModel dataModel = dataModelGormService.read(params.long('dataModel'))
+            DataModel dataModel = dataModelGormService.get(params.long('dataModel'))
             if (dataModel) {
                 return DataModelFilter.includes(dataModel)
             }

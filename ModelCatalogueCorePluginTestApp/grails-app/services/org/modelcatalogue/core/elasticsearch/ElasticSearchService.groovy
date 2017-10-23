@@ -928,7 +928,7 @@ class ElasticSearchService implements SearchCatalogue {
                 // and check that you should include the results for the imports as well in search results
                 if (dataModelId) {
                         if (subscribedModels.findResults { it.id }.contains(dataModelId)) {
-                            DataModel dataModel = dataModelGormService.read(dataModelId)
+                            DataModel dataModel = dataModelGormService.get(dataModelId)
                             if (dataModel) {
                                 if(params.get('searchImports')!="false") {
                                     return DataModelFilter.includes(dataModel).withImports(subscribedModels)

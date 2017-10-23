@@ -216,7 +216,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     protected DataModelFilter getOverridableDataModelFilter(Map params, List<DataModel> subscribedModels) {
         if (params.dataModel) {
             if(subscribedModels.find{it.id}==params.dataModel) {
-                DataModel dataModel = dataModelGormService.read(params.long('dataModel'))
+                DataModel dataModel = dataModelGormService.get(params.long('dataModel'))
                 if (dataModel) {
                     return DataModelFilter.includes(dataModel)
                 }

@@ -18,7 +18,7 @@ class NorthThamesController {
     //produce a grid report spreadsheet where the whole data set is displayed as a grid with metadata and relationships (rather then tabs)
 
     def northThamesSummaryReport(String name, Integer depth) {
-        DataModel dataModel = dataModelGormService.read(params.long('id'))
+        DataModel dataModel = dataModelGormService.get(params.long('id'))
         String organization = params.organization as String
         Long dataModelId = dataModel.id
 
@@ -34,7 +34,7 @@ class NorthThamesController {
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            GMCGridReportXlsxExporter.create(dataModelGormService.read(dataModelId), dataClassService, grailsApplication, depth, organization).export(outputStream)
+            GMCGridReportXlsxExporter.create(dataModelGormService.get(dataModelId), dataClassService, grailsApplication, depth, organization).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
