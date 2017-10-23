@@ -138,7 +138,7 @@ class GelJsonExporter {
                 if (isPhenotype) {
                     id = child.ext.get("OBO ID") ?: ""
                 } else { // tests
-                    id = child.ext.get("http://www.modelcatalogue.org/metadata/genomics/#gel-test-id-versioned") ?: child.getCombinedVersion()
+                    id = child.ext.get("http://www.modelcatalogue.org/metadata/genomics/#gel-test-id-versioned") ?: child.getLatestVersionId() ?: child.getId()
                 }
                 map.put(levelMetaData.get(6).tag1, id)
                 list << map
