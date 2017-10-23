@@ -419,12 +419,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def cloneElement() {
-        if (!modelCatalogueSecurityService.hasRole('VIEWER', getDataModel()) ) {
-            unauthorized()
-            return
-        }
-
-
         if (handleReadOnly()) {
             return
         }
@@ -434,17 +428,22 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             notFound()
             return
         }
-
-        DataModel destinationDataModel = dataModelGormService.findById(params.long('destinationDataModelId'))
-
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', destinationDataModel)) {
-            unauthorized()
-            return
+        if ( CatalogueElement.class.isAssignableFrom(instance.class) )  {
+            DataModel dataModel = instance.dataModel
+            if ( !dataModelGormService.hasReadPermission(dataModel) ) {
+                unauthorized()
+                return
+            }
         }
 
-
+        long destinationDataModelId = params.long('destinationDataModelId')
+        DataModel destinationDataModel = dataModelGormService.findById(destinationDataModelId)
         if (destinationDataModel == null) {
             notFound()
+            return
+        }
+        if ( !dataModelGormService.hasAdministratorPermission(destinationDataModel) ) {
+            unauthorized()
             return
         }
 

@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit
 
 class SpringSecurity2SecurityService implements SecurityService, LogoutListeners, LogoutHandler {
 
-
     //TODO: How do we handle imports - this needs work
 
     static transactional = false
@@ -53,8 +52,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if ( !SpringSecurityUtils.ifAnyGranted(roles.join(',')) ) {
             return false
         }
-
-        aclUtilService.hasPermission(springSecurityService.authentication, dataModel, BasePermission.READ)
+        hasReadPermission(dataModel)
     }
 
     //check if a user a general role

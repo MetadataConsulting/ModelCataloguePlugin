@@ -1,13 +1,20 @@
 package org.modelcatalogue.core.persistence
 
+import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.acl.AclUtilService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.util.DataModelFilter
+import org.springframework.security.acls.domain.BasePermission
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
 import com.google.common.collect.ImmutableSet
 
 class DataModelGormService {
+
+    AclUtilService aclUtilService
+
+    SpringSecurityService springSecurityService
 
     @Transactional(readOnly = true)
     @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
@@ -33,4 +40,13 @@ class DataModelGormService {
         List<DataModel> dataModelList = findAllInIdList(dataModelIdList)
         ( dataModelList.size() == dataModelIdList.size() )
     }
+
+    boolean hasReadPermission(DataModel dataModel) {
+        aclUtilService.hasPermission(springSecurityService.authentication, dataModel, BasePermission.READ)
+    }
+
+    boolean hasAdministratorPermission(DataModel dataModel) {
+        aclUtilService.hasPermission(springSecurityService.authentication, dataModel, BasePermission.ADMINISTRATION)
+    }
+
 }
