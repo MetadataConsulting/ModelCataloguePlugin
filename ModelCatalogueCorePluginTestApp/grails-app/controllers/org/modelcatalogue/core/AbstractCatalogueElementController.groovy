@@ -185,7 +185,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param max - number of results
      * @param id, the id of th catalogue element source of the relationship
      */
-    def mappings(Integer max){
+    def mappings(Integer max) {
         handleParams(max)
         long catalogueElementId = params.long('id')
         CatalogueElement element = findById(catalogueElementId)
