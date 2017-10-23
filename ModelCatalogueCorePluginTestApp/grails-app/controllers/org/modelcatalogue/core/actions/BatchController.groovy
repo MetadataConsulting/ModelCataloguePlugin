@@ -30,7 +30,7 @@ class BatchController extends AbstractRestfulController<Batch> {
             return
         }
 
-        Batch batch = Batch.get(params.id)
+        Batch batch = findById(params.long('id'))
 
         if (!batch) {
             notFound()
@@ -53,7 +53,7 @@ class BatchController extends AbstractRestfulController<Batch> {
             return
         }
 
-        Batch batch = Batch.get(params.id)
+        Batch batch = findById(params.long('id'))
 
         if (!batch) {
             notFound()
