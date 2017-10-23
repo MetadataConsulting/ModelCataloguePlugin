@@ -11,9 +11,29 @@ class BatchController extends AbstractRestfulController<Batch> {
     BatchGormService batchGormService
     static allowedMethods = [index: 'GET', actions: 'GET', run: 'POST', reactivate: 'POST', dismiss: 'POST', updateActionParameters: 'PUT', addDependency: 'POST', removeDependency: 'DELETE']
 
-    @Override
-    protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('ADMIN')
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
+    def search(Integer max) {
+        super.search(max)
+    }
+
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
+    def validate() {
+        super.validate()
+    }
+
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
+    def save() {
+        super.save()
+    }
+
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
+    def update() {
+        super.update()
+    }
+
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
+    def delete() {
+        super.delete()
     }
 
     BatchController() {
