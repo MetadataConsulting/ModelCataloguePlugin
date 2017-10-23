@@ -473,7 +473,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         } else {
             Long dataModelId = findDataModelId()
             if (dataModelId) {
-                return dataModelGormService?.get(dataModelId)
+                return dataModelGormService?.findById(dataModelId)
             }
         }
         null
