@@ -53,16 +53,17 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     }
 
     def validateXml() {
-        Asset currentAsset = Asset.get(params.id)
+        Long assetId = params.long('id')
+        Asset currentAsset = findById(assetId)
         if (!currentAsset) {
-            respond(errors: [[message: "Current asset ${params.id} not found"]])
+            respond(errors: [[message: "Current asset ${assetId} not found"]])
             return
         }
 
         Asset asset =  getAssetWithContent(currentAsset)
 
         if (!asset) {
-            respond(errors: [[message: "Asset with content for ${params.id} not found"]])
+            respond(errors: [[message: "Asset with content for ${assetId} not found"]])
             return
         }
 
@@ -100,7 +101,8 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     }
 
     protected serveOrDownload(boolean serve) {
-        Asset currentAsset = Asset.get(params.id)
+        Long assetId = params.long('id')
+        Asset currentAsset = findById(assetId)
         if (!currentAsset) {
             notFound()
             return
@@ -162,8 +164,9 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         String name = getResourceName()
         Class type = resource
 
+        Long assetId = params.long('id')
         params.max = Math.min(max ?: 10, 100)
-        CatalogueElement element = findById(params.id)
+        CatalogueElement element = findById(assetId)
         if (!element) {
             notFound()
             return
@@ -172,7 +175,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         Long id = element.id
 
         if (!element.latestVersionId) {
-            respond Lists.wrap(params, "/${name}/${params.id}/history", Lists.lazy(params, type, {
+            respond Lists.wrap(params, "/${name}/${assetId}/history", Lists.lazy(params, type, {
                 [type.get(id)]
             }, { 1 }))
             return
@@ -186,7 +189,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         customParams.sort = 'versionNumber'
         customParams.order = 'desc'
 
-        respond Lists.fromCriteria(customParams, type, "/${name}/${params.id}/history") {
+        respond Lists.fromCriteria(customParams, type, "/${name}/${assetId}/history") {
             eq 'latestVersionId', latestVersionId
         }
     }

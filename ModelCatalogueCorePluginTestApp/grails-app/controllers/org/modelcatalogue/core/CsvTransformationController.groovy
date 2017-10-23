@@ -29,7 +29,7 @@ class CsvTransformationController extends AbstractRestfulController<CsvTransform
             return
         }
 
-        CsvTransformation transformation = CsvTransformation.get(params.id)
+        CsvTransformation transformation = csvTransformationGormService.findById(params.long('id'))
 
         if (!transformation) {
             notFound()

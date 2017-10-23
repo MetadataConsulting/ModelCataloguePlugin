@@ -19,7 +19,8 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
     }
 
     def content() {
-        DataElement dataElement = DataElement.get(params.id)
+        long dataElementId = params.long('id')
+        DataElement dataElement = dataElementGormService.findById(dataElementId)
         if (!dataElement) {
             notFound()
             return
@@ -33,7 +34,7 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
             return []
         }
 
-        respond Lists.wrap(params, "/${resourceName}/${params.id}/content", list)
+        respond Lists.wrap(params, "/${resourceName}/${dataElementId}/content", list)
     }
 
     @Override

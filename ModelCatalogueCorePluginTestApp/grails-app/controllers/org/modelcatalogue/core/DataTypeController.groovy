@@ -23,7 +23,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
 
     def dataElements(Integer max){
         handleParams(max)
-        DataType dataType = findById(params.id)
+        DataType dataType = findById(params.long('id'))
         if (!dataType) {
             notFound()
             return
@@ -40,7 +40,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
     }
 
     def convert() {
-        DataType dataType = findById(params.id)
+        DataType dataType = findById(params.long('id'))
         if (!dataType) {
             notFound()
             return
@@ -82,7 +82,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
 
 
     def validateValue() {
-        DataType dataType = findById(params.id)
+        DataType dataType = findById(params.long('id'))
         if (!dataType) {
             notFound()
             return

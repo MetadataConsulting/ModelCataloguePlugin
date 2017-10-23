@@ -25,7 +25,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         Boolean all = params.boolean('all')
 
-        DataClass dataClass = findById(params.id)
+        DataClass dataClass = findById(params.long('id'))
         if (!dataClass) {
             notFound()
             return
@@ -47,7 +47,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         params.sort = 'outgoingIndex'
 
-        DataClass element = findById(params.id)
+        DataClass element = findById(params.long('id'))
 
         if (!element) {
             notFound()
@@ -95,7 +95,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
             return
         }
 
-        DataClass dataClass = DataClass.get(params.id)
+        DataClass dataClass = dataClassGormService.findById(params.long('id'))
         def assetId =  assetService.storeReportAsAsset(
                 dataClass.dataModel,
                 name: name ? name : "${dataClass.name} report as MS Excel Document",
@@ -119,7 +119,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
             return
         }
 
-        DataClass dataClass = DataClass.get(params.id)
+        DataClass dataClass = dataClassGormService.findById(params.long('id'))
 
         Long dataClassId = dataClass.id
         def assetId= assetService.storeReportAsAsset(
@@ -145,7 +145,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
             return
         }
 
-        DataClass dataClass = DataClass.get(params.id)
+        DataClass dataClass = dataClassGormService.findById(params.long('id'))
 
         Long dataClassId = dataClass.id
         def assetId = assetService.storeReportAsAsset(

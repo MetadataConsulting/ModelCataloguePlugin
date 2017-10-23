@@ -180,13 +180,14 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     def mappings(Integer max){
         handleParams(max)
-        CatalogueElement element = queryForResource(params.id)
+        long catalogueElementId = params.long('id')
+        CatalogueElement element = findById(catalogueElementId)
         if (!element) {
             notFound()
             return
         }
 
-        respond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${params.id}/mapping") {
+        respond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${catalogueElementId}/mapping") {
             eq 'source', element
         })
     }
@@ -258,7 +259,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @return The rendered resource or a 404 if it doesn't exist
      */
     def show() {
-        T element = queryForResource(params.id)
+        T element = findById(params.long('id'))
 
         if (!element) {
             notFound()
@@ -282,7 +283,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        T instance = queryForResource(params.id)
+        T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
             return
@@ -375,13 +376,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        T source = queryForResource(params.source)
+        T source = findById(params.source)
         if (source == null) {
             notFound()
             return
         }
 
-        T destination = queryForResource(params.destination)
+        T destination = findById(params.destination)
         if (destination == null) {
             notFound()
             return
@@ -421,7 +422,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        T instance = queryForResource(params.id)
+        T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
             return
@@ -480,7 +481,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        T instance = queryForResource(params.id)
+        T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
             return
@@ -516,7 +517,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        T instance = queryForResource(params.id)
+        T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
             return
@@ -541,13 +542,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     //TODO: this needs some work - not sure why we need this and the below
     def changes(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = findById(params.long('id'))
         if (!element) {
             notFound()
             return
         }
 
-        respond Lists.wrap(params, "/${resourceName}/${params.id}/changes", auditService.getChanges(params, element))
+        respond Lists.wrap(params, "/${resourceName}/${params.long('id')}/changes", auditService.getChanges(params, element))
     }
 
     /**
@@ -557,7 +558,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     //TODO: this needs some work - not sure why we need this and the above
     def history(Integer max) {
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = findById(params.long('id'))
         if (!element) {
             notFound()
             return
@@ -574,7 +575,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     def typeHierarchy(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = findById(params.long('id'))
          if(!element) {
             notFound()
             return
@@ -590,7 +591,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param max, maximum results
      */
     def path() {
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = findById(params.long('id'))
         if (!element) {
             notFound()
             return
@@ -825,7 +826,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             params.sort = direction.sortProperty
         }
 
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = findById(params.long('id'))
         if (!element) {
             notFound()
             return
@@ -848,7 +849,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     //TODO: this should all go into a service
     private searchWithinRelationshipsInternal(Integer max, String type, RelationshipDirection direction){
-        CatalogueElement element = queryForResource(params?.id)
+        CatalogueElement element = findById(params.long('id'))
 
         if (!element) {
             notFound()
@@ -885,13 +886,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 notFound()
                 return
             }
-            CatalogueElement element = queryForResource(params.id)
+            CatalogueElement element = findById(params.long('id'))
             if (!element) {
                 notFound()
                 return
             }
 
-            CatalogueElement destination = queryForResource(params.destination)
+            CatalogueElement destination = findById(params.destination)
             if (!destination) {
                 notFound()
                 return

@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.rest.RestfulController
 import org.modelcatalogue.core.audit.Change
+import org.modelcatalogue.core.persistence.ChangeGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
@@ -20,9 +21,10 @@ class ChangeController extends RestfulController<Change> {
     def auditService
     def dataModelService
     DataModelGormService dataModelGormService
+    ChangeGormService changeGormService
 
     def undo() {
-        Change change = Change.get(params.id)
+        Change change = changeGormService.findById(params.long('id'))
 
         if (!change) {
             render status: NOT_FOUND
@@ -43,14 +45,15 @@ class ChangeController extends RestfulController<Change> {
         } else {
             params.max = params.long('max')
         }
-        Change change = Change.get(params.id)
+        long changeId = params.long('id')
+        Change change = changeGormService.findById(changeId)
 
         if (!change) {
             notFound()
             return
         }
 
-        respond Lists.wrap(params, "/${resourceName}/${params.id}/changes", auditService.getSubChanges(params, change))
+        respond Lists.wrap(params, "/${resourceName}/${changeId}/changes", auditService.getSubChanges(params, change))
     }
 
     def global() {
@@ -65,24 +68,26 @@ class ChangeController extends RestfulController<Change> {
 
     def dataModelActivity(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        DataModel element = dataModelGormService.findById(params.long('id'))
+        long dataModelId = params.long('id')
+        DataModel element = dataModelGormService.findById(dataModelId)
         if (!element) {
             notFound()
             return
         }
 
-        respond Lists.wrap(params, "/dataModel/${params.id}/activity", auditService.getGlobalChanges(params, DataModelFilter.includes(element)))
+        respond Lists.wrap(params, "/dataModel/${dataModelId}/activity", auditService.getGlobalChanges(params, DataModelFilter.includes(element)))
     }
 
     def userActivity(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        User element = User.get(params.id)
+        long userId = params.long('id')
+        User element = User.get(userId)
         if (!element) {
             notFound()
             return
         }
 
-        respond Lists.wrap(params, "/user/${params.id}/activity", auditService.getChangesForUser(params, element))
+        respond Lists.wrap(params, "/user/${userId}/activity", auditService.getChangesForUser(params, element))
     }
 
     protected DataModelFilter getOverridableDataModelFilter() {

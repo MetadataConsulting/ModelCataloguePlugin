@@ -20,7 +20,7 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
 
         params.sort = 'incomingIndex'
 
-        ValidationRule element = findById(params.id)
+        ValidationRule element = findById(params.long('id'))
 
         if (!element) {
             notFound()

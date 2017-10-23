@@ -15,7 +15,7 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
     def primitiveTypes(Integer max){
         handleParams(max)
 
-        MeasurementUnit unit = findById(params.id)
+        MeasurementUnit unit = findById(params.long('id'))
         if (!unit) {
             notFound()
             return

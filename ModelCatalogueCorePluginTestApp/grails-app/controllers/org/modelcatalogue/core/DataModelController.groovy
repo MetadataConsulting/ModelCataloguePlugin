@@ -170,7 +170,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        T instance = findById(params.id)
+        T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
             return
@@ -228,7 +228,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        T instance = findById(params.id)
+        T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
             return
@@ -338,7 +338,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     //TODO: needs work, counts etc are confusing and have been removed from the ui but they should at some point be update properly
 
     def content() {
-        DataModel dataModel = dataModelGormService.findById(params.long('id'))
+        long dataModelId = params.long('id')
+        DataModel dataModel = dataModelGormService.findById(dataModelId)
         if (!dataModel) {
             notFound()
             return
@@ -378,7 +379,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             contentDescriptors
         }
 
-        respond Lists.wrap(params, "/${resourceName}/${params.id}/content", list)
+        respond Lists.wrap(params, "/${resourceName}/${dataModelId}/content", list)
     }
 
 
@@ -410,7 +411,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         Class type = resource
 
         params.max = Math.min(max ?: 10, 100)
-        CatalogueElement element = findById(params.id)
+        long catalogueElementId = params.long('id')
+        CatalogueElement element = findById(catalogueElementId)
         if (!element) {
             notFound()
             return
@@ -419,7 +421,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         Long id = element.id
 
         if (!element.latestVersionId) {
-            respond Lists.wrap(params, "/${name}/${params.id}/history", Lists.lazy(params, type, {
+            respond Lists.wrap(params, "/${name}/${catalogueElementId}/history", Lists.lazy(params, type, {
                 [type.get(id)]
             }, { 1 }))
             return
@@ -433,7 +435,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         customParams.sort = 'versionNumber'
         customParams.order = 'desc'
 
-        respond Lists.fromCriteria(customParams, type, "/${name}/${params.id}/history") {
+        respond Lists.fromCriteria(customParams, type, "/${name}/${catalogueElementId}/history") {
             eq 'latestVersionId', latestVersionId
         }
     }

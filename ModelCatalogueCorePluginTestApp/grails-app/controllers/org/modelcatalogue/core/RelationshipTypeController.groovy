@@ -70,7 +70,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
             return
         }
 
-        RelationshipType instance = findById(params.id)
+        RelationshipType instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
             return
