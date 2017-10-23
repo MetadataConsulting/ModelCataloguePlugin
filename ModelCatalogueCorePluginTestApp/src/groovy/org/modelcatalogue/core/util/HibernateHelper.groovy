@@ -32,7 +32,7 @@ class HibernateHelper {
             return GrailsHibernateUtil.unwrapProxy(published) as T
         }
         if (published.getClass().name.contains('_javassist_')) {
-            return GrailsHibernateUtil.unwrapIfProxy(published)
+            return GrailsHibernateUtil.unwrapIfProxy(published) as T
         }
         return published
     }
