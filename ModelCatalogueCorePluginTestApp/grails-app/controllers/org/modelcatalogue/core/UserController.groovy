@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.annotation.Secured
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
@@ -117,8 +118,7 @@ class UserController extends AbstractCatalogueElementController<User> {
 
     @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def role() {
-
-        User user = User.get(params.id)
+        User user = findById(params.long('id'))
         if (!user) {
             notFound()
             return
@@ -146,23 +146,16 @@ class UserController extends AbstractCatalogueElementController<User> {
         render([apiKey: userService.getApiKey(modelCatalogueSecurityService.currentUser, regenerate)] as JSON)
     }
 
+
     private switchEnabled(boolean enabled) {
 
-        User user = User.get(params.id)
-        if (!user) {
+        long userId = params.long('id')
+        User user = userGormService.switchEnabled(userId, enabled)
+        if ( !user ) {
             notFound()
             return
         }
-
-        if (user.authorities.contains(UserService.ROLE_SUPERVISOR)) {
-            user.errors.rejectValue('enabled', 'user.cannot.edit.supervisor', 'Cannot edit supervisor account')
-            respond user.errors
-            return
-        }
-
-        user.enabled = enabled
-
-        if (!user.save(flush: true)) {
+        if ( user.hasErrors() ) {
             respond user.errors
             return
         }
