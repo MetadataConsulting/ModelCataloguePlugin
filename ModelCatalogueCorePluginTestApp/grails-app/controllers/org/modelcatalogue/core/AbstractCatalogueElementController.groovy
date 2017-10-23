@@ -25,7 +25,18 @@ import static org.springframework.http.HttpStatus.OK
 abstract class AbstractCatalogueElementController<T extends CatalogueElement> extends AbstractRestfulController<T> {
 
     static responseFormats = ['json', 'xml']
-    static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE", mappings: "GET", removeMapping: "DELETE", addMapping: "POST", update: "PUT"]
+    static allowedMethods = [
+            outgoing: "GET",
+            incoming: "GET",
+            addIncoming: "POST",
+            addOutgoing: "POST",
+            removeIncoming: "DELETE",
+            removeOutgoing: "DELETE",
+            mappings: "GET",
+            removeMapping: "DELETE",
+            addMapping: "POST",
+            update: "PUT"
+    ]
 
     def relationshipService
     def mappingService
