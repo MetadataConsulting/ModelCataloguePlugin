@@ -28,7 +28,7 @@ class FavouriteService {
 
     @Transactional
     void favouriteModelById(Long id) {
-        DataModel dataModel = dataModelGormService.get(id)
+        DataModel dataModel = dataModelGormService.findById(id)
         if ( !dataModel ) {
             log.info ('data model not found with id: {}', id)
             return
@@ -38,7 +38,7 @@ class FavouriteService {
 
     @Transactional
     void unfavouriteModelById(Long id) {
-        DataModel dataModel = dataModelGormService.get(id)
+        DataModel dataModel = dataModelGormService.findById(id)
         if ( !dataModel ) {
             log.info ('data model not found with id: {}', id)
             return

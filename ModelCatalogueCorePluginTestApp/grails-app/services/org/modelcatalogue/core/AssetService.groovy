@@ -45,7 +45,7 @@ class AssetService {
     }
 
     Asset upload(Long id, Long dataModelId, String name, String description, MultipartFile file, String filename = file.originalFilename) {
-        Asset asset = dataModelId ? new Asset(dataModel: dataModelGormService.get(dataModelId)) : new Asset()
+        Asset asset = dataModelId ? new Asset(dataModel: dataModelGormService.findById(dataModelId)) : new Asset()
 
         if (file.size > modelCatalogueStorageService.maxFileSize) {
             asset.errors.rejectValue('md5', 'asset.uploadfailed', "You cannot upload files greater than ${toBytes(modelCatalogueStorageService.maxFileSize)}")

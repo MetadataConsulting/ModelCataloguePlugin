@@ -57,7 +57,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     @CompileStatic
     @Override
     protected DataModel queryForResource(Serializable id) {
-        dataModelGormService.get(id as Long)
+        dataModelGormService.findById(id as Long)
     }
 
     //can be used in the future
@@ -274,7 +274,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     */
     def containsOrImports() {
 
-        DataModel dataModel = dataModelGormService.get(params.long('id'))
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
         if (!dataModel) {
             notFound()
             return
@@ -315,7 +315,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        DataModel dataModel = dataModelGormService.get(params.long('id'))
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
         if (!dataModel) {
             notFound()
             return
@@ -324,7 +324,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         Long id = dataModel.id
 
         executorService.submit {
-            DataModel model = dataModelGormService.get(id)
+            DataModel model = dataModelGormService.findById(id)
             modelCatalogueSearchService.index(model.declares).subscribe {
                 log.info "${model} reindexed"
             }
@@ -343,7 +343,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     //TODO: needs work, counts etc are confusing and have been removed from the ui but they should at some point be update properly
 
     def content() {
-        DataModel dataModel = dataModelGormService.get(params.long('id'))
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
         if (!dataModel) {
             notFound()
             return
@@ -393,7 +393,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      */
 
     def dependents() {
-        DataModel dataModel = dataModelGormService.get(params.long('id'))
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
         if (!dataModel) {
             notFound()
             return
@@ -453,7 +453,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        DataModel dataModel = dataModelGormService.get(params.long('id'))
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
         if (!dataModel) {
             respond status: HttpStatus.NOT_FOUND
             return
@@ -468,7 +468,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            CatalogueElementToXlsxExporter.forDataModel(dataModelGormService.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            CatalogueElementToXlsxExporter.forDataModel(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -485,7 +485,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        DataModel dataModel = dataModelGormService.get(params.long('id'))
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
 
         Long dataModelId = dataModel.id
 
@@ -502,7 +502,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
            // GridReportXlsxExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
-            GMCGridReportXlsxExporter.create(dataModelGormService.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            GMCGridReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
 
         }
 
@@ -523,7 +523,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        DataModel dataModel = dataModelGormService.get(params.long('id'))
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
 
         Long dataModelId = dataModel.id
 
@@ -539,7 +539,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            ExcelExporter.create(dataModelGormService.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            ExcelExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -557,7 +557,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        DataModel dataModel = dataModelGormService.get(params.long('id'))
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
         if (!dataModel) {
             respond status: HttpStatus.NOT_FOUND
             return
@@ -570,7 +570,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
                 originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream outputStream ->
-            new DataModelToDocxExporter(dataModelGormService.get(modelId), dataClassService, elementService, customTemplate, DOC_IMAGE_PATH, depth).export(outputStream)
+            new DataModelToDocxExporter(dataModelGormService.findById(modelId), dataClassService, elementService, customTemplate, DOC_IMAGE_PATH, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
