@@ -1,4 +1,3 @@
-<div class="col-md-12 metadata-stewardship-item-content">
 
     <!--
     <div class="alert alert-warning" ng-if="editableForm.$visible">
@@ -18,165 +17,104 @@
       "http://stewardship.modelcatalogue.org/stewardship#databaseAdministrator" # name
 
       -->
-    <table ng-controller="SelectStewardshipInfo"  class="table table-condensed table-striped table-borderless table-no-margin small">
-        <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#registrationAuthority')">
-          <th class="col-md-3">
-            Registration Authority
-            <i class="fa fa-question"
-               popover="e.g. NHS for COSD, IHTSDO for SNOMED"
-               popover-title="Registration Authority"
-               popover-trigger="mouseenter"></i>
-          </th>
-          <td class="full-width-editable">
 
-            <span editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#registrationAuthority']" class = "small">
-                      {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#registrationAuthority')}}
-                  </span>
-          </td>
-        </tr>
-        <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#dataSteward')">
-            <th class="col-md-3">
-                Data Steward
-                <i class="fa fa-question"
-                   popover="The name of the data steward"
-                   popover-title="Data Steward"
-                   popover-trigger="mouseenter"></i>
-            </th>
-            <td class="full-width-editable">
-                <span editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#dataSteward']" class = "small">
-                    {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#dataSteward')}}
+
+
+
+<div ng-controller="SelectStewardshipInfo">
+<div class="col-md-6" >
+    <div class="row">
+        <div class="col-md-6"><strong class="small">Registration Authority</strong></div>
+        <div class="full-width-editable col-md-6">
+            <small editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#registrationAuthority']" e-name="registration-authority">
+                {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#registrationAuthority') || 'empty'}}
+            </small>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6"><strong class="small">Data Steward</strong></div>
+        <div class="full-width-editable col-md-6">
+            <small editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#dataSteward']" e-name="data-steward">
+                {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#dataSteward') || 'empty'}}
+            </small>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6"><strong class="small">Stewardship Effective From</strong></div>
+        <div class="col-md-6 datepicker-xs">
+            <small editable-bsdate="extAsMap['http://stewardship.modelcatalogue.org/stewardship#stewardshipEffectiveFrom']"
+                   e-name="stewards-effective-from" e-readonly="true" e-datepicker-popup="dd/MM/yyyy" e-init-date="false"
+                   e-is-open="data.isOpen" e-ng-click="data.isOpen = true" e-on-open-focus="false">
+                {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#stewardshipEffectiveFrom') | date: "dd/MM/yyyy" || 'empty'}}
                 </span>
-            </td>
-        </tr>
-        <!-- I'd like to be able to generate these sort of automatically -->
-        <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#dataQualityAssessment')">
-            <th class="col-md-3">
-                Data Quality Assessment
-                <i class="fa fa-question"
-                   popover=""
-                   popover-title="Data Quality Assessment"
-                   popover-trigger="mouseenter"></i>
-            </th>
-            <td class="full-width-editable">
-                    <span editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#dataQualityAssessment']" class = "small">
-                        {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#dataQualityAssessment')}}
-                    </span>
-            </td>
-        </tr>
-        <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#effectiveFrom')">
-          <th class="col-md-3">
-            Steward Effective From
-            <i class="fa fa-question"
-               popover="Date starting from which the steward is responsible for this data"
-               popover-title="Steward Effective From"
-               popover-trigger="mouseenter"></i>
-          </th>
-          <td class="full-width-editable">
+            </small>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6"><strong class="small">Stewardship Effective To</strong></div>
+        <div class="col-md-6 datepicker-xs">
+            <small editable-bsdate="extAsMap['http://stewardship.modelcatalogue.org/stewardship#stewardshipEffectiveTo']"
+                   e-name="steward-effective-to" e-readonly="true" e-datepicker-popup="dd/MM/yyyy" e-init-date="false"
+                   e-is-open="data.isOpen" e-ng-click="data.isOpen = true" e-on-open-focus="false">
+                {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#stewardshipEffectiveTo') | date: "dd/MM/yyyy" || 'empty'}}
+            </small>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6"><strong class="small">Data Quality Assessment</strong></div>
+        <div class="full-width-editable col-md-6">
+            <small editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#dataQualityAssessment']" e-name="data-quality">
+                {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#dataQualityAssessment') || 'empty'}}
+            </small>
+        </div>
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="row">
+        <div class="col-md-6"><strong class="small">Last Audit</strong></div>
+        <div class="col-md-6 datepicker-xs">
+            <small editable-bsdate="extAsMap['http://stewardship.modelcatalogue.org/stewardship#lastAudit']"
+                   e-name="metadata-last-audit" e-readonly="true" e-datepicker-popup="dd/MM/yyyy" e-init-date="false"
+                   e-is-open="data.isOpen" e-ng-click="data.isOpen = true" e-on-open-focus="false">
+                {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#lastAudit') | date: "dd/MM/yyyy" || 'empty'}}
+            </small>
+        </div>
+    </div>
 
-              <span editable-date="effectiveFrom" class = "small">
-                        {{effectiveFrom
-                          | date: "dd/MM/yyyy"}}
-                    </span>
-          </td>
-        </tr>
-        <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#effectiveTo')">
-          <th class="col-md-3">
-            Steward Effective To
-            <i class="fa fa-question"
-               popover="Date when the steward's responsibility for this data ends"
-               popover-title="Steward Effective To"
-               popover-trigger="mouseenter"></i>
-          </th>
-          <td class="full-width-editable">
 
-              <span editable-date="effectiveTo" class = "small">
-                        {{effectiveTo
-                            | date: "dd/MM/yyyy"}}
-                    </span>
-          </td>
-        </tr>
-        <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#lastAudit')">
-            <th class="col-md-3">
-                Last Audit
-                <i class="fa fa-question"
-                   popover="Date of last audit"
-                   popover-title="Last Audit"
-                   popover-trigger="mouseenter"></i>
-            </th>
-            <td class="full-width-editable">
-                <!-- this editable date is an HTML5 feature -->
-                    <span editable-date="lastAudit"
-                          class = "small">
-                      <!--e-is-open="opened.$data"
-                          e-ng-click="open($event,'$data')"
-                          e-datepicker-popup="dd-MMMM-yyyy"-->
-                        {{lastAudit
-                            | date: "dd/MM/yyyy"
-                            }}<!--want to format with| date:"dd/MM/yyyy"-->
-                    </span>
-            </td>
-        </tr>
-        <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#sensitivity')">
-            <th class="col-md-3">
-                Sensitivity
-                <i class="fa fa-question"
-                   popover="Sensitivity Levels"
-                   popover-title="Sensitivity"
-                   popover-trigger="mouseenter"></i>
-            </th>
-            <td class="full-width-editable">
-                <div >
+    <div class="row">
+        <div class="col-md-6"><strong class="small">Sensitivity</strong></div>
+        <div class="col-md-6">
                     <span editable-select="extAsMap['http://stewardship.modelcatalogue.org/stewardship#sensitivity']"
                           e-ng-options="s for s in sensitivityLevels"
                           class = "small">
                         {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#sensitivity')}}
                     </span>
-                </div>
-            </td>
-        </tr>
-        <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#databaseLocation')">
-            <th class="col-md-3">
-                Database Location
-                <i class="fa fa-question"
-                   popover="A url for locating the database"
-                   popover-title="Database Location"
-                   popover-trigger="mouseenter"></i>
-            </th>
-            <td class="full-width-editable">
-                <!-- editable url is an HTML5 feature -->
-                    <span editable-url="extAsMap['http://stewardship.modelcatalogue.org/stewardship#databaseLocation']" class = "small">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6"><strong class="small">Database Location</strong></div>
+        <div class="col-md-6">
+            <span editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#databaseLocation']" class = "small">
                         {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#databaseLocation')}}
-                    </span>
-            </td>
-        </tr>
-        <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#databaseAccessDetails')">
-            <th class="col-md-3">
-                Database Access Details
-                <i class="fa fa-question"
-                   popover=""
-                   popover-title="Database Access Details"
-                   popover-trigger="mouseenter"></i>
-            </th>
-            <td class="full-width-editable">
-                    <span editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#databaseAccessDetails']" class = "small">
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6"><strong class="small">Database Access</strong></div>
+        <div class="col-md-6">
+            <span editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#databaseAccessDetails']" class = "small">
                         {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#databaseAccessDetails')}}
                     </span>
-            </td>
-        </tr>
-        <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#databaseAdministrator')">
-          <th class="col-md-3">
-            Database Administrator
-            <i class="fa fa-question"
-               popover="The administrator of the database"
-               popover-title="Database Administrator"
-               popover-trigger="mouseenter"></i>
-          </th>
-          <td class="full-width-editable">
-
-              <span editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#databaseAdministrator']" class = "small">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6"><strong class="small">Database Administrator</strong></div>
+        <div class="col-md-6">
+            <span editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#databaseAdministrator']" class = "small">
                         {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#databaseAdministrator')}}
                     </span>
-          </td>
-        </tr>
-    </table>
+        </div>
+    </div>
+</div>
 </div>

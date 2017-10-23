@@ -12,7 +12,6 @@ environments {
         dataSource {
             driverClassName = "com.mysql.jdbc.Driver"
             dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
-
             url = "jdbc:mysql://localhost:3306/nhs_dd_rbma"
             username = 'root'
             password = ''

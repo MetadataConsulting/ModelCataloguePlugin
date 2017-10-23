@@ -18,10 +18,6 @@ stewardship.controller 'SelectStewardshipInfo', ($scope) ->
     "Pseudonymous"
     "Sensitive"
   ]
-  $scope.effectiveFrom = new Date($scope.element.ext.get('http://stewardship.modelcatalogue.org/stewardship#effectiveFrom'))
-  $scope.effectiveTo = new Date($scope.element.ext.get('http://stewardship.modelcatalogue.org/stewardship#effectiveTo'))
-  $scope.lastAudit = new Date($scope.element.ext.get('http://stewardship.modelcatalogue.org/stewardship#lastAudit'))
-
 
 
 stewardship.config ['detailSectionsProvider', (detailSectionsProvider)->
@@ -29,17 +25,15 @@ stewardship.config ['detailSectionsProvider', (detailSectionsProvider)->
     title: 'Stewardship Metadata'
     position: 50
     types: [
-      'dataClass' # this detailSection applies to these types
-      'dataElement'
       'dataModel'
-      # may later extend to Data Types
+      # doesn't apply to classes or data elements - steward is concerned with the whole dataset
     ]
     keys: [
       "http://stewardship.modelcatalogue.org/stewardship#registrationAuthority" # name
       "http://stewardship.modelcatalogue.org/stewardship#dataSteward" # name
       "http://stewardship.modelcatalogue.org/stewardship#dataQualityAssessment" # name
-      "http://stewardship.modelcatalogue.org/stewardship#effectiveFrom" # date
-      "http://stewardship.modelcatalogue.org/stewardship#effectiveTo" # date
+      "http://stewardship.modelcatalogue.org/stewardship#stewardshipEffectiveFrom" # date
+      "http://stewardship.modelcatalogue.org/stewardship#stewardshipEffectiveTo" # date
       "http://stewardship.modelcatalogue.org/stewardship#lastAudit" # date
       "http://stewardship.modelcatalogue.org/stewardship#sensitivity" # sensitivity type
       "http://stewardship.modelcatalogue.org/stewardship#databaseLocation" # url
@@ -47,7 +41,8 @@ stewardship.config ['detailSectionsProvider', (detailSectionsProvider)->
       "http://stewardship.modelcatalogue.org/stewardship#databaseAdministrator" # name
 
     ]
-    hideByDefault: true
+    # should be displayed by default
+    hideByDefault: false
     template: '/mc/core/stewardship/stewardshipMetadata.html'
   }
 ]

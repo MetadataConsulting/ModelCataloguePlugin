@@ -20,6 +20,7 @@ import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Metadata
 import org.springframework.http.HttpMethod
+import org.modelcatalogue.core.util.test.TestDataHelper
 
 @Log
 class BootStrap {
@@ -47,7 +48,7 @@ class BootStrap {
             null
         }
 
-//        if (Environment.current in [ Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
+//        if (Environment.current in [ Environment.TEST, Environment.DEVELOPMENT] && !System.getenv('MC_BLANK_DEV')) {
 //            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
 //                initCatalogueService.initCatalogue(false)
 //                initPoliciesAndTags()
@@ -62,7 +63,7 @@ class BootStrap {
 
         println 'completed:initCatalogueService'
         log.info "completed:initCatalogueService"
-        modelCatalogueSearchService.reindex(true)
+//        modelCatalogueSearchService.reindex(true)
 
         initCatalogueService.setupStoredProcedures()
         println 'completed:setupStoredProcedures'

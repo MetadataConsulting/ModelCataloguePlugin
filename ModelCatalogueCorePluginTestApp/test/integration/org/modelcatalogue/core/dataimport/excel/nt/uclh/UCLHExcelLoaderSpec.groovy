@@ -5,10 +5,13 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.custommonkey.xmlunit.XMLUnit
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataClassService
+import org.modelcatalogue.core.DataClassServiceIntegrationSpec
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
+import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -23,12 +26,14 @@ import java.nio.charset.StandardCharsets
 /**
  * Created by david on 04/08/2017.
  */
-class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
+class UCLHExcelLoaderSpec extends AbstractIntegrationSpec {
 
-    @Shared ElementService elementService
-    @Shared DataModelService dataModelService
-    @Shared DataClassService dataClassService
     @Shared GrailsApplication grailsApplication
+    @Shared DataModelService dataModelService
+    @Shared ElementService elementService
+    @Shared DataClassService dataClassService
+    StringWriter stringWriter
+    ExcelLoader excelLoader
 
     @Shared List<String> testFiles = ['UCLH_nt_rawimport_AriaTest.xlsx']
 
@@ -37,6 +42,7 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
 
     @Shared CatalogueXmlLoader catalogueXmlLoader
     @Shared DataModel sourceDataModel
+
     def setupSpec(){
         initRelationshipTypes()
         defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
@@ -53,9 +59,9 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
         XMLUnit.ignoreAttributeOrder = true
         stringWriter = new StringWriter()
         //builder = new XmlCatalogueBuilder(stringWriter, true)
-        excelLoader = new org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader()
+        excelLoader = new UCLHExcelLoader()
     }
-    List<String> uclhHeaders = ['L2',	'L3',	'L4',	'L5',	'Lowest level ID',	'Idno',	'Name',	'Description',	'Multiplicity',	'Value Domain / Data Type',	'Related To',	'Current Paper Document  or system name',	'Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',	'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',	'Related To',	'Part of standard data set',	'Data Completeness',	'Estimated quality',	'Timely?', 'Comments']
+//    List<String> uclhHeaders = ['L2',	'L3',	'L4',	'L5',	'Lowest level ID',	'Idno',	'Name',	'Description',	'Multiplicity',	'Value Domain / Data Type',	'Related To',	'Current Paper Document  or system name',	'Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',	'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',	'Related To',	'Part of standard data set',	'Data Completeness',	'Estimated quality',	'Timely?', 'Comments']
 
     /**
      * There are two relatedTo columns!!!

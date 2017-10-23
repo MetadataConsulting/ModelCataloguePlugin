@@ -30,7 +30,6 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
     ExcelLoader excelLoader
     CatalogueBuilder catalogueBuilder
     def dataModelService, elementService
-
     DataClassService dataClassService
     GrailsApplication grailsApplication
     @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()

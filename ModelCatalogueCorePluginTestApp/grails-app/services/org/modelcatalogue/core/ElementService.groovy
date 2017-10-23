@@ -830,7 +830,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 if(!de.relatedTo.contains(item)) {
                     score  = score*100
                     if(score>minimumScore) {
-                        elementSuggestions.add(new ElasticMatchResult(dataElementA: de, dataElementB: item , matchScore: score.round(2), message: message))
+                        elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
                     }
                 }
             }
@@ -839,11 +839,42 @@ class ElementService implements Publisher<CatalogueElement> {
         return elementSuggestions
     }
 
-    private String checkRelatedTo(DataElement de, DataModel proposedModel){
+
+    /**
+     * Return class ids which are very likely to be synonyms using elasticsearch fuzzy matching.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Set<MatchResult> findFuzzyDataClassDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
+        Set<MatchResult> elementSuggestions = []
+        Map searchParams = [:]
+        //iterate through the data model a
+        def elementsToMatch = DataClass.findAllByDataModel(dataModelA)
+        elementsToMatch.each{ DataClass de ->
+            //set params map
+            searchParams.dataModel = dataModelB.id
+            searchParams.search = de.name
+            searchParams.minScore = minimumScore/100
+            def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            String message = checkRelatedTo(de, dataModelB)
+            matches.getItemsWithScore().each{ item, score ->
+                if(!de.relatedTo.contains(item)) {
+                    score  = score*100
+                    if(score>minimumScore) {
+                        elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
+                    }
+                }
+            }
+        }
+
+        return elementSuggestions
+    }
+
+
+    private String checkRelatedTo(CatalogueElement ce, DataModel proposedModel){
         String modelRelatedItems = ""
-        de.relatedTo.each{ ce ->
+        ce.relatedTo.each{ c ->
             if(ce.dataModel == proposedModel){
-                modelRelatedItems = modelRelatedItems + "Note: $de.name already related to: $ce.name \n "
+                modelRelatedItems = modelRelatedItems + "Note: $ce.name already related to: $c.name \n "
             }
         }
         modelRelatedItems

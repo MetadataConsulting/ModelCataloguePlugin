@@ -6,6 +6,8 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
+import org.modelcatalogue.core.dataimport.excel.loinc.LoincExcelLoader
+import org.modelcatalogue.core.dataimport.excel.loinc.LoincHeadersMap
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
@@ -94,6 +96,21 @@ class DataImportController  {
             return
         }
 
+        suffix = "loinc.xls"
+        if (checkFileNameTypeAndContainsString(file,suffix)) {
+            Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+            Long id = asset.id
+            InputStream inputStream = file.inputStream
+            String filename = file.originalFilename
+            Workbook wb = WorkbookFactory.create(inputStream)
+            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+            executeInBackground(id, "Imported from Excel") {
+                loadLoincSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
+            }
+            redirectToAsset(id)
+            return
+        }
+
         //North Thames GMC specific import type for cancer data
         suffix = "ca_nt_rawimport.xls"
         if (checkFileNameTypeAndContainsString(file,suffix)) {
@@ -154,7 +171,7 @@ class DataImportController  {
             executeInBackground(id, "Imported from Excel") {
                 try {
                     ExcelLoader parser = new ExcelLoader()
-                    parser.buildModelFromStandardWorkbookSheet(HeadersMap.createForStandardExcelLoader(), inputStream, )
+                    parser.buildModelFromStandardWorkbookSheet(HeadersMap.createForStandardExcelLoader(), inputStream, defaultCatalogueBuilder)
                     finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)
@@ -374,6 +391,27 @@ class DataImportController  {
                         0,
                         defaultCatalogueBuilder,
                         filename.split(/\.mc\.xls/)[0]
+                )
+                finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
+
+            }
+            catch (Exception e) {
+                logError(id, e)
+            }
+        }
+    }
+
+
+    @Async
+    protected void loadLoincSpreadsheet(Workbook wb, String filename, DefaultCatalogueBuilder defaultCatalogueBuilder, Long id, Long userId) {
+        auditService.mute {
+            try {
+                ExcelLoader loader = new LoincExcelLoader()
+                loader.buildModelFromStandardWorkbookSheet(
+                        LoincHeadersMap.createForLoincExcelLoader(),
+                        wb,
+                        defaultCatalogueBuilder,
+                        0
                 )
                 finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
 
