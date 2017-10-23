@@ -3,12 +3,12 @@ package org.modelcatalogue.core
 import com.google.common.collect.ImmutableSet
 import grails.transaction.Transactional
 import grails.util.GrailsNameUtils
-import groovy.transform.CompileStatic
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.ExcelExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.DataModelFilter
@@ -24,7 +24,6 @@ import grails.plugin.springsecurity.acl.AclUtilService
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.springframework.http.HttpStatus
 import org.springframework.security.acls.domain.BasePermission
-import org.springframework.security.acls.model.Acl
 import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import grails.plugin.springsecurity.acl.AclService
@@ -54,12 +53,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 		super(DataModel, false)
 	}
 
-    @CompileStatic
-    @Override
-    protected DataModel queryForResource(Serializable id) {
-        dataModelGormService.findById(id as Long)
-    }
-
     //can be used in the future
     static final String DOC_IMAGE_PATH = ""
 
@@ -80,8 +73,10 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         'paragraph.headerImage' height: 1.366.inches, width: 2.646.inches
     }
 
-
-
+    protected DataModel findById(long id) {
+        dataModelGormService.findById(id)
+    }
+    
     /**
      * Saves a resource
      * Overrides the base method - there is a slightly different security model
@@ -175,7 +170,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        T instance = queryForResource(params.id)
+        T instance = findById(params.id)
         if (instance == null) {
             notFound()
             return
@@ -233,7 +228,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        T instance = queryForResource(params.id)
+        T instance = findById(params.id)
         if (instance == null) {
             notFound()
             return
@@ -415,7 +410,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         Class type = resource
 
         params.max = Math.min(max ?: 10, 100)
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = findById(params.id)
         if (!element) {
             notFound()
             return

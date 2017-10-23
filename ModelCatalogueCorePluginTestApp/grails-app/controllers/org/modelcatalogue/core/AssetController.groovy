@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.dataarchitect.SchemaValidatorService
+import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.web.multipart.MultipartFile
 
@@ -8,6 +9,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
 
     StorageService modelCatalogueStorageService
     SchemaValidatorService schemaValidatorService
+    AssetGormService assetGormService
 
     static allowedMethods = [upload: 'POST', download: 'GET']
 
@@ -84,6 +86,10 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         serveOrDownload(false)
     }
 
+    protected Asset findById(long id) {
+        assetGormService.findById(id)
+    }
+
     @Override
     def delete() {
         def response = super.delete()
@@ -157,7 +163,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         Class type = resource
 
         params.max = Math.min(max ?: 10, 100)
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = findById(params.id)
         if (!element) {
             notFound()
             return

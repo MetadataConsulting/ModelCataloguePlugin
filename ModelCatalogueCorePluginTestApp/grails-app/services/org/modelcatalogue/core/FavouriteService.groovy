@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import groovy.transform.CompileDynamic
 import groovy.util.logging.Slf4j
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.User
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.transaction.Transactional

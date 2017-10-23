@@ -35,6 +35,7 @@ import org.hibernate.ObjectNotFoundException
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.rx.RxService
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter

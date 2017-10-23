@@ -3,7 +3,7 @@ package org.modelcatalogue.core.genomics
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.DataModelGormService
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.gel.GenomicsService
 import org.modelcatalogue.gel.RareDiseaseCsvExporter

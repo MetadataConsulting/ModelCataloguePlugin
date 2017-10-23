@@ -1,8 +1,8 @@
 package org.modelcatalogue.core
 
-import grails.util.Environment
 import org.hibernate.SessionFactory
-import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.persistence.DataElementGormService
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
@@ -12,6 +12,7 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
     DataElementService dataElementService
     SessionFactory sessionFactory
     DataModelGormService dataModelGormService
+    DataElementGormService dataElementGormService
 
     DataElementController() {
         super(DataElement, false)
@@ -46,7 +47,7 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
         if (isDatabaseFallback()) {
             return super.getAllEffectiveItems(max)
         }
-        return Lists.wrap(params, "/${resourceName}/", dataElementService.findAllDataElementsInModel(params, dataModelGormService.read(params.long('dataModel'))))
+        return Lists.wrap(params, "/${resourceName}/", dataElementService.findAllDataElementsInModel(params, dataModelGormService.findById(params.long('dataModel'))))
     }
 
     private boolean isDatabaseFallback() {
@@ -82,5 +83,9 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
                 eq 'relationshipType', RelationshipType.tagType
             }
         }
+    }
+
+    protected DataElement findById(long id) {
+        dataElementGormService.findById(id)
     }
 }

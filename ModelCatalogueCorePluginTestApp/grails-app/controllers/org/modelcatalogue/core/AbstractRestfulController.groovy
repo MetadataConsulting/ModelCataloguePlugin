@@ -27,6 +27,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     CatalogueElementService catalogueElementService
     ElementService elementService
     DataModelGormService dataModelGormService
+    abstract T findById(Serializable id)
 
     private Random random = new Random()
 
@@ -158,7 +159,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        T instance = queryForResource(params.id)
+        T instance = findById(params.id)
         if (instance == null) {
             notFound()
             return
@@ -213,7 +214,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        def instance = queryForResource(params.id)
+        def instance = findById(params.id)
         if (!instance) {
             notFound()
             return

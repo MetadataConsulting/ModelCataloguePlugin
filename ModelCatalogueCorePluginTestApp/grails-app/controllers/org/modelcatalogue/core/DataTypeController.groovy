@@ -1,8 +1,8 @@
 package org.modelcatalogue.core
 
-import grails.util.Environment
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.persistence.DataTypeGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
@@ -11,6 +11,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
 
     DataTypeService dataTypeService
     SessionFactory sessionFactory
+    DataTypeGormService dataTypeGormService
 
     DataTypeController() {
         super(DataType, false)
@@ -22,7 +23,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
 
     def dataElements(Integer max){
         handleParams(max)
-        DataType dataType = queryForResource(params.id)
+        DataType dataType = findById(params.id)
         if (!dataType) {
             notFound()
             return
@@ -39,13 +40,13 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
     }
 
     def convert() {
-        DataType dataType = queryForResource(params.id)
+        DataType dataType = findById(params.id)
         if (!dataType) {
             notFound()
             return
         }
 
-        DataType other = queryForResource(params.destination)
+        DataType other = findById(params.destination)
         if (!other) {
             notFound()
             return
@@ -81,7 +82,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
 
 
     def validateValue() {
-        DataType dataType = queryForResource(params.id)
+        DataType dataType = findById(params.id)
         if (!dataType) {
             notFound()
             return
@@ -122,6 +123,9 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
        ListWrapper<DataType> rapper = Lists.wrap(params, resourceName, typeListing )
 
        return rapper
+    }
 
+    protected DataType findById(long id) {
+        dataTypeGormService.findById(id)
     }
 }

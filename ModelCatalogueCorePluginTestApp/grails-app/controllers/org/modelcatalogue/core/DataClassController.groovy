@@ -3,7 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
-import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
+import org.modelcatalogue.core.persistence.DataClassGormService
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWrapper
@@ -14,6 +14,7 @@ import org.modelcatalogue.core.util.lists.Relationships
 class DataClassController extends AbstractCatalogueElementController<DataClass> {
 
     PerformanceUtilService performanceUtilService
+    DataClassGormService dataClassGormService
 
     DataClassController() {
         super(DataClass, false)
@@ -24,7 +25,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         Boolean all = params.boolean('all')
 
-        DataClass dataClass = queryForResource(params.id)
+        DataClass dataClass = findById(params.id)
         if (!dataClass) {
             notFound()
             return
@@ -46,7 +47,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         params.sort = 'outgoingIndex'
 
-        DataClass element = queryForResource(params.id)
+        DataClass element = findById(params.id)
 
         if (!element) {
             notFound()
@@ -167,5 +168,9 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
             return super.getAllEffectiveItems(max)
         }
         return Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelDataClasses(overridableDataModelFilter, params))
+    }
+
+    protected DataClass findById(long id) {
+        dataClassGormService.findById(id)
     }
 }

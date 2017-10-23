@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.dataarchitect.CSVService
+import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
@@ -16,6 +17,7 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
     def executorService
     def dataClassService
     @Autowired CSVService csvService
+    CatalogueElementGormService catalogueElementGormService
 
     DataArchitectController() {
         super(CatalogueElement, false)
@@ -148,4 +150,7 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     }
 
+    protected CatalogueElement findById(long id) {
+        catalogueElementGormService.findById(id)
+    }
 }

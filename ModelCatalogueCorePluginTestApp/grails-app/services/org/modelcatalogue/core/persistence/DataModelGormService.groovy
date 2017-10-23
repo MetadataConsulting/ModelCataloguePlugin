@@ -1,5 +1,6 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.persistence
 
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.util.DataModelFilter
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.security.access.prepost.PostFilter

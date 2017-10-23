@@ -1,12 +1,13 @@
 package org.modelcatalogue.core.actions
 
 import org.modelcatalogue.core.AbstractRestfulController
+import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.util.lists.Lists
 
 class BatchController extends AbstractRestfulController<Batch> {
 
     def actionService
-
+    BatchGormService batchGormService
     static allowedMethods = [index: 'GET', actions: 'GET', run: 'POST', reactivate: 'POST', dismiss: 'POST', updateActionParameters: 'PUT', addDependency: 'POST', removeDependency: 'DELETE']
 
     @Override
@@ -64,6 +65,10 @@ class BatchController extends AbstractRestfulController<Batch> {
         }
 
         respond batch
+    }
+
+    protected Batch findById(long id) {
+        batchGormService.findById(id)
     }
 
     @Override

@@ -3,20 +3,21 @@ package org.modelcatalogue.core
 import grails.util.GrailsNameUtils
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.core.util.OrderedMap
-import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.persistence.TagGormService
 import org.modelcatalogue.core.util.lists.Lists
-import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
 class TagController extends AbstractCatalogueElementController<Tag> {
 
     SessionFactory sessionFactory
+    TagGormService tagGormService
 
     TagController() {
         super(Tag, false)
+    }
+
+    protected Tag findById(long id) {
+        tagGormService.findById(id)
     }
 
     @Override

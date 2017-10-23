@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.rx.LoggingSubscriber
 import org.modelcatalogue.core.util.lists.Lists
 
@@ -13,8 +14,14 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
 
     ExecutorService executorService
 
+    CatalogueElementGormService catalogueElementGormService
+
     SearchController() {
         super(CatalogueElement, true)
+    }
+
+    protected CatalogueElement findById(long id) {
+        catalogueElementGormService.findById(id)
     }
 
     def index(Integer max) {

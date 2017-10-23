@@ -7,6 +7,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserGormService
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.security.UserService
 import org.modelcatalogue.core.util.DataModelFilter
@@ -14,6 +15,8 @@ import org.modelcatalogue.core.util.DataModelFilter
 class UserController extends AbstractCatalogueElementController<User> {
 
     UserService userService
+
+    UserGormService userGormService
 
     SpringSecurityService springSecurityService
 
@@ -39,7 +42,7 @@ class UserController extends AbstractCatalogueElementController<User> {
             return
         }
 
-        User element = queryForResource(id)
+        User element = findById(id)
 
         if (!element) {
             notFound()
@@ -47,6 +50,10 @@ class UserController extends AbstractCatalogueElementController<User> {
         }
 
         respond element
+    }
+
+    protected User findById(long id) {
+        userGormService.findById(id)
     }
 
     @Override

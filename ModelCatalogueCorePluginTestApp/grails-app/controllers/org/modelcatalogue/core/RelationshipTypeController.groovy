@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
+import org.modelcatalogue.core.persistence.RelationshipTypeGormService
 import org.modelcatalogue.core.util.CatalogueElementFinder
 import org.modelcatalogue.core.util.lists.Lists
 
@@ -10,6 +11,8 @@ import static org.springframework.http.HttpStatus.OK
 
 class RelationshipTypeController extends AbstractRestfulController<RelationshipType>{
 
+    RelationshipTypeGormService relationshipTypeGormService
+
     @Override
     protected boolean allowSaveAndEdit() {
         modelCatalogueSecurityService.hasRole('SUPERVISOR')
@@ -17,6 +20,10 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
 
     RelationshipTypeController() {
         super(RelationshipType)
+    }
+
+    protected RelationshipType findById(long id) {
+        relationshipTypeGormService.findById(id)
     }
 
     @Override
@@ -63,7 +70,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
             return
         }
 
-        RelationshipType instance = queryForResource(params.id)
+        RelationshipType instance = findById(params.id)
         if (instance == null) {
             notFound()
             return

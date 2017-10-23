@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.security
 
 import grails.transaction.Transactional
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class UserGormService {
 
     @Transactional(readOnly = true)
@@ -10,7 +12,7 @@ class UserGormService {
     }
 
     @Transactional(readOnly = true)
-    User findById(Long userId) {
-        User.where { id == userId }.get()
+    User findById(long id) {
+        User.get(id)
     }
 }

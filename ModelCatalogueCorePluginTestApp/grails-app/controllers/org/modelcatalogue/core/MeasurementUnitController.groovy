@@ -1,9 +1,12 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.persistence.MeasurementUnitGormService
 import org.modelcatalogue.core.util.lists.Lists
 
 class MeasurementUnitController extends AbstractCatalogueElementController<MeasurementUnit> {
+
+    MeasurementUnitGormService measurementUnitGormService
 
     MeasurementUnitController() {
         super(MeasurementUnit, false)
@@ -12,7 +15,7 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
     def primitiveTypes(Integer max){
         handleParams(max)
 
-        MeasurementUnit unit = queryForResource(params.id)
+        MeasurementUnit unit = findById(params.id)
         if (!unit) {
             notFound()
             return
@@ -27,6 +30,10 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
             }
         })
 
+    }
+
+    protected MeasurementUnit findById(long id) {
+        measurementUnitGormService.findById(id)
     }
 
     @Override

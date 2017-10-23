@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.apache.commons.io.input.CountingInputStream
@@ -10,6 +9,7 @@ import org.apache.commons.io.output.CountingOutputStream
 import org.codehaus.groovy.runtime.InvokerInvocationException
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.publishing.CloningContext
 import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
