@@ -1,8 +1,11 @@
 package org.modelcatalogue.core
 
+import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.events.RelationAddedEvent
+import org.modelcatalogue.core.events.RelationshipWithErrorsEvent
 import org.modelcatalogue.core.path.PathFinder
 import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.VerificationPhase
@@ -15,8 +18,10 @@ import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
-import org.modelcatalogue.core.xml.CatalogueXmlPrinter
-
+import org.modelcatalogue.core.events.MetadataResponseEvent
+import org.modelcatalogue.core.events.CatalogueElementNotFoundEvent
+import org.modelcatalogue.core.events.RelationshipNotFoundEvent
+import org.modelcatalogue.core.events.DataModelNotFoundEvent
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
 
@@ -43,7 +48,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def auditService
     def dataModelService
     def dataClassService
-    DataModelGormService dataModelGormService
+    AddRelationService addRelationService
 
     //used to run reports in background thread
     ExecutorService executorService
@@ -87,6 +92,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param id, catalogue element - source of relationshipsxs you want to
      * @param type, the type of relationship you want to return
      */
+    @Secured(['ROLE_METADATA_CURATOR','ROLE_ADMIN','ROLE_SUPERVISOR'])
     def addOutgoing(Long id, String type) {
         addRelation(id, type, true)
     }
@@ -97,6 +103,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param id, catalogue element - source of relationshipsxs you want to
      * @param type, the type of relationship you want to return
      */
+    @Secured(['ROLE_METADATA_CURATOR','ROLE_ADMIN','ROLE_SUPERVISOR'])
     def addIncoming(Long id, String type) {
         addRelation(id, type, false)
     }
@@ -719,95 +726,55 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
     }
 
-    //TODO: this should all go into a service
-    //general add any relation from a catalogue element based on the relationship type
-    // used by the directional add relation methods
-    private void addRelation(Long id, String type, boolean outgoing) {
+   /**
+    * general add any relation from a catalogue element based on the relationship type used by the directional add relation methods
+    */
+//    @CompileStatic
+    protected def addRelation(Long catalogueElementId, String type, boolean outgoing) {
 
-        withRetryingTransaction {
-            if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
-                unauthorized()
-                return
-            }
-
+        try {
             def otherSide = parseOtherSide()
-
-            CatalogueElement source = resource.get(id)
-            if (!source) {
+            def objectToBindParam = getObjectToBind()
+            MetadataResponseEvent metadataResponse = addRelationService.addRelation(resource,
+                    catalogueElementId,
+                    type,
+                    outgoing as Boolean,
+                    objectToBindParam as Object,
+                    otherSide as Object)
+            if ((metadataResponse instanceof CatalogueElementNotFoundEvent) ||
+                (metadataResponse instanceof RelationshipNotFoundEvent) ||
+                (metadataResponse instanceof DataModelNotFoundEvent)) {
                 notFound()
                 return
             }
-            RelationshipType relationshipType = RelationshipType.readByName(type)
-            if (!relationshipType) {
-                notFound()
+            if (metadataResponse instanceof RelationshipWithErrorsEvent) {
+                RelationshipWithErrorsEvent relationshipWithErrorsEvent = metadataResponse as RelationshipWithErrorsEvent
+                respond relationshipWithErrorsEvent.rel.errors
                 return
-
             }
-
-            def newDataModel = objectToBind['__dataModel'] ?: objectToBind['__classification']
-            Long dataModelId = newDataModel instanceof Map ? newDataModel.id as Long : null
-
-            DataModel dataModel = dataModelId ? dataModelGormService.get(dataModelId) : null
-
-
-            def oldDataModel = objectToBind['__oldDataModel'] ?: objectToBind['__oldClassification']
-            Long oldDataModelId = oldDataModel instanceof Map ? oldDataModel.id as Long : null
-
-            DataModel oldDataModelInstance = oldDataModelId ? dataModelGormService.get(oldDataModelId) : null
-
-            if (dataModelId && !dataModel) {
+            if( !(metadataResponse instanceof RelationAddedEvent)) {
                 notFound()
                 return
             }
-
-            Class otherSideType
-            try {
-                otherSideType = Class.forName otherSide.elementType
-            } catch (ClassNotFoundException ignored) {
-                notFound()
-                return
-            }
-
-            CatalogueElement destination = otherSideType.get(otherSide.id)
-            if (!destination) {
-                notFound()
-                return
-            }
-
-            if (oldDataModelInstance != dataModel) {
-                if (outgoing) {
-                    relationshipService.unlink(source, destination, relationshipType, oldDataModelInstance)
-                } else {
-                    relationshipService.unlink(destination, source, relationshipType, oldDataModelInstance)
-                }
-            }
-
-            RelationshipDefinitionBuilder definition = outgoing ? RelationshipDefinition.create(source, destination, relationshipType) : RelationshipDefinition.create(destination, source, relationshipType)
-
-            definition.withDataModel(dataModel).withMetadata(OrderedMap.fromJsonMap(objectToBind.metadata ?: [:]))
-
-            if (modelCatalogueSecurityService.hasRole('SUPERVISOR', getDataModel())) {
-                definition.withIgnoreRules(true)
-            }
-
-            Relationship rel = relationshipService.link(definition.definition)
-
-            if (rel.hasErrors()) {
-                respond rel.errors
-                return
-            }
-
+            RelationAddedEvent relationAddedEvent = metadataResponse as RelationAddedEvent
             response.status = HttpServletResponse.SC_CREATED
-            RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
-
-            rel.save(flush: true, deepValidate: false, validate: false)
-
-            respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name, classification: rel.dataModel, dataModel: rel.dataModel)
+            respond(id: relationAddedEvent.rel.id,
+                    type: relationAddedEvent.rel.relationshipType,
+                    ext: OrderedMap.toJsonMap(relationAddedEvent.rel.ext),
+                    element: CatalogueElementMarshaller.minimalCatalogueElementJSON(relationAddedEvent.direction.getElement(relationAddedEvent.source, relationAddedEvent.rel)),
+                    relation: relationAddedEvent.direction.getRelation(relationAddedEvent.source, relationAddedEvent.rel),
+                    direction: relationAddedEvent.direction.getDirection(relationAddedEvent.source, relationAddedEvent.rel),
+                    removeLink: RelationshipsMarshaller.getDeleteLink(relationAddedEvent.source, relationAddedEvent.rel),
+                    archived: relationAddedEvent.rel.archived, elementType: Relationship.name,
+                    classification: relationAddedEvent.rel.dataModel,
+                    dataModel: relationAddedEvent.rel.dataModel)
+        } catch (ClassNotFoundException ignored) {
+            notFound()
         }
     }
 
     //TODO: not sure what this does
-    protected parseOtherSide() {
+    protected Object parseOtherSide() {
         request.getJSON()
     }
 
@@ -817,7 +784,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param type,type of relationship
      * @param max, maximum results
      */
-
     //TODO: this should all go into a service
     private relationshipsInternal(Integer max, String typeParam, RelationshipDirection direction) {
         handleParams(max)

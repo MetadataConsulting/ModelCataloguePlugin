@@ -54,7 +54,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
             return false
         }
 
-        aclUtilService.hasPermission(springSecurityService.principal, dataModel, BasePermission.READ)
+        aclUtilService.hasPermission(springSecurityService.authentication, dataModel, BasePermission.READ)
     }
 
     //check if a user a general role
