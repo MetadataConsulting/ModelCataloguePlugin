@@ -92,12 +92,12 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def addFavourite() {
-        Long dataModelId = request.JSON.id
+        Long dataModelId = request.JSON.id as Long
         favouriteService.favouriteModelById(dataModelId)
     }
 
     def removeFavourite() {
-        Long dataModelId = request.JSON.id
+        Long dataModelId = request.JSON.id as Long
         favouriteService.unfavouriteModelById(dataModelId)
     }
 
