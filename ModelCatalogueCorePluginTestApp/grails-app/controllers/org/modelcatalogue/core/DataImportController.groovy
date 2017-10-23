@@ -16,6 +16,7 @@ import org.modelcatalogue.integration.obo.OboLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.Async
+import org.springframework.security.access.annotation.Secured
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
@@ -52,11 +53,9 @@ class DataImportController  {
         return errors
     }
 
+    @Secured(['ROLE_SUPERVISOR'])
     def upload() {
-        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
-            render status: HttpStatus.UNAUTHORIZED
-            return
-        }
+
 
         if (!(request instanceof MultipartHttpServletRequest)) {
             respond "errors": [message: 'No file selected']
