@@ -21,6 +21,12 @@ class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
             mkp.regex element.regexDef
         } else if (element.rule) {
             mkp.rule element.rule
+        } else if(element.isBasedOn){
+            if (element.isBasedOn.regexDef.first()!=null) {
+                mkp.regex element.isBasedOn.regexDef.first()
+            } else if (element.isBasedOn.rule.first()!=null) {
+                mkp.rule element.isBasedOn.rule.first()
+            }
         }
         if (element instanceof EnumeratedType && element.enumerations) {
             mkp.enumerations {
