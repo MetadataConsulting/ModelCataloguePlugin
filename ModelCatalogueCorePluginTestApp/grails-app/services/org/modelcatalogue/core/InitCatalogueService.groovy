@@ -42,7 +42,7 @@ class InitCatalogueService {
         List<Resource> forSecondPass = []
 
         // first pass
-        for (Resource resource in resolver.getResources('classpath*:**/*.mc')) {
+        for (Resource resource in resolver.getResources('classpath*:**/mc_resources/*.mc')) {
             if (isTestResource(resource)) {
                 continue
             }
@@ -110,7 +110,7 @@ class InitCatalogueService {
     private void readMCFile(Resource resource, boolean failOnError) {
         try {
             log.info "Importing MC file ${resource.URI}"
-            Set<CatalogueElement> lastCreated = importMCFile(resource.inputStream, true)
+            Set<CatalogueElement> lastCreated = importMCFile(resource.inputStream, false)
             for (CatalogueElement element in lastCreated) {
                 if (element.status == ElementStatus.DRAFT) {
                     elementService.finalizeElement(element)
