@@ -5,6 +5,7 @@ import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.persistence.CsvTransformationGormService
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.springframework.security.access.annotation.Secured
 import org.springframework.web.multipart.MultipartFile
 
 class CsvTransformationController extends AbstractRestfulController<CsvTransformation>{
@@ -22,11 +23,6 @@ class CsvTransformationController extends AbstractRestfulController<CsvTransform
     def transform() {
         if (!params.id) {
             notFound()
-        }
-
-        if (!modelCatalogueSecurityService.hasRole('USER', getDataModel())) {
-            unauthorized()
-            return
         }
 
         CsvTransformation transformation = csvTransformationGormService.findById(params.long('id'))

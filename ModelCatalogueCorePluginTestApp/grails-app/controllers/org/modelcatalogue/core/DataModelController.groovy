@@ -81,7 +81,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      * Saves a resource
      * Overrides the base method - there is a slightly different security model
      */
-    @Secured(['ROLE_METADATA_CURATOR','ROLE_ADMIN','ROLE_SUPERVISOR'])
     @Transactional
     def save() {
         if (handleReadOnly()) {
@@ -221,7 +220,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      * Create a new version of a data model
      * @param id
      */
-    @Secured(['ROLE_METADATA_CURATOR','ROLE_ADMIN','ROLE_SUPERVISOR'])
     @Transactional
     def newVersion() {
         if(handleReadOnly()) {

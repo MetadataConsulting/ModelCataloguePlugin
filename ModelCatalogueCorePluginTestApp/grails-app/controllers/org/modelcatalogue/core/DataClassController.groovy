@@ -86,11 +86,6 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def inventoryDoc(String name, Integer depth) {
-
-        if (!allowSaveAndEdit()) {
-            unauthorized()
-            return
-        }
         if (handleReadOnly()) {
             return
         }
@@ -110,11 +105,6 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def inventorySpreadsheet(String name, Integer depth) {
-
-        if (!allowSaveAndEdit()) {
-            unauthorized()
-            return
-        }
         if (handleReadOnly()) {
             return
         }
@@ -136,11 +126,6 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def changelogDoc(String name, Integer depth, Boolean includeMetadata) {
-
-        if (!allowSaveAndEdit()) {
-            unauthorized()
-            return
-        }
         if (handleReadOnly()) {
             return
         }

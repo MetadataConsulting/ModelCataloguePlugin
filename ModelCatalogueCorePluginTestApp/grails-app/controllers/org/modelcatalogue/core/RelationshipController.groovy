@@ -12,9 +12,6 @@ class RelationshipController {
     //TODO: check that we need this method at all
     //not sure that we do
     //only allowing supervisors to do this
-
-
-    @Secured(['ROLE_SUPERVISOR'])
     def restore() {
         Long id = params.long('id')
 

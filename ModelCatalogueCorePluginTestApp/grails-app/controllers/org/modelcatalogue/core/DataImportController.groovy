@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
@@ -7,6 +8,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
+import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
@@ -53,7 +55,6 @@ class DataImportController  {
         return errors
     }
 
-    @Secured(['ROLE_SUPERVISOR'])
     def upload() {
 
 
@@ -72,7 +73,7 @@ class DataImportController  {
 
         String confType = file.getContentType()
 
-        boolean isAdmin = modelCatalogueSecurityService.hasRole('ADMIN')
+        boolean isAdmin = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('ADMIN').join(','))
         DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
 
         Long userId = modelCatalogueSecurityService.currentUser?.id

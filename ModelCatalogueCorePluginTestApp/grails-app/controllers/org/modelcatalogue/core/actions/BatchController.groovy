@@ -11,36 +11,10 @@ class BatchController extends AbstractRestfulController<Batch> {
     BatchGormService batchGormService
     static allowedMethods = [index: 'GET', actions: 'GET', run: 'POST', reactivate: 'POST', dismiss: 'POST', updateActionParameters: 'PUT', addDependency: 'POST', removeDependency: 'DELETE']
 
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
-    def search(Integer max) {
-        super.search(max)
-    }
-
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
-    def validate() {
-        super.validate()
-    }
-
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
-    def save() {
-        super.save()
-    }
-
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
-    def update() {
-        super.update()
-    }
-
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
-    def delete() {
-        super.delete()
-    }
-
     BatchController() {
         super(Batch)
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def archive() {
 
         if (!params.id) {
@@ -60,7 +34,6 @@ class BatchController extends AbstractRestfulController<Batch> {
         respond batch
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def runAll() {
 
         if (!params.id) {
@@ -82,11 +55,6 @@ class BatchController extends AbstractRestfulController<Batch> {
         respond batch
     }
 
-    protected Batch findById(long id) {
-        batchGormService.findById(id)
-    }
-
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     @Override
     def index(Integer max) {
 
@@ -96,8 +64,6 @@ class BatchController extends AbstractRestfulController<Batch> {
         }
     }
 
-
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def updateActionParameters() {
 
 
@@ -126,7 +92,6 @@ class BatchController extends AbstractRestfulController<Batch> {
         respond action
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def listActions(Integer max) {
 
         handleParams(max)
@@ -148,7 +113,6 @@ class BatchController extends AbstractRestfulController<Batch> {
         respond Lists.wrap(params, "/${resourceName}/${batch.id}/actions/${params?.state ?: ''}", actionService.list(params, batch, state))
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def dismiss() {
 
 
@@ -168,7 +132,6 @@ class BatchController extends AbstractRestfulController<Batch> {
         ok()
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def reactivate() {
 
         if (!params.actionId) {
@@ -187,8 +150,6 @@ class BatchController extends AbstractRestfulController<Batch> {
         ok()
     }
 
-
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def run() {
 
         if (!params.actionId) {
@@ -207,7 +168,6 @@ class BatchController extends AbstractRestfulController<Batch> {
         ok()
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def addDependency() {
 
         if (!params.actionId || !params.providerId || !params.role) {
@@ -241,7 +201,6 @@ class BatchController extends AbstractRestfulController<Batch> {
         respond action
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_SUPERVISOR'])
     def removeDependency() {
 
         if (!params.actionId || !params.role) {
@@ -265,5 +224,9 @@ class BatchController extends AbstractRestfulController<Batch> {
         }
 
         respond action
+    }
+
+    protected Batch findById(long id) {
+        batchGormService.findById(id)
     }
 }

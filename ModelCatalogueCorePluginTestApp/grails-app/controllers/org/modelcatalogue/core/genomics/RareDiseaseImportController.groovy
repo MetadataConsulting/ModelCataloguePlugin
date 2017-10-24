@@ -8,6 +8,7 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.annotation.Secured
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
@@ -27,10 +28,6 @@ class RareDiseaseImportController {
     static allowedMethods = [upload: "POST"]
 
     def upload() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
-            render status: HttpStatus.UNAUTHORIZED
-            return
-        }
 
         if (!(request instanceof MultipartHttpServletRequest)) {
             respond "errors": [message: 'No file selected']

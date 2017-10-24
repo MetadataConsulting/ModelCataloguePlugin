@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import org.modelcatalogue.core.persistence.RelationshipTypeGormService
 import org.modelcatalogue.core.util.CatalogueElementFinder
@@ -13,11 +12,6 @@ import static org.springframework.http.HttpStatus.OK
 class RelationshipTypeController extends AbstractRestfulController<RelationshipType>{
 
     RelationshipTypeGormService relationshipTypeGormService
-
-    @Override
-    protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('SUPERVISOR')
-    }
 
     RelationshipTypeController() {
         super(RelationshipType)
@@ -63,10 +57,6 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
     @Override
     @Transactional
     def update() {
-        if (!allowSaveAndEdit()) {
-            unauthorized()
-            return
-        }
         if(handleReadOnly()) {
             return
         }

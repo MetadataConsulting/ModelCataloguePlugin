@@ -213,12 +213,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     @Override
     def delete() {
-        if (!allowDelete()) {
-            response.status = FORBIDDEN.value()
-            respond errors: "Delete is not allowed for you, you probably need higher user role."
-            return
-        }
-
         if (handleReadOnly()) {
             return
         }
@@ -236,7 +230,18 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR', getDataModel())) {
+        hasAut
+        
+        boolean isAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted('ROLE_SUPERVISOR,ROLE_ADMIN')
+
+        DataModel dataModel
+        if ( instance instanceof DataModel ) {
+            dataModel = instance as DataModel
+        } else if ( CatalogueElement.class.isAssignableFrom(instance.class) ) {
+            dataModel = instance.dataModel
+        }
+
+        if ( dataModel && ( isAdminOrSupervisor || dataModelGormService.hasAdministratorPermission(dataModel)) ) {
             // only drafts can be deleted
             def error = "Only elements with status of DRAFT can be deleted."
             if (instance instanceof DataModel) {
@@ -329,14 +334,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         boolean isAdmin = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('ADMIN').join(','))
         Authentication authentication = springSecurityService.authentication
         isAdmin || (isCurator && aclUtilService.hasPermission(authentication, dataModel, BasePermission.ADMINISTRATION))
-    }
-
-    /**
-     * Specify if delete is allowed.
-     * @return Returns true if user role is ADMIN, false otherwise.
-     */
-    protected boolean allowDelete() {
-        allowSaveAndEdit()
     }
 
     protected boolean isFavoriteAfterUpdate() {

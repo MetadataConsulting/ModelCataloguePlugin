@@ -14,6 +14,10 @@ import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.RelationshipDirection
 
+class DestinationDescription {
+    String elementType
+    Long id
+}
 class AddRelationService {
 
     DataModelGormService dataModelGormService
@@ -38,7 +42,7 @@ class AddRelationService {
                                       String type,
                                       Boolean outgoing,
                                       Object objectToBind,
-                                      Object otherSide) throws ClassNotFoundException {
+                                      DestinationDescription otherSide) throws ClassNotFoundException {
         CatalogueElement source = findCatalogueElementByClassAndId(resource, catalogueElementId)
         if ( !source ) {
             return new CatalogueElementNotFoundEvent()
@@ -113,8 +117,7 @@ class AddRelationService {
         OrderedMap.fromJsonMap(objectToBind.metadata ?: [:])
     }
 
-    @CompileDynamic
-    private CatalogueElement findDestinationByOtherSide(otherSide) {
+    private CatalogueElement findDestinationByOtherSide(DestinationDescription otherSide) {
         Class otherSideType = Class.forName otherSide.elementType
 
         findCatalogueElementByClassAndId(otherSideType, otherSide.id)

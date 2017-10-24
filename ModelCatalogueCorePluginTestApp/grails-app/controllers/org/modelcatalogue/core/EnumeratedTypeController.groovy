@@ -47,11 +47,6 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
     }
 
     def setDeprecated() {
-
-        if (!allowSaveAndEdit()) {
-            unauthorized()
-            return
-        }
         if (handleReadOnly()) {
             return
         }

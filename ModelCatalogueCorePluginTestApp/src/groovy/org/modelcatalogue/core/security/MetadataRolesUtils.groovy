@@ -25,4 +25,8 @@ class MetadataRolesUtils {
         return [authority]
     }
 
+    static String roles(String authority) {
+        getRolesFromAuthority(authority).join(',')
+    }
+
 }

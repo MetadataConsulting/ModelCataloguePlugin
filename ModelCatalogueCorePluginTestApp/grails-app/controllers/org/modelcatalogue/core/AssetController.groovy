@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.plugin.springsecurity.annotation.Secured
 import org.modelcatalogue.core.dataarchitect.SchemaValidatorService
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.lists.Lists
@@ -31,10 +32,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     }
 
     def upload() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
-            unauthorized()
-            return
-        }
+
         MultipartFile file = request.getFile('asset')
 
         Asset asset = assetService.upload(params.long('id'), params.long('dataModel'), params.name, params.description, file, params.filename ?: file.originalFilename)

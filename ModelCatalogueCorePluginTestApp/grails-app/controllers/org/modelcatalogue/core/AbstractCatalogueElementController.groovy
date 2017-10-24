@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
@@ -11,6 +12,7 @@ import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.OrderedMap
@@ -92,7 +94,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param id, catalogue element - source of relationshipsxs you want to
      * @param type, the type of relationship you want to return
      */
-    @Secured(['ROLE_METADATA_CURATOR','ROLE_ADMIN','ROLE_SUPERVISOR'])
     def addOutgoing(Long id, String type) {
         addRelation(id, type, true)
     }
@@ -103,11 +104,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param id, catalogue element - source of relationshipsxs you want to
      * @param type, the type of relationship you want to return
      */
-    @Secured(['ROLE_METADATA_CURATOR','ROLE_ADMIN','ROLE_SUPERVISOR'])
     def addIncoming(Long id, String type) {
         addRelation(id, type, false)
     }
-
 
     /**
      * remove an outgoing relationship to a catalogue element
@@ -115,11 +114,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param id, catalogue element - source of relationshipsxs you want to
      * @param type, the type of relationship you want to return
      */
-
     def removeOutgoing(Long id, String type) {
         removeRelation(id, type, true)
     }
-
 
     /**
      * remove an incoming relationship to a catalogue element
@@ -139,7 +136,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param id, catalogue element - source of relationshipsxs you want to
      * @param type, the type of relationship you want to return
      */
-
     def reorderOutgoing(Long id, String type) {
         reorderInternal(RelationshipDirection.OUTGOING, id, type)
     }
@@ -282,10 +278,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def update() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
-            unauthorized()
-            return
-        }
         if(handleReadOnly()) {
             return
         }
@@ -293,6 +285,19 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
+            return
+        }
+        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('CURATOR').join(','))
+
+        DataModel dataModel
+        if ( instance instanceof DataModel ) {
+            dataModel = instance as DataModel
+        } else if ( CatalogueElement.class.isAssignableFrom(instance.class) ) {
+            dataModel = instance.dataModel
+        }
+
+        if ( dataModel && ( isCuratorOrAdminOrSupervisor || dataModelGormService.hasAdministratorPermission(dataModel)) ) {
+            unauthorized()
             return
         }
 
@@ -366,6 +371,19 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond instance, [status: OK]
     }
 
+    protected boolean hasAuthorityOrHasAdministrationPermission(String authority, Object instance) {
+        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority(authority).join(','))
+
+        DataModel dataModel
+        if ( instance instanceof DataModel ) {
+            dataModel = instance as DataModel
+        } else if ( CatalogueElement.class.isAssignableFrom(instance.class) ) {
+            dataModel = instance.dataModel
+        }
+
+        dataModel && ( isCuratorOrAdminOrSupervisor || dataModelGormService.hasAdministratorPermission(dataModel))
+    }
+
     /**
      * Merge an element with another element i.e. if two elements have been created for the same item
      * @param id cloned element id
@@ -373,11 +391,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def merge() {
-
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
-            unauthorized()
-            return
-        }
 
         if (handleReadOnly()) {
             return
@@ -389,17 +402,20 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
+        if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', source) ) {
+            unauthorized()
+            return
+        }
+
         T destination = findById(params.destination)
         if (destination == null) {
             notFound()
             return
         }
-
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', destination.dataModel) ) {
+        if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', destination) ) {
             unauthorized()
             return
         }
-
 
         T merged = elementService.merge(source, destination)
 
@@ -477,12 +493,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def archive() {
-        // TODO: this should be moved to DataModelController
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
-            unauthorized()
-            return
-        }
-
         if (handleReadOnly()) {
             return
         }
@@ -490,6 +500,11 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
+            return
+        }
+
+        if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', instance) ) {
+            unauthorized()
             return
         }
 
@@ -617,15 +632,14 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     private reorderInternal(RelationshipDirection direction, Long id, String type) {
         // begin sanity checks
         //check the user has the minimum role needed
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
-            unauthorized()
-            return
-        }
-
-
         CatalogueElement owner = resource.get(id)
         if (!owner) {
             notFound()
+            return
+        }
+
+        if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', owner) ) {
+            unauthorized()
             return
         }
 
@@ -674,18 +688,18 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     private void removeRelation(Long id, String type, boolean outgoing) {
         withRetryingTransaction {
             //check the user has the minimum role needed
-            if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
-                unauthorized()
-                return
-            }
-
             def otherSide = parseOtherSide()
 
-            CatalogueElement source = resource.get(id)
+            CatalogueElement source = findById(id)
             if (!source) {
                 notFound()
                 return
             }
+            if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', source) ) {
+                unauthorized()
+                return
+            }
+
             RelationshipType relationshipType = RelationshipType.readByName(otherSide.type ? otherSide.type.name : type)
             if (!relationshipType) {
                 notFound()
@@ -734,12 +748,15 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         try {
             def otherSide = parseOtherSide()
             def objectToBindParam = getObjectToBind()
+            DestinationDescription destinationDescription = new DestinationDescription()
+            destinationDescription.elementType = otherSide.elementType
+            destinationDescription.id = otherSide.id
             MetadataResponseEvent metadataResponse = addRelationService.addRelation(resource,
                     catalogueElementId,
                     type,
                     outgoing as Boolean,
                     objectToBindParam as Object,
-                    otherSide as Object)
+                    destinationDescription)
             if ((metadataResponse instanceof CatalogueElementNotFoundEvent) ||
                 (metadataResponse instanceof RelationshipNotFoundEvent) ||
                 (metadataResponse instanceof DataModelNotFoundEvent)) {
@@ -842,11 +859,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     //TODO: this should all go into a service
     private addOrRemoveMapping(boolean add) {
         withRetryingTransaction {
-            if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
-                unauthorized()
-                return
-            }
-
             if (!params.destination || !params.id) {
                 notFound()
                 return
@@ -857,11 +869,21 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 return
             }
 
-            CatalogueElement destination = findById(params.destination)
+            if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', element) ) {
+                unauthorized()
+                return
+            }
+
+            CatalogueElement destination = findById(params.long('destination'))
             if (!destination) {
                 notFound()
                 return
             }
+            if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', destination) ) {
+                unauthorized()
+                return
+            }
+
             if (add) {
                 String mappingString = request.getJSON().mapping
                 Mapping mapping = mappingService.map(element, destination, mappingString)
