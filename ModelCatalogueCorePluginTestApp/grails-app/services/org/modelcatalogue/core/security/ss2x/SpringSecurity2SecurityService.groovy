@@ -30,12 +30,14 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
     Cache<String, Long> lastSeenCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1, TimeUnit.DAYS).build()
 
+    @Override
     boolean isUserLoggedIn() {
         return springSecurityService.isLoggedIn()
     }
 
 
     //check if a user is authorised for a particular model
+    @Override
     boolean hasRole(String authority, DataModel dataModel) {
         //if no role is passed, can't have that role
         if (!authority) {
@@ -57,6 +59,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     //check if a user a general role
     //this is used for very general activities like creating models or viewing draft models
 
+    @Override
     boolean hasRole(String authority) {
         //if no role is passed, can't have that role
         if (!authority) {
@@ -82,15 +85,27 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         translated
     }
 
+    @Override
     String encodePassword(String password) {
         return springSecurityService.encodePassword(password)
     }
 
+    @Override
     User getCurrentUser() {
         User user = springSecurityService.currentUser
         if (!user) return user
         lastSeenCache.put(user.username, System.currentTimeMillis())
         return user as User
+    }
+
+    @Override
+    String currentUsername() {
+        String username = springSecurityService.principal?.username
+        if (!username) {
+            return null
+        }
+        lastSeenCache.put(username, System.currentTimeMillis())
+        username
     }
 
     @Override
@@ -111,9 +126,8 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         Holders.applicationContext.getBean('userCache').removeUserFromCache(username)
     }
 
-
-
     //check if the user is subscribed to a data model
+    @Override
     boolean isSubscribed(DataModel dataModel) {
 
         //check if the user is a supervisor - if they are, they are subscribed to everything
@@ -132,8 +146,8 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         return false
     }
 
-
     //check if the user is subscribed to a list of data models
+    @Override
     boolean isSubscribed(Set<Long> dataModelIds) {
 
         Boolean subscribed = false
@@ -161,6 +175,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
 
 //check if the user is subscribed to a catalogueElement
+    @Override
     boolean isSubscribed(CatalogueElement ce){
 
         //check if the user is a supervisor - if they are, they are subscribed to everything
@@ -175,7 +190,8 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     //check if the user is a supervisor
     //if they are they can do most things
 
-    boolean isSupervisor(){
+    @Override
+    boolean isSupervisor() {
         if(UserRole.findByUserAndRole(getCurrentUser(), Role.findByAuthority('ROLE_SUPERVISOR'))) return true
         return false
     }
@@ -203,6 +219,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     }
 
     //get all the data models that this user is subscribed to regardless of the role
+    @Override
     List<DataModel> getSubscribed(){
 
         if(isSupervisor()) return DataModel.list()
@@ -220,6 +237,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     //get all the roles that the user has for a model i.e. are they just a user or also an admin
     //this is used by the json marshaller and which passes the info to
     // the front end angular interface
+    @Override
     Set getRoles(String dataModelId){
 
         //check if the user is a supervisor - if they are, they are subscribed to everything
@@ -243,14 +261,17 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         UserRole.create user, role, model, flush
     }
 
+    @Override
     void removeUserRoleModel(User user, Role role, DataModel model){
         UserRole.remove user, role, model
     }
 
+    @Override
     void removeAllUserRoleModel(User user, DataModel model){
         UserRole.executeUpdate 'DELETE FROM UserRole WHERE user=:user AND dataModel=:dataModel', [user: user, dataModel: model]
     }
 
+    @Override
     void copyUserRoles(DataModel sourceModel, DataModel destinationModel){
 
         List<UserRole> userRolesSourceModel = UserRole.findAllByDataModel(sourceModel)

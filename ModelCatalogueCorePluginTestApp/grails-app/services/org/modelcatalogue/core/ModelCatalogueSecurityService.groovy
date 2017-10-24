@@ -1,11 +1,13 @@
 package org.modelcatalogue.core
 
+import groovy.transform.CompileStatic
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 
 /**
  * Default implementation meaning no security. The user is always logged in and has all the roles.
  */
+@CompileStatic
 class ModelCatalogueSecurityService implements SecurityService, LogoutListeners {
 
     static transactional = false
@@ -33,6 +35,11 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
     @Override
     User getCurrentUser() {
         return null
+    }
+
+    @Override
+    String currentUsername() {
+        null
     }
 
     @Override

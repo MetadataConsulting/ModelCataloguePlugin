@@ -1,12 +1,14 @@
 package org.modelcatalogue.core
 
+import groovy.transform.CompileStatic
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 
 /**
  * Lightweight abstraction of security.
  */
-public interface SecurityService {
+@CompileStatic
+interface SecurityService {
 
     /**
      * Returns true if the user is logged in or if it doesn't matter if she is logged in.
@@ -46,6 +48,12 @@ public interface SecurityService {
      * @return the encoded password or the password argument unchanged if the password encoding is not set up
      */
     String encodePassword(String password)
+
+    /**
+     * Retrieves the currently logged username or null.
+     * @return currently logged in username or null
+     */
+    String currentUsername()
 
     /**
      * Retrieves the currently logged in user or null.
