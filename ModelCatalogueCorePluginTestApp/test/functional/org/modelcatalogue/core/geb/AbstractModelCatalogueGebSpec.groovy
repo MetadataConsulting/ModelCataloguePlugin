@@ -76,6 +76,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     def loginUser(String user, String pwd) {
         browser.driver.manage().window().maximize()
+
         go "logout"
 
         waitFor (120) {
@@ -95,6 +96,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         waitFor {
             $("#role_navigation-right_user-menu-menu-item-link").first().displayed
         }
+        browser.driver.navigate().refresh()
         check "#my-models" displayed
     }
 
