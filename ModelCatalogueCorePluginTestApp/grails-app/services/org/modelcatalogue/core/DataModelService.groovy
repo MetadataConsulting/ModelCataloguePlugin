@@ -1,7 +1,9 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import grails.transaction.Transactional
 import grails.util.Holders
+import groovy.transform.CompileStatic
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.actions.Batch
@@ -30,6 +32,12 @@ class DataModelService {
     @PostConstruct
     void init() {
         this.legacyDataModels = grailsApplication.config.mc.legacy.dataModels
+    }
+
+    @CompileStatic
+    @Transactional(readOnly = true)
+    List<DataModel> findAll() {
+        DataModel.where { }.list()
     }
 
     public Map<String, Integer> getStatistics(DataModelFilter filter) {
