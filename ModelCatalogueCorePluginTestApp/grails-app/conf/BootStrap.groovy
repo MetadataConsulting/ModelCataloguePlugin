@@ -44,6 +44,7 @@ class BootStrap {
     GrailsApplication grailsApplication
     AclService aclService
     ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy
+    RequestmapGormService requestmapGormService
 
     def init = { servletContext ->
         log.info "BootStrap:addExtensionModules()"
@@ -447,47 +448,46 @@ class BootStrap {
                 '/load',
                 '/index.gsp'
         ]) {
-            createRequestmapIfMissing(url, 'permitAll', null)
+            requestmapGormService.createRequestmapIfMissing(url, 'permitAll', null)
         }
 
-        createRequestmapIfMissing('/asset/download/*',                      'isAuthenticated()',   HttpMethod.GET)
-        createRequestmapIfMissing('/oauth/*/**',                            'IS_AUTHENTICATED_ANONYMOUSLY')
-        createRequestmapIfMissing('/user/current',                          'IS_AUTHENTICATED_ANONYMOUSLY',  HttpMethod.GET)
-        createRequestmapIfMissing('/catalogue/upload',                      'ROLE_METADATA_CURATOR',         HttpMethod.POST)
-        createRequestmapIfMissing('/catalogue/*/**',                        'isAuthenticated()',   HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',   HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'isAuthenticated()',   HttpMethod.POST) // post a comment
-        createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'isAuthenticated()',HttpMethod.POST) // favourite item
-        createRequestmapIfMissing('/api/modelCatalogue/core/user/apikey',    'isAuthenticated()',HttpMethod.POST) // get or create new api key
-        createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'isAuthenticated()',HttpMethod.DELETE) // unfavourite item
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.POST)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.PUT)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.DELETE)
-        createRequestmapIfMissing('/api/modelCatalogue/core/asset/*/validateXML',  'isAuthenticated()',   HttpMethod.POST) // validate xml
+        requestmapGormService.createRequestmapIfMissing('/asset/download/*',                      'isAuthenticated()',   HttpMethod.GET)
+        requestmapGormService.createRequestmapIfMissing('/oauth/*/**',                            'IS_AUTHENTICATED_ANONYMOUSLY')
+        requestmapGormService.createRequestmapIfMissing('/user/current',                          'IS_AUTHENTICATED_ANONYMOUSLY',  HttpMethod.GET)
+        requestmapGormService.createRequestmapIfMissing('/catalogue/upload',                      'ROLE_METADATA_CURATOR',         HttpMethod.POST)
+        requestmapGormService.createRequestmapIfMissing('/catalogue/*/**',                        'isAuthenticated()',   HttpMethod.GET)
+        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',   HttpMethod.GET)
+        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'isAuthenticated()',   HttpMethod.POST) // post a comment
+        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'isAuthenticated()',HttpMethod.POST) // favourite item
+        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/user/apikey',    'isAuthenticated()',HttpMethod.POST) // get or create new api key
+        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'isAuthenticated()',HttpMethod.DELETE) // unfavourite item
+        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.POST)
+        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.PUT)
+        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.DELETE)
+        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/asset/*/validateXML',  'isAuthenticated()',   HttpMethod.POST) // validate xml
 
-        createRequestmapIfMissing('/sso/*/**',                              'isAuthenticated()',   HttpMethod.GET)
+        requestmapGormService.createRequestmapIfMissing('/sso/*/**',                              'isAuthenticated()',   HttpMethod.GET)
 
-        createRequestmapIfMissing('/role/**',                               'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/userAdmin/**',                          'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/aclClass/**', 'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/aclSid/**', 'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/aclEntry/**', 'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/aclObjectIdentity/**', 'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/requestMap/**',                         'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/registrationCode/**',                   'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/securityInfo/**',                       'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/console/**',                            'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/plugins/console*/**',                   'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/dbconsole/**',                          'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/monitoring/**',                         'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/plugins/console-1.5.0/**',              'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/role/**',                               'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/userAdmin/**',                          'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/aclClass/**', 'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/aclSid/**', 'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/aclEntry/**', 'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/aclObjectIdentity/**', 'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/requestMap/**',                         'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/registrationCode/**',                   'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/securityInfo/**',                       'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/console/**',                            'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/plugins/console*/**',                   'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/dbconsole/**',                          'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/monitoring/**',                         'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/plugins/console-1.5.0/**',              'ROLE_SUPERVISOR')
 
-//        createRequestmapIfMissing('/api/modelCatalogue/core/dataClass/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
-
+//      requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/dataClass/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
+//      requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
+//      requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
+//      requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR')
+//      requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
 
    //create some test models etc. for dev
    //TODO: remove this and replace with a functional test
@@ -656,16 +656,7 @@ class BootStrap {
     def destroy = {}
 
 
-    private static Requestmap createRequestmapIfMissing(String url, String configAttribute, HttpMethod method = null) {
-        List<Requestmap> maps = Requestmap.findAllByUrlAndHttpMethod(url, method)
-        for(Requestmap map in maps) {
-            if (map.configAttribute == configAttribute) {
-                return map
-            }
-            println "Requestmap method: $method, url: $url has different config attribute - expected: $configAttribute, actual: $map.configAttribute"
-        }
-        Requestmap.findOrSaveByUrlAndConfigAttributeAndHttpMethod(url, configAttribute, method, [failOnError: true])
-    }
+
 
     protected static mergeConfig(GrailsApplication application){
         application.config.merge(loadConfig(application))
