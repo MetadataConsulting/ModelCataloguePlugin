@@ -19,4 +19,20 @@ class MetadataRolesUtilsSpec extends Specification {
         'ROLE_ADMIN' | ['ROLE_ADMIN']
 
     }
+
+    def "For #authority expaned roles as String should be #expected"(String authority, String expected) {
+
+        expect:
+        MetadataRolesUtils.roles(authority) == expected
+
+        where:
+        authority    | expected
+        'VIEWER'     | 'ROLE_USER,ROLE_METADATA_CURATOR,ROLE_ADMIN,ROLE_SUPERVISOR'
+        'CURATOR'    | 'ROLE_METADATA_CURATOR,ROLE_ADMIN,ROLE_SUPERVISOR'
+        'ADMIN'      | 'ROLE_ADMIN,ROLE_SUPERVISOR'
+        'SUPERVISOR' | 'ROLE_SUPERVISOR'
+        'FOO'        | 'ROLE_FOO'
+        'ROLE_ADMIN' | 'ROLE_ADMIN'
+
+    }
 }
