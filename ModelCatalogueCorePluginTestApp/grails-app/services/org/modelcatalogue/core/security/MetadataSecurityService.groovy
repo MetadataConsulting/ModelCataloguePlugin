@@ -772,7 +772,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/feedback", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/feedback/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/logs", 'ROLE_SUPERVISOR', HttpMethod.GET],
-            ["/", 'isAuthenticated()', HttpMethod.GET],
+            ["/", 'permitAll', HttpMethod.GET],
             ["/load", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/search/reindex", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/search/*?", 'isAuthenticated()', HttpMethod.GET],
