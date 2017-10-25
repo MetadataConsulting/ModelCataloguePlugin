@@ -29,6 +29,8 @@ import org.springframework.security.acls.model.Acl
 import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import grails.plugin.springsecurity.acl.AclService
+import org.modelcatalogue.core.persistence.RequestmapGormService
+import org.modelcatalogue.core.security.MetadataSecurityService
 
 @Log
 class BootStrap {
@@ -45,6 +47,7 @@ class BootStrap {
     AclService aclService
     ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy
     RequestmapGormService requestmapGormService
+    MetadataSecurityService metadataSecurityService
 
     def init = { servletContext ->
         log.info "BootStrap:addExtensionModules()"
@@ -74,7 +77,7 @@ class BootStrap {
 
         println 'completed:initCatalogueService'
         log.info "completed:initCatalogueService"
-        modelCatalogueSearchService.reindex(true)
+        //modelCatalogueSearchService.reindex(true)
 
         initCatalogueService.setupStoredProcedures()
         println 'completed:setupStoredProcedures'
@@ -379,7 +382,7 @@ class BootStrap {
         }
     }
 
-    private static void initSecurity(boolean production) {
+    private void initSecurity(boolean production) {
         final def var = log.info("start:initSecurity")
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
@@ -492,10 +495,9 @@ class BootStrap {
    //create some test models etc. for dev
    //TODO: remove this and replace with a functional test
 
+        metadataSecurityService.secureUrlMappings()
+
         final def var1 = log.info("completed:initSecurity")
-
-
-
     }
 
     def initPoliciesAndTags() {
