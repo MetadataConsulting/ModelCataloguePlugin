@@ -1,0 +1,55 @@
+import org.springframework.http.HttpMethod
+
+class ClassificationUrlMappings {
+
+    static mappings = {
+
+// Classification
+        "/api/modelCatalogue/core/classification"(controller: 'dataModel', action: 'index', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification"(controller: 'dataModel', action: 'save', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/search/$search?"(controller: 'dataModel', action: 'search', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/validate"(controller: 'dataModel', action: 'validate', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/validate"(controller: 'dataModel', action: 'validate', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/$id"(controller: 'dataModel', action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id"(controller: 'dataModel', action: 'update', method: HttpMethod.PUT)
+        "/api/modelCatalogue/core/classification/$id"(controller: 'dataModel', action: 'delete', method: HttpMethod.DELETE)
+        "/api/modelCatalogue/core/classification/$id/outgoing/search"(controller: 'dataModel', action: 'searchOutgoing', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/outgoing/$type/search"(controller: 'dataModel', action: 'searchOutgoing', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/outgoing/$type"(controller: 'dataModel', action: 'outgoing', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/outgoing/$type"(controller: 'dataModel', action: 'addOutgoing', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/$id/outgoing/$type"(controller: 'dataModel', action: 'removeOutgoing', method: HttpMethod.DELETE)
+        "/api/modelCatalogue/core/classification/$id/outgoing/$type"(controller: 'dataModel', action: 'reorderOutgoing', method: HttpMethod.PUT)
+        "/api/modelCatalogue/core/classification/$id/incoming/search"(controller: 'dataModel', action: 'searchIncoming', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/incoming/$type/search"(controller: 'dataModel', action: 'searchIncoming', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/incoming/$type"(controller: 'dataModel', action: 'incoming', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/incoming/$type"(controller: 'dataModel', action: 'addIncoming', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/$id/incoming/$type"(controller: 'dataModel', action: 'removeIncoming', method: HttpMethod.DELETE)
+        "/api/modelCatalogue/core/classification/$id/incoming/$type"(controller: 'dataModel', action: 'reorderIncoming', method: HttpMethod.PUT)
+        "/api/modelCatalogue/core/classification/$id/incoming"(controller: 'dataModel', action: 'incoming', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/outgoing"(controller: 'dataModel', action: 'outgoing', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/mapping/$destination"(controller: 'dataModel', action: 'addMapping', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/$id/mapping/$destination"(controller: 'dataModel', action: 'removeMapping', method: HttpMethod.DELETE)
+        "/api/modelCatalogue/core/classification/$id/mapping"(controller: 'dataModel', action: 'mappings', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/typeHierarchy"(controller: 'dataModel', action: 'typeHierarchy', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/history"(controller: 'dataModel', action: 'history', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/path"(controller: 'dataModel', action: 'path', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/archive"(controller: 'dataModel', action: 'archive', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/$id/restore"(controller: 'dataModel', action: 'restore', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/$id/finalize"(controller: 'dataModel', action: 'finalizeElement', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/$id/clone/$destinationDataModelId"(controller: 'dataModel', action: 'cloneElement', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/$source/merge/$destination"(controller: 'dataModel', action: 'merge', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/preload"(controller: 'catalogue', action: 'dataModelsForPreload', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/preload"(controller: 'catalogue', action: 'importFromUrl', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/$id/declares"(controller: 'dataModel', action: 'declares', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/containsOrImports/$other"(controller: 'dataModel', action: 'containsOrImports', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/content"(controller: 'dataModel', action: 'content', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/newVersion"(controller: 'dataModel', action: 'newVersion', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/classification/$id/inventorySpreadsheet"(controller: 'dataModel', action: 'inventorySpreadsheet', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/gridSpreadsheet"(controller: 'dataModel', action: 'gridSpreadsheet', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/excelExporterSpreadsheet"(controller: 'dataModel', action: 'excelExporterSpreadsheet', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/inventoryDoc"(controller: 'dataModel', action: 'inventoryDoc', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/dependents"(controller: 'dataModel', action: 'dependents', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/classification/$id/reindex"(controller: 'dataModel', action: 'reindex', method: HttpMethod.POST)
+
+    }
+}
