@@ -153,7 +153,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
     return 0 unless list
     return 0 unless list.base
 
-    return 0.5 if list.base.indexOf("/tag/forDataModel") >= 0 and newElement.isInstanceOf('dataElement')
+    return 0.5 if list.base.indexOf("/tag/forDataModel") >= 0 and angular.isFunction(newElement.isInstanceOf) and newElement.isInstanceOf('dataElement')
 
     return 0
   ]
