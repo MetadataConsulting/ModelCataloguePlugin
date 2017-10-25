@@ -1,0 +1,52 @@
+import org.springframework.http.HttpMethod
+
+class UserUrlMappings {
+
+    static mappings = {
+
+// User
+        "/api/modelCatalogue/core/user"(controller: 'user', action: 'index', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user"(controller: 'user', action: 'save', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/search/$search?"(controller: 'user', action: 'search', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/validate"(controller: 'user', action: 'validate', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/validate"(controller: 'user', action: 'validate', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$id"(controller: 'user', action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id"(controller: 'user', action: 'update', method: HttpMethod.PUT)
+        "/api/modelCatalogue/core/user/$id"(controller: 'user', action: 'delete', method: HttpMethod.DELETE)
+        "/api/modelCatalogue/core/user/$id/outgoing/search"(controller: 'user', action: 'searchOutgoing', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/outgoing/$type/search"(controller: 'user', action: 'searchOutgoing', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/outgoing/$type"(controller: 'user', action: 'outgoing', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/outgoing/$type"(controller: 'user', action: 'addOutgoing', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$id/outgoing/$type"(controller: 'user', action: 'removeOutgoing', method: HttpMethod.DELETE)
+        "/api/modelCatalogue/core/user/$id/outgoing/$type"(controller: 'user', action: 'reorderOutgoing', method: HttpMethod.PUT)
+        "/api/modelCatalogue/core/user/$id/incoming/search"(controller: 'user', action: 'searchIncoming', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/incoming/$type/search"(controller: 'user', action: 'searchIncoming', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/incoming/$type"(controller: 'user', action: 'incoming', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/incoming/$type"(controller: 'user', action: 'addIncoming', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$id/incoming/$type"(controller: 'user', action: 'removeIncoming', method: HttpMethod.DELETE)
+        "/api/modelCatalogue/core/user/$id/incoming/$type"(controller: 'user', action: 'reorderIncoming', method: HttpMethod.PUT)
+        "/api/modelCatalogue/core/user/$id/incoming"(controller: 'user', action: 'incoming', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/outgoing"(controller: 'user', action: 'outgoing', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/mapping/$destination"(controller: 'user', action: 'addMapping', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$id/mapping/$destination"(controller: 'user', action: 'removeMapping', method: HttpMethod.DELETE)
+        "/api/modelCatalogue/core/user/$id/mapping"(controller: 'user', action: 'mappings', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/typeHierarchy"(controller: 'user', action: 'typeHierarchy', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/history"(controller: 'user', action: 'history', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/path"(controller: 'user', action: 'path', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/archive"(controller: 'user', action: 'archive', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$id/restore"(controller: 'user', action: 'restore', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$id/finalize"(controller: 'user', action: 'finalizeElement', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$id/clone/$destinationDataModelId"(controller: 'user', action: 'cloneElement', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$source/merge/$destination"(controller: 'user', action: 'merge', method: HttpMethod.POST)
+        "/user/current"(controller: 'user', action: 'current', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/current"(controller: 'user', action: 'current', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/classifications"(controller: 'user', action: 'classifications', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/lastSeen"(controller: 'user', action: 'lastSeen', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/apikey"(controller: 'user', action: 'apiKey', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$id/favourite"(controller: 'user', action: 'addFavourite', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$id/favourite"(controller: 'user', action: 'removeFavourite', method: HttpMethod.DELETE)
+        "/api/modelCatalogue/core/user/$id/enable"(controller: 'user', action: 'enable', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$id/disable"(controller: 'user', action: 'disable', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/user/$id/role/$role"(controller: 'user', action: 'role', method: HttpMethod.POST)
+    }
+}
