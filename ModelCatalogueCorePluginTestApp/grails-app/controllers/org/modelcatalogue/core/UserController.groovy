@@ -96,6 +96,7 @@ class UserController extends AbstractCatalogueElementController<User> {
         }
         Long dataModelId = request.JSON.id as Long
         favouriteService.favouriteModelById(dataModelId)
+        render status: 200
     }
 
     def removeFavourite() {
@@ -105,6 +106,7 @@ class UserController extends AbstractCatalogueElementController<User> {
         }
         Long dataModelId = request.JSON.id as Long
         favouriteService.unfavouriteModelById(dataModelId)
+        render status: 200
     }
 
     def enable() {
