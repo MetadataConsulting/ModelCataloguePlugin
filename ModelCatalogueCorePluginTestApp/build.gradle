@@ -25,6 +25,7 @@ docker {
     if (System.getenv('DOCKER_CERT_PATH'))  {
         certPath = file(System.getenv('DOCKER_CERT_PATH'))
     }
+
 }
 
 String host = dockerHost
@@ -370,7 +371,7 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
 }
 
 task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMySQLContainer]) {
-    description = "Run all Grails MX tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
 
     assertJava8()
     environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
@@ -380,7 +381,7 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     environment 'MC_DOCKER_HOST', host
 
 
-    def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-integration', '-unit']
+    def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-unit', '-integration', '-functional']
     if (project.hasProperty('testArgs')) { // get arguments for grails test-app
         cmds.addAll(testArgs.split(' '))
     }
@@ -389,11 +390,9 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     inputs.files files('grails-app')
     inputs.files files('src')
     inputs.files files('web-app')
-    // we are not doing functional tests until they work robustly and independently of each other.
-    //inputs.files files('test/functional')
-    inputs.files files('test/integration')
     inputs.files files('test/unit')
-
+    inputs.files files('test/integration')
+    inputs.files files('test/functional')
     outputs.files file('target/test-reports/')
 }
 

@@ -18,7 +18,7 @@ class InitXMLSchemaDataTypesSpec extends AbstractIntegrationSpec {
 
     def "check XMLSchema classification present"() {
         expect:
-        DataModel.countByName('XMLSchema') == 1
+        DataModel.countByName('XMLSchema') >= 1
     }
 
     def "check #domain validates value #value as #valid"(){
