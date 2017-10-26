@@ -1,12 +1,12 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
 
-import static org.modelcatalogue.core.geb.Common.item
-import static org.modelcatalogue.core.geb.Common.pick
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
+import static org.modelcatalogue.core.gebUtils.Common.item
+import static org.modelcatalogue.core.gebUtils.Common.pick
+import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
 @Stepwise
 class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{

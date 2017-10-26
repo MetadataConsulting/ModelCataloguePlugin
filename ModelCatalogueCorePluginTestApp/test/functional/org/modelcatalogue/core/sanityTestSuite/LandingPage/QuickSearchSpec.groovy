@@ -1,17 +1,17 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.AssetWizardSpec
+import org.modelcatalogue.core.generalTestSuit.AssetWizardSpec
 
-import static org.modelcatalogue.core.geb.Common.admin
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import static org.modelcatalogue.core.gebUtils.Common.admin
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.getModalDialog
-import static org.modelcatalogue.core.geb.Common.getNameLabel
-import static org.modelcatalogue.core.geb.Common.getSave
-import static org.modelcatalogue.core.geb.Common.item
-import static org.modelcatalogue.core.geb.Common.pick
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
+import static org.modelcatalogue.core.gebUtils.Common.getModalDialog
+import static org.modelcatalogue.core.gebUtils.Common.getNameLabel
+import static org.modelcatalogue.core.gebUtils.Common.getSave
+import static org.modelcatalogue.core.gebUtils.Common.item
+import static org.modelcatalogue.core.gebUtils.Common.pick
+import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
 @Stepwise
 class QuickSearchSpec extends AbstractModelCatalogueGebSpec{

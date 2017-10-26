@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.WebDriver
 import spock.lang.Stepwise
 

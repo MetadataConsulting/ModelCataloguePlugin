@@ -1,19 +1,17 @@
 package org.modelcatalogue.core.sanityTestSuite
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.create
-import static org.modelcatalogue.core.geb.Common.description
-import static org.modelcatalogue.core.geb.Common.getItem
-import static org.modelcatalogue.core.geb.Common.getPick
-import static org.modelcatalogue.core.geb.Common.messages
-import static org.modelcatalogue.core.geb.Common.modalHeader
-import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.modelCatalogueId
-import static org.modelcatalogue.core.geb.Common.nameLabel
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
-import static org.modelcatalogue.core.geb.Common.save
+import static org.modelcatalogue.core.gebUtils.Common.create
+import static org.modelcatalogue.core.gebUtils.Common.description
+import static org.modelcatalogue.core.gebUtils.Common.messages
+import static org.modelcatalogue.core.gebUtils.Common.modalHeader
+import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.modelCatalogueId
+import static org.modelcatalogue.core.gebUtils.Common.nameLabel
+import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
+import static org.modelcatalogue.core.gebUtils.Common.save
 
 @Stepwise
 class CreateDataTypeAndSelectPrimitiveSpec extends AbstractModelCatalogueGebSpec {

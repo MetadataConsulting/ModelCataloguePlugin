@@ -1,23 +1,22 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueContent
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.CatalogueContent
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.admin
-import static org.modelcatalogue.core.geb.Common.create
-import static org.modelcatalogue.core.geb.Common.curator
-import static org.modelcatalogue.core.geb.Common.description
-import static org.modelcatalogue.core.geb.Common.getInlineEdit
-import static org.modelcatalogue.core.geb.Common.getInlineEditSubmit
-import static org.modelcatalogue.core.geb.Common.getUp
-import static org.modelcatalogue.core.geb.Common.messages
-import static org.modelcatalogue.core.geb.Common.modalHeader
-import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.modelCatalogueId
-import static org.modelcatalogue.core.geb.Common.nameLabel
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
-import static org.modelcatalogue.core.geb.Common.save
+import static org.modelcatalogue.core.gebUtils.Common.admin
+import static org.modelcatalogue.core.gebUtils.Common.create
+import static org.modelcatalogue.core.gebUtils.Common.description
+import static org.modelcatalogue.core.gebUtils.Common.getInlineEdit
+import static org.modelcatalogue.core.gebUtils.Common.getInlineEditSubmit
+import static org.modelcatalogue.core.gebUtils.Common.getUp
+import static org.modelcatalogue.core.gebUtils.Common.messages
+import static org.modelcatalogue.core.gebUtils.Common.modalHeader
+import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.modelCatalogueId
+import static org.modelcatalogue.core.gebUtils.Common.nameLabel
+import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
+import static org.modelcatalogue.core.gebUtils.Common.save
 
 @Stepwise
 class EditDataElementSpec extends AbstractModelCatalogueGebSpec {

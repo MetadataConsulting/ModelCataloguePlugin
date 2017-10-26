@@ -1,10 +1,9 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueContent
-import spock.lang.Ignore
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.CatalogueContent
 import spock.lang.Stepwise
-import static org.modelcatalogue.core.geb.Common.*
+import static org.modelcatalogue.core.gebUtils.Common.*
 
 
 @Stepwise

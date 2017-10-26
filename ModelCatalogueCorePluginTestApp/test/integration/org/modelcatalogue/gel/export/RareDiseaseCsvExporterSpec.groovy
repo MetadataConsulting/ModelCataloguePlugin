@@ -22,7 +22,7 @@ class RareDiseaseCsvExporterSpec extends AbstractRareDiseasesExporterSpec {
     private void generateCSVs() {
         def today = new Date().format("yyyy-MM-dd")
 
-        hpoAndClinicalTestsCSV = """id,Level 2 Disease Group,id,Level 3 Disease Subgroup,id,Level 4 Specific Disorder,Last Updated,Phenotype,Phenotype ID,FirstTestSpec,FirstTestSpec ID"""
+        hpoAndClinicalTestsCSV = """id,Level 2 Disease Group,id,Level 3 Disease Subgroup,id,Level 4 Specific Disorder,Last Updated,Phenotype,Phenotype ID,Test,Test ID"""
         for (int i in 1..2) {
             for (int j in 1..2) {
                 for (int k in 1..15) {

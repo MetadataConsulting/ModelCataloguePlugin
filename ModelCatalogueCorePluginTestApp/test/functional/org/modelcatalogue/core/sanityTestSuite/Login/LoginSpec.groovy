@@ -1,9 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
-import geb.spock.GebSpec
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.openqa.selenium.WebDriver
-
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 
 class LoginSpec extends AbstractModelCatalogueGebSpec {
 

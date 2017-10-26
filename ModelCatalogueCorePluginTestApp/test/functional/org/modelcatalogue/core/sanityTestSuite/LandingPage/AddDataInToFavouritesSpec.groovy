@@ -1,14 +1,14 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.admin
-import static org.modelcatalogue.core.geb.Common.item
-import static org.modelcatalogue.core.geb.Common.modalHeader
-import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.pick
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
+import static org.modelcatalogue.core.gebUtils.Common.admin
+import static org.modelcatalogue.core.gebUtils.Common.item
+import static org.modelcatalogue.core.gebUtils.Common.modalHeader
+import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.pick
+import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
 @Stepwise
 class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {

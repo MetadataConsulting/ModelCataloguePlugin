@@ -1,11 +1,11 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.*
+import static org.modelcatalogue.core.gebUtils.Common.*
 
 @Stepwise
 class MenuBarSpec extends AbstractModelCatalogueGebSpec {

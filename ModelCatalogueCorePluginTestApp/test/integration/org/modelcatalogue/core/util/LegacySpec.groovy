@@ -20,7 +20,7 @@ class LegacySpec extends IntegrationSpec {
         where:
         original                                                | fixed
         null                                                    | null
-        'http://localhost:8080/catalogue/classification/24.1'   | 'http://localhost:8080/catalogue/dataModelMenuBar/24.1'
+        'http://localhost:8080/catalogue/classification/24.1'   | 'http://localhost:8080/catalogue/dataModel/24.1'
         'http://localhost:8080/catalogue/model/22.1'            | 'http://localhost:8080/catalogue/dataClass/22.1'
         'http://www.example/model/ka'                           | 'http://www.example/model/ka'
         'http://localhost:8080/catalogue/dataElement/22.1'      | 'http://localhost:8080/catalogue/dataElement/22.1'

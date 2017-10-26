@@ -1,9 +1,8 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.openqa.selenium.Keys
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
-import static org.modelcatalogue.core.geb.Common.*
+import static org.modelcatalogue.core.gebUtils.Common.*
 
 @Stepwise
 class CreateTagSpec extends AbstractModelCatalogueGebSpec {

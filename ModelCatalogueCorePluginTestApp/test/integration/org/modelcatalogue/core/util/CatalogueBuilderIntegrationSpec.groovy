@@ -1173,7 +1173,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         policy.policy
         policy.policy.conventions.size() == 2
         policy.policyText.toString() == """
-        |check dataTypes property 'name' apply regex: '[a-zA-Z0-9]+'
+        |check dataType property 'name' apply regex: '[a-zA-Z0-9]+'
         |check dataClass property 'name' apply regex: '[a-zA-Z0-9]+'
         """.stripMargin().trim()
     }

@@ -46,8 +46,8 @@ class CatalogueElementDiffsIntegrationSpec extends AbstractIntegrationSpec {
             !diffs.containsKey(Diff.keyForProperty('lastUpdated'))
             !diffs.containsKey(Diff.keyForProperty('versionCreated'))
             !diffs.containsKey(Diff.keyForProperty('version'))
-            diffs.containsKey(Diff.keyForExtension('http://www.modelcatalogue.org/metadataStep/#reviewed'))
-            diffs.containsKey(Diff.keyForExtension('http://www.modelcatalogue.org/metadataStep/#approved'))
+            diffs.containsKey(Diff.keyForExtension('http://www.modelcatalogue.org/metadata/#reviewed'))
+            diffs.containsKey(Diff.keyForExtension('http://www.modelcatalogue.org/metadata/#approved'))
         when:
             DataClass detailsV1 = DataClass.findByNameAndDataModel('PATIENT IDENTITY DETAILS', testV1)
             DataClass detailsV2 = DataClass.findByNameAndDataModel('PATIENT IDENTITY DETAILS', testV2)

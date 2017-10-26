@@ -1,35 +1,25 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueContent
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.CatalogueContent
 import org.openqa.selenium.By
 import org.openqa.selenium.interactions.Actions
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.delete
-import static org.modelcatalogue.core.geb.Common.description
-import static org.modelcatalogue.core.geb.Common.getBackdrop
-import static org.modelcatalogue.core.geb.Common.getCreate
-import static org.modelcatalogue.core.geb.Common.getDescription
-import static org.modelcatalogue.core.geb.Common.getMessages
-import static org.modelcatalogue.core.geb.Common.getModalDialog
-import static org.modelcatalogue.core.geb.Common.getModalDialog
-import static org.modelcatalogue.core.geb.Common.getModalHeader
-import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.getModelCatalogueId
-import static org.modelcatalogue.core.geb.Common.getNameLabel
-import static org.modelcatalogue.core.geb.Common.getRightSideTitle
-import static org.modelcatalogue.core.geb.Common.getSave
-import static org.modelcatalogue.core.geb.Common.item
-import static org.modelcatalogue.core.geb.Common.messages
-import static org.modelcatalogue.core.geb.Common.modalDialog
-import static org.modelcatalogue.core.geb.Common.modalHeader
-import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.modelCatalogueId
-import static org.modelcatalogue.core.geb.Common.nameLabel
-import static org.modelcatalogue.core.geb.Common.pick
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
-import static org.modelcatalogue.core.geb.Common.save
+import static org.modelcatalogue.core.gebUtils.Common.delete
+import static org.modelcatalogue.core.gebUtils.Common.getBackdrop
+import static org.modelcatalogue.core.gebUtils.Common.getCreate
+import static org.modelcatalogue.core.gebUtils.Common.getDescription
+import static org.modelcatalogue.core.gebUtils.Common.item
+import static org.modelcatalogue.core.gebUtils.Common.messages
+import static org.modelcatalogue.core.gebUtils.Common.modalDialog
+import static org.modelcatalogue.core.gebUtils.Common.modalHeader
+import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.modelCatalogueId
+import static org.modelcatalogue.core.gebUtils.Common.nameLabel
+import static org.modelcatalogue.core.gebUtils.Common.pick
+import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
+import static org.modelcatalogue.core.gebUtils.Common.save
 
 @Stepwise
 class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
