@@ -2,7 +2,7 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 
 import geb.spock.GebSpec
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement

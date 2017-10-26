@@ -1,13 +1,13 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueAction
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.CatalogueAction
 import spock.lang.Stepwise
-import static org.modelcatalogue.core.geb.Common.getItem
-import static org.modelcatalogue.core.geb.Common.getModalHeader
-import static org.modelcatalogue.core.geb.Common.getPick
-import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.more
+import static org.modelcatalogue.core.gebUtils.Common.getItem
+import static org.modelcatalogue.core.gebUtils.Common.getModalHeader
+import static org.modelcatalogue.core.gebUtils.Common.getPick
+import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.more
 
 
 @Stepwise
