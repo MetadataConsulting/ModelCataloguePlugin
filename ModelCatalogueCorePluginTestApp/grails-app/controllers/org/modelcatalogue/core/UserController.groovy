@@ -3,6 +3,8 @@ package org.modelcatalogue.core
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
+import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
+import org.modelcatalogue.core.catalogueelement.addrelation.UserAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.UserReorderInternalService
 import org.modelcatalogue.core.security.MetadataRolesUtils
@@ -24,6 +26,8 @@ class UserController extends AbstractCatalogueElementController<User> {
     FavouriteService favouriteService
 
     UserReorderInternalService userReorderInternalService
+
+    UserAddRelationService userAddRelationService
 
     UserController() {
         super(User, false)
@@ -165,6 +169,11 @@ class UserController extends AbstractCatalogueElementController<User> {
     @Override
     protected AbstractReorderInternalService getReorderInternalService() {
         userReorderInternalService
+    }
+
+    @Override
+    protected AbstractAddRelationService getAddRelationService() {
+        userAddRelationService
     }
 
     protected boolean hasAdditionalIndexCriteria() { return true }

@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
+import org.modelcatalogue.core.catalogueelement.addrelation.DataClassAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.DataClassReorderInternalService
 import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
@@ -18,6 +20,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     PerformanceUtilService performanceUtilService
     DataClassGormService dataClassGormService
     DataClassReorderInternalService dataClassReorderInternalService
+    DataClassAddRelationService dataClassAddRelationService
 
     DataClassController() {
         super(DataClass, false)
@@ -165,5 +168,10 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
     protected DataClass findById(long id) {
         dataClassGormService.findById(id)
+    }
+
+    @Override
+    AbstractAddRelationService getAddRelationService() {
+        dataClassAddRelationService
     }
 }

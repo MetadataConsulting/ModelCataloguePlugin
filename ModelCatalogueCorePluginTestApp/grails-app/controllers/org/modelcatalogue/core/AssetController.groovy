@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
+import org.modelcatalogue.core.catalogueelement.addrelation.AssetAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.AssetReorderInternalService
 import org.modelcatalogue.core.dataarchitect.SchemaValidatorService
@@ -13,6 +15,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     SchemaValidatorService schemaValidatorService
     AssetGormService assetGormService
     AssetReorderInternalService assetReorderInternalService
+    AssetAddRelationService assetAddRelationService
 
     static allowedMethods = [upload: 'POST', download: 'GET']
 
@@ -197,5 +200,10 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     @Override
     protected AbstractReorderInternalService getReorderInternalService() {
         assetReorderInternalService
+    }
+
+    @Override
+    protected AbstractAddRelationService getAddRelationService() {
+        assetAddRelationService
     }
 }

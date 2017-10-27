@@ -2,6 +2,8 @@ package org.modelcatalogue.core
 
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
+import org.modelcatalogue.core.catalogueelement.addrelation.DataTypeAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.DataTypeReorderInternalService
 import org.modelcatalogue.core.persistence.DataTypeGormService
@@ -15,6 +17,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
     SessionFactory sessionFactory
     DataTypeGormService dataTypeGormService
     DataTypeReorderInternalService dataTypeReorderInternalService
+    DataTypeAddRelationService dataTypeAddRelationService
 
     DataTypeController() {
         super(DataType, false)
@@ -24,7 +27,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
         super(resource, false)
     }
 
-    def dataElements(Integer max){
+    def dataElements(Integer max) {
         handleParams(max)
         DataType dataType = findById(params.long('id'))
         if (!dataType) {
@@ -118,22 +121,27 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
     @Override
     protected ListWrapper<DataType> getAllEffectiveItems(Integer max) {
 
-       if (!params.long("dataModel") || sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL'){
+        if (!params.long("dataModel") || sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL') {
             return super.getAllEffectiveItems(max)
         }
 
-       String resourceName = "/${resourceName}/"
+        String resourceName = "/${resourceName}/"
 
-       DataModel dataModel = dataModelGormService.findById(params.long('dataModel'))
+        DataModel dataModel = dataModelGormService.findById(params.long('dataModel'))
 
-       ListWithTotalAndType<DataType>  typeListing = dataTypeService.findAllDataTypesInModel(params, dataModel)
+        ListWithTotalAndType<DataType> typeListing = dataTypeService.findAllDataTypesInModel(params, dataModel)
 
-       ListWrapper<DataType> rapper = Lists.wrap(params, resourceName, typeListing )
+        ListWrapper<DataType> rapper = Lists.wrap(params, resourceName, typeListing)
 
-       return rapper
+        return rapper
     }
 
     protected DataType findById(long id) {
         dataTypeGormService.findById(id)
+    }
+
+    @Override
+    AbstractAddRelationService getAddRelationService() {
+        dataTypeAddRelationService
     }
 }

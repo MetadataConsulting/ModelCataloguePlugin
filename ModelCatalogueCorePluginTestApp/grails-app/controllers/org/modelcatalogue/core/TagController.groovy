@@ -3,6 +3,8 @@ package org.modelcatalogue.core
 import grails.util.GrailsNameUtils
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
+import org.modelcatalogue.core.catalogueelement.addrelation.TagAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.TagReorderInternalService
 import org.modelcatalogue.core.persistence.TagGormService
@@ -14,6 +16,7 @@ class TagController extends AbstractCatalogueElementController<Tag> {
     SessionFactory sessionFactory
     TagGormService tagGormService
     TagReorderInternalService tagReorderInternalService
+    TagAddRelationService tagAddRelationService
 
     TagController() {
         super(Tag, false)
@@ -106,5 +109,10 @@ class TagController extends AbstractCatalogueElementController<Tag> {
     @Override
     protected AbstractReorderInternalService getReorderInternalService() {
         tagReorderInternalService
+    }
+
+    @Override
+    protected AbstractAddRelationService getAddRelationService() {
+        tagAddRelationService
     }
 }

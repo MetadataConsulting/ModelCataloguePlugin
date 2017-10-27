@@ -4,7 +4,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.catalogueelement.addrelation.AddRelationService
+import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.events.CatalogueElementStatusNotInDraftEvent
 import org.modelcatalogue.core.events.MappingSavedEvent
@@ -58,7 +58,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def auditService
     def dataModelService
     def dataClassService
-    AddRelationService addRelationService
     RelationshipsInternalService relationshipsInternalService
     AddMappingService addMappingService
     SourceDestinationService sourceDestinationService
@@ -798,6 +797,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
     }
 
+    abstract protected AbstractAddRelationService getAddRelationService()
+
    /**
     * general add any relation from a catalogue element based on the relationship type used by the directional add relation methods
     */
@@ -810,8 +811,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             DestinationClass destinationDescription = new DestinationClass()
             destinationDescription.className = otherSide.elementType
             destinationDescription.id = otherSide.id
-            MetadataResponseEvent metadataResponse = addRelationService.addRelation(resource,
-                    catalogueElementId,
+            MetadataResponseEvent metadataResponse = addRelationService.addRelation(catalogueElementId,
                     type,
                     outgoing as Boolean,
                     objectToBindParam as Object,

@@ -23,24 +23,27 @@ import org.modelcatalogue.core.util.DestinationClass
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.RelationshipDirection
 
-class AddRelationService {
+abstract class AbstractAddRelationService {
 
     DataModelGormService dataModelGormService
 
     RelationshipService relationshipService
 
     CatalogueElementGormService catalogueElementGormService
+
+
+    abstract CatalogueElement findById(Long id)
+
     /**
      * @param otherSide - request JSON as an JSONObject or an JSONArray
      */
     @Transactional
-    MetadataResponseEvent addRelation(Class resource,
-                                      Long catalogueElementId,
+    MetadataResponseEvent addRelation(Long catalogueElementId,
                                       String type,
                                       Boolean outgoing,
                                       Object objectToBind,
                                       DestinationClass otherSide) throws ClassNotFoundException {
-        CatalogueElement source = catalogueElementGormService.findCatalogueElementByClassAndId(resource, catalogueElementId)
+        CatalogueElement source = findById(catalogueElementId)
         if ( !source ) {
             return new CatalogueElementNotFoundEvent()
         }

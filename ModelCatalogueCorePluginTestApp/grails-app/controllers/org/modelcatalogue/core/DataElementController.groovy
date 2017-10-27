@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
 import org.hibernate.SessionFactory
+import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
+import org.modelcatalogue.core.catalogueelement.addrelation.DataElementAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.DataElementReorderInternalService
 import org.modelcatalogue.core.persistence.DataElementGormService
@@ -16,6 +18,7 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
     DataModelGormService dataModelGormService
     DataElementGormService dataElementGormService
     DataElementReorderInternalService dataElementReorderInternalService
+    DataElementAddRelationService dataElementAddRelationService
 
     DataElementController() {
         super(DataElement, false)
@@ -48,6 +51,11 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
     @Override
     protected AbstractReorderInternalService getReorderInternalService() {
         dataElementReorderInternalService
+    }
+
+    @Override
+    protected AbstractAddRelationService getAddRelationService() {
+        dataElementAddRelationService
     }
 
     @Override
@@ -96,4 +104,5 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
     protected DataElement findById(long id) {
         dataElementGormService.findById(id)
     }
+
 }

@@ -1,5 +1,8 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
+import org.modelcatalogue.core.catalogueelement.addrelation.AssetAddRelationService
+import org.modelcatalogue.core.catalogueelement.addrelation.ValidationRuleAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.ValidationRuleReorderInternalService
 import org.modelcatalogue.core.persistence.ValidationRuleGormService
@@ -8,11 +11,11 @@ import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 
-
 class ValidationRuleController extends AbstractCatalogueElementController<ValidationRule> {
 
     ValidationRuleGormService validationRuleGormService
     ValidationRuleReorderInternalService validationRuleReorderInternalService
+    ValidationRuleAddRelationService validationRuleAddRelationService
 
     ValidationRuleController() {
         super(ValidationRule, false)
@@ -68,6 +71,11 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
     @Override
     protected AbstractReorderInternalService getReorderInternalService() {
         validationRuleReorderInternalService
+    }
+
+    @Override
+    protected AbstractAddRelationService getAddRelationService() {
+        validationRuleAddRelationService
     }
 
     @Override

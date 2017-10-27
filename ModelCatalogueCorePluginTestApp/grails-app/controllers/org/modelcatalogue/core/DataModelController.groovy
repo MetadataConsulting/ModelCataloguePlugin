@@ -5,6 +5,8 @@ import grails.transaction.Transactional
 import grails.util.GrailsNameUtils
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
+import org.modelcatalogue.core.catalogueelement.addrelation.DataModelAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.dataimport.excel.ExcelExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
@@ -51,6 +53,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     AclService aclService
 
     DataModelGormService dataModelReorderInternalService
+    DataModelAddRelationService dataModelAddRelationService
 
 	DataModelController() {
 		super(DataModel, false)
@@ -803,4 +806,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         dataModelReorderInternalService
     }
 
+    @Override
+    protected AbstractAddRelationService getAddRelationService() {
+        dataModelAddRelationService
+    }
 }
