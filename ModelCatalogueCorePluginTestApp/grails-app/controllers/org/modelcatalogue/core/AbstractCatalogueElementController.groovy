@@ -1,21 +1,23 @@
 package org.modelcatalogue.core
 
 import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.events.MappingSavedEvent
+import org.modelcatalogue.core.events.MappingWithErrorsEvent
 import org.modelcatalogue.core.events.NotFoundEvent
 import org.modelcatalogue.core.events.RelationAddedEvent
 import org.modelcatalogue.core.events.RelationshipWithErrorsEvent
 import org.modelcatalogue.core.events.RelationshipsEvent
+import org.modelcatalogue.core.events.SourceDestinationEvent
+import org.modelcatalogue.core.events.UnauthorizedEvent
 import org.modelcatalogue.core.path.PathFinder
 import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.security.MetadataRolesUtils
-import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.ParamArgs
@@ -24,9 +26,7 @@ import org.modelcatalogue.core.util.lists.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
 import org.modelcatalogue.core.events.MetadataResponseEvent
-import org.modelcatalogue.core.events.CatalogueElementNotFoundEvent
-import org.modelcatalogue.core.events.RelationshipNotFoundEvent
-import org.modelcatalogue.core.events.DataModelNotFoundEvent
+
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
 
@@ -55,6 +55,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def dataClassService
     AddRelationService addRelationService
     RelationshipsInternalService relationshipsInternalService
+    AddMappingService addMappingService
+    SourceDestinationService sourceDestinationService
 
     //used to run reports in background thread
     ExecutorService executorService
@@ -206,19 +208,82 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param id, the id of th catalogue element source of the relationship
      */
     def removeMapping() {
-        addOrRemoveMapping(false)
+
+        Long destinationId = params.long('destination')
+        Long sourceId = params.long('id')
+
+        MetadataResponseEvent responseEvent = sourceDestinationService.findSourceDestination(sourceId, destinationId)
+        if ( responseEvent instanceof NotFoundEvent ) {
+            notFound()
+            return
+        }
+        if ( responseEvent instanceof UnauthorizedEvent ) {
+            unauthorized()
+            return
+        }
+
+        if ( !(responseEvent instanceof SourceDestinationEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+        SourceDestinationEvent sourceDestinationEvent = responseEvent as SourceDestinationEvent
+
+        Mapping old = mappingService.unmap(sourceDestinationEvent.source, sourceDestinationEvent.destination)
+        if ( !old ) {
+            notFound()
+            return
+        }
+        response.status = HttpServletResponse.SC_NO_CONTENT
+        render "DELETED"
     }
 
 
     /**
-     * add mappings that have been assocaited with a particular catalogue element
-     * * security checked in the add relation method
-     * @param max - number of results
+     * add mappings that have been associated with a particular catalogue element
      * @param id, the id of th catalogue element source of the relationship
      *
      */
     def addMapping() {
-        addOrRemoveMapping(true)
+        Long destinationId = params.long('destination')
+        Long sourceId = params.long('id')
+
+        MetadataResponseEvent responseEvent = sourceDestinationService.findSourceDestination(sourceId, destinationId)
+        if ( responseEvent instanceof NotFoundEvent ) {
+            notFound()
+            return
+        }
+        if ( responseEvent instanceof UnauthorizedEvent ) {
+            unauthorized()
+            return
+        }
+
+        if ( !(responseEvent instanceof SourceDestinationEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+        SourceDestinationEvent sourceDestinationEvent = responseEvent as SourceDestinationEvent
+
+        String mappingString = request.getJSON().mapping
+
+        responseEvent = addMappingService.add(sourceDestinationEvent.source, sourceDestinationEvent.destination, mappingString)
+
+        if ( responseEvent instanceof MappingWithErrorsEvent ) {
+            MappingWithErrorsEvent mappingWithErrorsEvent = responseEvent as MappingWithErrorsEvent
+            respond mappingWithErrorsEvent.mapping.errors
+            return
+
+        }
+        if ( !(responseEvent instanceof MappingSavedEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+
+        MappingSavedEvent mappingSavedEvent = responseEvent as MappingSavedEvent
+        response.status = HttpServletResponse.SC_CREATED
+        respond mappingSavedEvent.mapping
     }
 
 
@@ -856,56 +921,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 direction: direction,
                 type: relationshipType,
                 list: Lists.wrap(params, "/${resourceName}/${params.id}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${params.search?.encodeAsURL() ?: ''}", results))
-    }
-
-
-    //TODO: this should all go into a service
-    private addOrRemoveMapping(boolean add) {
-        withRetryingTransaction {
-            if (!params.destination || !params.id) {
-                notFound()
-                return
-            }
-            CatalogueElement element = findById(params.long('id'))
-            if (!element) {
-                notFound()
-                return
-            }
-
-            if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', element) ) {
-                unauthorized()
-                return
-            }
-
-            CatalogueElement destination = findById(params.long('destination'))
-            if (!destination) {
-                notFound()
-                return
-            }
-            if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', destination) ) {
-                unauthorized()
-                return
-            }
-
-            if (add) {
-                String mappingString = request.getJSON().mapping
-                Mapping mapping = mappingService.map(element, destination, mappingString)
-                if (mapping.hasErrors()) {
-                    respond mapping.errors
-                    return
-                }
-                response.status = HttpServletResponse.SC_CREATED
-                respond mapping
-                return
-            }
-            Mapping old = mappingService.unmap(element, destination)
-            if (old) {
-                response.status = HttpServletResponse.SC_NO_CONTENT
-                render "DELETED"
-            } else {
-                notFound()
-            }
-        }
     }
 
     protected String getDefaultSort()  { actionName == 'index' ? 'name'  : null }

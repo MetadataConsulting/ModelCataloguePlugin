@@ -1,8 +1,11 @@
 package org.modelcatalogue.core.persistence
 
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.acl.AclUtilService
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.DataModelFilter
 import org.springframework.security.acls.domain.BasePermission
 import org.springframework.transaction.annotation.Transactional
@@ -47,6 +50,29 @@ class DataModelGormService {
 
     boolean hasAdministratorPermission(DataModel dataModel) {
         aclUtilService.hasPermission(springSecurityService.authentication, dataModel, BasePermission.ADMINISTRATION)
+    }
+
+    boolean isAdminOrHasAdministratorPermission(DataModel dataModel) {
+        if ( SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('ADMIN')) ) {
+            return true
+        }
+        hasAdministratorPermission(dataModel)
+    }
+
+    boolean isAdminOrHasAdministratorPermission(Object instance) {
+        if ( SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('ADMIN')) ) {
+            return true
+        }
+        DataModel dataModel
+        if ( instance instanceof DataModel ) {
+            dataModel = instance as DataModel
+        } else if ( dataModel instanceof CatalogueElement ) {
+            dataModel = instance.dataModel
+        }
+        if ( !dataModel ) {
+            return true
+        }
+        hasAdministratorPermission(dataModel)
     }
 
 }
