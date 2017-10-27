@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
 import org.hibernate.SessionFactory
+import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
+import org.modelcatalogue.core.catalogueelement.reorder.DataElementReorderInternalService
 import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -13,6 +15,7 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
     SessionFactory sessionFactory
     DataModelGormService dataModelGormService
     DataElementGormService dataElementGormService
+    DataElementReorderInternalService dataElementReorderInternalService
 
     DataElementController() {
         super(DataElement, false)
@@ -42,6 +45,10 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
         return isDatabaseFallback() && params.containsKey('tag')
     }
 
+    @Override
+    protected AbstractReorderInternalService getReorderInternalService() {
+        dataElementReorderInternalService
+    }
 
     @Override
     protected ListWrapper<DataElement> getAllEffectiveItems(Integer max) {

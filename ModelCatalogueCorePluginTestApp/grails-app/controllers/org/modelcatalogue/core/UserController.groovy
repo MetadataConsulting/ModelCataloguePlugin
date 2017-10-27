@@ -5,6 +5,8 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.annotation.Secured
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
+import org.modelcatalogue.core.catalogueelement.reorder.UserReorderInternalService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
@@ -22,6 +24,8 @@ class UserController extends AbstractCatalogueElementController<User> {
     SpringSecurityService springSecurityService
 
     FavouriteService favouriteService
+
+    UserReorderInternalService userReorderInternalService
 
     UserController() {
         super(User, false)
@@ -158,6 +162,11 @@ class UserController extends AbstractCatalogueElementController<User> {
         modelCatalogueSecurityService.logout(user.username)
 
         respond user
+    }
+
+    @Override
+    protected AbstractReorderInternalService getReorderInternalService() {
+        userReorderInternalService
     }
 
     protected boolean hasAdditionalIndexCriteria() { return true }

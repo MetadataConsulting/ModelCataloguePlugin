@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
+import org.modelcatalogue.core.catalogueelement.reorder.DataClassReorderInternalService
 import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.persistence.DataClassGormService
@@ -15,6 +17,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
     PerformanceUtilService performanceUtilService
     DataClassGormService dataClassGormService
+    DataClassReorderInternalService dataClassReorderInternalService
 
     DataClassController() {
         super(DataClass, false)
@@ -145,6 +148,11 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    @Override
+    protected AbstractReorderInternalService getReorderInternalService() {
+        dataClassReorderInternalService
     }
 
     @Override

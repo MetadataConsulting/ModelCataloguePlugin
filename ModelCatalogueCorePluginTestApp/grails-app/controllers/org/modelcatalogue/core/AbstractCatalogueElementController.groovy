@@ -4,10 +4,13 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
+import org.modelcatalogue.core.events.CatalogueElementStatusNotInDraftEvent
 import org.modelcatalogue.core.events.MappingSavedEvent
 import org.modelcatalogue.core.events.MappingWithErrorsEvent
 import org.modelcatalogue.core.events.NotFoundEvent
 import org.modelcatalogue.core.events.RelationAddedEvent
+import org.modelcatalogue.core.events.RelationshipMovedEvent
 import org.modelcatalogue.core.events.RelationshipWithErrorsEvent
 import org.modelcatalogue.core.events.RelationshipsEvent
 import org.modelcatalogue.core.events.SourceDestinationEvent
@@ -690,65 +693,50 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond new PathFinder().findPath(element)
     }
 
+    abstract protected AbstractReorderInternalService getReorderInternalService()
+
     /**
      * GENERAL reorder relationships METHOD used for internal and external relationships i.e. if you want one data element contained in a class to come before another
-     *security checked in the reorder method
      * @param id, id of the catalogue element
      * @param type,type of relationship
      * @param max, maximum results
      */
-    //TODO: this should all go into a service
-    private reorderInternal(RelationshipDirection direction, Long id, String type) {
-        // begin sanity checks
-        //check the user has the minimum role needed
-        CatalogueElement owner = resource.get(id)
-        if (!owner) {
-            notFound()
-            return
-        }
-
-        if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', owner) ) {
-            unauthorized()
-            return
-        }
-
-        if (!RelationshipType.readByName(type)) {
-            notFound()
-            return
-        }
-        // end sanity checks
-
-        Long movedId = objectToBind?.moved?.id
-        Long currentId = objectToBind?.current?.id
-
+    private def reorderInternal(RelationshipDirection direction, Long catalogueElementId, String type) {
+        Long movedId = objectToBind?.moved?.id as Long
         if (!movedId) {
             notAcceptable()
             return
         }
+        Long currentId = objectToBind?.current?.id as Long
 
-        Relationship rel = Relationship.get(movedId)
-
-        if (!rel) {
+        MetadataResponseEvent responseEvent = reorderInternalService.reorderInternal(direction, catalogueElementId, type, movedId, currentId)
+        if (responseEvent instanceof NotFoundEvent) {
             notFound()
             return
         }
-
-        Relationship current = currentId ? Relationship.get(currentId) : null
-
-        if (!current && currentId) {
-            notFound()
+        if (responseEvent instanceof UnauthorizedEvent) {
+            unauthorized()
             return
         }
-
-        if (current && current.relationshipType.versionSpecific && current.source.status != ElementStatus.DRAFT) {
+        if (responseEvent instanceof CatalogueElementStatusNotInDraftEvent) {
             respond(error: 'You can only reorder items when the element is draft!')
             return
         }
+        if (!(responseEvent instanceof RelationshipMovedEvent)) {
+            log.warn "got an unexpected response event {responsEvent.class.name} in reorderInternal"
+            return
+        }
 
-
-        rel = relationshipService.moveAfter(direction, owner, rel, current)
-
-        respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: rel.source, relation: rel.destination, direction: 'sourceToDestination', removeLink: RelationshipsMarshaller.getDeleteLink(rel.source, rel), archived: rel.archived, elementType: Relationship.name)
+        Relationship rel = (RelationshipMovedEvent as RelationshipMovedEvent).relationship
+        respond(id: rel.id,
+                type: rel.relationshipType,
+                ext: OrderedMap.toJsonMap(rel.ext),
+                element: rel.source, relation:
+                rel.destination,
+                direction: 'sourceToDestination',
+                removeLink: RelationshipsMarshaller.getDeleteLink(rel.source, rel),
+                archived: rel.archived,
+                elementType: Relationship.name)
     }
 
     //TODO: this should all go into a service

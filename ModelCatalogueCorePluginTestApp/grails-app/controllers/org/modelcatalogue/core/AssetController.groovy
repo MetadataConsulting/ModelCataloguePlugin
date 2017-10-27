@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
-import grails.plugin.springsecurity.annotation.Secured
+import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
+import org.modelcatalogue.core.catalogueelement.reorder.AssetReorderInternalService
 import org.modelcatalogue.core.dataarchitect.SchemaValidatorService
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.lists.Lists
@@ -11,6 +12,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     StorageService modelCatalogueStorageService
     SchemaValidatorService schemaValidatorService
     AssetGormService assetGormService
+    AssetReorderInternalService assetReorderInternalService
 
     static allowedMethods = [upload: 'POST', download: 'GET']
 
@@ -192,4 +194,8 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         }
     }
 
+    @Override
+    protected AbstractReorderInternalService getReorderInternalService() {
+        assetReorderInternalService
+    }
 }

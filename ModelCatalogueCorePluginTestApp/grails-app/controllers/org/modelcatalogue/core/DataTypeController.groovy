@@ -2,6 +2,8 @@ package org.modelcatalogue.core
 
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
+import org.modelcatalogue.core.catalogueelement.reorder.DataTypeReorderInternalService
 import org.modelcatalogue.core.persistence.DataTypeGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWrapper
@@ -12,6 +14,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
     DataTypeService dataTypeService
     SessionFactory sessionFactory
     DataTypeGormService dataTypeGormService
+    DataTypeReorderInternalService dataTypeReorderInternalService
 
     DataTypeController() {
         super(DataType, false)
@@ -107,7 +110,12 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
         respond result: result
     }
 
-   @Override
+    @Override
+    protected AbstractReorderInternalService getReorderInternalService() {
+        dataTypeReorderInternalService
+    }
+
+    @Override
     protected ListWrapper<DataType> getAllEffectiveItems(Integer max) {
 
        if (!params.long("dataModel") || sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL'){

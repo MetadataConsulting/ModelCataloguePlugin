@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
+import org.modelcatalogue.core.catalogueelement.reorder.ValidationRuleReorderInternalService
 import org.modelcatalogue.core.persistence.ValidationRuleGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -10,6 +12,7 @@ import org.modelcatalogue.core.util.lists.Relationships
 class ValidationRuleController extends AbstractCatalogueElementController<ValidationRule> {
 
     ValidationRuleGormService validationRuleGormService
+    ValidationRuleReorderInternalService validationRuleReorderInternalService
 
     ValidationRuleController() {
         super(ValidationRule, false)
@@ -60,6 +63,11 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
 
     protected ValidationRule findById(long id) {
         validationRuleGormService.findById(id)
+    }
+
+    @Override
+    protected AbstractReorderInternalService getReorderInternalService() {
+        validationRuleReorderInternalService
     }
 
     @Override

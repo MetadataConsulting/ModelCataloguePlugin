@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 import grails.util.GrailsNameUtils
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.dataimport.excel.ExcelExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
@@ -48,6 +49,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     FavouriteService favouriteService
 
     AclService aclService
+
+    DataModelGormService dataModelReorderInternalService
 
 	DataModelController() {
 		super(DataModel, false)
@@ -438,7 +441,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
     }
 
-    /**
+/**
      * Spreadsheet report
      * @param id of data model
      */
@@ -793,6 +796,11 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
 
         return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
+    }
+
+    @Override
+    protected AbstractReorderInternalService getReorderInternalService() {
+        dataModelReorderInternalService
     }
 
 }

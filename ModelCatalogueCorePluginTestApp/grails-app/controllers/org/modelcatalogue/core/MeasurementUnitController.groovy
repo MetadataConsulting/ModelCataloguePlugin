@@ -1,12 +1,16 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
+import org.modelcatalogue.core.catalogueelement.reorder.MeasurementUnitReorderInternalService
 import org.modelcatalogue.core.persistence.MeasurementUnitGormService
 import org.modelcatalogue.core.util.lists.Lists
 
 class MeasurementUnitController extends AbstractCatalogueElementController<MeasurementUnit> {
 
     MeasurementUnitGormService measurementUnitGormService
+
+    MeasurementUnitReorderInternalService measurementUnitReorderInternalService
 
     MeasurementUnitController() {
         super(MeasurementUnit, false)
@@ -41,4 +45,8 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
         true
     }
 
+    @Override
+    protected AbstractReorderInternalService getReorderInternalService() {
+        measurementUnitReorderInternalService
+    }
 }
