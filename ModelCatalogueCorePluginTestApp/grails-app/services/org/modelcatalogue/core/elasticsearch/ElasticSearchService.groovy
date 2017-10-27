@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.elasticsearch
 
-
 import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
@@ -40,14 +39,16 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.Lists
-import rx.Observable
+import org.modelcatalogue.core.util.SearchParams
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+import groovy.transform.CompileStatic
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
 import static rx.Observable.just
+import grails.plugin.springsecurity.SpringSecurityUtils
 
 class ElasticSearchService implements SearchCatalogue {
 
@@ -165,7 +166,7 @@ class ElasticSearchService implements SearchCatalogue {
     * */
 
     @Override
-    ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
+    ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, SearchParams params) {
         if (!type.searchable) {
             return Lists.emptyListWithTotalAndType(Relationship)
         }
@@ -192,15 +193,15 @@ class ElasticSearchService implements SearchCatalogue {
         //TODO: NEED TO REMOVE THIS????????
 
         if (params.status) {
-            states = ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()
+            states = ElementService.findAllElementStatus(params.status, isViewer())*.toString()
         }
 
         List<String> types = []
 
 
         //if you only want to search for a particular element class and subclasses of it
-        if (params.elementType) {
-            String elementType = params.elementType.toString()
+        if ( params.elementType ) {
+            String elementType = params.elementType
             if (!elementType.contains('.')) {
                 GrailsClass clazz = grailsApplication.getDomainClasses().find { it.logicalPropertyName == elementType }
                 if (clazz && clazz.clazz) {
@@ -260,11 +261,11 @@ class ElasticSearchService implements SearchCatalogue {
                 .setQuery(boolQuery)
 
 
-        return ElasticSearchQueryList.search(params,Relationship, request)
+        return ElasticSearchQueryList.search(params, Relationship, request)
     }
 
     @Override
-    public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
+    public <T> ListWithTotalAndType<T> search(Class<T> resource, SearchParams params) {
         String search = params.search
         QueryBuilder qb
         List<String> indicies
@@ -279,7 +280,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.findAllElementStatus(params.status, isViewer())*.toString()))
             }
 
             if (params.contentType) {
@@ -346,6 +347,11 @@ class ElasticSearchService implements SearchCatalogue {
         return ElasticSearchQueryList.search(params,resource, request)
     }
 
+    @CompileStatic
+    protected boolean isViewer() {
+        SpringSecurityUtils.anyGranted(MetadataRolesUtils.roles('VIEWER'))
+    }
+
 
     // may want to build on this query at a later date
     public <T> ElasticSearchQueryList<T> fuzzySearch(Class<T> resource, Map params) {
@@ -365,7 +371,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.findAllElementStatus(params.status, isViewer())*.toString()))
             }
 
             if (params.contentType) {
@@ -432,7 +438,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     //get all of the indicies associated with a data model
-    private List<String> collectDataModelIndicies(Map params, List<Class> types) {
+    private List<String> collectDataModelIndicies(SearchParams params, List<Class> types) {
         DataModelFilter filter = getOverridableDataModelFilter(params, dataModelGormService.findAll())
 
         if (!filter) {
@@ -463,7 +469,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     @Override
-    ListWithTotalAndType<CatalogueElement> search(Map params) {
+    ListWithTotalAndType<CatalogueElement> search(SearchParams params) {
         search CatalogueElement, params
     }
 
@@ -913,22 +919,16 @@ class ElasticSearchService implements SearchCatalogue {
         return current
     }
 
-    private DataModelFilter getOverridableDataModelFilter(Map params, List<DataModel> subscribedModels) {
+    private DataModelFilter getOverridableDataModelFilter(SearchParams params, List<DataModel> subscribedModels) {
         if (params.dataModel) {
-            Long dataModelId
-                if(params.get('dataModel') instanceof Long){
-                    dataModelId = params.get('dataModel')
-                }else{
-                    dataModelId = params.long('dataModel')
-                }
-
+            Long dataModelId = params.dataModel
                 //check that there is a data model is
                 // and check that you should include the results for the imports as well in search results
                 if (dataModelId) {
                         if (subscribedModels.findResults { it.id }.contains(dataModelId)) {
                             DataModel dataModel = dataModelGormService.findById(dataModelId)
                             if (dataModel) {
-                                if(params.get('searchImports')!="false") {
+                                if ( params.searchImports != 'false' ) {
                                     return DataModelFilter.includes(dataModel).withImports(subscribedModels)
                                 }else{
                                     return DataModelFilter.includes(dataModel)

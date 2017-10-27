@@ -32,11 +32,8 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
             return
         }
         ParamArgs paramArgs = instantiateParamArgs(max)
-        paramArgs.max = safeMax(max)
-        String status = params.status
-        Long dataModelId = params.long('dataModel')
-
-        respond Lists.wrap(params, "/search/?search=${params.search.encodeAsURL()}", modelCatalogueSearchService.search(search, status, dataModelId, paramArgs))
+        SearchParams searchParams = SearchParams.of(params, paramArgs)
+        respond Lists.wrap(params, "/search/?search=${params.search.encodeAsURL()}", modelCatalogueSearchService.search(searchParams))
 
     }
 

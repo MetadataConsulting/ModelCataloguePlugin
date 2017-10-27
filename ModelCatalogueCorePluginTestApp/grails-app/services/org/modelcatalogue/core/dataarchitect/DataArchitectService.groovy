@@ -11,6 +11,8 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.util.ParamArgs
+import org.modelcatalogue.core.util.SearchParams
 
 class DataArchitectService {
 
@@ -139,7 +141,11 @@ class DataArchitectService {
             if (element) {
                 elements << element
             } else {
-                def searchResult = modelCatalogueSearchService.search(resource, [search: header, max: 1])
+                SearchParms searchParms = new SearchParams()
+                searchParms.search = header
+                searchParms.paramArgs = new ParamArgs()
+                searchParms.paramArgs.max = 1
+                def searchResult = modelCatalogueSearchService.search(resource, searchParms)
                 // expect that the first hit is the best hit
                 if (searchResult.total >= 1L) {
                     elements << searchResult.items[0]

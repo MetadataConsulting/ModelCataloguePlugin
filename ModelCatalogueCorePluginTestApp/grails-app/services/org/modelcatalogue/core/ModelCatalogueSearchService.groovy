@@ -10,6 +10,7 @@ import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import rx.Observable
+import org.modelcatalogue.core.util.SearchParams
 
 /**
  * Poor man's search service searching in name and description
@@ -37,10 +38,12 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     ListWithTotalAndType<Relationship> search(CatalogueElement element,
                                               RelationshipType type,
                                               RelationshipDirection direction,
-                                              String search,
-                                              String status,
-                                              Long dataModelId,
-                                              ParamArgs paramArgs) {
+                                              SearchParams searchParams) {
+        String search = searchParams.search
+        String status = searchParams.status
+        Long dataModelId = searchParams.dataModelId
+        ParamArgs paramArgs = searchParams.paramArgs
+
         String query = "%$params.search%"
         Map params = paramArgs as Map
         List<DataModel> subscribedModels = dataModelGormService.findAll()
@@ -75,10 +78,12 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     }
 
     public <T> ListWithTotalAndType<T> search(Class<T> resource,
-                                              String search,
-                                              String status,
-                                              Long dataModelId,
-                                              ParamArgs paramArgs) {
+                                              SearchParams searchParams) {
+        String search = searchParams.search
+        String status = searchParams.status
+        Long dataModelId = searchParams.dataModelId
+        ParamArgs paramArgs = searchParams.paramArgs
+
         Map params = paramArgs as Map
 
         List<DataModel> subscribedModels = dataModelGormService.findAll()
@@ -204,11 +209,8 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         }
     }
 
-    ListWithTotalAndType<CatalogueElement> search(String searchParam,
-                                                  String status,
-                                                  Long dataModelId,
-                                                  ParamArgs paramArgs) {
-        search(CatalogueElement, searchParam, status, dataModelId, paramArgs)
+    ListWithTotalAndType<CatalogueElement> search(SearchParams searchParams) {
+        search(CatalogueElement, searchParams)
     }
 
     Observable<Boolean> index(Object element) {

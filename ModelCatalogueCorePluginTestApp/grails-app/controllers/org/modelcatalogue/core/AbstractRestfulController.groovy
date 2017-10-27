@@ -55,9 +55,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
         ParamArgs paramArgs = instantiateParamArgs(max)
-        String status = params.status
-        Long dataModelId = params.long('dataModel')
-        ListWithTotalAndType<T> results = modelCatalogueSearchService.search(resource, search, status, dataModelId, paramArgs)
+        SearchParams searchParams = SearchParams.of(params, paramArgs)
+        ListWithTotalAndType<T> results = modelCatalogueSearchService.search(resource, searchParams)
         respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(search, 'UTF-8')}", results)
     }
 

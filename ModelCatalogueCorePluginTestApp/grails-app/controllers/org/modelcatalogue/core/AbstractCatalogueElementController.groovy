@@ -905,15 +905,11 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
         Long catalogueElementId = params.long('id')
         ParamArgs paramArgs = instantiateParamArgs(max)
-        String status = params.status
-        Long dataModelId = params.long('dataModel')
+        SearchParams searchParams = SearchParams.of(params, paramArgs)
         MetadataResponseEvent responseEvent = searchWithinRelationshipsService.searchWithinRelationships(catalogueElementId,
                 type,
-                paramArgs,
                 direction,
-                search,
-                status,
-                dataModelId)
+                searchParams)
 
         if ( responseEvent instanceof NotFoundEvent ) {
             notFound()
