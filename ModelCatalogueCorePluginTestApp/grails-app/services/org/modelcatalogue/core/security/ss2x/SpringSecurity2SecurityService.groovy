@@ -9,7 +9,6 @@ import grails.util.Holders
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.LogoutListeners
-import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role

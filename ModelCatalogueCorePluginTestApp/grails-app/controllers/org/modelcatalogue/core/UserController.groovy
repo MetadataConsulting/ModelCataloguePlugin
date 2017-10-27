@@ -3,8 +3,6 @@ package org.modelcatalogue.core
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.plugin.springsecurity.annotation.Secured
-import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.UserReorderInternalService
 import org.modelcatalogue.core.security.MetadataRolesUtils

@@ -1,38 +1,35 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.catalogueelement.addrelation
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipDefinition
+import org.modelcatalogue.core.RelationshipDefinitionBuilder
+import org.modelcatalogue.core.RelationshipService
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.events.DataModelNotFoundEvent
 import org.modelcatalogue.core.events.CatalogueElementNotFoundEvent
 import org.modelcatalogue.core.events.MetadataResponseEvent
 import org.modelcatalogue.core.events.RelationAddedEvent
 import org.modelcatalogue.core.events.RelationshipNotFoundEvent
 import org.modelcatalogue.core.events.RelationshipWithErrorsEvent
+import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.MetadataRolesUtils
+import org.modelcatalogue.core.util.DestinationClass
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.RelationshipDirection
 
-class DestinationDescription {
-    String elementType
-    Long id
-}
 class AddRelationService {
 
     DataModelGormService dataModelGormService
 
     RelationshipService relationshipService
 
-    @Transactional
-    @CompileDynamic
-    CatalogueElement findCatalogueElementByClassAndId(Class catalogueElementClass, Long id) {
-        if ( catalogueElementClass == DataModel ) {
-            return dataModelGormService.findById(id)
-        }
-        catalogueElementClass.get(id)
-    }
-
+    CatalogueElementGormService catalogueElementGormService
     /**
      * @param otherSide - request JSON as an JSONObject or an JSONArray
      */
@@ -42,8 +39,8 @@ class AddRelationService {
                                       String type,
                                       Boolean outgoing,
                                       Object objectToBind,
-                                      DestinationDescription otherSide) throws ClassNotFoundException {
-        CatalogueElement source = findCatalogueElementByClassAndId(resource, catalogueElementId)
+                                      DestinationClass otherSide) throws ClassNotFoundException {
+        CatalogueElement source = catalogueElementGormService.findCatalogueElementByClassAndId(resource, catalogueElementId)
         if ( !source ) {
             return new CatalogueElementNotFoundEvent()
         }
@@ -117,10 +114,10 @@ class AddRelationService {
         OrderedMap.fromJsonMap(objectToBind.metadata ?: [:])
     }
 
-    private CatalogueElement findDestinationByOtherSide(DestinationDescription otherSide) {
-        Class otherSideType = Class.forName otherSide.elementType
+    private CatalogueElement findDestinationByOtherSide(DestinationClass otherSide) {
+        Class otherSideType = Class.forName otherSide.className
 
-        findCatalogueElementByClassAndId(otherSideType, otherSide.id)
+        catalogueElementGormService.findCatalogueElementByClassAndId(otherSideType, otherSide.id)
     }
 
 }

@@ -4,6 +4,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.addrelation.AddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.events.CatalogueElementStatusNotInDraftEvent
 import org.modelcatalogue.core.events.MappingSavedEvent
@@ -22,6 +23,7 @@ import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.DestinationClass
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -805,8 +807,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         try {
             def otherSide = parseOtherSide()
             def objectToBindParam = getObjectToBind()
-            DestinationDescription destinationDescription = new DestinationDescription()
-            destinationDescription.elementType = otherSide.elementType
+            DestinationClass destinationDescription = new DestinationClass()
+            destinationDescription.className = otherSide.elementType
             destinationDescription.id = otherSide.id
             MetadataResponseEvent metadataResponse = addRelationService.addRelation(resource,
                     catalogueElementId,
