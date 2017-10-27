@@ -49,16 +49,16 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
     def search(Integer max) {
-        handleParams(max)
-
-        if (!params.search) {
+        String search = params.search
+        if ( !search ) {
             respond errors: "No query string to search on"
             return
         }
-
-        ListWithTotalAndType<T> results = modelCatalogueSearchService.search(resource, params)
-
-        respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(params.search, 'UTF-8')}", results)
+        ParamArgs paramArgs = instantiateParamArgs(max)
+        String status = params.status
+        Long dataModelId = params.long('dataModel')
+        ListWithTotalAndType<T> results = modelCatalogueSearchService.search(resource, search, status, dataModelId, paramArgs)
+        respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(search, 'UTF-8')}", results)
     }
 
     @Override

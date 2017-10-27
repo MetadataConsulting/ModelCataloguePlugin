@@ -7,6 +7,8 @@ import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationS
 import org.modelcatalogue.core.catalogueelement.addrelation.UserAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.UserReorderInternalService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.UserSearchWithinRelationshipsService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
@@ -28,6 +30,8 @@ class UserController extends AbstractCatalogueElementController<User> {
     UserReorderInternalService userReorderInternalService
 
     UserAddRelationService userAddRelationService
+
+    UserSearchWithinRelationshipsService userSearchWithinRelationshipsService
 
     UserController() {
         super(User, false)
@@ -174,6 +178,11 @@ class UserController extends AbstractCatalogueElementController<User> {
     @Override
     protected AbstractAddRelationService getAddRelationService() {
         userAddRelationService
+    }
+
+    @Override
+    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
+        userSearchWithinRelationshipsService
     }
 
     protected boolean hasAdditionalIndexCriteria() { return true }

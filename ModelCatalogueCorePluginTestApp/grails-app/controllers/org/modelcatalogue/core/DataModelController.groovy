@@ -8,6 +8,8 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
 import org.modelcatalogue.core.catalogueelement.addrelation.DataModelAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.DataModelSearchWithinRelationshipsService
 import org.modelcatalogue.core.dataimport.excel.ExcelExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
@@ -31,7 +33,6 @@ import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import grails.plugin.springsecurity.acl.AclService
 import org.springframework.validation.Errors
-import org.springframework.security.access.annotation.Secured
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import grails.plugin.springsecurity.SpringSecurityService
@@ -53,7 +54,10 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     AclService aclService
 
     DataModelGormService dataModelReorderInternalService
+
     DataModelAddRelationService dataModelAddRelationService
+
+    DataModelSearchWithinRelationshipsService dataModelSearchWithinRelationshipsService
 
 	DataModelController() {
 		super(DataModel, false)
@@ -809,5 +813,10 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     @Override
     protected AbstractAddRelationService getAddRelationService() {
         dataModelAddRelationService
+    }
+
+    @Override
+    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
+        dataModelSearchWithinRelationshipsService
     }
 }

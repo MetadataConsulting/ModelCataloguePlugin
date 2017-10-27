@@ -5,6 +5,8 @@ import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationS
 import org.modelcatalogue.core.catalogueelement.addrelation.DataElementAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.DataElementReorderInternalService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.DataElementSearchWithinRelationshipsService
 import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -19,6 +21,7 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
     DataElementGormService dataElementGormService
     DataElementReorderInternalService dataElementReorderInternalService
     DataElementAddRelationService dataElementAddRelationService
+    DataElementSearchWithinRelationshipsService dataElementSearchWithinRelationshipsService
 
     DataElementController() {
         super(DataElement, false)
@@ -56,6 +59,11 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
     @Override
     protected AbstractAddRelationService getAddRelationService() {
         dataElementAddRelationService
+    }
+
+    @Override
+    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
+        dataElementSearchWithinRelationshipsService
     }
 
     @Override

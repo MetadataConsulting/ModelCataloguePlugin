@@ -4,6 +4,8 @@ import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationS
 import org.modelcatalogue.core.catalogueelement.addrelation.AssetAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.AssetReorderInternalService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AssetSearchWithinRelationshipsService
 import org.modelcatalogue.core.dataarchitect.SchemaValidatorService
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.lists.Lists
@@ -16,6 +18,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     AssetGormService assetGormService
     AssetReorderInternalService assetReorderInternalService
     AssetAddRelationService assetAddRelationService
+    AssetSearchWithinRelationshipsService assetSearchWithinRelationshipsService
 
     static allowedMethods = [upload: 'POST', download: 'GET']
 
@@ -205,5 +208,10 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     @Override
     protected AbstractAddRelationService getAddRelationService() {
         assetAddRelationService
+    }
+
+    @Override
+    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
+        assetSearchWithinRelationshipsService
     }
 }

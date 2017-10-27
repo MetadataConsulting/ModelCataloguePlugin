@@ -386,6 +386,19 @@ class ElementService implements Publisher<CatalogueElement> {
         return ImmutableList.of(ElementStatus.valueOf(params.status.toString().toUpperCase()))
     }
 
+    static List<ElementStatus> findAllElementStatus(String status, boolean canViewDrafts) {
+        if (!status) {
+            return ImmutableList.copyOf(ElementStatus.values().toList())
+        }
+        if (status == 'active') {
+            if (canViewDrafts) {
+                return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
+            }
+            return ImmutableList.of(ElementStatus.FINALIZED)
+        }
+        ImmutableList.of(ElementStatus.valueOf(status.toUpperCase()))
+    }
+
 
     public <E extends CatalogueElement> E merge(E source, E destination, DataModel dataModel = source.dataModel) {
         log.info "Merging $source into $destination"

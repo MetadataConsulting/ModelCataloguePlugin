@@ -7,6 +7,8 @@ import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationS
 import org.modelcatalogue.core.catalogueelement.addrelation.TagAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.TagReorderInternalService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.TagSearchWithinRelationshipsService
 import org.modelcatalogue.core.persistence.TagGormService
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
@@ -17,6 +19,7 @@ class TagController extends AbstractCatalogueElementController<Tag> {
     TagGormService tagGormService
     TagReorderInternalService tagReorderInternalService
     TagAddRelationService tagAddRelationService
+    TagSearchWithinRelationshipsService tagSearchWithinRelationshipsService
 
     TagController() {
         super(Tag, false)
@@ -114,5 +117,10 @@ class TagController extends AbstractCatalogueElementController<Tag> {
     @Override
     protected AbstractAddRelationService getAddRelationService() {
         tagAddRelationService
+    }
+
+    @Override
+    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
+        tagSearchWithinRelationshipsService
     }
 }

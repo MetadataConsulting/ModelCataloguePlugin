@@ -5,6 +5,8 @@ import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationS
 import org.modelcatalogue.core.catalogueelement.addrelation.MeasurementUnitAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.MeasurementUnitReorderInternalService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.MeasurementUnitSearchWithinRelationshipsService
 import org.modelcatalogue.core.persistence.MeasurementUnitGormService
 import org.modelcatalogue.core.util.lists.Lists
 
@@ -15,6 +17,8 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
     MeasurementUnitReorderInternalService measurementUnitReorderInternalService
 
     MeasurementUnitAddRelationService measurementUnitAddRelationService
+
+    MeasurementUnitSearchWithinRelationshipsService measurementUnitSearchWithinRelationshipsService
 
     MeasurementUnitController() {
         super(MeasurementUnit, false)
@@ -57,5 +61,10 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
     @Override
     AbstractAddRelationService getAddRelationService() {
         measurementUnitAddRelationService
+    }
+
+    @Override
+    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
+        measurementUnitSearchWithinRelationshipsService
     }
 }

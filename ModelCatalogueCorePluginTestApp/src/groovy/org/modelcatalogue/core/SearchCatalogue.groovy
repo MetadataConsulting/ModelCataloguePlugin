@@ -1,14 +1,15 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
 
 public interface SearchCatalogue {
 
-    ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params)
-    public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params)
-    ListWithTotalAndType<CatalogueElement> search(Map params)
+    ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, String search, String status, Long dataModelId, ParamArgs paramArgs)
+    public <T> ListWithTotalAndType<T> search(Class<T> resource, String search, String status, Long dataModelId, ParamArgs paramArgs)
+    ListWithTotalAndType<CatalogueElement> search(String search, String status, Long dataModelId, ParamArgs paramArgs)
 
     Observable<Boolean> index(Object element)
     Observable<Boolean> index(Iterable<Object> resource)

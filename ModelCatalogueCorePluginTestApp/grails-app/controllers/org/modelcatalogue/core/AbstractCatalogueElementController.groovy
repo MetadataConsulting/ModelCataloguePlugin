@@ -4,6 +4,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
 import org.modelcatalogue.core.catalogueelement.RemoveRelationService
 import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
@@ -894,31 +895,38 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond relationships
     }
 
+    protected abstract AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService()
 
-    //TODO: this should all go into a service
-    private searchWithinRelationshipsInternal(Integer max, String type, RelationshipDirection direction){
-        CatalogueElement element = findById(params.long('id'))
+    protected void searchWithinRelationshipsInternal(Integer max, String type, RelationshipDirection direction){
+        String search = params.search
+        if (!search) {
+            respond errors: "No query string to search on"
+            return
+        }
+        Long catalogueElementId = params.long('id')
+        ParamArgs paramArgs = instantiateParamArgs(max)
+        String status = params.status
+        Long dataModelId = params.long('dataModel')
+        MetadataResponseEvent responseEvent = searchWithinRelationshipsService.searchWithinRelationships(catalogueElementId,
+                type,
+                paramArgs,
+                direction,
+                search,
+                status,
+                dataModelId)
 
-        if (!element) {
+        if ( responseEvent instanceof NotFoundEvent ) {
             notFound()
             return
         }
 
-        RelationshipType relationshipType = RelationshipType.readByName(type)
-
-        handleParams(max)
-
-        if (!params.search) {
-            respond errors: "No query string to search on"
+        if ( !(responseEvent instanceof RelationshipsEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
             return
         }
-
-        ListWithTotalAndType<Relationship> results =  modelCatalogueSearchService.search(element, relationshipType, direction, params)
-
-        respond new Relationships(owner: element,
-                direction: direction,
-                type: relationshipType,
-                list: Lists.wrap(params, "/${resourceName}/${params.id}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${params.search?.encodeAsURL() ?: ''}", results))
+        RelationshipsEvent relationshipsEvent = responseEvent as RelationshipsEvent
+        respond relationshipsEvent.relationships
     }
 
     protected String getDefaultSort()  { actionName == 'index' ? 'name'  : null }

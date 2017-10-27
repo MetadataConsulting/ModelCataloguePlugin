@@ -6,6 +6,8 @@ import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationS
 import org.modelcatalogue.core.catalogueelement.addrelation.DataTypeAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.DataTypeReorderInternalService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.DataTypeSearchWithinRelationshipsService
 import org.modelcatalogue.core.persistence.DataTypeGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWrapper
@@ -18,6 +20,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
     DataTypeGormService dataTypeGormService
     DataTypeReorderInternalService dataTypeReorderInternalService
     DataTypeAddRelationService dataTypeAddRelationService
+    DataTypeSearchWithinRelationshipsService dataTypeSearchWithinRelationshipsService
 
     DataTypeController() {
         super(DataType, false)
@@ -143,5 +146,10 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
     @Override
     AbstractAddRelationService getAddRelationService() {
         dataTypeAddRelationService
+    }
+
+    @Override
+    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
+        dataTypeSearchWithinRelationshipsService
     }
 }

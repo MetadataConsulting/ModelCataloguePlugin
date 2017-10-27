@@ -5,6 +5,8 @@ import org.modelcatalogue.core.catalogueelement.addrelation.AssetAddRelationServ
 import org.modelcatalogue.core.catalogueelement.addrelation.ValidationRuleAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.reorder.ValidationRuleReorderInternalService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.ValidationRuleSearchWithinRelationshipsService
 import org.modelcatalogue.core.persistence.ValidationRuleGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -16,6 +18,7 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
     ValidationRuleGormService validationRuleGormService
     ValidationRuleReorderInternalService validationRuleReorderInternalService
     ValidationRuleAddRelationService validationRuleAddRelationService
+    ValidationRuleSearchWithinRelationshipsService validationRuleSearchWithinRelationshipsService
 
     ValidationRuleController() {
         super(ValidationRule, false)
@@ -76,6 +79,11 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
     @Override
     protected AbstractAddRelationService getAddRelationService() {
         validationRuleAddRelationService
+    }
+
+    @Override
+    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
+        validationRuleSearchWithinRelationshipsService
     }
 
     @Override

@@ -4,6 +4,7 @@ import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -33,12 +34,22 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     // i.e. search for anything that is a favourite on the home screen
 
     @Override
-    ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
+    ListWithTotalAndType<Relationship> search(CatalogueElement element,
+                                              RelationshipType type,
+                                              RelationshipDirection direction,
+                                              String search,
+                                              String status,
+                                              Long dataModelId,
+                                              ParamArgs paramArgs) {
         String query = "%$params.search%"
+        Map params = paramArgs as Map
+        List<DataModel> subscribedModels = dataModelGormService.findAll()
 
-        Set<DataModel> subscribedModels = dataModelGormService.findAll()
-
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params, modelCatalogueSecurityService.isSubscribed(element)), getOverridableDataModelFilter(params, subscribedModels))
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element,
+                type,
+                ElementService.findAllElementStatus(status, modelCatalogueSecurityService.isSubscribed(element)),
+                getOverridableDataModelFilter(dataModelId, subscribedModels)
+        )
 
         if (query != '%*%') {
             switch (direction) {
@@ -63,16 +74,21 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         return Lists.fromCriteria(params, criteria)
     }
 
-    public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
+    public <T> ListWithTotalAndType<T> search(Class<T> resource,
+                                              String search,
+                                              String status,
+                                              Long dataModelId,
+                                              ParamArgs paramArgs) {
+        Map params = paramArgs as Map
 
-        Set<DataModel> subscribedModels = dataModelGormService.findAll()
+        List<DataModel> subscribedModels = dataModelGormService.findAll()
 
         // if the user doesn't have at least VIEWER role, don't return other elements than finalized
 //        if (!params.status && !false /*modelCatalogueSecurityService.hasRole('VIEWER')*/) {
 //            params.status = 'FINALIZED'
 //        }
 
-        String query = "%$params.search%"
+        String query = "%${search}%"
 
         //TODO: check why measurement unit is included here
 
@@ -86,16 +102,16 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
             criteria.'in'('id', subscribedModels.collect{it.id})
 
-            if (params.status) {
-                criteria.'in'('status', ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+            if (status) {
+                criteria.'in'('status', ElementService.findAllElementStatus(status, false))
             }
-            return Lists.fromCriteria(params, criteria).customize {
+            return Lists.fromCriteria(paramArgs as Map, criteria).customize {
                 it.collect { item -> CatalogueElementMarshaller.minimalCatalogueElementJSON(item) }
             }
         }
 
         if (CatalogueElement.isAssignableFrom(resource)) {
-            DataModelFilter dataModels = getOverridableDataModelFilter(params, subscribedModels).withImports(subscribedModels)
+            DataModelFilter dataModels = getOverridableDataModelFilter(dataModelId, subscribedModels).withImports(subscribedModels)
 
 
             String alias = resource.simpleName[0].toLowerCase()
@@ -113,8 +129,8 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
             List<ElementStatus> statuses = [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED]
 
-            if (params.status) {
-                statuses = [ElementStatus.valueOf(params.status.toString().toUpperCase())]
+            if (status) {
+                statuses = [ElementStatus.valueOf(status.toUpperCase())]
             }
 
             Map<String, Object> arguments = [
@@ -188,8 +204,11 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         }
     }
 
-    ListWithTotalAndType<CatalogueElement> search(Map params){
-        search CatalogueElement, params
+    ListWithTotalAndType<CatalogueElement> search(String searchParam,
+                                                  String status,
+                                                  Long dataModelId,
+                                                  ParamArgs paramArgs) {
+        search(CatalogueElement, searchParam, status, dataModelId, paramArgs)
     }
 
     Observable<Boolean> index(Object element) {
@@ -214,10 +233,10 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         Observable.just(true)
     }
 
-    protected DataModelFilter getOverridableDataModelFilter(Map params, List<DataModel> subscribedModels) {
-        if (params.dataModel) {
-            if(subscribedModels.find{it.id}==params.dataModel) {
-                DataModel dataModel = dataModelGormService.findById(params.long('dataModel'))
+    protected DataModelFilter getOverridableDataModelFilter(Long dataModelId, List<DataModel> subscribedModels) {
+        if ( dataModelId ) {
+            if( subscribedModels.find { it.id == dataModelId } ) {
+                DataModel dataModel = dataModelGormService.findById(dataModelId)
                 if (dataModel) {
                     return DataModelFilter.includes(dataModel)
                 }
