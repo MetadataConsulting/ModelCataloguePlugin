@@ -2,7 +2,7 @@ package org.modelcatalogue.core.security.ss2x
 
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserGormService
+import org.modelcatalogue.core.persistence.UserGormService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken

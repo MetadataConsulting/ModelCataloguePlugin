@@ -1,7 +1,9 @@
-package org.modelcatalogue.core.security
+package org.modelcatalogue.core.persistence
 
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
+import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserService
 
 @CompileStatic
 class UserGormService {

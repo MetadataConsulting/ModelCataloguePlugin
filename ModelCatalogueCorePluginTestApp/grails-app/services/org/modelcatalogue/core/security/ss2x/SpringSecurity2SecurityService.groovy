@@ -14,7 +14,7 @@ import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserGormService
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.security.UserRole
 import org.springframework.security.acls.domain.BasePermission
 import org.springframework.security.core.Authentication
