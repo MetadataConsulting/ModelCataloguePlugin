@@ -5,5 +5,5 @@ import org.modelcatalogue.core.Relationship
 
 @CompileStatic
 class RelationshipWithErrorsEvent implements MetadataResponseFailureEvent {
-    Relationship rel
+    Relationship relationship
 }

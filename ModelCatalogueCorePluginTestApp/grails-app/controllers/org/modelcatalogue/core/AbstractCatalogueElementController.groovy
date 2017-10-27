@@ -4,6 +4,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.RemoveRelationService
 import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.events.CatalogueElementStatusNotInDraftEvent
@@ -12,6 +13,7 @@ import org.modelcatalogue.core.events.MappingWithErrorsEvent
 import org.modelcatalogue.core.events.NotFoundEvent
 import org.modelcatalogue.core.events.RelationAddedEvent
 import org.modelcatalogue.core.events.RelationshipMovedEvent
+import org.modelcatalogue.core.events.RelationshipRemovedEvent
 import org.modelcatalogue.core.events.RelationshipWithErrorsEvent
 import org.modelcatalogue.core.events.RelationshipsEvent
 import org.modelcatalogue.core.events.SourceDestinationEvent
@@ -61,6 +63,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     RelationshipsInternalService relationshipsInternalService
     AddMappingService addMappingService
     SourceDestinationService sourceDestinationService
+    RemoveRelationService removeRelationService
 
     //used to run reports in background thread
     ExecutorService executorService
@@ -744,60 +747,67 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     //general remove any relation from a catalogue element based on the relationship type
     // used by the directional remove relation methods
     private void removeRelation(Long id, String type, boolean outgoing) {
-        withRetryingTransaction {
-            //check the user has the minimum role needed
-            def otherSide = parseOtherSide()
+        Object otherSide = parseOtherSide()
+        DestinationClass destinationClass = new DestinationClass(
+            className: otherSide.relation ? otherSide.relation.elementType : otherSide.elementType,
+            id: otherSide.relation ? otherSide.relation.id : otherSide.id
+        )
+        String relationshipTypeName = otherSide.type ? otherSide.type.name : type
+        def dataModelObject = otherSide.dataModel ?: otherSide.classification
+        Long dataModelId = dataModelObject?.id as Long
 
-            CatalogueElement source = findById(id)
-            if (!source) {
-                notFound()
-                return
-            }
-            if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', source) ) {
-                unauthorized()
-                return
-            }
-
-            RelationshipType relationshipType = RelationshipType.readByName(otherSide.type ? otherSide.type.name : type)
-            if (!relationshipType) {
-                notFound()
-                return
-
-            }
-            Class otherSideType
-            try {
-                otherSideType = Class.forName (otherSide.relation ? otherSide.relation.elementType : otherSide.elementType)
-            } catch (ClassNotFoundException ignored) {
-                notFound()
-                return
-            }
-
-            CatalogueElement destination = otherSideType.get(otherSide.relation ? otherSide.relation.id : otherSide.id )
-            if (!destination) {
-                notFound()
-                return
-            }
-
-            def dataModelObject = otherSide.dataModel ?: otherSide.classification
-            DataModel dataModel = dataModelObject ? dataModelGormService.findById(dataModelObject.id as Long) : null
-
-            Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType, dataModel) :  relationshipService.unlink(destination, source, relationshipType, dataModel)
-            if (!old) {
-                notFound()
-                return
-            }
-
-            if (old.hasErrors()) {
-                respond old.errors
-                return
-            }
-
-            response.status = HttpServletResponse.SC_NO_CONTENT
-            render "DELETED"
+        MetadataResponseEvent responseEvent = sourceDestinationService.findSourceDestination(id, destinationClass)
+        if ( responseEvent instanceof NotFoundEvent ) {
+            notFound()
+            return
         }
+        if ( responseEvent instanceof UnauthorizedEvent ) {
+            unauthorized()
+            return
+        }
+
+        if ( !(responseEvent instanceof SourceDestinationEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+        SourceDestinationEvent sourceDestinationEvent = responseEvent as SourceDestinationEvent
+
+        CatalogueElement source = sourceDestinationEvent.source
+        CatalogueElement destination = sourceDestinationEvent.destination
+        responseEvent = removeRelationService.removeRelation(relationshipTypeName,
+                                             dataModelId,
+                                             outgoing,
+                                             source,
+                                             destination)
+        if ( responseEvent instanceof NotFoundEvent ) {
+            notFound()
+            return
+        }
+        if ( responseEvent instanceof RelationshipWithErrorsEvent ) {
+            RelationshipWithErrorsEvent relationshipWithErrorsEvent = responseEvent as RelationshipWithErrorsEvent
+            respond relationshipWithErrorsEvent.relationship.errors
+            return
+        }
+        if ( !(responseEvent instanceof RelationshipRemovedEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+
+        response.status = HttpServletResponse.SC_NO_CONTENT
+        render "DELETED"
     }
 
     abstract protected AbstractAddRelationService getAddRelationService()
+
+    protected DestinationClass destinationClassFromJsonPayload()  {
+        DestinationClass destination = new DestinationClass()
+        destination.className = otherSide.elementType
+        destination.id = otherSide.id
+        destination
+    }
+
 
    /**
     * general add any relation from a catalogue element based on the relationship type used by the directional add relation methods
@@ -807,22 +817,20 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         try {
             def otherSide = parseOtherSide()
+            DestinationClass destinationClass = destinationClassFromJsonPayload()
             def objectToBindParam = getObjectToBind()
-            DestinationClass destinationDescription = new DestinationClass()
-            destinationDescription.className = otherSide.elementType
-            destinationDescription.id = otherSide.id
             MetadataResponseEvent metadataResponse = addRelationService.addRelation(catalogueElementId,
                     type,
                     outgoing as Boolean,
                     objectToBindParam as Object,
-                    destinationDescription)
+                    destinationClass)
             if ( metadataResponse instanceof NotFoundEvent ) {
                 notFound()
                 return
             }
             if (metadataResponse instanceof RelationshipWithErrorsEvent) {
                 RelationshipWithErrorsEvent relationshipWithErrorsEvent = metadataResponse as RelationshipWithErrorsEvent
-                respond relationshipWithErrorsEvent.rel.errors
+                respond relationshipWithErrorsEvent.relationship.errors
                 return
             }
             if( !(metadataResponse instanceof RelationAddedEvent)) {
