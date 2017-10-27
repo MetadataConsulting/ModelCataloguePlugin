@@ -5,8 +5,10 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.events.NotFoundEvent
 import org.modelcatalogue.core.events.RelationAddedEvent
 import org.modelcatalogue.core.events.RelationshipWithErrorsEvent
+import org.modelcatalogue.core.events.RelationshipsEvent
 import org.modelcatalogue.core.path.PathFinder
 import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.VerificationPhase
@@ -16,6 +18,7 @@ import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.OrderedMap
+import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
@@ -51,6 +54,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def dataModelService
     def dataClassService
     AddRelationService addRelationService
+    RelationshipsInternalService relationshipsInternalService
 
     //used to run reports in background thread
     ExecutorService executorService
@@ -800,32 +804,33 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @param type,type of relationship
      * @param max, maximum results
      */
-    //TODO: this should all go into a service
     private relationshipsInternal(Integer max, String typeParam, RelationshipDirection direction) {
-        handleParams(max)
-
+        ParamArgs paramArgs = instantiateParamArgs(max)
         if (!params.sort) {
-            params.sort = direction.sortProperty
+            paramArgs.sort = direction.sortProperty
         }
 
-        CatalogueElement element = findById(params.long('id'))
-        if (!element) {
+        Long catalogueElementId = params.long('id')
+        MetadataResponseEvent responseEvent = relationshipsInternalService.relationshipsInternal(catalogueElementId,
+                typeParam,
+                direction,
+                resourceName,
+                paramArgs,
+                overridableDataModelFilter)
+
+        if ( responseEvent instanceof NotFoundEvent ) {
             notFound()
             return
         }
 
-        RelationshipType type = typeParam ? RelationshipType.readByName(typeParam) : null
-        if (typeParam && !type) {
-            notFound()
+        if ( !(responseEvent instanceof RelationshipsEvent) ) {
+            log.warn "got an unexpected response event {responsEvent.class.name} in relationshipsInternal"
             return
         }
 
-        respond new Relationships(
-                type: type,
-                owner: element,
-                direction: direction,
-                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, ElementService.getStatusFromParams(params, true), overridableDataModelFilter))
-        )
+        RelationshipsEvent relationshipsEvent = responseEvent as RelationshipsEvent
+        Relationships relationships = relationshipsEvent.relationships
+        respond relationships
     }
 
 
@@ -905,8 +910,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
     }
 
-    protected getDefaultSort()  { actionName == 'index' ? 'name'  : null }
-    protected getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
+    protected String getDefaultSort()  { actionName == 'index' ? 'name'  : null }
+    protected String getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
 
 
     /**

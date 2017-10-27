@@ -13,6 +13,7 @@ import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.Metadata
+import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.dao.ConcurrencyFailureException
@@ -296,6 +297,34 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             respond errors: "Unexpected error while deleting $instance ${e.message}"
             log.error("unexpected error while deleting $instance", e)
         }
+    }
+
+    protected ParamArgs instantiateParamArgs(Integer max) {
+
+        ParamArgs paramArgs = new ParamArgs()
+
+        withFormat {
+            json {
+                paramArgs.max = Math.min(max ?: 25, 100)
+            }
+            xml {
+                paramArgs.max = Math.min(max ?: 10000, 10000)
+            }
+        }
+
+        if ( defaultSort && !params.sort) {
+            paramArgs.sort = defaultSort
+        } else {
+            paramArgs.sort = params.sort
+        }
+
+        if ( defaultOrder && !params.order) {
+            paramArgs.order = defaultOrder
+        } else {
+            paramArgs.order = params.order
+        }
+
+        paramArgs
     }
 
     protected handleParams(Integer max) {
