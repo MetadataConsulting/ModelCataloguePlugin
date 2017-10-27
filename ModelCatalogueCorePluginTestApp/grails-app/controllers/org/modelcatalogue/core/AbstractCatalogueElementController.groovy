@@ -761,9 +761,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                     outgoing as Boolean,
                     objectToBindParam as Object,
                     destinationDescription)
-            if ((metadataResponse instanceof CatalogueElementNotFoundEvent) ||
-                (metadataResponse instanceof RelationshipNotFoundEvent) ||
-                (metadataResponse instanceof DataModelNotFoundEvent)) {
+            if ( metadataResponse instanceof NotFoundEvent ) {
                 notFound()
                 return
             }
