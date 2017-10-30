@@ -10,6 +10,7 @@ import org.modelcatalogue.core.catalogueelement.addrelation.DataModelAddRelation
 import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
 import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
 import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.DataModelSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.reorder.DataModelReorderInternalService
 import org.modelcatalogue.core.dataimport.excel.ExcelExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
@@ -53,7 +54,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
     AclService aclService
 
-    DataModelGormService dataModelReorderInternalService
+    DataModelReorderInternalService dataModelReorderInternalService
 
     DataModelAddRelationService dataModelAddRelationService
 
