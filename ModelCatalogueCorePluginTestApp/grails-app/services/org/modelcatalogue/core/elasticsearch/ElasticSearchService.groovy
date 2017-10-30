@@ -296,7 +296,7 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
                 boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
-            } else{
+            } else {
 
                 for ( String property : CATALOGUE_ELEMENT_BOOSTS.keySet() ) {
                     int boost = CATALOGUE_ELEMENT_BOOSTS.get(property)
