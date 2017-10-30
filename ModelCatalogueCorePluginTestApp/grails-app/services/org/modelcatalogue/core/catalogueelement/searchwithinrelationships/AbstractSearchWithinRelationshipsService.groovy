@@ -1,8 +1,6 @@
 package org.modelcatalogue.core.catalogueelement.searchwithinrelationships
 
-import groovy.transform.CompileStatic
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ModelCatalogueSearchService
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.events.CatalogueElementNotFoundEvent
@@ -15,10 +13,9 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 
-@CompileStatic
 abstract class AbstractSearchWithinRelationshipsService {
 
-    ModelCatalogueSearchService modelCatalogueSearchService
+    def modelCatalogueSearchService
 
     abstract protected String resourceName()
 
