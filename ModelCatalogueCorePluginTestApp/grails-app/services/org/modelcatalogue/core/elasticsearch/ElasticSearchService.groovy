@@ -288,7 +288,8 @@ class ElasticSearchService implements SearchCatalogue {
 
             if ( !search.contains("*") ) {
 
-                CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+                for ( String property : CATALOGUE_ELEMENT_BOOSTS.keySet() ) {
+                    int boost = CATALOGUE_ELEMENT_BOOSTS.get(property)
                     boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
                 }
 
@@ -297,7 +298,8 @@ class ElasticSearchService implements SearchCatalogue {
 
             } else{
 
-                CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+                for ( String property : CATALOGUE_ELEMENT_BOOSTS.keySet() ) {
+                    int boost = CATALOGUE_ELEMENT_BOOSTS.get(property)
                     boolQuery.should(QueryBuilders.wildcardQuery(property, search).boost(boost))
                 }
 
@@ -312,7 +314,8 @@ class ElasticSearchService implements SearchCatalogue {
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
 
-            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+            for ( String property : CATALOGUE_ELEMENT_BOOSTS.keySet() ) {
+                int boost = CATALOGUE_ELEMENT_BOOSTS.get(property)
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
 
@@ -324,7 +327,8 @@ class ElasticSearchService implements SearchCatalogue {
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
 
-            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+            for ( String property : CATALOGUE_ELEMENT_BOOSTS.keySet() ) {
+                int boost = CATALOGUE_ELEMENT_BOOSTS.get(property)
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
 
@@ -386,7 +390,8 @@ class ElasticSearchService implements SearchCatalogue {
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
 
-            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+            for ( String property : CATALOGUE_ELEMENT_BOOSTS.keySet() ) {
+                int boost = CATALOGUE_ELEMENT_BOOSTS.get(property)
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
 
@@ -398,7 +403,8 @@ class ElasticSearchService implements SearchCatalogue {
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
 
-            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+            for ( String property : CATALOGUE_ELEMENT_BOOSTS.keySet() ) {
+                int boost = CATALOGUE_ELEMENT_BOOSTS.get(property)
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
 
