@@ -56,7 +56,6 @@ class ElasticSearchService implements SearchCatalogue {
 
     static transactional = false
 
-
     private static final int ELEMENTS_PER_BATCH = readFromEnv('MC_ES_ELEMENTS_PER_BATCH', 30)
 
     private static int readFromEnv(String envName, int defaultValue) {
@@ -922,8 +921,8 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private DataModelFilter getOverridableDataModelFilter(SearchParams params, List<DataModel> subscribedModels) {
-        if (params.dataModel) {
-            Long dataModelId = params.dataModel
+        if (params.dataModelId) {
+            Long dataModelId = params.dataModelId
                 //check that there is a data model is
                 // and check that you should include the results for the imports as well in search results
                 if (dataModelId) {

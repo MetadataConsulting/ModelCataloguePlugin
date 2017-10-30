@@ -2,7 +2,6 @@ package org.modelcatalogue.core.util.builder
 
 import com.google.common.collect.Maps
 import com.google.common.collect.Sets
-import grails.compiler.GrailsCompileStatic
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
@@ -12,8 +11,8 @@ import java.lang.reflect.Modifier
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
-//@GrailsCompileStatic
-@Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
+@Log4j
+class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
 
     static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, DataModel, DataElement, DataType, EnumeratedType, ReferenceType, MeasurementUnit, DataClass, PrimitiveType, ValidationRule, Tag]
 

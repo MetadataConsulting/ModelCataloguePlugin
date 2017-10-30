@@ -13,7 +13,6 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.api.RelationshipBuilder
 import org.modelcatalogue.builder.api.RelationshipConfiguration
 import org.modelcatalogue.builder.api.RelationshipTypeBuilder
-import org.modelcatalogue.core.policy.Conventions
 import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.PolicyBuilder
 import org.modelcatalogue.core.util.FriendlyErrors

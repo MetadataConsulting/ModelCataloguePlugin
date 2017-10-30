@@ -9,18 +9,14 @@ class ParamArgs {
     String sort
     String order
 
-
-    Object asType(Class clazz) {
-        if (clazz == Map) {
-            Map<String, Object> m = [offset: offset, max: max] as Map<String, Object>
-            if ( sort ) {
-                m['sort'] = sort
-            }
-            if ( order ) {
-                m['order'] = order
-            }
-            return m
+    Map toMap() {
+        Map<String, Object> m = [offset: offset, max: max] as HashMap<String, Object>
+        if ( sort ) {
+            m['sort'] = sort
         }
-        super.asType(clazz)
+        if ( order ) {
+            m['order'] = order
+        }
+        m
     }
 }

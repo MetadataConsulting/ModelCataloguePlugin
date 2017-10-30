@@ -11,14 +11,17 @@ class SearchParams {
     String type
     String searchImports
     String contentType
-    double minScore
-    boolean explain
+    Double minScore
+    Boolean explain
 
     public static SearchParams of(GrailsParameterMap params, ParamArgs paramArgsParameter) {
         SearchParams searchParams = new SearchParams()
         searchParams.search = params.search
         searchParams.status = params.status
         searchParams.dataModelId = params.long('dataModelId')
+        if ( !searchParams.dataModelId ) {
+            searchParams.dataModelId = params.long('dataModel')
+        }
         searchParams.paramArgs = paramArgsParameter
         searchParams.elementType = params.elementType
         searchParams.type = params.type

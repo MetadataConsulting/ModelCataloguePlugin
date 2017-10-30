@@ -9,6 +9,6 @@ class ParamArgsSpec extends Specification {
         ParamArgs paramArgs = new ParamArgs(order: 'title', sort: 'asc', max: 100, offset: 10)
 
         expect:
-        (paramArgs as Map) == [order: 'title', sort: 'asc', max: 100, offset: 10]
+        paramArgs.toMap() == [order: 'title', sort: 'asc', max: 100, offset: 10]
     }
 }

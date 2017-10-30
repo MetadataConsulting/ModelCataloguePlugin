@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.policy
 
-import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel

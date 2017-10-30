@@ -36,7 +36,7 @@ abstract class AbstractSearchWithinRelationshipsService {
             return new RelationshipTypeNotFoundEvent()
         }
 
-        Map params = searchParams.paramArgs as Map
+        Map params = searchParams.paramArgs.toMap()
         ListWithTotalAndType<Relationship> results = modelCatalogueSearchService.search(element, relationshipType, direction, searchParams)
         String searchEncoded = URLEncoder.encode(searchParams.search, 'UTF-8')
         String base = "/${resourceName()}/${catalogueElementId}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${searchEncoded ?: ''}"

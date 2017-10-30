@@ -45,7 +45,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         ParamArgs paramArgs = searchParams.paramArgs
 
         String query = "%$params.search%"
-        Map params = paramArgs as Map
+        Map params = paramArgs.toMap()
         List<DataModel> subscribedModels = dataModelGormService.findAll()
 
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element,
@@ -84,7 +84,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         Long dataModelId = searchParams.dataModelId
         ParamArgs paramArgs = searchParams.paramArgs
 
-        Map params = paramArgs as Map
+        Map params = paramArgs.toMap()
 
         List<DataModel> subscribedModels = dataModelGormService.findAll()
 
@@ -110,7 +110,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             if (status) {
                 criteria.'in'('status', ElementService.findAllElementStatus(status, false))
             }
-            return Lists.fromCriteria(paramArgs as Map, criteria).customize {
+            return Lists.fromCriteria(paramArgs.toMap(), criteria).customize {
                 it.collect { item -> CatalogueElementMarshaller.minimalCatalogueElementJSON(item) }
             }
         }

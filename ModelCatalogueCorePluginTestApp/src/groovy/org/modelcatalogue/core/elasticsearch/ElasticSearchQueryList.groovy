@@ -57,11 +57,15 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
 
     private SearchResponse initializeResponse() {
         try {
-            if (params.offset) {
-                searchRequest.setFrom(Integer.parseInt(params.offset.toString(), 10))
+
+
+            if (params.paramArgs?.offset) {
+                int offset = params.paramArgs?.offset
+                searchRequest.setFrom(offset)
             }
-            if (params.max) {
-                searchRequest.setSize(Integer.parseInt(params.max.toString(), 10))
+            if (params.paramArgs?.max) {
+                int max = params.paramArgs?.max
+                searchRequest.setSize(max)
             }
             if (params.explain) {
                 log.info searchRequest.toString()
