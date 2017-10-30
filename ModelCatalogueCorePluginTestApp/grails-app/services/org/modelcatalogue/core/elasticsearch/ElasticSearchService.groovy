@@ -274,19 +274,19 @@ class ElasticSearchService implements SearchCatalogue {
 
             QueryBuilder boolQuery = QueryBuilders.boolQuery()
 
-            if (search != '*') {
+            if ( search != '*' ) {
                 boolQuery.minimumNumberShouldMatch(1)
             }
 
-            if (params.status) {
+            if ( params.status ) {
                 boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()))
             }
 
-            if (params.contentType) {
+            if ( params.contentType ) {
                 boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
-            if(!search.contains("*")) {
+            if ( !search.contains("*") ) {
 
                 CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
                     boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
@@ -294,7 +294,8 @@ class ElasticSearchService implements SearchCatalogue {
 
                 boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
                 boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
-            }else{
+
+            } else{
 
                 CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
                     boolQuery.should(QueryBuilders.wildcardQuery(property, search).boost(boost))
