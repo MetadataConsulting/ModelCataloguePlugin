@@ -141,11 +141,11 @@ class DataArchitectService {
             if (element) {
                 elements << element
             } else {
-                SearchParms searchParms = new SearchParams()
-                searchParms.search = header
-                searchParms.paramArgs = new ParamArgs()
-                searchParms.paramArgs.max = 1
-                def searchResult = modelCatalogueSearchService.search(resource, searchParms)
+                SearchParams searchParams = new SearchParams()
+                searchParams.search = header
+                searchParams.paramArgs = new ParamArgs()
+                searchParams.paramArgs.max = 1
+                def searchResult = modelCatalogueSearchService.search(resource, searchParams)
                 // expect that the first hit is the best hit
                 if (searchResult.total >= 1L) {
                     elements << searchResult.items[0]

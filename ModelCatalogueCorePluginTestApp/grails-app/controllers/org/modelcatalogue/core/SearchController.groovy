@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.rx.LoggingSubscriber
 import org.modelcatalogue.core.util.ParamArgs
+import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.Lists
 
 import java.util.concurrent.ExecutorService

@@ -34,6 +34,7 @@ import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.rx.RxService
+import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -48,6 +49,7 @@ import groovy.transform.CompileStatic
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
 import static rx.Observable.just
+import rx.Observable
 import grails.plugin.springsecurity.SpringSecurityUtils
 
 class ElasticSearchService implements SearchCatalogue {
@@ -349,7 +351,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     @CompileStatic
     protected boolean isViewer() {
-        SpringSecurityUtils.anyGranted(MetadataRolesUtils.roles('VIEWER'))
+        SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('VIEWER'))
     }
 
 

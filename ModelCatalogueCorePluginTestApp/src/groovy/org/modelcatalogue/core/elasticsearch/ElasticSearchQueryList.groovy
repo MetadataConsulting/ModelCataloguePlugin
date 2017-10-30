@@ -17,21 +17,22 @@ import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.lists.JsonAwareListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.SearchParams
 
 @Log4j
 class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
 
-    final SearchParms params
+    final SearchParams params
     final Class<T> type
     final SearchRequestBuilder searchRequest
 
     SearchResponse response
 
-    static <T> ListWithTotalAndType<T> search(SearchParms params, Class<T> type, SearchRequestBuilder searchRequest) {
+    static <T> ListWithTotalAndType<T> search(SearchParams params, Class<T> type, SearchRequestBuilder searchRequest) {
         return new ElasticSearchQueryList<T>(params, type, searchRequest)
     }
 
-    private ElasticSearchQueryList(SearchParms params, Class<T> type, SearchRequestBuilder searchRequest) {
+    private ElasticSearchQueryList(SearchParams params, Class<T> type, SearchRequestBuilder searchRequest) {
         this.params = params
         this.type = type
         this.searchRequest = searchRequest

@@ -2,9 +2,7 @@ package org.modelcatalogue.core.policy
 
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
-
 import java.util.regex.Pattern
-
 import static com.google.common.base.Preconditions.checkNotNull
 
 class RegexChecker implements ConventionChecker {

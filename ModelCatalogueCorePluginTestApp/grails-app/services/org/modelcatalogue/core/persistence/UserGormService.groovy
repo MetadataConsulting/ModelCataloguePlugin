@@ -6,12 +6,12 @@ import org.modelcatalogue.core.security.UserService
 
 class UserGormService {
 
-    @Transactional(readOnly = true)
+    @Transactional
     User findByUsername(String usernameParam) {
         User.where { username == usernameParam }.get()
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     User findById(long id) {
         User.get(id)
     }

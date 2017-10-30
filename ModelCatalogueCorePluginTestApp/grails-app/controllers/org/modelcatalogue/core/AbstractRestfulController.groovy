@@ -14,6 +14,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.ParamArgs
+import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.dao.ConcurrencyFailureException

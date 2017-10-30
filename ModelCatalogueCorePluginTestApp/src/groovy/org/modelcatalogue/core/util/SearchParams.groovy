@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.util
 
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+
 class SearchParams {
     String search
     String status

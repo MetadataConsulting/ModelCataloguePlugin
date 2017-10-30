@@ -5,7 +5,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ModelCatalogueSearchService
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.events.CatalogueElementNotFound
+import org.modelcatalogue.core.events.CatalogueElementNotFoundEvent
 import org.modelcatalogue.core.events.MetadataResponseEvent
 import org.modelcatalogue.core.events.RelationshipTypeNotFoundEvent
 import org.modelcatalogue.core.events.RelationshipsEvent
@@ -31,7 +31,7 @@ abstract class AbstractSearchWithinRelationshipsService {
 
         CatalogueElement element = findById(catalogueElementId)
         if (!element) {
-            return new CatalogueElementNotFound()
+            return new CatalogueElementNotFoundEvent()
         }
 
         RelationshipType relationshipType = RelationshipType.readByName(type)
@@ -41,7 +41,7 @@ abstract class AbstractSearchWithinRelationshipsService {
 
         Map params = searchParams.paramArgs as Map
         ListWithTotalAndType<Relationship> results = modelCatalogueSearchService.search(element, relationshipType, direction, searchParams)
-        String searchEncoded = URLEncoder.encode(search, 'UTF-8')
+        String searchEncoded = URLEncoder.encode(searchParams.search, 'UTF-8')
         String base = "/${resourceName()}/${catalogueElementId}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${searchEncoded ?: ''}"
         Relationships relationships = new Relationships(owner: element,
                 direction: direction,
