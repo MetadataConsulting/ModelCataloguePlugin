@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.catalogueelement
 
-import groovy.transform.CompileStatic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
@@ -13,7 +12,6 @@ import org.modelcatalogue.core.events.RelationshipTypeNotFoundEvent
 import org.modelcatalogue.core.events.RelationshipWithErrorsEvent
 import org.modelcatalogue.core.persistence.DataModelGormService
 
-@CompileStatic
 class RemoveRelationService {
 
     DataModelGormService dataModelGormService

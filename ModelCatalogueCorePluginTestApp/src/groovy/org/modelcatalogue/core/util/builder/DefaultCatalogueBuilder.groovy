@@ -22,8 +22,6 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
-
-
 /**
  * CatalogueBuilder class allows to design the catalogue elements relationship in a tree-like structure simply without
  * having to know the implementation details. CatalogueBuilder handles creating the draft versions if necessary.
@@ -31,8 +29,8 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
  * Practical example how the builder can be used are the imports present in the application or DSL MC files.
  *
  */
-@CompileStatic
-@Log4j class DefaultCatalogueBuilder extends AbstractCatalogueBuilder {
+@Log4j
+class DefaultCatalogueBuilder extends AbstractCatalogueBuilder {
 
     /**
      * These classes can be created automatically setting e.g. <code>automatic dataType</code> flag on.

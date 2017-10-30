@@ -12,7 +12,7 @@ import java.lang.reflect.Modifier
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
-@GrailsCompileStatic
+//@GrailsCompileStatic
 @Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
 
     static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, DataModel, DataElement, DataType, EnumeratedType, ReferenceType, MeasurementUnit, DataClass, PrimitiveType, ValidationRule, Tag]

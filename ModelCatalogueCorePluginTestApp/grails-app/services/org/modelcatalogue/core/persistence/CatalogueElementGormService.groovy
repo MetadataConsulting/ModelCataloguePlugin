@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.persistence
 
-import groovy.transform.CompileStatic
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
@@ -13,7 +12,6 @@ import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.security.User
 import org.springframework.transaction.annotation.Transactional
 
-@CompileStatic
 class CatalogueElementGormService {
 
     MeasurementUnitGormService measurementUnitGormService
