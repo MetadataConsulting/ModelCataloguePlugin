@@ -446,6 +446,7 @@ class BootStrap {
                 '/**/images/**',
                 '/**/img/**',
                 '/login', '/login.*', '/login/*',
+                '/j_spring_security_check',
                 '/logout', '/logout.*', '/logout/*',
                 '/register/*', '/errors', '/errors/*',
                 '/load',
