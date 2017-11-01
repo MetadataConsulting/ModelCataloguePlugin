@@ -62,7 +62,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
                                                     SearchParams searchParams) {
 
         CatalogueElement element = findById(catalogueElementId)
-        if (!element) {
+        if ( element == null ) {
             return new CatalogueElementNotFoundEvent()
         }
 
@@ -87,7 +87,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
 
         CatalogueElement instance = findById(catalogueElementId)
 
-        if (!instance) {
+        if (instance == null) {
             return new CatalogueElementNotFoundEvent()
         }
 
@@ -110,7 +110,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
 
         CatalogueElement instance = findById(catalogueElementId)
 
-        if (!instance) {
+        if ( instance == null ) {
             return new CatalogueElementNotFoundEvent()
         }
 
@@ -132,7 +132,8 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
         // begin sanity checks
         //check the user has the minimum role needed
         CatalogueElement owner = findById(catalogueElementId)
-        if (!owner) {
+
+        if ( owner == null ) {
             return new CatalogueElementNotFoundEvent()
         }
 
@@ -146,13 +147,13 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
         }
 
         Relationship rel = relationshipGormService.findById(movedId)
-        if (!rel) {
+        if ( rel == null ) {
             return new RelationshipNotFoundEvent()
         }
 
         Relationship current = currentId ? relationshipGormService.findById(currentId) : null
 
-        if (!current && currentId) {
+        if ( (current == null) && currentId ) {
             return new RelationshipNotFoundEvent()
         }
 
@@ -174,13 +175,12 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
                                       Object objectToBind,
                                       DestinationClass otherSide) throws ClassNotFoundException {
         CatalogueElement source = findById(catalogueElementId)
-        if ( !source ) {
+        if ( source == null ) {
             return new CatalogueElementNotFoundEvent()
         }
         RelationshipType relationshipType = RelationshipType.readByName(type)
-        if (!relationshipType) {
+        if ( relationshipType == null ) {
             return new RelationshipNotFoundEvent()
-
         }
 
         Object newDataModel = objectToBind['__dataModel'] ?: objectToBind['__classification']
@@ -189,7 +189,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
         DataModel dataModel
         if ( dataModelId ) {
             dataModel = dataModelGormService.findById(dataModelId)
-            if ( !dataModel ) {
+            if ( dataModel == null ) {
                 return new DataModelNotFoundEvent()
             }
         }
@@ -200,13 +200,13 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
         DataModel oldDataModelInstance
         if ( oldDataModelId ) {
             oldDataModelInstance = dataModelGormService.findById(oldDataModelId)
-            if ( !oldDataModelInstance ) {
+            if ( oldDataModelInstance == null ) {
                 return new DataModelNotFoundEvent()
             }
         }
 
         CatalogueElement destination = findDestinationByOtherSide(otherSide)
-        if ( !destination ) {
+        if ( destination == null ) {
             return new CatalogueElementNotFoundEvent()
         }
 
