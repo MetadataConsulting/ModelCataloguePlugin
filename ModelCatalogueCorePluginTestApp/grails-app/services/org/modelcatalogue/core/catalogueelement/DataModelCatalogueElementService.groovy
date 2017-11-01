@@ -4,12 +4,9 @@ import grails.util.GrailsNameUtils
 import groovy.transform.CompileStatic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.persistence.DataModelGormService
 
 @CompileStatic
 class DataModelCatalogueElementService extends AbstractCatalogueElementService {
-
-    DataModelGormService dataModelGormService
 
     @Override
     CatalogueElement findById(Long id) {
