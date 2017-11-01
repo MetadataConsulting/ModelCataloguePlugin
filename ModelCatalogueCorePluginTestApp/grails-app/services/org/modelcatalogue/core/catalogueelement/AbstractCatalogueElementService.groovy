@@ -15,6 +15,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.events.CatalogueElementArchivedEvent
 import org.modelcatalogue.core.events.CatalogueElementNotFoundEvent
 import org.modelcatalogue.core.events.CatalogueElementStatusNotInDraftEvent
+import org.modelcatalogue.core.events.CatalogueElementStatusNotFinalizedEvent
 import org.modelcatalogue.core.events.CatalogueElementWithErrorsEvent
 import org.modelcatalogue.core.events.DataModelNotFoundEvent
 import org.modelcatalogue.core.events.MetadataResponseEvent
@@ -93,6 +94,10 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
 
         if ( !dataModelGormService.isAdminOrHasAdministratorPermission(instance) ) {
             return new UnauthorizedEvent()
+        }
+
+        if ( !(instance.status == ElementStatus.FINALIZED) ) {
+            return new CatalogueElementStatusNotFinalizedEvent()
         }
 
         // do not archive relationships as we need to transfer the deprecated elements to the new versions
