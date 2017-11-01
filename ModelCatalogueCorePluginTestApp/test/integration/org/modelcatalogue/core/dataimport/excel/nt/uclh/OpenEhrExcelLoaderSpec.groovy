@@ -58,29 +58,5 @@ class OpenEhrExcelLoaderSpec extends ExcelLoaderSpec{
         similar excelLoaderXmlResult(file, '_openEHR_Cross_references_test').left, getClass().getResourceAsStream('OpenEhrTest.xml').text
         where:
         file << testOpenEhrFiles
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
