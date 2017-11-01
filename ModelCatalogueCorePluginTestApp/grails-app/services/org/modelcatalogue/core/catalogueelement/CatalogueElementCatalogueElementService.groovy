@@ -1,11 +1,16 @@
-package org.modelcatalogue.core.catalogueelement.reorder
+package org.modelcatalogue.core.catalogueelement
 
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.persistence.CatalogueElementGormService
 
-class CatalogueElementReorderInternalService extends AbstractReorderInternalService {
+class CatalogueElementCatalogueElementService extends AbstractCatalogueElementService {
 
     CatalogueElementGormService catalogueElementGormService
+
+    @Override
+    protected String resourceName() {
+        'catalogueElement'
+    }
 
     @Override
     CatalogueElement findById(Long id) {

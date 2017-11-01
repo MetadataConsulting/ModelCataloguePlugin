@@ -1,12 +1,7 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
-import org.modelcatalogue.core.catalogueelement.addrelation.AssetAddRelationService
-import org.modelcatalogue.core.catalogueelement.addrelation.ValidationRuleAddRelationService
-import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
-import org.modelcatalogue.core.catalogueelement.reorder.ValidationRuleReorderInternalService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.ValidationRuleSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ValidationRuleCatalogueElementService
 import org.modelcatalogue.core.persistence.ValidationRuleGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -16,9 +11,7 @@ import org.modelcatalogue.core.util.lists.Relationships
 class ValidationRuleController extends AbstractCatalogueElementController<ValidationRule> {
 
     ValidationRuleGormService validationRuleGormService
-    ValidationRuleReorderInternalService validationRuleReorderInternalService
-    ValidationRuleAddRelationService validationRuleAddRelationService
-    ValidationRuleSearchWithinRelationshipsService validationRuleSearchWithinRelationshipsService
+    ValidationRuleCatalogueElementService validationRuleCatalogueElementService
 
     ValidationRuleController() {
         super(ValidationRule, false)
@@ -72,18 +65,8 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
     }
 
     @Override
-    protected AbstractReorderInternalService getReorderInternalService() {
-        validationRuleReorderInternalService
-    }
-
-    @Override
-    protected AbstractAddRelationService getAddRelationService() {
-        validationRuleAddRelationService
-    }
-
-    @Override
-    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
-        validationRuleSearchWithinRelationshipsService
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        validationRuleCatalogueElementService
     }
 
     @Override

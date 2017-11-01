@@ -4,11 +4,12 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.catalogueelement.RemoveRelationService
-import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
-import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
+import org.modelcatalogue.core.events.CatalogueElementArchivedEvent
+import org.modelcatalogue.core.events.CatalogueElementRestoredEvent
 import org.modelcatalogue.core.events.CatalogueElementStatusNotInDraftEvent
+import org.modelcatalogue.core.events.CatalogueElementWithErrorsEvent
 import org.modelcatalogue.core.events.MappingSavedEvent
 import org.modelcatalogue.core.events.MappingWithErrorsEvent
 import org.modelcatalogue.core.events.NotFoundEvent
@@ -66,6 +67,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     AddMappingService addMappingService
     SourceDestinationService sourceDestinationService
     RemoveRelationService removeRelationService
+
+    abstract protected ManageCatalogueElementService getManageCatalogueElementService()
 
     //used to run reports in background thread
     ExecutorService executorService
@@ -222,12 +225,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         Long sourceId = params.long('id')
 
         MetadataResponseEvent responseEvent = sourceDestinationService.findSourceDestination(sourceId, destinationId)
-        if ( responseEvent instanceof NotFoundEvent ) {
-            notFound()
-            return
-        }
-        if ( responseEvent instanceof UnauthorizedEvent ) {
-            unauthorized()
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
             return
         }
 
@@ -258,12 +257,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         Long sourceId = params.long('id')
 
         MetadataResponseEvent responseEvent = sourceDestinationService.findSourceDestination(sourceId, destinationId)
-        if ( responseEvent instanceof NotFoundEvent ) {
-            notFound()
-            return
-        }
-        if ( responseEvent instanceof UnauthorizedEvent ) {
-            unauthorized()
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
             return
         }
 
@@ -575,25 +570,18 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        T instance = findById(params.long('id'))
-        if (instance == null) {
+        Long catalogueElementId = params.long('id')
+        MetadataResponseEvent responseEvent = manageCatalogueElementService.archive(catalogueElementId)
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
+            return
+        }
+        if (!responseEvent instanceof CatalogueElementArchivedEvent) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
             notFound()
-            return
         }
 
-        if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', instance) ) {
-            unauthorized()
-            return
-        }
-
-        // do not archive relationships as we need to transfer the deprecated elements to the new versions
-        instance = elementService.archive(instance, false)
-
-        if (instance.hasErrors()) {
-            respond instance.errors, view: 'edit' // STATUS CODE 422
-            return
-        }
-
+        T instance = (responseEvent as CatalogueElementArchivedEvent).catalogueElement
         respond instance, [status: OK]
     }
 
@@ -601,34 +589,21 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * Used on an Archived element to restore it i.e. bring it's status back
      * @param id
      */
-
-
     //TODO: this always makes the element finalised - if it's contained in a draft model it should be brought back to a draft state
     @Transactional
     def restore() {
 
-        if (!modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())) {
-            unauthorized()
+        Long catalogueElementId = params.long('id')
+        MetadataResponseEvent responseEvent = manageCatalogueElementService.restore(catalogueElementId)
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
             return
         }
-
-        if (handleReadOnly()) {
-            return
-        }
-
-        T instance = findById(params.long('id'))
-        if (instance == null) {
+        if (!responseEvent instanceof CatalogueElementRestoredEvent) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
             notFound()
-            return
         }
-
-        // do not archive relationships as we need to transfer the deprecated elements to the new versions
-        instance = elementService.restore(instance)
-
-        if (instance.hasErrors()) {
-            respond instance.errors, view: 'edit' // STATUS CODE 422
-            return
-        }
+        T instance = (responseEvent as CatalogueElementRestoredEvent).catalogueElement
 
         respond instance, [status: OK]
     }
@@ -699,8 +674,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond new PathFinder().findPath(element)
     }
 
-    abstract protected AbstractReorderInternalService getReorderInternalService()
-
     /**
      * GENERAL reorder relationships METHOD used for internal and external relationships i.e. if you want one data element contained in a class to come before another
      * @param id, id of the catalogue element
@@ -715,13 +688,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
         Long currentId = objectToBind?.current?.id as Long
 
-        MetadataResponseEvent responseEvent = reorderInternalService.reorderInternal(direction, catalogueElementId, type, movedId, currentId)
-        if (responseEvent instanceof NotFoundEvent) {
-            notFound()
-            return
-        }
-        if (responseEvent instanceof UnauthorizedEvent) {
-            unauthorized()
+        MetadataResponseEvent responseEvent = manageCatalogueElementService.reorderInternal(direction, catalogueElementId, type, movedId, currentId)
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
             return
         }
         if (responseEvent instanceof CatalogueElementStatusNotInDraftEvent) {
@@ -759,12 +728,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         Long dataModelId = dataModelObject?.id as Long
 
         MetadataResponseEvent responseEvent = sourceDestinationService.findSourceDestination(id, destinationClass)
-        if ( responseEvent instanceof NotFoundEvent ) {
-            notFound()
-            return
-        }
-        if ( responseEvent instanceof UnauthorizedEvent ) {
-            unauthorized()
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
             return
         }
 
@@ -782,15 +747,11 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                                              outgoing,
                                              source,
                                              destination)
-        if ( responseEvent instanceof NotFoundEvent ) {
-            notFound()
+        handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
             return
         }
-        if ( responseEvent instanceof RelationshipWithErrorsEvent ) {
-            RelationshipWithErrorsEvent relationshipWithErrorsEvent = responseEvent as RelationshipWithErrorsEvent
-            respond relationshipWithErrorsEvent.relationship.errors
-            return
-        }
+
         if ( !(responseEvent instanceof RelationshipRemovedEvent) ) {
             log.warn("Got an unexpected event ${responseEvent.class.name}")
             notFound()
@@ -800,8 +761,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         response.status = HttpServletResponse.SC_NO_CONTENT
         render "DELETED"
     }
-
-    abstract protected AbstractAddRelationService getAddRelationService()
 
     protected DestinationClass destinationClassFromJsonPayload()  {
         DestinationClass destination = new DestinationClass()
@@ -821,20 +780,17 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             def otherSide = parseOtherSide()
             DestinationClass destinationClass = destinationClassFromJsonPayload()
             def objectToBindParam = getObjectToBind()
-            MetadataResponseEvent metadataResponse = addRelationService.addRelation(catalogueElementId,
+            MetadataResponseEvent metadataResponse = manageCatalogueElementService.addRelation(catalogueElementId,
                     type,
                     outgoing as Boolean,
                     objectToBindParam as Object,
                     destinationClass)
-            if ( metadataResponse instanceof NotFoundEvent ) {
-                notFound()
+
+            boolean handled = handleMetadataResponseEvent(metadataResponse)
+            if ( handled ) {
                 return
             }
-            if (metadataResponse instanceof RelationshipWithErrorsEvent) {
-                RelationshipWithErrorsEvent relationshipWithErrorsEvent = metadataResponse as RelationshipWithErrorsEvent
-                respond relationshipWithErrorsEvent.relationship.errors
-                return
-            }
+
             if( !(metadataResponse instanceof RelationAddedEvent)) {
                 notFound()
                 return
@@ -881,8 +837,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 paramArgs,
                 overridableDataModelFilter)
 
-        if ( responseEvent instanceof NotFoundEvent ) {
-            notFound()
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
             return
         }
 
@@ -896,8 +852,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond relationships
     }
 
-    protected abstract AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService()
-
     protected void searchWithinRelationshipsInternal(Integer max, String type, RelationshipDirection direction){
         String search = params.search
         if (!search) {
@@ -907,13 +861,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         Long catalogueElementId = params.long('id')
         ParamArgs paramArgs = instantiateParamArgs(max)
         SearchParams searchParams = SearchParams.of(params, paramArgs)
-        MetadataResponseEvent responseEvent = searchWithinRelationshipsService.searchWithinRelationships(catalogueElementId,
+        MetadataResponseEvent responseEvent = manageCatalogueElementService.searchWithinRelationships(catalogueElementId,
                 type,
                 direction,
                 searchParams)
 
-        if ( responseEvent instanceof NotFoundEvent ) {
-            notFound()
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
             return
         }
 
@@ -1080,4 +1034,28 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         dataModelService.dataModelFilter
     }
 
+    /**
+     * @return true if the event was handled, false if it was not
+     */
+    protected boolean handleMetadataResponseEvent(MetadataResponseEvent responseEvent) {
+        if (responseEvent instanceof NotFoundEvent) {
+            notFound()
+            return true
+        }
+        if (responseEvent instanceof UnauthorizedEvent) {
+            unauthorized()
+            return true
+        }
+        if (responseEvent instanceof CatalogueElementWithErrorsEvent) {
+            respond responseEvent.catalogueElement.errors, view: 'edit' // STATUS CODE 422
+            return true
+        }
+        if ( responseEvent instanceof RelationshipWithErrorsEvent ) {
+            RelationshipWithErrorsEvent relationshipWithErrorsEvent = responseEvent as RelationshipWithErrorsEvent
+            respond relationshipWithErrorsEvent.relationship.errors
+            return true
+        }
+
+        false
+    }
 }

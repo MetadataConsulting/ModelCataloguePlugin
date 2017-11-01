@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.catalogueelement.searchwithinrelationships
+package org.modelcatalogue.core.catalogueelement
 
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileStatic
@@ -7,7 +7,7 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.persistence.MeasurementUnitGormService
 
 @CompileStatic
-class MeasurementUnitSearchWithinRelationshipsService extends AbstractSearchWithinRelationshipsService {
+class MeasurementUnitCatalogueElementService extends AbstractCatalogueElementService {
 
     MeasurementUnitGormService measurementUnitGormService
 

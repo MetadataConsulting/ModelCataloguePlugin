@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.catalogueelement.searchwithinrelationships
+package org.modelcatalogue.core.catalogueelement
 
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileStatic
@@ -7,7 +7,7 @@ import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.persistence.ValidationRuleGormService
 
 @CompileStatic
-class ValidationRuleSearchWithinRelationshipsService extends AbstractSearchWithinRelationshipsService {
+class ValidationRuleCatalogueElementService extends AbstractCatalogueElementService {
 
     ValidationRuleGormService validationRuleGormService
 

@@ -3,12 +3,8 @@ package org.modelcatalogue.core
 import grails.util.GrailsNameUtils
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
-import org.modelcatalogue.core.catalogueelement.addrelation.TagAddRelationService
-import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
-import org.modelcatalogue.core.catalogueelement.reorder.TagReorderInternalService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.TagSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.TagCatalogueElementService
 import org.modelcatalogue.core.persistence.TagGormService
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
@@ -17,9 +13,7 @@ class TagController extends AbstractCatalogueElementController<Tag> {
 
     SessionFactory sessionFactory
     TagGormService tagGormService
-    TagReorderInternalService tagReorderInternalService
-    TagAddRelationService tagAddRelationService
-    TagSearchWithinRelationshipsService tagSearchWithinRelationshipsService
+    TagCatalogueElementService tagCatalogueElementService
 
     TagController() {
         super(Tag, false)
@@ -110,17 +104,7 @@ class TagController extends AbstractCatalogueElementController<Tag> {
     }
 
     @Override
-    protected AbstractReorderInternalService getReorderInternalService() {
-        tagReorderInternalService
-    }
-
-    @Override
-    protected AbstractAddRelationService getAddRelationService() {
-        tagAddRelationService
-    }
-
-    @Override
-    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
-        tagSearchWithinRelationshipsService
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        tagCatalogueElementService
     }
 }

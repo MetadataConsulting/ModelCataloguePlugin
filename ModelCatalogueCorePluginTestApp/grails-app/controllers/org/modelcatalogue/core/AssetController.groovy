@@ -1,11 +1,7 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
-import org.modelcatalogue.core.catalogueelement.addrelation.AssetAddRelationService
-import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
-import org.modelcatalogue.core.catalogueelement.reorder.AssetReorderInternalService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AssetSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.AssetCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.dataarchitect.SchemaValidatorService
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.lists.Lists
@@ -16,9 +12,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     StorageService modelCatalogueStorageService
     SchemaValidatorService schemaValidatorService
     AssetGormService assetGormService
-    AssetReorderInternalService assetReorderInternalService
-    AssetAddRelationService assetAddRelationService
-    AssetSearchWithinRelationshipsService assetSearchWithinRelationshipsService
+    AssetCatalogueElementService assetCatalogueElementService
 
     static allowedMethods = [upload: 'POST', download: 'GET']
 
@@ -166,6 +160,11 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         return null
     }
 
+    @Override
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        assetCatalogueElementService
+    }
+
     def history(Integer max) {
         String name = getResourceName()
         Class type = resource
@@ -198,20 +197,5 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         respond Lists.fromCriteria(customParams, type, "/${name}/${assetId}/history") {
             eq 'latestVersionId', latestVersionId
         }
-    }
-
-    @Override
-    protected AbstractReorderInternalService getReorderInternalService() {
-        assetReorderInternalService
-    }
-
-    @Override
-    protected AbstractAddRelationService getAddRelationService() {
-        assetAddRelationService
-    }
-
-    @Override
-    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
-        assetSearchWithinRelationshipsService
     }
 }

@@ -1,12 +1,8 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
-import org.modelcatalogue.core.catalogueelement.addrelation.MeasurementUnitAddRelationService
-import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
-import org.modelcatalogue.core.catalogueelement.reorder.MeasurementUnitReorderInternalService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.MeasurementUnitSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.MeasurementUnitCatalogueElementService
 import org.modelcatalogue.core.persistence.MeasurementUnitGormService
 import org.modelcatalogue.core.util.lists.Lists
 
@@ -14,11 +10,7 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
 
     MeasurementUnitGormService measurementUnitGormService
 
-    MeasurementUnitReorderInternalService measurementUnitReorderInternalService
-
-    MeasurementUnitAddRelationService measurementUnitAddRelationService
-
-    MeasurementUnitSearchWithinRelationshipsService measurementUnitSearchWithinRelationshipsService
+    MeasurementUnitCatalogueElementService measurementUnitCatalogueElementService
 
     MeasurementUnitController() {
         super(MeasurementUnit, false)
@@ -54,17 +46,8 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
     }
 
     @Override
-    protected AbstractReorderInternalService getReorderInternalService() {
-        measurementUnitReorderInternalService
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        measurementUnitCatalogueElementService
     }
 
-    @Override
-    AbstractAddRelationService getAddRelationService() {
-        measurementUnitAddRelationService
-    }
-
-    @Override
-    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
-        measurementUnitSearchWithinRelationshipsService
-    }
 }

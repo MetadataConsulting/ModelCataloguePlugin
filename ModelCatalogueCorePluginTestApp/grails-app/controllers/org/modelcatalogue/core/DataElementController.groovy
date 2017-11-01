@@ -1,12 +1,8 @@
 package org.modelcatalogue.core
 
 import org.hibernate.SessionFactory
-import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
-import org.modelcatalogue.core.catalogueelement.addrelation.DataElementAddRelationService
-import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
-import org.modelcatalogue.core.catalogueelement.reorder.DataElementReorderInternalService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.DataElementSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.DataElementCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -19,9 +15,7 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
     SessionFactory sessionFactory
     DataModelGormService dataModelGormService
     DataElementGormService dataElementGormService
-    DataElementReorderInternalService dataElementReorderInternalService
-    DataElementAddRelationService dataElementAddRelationService
-    DataElementSearchWithinRelationshipsService dataElementSearchWithinRelationshipsService
+    DataElementCatalogueElementService dataElementCatalogueElementService
 
     DataElementController() {
         super(DataElement, false)
@@ -52,18 +46,8 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
     }
 
     @Override
-    protected AbstractReorderInternalService getReorderInternalService() {
-        dataElementReorderInternalService
-    }
-
-    @Override
-    protected AbstractAddRelationService getAddRelationService() {
-        dataElementAddRelationService
-    }
-
-    @Override
-    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
-        dataElementSearchWithinRelationshipsService
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        dataElementCatalogueElementService
     }
 
     @Override

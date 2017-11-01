@@ -1,12 +1,8 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
-import org.modelcatalogue.core.catalogueelement.addrelation.DataClassAddRelationService
-import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
-import org.modelcatalogue.core.catalogueelement.reorder.DataClassReorderInternalService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.DataClassSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.DataClassCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.persistence.DataClassGormService
@@ -21,9 +17,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
     PerformanceUtilService performanceUtilService
     DataClassGormService dataClassGormService
-    DataClassReorderInternalService dataClassReorderInternalService
-    DataClassAddRelationService dataClassAddRelationService
-    DataClassSearchWithinRelationshipsService dataClassSearchWithinRelationshipsService
+    DataClassCatalogueElementService dataClassCatalogueElementService
 
     DataClassController() {
         super(DataClass, false)
@@ -157,8 +151,8 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     @Override
-    protected AbstractReorderInternalService getReorderInternalService() {
-        dataClassReorderInternalService
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        dataClassCatalogueElementService
     }
 
     @Override
@@ -171,15 +165,5 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
     protected DataClass findById(long id) {
         dataClassGormService.findById(id)
-    }
-
-    @Override
-    AbstractAddRelationService getAddRelationService() {
-        dataClassAddRelationService
-    }
-
-    @Override
-    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
-        dataClassSearchWithinRelationshipsService
     }
 }

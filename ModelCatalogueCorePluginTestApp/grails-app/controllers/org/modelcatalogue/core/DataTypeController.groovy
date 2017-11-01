@@ -2,12 +2,8 @@ package org.modelcatalogue.core
 
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
-import org.modelcatalogue.core.catalogueelement.addrelation.DataTypeAddRelationService
-import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
-import org.modelcatalogue.core.catalogueelement.reorder.DataTypeReorderInternalService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.DataTypeSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.DataTypeCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.persistence.DataTypeGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWrapper
@@ -18,9 +14,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
     DataTypeService dataTypeService
     SessionFactory sessionFactory
     DataTypeGormService dataTypeGormService
-    DataTypeReorderInternalService dataTypeReorderInternalService
-    DataTypeAddRelationService dataTypeAddRelationService
-    DataTypeSearchWithinRelationshipsService dataTypeSearchWithinRelationshipsService
+    DataTypeCatalogueElementService dataTypeCatalogueElementService
 
     DataTypeController() {
         super(DataType, false)
@@ -117,8 +111,8 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
     }
 
     @Override
-    protected AbstractReorderInternalService getReorderInternalService() {
-        dataTypeReorderInternalService
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        dataTypeCatalogueElementService
     }
 
     @Override
@@ -141,15 +135,5 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
 
     protected DataType findById(long id) {
         dataTypeGormService.findById(id)
-    }
-
-    @Override
-    AbstractAddRelationService getAddRelationService() {
-        dataTypeAddRelationService
-    }
-
-    @Override
-    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
-        dataTypeSearchWithinRelationshipsService
     }
 }

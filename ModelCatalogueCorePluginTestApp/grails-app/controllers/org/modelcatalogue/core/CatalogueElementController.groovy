@@ -1,22 +1,14 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
-import org.modelcatalogue.core.catalogueelement.addrelation.CatalogueElementAddRelationService
-import org.modelcatalogue.core.catalogueelement.reorder.CatalogueElementReorderInternalService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.CatalogueElementSearchWithinRelationshipsService
-import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
+import org.modelcatalogue.core.catalogueelement.CatalogueElementCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.persistence.CatalogueElementGormService
 
 class CatalogueElementController extends AbstractCatalogueElementController<CatalogueElement> {
 
     CatalogueElementGormService catalogueElementGormService
 
-    CatalogueElementSearchWithinRelationshipsService catalogueElementSearchWithinRelationshipsService
-
-    CatalogueElementAddRelationService catalogueElementAddRelationService
-
-    CatalogueElementReorderInternalService catalogueElementReorderInternalService
+    CatalogueElementCatalogueElementService catalogueElementCatalogueElementService
 
     CatalogueElementController() {
         super(CatalogueElement, true)
@@ -27,17 +19,7 @@ class CatalogueElementController extends AbstractCatalogueElementController<Cata
     }
 
     @Override
-    protected AbstractReorderInternalService getReorderInternalService() {
-        catalogueElementReorderInternalService
-    }
-
-    @Override
-    protected AbstractAddRelationService getAddRelationService() {
-        catalogueElementAddRelationService
-    }
-
-    @Override
-    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
-        catalogueElementSearchWithinRelationshipsService
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        catalogueElementCatalogueElementService
     }
 }

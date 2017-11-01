@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.catalogueelement.searchwithinrelationships
+package org.modelcatalogue.core.catalogueelement
 
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileStatic
@@ -7,7 +7,7 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.persistence.DataTypeGormService
 
 @CompileStatic
-class DataTypeSearchWithinRelationshipsService extends AbstractSearchWithinRelationshipsService {
+class DataTypeCatalogueElementService extends AbstractCatalogueElementService {
 
     DataTypeGormService dataTypeGormService
 

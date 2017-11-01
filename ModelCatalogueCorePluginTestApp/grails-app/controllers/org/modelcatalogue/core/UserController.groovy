@@ -3,12 +3,8 @@ package org.modelcatalogue.core
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
-import org.modelcatalogue.core.catalogueelement.addrelation.AbstractAddRelationService
-import org.modelcatalogue.core.catalogueelement.addrelation.UserAddRelationService
-import org.modelcatalogue.core.catalogueelement.reorder.AbstractReorderInternalService
-import org.modelcatalogue.core.catalogueelement.reorder.UserReorderInternalService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.AbstractSearchWithinRelationshipsService
-import org.modelcatalogue.core.catalogueelement.searchwithinrelationships.UserSearchWithinRelationshipsService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.UserCatalogueElementService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
@@ -27,11 +23,7 @@ class UserController extends AbstractCatalogueElementController<User> {
 
     FavouriteService favouriteService
 
-    UserReorderInternalService userReorderInternalService
-
-    UserAddRelationService userAddRelationService
-
-    UserSearchWithinRelationshipsService userSearchWithinRelationshipsService
+    UserCatalogueElementService userCatalogueElementService
 
     UserController() {
         super(User, false)
@@ -171,18 +163,8 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     @Override
-    protected AbstractReorderInternalService getReorderInternalService() {
-        userReorderInternalService
-    }
-
-    @Override
-    protected AbstractAddRelationService getAddRelationService() {
-        userAddRelationService
-    }
-
-    @Override
-    protected AbstractSearchWithinRelationshipsService getSearchWithinRelationshipsService() {
-        userSearchWithinRelationshipsService
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        userCatalogueElementService
     }
 
     protected boolean hasAdditionalIndexCriteria() { return true }
