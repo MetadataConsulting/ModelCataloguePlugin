@@ -45,10 +45,16 @@ class DataModelGormService {
     }
 
     boolean hasReadPermission(DataModel dataModel) {
+        if ( dataModel == null) {
+            return true
+        }
         aclUtilService.hasPermission(springSecurityService.authentication, dataModel, BasePermission.READ)
     }
 
     boolean hasAdministratorPermission(DataModel dataModel) {
+        if ( dataModel == null) {
+            return true
+        }
         aclUtilService.hasPermission(springSecurityService.authentication, dataModel, BasePermission.ADMINISTRATION)
     }
 
