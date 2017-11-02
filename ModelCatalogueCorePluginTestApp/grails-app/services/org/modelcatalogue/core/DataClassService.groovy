@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.transaction.Transactional
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DataModelFilter
 
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -16,6 +17,7 @@ class DataClassService {
     DataModelService dataModelService
     PerformanceUtilService performanceUtilService
     DataModelGormService dataModelGormService
+    DataModelAclService dataModelAclService
 
     ListWithTotalAndType<DataClass> getTopLevelDataClasses(Map params = [:]) {
         getTopLevelDataClasses(dataModelService.dataModelFilter, params)
@@ -23,7 +25,7 @@ class DataClassService {
 
     ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter,
                                                            Map params = [:],
-                                                           boolean canViewDrafts = dataModelGormService.hasAccessToEveryDataModelInFilterIncludes(dataModelFilter) ) {
+                                                           boolean canViewDrafts = dataModelAclService.hasAccessToEveryDataModelInFilterIncludes(dataModelFilter) ) {
         RelationshipType hierarchy = RelationshipType.hierarchyType
         List<ElementStatus> status = ElementService.getStatusFromParams(params, canViewDrafts)
 

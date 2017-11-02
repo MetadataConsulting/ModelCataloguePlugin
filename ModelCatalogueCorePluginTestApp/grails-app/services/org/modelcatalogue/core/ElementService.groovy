@@ -19,6 +19,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -45,8 +46,7 @@ class ElementService implements Publisher<CatalogueElement> {
     def sessionFactory
     def elasticSearchService
 
-    DataModelGormService dataModelGormService
-
+    DataModelAclService dataModelAclService
 
 //    NONE OF THESE ARE USED OR IMPLEMENTED - Commenting them out - will remove
 //    List<CatalogueElement> list(Map params = [:]) {
@@ -86,7 +86,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 // TODO: better target the changes
                 CacheService.VERSION_COUNT_CACHE.invalidateAll()
 
-                dataModelGormService.copyPermissions(dataModel, draft)
+                dataModelAclService.copyPermissions(dataModel, draft)
 
                 return draft
             }

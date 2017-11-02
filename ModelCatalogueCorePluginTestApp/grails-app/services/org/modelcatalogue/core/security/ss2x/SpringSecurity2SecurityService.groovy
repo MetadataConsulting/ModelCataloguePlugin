@@ -11,6 +11,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.LogoutListeners
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
@@ -31,7 +32,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
     SpringSecurityService springSecurityService
 
-    DataModelGormService dataModelGormService
+    DataModelAclService dataModelAclService
 
     UserGormService userGormService
 
@@ -54,7 +55,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if ( !SpringSecurityUtils.ifAnyGranted(roles.join(',')) ) {
             return false
         }
-        dataModelGormService.hasReadPermission(dataModel)
+        dataModelAclService.hasReadPermission(dataModel)
     }
 
     //check if a user a general role
@@ -115,17 +116,5 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     boolean isSupervisor(){
         if(UserRole.findByUserAndRole(getCurrentUser(), Role.findByAuthority('ROLE_SUPERVISOR'))) return true
         return false
-    }
-
-    void addUserRoleModel(User user, Role role, DataModel model, boolean flush = false){
-        UserRole.create user, role, model, flush
-    }
-
-    void removeUserRoleModel(User user, Role role, DataModel model){
-        UserRole.remove user, role, model
-    }
-
-    void removeAllUserRoleModel(User user, DataModel model){
-        UserRole.executeUpdate 'DELETE FROM UserRole WHERE user=:user AND dataModel=:dataModel', [user: user, dataModel: model]
     }
 }

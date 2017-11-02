@@ -31,6 +31,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     transient elementService
     transient modelCatalogueSecurityService
 
+    transient dataModelAclService
+
     DataModel dataModel
 
     String name
@@ -230,10 +232,9 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     def beforeDelete(){
-        User currentUser = modelCatalogueSecurityService.getCurrentUser()
         //if this is a data model add this data model, otherwise add the data model of the class.
-        if(this.instanceOf(DataModel) && currentUser) {
-            modelCatalogueSecurityService.removeAllUserRoleModel(currentUser, this)
+        if( this.instanceOf(DataModel) ) {
+            dataModelAclService.removePermissions(this)
         }
         auditService.logElementDeleted(this)
     }

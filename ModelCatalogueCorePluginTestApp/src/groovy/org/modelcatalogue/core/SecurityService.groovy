@@ -74,38 +74,6 @@ public interface SecurityService {
      */
     boolean isSubscribed(CatalogueElement ce)
 
-    /**
-     * Adds a user with a particular role to a data model. This gives them access to the particular model
-     * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN, SUPERVISOR. Any
-     * service implementations should map to these roles as well.
-     *
-     * @param the user to be added, role the role to be added, data model that data model the user and role applies to
-     */
-
-    void addUserRoleModel(User user, Role role, DataModel model)
-
-
-    /**
-     * Removes a user with a particular role from a data model. This gives them access to the particular model
-     * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN, SUPERVISOR. Any
-     * service implementations should map to these roles as well.
-     *
-     * @param the role, the user and data model to be removed
-     */
-    void removeUserRoleModel(User user, Role role, DataModel model)
-
-
-    /**
-     * Removes all the userroles for a user for a data model. This removes all their access to a particular data model
-     * useful when deleting a data model or revoking all access to a data model for a particular user
-     * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN, SUPERVISOR. Any
-     * service implementations should map to these roles as well.
-     *
-     * @param the user and data model for all roles to be to be removed
-     */
-
-    void removeAllUserRoleModel(User user, DataModel model)
-
 /**
  * Checks if the current user is a supervisor
  * @return true if the user has particular role or it doesn't matter if she has any role

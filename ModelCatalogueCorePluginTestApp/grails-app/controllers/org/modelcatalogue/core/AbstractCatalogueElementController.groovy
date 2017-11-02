@@ -369,7 +369,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             dataModel = instance.dataModel
         }
 
-        if ( dataModel && ( isCuratorOrAdminOrSupervisor || dataModelGormService.hasAdministratorPermission(dataModel)) ) {
+        if ( dataModel && ( isCuratorOrAdminOrSupervisor || dataModelAclService.hasAdministratorPermission(dataModel)) ) {
             unauthorized()
             return
         }
@@ -454,7 +454,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             dataModel = instance.dataModel
         }
 
-        dataModel && ( isCuratorOrAdminOrSupervisor || dataModelGormService.hasAdministratorPermission(dataModel))
+        dataModel && ( isCuratorOrAdminOrSupervisor || dataModelAclService.hasAdministratorPermission(dataModel))
     }
 
     /**
@@ -519,7 +519,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
         if ( CatalogueElement.class.isAssignableFrom(instance.class) )  {
             DataModel dataModel = instance.dataModel
-            if ( !dataModelGormService.hasReadPermission(dataModel) ) {
+            if ( !dataModelAclService.hasReadPermission(dataModel) ) {
                 unauthorized()
                 return
             }
@@ -531,7 +531,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             notFound()
             return
         }
-        if ( !dataModelGormService.hasAdministratorPermission(destinationDataModel) ) {
+        if ( !dataModelAclService.hasAdministratorPermission(destinationDataModel) ) {
             unauthorized()
             return
         }

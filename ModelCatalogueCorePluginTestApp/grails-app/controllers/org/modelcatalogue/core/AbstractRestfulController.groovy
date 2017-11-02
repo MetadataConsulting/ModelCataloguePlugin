@@ -11,6 +11,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.ParamArgs
@@ -34,6 +35,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     CatalogueElementService catalogueElementService
     ElementService elementService
     DataModelGormService dataModelGormService
+    DataModelAclService dataModelAclService
     AclUtilService aclUtilService
     SpringSecurityService springSecurityService
 
@@ -242,7 +244,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             dataModel = instance.dataModel
         }
 
-        if ( dataModel && ( isAdminOrSupervisor || dataModelGormService.hasAdministratorPermission(dataModel)) ) {
+        if ( dataModel && ( isAdminOrSupervisor || dataModelAclService.hasAdministratorPermission(dataModel)) ) {
             // only drafts can be deleted
             def error = "Only elements with status of DRAFT can be deleted."
             if (instance instanceof DataModel) {

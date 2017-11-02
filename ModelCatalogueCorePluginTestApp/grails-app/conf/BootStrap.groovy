@@ -1,38 +1,33 @@
 import grails.plugin.springsecurity.acl.AclService
 import grails.util.Environment
-import groovy.util.logging.Log
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.modelcatalogue.core.persistence.RequestmapGormService
 import org.modelcatalogue.core.reports.ReportsRegistry
-import org.modelcatalogue.core.security.Role
-import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserRole
-import org.modelcatalogue.core.security.UserService
-import org.modelcatalogue.core.testapp.Requestmap
-import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.security.*
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Metadata
 import org.springframework.http.HttpMethod
+import org.springframework.security.acls.model.Acl
+import org.springframework.security.acls.model.NotFoundException
+import org.springframework.security.acls.model.ObjectIdentity
+import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.acls.model.Acl
-import org.springframework.security.acls.model.ObjectIdentity
-import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
-import grails.plugin.springsecurity.acl.AclService
-import org.modelcatalogue.core.persistence.RequestmapGormService
-import org.modelcatalogue.core.security.MetadataSecurityService
 
-@Log
+@Slf4j
 class BootStrap {
 
     def initCatalogueService
@@ -91,8 +86,11 @@ class BootStrap {
 
         //register custom json Marshallers
         //ctx.domainModellerService.modelDomains()
+        println 'completed:registeringMarshallers'
+
         grailsApplication.mainContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
         println 'completed:register'
+
         log.info "completed:inviteAdmins"
 
         ReportsRegistry reportsRegistry = grailsApplication.mainContext.getBean(ReportsRegistry)
@@ -100,16 +98,26 @@ class BootStrap {
         log.info "completed:inviteAdmins"
 
         loginAsSupervisor()
+        println 'completed:loginAsSuperVisor'
+        log.info "completed:loginAsSuperVisor"
+
         configureAcl()
+        println 'completed:configuredAcl'
+        log.info "completed:configuredAcl"
     }
 
     private void configureAcl() {
         List<DataModel> dataModelList = DataModel.findAll()
         for ( DataModel dataModel : dataModelList ) {
             ObjectIdentity objectIdentity = objectIdentityRetrievalStrategy.getObjectIdentity(dataModel)
-            Acl acl = aclService.readAclById(objectIdentity)
-            if ( !acl ) {
-                aclService.createAcl(objectIdentity)
+            try {
+                Acl acl = aclService.readAclById(objectIdentity)
+                if ( !acl ) {
+                    aclService.createAcl(objectIdentity)
+                }
+            } catch ( NotFoundException e ) {
+                log.warn "NotFoundException for ${dataModel.id}"
+                //aclService.createAcl(objectIdentity)
             }
 
         }

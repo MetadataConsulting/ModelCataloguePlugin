@@ -141,7 +141,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             favouriteService.favouriteModel(instance)
         }
 
-        dataModelGormService.addAdministrationPermission(instance)
+        dataModelAclService.addAdministrationPermission(instance)
 
         respond instance, [status: CREATED]
     }

@@ -9,7 +9,7 @@ import org.modelcatalogue.core.events.CatalogueElementStatusNotFinalizedEvent
 import org.modelcatalogue.core.events.MetadataResponseEvent
 import org.modelcatalogue.core.events.NotFoundEvent
 import org.modelcatalogue.core.persistence.DataModelGormService
-import spock.lang.IgnoreRest
+import org.modelcatalogue.core.security.DataModelAclService
 import spock.lang.Specification
 
 @Mock([DataModel])
@@ -34,6 +34,8 @@ class DataModelCatalogueElementServiceSpec extends Specification {
         DataModel dataModel = new DataModel(status: ElementStatus.PENDING)
         service.dataModelGormService = Stub(DataModelGormService) {
             findById(_) >> dataModel
+        }
+        service.dataModelAclService = Stub(DataModelAclService) {
             isAdminOrHasAdministratorPermission(_) >> true
         }
 
@@ -49,6 +51,8 @@ class DataModelCatalogueElementServiceSpec extends Specification {
         DataModel dataModel = new DataModel(status: ElementStatus.FINALIZED)
         service.dataModelGormService = Stub(DataModelGormService) {
             findById(_) >> dataModel
+        }
+        service.dataModelAclService = Stub(DataModelAclService) {
             isAdminOrHasAdministratorPermission(_) >> true
         }
 

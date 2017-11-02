@@ -31,6 +31,7 @@ import org.modelcatalogue.core.events.UnauthorizedEvent
 import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.persistence.RelationshipGormService
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.DestinationClass
 import org.modelcatalogue.core.util.OrderedMap
@@ -41,6 +42,8 @@ import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 
 abstract class AbstractCatalogueElementService implements ManageCatalogueElementService {
+
+    DataModelAclService dataModelAclService
 
     DataModelGormService dataModelGormService
 
@@ -95,7 +98,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
             return new CatalogueElementNotFoundEvent()
         }
 
-        if ( !dataModelGormService.isAdminOrHasAdministratorPermission(instance) ) {
+        if ( !dataModelAclService.isAdminOrHasAdministratorPermission(instance) ) {
             return new UnauthorizedEvent()
         }
 
@@ -122,7 +125,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
             return new CatalogueElementNotFoundEvent()
         }
 
-        if ( !dataModelGormService.isAdminOrHasAdministratorPermission(instance) ) {
+        if ( !dataModelAclService.isAdminOrHasAdministratorPermission(instance) ) {
             return new UnauthorizedEvent()
         }
 
@@ -149,7 +152,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
             return new CatalogueElementNotFoundEvent()
         }
 
-        if ( !dataModelGormService.isAdminOrHasAdministratorPermission(owner) ) {
+        if ( !dataModelAclService.isAdminOrHasAdministratorPermission(owner) ) {
             return new UnauthorizedEvent()
         }
 

@@ -46,15 +46,6 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
     }
 
     @Override
-    void addUserRoleModel(User user, Role role, DataModel model){}
-
-    @Override
-    void removeUserRoleModel(User user, Role role, DataModel model){}
-
-    @Override
-    void removeAllUserRoleModel(User user, DataModel model){}
-
-    @Override
     void logout(String username) {}
 
     @Override

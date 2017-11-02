@@ -8,12 +8,13 @@ import org.modelcatalogue.core.events.SourceDestinationEvent
 import org.modelcatalogue.core.events.UnauthorizedEvent
 import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DestinationClass
 
 @CompileStatic
 class SourceDestinationService {
 
-    DataModelGormService dataModelGormService
+    DataModelAclService dataModelAclService
 
     CatalogueElementGormService catalogueElementGormService
 
@@ -36,7 +37,7 @@ class SourceDestinationService {
         if (!element) {
             return new CatalogueElementNotFoundEvent()
         }
-        if ( !dataModelGormService.isAdminOrHasAdministratorPermission(element) ) {
+        if ( !dataModelAclService.isAdminOrHasAdministratorPermission(element) ) {
             return new UnauthorizedEvent()
         }
         new CatalogueElementFound(catalogueElement: element)
@@ -53,7 +54,7 @@ class SourceDestinationService {
         if (!element) {
             return new CatalogueElementNotFoundEvent()
         }
-        if ( !dataModelGormService.isAdminOrHasAdministratorPermission(element) ) {
+        if ( !dataModelAclService.isAdminOrHasAdministratorPermission(element) ) {
             return new UnauthorizedEvent()
         }
         new CatalogueElementFound(catalogueElement: element)
