@@ -38,7 +38,6 @@ class DataModelUrlMappings {
         "/api/modelCatalogue/core/dataModel/$source/merge/$destination"(controller: 'dataModel', action: 'merge', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataModel/preload"(controller: 'catalogue', action: 'dataModelsForPreload', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataModel/preload"(controller: 'catalogue', action: 'importFromUrl', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/dataModel/$id/declares"(controller: 'dataModel', action: 'declares', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataModel/$id/containsOrImports/$other"(controller: 'dataModel', action: 'containsOrImports', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataModel/$id/content"(controller: 'dataModel', action: 'content', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataModel/$id/newVersion"(controller: 'dataModel', action: 'newVersion', method: HttpMethod.POST)

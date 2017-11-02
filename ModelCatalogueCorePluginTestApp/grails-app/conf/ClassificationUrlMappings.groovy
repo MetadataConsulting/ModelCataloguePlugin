@@ -37,7 +37,6 @@ class ClassificationUrlMappings {
         "/api/modelCatalogue/core/classification/$source/merge/$destination"(controller: 'dataModel', action: 'merge', method: HttpMethod.POST)
         "/api/modelCatalogue/core/classification/preload"(controller: 'catalogue', action: 'dataModelsForPreload', method: HttpMethod.GET)
         "/api/modelCatalogue/core/classification/preload"(controller: 'catalogue', action: 'importFromUrl', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/classification/$id/declares"(controller: 'dataModel', action: 'declares', method: HttpMethod.GET)
         "/api/modelCatalogue/core/classification/$id/containsOrImports/$other"(controller: 'dataModel', action: 'containsOrImports', method: HttpMethod.GET)
         "/api/modelCatalogue/core/classification/$id/content"(controller: 'dataModel', action: 'content', method: HttpMethod.GET)
         "/api/modelCatalogue/core/classification/$id/newVersion"(controller: 'dataModel', action: 'newVersion', method: HttpMethod.POST)
