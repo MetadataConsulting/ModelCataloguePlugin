@@ -24,13 +24,7 @@ class DataModelAclService {
     AclService aclService
 
     SpringSecurityService springSecurityService
-
-    boolean hasAccessToEveryDataModelInFilterIncludes(DataModelFilter dataModelFilter) {
-        ImmutableSet<Long> dataModelIds = dataModelFilter.includes
-        List<Long> dataModelIdList = dataModelIds.toList()
-        List<DataModel> dataModelList = findAllInIdList(dataModelIdList)
-        ( dataModelList.size() == dataModelIdList.size() )
-    }
+    
 
     boolean hasReadPermission(DataModel dataModel) {
         if ( dataModel == null) {

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableSet
 import grails.transaction.Transactional
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.persistence.DataModelGormService
@@ -25,7 +26,16 @@ class DataClassService {
 
     ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter,
                                                            Map params = [:],
-                                                           boolean canViewDrafts = dataModelAclService.hasAccessToEveryDataModelInFilterIncludes(dataModelFilter) ) {
+                                                            Boolean canViewDraftsParam = null) {
+        boolean canViewDrafts
+        if ( canViewDraftsParam == null ) {
+            ImmutableSet<Long> dataModelIds = dataModelFilter.includes
+            List<Long> dataModelIdList = dataModelIds.toList()
+            canViewDrafts  = dataModelIdList.size() == dataModelGormService.findAllInIdList(dataModelIdList).size()
+        } else {
+            canViewDrafts = canViewDraftsParam
+        }
+
         RelationshipType hierarchy = RelationshipType.hierarchyType
         List<ElementStatus> status = ElementService.getStatusFromParams(params, canViewDrafts)
 
