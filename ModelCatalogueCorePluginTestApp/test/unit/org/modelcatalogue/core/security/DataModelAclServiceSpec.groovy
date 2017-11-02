@@ -1,10 +1,10 @@
-package org.modelcatalogue.core.persistence
+package org.modelcatalogue.core.security
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-@TestFor(DataModelGormService)
-class DataModelGormServiceSpec extends Specification {
+@TestFor(DataModelAclService)
+class DataModelAclServiceSpec extends Specification {
 
     def "hasReadPermission returns true for null object"() {
         expect:
