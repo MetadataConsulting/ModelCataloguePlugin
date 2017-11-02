@@ -2,12 +2,18 @@ package org.modelcatalogue.core.persistence
 
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.acl.AclService
 import grails.plugin.springsecurity.acl.AclUtilService
+import groovy.transform.CompileDynamic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.security.MetadataRolesUtils
+import org.springframework.security.acls.model.Acl
+import org.springframework.security.acls.model.Permission
 import org.modelcatalogue.core.util.DataModelFilter
 import org.springframework.security.acls.domain.BasePermission
+import org.springframework.security.acls.model.ObjectIdentity
+import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
@@ -16,6 +22,10 @@ import com.google.common.collect.ImmutableSet
 class DataModelGormService {
 
     AclUtilService aclUtilService
+
+    ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy
+
+    AclService aclService
 
     SpringSecurityService springSecurityService
 
@@ -81,4 +91,34 @@ class DataModelGormService {
         hasAdministratorPermission(dataModel)
     }
 
+    void addAdministrationPermission(DataModel dataModel) {
+        addPermission(dataModel, BasePermission.ADMINISTRATION)
+    }
+
+    void addReadPermission(DataModel dataModel) {
+        addPermission(dataModel, BasePermission.READ)
+    }
+
+    void addPermission(DataModel dataModel, Permission permission) {
+        ObjectIdentity objectIdentity = objectIdentityRetrievalStrategy.getObjectIdentity(dataModel)
+        Acl acl = aclService.readAclById(objectIdentity)
+        if ( !acl ) {
+            aclService.createAcl(objectIdentity)
+        }
+        aclUtilService.addPermission(dataModel, loggedUsername(), permission)
+    }
+
+    void copyPermissions(DataModel sourceModel, DataModel destinationModel){
+        if ( hasReadPermission(sourceModel) ) {
+            addReadPermission(destinationModel)
+        }
+        if ( hasAdministratorPermission(sourceModel) ) {
+            addAdministrationPermission(destinationModel)
+        }
+    }
+
+    @CompileDynamic
+    String loggedUsername() {
+        springSecurityService.principal.username
+    }
 }

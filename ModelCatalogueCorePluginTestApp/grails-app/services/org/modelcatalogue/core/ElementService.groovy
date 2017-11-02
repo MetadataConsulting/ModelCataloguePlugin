@@ -12,6 +12,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftChain
 import org.modelcatalogue.core.publishing.DraftContext
@@ -43,6 +44,8 @@ class ElementService implements Publisher<CatalogueElement> {
     AuditService auditService
     def sessionFactory
     def elasticSearchService
+
+    DataModelGormService dataModelGormService
 
 
 //    NONE OF THESE ARE USED OR IMPLEMENTED - Commenting them out - will remove
@@ -83,8 +86,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 // TODO: better target the changes
                 CacheService.VERSION_COUNT_CACHE.invalidateAll()
 
-                //add all the userRoles from the old version to the new version
-                modelCatalogueSecurityService.copyUserRoles(dataModel, draft)
+                dataModelGormService.copyPermissions(dataModel, draft)
 
                 return draft
             }

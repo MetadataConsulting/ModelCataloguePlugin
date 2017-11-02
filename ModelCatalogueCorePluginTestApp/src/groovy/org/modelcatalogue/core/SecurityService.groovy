@@ -113,9 +113,4 @@ public interface SecurityService {
     boolean isSupervisor()
 
 
-/**
- * Copies the user roles from one model to another.
- * Useful when creating a new model version
- */
-    void copyUserRoles(DataModel sourceModel, DataModel destinationModel)
 }

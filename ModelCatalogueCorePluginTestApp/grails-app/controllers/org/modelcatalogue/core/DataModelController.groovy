@@ -44,11 +44,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
     AclUtilService aclUtilService
 
-    ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy
-
     FavouriteService favouriteService
-
-    AclService aclService
 
     DataModelCatalogueElementService dataModelCatalogueElementService
 
@@ -145,11 +141,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             favouriteService.favouriteModel(instance)
         }
 
-        ObjectIdentity objectIdentity = objectIdentityRetrievalStrategy.getObjectIdentity(instance)
-        aclService.createAcl(objectIdentity)
-
-        String username = springSecurityService.principal.username
-        aclUtilService.addPermission instance, username, BasePermission.ADMINISTRATION
+        dataModelGormService.addAdministrationPermission(instance)
 
         respond instance, [status: CREATED]
     }
