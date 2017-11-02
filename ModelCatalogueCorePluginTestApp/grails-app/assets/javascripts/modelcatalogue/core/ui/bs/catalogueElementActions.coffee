@@ -62,6 +62,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
           action.label = 'Restore'
           action.icon = 'fa fa-fw fa-repeat'
           action.type = 'primary'
+          if $scope.element.status != 'DEPRECATED'
+            action.disabled = true
       else
         action.label = 'Deprecate'
         action.icon = 'fa fa-fw fa-ban'
