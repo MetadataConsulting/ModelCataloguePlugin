@@ -34,7 +34,6 @@ class DataTypeUrlMappings {
         "/api/modelCatalogue/core/dataType/$id/path"(controller: 'dataType', action: 'path', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataType/$id/archive"(controller: 'dataType', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataType/$id/restore"(controller: 'dataType', action: 'restore', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/dataType/$id/finalize"(controller: 'dataType', action: 'finalizeElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataType/$id/clone/$destinationDataModelId"(controller: 'dataType', action: 'cloneElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataType/$source/merge/$destination"(controller: 'dataType', action: 'merge', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataType/$id/dataElement"(controller: 'dataType', action: 'dataElements', method: HttpMethod.GET)

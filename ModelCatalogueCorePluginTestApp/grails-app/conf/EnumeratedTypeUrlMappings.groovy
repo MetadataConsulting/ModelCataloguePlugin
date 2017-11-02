@@ -34,7 +34,6 @@ class EnumeratedTypeUrlMappings {
         "/api/modelCatalogue/core/enumeratedType/$id/path"(controller: 'enumeratedType', action: 'path', method: HttpMethod.GET)
         "/api/modelCatalogue/core/enumeratedType/$id/archive"(controller: 'enumeratedType', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/enumeratedType/$id/restore"(controller: 'enumeratedType', action: 'restore', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/enumeratedType/$id/finalize"(controller: 'enumeratedType', action: 'finalizeElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/enumeratedType/$id/clone/$destinationDataModelId"(controller: 'enumeratedType', action: 'cloneElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/enumeratedType/$source/merge/$destination"(controller: 'enumeratedType', action: 'merge', method: HttpMethod.POST)
         "/api/modelCatalogue/core/enumeratedType/$id/dataElement"(controller: 'enumeratedType', action: 'dataElements', method: HttpMethod.GET)

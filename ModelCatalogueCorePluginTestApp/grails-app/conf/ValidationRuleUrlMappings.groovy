@@ -34,7 +34,6 @@ class ValidationRuleUrlMappings {
         "/api/modelCatalogue/core/validationRule/$id/path"(controller: 'validationRule', action: 'path', method: HttpMethod.GET)
         "/api/modelCatalogue/core/validationRule/$id/archive"(controller: 'validationRule', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/validationRule/$id/restore"(controller: 'validationRule', action: 'restore', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/validationRule/$id/finalize"(controller: 'validationRule', action: 'finalizeElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/validationRule/$id/clone/$destinationDataModelId"(controller: 'validationRule', action: 'cloneElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/validationRule/$source/merge/$destination"(controller: 'validationRule', action: 'merge', method: HttpMethod.POST)
         "/api/modelCatalogue/core/validationRule/$id/content"(controller: 'validationRule', action: 'content', method: HttpMethod.GET)

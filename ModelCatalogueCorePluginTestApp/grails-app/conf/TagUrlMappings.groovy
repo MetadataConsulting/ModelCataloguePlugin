@@ -35,7 +35,6 @@ class TagUrlMappings {
         "/api/modelCatalogue/core/tag/$id/path"(controller: 'tag', action: 'path', method: HttpMethod.GET)
         "/api/modelCatalogue/core/tag/$id/archive"(controller: 'tag', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/tag/$id/restore"(controller: 'tag', action: 'restore', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/tag/$id/finalize"(controller: 'tag', action: 'finalizeElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/tag/$id/clone/$destinationDataModelId"(controller: 'tag', action: 'cloneElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/tag/$source/merge/$destination"(controller: 'tag', action: 'merge', method: HttpMethod.POST)
 

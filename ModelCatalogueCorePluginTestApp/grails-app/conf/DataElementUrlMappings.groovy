@@ -33,7 +33,6 @@ class DataElementUrlMappings {
         "/api/modelCatalogue/core/dataElement/$id/path"(controller: 'dataElement', action: 'path', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataElement/$id/archive"(controller: 'dataElement', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataElement/$id/restore"(controller: 'dataElement', action: 'restore', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/dataElement/$id/finalize"(controller: 'dataElement', action: 'finalizeElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataElement/$id/clone/$destinationDataModelId"(controller: 'dataElement', action: 'cloneElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataElement/$source/merge/$destination"(controller: 'dataElement', action: 'merge', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataElement/$id/content"(controller: 'dataElement', action: 'content', method: HttpMethod.GET)

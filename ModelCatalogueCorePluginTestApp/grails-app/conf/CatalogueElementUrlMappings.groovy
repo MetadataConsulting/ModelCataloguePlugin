@@ -33,7 +33,6 @@ class CatalogueElementUrlMappings {
         "/api/modelCatalogue/core/catalogueElement/$id/path"(controller: 'catalogueElement', action: 'path', method: HttpMethod.GET)
         "/api/modelCatalogue/core/catalogueElement/$id/archive"(controller: 'catalogueElement', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/catalogueElement/$id/restore"(controller: 'catalogueElement', action: 'restore', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/catalogueElement/$id/finalize"(controller: 'catalogueElement', action: 'finalizeElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/catalogueElement/$id/clone/$destinationDataModelId"(controller: 'catalogueElement', action: 'cloneElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/catalogueElement/$source/merge/$destination"(controller: 'catalogueElement', action: 'merge', method: HttpMethod.POST)
     }

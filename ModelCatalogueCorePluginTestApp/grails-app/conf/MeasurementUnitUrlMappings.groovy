@@ -33,7 +33,6 @@ class MeasurementUnitUrlMappings {
         "/api/modelCatalogue/core/measurementUnit/$id/path"(controller: 'measurementUnit', action: 'path', method: HttpMethod.GET)
         "/api/modelCatalogue/core/measurementUnit/$id/archive"(controller: 'measurementUnit', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/measurementUnit/$id/restore"(controller: 'measurementUnit', action: 'restore', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/measurementUnit/$id/finalize"(controller: 'measurementUnit', action: 'finalizeElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/measurementUnit/$id/clone/$destinationDataModelId"(controller: 'measurementUnit', action: 'cloneElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/measurementUnit/$source/merge/$destination"(controller: 'measurementUnit', action: 'merge', method: HttpMethod.POST)
         "/api/modelCatalogue/core/measurementUnit/$id/primitiveType"(controller: 'measurementUnit', action: 'primitiveTypes', method: HttpMethod.GET)

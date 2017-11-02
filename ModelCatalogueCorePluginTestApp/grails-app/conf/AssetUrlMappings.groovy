@@ -34,7 +34,6 @@ class AssetUrlMappings {
         "/api/modelCatalogue/core/asset/$id/path"(controller: 'asset', action: 'path', method: HttpMethod.GET)
         "/api/modelCatalogue/core/asset/$id/archive"(controller: 'asset', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/asset/$id/restore"(controller: 'asset', action: 'restore', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/asset/$id/finalize"(controller: 'asset', action: 'finalizeElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/asset/$id/clone/$destinationDataModelId"(controller: 'asset', action: 'cloneElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/asset/$source/merge/$destination"(controller: 'asset', action: 'merge', method: HttpMethod.POST)
         "/api/modelCatalogue/core/asset/upload"(controller: 'asset', action: 'upload', method: HttpMethod.POST)

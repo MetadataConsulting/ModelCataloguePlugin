@@ -35,7 +35,6 @@ class PrimitiveTypeUrlMappings {
         "/api/modelCatalogue/core/primitiveType/$id/path"(controller: 'primitiveType', action: 'path', method: HttpMethod.GET)
         "/api/modelCatalogue/core/primitiveType/$id/archive"(controller: 'primitiveType', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/primitiveType/$id/restore"(controller: 'primitiveType', action: 'restore', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/primitiveType/$id/finalize"(controller: 'primitiveType', action: 'finalizeElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/primitiveType/$id/clone/$destinationDataModelId"(controller: 'primitiveType', action: 'cloneElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/primitiveType/$source/merge/$destination"(controller: 'primitiveType', action: 'merge', method: HttpMethod.POST)
         "/api/modelCatalogue/core/primitiveType/$id/dataElement"(controller: 'primitiveType', action: 'dataElements', method: HttpMethod.GET)

@@ -35,7 +35,6 @@ class ReferenceTypeUrlMappings {
         "/api/modelCatalogue/core/referenceType/$id/path"(controller: 'referenceType', action: 'path', method: HttpMethod.GET)
         "/api/modelCatalogue/core/referenceType/$id/archive"(controller: 'referenceType', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/referenceType/$id/restore"(controller: 'referenceType', action: 'restore', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/referenceType/$id/finalize"(controller: 'referenceType', action: 'finalizeElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/referenceType/$id/clone/$destinationDataModelId"(controller: 'referenceType', action: 'cloneElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/referenceType/$source/merge/$destination"(controller: 'referenceType', action: 'merge', method: HttpMethod.POST)
         "/api/modelCatalogue/core/referenceType/$id/dataElement"(controller: 'referenceType', action: 'dataElements', method: HttpMethod.GET)
