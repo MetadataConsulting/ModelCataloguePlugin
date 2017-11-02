@@ -3,8 +3,6 @@ import org.springframework.http.HttpMethod
 class DataModelUrlMappings {
 
     static mappings = {
-
-// DataModel
         "/api/modelCatalogue/core/dataModel"(controller: 'dataModel', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataModel"(controller: 'dataModel', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataModel/search/$search?"(controller: 'dataModel', action: 'search', method: HttpMethod.GET)

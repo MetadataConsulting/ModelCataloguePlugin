@@ -3,8 +3,6 @@ import org.springframework.http.HttpMethod
 class EnumeratedTypeUrlMappings {
 
     static mappings = {
-
-// EnumeratedType
         "/api/modelCatalogue/core/enumeratedType"(controller: 'enumeratedType', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/enumeratedType"(controller: 'enumeratedType', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/enumeratedType/search/$search?"(controller: 'enumeratedType', action: 'search', method: HttpMethod.GET)

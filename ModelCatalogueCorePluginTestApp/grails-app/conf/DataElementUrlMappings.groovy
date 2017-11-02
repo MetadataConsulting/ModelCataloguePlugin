@@ -3,7 +3,6 @@ import org.springframework.http.HttpMethod
 class DataElementUrlMappings {
 
     static mappings = {
-        // DataElement
         "/api/modelCatalogue/core/dataElement" (controller: 'dataElement', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataElement" (controller: 'dataElement', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataElement/search/$search?" (controller: 'dataElement', action: 'search', method: HttpMethod.GET)

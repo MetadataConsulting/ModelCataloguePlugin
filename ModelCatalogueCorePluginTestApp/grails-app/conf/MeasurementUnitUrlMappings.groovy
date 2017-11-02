@@ -3,7 +3,6 @@ import org.springframework.http.HttpMethod
 class MeasurementUnitUrlMappings {
 
     static mappings = {
-        // MeasurementUnit
         "/api/modelCatalogue/core/measurementUnit"(controller: 'measurementUnit', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/measurementUnit"(controller: 'measurementUnit', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/measurementUnit/search/$search?"(controller: 'measurementUnit', action: 'search', method: HttpMethod.GET)

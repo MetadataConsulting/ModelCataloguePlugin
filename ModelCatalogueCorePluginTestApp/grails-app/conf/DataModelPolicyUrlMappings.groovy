@@ -3,7 +3,6 @@ import org.springframework.http.HttpMethod
 class DataModelPolicyUrlMappings {
 
     static mappings = {
-        // DataModelPolicy
         "/api/modelCatalogue/core/dataModelPolicy"(controller: 'dataModelPolicy', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataModelPolicy"(controller: 'dataModelPolicy', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataModelPolicy/search/$search?"(controller: 'dataModelPolicy', action: 'search', method: HttpMethod.GET)

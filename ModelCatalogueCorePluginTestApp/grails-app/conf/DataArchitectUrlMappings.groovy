@@ -2,7 +2,6 @@ import org.springframework.http.HttpMethod
 
 class DataArchitectUrlMappings {
     static mappings = {
-        // DataArchitect
         "/api/modelCatalogue/core/dataArchitect/metadataKeyCheck/$key?"(controller: "dataArchitect", action: 'metadataKeyCheck', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataArchitect/getSubModelElements/$modelId?"(controller: "dataArchitect", action: 'getSubModelElements', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataArchitect/findRelationsByMetadataKeys/$key?"(controller: "dataArchitect", action: 'findRelationsByMetadataKeys', method: HttpMethod.GET)

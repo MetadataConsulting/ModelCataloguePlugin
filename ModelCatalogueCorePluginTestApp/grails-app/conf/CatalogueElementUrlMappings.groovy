@@ -3,7 +3,6 @@ import org.springframework.http.HttpMethod
 class CatalogueElementUrlMappings {
 
     static mappings = {
-        // CatalogueElement
         "/api/modelCatalogue/core/catalogueElement" (controller: 'catalogueElement', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/catalogueElement" (controller: 'catalogueElement', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/catalogueElement/search/$search?" (controller: 'catalogueElement', action: 'search', method: HttpMethod.GET)

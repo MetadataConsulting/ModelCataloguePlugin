@@ -3,7 +3,6 @@ import org.springframework.http.HttpMethod
 class DataClassUrlMappings {
 
     static mappings = {
-        // DataClass
         "/api/modelCatalogue/core/dataClass"(controller: 'dataClass', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataClass"(controller: 'dataClass', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataClass/search/$search?"(controller: 'dataClass', action: 'search', method: HttpMethod.GET)

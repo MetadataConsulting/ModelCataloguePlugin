@@ -3,8 +3,6 @@ import org.springframework.http.HttpMethod
 class ClassificationUrlMappings {
 
     static mappings = {
-
-// Classification
         "/api/modelCatalogue/core/classification"(controller: 'dataModel', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/classification"(controller: 'dataModel', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/classification/search/$search?"(controller: 'dataModel', action: 'search', method: HttpMethod.GET)

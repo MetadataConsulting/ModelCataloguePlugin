@@ -3,7 +3,6 @@ import org.springframework.http.HttpMethod
 class CsvTransformationUrlMappings {
 
     static mappings = {
-        // CsvTransformation
         "/api/modelCatalogue/core/csvTransformation"(controller: 'csvTransformation', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/csvTransformation"(controller: 'csvTransformation', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/csvTransformation/search/$search?"(controller: 'csvTransformation', action: 'search', method: HttpMethod.GET)
