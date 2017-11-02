@@ -16,7 +16,7 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
     def dataArchitectService
     def executorService
     def dataClassService
-    @Autowired CSVService csvService
+    CSVService csvService
     CatalogueElementGormService catalogueElementGormService
 
     DataArchitectController() {

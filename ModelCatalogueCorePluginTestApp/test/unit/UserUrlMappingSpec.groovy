@@ -1,7 +1,6 @@
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.UserController
-import org.springframework.http.HttpMethod
 import spock.lang.Specification
 
 @TestFor(UserUrlMappings)

@@ -46,6 +46,5 @@ class ClassificationUrlMappings {
         "/api/modelCatalogue/core/classification/$id/inventoryDoc"(controller: 'dataModel', action: 'inventoryDoc', method: HttpMethod.GET)
         "/api/modelCatalogue/core/classification/$id/dependents"(controller: 'dataModel', action: 'dependents', method: HttpMethod.GET)
         "/api/modelCatalogue/core/classification/$id/reindex"(controller: 'dataModel', action: 'reindex', method: HttpMethod.POST)
-
     }
 }
