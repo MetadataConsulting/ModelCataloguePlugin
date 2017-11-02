@@ -75,14 +75,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
         }
 
         Map params = searchParams.paramArgs.toMap()
-        ListWithTotalAndType<Relationship> results
-
-        try {
-             results = modelCatalogueSearchService.search(element, relationshipType, direction, searchParams)
-
-        } catch(Exception e) {
-            log.error e.message
-        }
+        ListWithTotalAndType<Relationship> results = modelCatalogueSearchService.search(element, relationshipType, direction, searchParams)
 
         String searchEncoded = URLEncoder.encode(searchParams.search, 'UTF-8')
         String base = "/${resourceName()}/${catalogueElementId}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${searchEncoded ?: ''}"
