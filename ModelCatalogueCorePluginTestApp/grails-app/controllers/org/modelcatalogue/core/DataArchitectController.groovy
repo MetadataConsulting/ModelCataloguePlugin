@@ -33,8 +33,8 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
         Long id = params.long('dataClassId') ?: params.long('id')
         respond Lists.lazy(params, DataElement, "/dataArchitect/getSubModelElements") {
             if (id){
-                DataClass model = DataClass.get(id)
-                ListWithTotalAndType<DataClass> subModels = dataClassService.getInnerClasses(model)
+                DataClass dataClass = DataClass.get(id)
+                ListWithTotalAndType<DataClass> subModels = dataClassService.getInnerClasses(dataClass)
                 return dataClassService.getDataElementsFromClasses(subModels.items).items
             }
             return []
