@@ -579,6 +579,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         if (!responseEvent instanceof CatalogueElementArchivedEvent) {
             log.warn("Got an unexpected event ${responseEvent.class.name}")
             notFound()
+            return
         }
 
         T instance = (responseEvent as CatalogueElementArchivedEvent).catalogueElement
@@ -602,6 +603,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         if (!responseEvent instanceof CatalogueElementRestoredEvent) {
             log.warn("Got an unexpected event ${responseEvent.class.name}")
             notFound()
+            return
         }
         T instance = (responseEvent as CatalogueElementRestoredEvent).catalogueElement
 
