@@ -68,6 +68,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         action.label = 'Deprecate'
         action.icon = 'fa fa-fw fa-ban'
         action.type = 'danger'
+        if $scope.element.status != 'FINALIZED'
+          action.disabled = true
 
       action
 
