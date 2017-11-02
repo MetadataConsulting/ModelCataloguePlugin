@@ -41,6 +41,7 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.SearchParams
+import org.springframework.security.acls.model.NotFoundException
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
@@ -438,9 +439,21 @@ class ElasticSearchService implements SearchCatalogue {
         "${ORPHANED_INDEX}_${getTypeName(resource)}"
     }
 
+    protected List<DataModel> subscribedModels() {
+        List<DataModel> subscribedModels = []
+        try {
+
+            subscribedModels = dataModelGormService.findAll()
+
+        } catch(NotFoundException notFoundException) {
+            log.warn('ACL not found exception captured when fetching all the data models')
+        }
+        subscribedModels
+    }
+
     //get all of the indicies associated with a data model
     private List<String> collectDataModelIndicies(SearchParams params, List<Class> types) {
-        DataModelFilter filter = getOverridableDataModelFilter(params, dataModelGormService.findAll())
+        DataModelFilter filter = getOverridableDataModelFilter(params, subscribedModels())
 
         if (!filter) {
             return types.collect { ElasticSearchService.getGlobalIndexName(it) }

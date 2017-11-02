@@ -9,6 +9,7 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
+import org.springframework.security.acls.model.NotFoundException
 import rx.Observable
 import org.modelcatalogue.core.util.SearchParams
 
@@ -34,6 +35,19 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     //Search relationships
     // i.e. search for anything that is a favourite on the home screen
 
+
+    protected List<DataModel> subscribedModels() {
+        List<DataModel> subscribedModels = []
+        try {
+
+            subscribedModels = dataModelGormService.findAll()
+
+        } catch(NotFoundException notFoundException) {
+            log.warn('ACL not found exception captured when fetching all the data models')
+        }
+        subscribedModels
+    }
+
     @Override
     ListWithTotalAndType<Relationship> search(CatalogueElement element,
                                               RelationshipType type,
@@ -44,9 +58,10 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         Long dataModelId = searchParams.dataModelId
         ParamArgs paramArgs = searchParams.paramArgs
 
-        String query = "%$params.search%"
+        String query = "%$search%"
         Map params = paramArgs.toMap()
-        List<DataModel> subscribedModels = dataModelGormService.findAll()
+
+        List<DataModel> subscribedModels = subscribedModels()
 
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element,
                 type,
@@ -86,7 +101,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         Map params = paramArgs.toMap()
 
-        List<DataModel> subscribedModels = dataModelGormService.findAll()
+        List<DataModel> subscribedModels = subscribedModels()
 
         // if the user doesn't have at least VIEWER role, don't return other elements than finalized
 //        if (!params.status && !false /*modelCatalogueSecurityService.hasRole('VIEWER')*/) {
