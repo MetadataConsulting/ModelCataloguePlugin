@@ -10,6 +10,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.LogoutListeners
 import org.modelcatalogue.core.SecurityService
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
@@ -29,6 +30,8 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     static transactional = false
 
     SpringSecurityService springSecurityService
+
+    DataModelGormService dataModelGormService
 
     UserGormService userGormService
 
@@ -51,7 +54,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if ( !SpringSecurityUtils.ifAnyGranted(roles.join(',')) ) {
             return false
         }
-        hasReadPermission(dataModel)
+        dataModelGormService.hasReadPermission(dataModel)
     }
 
     //check if a user a general role
