@@ -7,7 +7,7 @@ class UserUrlMappings {
 // User
         "/api/modelCatalogue/core/user"(controller: 'user', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/user"(controller: 'user', action: 'save', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/user/search/$search?"(controller: 'user', action: 'search', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/search/$search"(controller: 'user', action: 'search', method: HttpMethod.GET)
         "/api/modelCatalogue/core/user/$id/validate"(controller: 'user', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/user/validate"(controller: 'user', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/user/$id"(controller: 'user', action: 'show', method: HttpMethod.GET)
@@ -35,7 +35,6 @@ class UserUrlMappings {
         "/api/modelCatalogue/core/user/$id/path"(controller: 'user', action: 'path', method: HttpMethod.GET)
         "/api/modelCatalogue/core/user/$id/archive"(controller: 'user', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/user/$id/restore"(controller: 'user', action: 'restore', method: HttpMethod.POST)
-        "/api/modelCatalogue/core/user/$id/finalize"(controller: 'user', action: 'finalizeElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/user/$id/clone/$destinationDataModelId"(controller: 'user', action: 'cloneElement', method: HttpMethod.POST)
         "/api/modelCatalogue/core/user/$source/merge/$destination"(controller: 'user', action: 'merge', method: HttpMethod.POST)
         "/user/current"(controller: 'user', action: 'current', method: HttpMethod.GET)
