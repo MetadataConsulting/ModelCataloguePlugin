@@ -14,6 +14,7 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.events.CatalogueElementArchivedEvent
 import org.modelcatalogue.core.events.CatalogueElementNotFoundEvent
+import org.modelcatalogue.core.events.CatalogueElementRestoredEvent
 import org.modelcatalogue.core.events.CatalogueElementStatusNotInDraftEvent
 import org.modelcatalogue.core.events.CatalogueElementStatusNotFinalizedEvent
 import org.modelcatalogue.core.events.CatalogueElementWithErrorsEvent
@@ -129,7 +130,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
             return new CatalogueElementWithErrorsEvent(catalogueElement: instance)
         }
 
-        new CatalogueElementArchivedEvent(catalogueElement: instance)
+        new CatalogueElementRestoredEvent(catalogueElement: instance)
     }
 
     @Override
