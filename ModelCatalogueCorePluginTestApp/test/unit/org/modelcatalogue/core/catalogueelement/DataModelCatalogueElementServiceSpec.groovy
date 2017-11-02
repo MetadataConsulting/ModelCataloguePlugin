@@ -4,6 +4,7 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.events.CatalogueElementStatusNotDeprecatedEvent
 import org.modelcatalogue.core.events.CatalogueElementStatusNotFinalizedEvent
 import org.modelcatalogue.core.events.MetadataResponseEvent
 import org.modelcatalogue.core.events.NotFoundEvent
@@ -41,5 +42,20 @@ class DataModelCatalogueElementServiceSpec extends Specification {
 
         then:
         responseEvent instanceof CatalogueElementStatusNotFinalizedEvent
+    }
+
+    def "restore returns CatalogueElementStatusNotDeprecatedEvent if data model is not deprecated"() {
+        given:
+        DataModel dataModel = new DataModel(status: ElementStatus.FINALIZED)
+        service.dataModelGormService = Stub(DataModelGormService) {
+            findById(_) >> dataModel
+            isAdminOrHasAdministratorPermission(_) >> true
+        }
+
+        when:
+        MetadataResponseEvent responseEvent = service.restore(1)
+
+        then:
+        responseEvent instanceof CatalogueElementStatusNotDeprecatedEvent
     }
 }

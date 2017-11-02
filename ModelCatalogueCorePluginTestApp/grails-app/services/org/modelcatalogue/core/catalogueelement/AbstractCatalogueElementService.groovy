@@ -15,6 +15,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.events.CatalogueElementArchivedEvent
 import org.modelcatalogue.core.events.CatalogueElementNotFoundEvent
 import org.modelcatalogue.core.events.CatalogueElementRestoredEvent
+import org.modelcatalogue.core.events.CatalogueElementStatusNotDeprecatedEvent
 import org.modelcatalogue.core.events.CatalogueElementStatusNotInDraftEvent
 import org.modelcatalogue.core.events.CatalogueElementStatusNotFinalizedEvent
 import org.modelcatalogue.core.events.CatalogueElementWithErrorsEvent
@@ -74,7 +75,15 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
         }
 
         Map params = searchParams.paramArgs.toMap()
-        ListWithTotalAndType<Relationship> results = modelCatalogueSearchService.search(element, relationshipType, direction, searchParams)
+        ListWithTotalAndType<Relationship> results
+
+        try {
+             results = modelCatalogueSearchService.search(element, relationshipType, direction, searchParams)
+
+        } catch(Exception e) {
+            log.error e.message
+        }
+
         String searchEncoded = URLEncoder.encode(searchParams.search, 'UTF-8')
         String base = "/${resourceName()}/${catalogueElementId}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${searchEncoded ?: ''}"
         Relationships relationships = new Relationships(owner: element,
@@ -122,6 +131,10 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
 
         if ( !dataModelGormService.isAdminOrHasAdministratorPermission(instance) ) {
             return new UnauthorizedEvent()
+        }
+
+        if ( !(instance.status == ElementStatus.DEPRECATED) ) {
+            return new CatalogueElementStatusNotDeprecatedEvent()
         }
 
         instance = elementService.restore(instance)
