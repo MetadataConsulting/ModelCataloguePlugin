@@ -11,7 +11,7 @@ import spock.lang.Specification
 @TestFor(ModelCatalogueCorePluginUrlMappings)
 @Mock([SearchController,RelationshipController, CatalogueController, LoggingController, DataImportController, FormGeneratorController])
 class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
-    void "test EnumeratedTypeUrlMappings POST Request mappings"() {
+    void "test ModelCatalogueCorePluginUrlMappings POST Request mappings"() {
         given:
         request.method = 'post'
 
@@ -21,7 +21,7 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         assertForwardUrlMapping('/api/modelCatalogue/core/relationship/$id/restore',controller:"relationship", action : 'restore')
     }
 
-    void "test EnumeratedTypeUrlMappings GET Request mappings"() {
+    void "test ModelCatalogueCorePluginUrlMappings GET Request mappings"() {
         given:
         request.method = 'get'
 
