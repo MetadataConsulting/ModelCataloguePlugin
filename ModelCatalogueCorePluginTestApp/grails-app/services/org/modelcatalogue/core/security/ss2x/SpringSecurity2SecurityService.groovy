@@ -109,12 +109,4 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
         aclUtilService.hasPermission(springSecurityService.principal, ce?.dataModel, BasePermission.READ)
     }
-
-    //check if the user is a supervisor
-    //if they are they can do most things
-
-    boolean isSupervisor(){
-        if(UserRole.findByUserAndRole(getCurrentUser(), Role.findByAuthority('ROLE_SUPERVISOR'))) return true
-        return false
-    }
 }

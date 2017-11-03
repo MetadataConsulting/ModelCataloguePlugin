@@ -47,11 +47,4 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
 
     @Override
     void logout(String username) {}
-
-    @Override
-    boolean isSupervisor(){
-        return true
-    }
-
-    void copyUserRoles(DataModel sourceModel, DataModel destinationModel){}
 }
