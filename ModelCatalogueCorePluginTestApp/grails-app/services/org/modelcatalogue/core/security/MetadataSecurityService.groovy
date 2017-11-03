@@ -763,7 +763,6 @@ class MetadataSecurityService {
         requestmapGormService.createRequestmapIfMissing('/catalogue/*/**',                        'isAuthenticated()',   HttpMethod.GET)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',   HttpMethod.GET)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'isAuthenticated()',   HttpMethod.POST) // post a comment
-        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/user/apikey',    'isAuthenticated()',HttpMethod.POST) // get or create new api key
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.POST)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.PUT)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.DELETE)
