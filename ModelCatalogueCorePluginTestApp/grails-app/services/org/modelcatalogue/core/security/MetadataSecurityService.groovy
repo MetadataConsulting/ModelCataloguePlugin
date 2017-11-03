@@ -688,7 +688,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/user/lastSeen", MetadataRolesUtils.roles('ADMIN'), HttpMethod.GET],
             ["/api/modelCatalogue/core/user/apikey", MetadataRolesUtils.roles('VIEWER'), HttpMethod.POST],
             ["/api/modelCatalogue/core/user/*/favourite",'isAuthenticated()',HttpMethod.POST],
-            ["/api/modelCatalogue/core/user/*/favourite",MetadataRolesUtils.roles('ADMIN'),HttpMethod.DELETE],
+            ["/api/modelCatalogue/core/user/*/favourite",'isAuthenticated()',HttpMethod.DELETE],
             ["/api/modelCatalogue/core/user/*/enable", MetadataRolesUtils.roles('ADMIN'), HttpMethod.POST],
             ["/api/modelCatalogue/core/user/*/disable", MetadataRolesUtils.roles('ADMIN'), HttpMethod.POST],
             ["/api/modelCatalogue/core/user/*/role/*", MetadataRolesUtils.roles('ADMIN'), HttpMethod.POST],
@@ -763,9 +763,7 @@ class MetadataSecurityService {
         requestmapGormService.createRequestmapIfMissing('/catalogue/*/**',                        'isAuthenticated()',   HttpMethod.GET)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',   HttpMethod.GET)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'isAuthenticated()',   HttpMethod.POST) // post a comment
-        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'isAuthenticated()',HttpMethod.POST) // favourite item
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/user/apikey',    'isAuthenticated()',HttpMethod.POST) // get or create new api key
-        requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'isAuthenticated()',HttpMethod.DELETE) // unfavourite item
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.POST)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.PUT)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.DELETE)
