@@ -14,6 +14,7 @@ import org.springframework.security.acls.model.Acl
 import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import org.springframework.security.acls.model.Permission
+import org.springframework.security.core.Authentication
 
 class DataModelAclService {
 
@@ -24,20 +25,28 @@ class DataModelAclService {
     AclService aclService
 
     SpringSecurityService springSecurityService
-    
+
 
     boolean hasReadPermission(DataModel dataModel) {
         if ( dataModel == null) {
             return true
         }
-        aclUtilService.hasPermission(springSecurityService.authentication, dataModel, BasePermission.READ)
+        Authentication authentication = springSecurityService.authentication
+        if ( authentication == null ) {
+            return false
+        }
+        aclUtilService.hasPermission(authentication, dataModel, BasePermission.READ)
     }
 
     boolean hasAdministratorPermission(DataModel dataModel) {
         if ( dataModel == null) {
             return true
         }
-        aclUtilService.hasPermission(springSecurityService.authentication, dataModel, BasePermission.ADMINISTRATION)
+        Authentication authentication = springSecurityService.authentication
+        if ( authentication == null ) {
+            return false
+        }
+        aclUtilService.hasPermission(authentication, dataModel, BasePermission.ADMINISTRATION)
     }
 
     boolean isAdminOrHasAdministratorPermission(DataModel dataModel) {
