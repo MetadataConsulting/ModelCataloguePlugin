@@ -768,15 +768,8 @@ class MetadataSecurityService {
 
         requestmapGormService.createRequestmapIfMissing('/sso/*/**',                              'isAuthenticated()',   HttpMethod.GET)
 
-        requestmapGormService.createRequestmapIfMissing('/role/**',                               'ROLE_SUPERVISOR')
-        requestmapGormService.createRequestmapIfMissing('/userAdmin/**',                          'ROLE_SUPERVISOR')
-        requestmapGormService.createRequestmapIfMissing('/aclClass/**', 'ROLE_SUPERVISOR')
-        requestmapGormService.createRequestmapIfMissing('/aclSid/**', 'ROLE_SUPERVISOR')
-        requestmapGormService.createRequestmapIfMissing('/aclEntry/**', 'ROLE_SUPERVISOR')
-        requestmapGormService.createRequestmapIfMissing('/aclObjectIdentity/**', 'ROLE_SUPERVISOR')
-        requestmapGormService.createRequestmapIfMissing('/requestMap/**',                         'ROLE_SUPERVISOR')
-        requestmapGormService.createRequestmapIfMissing('/registrationCode/**',                   'ROLE_SUPERVISOR')
-        requestmapGormService.createRequestmapIfMissing('/securityInfo/**',                       'ROLE_SUPERVISOR')
+        secureSpringSecurityUiEndpoints()
+
         requestmapGormService.createRequestmapIfMissing('/console/**',                            'ROLE_SUPERVISOR')
         requestmapGormService.createRequestmapIfMissing('/plugins/console*/**',                   'ROLE_SUPERVISOR')
         requestmapGormService.createRequestmapIfMissing('/dbconsole/**',                          'ROLE_SUPERVISOR')
@@ -795,6 +788,18 @@ class MetadataSecurityService {
         secureMappings(MODEL_CATALOGUE_FORM_URL_MAPPINGS)
         secureMappings(MODEL_CATALOGUE_AUDIT_PLUGIN_MAPPINGS)
         secureModelCatalogueCorePluginUrlMappings()
+    }
+
+    void secureSpringSecurityUiEndpoints() {
+        requestmapGormService.createRequestmapIfMissing('/role/**',                               'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/userAdmin/**',                          'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/aclClass/**', 'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/aclSid/**', 'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/aclEntry/**', 'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/aclObjectIdentity/**', 'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/requestMap/**',                         'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/registrationCode/**',                   'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/securityInfo/**',                       'ROLE_SUPERVISOR')
     }
 
     private void secureMappings(List<List> mappings) {
