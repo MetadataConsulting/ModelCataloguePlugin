@@ -758,7 +758,6 @@ class MetadataSecurityService {
 
         requestmapGormService.createRequestmapIfMissing('/asset/download/*',                      'isAuthenticated()',   HttpMethod.GET)
         requestmapGormService.createRequestmapIfMissing('/oauth/*/**',                            'IS_AUTHENTICATED_ANONYMOUSLY')
-        requestmapGormService.createRequestmapIfMissing('/user/current',                          'IS_AUTHENTICATED_ANONYMOUSLY',  HttpMethod.GET)
         requestmapGormService.createRequestmapIfMissing('/catalogue/*/**',                        'isAuthenticated()',   HttpMethod.GET)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',   HttpMethod.GET)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'isAuthenticated()',   HttpMethod.POST) // post a comment
