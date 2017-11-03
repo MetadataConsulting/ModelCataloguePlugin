@@ -200,6 +200,7 @@ grails.project.dependency.resolution = {
         compile ':spring-security-oauth-facebook:0.1'
 
         compile ':spring-security-acl:2.0.1'
+        test 'org.grails.plugins:rest-client-builder:2.1.1'
     }
 }
 

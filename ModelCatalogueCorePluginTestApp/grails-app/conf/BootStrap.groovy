@@ -45,6 +45,19 @@ class BootStrap {
     MetadataSecurityService metadataSecurityService
 
     def init = { servletContext ->
+
+        if ( Environment.current == Environment.TEST ) {
+            // See: https://github.com/grails-plugins/grails-rest-client-builder/issues/40
+            RestBuilder.metaClass.constructor = { ->
+                def constructor = RestBuilder.class.getConstructor()
+                def instance = constructor.newInstance()
+                instance.restTemplate.messageConverters.removeAll {
+                    it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter'
+                }
+                instance
+            }
+        }
+
         log.info "BootStrap:addExtensionModules()"
         ExtensionModulesLoader.addExtensionModules()
         log.info "BootStrap:addExtensionModules():complete"
