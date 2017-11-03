@@ -153,6 +153,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
             ExcelLoader.getOwnerAndGelModelFromFileName(sampleFile, '_nt_rawimport')
         )
     }
+
     Pair<String, List<String>> excelLoaderXmlResult(String sampleFile, String bitInBetween, int index=0) {
         excelLoader.buildXmlFromWorkbookSheet(
             new XSSFWorkbook(
@@ -162,20 +163,5 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         )
     }
 
-
-    boolean similar(String sampleXml, String expectedXml) {
-
-        println "==ACTUAL=="
-        println sampleXml
-
-        println "==EXPECTED=="
-        println expectedXml
-
-        Diff diff = new Diff(sampleXml, expectedXml)
-        DetailedDiff detailedDiff = new DetailedDiff(diff)
-
-        assert detailedDiff.similar(), detailedDiff.toString()
-        return true
-    }
 
 }
