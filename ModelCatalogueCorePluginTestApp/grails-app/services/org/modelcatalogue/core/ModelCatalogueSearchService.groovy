@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -26,6 +27,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     def elementService
 
     DataModelGormService dataModelGormService
+    DataModelAclService dataModelAclService
 
     @Override
     boolean isIndexingManually() {
@@ -63,9 +65,11 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         List<DataModel> subscribedModels = subscribedModels()
 
+        boolean hasReadPermission = dataModelAclService.hasReadPermission(element)
+
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element,
                 type,
-                ElementService.findAllElementStatus(status, modelCatalogueSecurityService.isSubscribed(element)),
+                ElementService.findAllElementStatus(status, hasReadPermission),
                 getOverridableDataModelFilter(dataModelId, subscribedModels)
         )
 

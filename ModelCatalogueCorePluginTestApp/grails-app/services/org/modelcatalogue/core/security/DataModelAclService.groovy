@@ -26,6 +26,10 @@ class DataModelAclService {
 
     SpringSecurityService springSecurityService
 
+    boolean hasReadPermission(Object instance) {
+        DataModel dataModel = dataModelFromInstance(instance)
+        hasReadPermission(dataModel)
+    }
 
     boolean hasReadPermission(DataModel dataModel) {
         if ( dataModel == null) {
@@ -36,6 +40,11 @@ class DataModelAclService {
             return false
         }
         aclUtilService.hasPermission(authentication, dataModel, BasePermission.READ)
+    }
+
+    boolean hasAdministratorPermission(Object instance) {
+        DataModel dataModel = dataModelFromInstance(instance)
+        hasAdministratorPermission(dataModel)
     }
 
     boolean hasAdministratorPermission(DataModel dataModel) {
@@ -56,16 +65,23 @@ class DataModelAclService {
         hasAdministratorPermission(dataModel)
     }
 
+    protected DataModel dataModelFromInstance(Object instance) {
+        DataModel dataModel
+        if ( instance instanceof DataModel ) {
+            return instance as DataModel
+        } else if ( dataModel instanceof CatalogueElement ) {
+            return instance.dataModel
+        }
+        dataModel
+    }
+
     boolean isAdminOrHasAdministratorPermission(Object instance) {
         if ( SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('ADMIN')) ) {
             return true
         }
-        DataModel dataModel
-        if ( instance instanceof DataModel ) {
-            dataModel = instance as DataModel
-        } else if ( dataModel instanceof CatalogueElement ) {
-            dataModel = instance.dataModel
-        }
+
+        DataModel dataModel = dataModelFromInstance(instance)
+
         if ( !dataModel ) {
             return true
         }

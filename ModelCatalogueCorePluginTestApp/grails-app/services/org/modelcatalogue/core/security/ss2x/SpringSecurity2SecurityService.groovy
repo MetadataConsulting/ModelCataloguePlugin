@@ -99,14 +99,4 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     void logout(String username) {
         Holders.applicationContext.getBean('userCache').removeUserFromCache(username)
     }
-
-//check if the user is subscribed to a catalogueElement
-    boolean isSubscribed(CatalogueElement ce){
-        //if the catalogue element doesn't have a data model it is an orphan and you can't be subscribed to it.
-        if(!ce?.dataModel) {
-            return false
-        }
-
-        aclUtilService.hasPermission(springSecurityService.principal, ce?.dataModel, BasePermission.READ)
-    }
 }

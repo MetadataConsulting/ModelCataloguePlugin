@@ -41,10 +41,5 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
     }
 
     @Override
-    boolean isSubscribed(CatalogueElement ce) {
-        return true
-    }
-
-    @Override
     void logout(String username) {}
 }

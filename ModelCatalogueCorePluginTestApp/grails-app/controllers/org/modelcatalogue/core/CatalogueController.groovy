@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.cache.CacheService
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
@@ -25,7 +26,7 @@ class CatalogueController {
     def initCatalogueService
     def modelCatalogueSecurityService
     def executorService
-
+    DataModelAclService dataModelAclService
 
     def xref() {
         CatalogueElement element = elementService.findByModelCatalogueId(CatalogueElement, request.forwardURI.replace('/export', ''))
@@ -35,12 +36,12 @@ class CatalogueController {
             return
         }
 
-        if (params.format == 'xml') {
+        if ( !dataModelAclService.hasReadPermission((element)) ) {
+            response.sendError HttpServletResponse.SC_UNAUTHORIZED
+            return false
+        }
 
-            if(!modelCatalogueSecurityService.isSubscribed(getDataModel(element))){
-                response.sendError HttpServletResponse.SC_UNAUTHORIZED
-                return false
-            }
+        if (params.format == 'xml') {
             response.contentType = 'application/xml'
             response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.xml\"")
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)

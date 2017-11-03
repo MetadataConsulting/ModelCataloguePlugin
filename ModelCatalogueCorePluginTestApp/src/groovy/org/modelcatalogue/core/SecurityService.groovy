@@ -62,23 +62,4 @@ public interface SecurityService {
      * @param username username of the user to be logged out
      */
     void logout(String username)
-
-    /**
-     * Returns true if the user is subscribed to a particular model or it doesn't matter if she has any role.
-     *
-     * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN. Any
-     * service implementations should map to these roles as well.
-     *
-     * @param role the role to be tested
-     * @return true if the user has particular role or it doesn't matter if she has any role
-     */
-    boolean isSubscribed(CatalogueElement ce)
-
-/**
- * Checks if the current user is a supervisor
- * @return true if the user has particular role or it doesn't matter if she has any role
- */
-    boolean isSupervisor()
-
-
 }

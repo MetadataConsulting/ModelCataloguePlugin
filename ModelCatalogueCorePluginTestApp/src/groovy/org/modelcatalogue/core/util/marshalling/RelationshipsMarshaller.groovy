@@ -38,8 +38,10 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
         List list = []
         relationsList.items.each { item ->
             if (item) {
+
                 CatalogueElement relation = relationsList.direction.getRelation(relationsList.owner, item)
-                if (modelCatalogueSecurityService.isSubscribed(relation)) {
+                boolean hasReadPermission = dataModelAclService.hasReadPermission(relation)
+                if ( hasReadPermission ) {
                     list.add([id            : item.id,
                               type          : item.relationshipType,
                               ext           : OrderedMap.toJsonMap(item.ext),
