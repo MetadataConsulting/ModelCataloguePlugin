@@ -759,7 +759,6 @@ class MetadataSecurityService {
         requestmapGormService.createRequestmapIfMissing('/asset/download/*',                      'isAuthenticated()',   HttpMethod.GET)
         requestmapGormService.createRequestmapIfMissing('/oauth/*/**',                            'IS_AUTHENTICATED_ANONYMOUSLY')
         requestmapGormService.createRequestmapIfMissing('/user/current',                          'IS_AUTHENTICATED_ANONYMOUSLY',  HttpMethod.GET)
-        requestmapGormService.createRequestmapIfMissing('/catalogue/upload',                      'ROLE_METADATA_CURATOR',         HttpMethod.POST)
         requestmapGormService.createRequestmapIfMissing('/catalogue/*/**',                        'isAuthenticated()',   HttpMethod.GET)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',   HttpMethod.GET)
         requestmapGormService.createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'isAuthenticated()',   HttpMethod.POST) // post a comment
@@ -809,7 +808,7 @@ class MetadataSecurityService {
         secureMappings([
             ["/api/modelCatalogue/core/forms/generate/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/forms/preview/*", 'isAuthenticated()', HttpMethod.GET],
-            ["/catalogue/upload", 'isAuthenticated()', HttpMethod.POST],
+            ["/catalogue/upload", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/catalogue/ext/*/*", 'isAuthenticated()', HttpMethod.GET],
             ["/catalogue/ext/*/*/export", 'isAuthenticated()', HttpMethod.GET],
             ["/catalogue/*/*", 'isAuthenticated()', HttpMethod.GET],
