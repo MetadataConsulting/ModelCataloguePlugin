@@ -6,6 +6,7 @@ import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.hibernate.StaleStateException
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.security.User
@@ -439,7 +440,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 //TODO: REMOVE PUT INTO SERVICE AND CLASSES
     protected DataModel getDataModel(){
         DataModel dataModel
-        if(resource!=DataModel && resource!=RelationshipType && resource && params?.id){
+        if(resource!=DataModel && resource!=RelationshipType && resource!=CsvTransformation && resource!=DataModelPolicy && resource && params?.id){
             dataModel = (resource.get(params.id)?.dataModel)
         }else if(resource == DataModel && params?.id){
             dataModel = (resource.get(params.id))

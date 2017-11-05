@@ -147,7 +147,7 @@ class DataModelFilter {
     }
 
 
-    DataModelFilter withImports(List <DataModel> subscribedModels) {
+    DataModelFilter withImports(List<DataModel> subscribedModels) {
 
         if (includesImports || unclassifiedOnly) {
             return this

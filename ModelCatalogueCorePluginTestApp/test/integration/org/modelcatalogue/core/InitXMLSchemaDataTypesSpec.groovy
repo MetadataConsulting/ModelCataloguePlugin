@@ -12,7 +12,7 @@ import spock.lang.Unroll
 class InitXMLSchemaDataTypesSpec extends AbstractIntegrationSpec {
 
 
-    def setup() {
+    def setupSpec() {
         initCatalogue()
     }
 

@@ -84,6 +84,7 @@ class User extends CatalogueElement {
     void beforeInsert() {
         super.beforeInsert()
         encodePassword()
+        apiKey = ApiKeyUtils.apiKey()
         if (!getName()) {
             setName(getUsername())
         }

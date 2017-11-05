@@ -63,7 +63,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
 
         //find the data models that the user is subscribed to and only search those
-        Set<DataModel> subscribedModels = modelCatalogueSecurityService.getSubscribed()
+        List<DataModel> subscribedModels = modelCatalogueSecurityService.getSubscribed()
 
 
         // if the user doesn't have at least VIEWER role, don't return other elements than finalized

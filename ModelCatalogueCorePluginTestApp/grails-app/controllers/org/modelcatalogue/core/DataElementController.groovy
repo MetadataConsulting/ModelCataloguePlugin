@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
-import grails.util.Environment
 import org.hibernate.SessionFactory
-import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists

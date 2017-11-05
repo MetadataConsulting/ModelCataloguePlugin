@@ -267,8 +267,6 @@ class UCLHExcelLoader extends ExcelLoader{
 
 
 
-    //String defaultGMCMetadataValue = GMCGridReportExcelLoader.defaultGMCMetadataValue
-
 
 
     @Override
@@ -302,7 +300,7 @@ class UCLHExcelLoader extends ExcelLoader{
                 rowMaps.each { Map<String, String> rowMap ->
                     dataElement(name: getNTElementName(rowMap)) {
                         metadataHeaders.each {k, v ->
-                            ext v, (rowMap[k] ?: defaultGMCMetadataValue)
+                            ext v, (rowMap[k] ?: '')
                         }
                         ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
                         //id('mcID1000')

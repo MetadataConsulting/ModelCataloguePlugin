@@ -3,6 +3,8 @@ package org.modelcatalogue.core
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import org.custommonkey.xmlunit.DetailedDiff
+import org.custommonkey.xmlunit.Diff
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
@@ -132,12 +134,27 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         return notNull(DataModel.findByName(COMPLEX_MODEL_NAME))
     }
 
+    boolean similar(String sampleXml, String expectedXml) {
 
+        println "==ACTUAL=="
+        println sampleXml
+
+        println "==EXPECTED=="
+        println expectedXml
+
+        Diff diff = new Diff(sampleXml, expectedXml)
+        DetailedDiff detailedDiff = new DetailedDiff(diff)
+
+        assert detailedDiff.similar(), detailedDiff.toString()
+        return true
+    }
 
 
     public <T> T notNull(T item) {
         assert item
         item
     }
+
+
 
 }
