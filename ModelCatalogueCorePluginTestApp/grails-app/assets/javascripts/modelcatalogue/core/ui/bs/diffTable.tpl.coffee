@@ -9,7 +9,7 @@ angular.module('mc.core.ui.bs.diffTable', ['mc.core.ui.diffTable']).run [ '$temp
             </tr>
             <tr ng-if="$$actionsExpanded">
               <th class="col-md-2"></th>
-              <th ng-repeat="element in elements" class="col-md-5"><a ng-href="{{element.href()}}"><contextual-actions role="item" icon-only="true" no-colors="true" group="true"></contextual-actions></th>
+              <th ng-repeat="element in elements" class="col-md-5"><a ng-href="{{element.href()}}"><contextual-actions role="{{::actionRoleAccess.ROLE_ITEM_ACTION}}" icon-only="true" no-colors="true" group="true"></contextual-actions></th>
             </tr>
           </thead>
           <tbody>

@@ -8,7 +8,7 @@ angular.module('mc.core.ui.bs.modalFeedback', ['mc.util.messages']).config (mess
         template: '''
          <div class="modal-header">
                 <div class="catalogue-element-detail-actions">
-                  <contextual-actions icon-only="true" role="feedback" size="xs" no-colors="true"></contextual-actions>
+                  <contextual-actions icon-only="true" role="{{::actionRoleAccess.ROLE_FEEDBACK_ACTION}" size="xs" no-colors="true"></contextual-actions>
                 </div>
             <h4>{{ feedback.name }}</h4>
         </div>

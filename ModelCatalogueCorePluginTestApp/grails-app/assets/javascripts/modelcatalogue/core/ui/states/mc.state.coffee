@@ -14,7 +14,7 @@ angular.module('mc.core.ui.states.mc', ['mc.core.ui.states.controllers.DataModel
         template: '<contextual-menu></contextual-menu>'
 
       'navbar-right@':
-        template: '<contextual-menu role="navigation-right" right="true"></contextual-menu>'
+        template: '<contextual-menu role="{{::actionRoleAccess.ROLE_NAVIGATION_RIGHT_ACTION}}" right="true"></contextual-menu>'
         controller: 'mc.core.ui.states.controllers.DataModelCtrl'
 
     resolve:

@@ -9,7 +9,7 @@ angular.module('mc.core.ui.states.mc.resource.show', ['mc.core.ui.states.control
           controller: 'mc.core.ui.states.controllers.ShowCtrl'
 
         'navbar-left@':
-          template: '<contextual-menu role="item"></contextual-menu>'
+          template: '<contextual-menu role="{{::actionRoleAccess.ROLE_ITEM_ACTION}}"></contextual-menu>'
           controller: 'mc.core.ui.states.controllers.ElementWithDataModelCtrl'
 
       resolve:

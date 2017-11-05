@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages', 'mc.util.ui.actions']).config ['messagesProvider', (messagesProvider)->
 
   factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
@@ -28,11 +28,12 @@ angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages']).config ['mes
             </form>
         </div>
         <div class="modal-footer">
-          <contextual-actions role="modal"></contextual-actions>
+          <contextual-actions role="{{::actionRoleAccess.ROLE_MODAL_ACTION}}"></contextual-actions>
         </div>
         '''
-        controller: ($rootScope, $scope, messages, $uibModalInstance, enhance, rest, modelCatalogueApiRoot) ->
+        controller: ($rootScope, $scope, messages, $uibModalInstance, enhance, rest, modelCatalogueApiRoot, actionRoleAccess) ->
           'ngInject'
+          $scope.actionRoleAccess = actionRoleAccess
           $scope.semanticVersion = args.element.semanticVersion
           $scope.revisionNotes = args.element.revisionNotes
           $scope.messages = messages.createNewMessages()

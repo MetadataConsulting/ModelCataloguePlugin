@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security'])
-.config (actionsProvider, names, actionRole)->
+.config (actionsProvider, names, actionRoleRegister)->
   'ngInject'
   ##############
   # Data Model #
@@ -71,7 +71,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 
 
 
-  actionsProvider.registerActionInRole 'create-data-model', actionRole.ROLE_DATA_MODELS ,['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
+  actionsProvider.registerActionInRole 'create-data-model', actionRoleRegister.ROLE_DATA_MODELS_ACTION ,['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
       return undefined unless security.hasRole('CURATOR')
 
       {
@@ -92,7 +92,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
       }
   ]
 
-  actionsProvider.registerActionInRole 'all-data-models', actionRole.ROLE_GLOBAL_ACTION ,['security', '$scope', '$state', (security, $scope, $state) ->
+  actionsProvider.registerActionInRole 'all-data-models', actionRoleRegister.ROLE_GLOBAL_ACTION ,['security', '$scope', '$state', (security, $scope, $state) ->
     return undefined if not security.isUserLoggedIn()
 
     {
@@ -104,7 +104,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
   ]
 
-  actionsProvider.registerActionInRole 'global-draft', actionRole.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
+  actionsProvider.registerActionInRole 'global-draft', actionRoleRegister.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
     return undefined unless $state.current.name == 'mc.resource.list'
     return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
 
@@ -115,7 +115,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
   ]
 
-  actionsProvider.registerActionInRole 'global-pending', actionRole.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
+  actionsProvider.registerActionInRole 'global-pending', actionRoleRegister.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
     return undefined unless $state.current.name == 'mc.resource.list'
     return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
 
@@ -126,7 +126,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
   ]
 
-  actionsProvider.registerActionInRole 'global-finalized', actionRole.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
+  actionsProvider.registerActionInRole 'global-finalized', actionRoleRegister.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
     return undefined unless $state.current.name == 'mc.resource.list'
     return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
 
@@ -137,7 +137,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
   ]
 
-  actionsProvider.registerActionInRole 'about-dialog', actionRole.ROLE_GLOBAL_ACTION, ['messages', (messages) ->
+  actionsProvider.registerActionInRole 'about-dialog', actionRoleRegister.ROLE_GLOBAL_ACTION, ['messages', (messages) ->
 
     {
       icon: 'fa fa-question'

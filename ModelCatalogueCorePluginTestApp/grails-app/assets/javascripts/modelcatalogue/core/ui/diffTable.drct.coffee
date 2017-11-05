@@ -1,11 +1,12 @@
-angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTable',  [-> {
+angular.module('mc.core.ui.diffTable', ['diff-match-patch', 'mc.util.ui.actions']).directive 'diffTable',  [-> {
   restrict: 'E'
   replace: true
   scope:
     elements: '='
   templateUrl: 'modelcatalogue/core/ui/diffTable.html'
 
-  controller: ['$scope', 'names', 'catalogueElementProperties', 'security', 'enhance', '$filter', '$state', '$q', 'modelCatalogueApiRoot', '$http', ($scope, names, catalogueElementProperties, security, enhance, $filter, $state, $q, modelCatalogueApiRoot, $http)->
+  controller: ['$scope', 'names', 'catalogueElementProperties', 'security', 'enhance', '$filter', '$state', '$q', 'modelCatalogueApiRoot', '$http', 'actionRoleAccess', ($scope, names, catalogueElementProperties, security, enhance, $filter, $state, $q, modelCatalogueApiRoot, $http, actionRoleAccess)->
+    $scope.actionRoleAccess = actionRoleAccess
     propExcludes = ['version', 'id', 'link', 'modelCatalogueId', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReports', 'archived', 'dateCreated', 'lastUpdated', 'versionCreated',  '__enhancedBy', 'defaultExcludes', 'updatableProperties']
 
     printNumber = (number) -> '' + number

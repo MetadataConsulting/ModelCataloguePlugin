@@ -31,9 +31,9 @@ module.config ['messagesProvider', (messagesProvider)->
         </div>
         """
 
-        controller: ['$scope', 'actions', 'actionRole', '$uibModalInstance', '$filter', ($scope, actions, actionRole, $uibModalInstance, $filter) ->
+        controller: ['$scope', 'actions', 'actionRoleAccess', '$uibModalInstance', '$filter', ($scope, actions, actionRoleAccess, $uibModalInstance, $filter) ->
           $scope.selected = -1
-          $scope.actions = actions.getActions($scope, actionRole.ROLE_GLOBAL_ACTION)
+          $scope.actions = actions.getActions($scope, actionRoleAccess.ROLE_GLOBAL_ACTION)
 
           $scope.getIcon = (action) ->
             action.icon ? 'fa-flash'
@@ -46,7 +46,7 @@ module.config ['messagesProvider', (messagesProvider)->
             return value.label?.toLowerCase().indexOf($scope.query.toLowerCase()) > -1
 
           $scope.$watch 'query', ->
-            $scope.actions = $filter('filter')(actions.getActions($scope, actionRole.ROLE_GLOBAL_ACTION), queryFilter)
+            $scope.actions = $filter('filter')(actions.getActions($scope, actionRoleAccess.ROLE_GLOBAL_ACTION), queryFilter)
 
 
 

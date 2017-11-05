@@ -7,7 +7,7 @@ angular.module('mc.core.ui.states.mc.resource.diff', ['mc.core.ui.states.control
           controller: 'mc.core.ui.states.controllers.DiffCtrl'
 
         'navbar-left@':
-          template: '<contextual-menu role="item"></contextual-menu>'
+          template: '<contextual-menu role="{{::actionRoleAccess.ROLE_ITEM_ACTION}}"></contextual-menu>'
           controller: 'mc.core.ui.states.controllers.ElementsCtrl'
 
       url: '/diff/{ids:(?:\\d+)(?:\\|\\d+)+}'

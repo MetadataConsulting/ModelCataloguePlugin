@@ -33,7 +33,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="pull-right data-model-create-buttons">
-          <contextual-actions role="data-models" no-colors="true" size="sm"></contextual-actions>
+          <contextual-actions role="{{::actionRoleAccess.ROLE_DATA_MODELS_ACTION}}" no-colors="true" size="sm"></contextual-actions>
         </div>
         <ul class="nav nav-tabs" role="tablist">
           <li id="my-models" ng-class="{'active' : getCurrentType() == 'My Models'}" role="presentation">

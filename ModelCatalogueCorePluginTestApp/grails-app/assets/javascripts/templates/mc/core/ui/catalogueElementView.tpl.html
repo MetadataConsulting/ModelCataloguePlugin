@@ -3,7 +3,7 @@
     <div class="col-md-12">
       <form editable-form name="editableForm" onaftersave="inlineUpdateElement()">
         <div class="catalogue-element-detail-actions">
-          <contextual-actions icon-only="true" role="item-detail" size="xs" no-colors="true"></contextual-actions>
+          <contextual-actions icon-only="true" role="{{::actionRoleAccess.ROLE_ITEM_DETAIL_ACTION}}" size="xs" no-colors="true"></contextual-actions>
         </div>
         <h3 class="ce-name">
           <small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small>

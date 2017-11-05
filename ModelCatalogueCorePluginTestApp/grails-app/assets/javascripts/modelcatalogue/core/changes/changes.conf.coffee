@@ -121,9 +121,9 @@ changes.config ['enhanceProvider', (enhanceProvider)->
 ###
   Configure Actions Provider
 ###
-changes.config ['actionsProvider', 'actionRole', (actionsProvider, actionRole)->
+changes.config ['actionsProvider', 'actionRoleRegister', (actionsProvider, actionRoleRegister)->
 
-  actionsProvider.registerActionInRoles 'undo-change',[actionRole.ROLE_ITEM_ACTION], ['$scope', 'messages', 'security', '$http', 'modelCatalogueApiRoot', '$state', ($scope, messages, security, $http, modelCatalogueApiRoot, $state) ->
+  actionsProvider.registerActionInRoles 'undo-change',[actionRoleRegister.ROLE_ITEM_ACTION], ['$scope', 'messages', 'security', '$http', 'modelCatalogueApiRoot', '$state', ($scope, messages, security, $http, modelCatalogueApiRoot, $state) ->
     return undefined unless $scope.element
     return undefined unless $scope.element.changed
     return undefined unless $scope.element.changed.status == 'DRAFT' or ($scope.element.changed.isInstanceOf('asset') and $scope.element.changed.status == 'FINALIZED')

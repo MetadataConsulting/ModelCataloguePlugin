@@ -1,5 +1,5 @@
-angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', 'actionRole', (actionsProvider, names, actionRole)->
-  actionsProvider.registerActionInRole 'search-menu', actionRole.ROLE_NAVIGATION_RIGHT, [
+angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', 'actionRoleRegister', (actionsProvider, names, actionRoleRegister)->
+  actionsProvider.registerActionInRole 'search-menu', actionRoleRegister.ROLE_NAVIGATION_RIGHT_ACTION, [
     '$scope', 'security', 'messages',
     ($scope ,  security ,  messages) ->
 
@@ -16,7 +16,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       }
   ]
 
-  actionsProvider.registerActionInRole 'fast-action', actionRole.ROLE_NAVIGATION_RIGHT, ['security', 'messages', (security, messages) ->
+  actionsProvider.registerActionInRole 'fast-action', actionRoleRegister.ROLE_NAVIGATION_RIGHT_ACTION, ['security', 'messages', (security, messages) ->
     return undefined unless security.isUserLoggedIn()
     {
       position:   -5000
@@ -28,7 +28,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
-  actionsProvider.registerActionInRole 'user-menu', actionRole.ROLE_NAVIGATION_RIGHT, ['security', (security) ->
+  actionsProvider.registerActionInRole 'user-menu', actionRoleRegister.ROLE_NAVIGATION_RIGHT_ACTION, ['security', (security) ->
     return undefined unless security.isUserLoggedIn()
     {
       position:   10000
@@ -113,7 +113,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
 
 
-  actionsProvider.registerActionInRole 'admin-menu', actionRole.ROLE_NAVIGATION_RIGHT, ['security', (security) ->
+  actionsProvider.registerActionInRole 'admin-menu', actionRoleRegister.ROLE_NAVIGATION_RIGHT_ACTION, ['security', (security) ->
     return undefined unless security.hasRole('ADMIN')
     {
       position:   5000
@@ -190,7 +190,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       }
   ]
 
-  actionsProvider.registerActionInRoles 'user-last-seen', [actionRole.ROLE_GLOBAL_ACTION], userLastSeen
+  actionsProvider.registerActionInRoles 'user-last-seen', [actionRoleRegister.ROLE_GLOBAL_ACTION], userLastSeen
   actionsProvider.registerChildAction 'admin-menu', 'user-last-seen-child', userLastSeen
 
   reindexCatalogue = [
@@ -210,7 +210,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       }
   ]
 
-  actionsProvider.registerActionInRoles 'reindex-catalogue', [actionRole.ROLE_GLOBAL_ACTION], reindexCatalogue
+  actionsProvider.registerActionInRoles 'reindex-catalogue', [actionRoleRegister.ROLE_GLOBAL_ACTION], reindexCatalogue
   actionsProvider.registerChildAction 'admin-menu', 'reindex-catalogue-child', reindexCatalogue
 
   actionsProvider.registerChildAction 'admin-menu', 'monitoring', ($window, security) ->
@@ -224,7 +224,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         $window.open("#{security.contextPath}/monitoring")
     }
 
-  actionsProvider.registerActionInRole 'curator-menu', actionRole.ROLE_NAVIGATION_RIGHT, ['security', (security) ->
+  actionsProvider.registerActionInRole 'curator-menu', actionRoleRegister.ROLE_NAVIGATION_RIGHT_ACTION, ['security', (security) ->
     return undefined unless security.hasRole('CURATOR')
     {
       position:   1000
@@ -268,7 +268,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
 
 
-  actionsProvider.registerActionInRole 'new-import', actionRole.ROLE_LIST_ACTION, [
+  actionsProvider.registerActionInRole 'new-import', actionRoleRegister.ROLE_LIST_ACTION, [
     '$scope', 'names','security', '$state',
     ($scope ,  names , security ,  $state ) ->
       return undefined if not security.hasRole('CURATOR')
@@ -299,7 +299,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     actionsProvider.registerChildAction 'new-import', 'import-loinc', loincImport
     actionsProvider.registerChildAction 'import-data-models-screen', 'import-loinc', loincImport
     actionsProvider.registerChildAction 'curator-menu', 'import-loinc', loincImport
-    actionsProvider.registerActionInRole 'global-import-loinc', actionRole.ROLE_GLOBAL_ACTION, loincImport
+    actionsProvider.registerActionInRole 'global-import-loinc', actionRoleRegister.ROLE_GLOBAL_ACTION, loincImport
 
   excelImport = ($scope, messages, security) ->
     'ngInject'
@@ -315,7 +315,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerChildAction 'new-import', 'import-excel', excelImport
   actionsProvider.registerChildAction 'import-data-models-screen', 'import-excel', excelImport
   actionsProvider.registerChildAction 'curator-menu', 'import-excel', excelImport
-  actionsProvider.registerActionInRole 'global-import-excel', actionRole.ROLE_GLOBAL_ACTION, excelImport
+  actionsProvider.registerActionInRole 'global-import-excel', actionRoleRegister.ROLE_GLOBAL_ACTION, excelImport
 
   oboImport = ($scope, messages, security) ->
     'ngInject'
@@ -330,7 +330,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerChildAction 'new-import', 'import-obo', oboImport
   actionsProvider.registerChildAction 'import-data-models-screen', 'import-obo', oboImport
   actionsProvider.registerChildAction 'curator-menu', 'import-obo', oboImport
-  actionsProvider.registerActionInRole 'global-import-obo', actionRole.ROLE_GLOBAL_ACTION, oboImport
+  actionsProvider.registerActionInRole 'global-import-obo', actionRoleRegister.ROLE_GLOBAL_ACTION, oboImport
 
   umlImport = ($scope, messages, security) ->
     'ngInject'
@@ -346,7 +346,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     actionsProvider.registerChildAction 'new-import', 'import-umlj', umlImport
     actionsProvider.registerChildAction 'import-data-models-screen', 'import-umlj', umlImport
     actionsProvider.registerChildAction 'curator-menu', 'import-umlj', umlImport
-    actionsProvider.registerActionInRole 'global-import-uml', actionRole.ROLE_GLOBAL_ACTION, umlImport
+    actionsProvider.registerActionInRole 'global-import-uml', actionRoleRegister.ROLE_GLOBAL_ACTION, umlImport
 
   mcImport = ($scope, messages, security) ->
     'ngInject'
@@ -361,7 +361,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerChildAction 'new-import', 'import-mc', mcImport
   actionsProvider.registerChildAction 'import-data-models-screen', 'import-mc', mcImport
   actionsProvider.registerChildAction 'curator-menu', 'import-mc', mcImport
-  actionsProvider.registerActionInRole 'global-import-mc', actionRole.ROLE_GLOBAL_ACTION, mcImport
+  actionsProvider.registerActionInRole 'global-import-mc', actionRoleRegister.ROLE_GLOBAL_ACTION, mcImport
 
   xmlImport = ($scope, messages, security) ->
     'ngInject'
@@ -376,7 +376,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerChildAction 'new-import', 'import-catalogue-xml', xmlImport
   actionsProvider.registerChildAction 'import-data-models-screen', 'import-catalogue-xml', xmlImport
   actionsProvider.registerChildAction 'curator-menu', 'import-catalogue-xml', xmlImport
-  actionsProvider.registerActionInRole 'global-import-xml', actionRole.ROLE_GLOBAL_ACTION, xmlImport
+  actionsProvider.registerActionInRole 'global-import-xml', actionRoleRegister.ROLE_GLOBAL_ACTION, xmlImport
 
   rareDiseaseCsvImport = ($scope, messages, security) ->
     'ngInject'
@@ -393,9 +393,9 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     actionsProvider.registerChildAction 'new-import', 'rare-disease-csv', rareDiseaseCsvImport
     actionsProvider.registerChildAction 'import-data-models-screen', 'rare-disease-csv', rareDiseaseCsvImport
     actionsProvider.registerChildAction 'curator-menu', 'rare-disease-csv', rareDiseaseCsvImport
-    actionsProvider.registerActionInRole 'global-import-csv', actionRole.ROLE_GLOBAL_ACTION, rareDiseaseCsvImport
+    actionsProvider.registerActionInRole 'global-import-csv', actionRoleRegister.ROLE_GLOBAL_ACTION, rareDiseaseCsvImport
 
-  actionsProvider.registerActionInRole 'connected', actionRole.ROLE_NAVIGATION_RIGHT, ($rootScope, messages, $window) ->
+  actionsProvider.registerActionInRole 'connected', actionRoleRegister.ROLE_NAVIGATION_RIGHT_ACTION, ($rootScope, messages, $window) ->
     'ngInject'
     if $rootScope.$$disconnected
       return {

@@ -8,7 +8,7 @@ angular.module('mc.core.ui.states.mc.search', ['mc.core.ui.states.controllers.Li
           controller: 'mc.core.ui.states.controllers.ListCtrl'
 
         'navbar-left@':
-          template: '<contextual-menu role="list"></contextual-menu>'
+          template: '<contextual-menu role="{{::actionRoleAccess.ROLE_LIST_ACTION}}"></contextual-menu>'
           controller: 'mc.core.ui.states.controllers.ListCtrl'
       resolve: {
         list: ['$stateParams','modelCatalogueSearch', ($stateParams, modelCatalogueSearch) ->

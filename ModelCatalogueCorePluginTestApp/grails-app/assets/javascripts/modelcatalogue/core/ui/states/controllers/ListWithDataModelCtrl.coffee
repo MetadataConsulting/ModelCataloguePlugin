@@ -1,6 +1,7 @@
 angular.module('mc.core.ui.states.controllers.ListWithDataModelCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.ListWithDataModelCtrl', [
-  '$scope', '$stateParams', '$state', 'list', 'names', 'catalogue', 'enhance', 'applicationTitle', 'currentDataModel'
-  ($scope ,  $stateParams ,  $state ,  list ,  names ,  catalogue ,  enhance ,  applicationTitle ,  currentDataModel) ->
+  '$scope', '$stateParams', '$state', 'list', 'names', 'catalogue', 'enhance', 'applicationTitle', 'currentDataModel', 'actionRoleAccess',
+  ($scope ,  $stateParams ,  $state ,  list ,  names ,  catalogue ,  enhance ,  applicationTitle ,  currentDataModel, actionRoleAccess) ->
+    $scope.actionRoleAccess = actionRoleAccess
 
     if $stateParams.resource
       applicationTitle catalogue.getPlural($stateParams.resource)

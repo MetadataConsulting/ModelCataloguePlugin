@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsProvider, names, actionRole) ->
+angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsProvider, names, actionRoleRegister) ->
   'ngInject'
 
   showErrorsUsingMessages = (messages) ->
@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
             messages.error err.message
 
   actionsProvider.registerActionInRoles 'create-catalogue-element',
-    [actionRole.ROLE_LIST_ACTION, actionRole.ROLE_LIST_FOOTER_ACTION],
+    [actionRoleRegister.ROLE_LIST_ACTION, actionRoleRegister.ROLE_LIST_FOOTER_ACTION],
     ($scope, names, security, messages, $state, $log, dataModelService) ->
       'ngInject'
       resource = $scope.resource
@@ -51,7 +51,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
 
   actionsProvider.registerActionInRoles 'favorite-element',
-    [actionRole.ROLE_ITEM_DETAIL_ACTION, actionRole.ROLE_ITEM_INFINITE_LIST],
+    [actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, actionRoleRegister.ROLE_ITEM_INFINITE_LIST],
     ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest, $rootScope) ->
       'ngInject'
       elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and
@@ -94,8 +94,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
       action
 
-  actionsProvider.registerActionInRoles 'favorite-element-in-header', [actionRole.ROLE_LIST_HEADER_ACTION,
-    actionRole.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', '$state', 'security', 'catalogueElementResource',
+  actionsProvider.registerActionInRoles 'favorite-element-in-header', [actionRoleRegister.ROLE_LIST_HEADER_ACTION,
+    actionRoleRegister.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', '$state', 'security', 'catalogueElementResource',
     'modelCatalogueApiRoot', 'enhance', 'rest',
     ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
       return undefined if not $scope.list
@@ -123,7 +123,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
-  actionsProvider.registerActionInRoles 'archive-batch', [actionRole.ROLE_ITEM_ACTION], ['$rootScope', '$scope',
+  actionsProvider.registerActionInRoles 'archive-batch', [actionRoleRegister.ROLE_ITEM_ACTION], ['$rootScope', '$scope',
     'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot',
     ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
       return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('batch') or $scope.batch
@@ -146,8 +146,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
 
-  actionsProvider.registerActionInRoles 'create-new-relationship-in-header', [actionRole.ROLE_LIST_HEADER_ACTION,
-    actionRole.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue',
+  actionsProvider.registerActionInRoles 'create-new-relationship-in-header', [actionRoleRegister.ROLE_LIST_HEADER_ACTION,
+    actionRoleRegister.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue',
     ($scope, messages, names, security, catalogue) ->
       return undefined if not $scope.list
       return undefined if not $scope.list.base
@@ -180,8 +180,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
-  actionsProvider.registerActionInRoles 'create-new-mapping-in-header', [actionRole.ROLE_LIST_HEADER_ACTION,
-    actionRole.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue',
+  actionsProvider.registerActionInRoles 'create-new-mapping-in-header', [actionRoleRegister.ROLE_LIST_HEADER_ACTION,
+    actionRoleRegister.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue',
     ($scope, messages, names, security, catalogue) ->
       return undefined if not $scope.$parent.element
       return undefined if not $scope.$parent.element.hasOwnProperty('mappings')
@@ -202,7 +202,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
-  actionsProvider.registerActionInRoles 'transform-csv', [actionRole.ROLE_ITEM_ACTION], ['$scope', 'messages',
+  actionsProvider.registerActionInRoles 'transform-csv', [actionRoleRegister.ROLE_ITEM_ACTION], ['$scope', 'messages',
     'security', ($scope, messages, security) ->
       return undefined if not $scope.element
       return undefined if not angular.isFunction $scope.element.isInstanceOf
@@ -220,7 +220,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
-  actionsProvider.registerActionInRoles 'refresh-asset', [actionRole.ROLE_ITEM_DETAIL_ACTION], ['$scope',
+  actionsProvider.registerActionInRoles 'refresh-asset', [actionRoleRegister.ROLE_ITEM_DETAIL_ACTION], ['$scope',
     '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->
       return undefined if $scope.element?.elementType != 'org.modelcatalogue.core.Asset'
       return undefined if $scope.element.status != 'PENDING'
@@ -241,7 +241,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ###
   The action and the message type are both called generate-suggestions.
   ###
-  actionsProvider.registerActionInRole 'generate-suggestions', actionRole.ROLE_LIST_ACTION, ['$scope', 'security',
+  actionsProvider.registerActionInRole 'generate-suggestions', actionRoleRegister.ROLE_LIST_ACTION, ['$scope', 'security',
     'catalogue', 'modelCatalogueApiRoot', 'enhance', 'rest', 'messages', '$state',
     ($scope, security, catalogue, modelCatalogueApiRoot, enhance, rest, messages, $state)->
       return undefined unless security.isUserLoggedIn()
@@ -259,7 +259,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
-  actionsProvider.registerActionInRole 'refresh-batches', actionRole.ROLE_LIST_ACTION, ['$state', '$scope',
+  actionsProvider.registerActionInRole 'refresh-batches', actionRoleRegister.ROLE_LIST_ACTION, ['$state', '$scope',
     'security', 'catalogue', ($state, $scope, security, catalogue)->
       return undefined unless security.isUserLoggedIn()
       return undefined unless $scope.list
@@ -274,8 +274,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
-  actionsProvider.registerActionInRoles 'export', [actionRole.ROLE_LIST_ACTION, actionRole.ROLE_ITEM_ACTION,
-    actionRole.ROLE_NAVIGATION, actionRole.ROLE_LIST_HEADER_ACTION], ['$scope', 'security',
+  actionsProvider.registerActionInRoles 'export', [actionRoleRegister.ROLE_LIST_ACTION, actionRoleRegister.ROLE_ITEM_ACTION,
+    actionRoleRegister.ROLE_NAVIGATION_ACTION, actionRoleRegister.ROLE_LIST_HEADER_ACTION], ['$scope', 'security',
     ($scope, security)->
       return undefined unless security.hasRole('CURATOR')
       return undefined unless $scope.list or $scope.element
@@ -391,7 +391,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
         }
     ])
 
-  actionsProvider.registerChildAction('export', 'list-exports-current', actionRole.ROLE_LIST_ACTION,
+  actionsProvider.registerChildAction('export', 'list-exports-current', actionRoleRegister.ROLE_LIST_ACTION,
     ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout',
       ($scope, $window, enhance, rest, $log, messages, $timeout) ->
         return undefined if not $scope.list?
@@ -406,7 +406,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
         }
     ])
 
-  actionsProvider.registerActionInRole 'switch-archived-batches', actionRole.ROLE_LIST_ACTION, ['$state', '$scope',
+  actionsProvider.registerActionInRole 'switch-archived-batches', actionRoleRegister.ROLE_LIST_ACTION, ['$state', '$scope',
     '$stateParams', ($state, $scope, $stateParams) ->
       return undefined unless $state.current.name == 'mc.resource.list' and $scope.list and $stateParams.resource == 'batch'
 
@@ -454,7 +454,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
 
-  actionsProvider.registerActionInRole 'run-action', actionRole.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'run-action', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'PENDING'
 
     {
@@ -471,7 +471,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
 
-  actionsProvider.registerActionInRole 'dismiss-action', actionRole.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'dismiss-action', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'PENDING'
 
     {
@@ -487,7 +487,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
 
-  actionsProvider.registerActionInRole 'reactivate-action', actionRole.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'reactivate-action', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'DISMISSED'
 
     {
@@ -502,7 +502,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
     }
   ]
 
-  actionsProvider.registerActionInRole 'repeat-action', actionRole.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'repeat-action', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'FAILED'
 
     {
@@ -518,8 +518,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
 
-  actionsProvider.registerActionInRoles 'reload-actions', [actionRole.ROLE_ACTION_ACTION, actionRole.ROLE_ITEM_ACTION,
-    actionRole.ROLE_NAVIGATION], ['$scope', ($scope) ->
+  actionsProvider.registerActionInRoles 'reload-actions', [actionRoleRegister.ROLE_ACTION_ACTION, actionRoleRegister.ROLE_ITEM_ACTION,
+    actionRoleRegister.ROLE_NAVIGATION_ACTION], ['$scope', ($scope) ->
     return undefined unless angular.isFunction($scope.batch?.$$reload) and ($scope.action and $scope.action.state == 'PERFORMING') or ($scope.batch and not $scope.action)
 
     {
@@ -536,7 +536,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
     }
   ]
 
-  actionsProvider.registerActionInRole 'link-actions', actionRole.ROLE_ACTION_ACTION, ['$scope', '$rootScope', 'messages',
+  actionsProvider.registerActionInRole 'link-actions', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', '$rootScope', 'messages',
     ($scope, $rootScope, messages) ->
       return undefined unless $scope.action and not ($scope.action.state == 'PERFORMING' or $scope.action.state == 'PERFORMED')
 
@@ -596,7 +596,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
 
-  actionsProvider.registerActionInRoles 'run-all-actions-in-batch', [actionRole.ROLE_ITEM_ACTION], ['$scope',
+  actionsProvider.registerActionInRoles 'run-all-actions-in-batch', [actionRoleRegister.ROLE_ITEM_ACTION], ['$scope',
     'messages', 'modelCatalogueApiRoot', 'enhance', 'rest', '$timeout', 'security',
     ($scope, messages, modelCatalogueApiRoot, enhance, rest, $timeout, security) ->
       return undefined if not security.hasRole('CURATOR')
@@ -627,7 +627,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
 
-  actionsProvider.registerActionInRole 'update-action-parameters', actionRole.ROLE_ACTION_ACTION, ['$scope', 'messages', 'names',
+  actionsProvider.registerActionInRole 'update-action-parameters', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', 'messages', 'names',
     'security', ($scope, messages, names, security) ->
       return undefined if not $scope.action
       return undefined if $scope.action.state in ['PERFORMING', 'PERFORMED']
@@ -647,7 +647,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
   ]
 
-  actionsProvider.registerActionInRole 'modal-cancel', actionRole.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'modal-cancel', actionRoleRegister.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
     return undefined if not angular.isFunction($scope.$dismiss)
 
     {
@@ -660,7 +660,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
 
-  actionsProvider.registerActionInRole 'modal-finalize-data-modal', actionRole.ROLE_MODAL_ACTION, ['$scope',
+  actionsProvider.registerActionInRole 'modal-finalize-data-modal', actionRoleRegister.ROLE_MODAL_ACTION, ['$scope',
     ($scope) ->
       return undefined unless angular.isFunction($scope.finalizeElement)
 
@@ -677,7 +677,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
 
-  actionsProvider.registerActionInRole 'modal-create-new-version', actionRole.ROLE_MODAL_ACTION, ['$scope',
+  actionsProvider.registerActionInRole 'modal-create-new-version', actionRoleRegister.ROLE_MODAL_ACTION, ['$scope',
     ($scope) ->
       return undefined unless angular.isFunction($scope.createDraftVersion)
 
@@ -694,7 +694,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
 
-  actionsProvider.registerActionInRole 'modal-save-element', actionRole.ROLE_MODAL_ACTION, ($scope) ->
+  actionsProvider.registerActionInRole 'modal-save-element', actionRoleRegister.ROLE_MODAL_ACTION, ($scope) ->
     'ngInject'
 
     return undefined unless $scope.hasChanged and $scope.saveElement
@@ -716,7 +716,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
             $scope.saveInProgress = false
     }
 
-  actionsProvider.registerActionInRole 'modal-save-and-add-another', actionRole.ROLE_MODAL_ACTION, ($scope, $q) ->
+  actionsProvider.registerActionInRole 'modal-save-and-add-another', actionRoleRegister.ROLE_MODAL_ACTION, ($scope, $q) ->
     'ngInject'
 
     return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother
@@ -740,7 +740,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
     }
 
-  actionsProvider.registerActionInRole 'expand-all-rows', actionRole.ROLE_LIST_HEADER_ACTION, ['$scope',
+  actionsProvider.registerActionInRole 'expand-all-rows', actionRoleRegister.ROLE_LIST_HEADER_ACTION, ['$scope',
     ($scope) ->
       return undefined unless $scope.rows
 
@@ -764,7 +764,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
-  actionsProvider.registerActionInRole 'import-data-models-screen', actionRole.ROLE_DATA_MODELS, [
+  actionsProvider.registerActionInRole 'import-data-models-screen', actionRoleRegister.ROLE_DATA_MODELS_ACTION, [
     'security',
     (security) ->
       return undefined unless security.hasRole('CURATOR')

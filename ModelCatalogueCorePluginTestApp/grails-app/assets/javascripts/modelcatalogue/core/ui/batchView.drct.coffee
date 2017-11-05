@@ -8,7 +8,8 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
 
     templateUrl: 'modelcatalogue/core/ui/batchView.html'
 
-    controller: ['$scope','$q', '$window', 'names', '$timeout', ($scope, $q, $window, names, $timeout) ->
+    controller: ['$scope','$q', '$window', 'names', '$timeout', 'actionRoleAccess', ($scope, $q, $window, names, $timeout, actionRoleAccess) ->
+      $scope.actionRoleAccess = actionRoleAccess
       $scope.getType = (action) ->
         return 'info'    if not action
         return 'warning' if action.highlighted

@@ -56,12 +56,12 @@
         <td class="actions-cell col-md-12" colspan="{{columns.length}}">
           <div class="text-right" ng-if="row.element.relation" ng-init="element = row.element.relation">
             <span class="pull-left text-muted"><em>Actions for {{row.element.relation.getElementTypeName()}}</em></span>
-            <contextual-actions size="sm" no-colors="true" role="item-detail,item"
+            <contextual-actions size="sm" no-colors="true" role="{{::actionRoleAccess.ROLE_ITEM_DETAIL_ACTION}},{{::actionRoleAccess.ROLE_ITEM_ACTION}}"
                                 no-actions="true"></contextual-actions>
           </div>
           <div class="text-right" ng-init="element = row.element">
             <span class="pull-left text-muted"><em>Actions for {{row.element.getElementTypeName()}}</em></span>
-            <contextual-actions size="sm" no-colors="true" role="item-detail,item"
+            <contextual-actions size="sm" no-colors="true" role="{{::actionRoleAccess.ROLE_ITEM_DETAIL_ACTION}},{{::actionRoleAccess.ROLE_ITEM_ACTION}}"
                                 no-actions="true"></contextual-actions>
           </div>
           <blockquote ng-if="row.element.description || row.element.relation.description" class="preserve-new-lines"

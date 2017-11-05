@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages', 'mc.util.ui.actions']).config ['messagesProvider', (messagesProvider)->
 
   factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
@@ -32,7 +32,7 @@ angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages']).config ['m
             </form>
         </div>
         <div class="modal-footer">
-          <contextual-actions role="modal"></contextual-actions>
+          <contextual-actions role="{{::actionRoleAccess.ROLE_MODAL_ACTION}}"></contextual-actions>
         </div>
         '''
 
@@ -40,9 +40,9 @@ angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages']).config ['m
           dependents: ->
             args.element.execute('dependents')
 
-        controller: ($rootScope, $scope, messages, $uibModalInstance, dependents) ->
+        controller: ($rootScope, $scope, messages, $uibModalInstance, dependents, actionRoleAccess) ->
           'ngInject'
-
+          $scope.actionRoleAccess = actionRoleAccess
           collectDraftPreference = (preferDrafts) ->
             result = []
             angular.forEach preferDrafts, (value, key) ->

@@ -91,7 +91,7 @@ angular.module('mc.core.ui.bs', [
       # shift + space
       if e.shiftKey and (e.ctrlKey or e.metaKey) and e.which in [1, 65]
         # mock click to the menu item
-        $('#role_navigation-right_search-menu-menu-item-link').click()
+        $('#ROLE_NAVIGATION_ACTION-right_search-menu-menu-item-link').click()
         e.preventDefault()
 ]
 

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.core.ui.columnsSupportCtrl', 'ngAnimate', 'mc.util.ui.sortable']).directive 'infiniteTable',  [-> {
+angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.core.ui.columnsSupportCtrl', 'ngAnimate', 'mc.util.ui.sortable', 'mc.util.ui.actions']).directive 'infiniteTable',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -14,7 +14,8 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
     compile: (element, attrs) ->
       attrs.transform = '$element' unless attrs.transform
 
-    controller: ['$scope', '$animate', '$window', '$controller', '$element', '$state', '$stateParams', '$q', '$timeout', ($scope, $animate, $window, $controller, $element, $state, $stateParams, $q, $timeout) ->
+    controller: ['$scope', '$animate', '$window', '$controller', '$element', '$state', '$stateParams', '$q', '$timeout', 'actionRoleAccess', ($scope, $animate, $window, $controller, $element, $state, $stateParams, $q, $timeout, actionRoleAccess) ->
+      $scope.actionRoleAccess = actionRoleAccess
       angular.extend(this, $controller('infiniteListCtrl', {$scope: $scope, $element: $element}))
 
       header = $element.find('.inf-table-header')

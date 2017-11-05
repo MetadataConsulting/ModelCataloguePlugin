@@ -10,7 +10,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.
           <div uib-alert type="{{getType(action)}}" ng-repeat="action in pendingActions" id="action-{{action.id}}">
             <div class="action-header">
               <div class="pull-right">
-                <contextual-actions group="true" icon-only="true" size="sm" no-colors="true" role="action"/>
+                <contextual-actions group="true" icon-only="true" size="sm" no-colors="true" role="{{::actionRoleAccess.ROLE_ACTION_ACTION}}"/>
               </div>
               <h4>{{action.naturalName}}
                 <small>
@@ -34,7 +34,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.
           <div uib-alert type="{{getType(action)}}" class="alert" ng-repeat="action in performedActions" id="action-{{action.id}}">
             <div>
               <div class="pull-right">
-                <contextual-actions group="true" icon-only="true" size="sm" no-colors="true" role="action"/>
+                <contextual-actions group="true" icon-only="true" size="sm" no-colors="true" role="{{::actionRoleAccess.ROLE_ACTION_ACTION}}"/>
               </div>
               <h4>{{action.naturalName}}
                 <small>

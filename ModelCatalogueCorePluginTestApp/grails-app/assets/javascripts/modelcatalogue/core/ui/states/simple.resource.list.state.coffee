@@ -12,7 +12,7 @@ angular.module('mc.core.ui.states.simple.resource.list', ['mc.core.ui.states.con
           controller: 'mc.core.ui.states.controllers.ListCtrl'
 
         'navbar-left@':
-          template: '<contextual-menu role="list"></contextual-menu>'
+          template: '<contextual-menu role="{{::actionRoleAccess.ROLE_LIST_ACTION}}"></contextual-menu>'
           controller: 'mc.core.ui.states.controllers.ListCtrl'
 
 

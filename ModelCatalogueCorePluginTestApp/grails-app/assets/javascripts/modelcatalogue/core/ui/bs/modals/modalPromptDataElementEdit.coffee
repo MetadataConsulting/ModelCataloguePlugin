@@ -49,7 +49,7 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
             </form>
         </div>
         <div class="modal-footer">
-            <contextual-actions role="modal"></contextual-actions>
+            <contextual-actions role="{{::actionRoleAccess.ROLE_MODAL_ACTION}}"></contextual-actions>
         </div>
         '''
         controller: 'saveOrUpdatePublishedElementCtrl'

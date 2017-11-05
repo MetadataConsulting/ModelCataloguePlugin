@@ -4,7 +4,8 @@
 
 angular.module('mc.core.ui.states.controllers.DataModelCtrl', ['ui.router', 'mc.util.ui'])
 .controller('mc.core.ui.states.controllers.DataModelCtrl', [
-  '$scope', 'currentDataModel',
-  ($scope ,  currentDataModel ) ->
+  '$scope', 'currentDataModel', 'actionRoleAccess',
+  ($scope ,  currentDataModel, actionRoleAccess ) ->
     $scope.currentDataModel  = currentDataModel
+    $scope.actionRoleAccess = actionRoleAccess
 ])

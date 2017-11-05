@@ -9,7 +9,7 @@ angular.module('mc.core.ui.states.simple.actions.show', ['mc.core.ui.states.cont
           controller: 'mc.core.ui.states.controllers.BatchCtrl'
 
         'navbar-left@':
-          template: '<contextual-menu role="item"></contextual-menu>'
+          template: '<contextual-menu role="{{::actionRoleAccess.ROLE_ITEM_ACTION}}"></contextual-menu>'
           controller: 'mc.core.ui.states.controllers.BatchOnlyCtrl'
 
       resolve:

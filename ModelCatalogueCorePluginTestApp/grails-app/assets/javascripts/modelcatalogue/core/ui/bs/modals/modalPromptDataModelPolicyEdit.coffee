@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptDatModelPolicyEdit', ['mc.util.messages']).config (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptDatModelPolicyEdit', ['mc.util.messages', 'mc.util.ui.actions']).config (messagesProvider)->
   factory =  ($uibModal, $q, messages) ->
     "ngInject"
     (title, body, args) ->
@@ -29,12 +29,13 @@ angular.module('mc.core.ui.bs.modalPromptDatModelPolicyEdit', ['mc.util.messages
             </form>
         </div>
         <div class="modal-footer">
-            <contextual-actions role="modal"></contextual-actions>
+            <contextual-actions role="{{::actionRoleAccess.ROLE_MODAL_ACTION}}"></contextual-actions>
         </div>
         '''
 
-        controller: ($scope, messages, $controller, $uibModalInstance) ->
+        controller: ($scope, messages, $controller, $uibModalInstance, actionRoleAccess) ->
           'ngInject'
+          $scope.actionRoleAccess = actionRoleAccess
           $scope.copy     = angular.copy(args.element ? {})
           $scope.create   = args.create
           $scope.original = args.element ? {}

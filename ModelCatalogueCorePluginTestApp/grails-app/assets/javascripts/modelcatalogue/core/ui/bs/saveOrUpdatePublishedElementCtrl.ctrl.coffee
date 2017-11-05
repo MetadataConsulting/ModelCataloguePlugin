@@ -1,4 +1,5 @@
-angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', ['mc.core.ui.bs.withClassificationCtrlMixin', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl', 'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin']).controller 'saveOrUpdatePublishedElementCtrl', ['$scope', 'messages', '$controller', '$uibModalInstance', 'args', 'catalogueElementResource', '$q', ($scope, messages, $controller, $uibModalInstance, args, catalogueElementResource, $q) ->
+angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', ['mc.core.ui.bs.withClassificationCtrlMixin', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl', 'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', 'mc.util.ui.actions']).controller 'saveOrUpdatePublishedElementCtrl', ['$scope', 'messages', '$controller', '$uibModalInstance', 'args', 'catalogueElementResource', '$q', 'actionRoleAccess', ($scope, messages, $controller, $uibModalInstance, args, catalogueElementResource, $q, actionRoleAccess) ->
+  $scope.actionRoleAccess = actionRoleAccess
   $scope.$uibModalInstance = $uibModalInstance
   $scope.pending        = {dataModel: null}
   $scope.newEntity      = -> {dataModels: $scope.copy?.dataModels ? []}

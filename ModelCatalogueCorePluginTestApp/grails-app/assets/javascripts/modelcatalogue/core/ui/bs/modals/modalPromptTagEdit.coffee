@@ -36,10 +36,11 @@ angular.module('mc.core.ui.bs.modalPromptTagEdit', ['mc.util.messages', 'mc.core
             </form>
         </div>
         <div class="modal-footer">
-          <contextual-actions role="modal"></contextual-actions>
+          <contextual-actions role="{{::actionRoleAccess.ROLE_MODAL_ACTION}}"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', '$controller', '$uibModalInstance', ($scope, messages, $controller, $uibModalInstance) ->
+        controller: ['$scope', 'messages', '$controller', '$uibModalInstance', 'actionRoleAccess', ($scope, messages, $controller, $uibModalInstance, actionRoleAccess) ->
+          $scope.actionRoleAccess = actionRoleAccess
           $scope.pending    = {dataModel: null}
           $scope.newEntity  = -> {dataModels: $scope.copy?.dataModels ? []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())

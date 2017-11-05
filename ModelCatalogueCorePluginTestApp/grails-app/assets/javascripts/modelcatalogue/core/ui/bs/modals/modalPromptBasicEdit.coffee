@@ -5,7 +5,7 @@
   messagesProvider.setPromptFactory 'edit-batch', factory
   messagesProvider.setPromptFactory 'edit-csvTransformation', factory
 ###
-angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages', 'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages', 'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', 'mc.util.ui.actions']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
@@ -40,10 +40,11 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages', 'mc.co
             </form>
         </div>
         <div class="modal-footer">
-          <contextual-actions role="modal"></contextual-actions>
+          <contextual-actions role="{{::actionRoleAccess.ROLE_MODAL_ACTION}}"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', '$uibModalInstance', '$controller', ($scope, messages, names, $uibModalInstance, $controller) ->
+        controller: ['$scope', 'messages', 'names', '$uibModalInstance', '$controller',  'actionRoleAccess', ($scope, messages, names, $uibModalInstance, $controller, actionRoleAccess) ->
+          $scope.actionRoleAccess = actionRoleAccess
           $scope.copy     = angular.copy(args.element ? {})
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()

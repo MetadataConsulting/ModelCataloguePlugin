@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFileUpload', 'mc.core.ui.bs.withClassificationCtrlMixin']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFileUpload', 'mc.core.ui.bs.withClassificationCtrlMixin', 'mc.util.ui.actions']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
@@ -42,10 +42,11 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
             </form>
         </div>
         <div class="modal-footer">
-          <contextual-actions role="modal"></contextual-actions>
+          <contextual-actions role="{{::actionRoleAccess.ROLE_MODAL_ACTION}}"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', '$rootScope', '$controller', ($scope, messages, names, catalogueElementResource, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance, $rootScope, $controller) ->
+        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', '$rootScope', '$controller', 'actionRoleAccess', ($scope, messages, names, catalogueElementResource, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance, $rootScope, $controller, actionRoleAccess) ->
+          $scope.actionRoleAccess = actionRoleAccess
           $scope.pending        = {dataModel: null}
           $scope.newEntity      = -> {dataModels: $scope.copy?.dataModels ? []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())

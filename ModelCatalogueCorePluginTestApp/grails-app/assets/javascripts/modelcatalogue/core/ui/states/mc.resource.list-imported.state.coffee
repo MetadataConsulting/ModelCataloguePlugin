@@ -13,7 +13,7 @@ angular.module('mc.core.ui.states.mc.resource.list-imported', ['mc.core.ui.state
           controller: 'mc.core.ui.states.controllers.ListWithDataModelCtrl'
 
         'navbar-left@':
-          template: '<contextual-menu role="list"></contextual-menu>'
+          template: '<contextual-menu role="{{::actionRoleAccess.ROLE_LIST_ACTION}}"></contextual-menu>'
           controller: 'mc.core.ui.states.controllers.ListWithDataModelCtrl'
 
 

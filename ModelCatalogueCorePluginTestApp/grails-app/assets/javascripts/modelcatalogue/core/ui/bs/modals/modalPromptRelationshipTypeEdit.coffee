@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messages', 'mc.util.ui.actions']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
@@ -70,7 +70,7 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
             </form>
         </div>
         <div class="modal-footer">
-            <contextual-actions role="modal"></contextual-actions>
+            <contextual-actions role="{{::actionRoleAccess.ROLE_MODAL_ACTION}}"></contextual-actions>
         </div>
         '''
 
@@ -79,7 +79,8 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
             $http.get("#{modelCatalogueApiRoot}/relationshipType/elementClasses").then (response) -> response.data
           ]
 
-        controller: ['$scope', 'messages', '$controller', '$uibModalInstance', 'elementClasses', ($scope, messages, $controller, $uibModalInstance, elementClasses) ->
+        controller: ['$scope', 'messages', '$controller', '$uibModalInstance', 'elementClasses', 'actionRoleAccess', ($scope, messages, $controller, $uibModalInstance, elementClasses, actionRoleAccess) ->
+          $scope.actionRoleAccess = actionRoleAccess
           $scope.copy     = angular.copy(args.element ? {})
           $scope.create   = args.create
           $scope.original = args.element ? {}

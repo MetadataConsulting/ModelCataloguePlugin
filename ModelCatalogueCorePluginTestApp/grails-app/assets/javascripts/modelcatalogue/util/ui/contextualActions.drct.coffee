@@ -1,5 +1,5 @@
 angular.module('mc.util.ui.contextualActions', ['mc.core.ui.utils'])
-.directive('contextualActions', ($compile, $templateCache, actions) -> {
+.directive('contextualActions', ($compile, $templateCache, actions, actionRoleAccess) -> {
   'ngInject'
   restrict: 'E'
   replace: true
@@ -55,7 +55,7 @@ angular.module('mc.util.ui.contextualActions', ['mc.core.ui.utils'])
 
       actionsScope = $scope.scope ? $scope.$parent
 
-      for role in ($scope.role ? 'item').split(',')
+      for role in ($scope.role ? actionRoleAccess.ROLE_ITEM_ACTION).split(',')
         for action in actions.getActions(actionsScope, role)
           watches = []
           hasActions = hasActions || true

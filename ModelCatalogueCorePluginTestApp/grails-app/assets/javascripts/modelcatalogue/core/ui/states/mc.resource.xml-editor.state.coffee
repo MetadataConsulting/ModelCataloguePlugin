@@ -10,7 +10,7 @@ angular.module('mc.core.ui.states.mc.resource.xml-editor', ['ui.ace']).config([
           controller: 'mc.core.ui.states.controllers.XmlEditorCtrl'
 
       'navbar-left@':
-        template: '<contextual-menu role="item"></contextual-menu>'
+        template: '<contextual-menu role="{{::actionRoleAccess.ROLE_ITEM_ACTION}}"></contextual-menu>'
         controller: 'mc.core.ui.states.controllers.ElementWithDataModelCtrl'
 
       resolve:

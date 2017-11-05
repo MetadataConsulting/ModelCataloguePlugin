@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptValidationRuleEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin']).config (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptValidationRuleEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin', 'mc.util.ui.actions']).config (messagesProvider)->
   factory = ($uibModal, $q, messages) ->
     "ngInject"
     (title, body, args) ->
@@ -10,8 +10,9 @@ angular.module('mc.core.ui.bs.modalPromptValidationRuleEdit', ['mc.util.messages
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
         templateUrl: '/mc/core/ui/modals/modalValidationRuleEdit.html'
-        controller: ($scope, messages, $controller, $uibModalInstance) ->
+        controller: ($scope, messages, $controller, $uibModalInstance, actionRoleAccess) ->
           'ngInject'
+          $scope.actionRoleAccess = actionRoleAccess
           $scope.title      = args.title
           $scope.pending    = {dataModel: null}
           $scope.newEntity  = -> {dataModels: $scope.copy?.dataModels ? [], dataClasses: $scope.copy?.dataClasses ? [], dataElements: $scope.copy?.dataElements ? []}

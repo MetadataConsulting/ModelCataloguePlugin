@@ -1,5 +1,5 @@
 #= require contextualMenu.tpl.coffee
-angular.module('mc.util.ui.contextualMenu').directive 'contextualMenu',  ['$compile', '$templateCache', 'actions', 'actionRole', ($compile, $templateCache, actions, actionRole)-> {
+angular.module('mc.util.ui.contextualMenu').directive 'contextualMenu',  ['$compile', '$templateCache', 'actions', 'actionRoleAccess', ($compile, $templateCache, actions, actionRoleAccess)-> {
   restrict: 'E'
   replace:  true
   scope:
@@ -44,7 +44,7 @@ angular.module('mc.util.ui.contextualMenu').directive 'contextualMenu',  ['$comp
       scopes = []
 
       $element.empty()
-      for role in ($scope.role ? actionRole.ROLE_NAVIGATION).split(',')
+      for role in ($scope.role ? actionRoleAccess.ROLE_NAVIGATION_ACTION).split(',')
         for action in actions.getActions($scope.scope ? $scope.$parent, role)
           if action.children
             for child in action.children

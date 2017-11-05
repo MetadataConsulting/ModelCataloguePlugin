@@ -9,7 +9,7 @@ angular.module('mc.core.ui.states.simple.favorites', ['mc.core.ui.states.control
         controller: 'mc.core.ui.states.controllers.FavoritesCtrl'
 
       'navbar-left@':
-        template: '<contextual-menu role="list"></contextual-menu>'
+        template: '<contextual-menu role="{{::actionRoleAccess.ROLE_LIST_ACTION}}"></contextual-menu>'
         controller: 'mc.core.ui.states.controllers.FavoritesCtrl'
 
     url: '/favourites'

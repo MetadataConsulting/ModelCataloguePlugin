@@ -10,8 +10,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
     templateUrl: '/mc/core/ui/catalogueElementView.html'
 
     controller: [
-     '$scope', '$filter', '$q', '$timeout', '$state', 'enhance', 'names', 'columns', 'messages', '$element', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'catalogueElementResource', 'detailSections', 'rest', 'modelCatalogueApiRoot',
-     ($scope ,  $filter ,  $q ,  $timeout ,  $state ,  enhance ,  names ,  columns ,  messages ,  $element ,  $rootScope ,  security ,  catalogueElementProperties ,  $injector ,  applicationTitle ,  catalogue ,  catalogueElementResource ,  detailSections, rest, modelCatalogueApiRoot) ->
+     '$scope', '$filter', '$q', '$timeout', '$state', 'enhance', 'names', 'columns', 'messages', '$element', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'catalogueElementResource', 'detailSections', 'rest', 'modelCatalogueApiRoot', 'actionRoleAccess',
+     ($scope ,  $filter ,  $q ,  $timeout ,  $state ,  enhance ,  names ,  columns ,  messages ,  $element ,  $rootScope ,  security ,  catalogueElementProperties ,  $injector ,  applicationTitle ,  catalogue ,  catalogueElementResource ,  detailSections, rest, modelCatalogueApiRoot, actionRoleAccess) ->
+      $scope.actionRoleAccess = actionRoleAccess
       showErrorsUsingMessages = (localMessages) ->
         (response) ->
           if response?.data and response.data.errors

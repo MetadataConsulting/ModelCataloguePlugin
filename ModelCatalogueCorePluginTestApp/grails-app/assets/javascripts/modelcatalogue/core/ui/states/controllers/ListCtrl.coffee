@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.states.controllers.ListCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.ListCtrl', [
-  '$scope', '$stateParams', '$state', 'list', 'names', 'catalogue', 'enhance', 'applicationTitle',
-  ($scope ,  $stateParams ,  $state ,  list ,  names ,  catalogue ,  enhance ,  applicationTitle ) ->
-
+  '$scope', '$stateParams', '$state', 'list', 'names', 'catalogue', 'enhance', 'applicationTitle', 'actionRoleAccess',
+  ($scope ,  $stateParams ,  $state ,  list ,  names ,  catalogue ,  enhance ,  applicationTitle, actionRoleAccess) ->
+    $scope.actionRoleAccess = actionRoleAccess
     if $stateParams.resource
       applicationTitle  catalogue.getPlural($stateParams.resource)
 

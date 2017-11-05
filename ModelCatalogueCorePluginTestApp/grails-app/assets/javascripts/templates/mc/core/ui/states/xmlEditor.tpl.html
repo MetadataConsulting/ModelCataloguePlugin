@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="catalogue-element-detail-actions">
-          <contextual-actions icon-only="true" role="xmleditor-xslt" size="xs" no-colors="true"></contextual-actions>
+          <contextual-actions icon-only="true" role="{{::actionRoleAccess.ROLE_XMLEDITOR_XSLT_ACTION}}" size="xs" no-colors="true"></contextual-actions>
         </div>
         <h4>
           Stylesheet Transformation <small>{{xsltAsset.classifiedName}}</small>
@@ -51,7 +51,7 @@
 
   <div class="col-md-6">
     <div class="catalogue-element-detail-actions">
-      <contextual-actions icon-only="true" role="xmleditor-xsd" size="xs" no-colors="true"></contextual-actions>
+      <contextual-actions icon-only="true" role="{{::actionRoleAccess.ROLE_XMLEDITOR_XSD_ACTION}}" size="xs" no-colors="true"></contextual-actions>
     </div>
     <h4>
       Result <small>{{xsdAsset.classifiedName}}</small>
