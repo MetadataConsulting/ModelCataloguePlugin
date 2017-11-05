@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.simple.feedback', ['mc.core.ui.states.controllers.FeedbackCtrl']).config(($stateProvider, actionsProvider) ->
+angular.module('mc.core.ui.states.simple.feedback', ['mc.core.ui.states.controllers.FeedbackCtrl']).config(($stateProvider, actionsProvider, actionRole) ->
 
     $stateProvider.state 'simple.feedback', {
 
@@ -18,7 +18,7 @@ angular.module('mc.core.ui.states.simple.feedback', ['mc.core.ui.states.controll
 
     }
 
-    actionsProvider.registerActionInRoles 'refresh-feedback',['feedback'],  ($scope, $http, modelCatalogueApiRoot, $stateParams) ->
+    actionsProvider.registerActionInRole 'refresh-feedback', actionRole.ROLE_FEEDBACK,  ($scope, $http, modelCatalogueApiRoot, $stateParams) ->
       "ngInject"
       {
         position:   -100

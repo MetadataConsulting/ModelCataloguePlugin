@@ -43,11 +43,9 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
     $scope.$watchGroup ['xml', 'xslt'], transform
 
 ])
-.config(['actionsProvider', (actionsProvider) ->
-  XML_EDITOR_XSLT_ROLE = 'xmleditor-xslt'
-  XML_EDITOR_XSD_ROLE = 'xmleditor-xsd'
+.config(['actionsProvider', 'actionRole', (actionsProvider, actionRole) ->
 
-  actionsProvider.registerActionInRole('load-xslt', XML_EDITOR_XSLT_ROLE, [
+  actionsProvider.registerActionInRole('load-xslt', actionRole.ROLE_XMLEDITOR_XSLT, [
     '$log', '$scope','messages', ($log, $scope, messages) ->
       {
         label: 'Load XSLT'
@@ -64,7 +62,7 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
       }
   ])
 
-  actionsProvider.registerActionInRole('save-xslt', XML_EDITOR_XSLT_ROLE, [
+  actionsProvider.registerActionInRole('save-xslt', actionRole.ROLE_XMLEDITOR_XSLT, [
     '$log', '$scope','messages', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($log, $scope, messages, Upload, modelCatalogueApiRoot, enhance) ->
       {
         label: 'Save Stylesheet'
@@ -96,7 +94,7 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
       }
   ])
 
-  actionsProvider.registerActionInRole('save-xsd', XML_EDITOR_XSD_ROLE, [
+  actionsProvider.registerActionInRole('save-xsd', actionRole.ROLE_XMLEDITOR_XSD, [
     '$log', '$scope','messages', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($log, $scope, messages, Upload, modelCatalogueApiRoot, enhance) ->
       {
         label: 'Save Schema'
@@ -128,7 +126,7 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
       }
   ])
 
-  actionsProvider.registerActionInRole('load-xslt', XML_EDITOR_XSD_ROLE, [ '$scope', ($scope) ->
+  actionsProvider.registerActionInRole('load-xslt', actionRole.ROLE_XMLEDITOR_XSD, [ '$scope', ($scope) ->
 
     {
       label: 'Download Result'

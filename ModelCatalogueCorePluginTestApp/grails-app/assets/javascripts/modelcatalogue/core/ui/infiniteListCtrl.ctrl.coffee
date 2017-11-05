@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names, security, enhance, catalogue) ->
+angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, actionRole, $controller, names, security, enhance, catalogue) ->
   'ngInject'
 
   angular.extend(this, $controller('columnsSupportCtrl', {$scope: $scope}))
@@ -133,7 +133,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
   onListUpdate($scope.list)
 
 
-  footerActions = actions.getActions($scope, actions.ROLE_LIST_FOOTER_ACTION)
+  footerActions = actions.getActions($scope, actionRole.ROLE_LIST_FOOTER_ACTION)
 
   $scope.footerAction = if footerActions then footerActions[0]
 
