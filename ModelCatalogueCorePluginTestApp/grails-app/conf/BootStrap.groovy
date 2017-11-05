@@ -20,6 +20,7 @@ import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Metadata
 import org.springframework.http.HttpMethod
+import org.modelcatalogue.core.util.test.TestDataHelper
 
 @Log
 class BootStrap {
