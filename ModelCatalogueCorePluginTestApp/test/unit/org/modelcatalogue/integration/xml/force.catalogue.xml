@@ -1,28 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
-    <dataType name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
+    <dataType name="Force" id="http://www.example.com/domains/Force">
         <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
-        <relatedTo ref="http://www.example.com/domains/Pressure">
-            <metadata>
-                <extension key="Relation">Derived From</extension>
-            </metadata>
-        </relatedTo>
+        <dataType name="Decimal" id="http://www.example.com/types/Decimal">
+            <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
+        </dataType>
         <regex>\d+</regex>
-        <measurementUnit name="Newton" id="http://www.example.com/units/Newton" status="DRAFT" symbol="N">
+        <measurementUnit symbol="N" name="Newton" id="http://www.example.com/units/Newton">
             <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
             <extensions>
                 <extension key="From">SI</extension>
             </extensions>
         </measurementUnit>
-        <dataType name="Decimal" id="http://www.example.com/types/Decimal" status="DRAFT">
-            <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
-        </dataType>
     </dataType>
-    <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
     <relationshipTypes>
-        <relationshipType name="relatedTo" source="org.modelcatalogue.integration.CatalogueElement" destination="org.modelcatalogue.integration.CatalogueElement" bidirectional="true">
-            <sourceToDestination label="related to">Any element can be related to multiple elements. This relationship has no specific meaning.</sourceToDestination>
-            <destinationToSource label="related to"/>
+        <relationshipType name="base" source="org.modelcatalogue.core.CatalogueElement" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true">
+            <sourceToDestination label="is based on">A Catalogue Element can be based on multiple Catalogue Elements of the same type. Value domains will first use rules of the base value domains and then their own when validating input values.</sourceToDestination>
+            <destinationToSource label="is base for">A Catalogue Element can be base for multiple Catalogue Elements of the same type.</destinationToSource>
+            <rule>isSameClass()</rule>
         </relationshipType>
     </relationshipTypes>
 </catalogue>

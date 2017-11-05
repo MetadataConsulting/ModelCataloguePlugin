@@ -5,6 +5,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
@@ -28,7 +29,7 @@ import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportHeade
  * Created by james on 17/08/2017.
  */
 @Log4j
-class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
+class GMCGridReportExcelLoaderSpec extends AbstractIntegrationSpec {
     @Shared DataModelService dataModelService
     @Shared ElementService elementService
     DataClassService dataClassService

@@ -74,6 +74,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
             initRelationshipTypes()
             catalogueBuilder.build {
                 skip draft
+                copy relationships
                 dataModel name: TEST_DATA_MODEL_1_NAME, {
                     dataClass name: DUMMY_DATA_CLASS_NAME
                     dataClass name: TEST_PARENT_DATA_CLASS_NAME, {
