@@ -1,8 +1,7 @@
 angular.module('modelcatalogue.core.sections.detailSections.forms.actions').config(function (actionsProvider) {
   "ngInject"
 
-  actionsProvider.registerChildActionInRoles('export', 'export-crf', [actionsProvider.ROLE_LIST_ACTION,
-      actionsProvider.ROLE_ITEM_ACTION, actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_LIST_HEADER_ACTION],
+  actionsProvider.registerChildAction('export', 'export-crf',
     function (security, $uibModal, $window, $scope, modelCatalogueApiRoot) {
       "ngInject"
       if (!security.hasRole('CURATOR')) {

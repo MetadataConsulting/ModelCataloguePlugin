@@ -22,7 +22,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ##############################
 
   # Deprecate / Restore
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'archive', actionsProvider.ROLE_ITEM_ACTION,
+  actionsProvider.registerChildAction 'catalogue-element', 'archive',
     ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
       'ngInject'
       return undefined if not $scope.element
@@ -70,7 +70,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       action
 
     # Delete
-    actionsProvider.registerChildActionInRole 'catalogue-element', 'delete', actionsProvider.ROLE_ITEM_ACTION,
+    actionsProvider.registerChildAction 'catalogue-element', 'delete',
       ($rootScope, $scope, $state, messages, names, security) ->
         'ngInject'
         return undefined if not $scope.element
@@ -106,7 +106,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         }
 
       # Merge
-      actionsProvider.registerChildActionInRole 'catalogue-element', 'merge', actionsProvider.ROLE_ITEM_ACTION,
+      actionsProvider.registerChildAction 'catalogue-element', 'merge',
         ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
           'ngInject'
           return undefined if not $scope.element
@@ -156,7 +156,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       action:     ->
         messages.prompt(null, null, type: 'new-version', element: $scope.element)
     }
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, newVersionAction
+  actionsProvider.registerChildAction 'catalogue-element', 'create-new-version', newVersionAction
   actionsProvider.registerActionInRoles 'create-new-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INFINITE_LIST], newVersionAction
 
 
@@ -339,7 +339,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerChildActionInRoles 'catalogue-element', 'create-new-relationship',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerChildAction 'catalogue-element', 'create-new-relationship', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('catalogueElement')
@@ -360,7 +360,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
   ###
   # remove compare action until properly implemented
-  actionsProvider.registerChildActionInRoles 'catalogue-element', 'compare-catalogue-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', '$state', ($scope, messages, $state) ->
+  actionsProvider.registerChildAction 'catalogue-element', 'compare-catalogue-element', ['$scope', 'messages', '$state', ($scope, messages, $state) ->
     elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('catalogueElement')
     diffView = $state.current.name == 'mc.resource.diff'
 
@@ -383,7 +383,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ###
 
 
-  actionsProvider.registerChildActionInRoles 'catalogue-element', 'create-new-mapping',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerChildAction 'catalogue-element', 'create-new-mapping', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.hasOwnProperty('mappings')
     return undefined if not security.hasRole('CURATOR')
@@ -399,7 +399,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
 
-  actionsProvider.registerChildActionInRoles 'catalogue-element', 'validate-value',[actionsProvider.ROLE_ITEM_ACTION], [ '$scope', 'messages', 'security', ($scope, messages) ->
+  actionsProvider.registerChildAction 'catalogue-element', 'validate-value', [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('dataType')
@@ -419,7 +419,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
 
-  actionsProvider.registerChildActionInRoles 'catalogue-element', 'convert',[actionsProvider.ROLE_ITEM_ACTION], [ '$scope', 'messages', 'security', ($scope, messages) ->
+  actionsProvider.registerChildAction 'catalogue-element', 'convert', [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('dataType') and not $scope.element.isInstanceOf('mapping')
@@ -438,7 +438,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerChildActionInRoles 'catalogue-element', 'validate-xsd-schema',[actionsProvider.ROLE_ITEM_ACTION], [ '$scope', 'messages', 'catalogue', ($scope, messages, catalogue) ->
+  actionsProvider.registerChildAction 'catalogue-element', 'validate-xsd-schema', [ '$scope', 'messages', 'catalogue', ($scope, messages, catalogue) ->
     return undefined if not catalogue.isInstanceOf($scope.element?.elementType, 'asset')
 
     {
@@ -513,7 +513,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerChildActionInRoles 'catalogue-element',  'restore-relationship',[actionsProvider.ROLE_ITEM_ACTION], ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', 'rest', 'enhance', 'modelCatalogueApiRoot', ($rootScope, $scope, $state, messages, names, security, $q, rest, enhance, modelCatalogueApiRoot) ->
+  actionsProvider.registerChildAction 'catalogue-element',  'restore-relationship', ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', 'rest', 'enhance', 'modelCatalogueApiRoot', ($rootScope, $scope, $state, messages, names, security, $q, rest, enhance, modelCatalogueApiRoot) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('relationship')
@@ -669,7 +669,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'clone', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
+  actionsProvider.registerChildAction 'catalogue-element', 'clone', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
@@ -688,7 +688,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'clone-from', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
+  actionsProvider.registerChildAction 'catalogue-element', 'clone-from', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
@@ -708,7 +708,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'reindex-data-model', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
+  actionsProvider.registerChildAction 'catalogue-element', 'reindex-data-model', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not security.hasRole('ADMIN')
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
@@ -727,7 +727,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'finalize', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
+  actionsProvider.registerChildAction 'catalogue-element', 'finalize', ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
     return undefined unless security.hasRole('CURATOR')
     return undefined unless $scope.element
     return undefined unless $scope.element.status
@@ -767,5 +767,5 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'upload-new-asset-version', actionsProvider.ROLE_ITEM_ACTION, newAssetVersion
+  actionsProvider.registerChildAction 'catalogue-element', 'upload-new-asset-version', newAssetVersion
   actionsProvider.registerActionInRoles 'upload-new-asset-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INFINITE_LIST], newAssetVersion

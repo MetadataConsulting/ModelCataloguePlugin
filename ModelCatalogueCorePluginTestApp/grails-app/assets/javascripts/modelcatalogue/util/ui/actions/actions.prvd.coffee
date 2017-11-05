@@ -1,8 +1,12 @@
 angular.module('mc.util.ui.actions', []).provider 'actions', ->
 
-  actionsRolesById          = {}
+  # actionsChildrenByParentId[parentId][childId] = actionFactory
+  # parent-child relation only goes one level deep.
+  # according to this structure, a parent action is actually exactly like a role, just one level below.
   actionsChildrenByParentId = {}
-  availableActionsById      = {}
+  # roleIdActionMap[role][actionId] = actionFactory
+  # actions stored here are definitely not children
+  roleIdActionMap      = {}
   actionsProvider           =
     ROLE_NAVIGATION:              'navigation'
     ROLE_NAVIGATION_RIGHT:        'navigation-right'
@@ -23,23 +27,22 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
     throw {message: "id must be string", id: id} if not angular.isString(id)
     throw {message: "parent id must be string", parentId: parentId} if parentId and not angular.isString(parentId)
 
-    actionsRolesById[id] ?= roles
+    rolesChildErrorMessage = "Action registered with roles if, AND ONLY IF, it is NOT a child action"
 
     if parentId
-      roles = roles ? actionsRolesById[parentId]
-      if not roles
+      if roles
+        throw {message: rolesChildErrorMessage}
+      else # no roles
         actionsChildrenByParentId[parentId] ?= {}
         actionsChildrenByParentId[parentId][id] = actionFactory
-      else
+    else # no parent
+      if roles
         angular.forEach roles, (role)->
-          actionsChildrenByParentId[getRoleAwareId(role, parentId)] ?= {}
-          actionsChildrenByParentId[getRoleAwareId(role, parentId)][id] = actionFactory
-    else
-      if not roles
-        availableActionsById[id] = actionFactory
-      else
-        angular.forEach roles, (role)->
-          availableActionsById[getRoleAwareId(role, id)] = actionFactory
+          roleIdActionMap[role] ?= {}
+          roleIdActionMap[role][id] = actionFactory
+      else # no roles
+        throw {message: rolesChildErrorMessage}
+
 
   actionsProvider.registerActionInRole  = (id, role, actionFactory) ->
     registerActionInternal(undefined, id, actionFactory, [role])
@@ -47,21 +50,13 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
   actionsProvider.registerActionInRoles = (id, roles, actionFactory) ->
     registerActionInternal(undefined, id, actionFactory, roles)
 
-  actionsProvider.registerAction = (id, actionFactory, roles = undefined) ->
-    registerActionInternal(undefined, id, actionFactory, roles)
-
-  actionsProvider.registerChildActionInRole = (parentId, id, role, actionFactory) ->
-    registerActionInternal(parentId, id, actionFactory, [role])
-
-  actionsProvider.registerChildActionInRoles = (parentId, id, roles, actionFactory) ->
-    registerActionInternal(parentId, id, actionFactory, roles)
-
-  actionsProvider.registerChildAction = (parentId, id, actionFactory, roles = undefined) ->
-    registerActionInternal(parentId, id, actionFactory, roles)
+  actionsProvider.registerChildAction = (parentId, id, actionFactory) ->
+    registerActionInternal(parentId, id, actionFactory, undefined)
 
   actionsProvider.$get = [ '$injector', '$filter', '$rootScope', '$q', '$log', '$timeout', ($injector, $filter, $rootScope, $q, $log, $timeout) ->
 
     createAction = (parentId, id, actionFactory, actionsService, $scope) ->
+      # use DI to invoke the factory
       try
         action = $injector.invoke(actionFactory, undefined, {$scope: $scope, actions: actionsService})
       catch e
@@ -147,13 +142,12 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
       ROLE_LIST_FOOTER_ACTION:      actionsProvider.ROLE_LIST_FOOTER_ACTION
       ROLE_GLOBAL_ACTION:           actionsProvider.ROLE_GLOBAL_ACTION
 
-    actions.getActions = ($scope, role = undefined) ->
+    actions.getActions = ($scope, role) ->
+      throw {message: "role undefined in #{$scope}"} if not role
       currentActions = []
-      for id, actionConfig of availableActionsById
-        match = id.match(/^role_(.*)_(.*)$/)
-        if not role and not match or role and match and match[1] == role
-          action = createAction(undefined, id, actionConfig, actions, $scope)
-          currentActions.push action if action
+      for id, actionConfig of roleIdActionMap[role]
+        action = createAction(undefined, id, actionConfig, actions, $scope)
+        currentActions.push action if action
 
       $filter('orderBy')(currentActions, if role is actionsProvider.ROLE_GLOBAL_ACTION then 'label' else 'position')
 
@@ -161,11 +155,9 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
     ###
       Retrieves top-level action by it's id for the current scope. Mainly for the testing purposes.
     ###
-    actions.getActionById = (id, $scope, role = undefined) ->
-      if role
-        createAction(undefined, id, availableActionsById[getRoleAwareId(role, id)], actions, $scope)
-      else
-        createAction(undefined, id, availableActionsById[id], actions, $scope)
+    actions.getActionById = (id, $scope, role) ->
+      throw {message: "Role needed for getActionById"} if not role
+      createAction(undefined, id, roleIdActionMap[role][id], actions, $scope)
 
     actions
   ]

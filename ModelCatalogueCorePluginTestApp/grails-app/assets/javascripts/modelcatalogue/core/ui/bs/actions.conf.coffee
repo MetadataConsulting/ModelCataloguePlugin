@@ -364,7 +364,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
             return true
         }
 
-  actionsProvider.registerChildActionInRoles('export', 'catalogue-element-export-specific-reports', [actionsProvider.ROLE_ITEM_ACTION],
+  actionsProvider.registerChildAction('export', 'catalogue-element-export-specific-reports',
     ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout',
       ($scope, $window, enhance, rest, $log, messages, $timeout) ->
         return undefined if not $scope.element
