@@ -48,7 +48,7 @@ class BootStrap {
             null
         }
 
-        if (Environment.current in [ Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
+        if (Environment.current in [Environment.TEST, Environment.DEVELOPMENT] && !System.getenv('MC_BLANK_DEV')) {
             TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
                 initCatalogueService.initCatalogue(false)
                 initPoliciesAndTags()
