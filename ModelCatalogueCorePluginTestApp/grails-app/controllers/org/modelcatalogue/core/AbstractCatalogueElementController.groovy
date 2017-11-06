@@ -360,7 +360,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             notFound()
             return
         }
-        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('CURATOR').join(','))
 
         DataModel dataModel
         if ( instance instanceof DataModel ) {
@@ -369,6 +368,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             dataModel = instance.dataModel
         }
 
+        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('CURATOR'))
         if ( dataModel && ( isCuratorOrAdminOrSupervisor || dataModelAclService.hasAdministratorPermission(dataModel)) ) {
             unauthorized()
             return
@@ -445,7 +445,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     }
 
     protected boolean hasAuthorityOrHasAdministrationPermission(String authority, Object instance) {
-        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority(authority).join(','))
 
         DataModel dataModel
         if ( instance instanceof DataModel ) {
@@ -454,6 +453,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             dataModel = instance.dataModel
         }
 
+        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles(authority))
         dataModel && ( isCuratorOrAdminOrSupervisor || dataModelAclService.hasAdministratorPermission(dataModel))
     }
 
@@ -531,7 +531,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             notFound()
             return
         }
-        if ( !dataModelAclService.hasAdministratorPermission(destinationDataModel) ) {
+        if ( !dataModelAclService.isAdminOrHasAdministratorPermission(destinationDataModel) ) {
             unauthorized()
             return
         }

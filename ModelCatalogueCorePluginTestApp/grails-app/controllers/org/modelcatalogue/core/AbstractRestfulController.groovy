@@ -233,9 +233,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        hasAut
-        
-        boolean isAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted('ROLE_SUPERVISOR,ROLE_ADMIN')
 
         DataModel dataModel
         if ( instance instanceof DataModel ) {
@@ -244,7 +241,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             dataModel = instance.dataModel
         }
 
-        if ( dataModel && ( isAdminOrSupervisor || dataModelAclService.hasAdministratorPermission(dataModel)) ) {
+        if ( dataModel && ( dataModelAclService.isAdminOrHasAdministratorPermission(dataModel)) ) {
             // only drafts can be deleted
             def error = "Only elements with status of DRAFT can be deleted."
             if (instance instanceof DataModel) {
