@@ -28,6 +28,9 @@ class DataModelAclService {
 
     boolean hasReadPermission(Object instance) {
         DataModel dataModel = dataModelFromInstance(instance)
+        if ( dataModel == null ) {
+            return true
+        }
         hasReadPermission(dataModel)
     }
 
@@ -44,6 +47,9 @@ class DataModelAclService {
 
     boolean hasAdministratorPermission(Object instance) {
         DataModel dataModel = dataModelFromInstance(instance)
+        if ( dataModel == null ) {
+            return true
+        }
         hasAdministratorPermission(dataModel)
     }
 
