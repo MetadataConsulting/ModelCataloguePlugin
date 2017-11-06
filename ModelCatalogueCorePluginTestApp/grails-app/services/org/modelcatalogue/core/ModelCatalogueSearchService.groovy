@@ -104,7 +104,6 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         ParamArgs paramArgs = searchParams.paramArgs
 
         Map params = paramArgs.toMap()
-
         List<DataModel> subscribedModels = subscribedModels()
 
         // if the user doesn't have at least VIEWER role, don't return other elements than finalized

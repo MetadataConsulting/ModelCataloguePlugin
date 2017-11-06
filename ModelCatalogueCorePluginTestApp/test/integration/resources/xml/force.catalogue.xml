@@ -1,15 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
+<?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
     <dataType name="Force" id="http://www.example.com/domains/Force">
         <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
         <dataType name="Decimal" id="http://www.example.com/types/Decimal">
             <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
         </dataType>
-        <relatedTo ref="http://www.example.com/domains/Pressure">
-            <metadata>
-                <extension key="Relation">Derived From</extension>
-            </metadata>
-        </relatedTo>
         <regex>\d+</regex>
         <measurementUnit name="Newton" id="http://www.example.com/units/Newton" symbol="N">
             <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
@@ -24,10 +18,6 @@
             <sourceToDestination label="is based on">A Catalogue Element can be based on multiple Catalogue Elements of the same type. Value domains will first use rules of the base value domains and then their own when validating input values.</sourceToDestination>
             <destinationToSource label="is base for">A Catalogue Element can be base for multiple Catalogue Elements of the same type.</destinationToSource>
             <rule>isSameClass()</rule>
-        </relationshipType>
-        <relationshipType name="relatedTo" source="org.modelcatalogue.core.CatalogueElement" destination="org.modelcatalogue.core.CatalogueElement" bidirectional="true">
-            <sourceToDestination label="related to">A Catalogue Element can be related to multiple Catalogue Elements. This relationship has no specific meaning, but may carry metadata to further specify it.</sourceToDestination>
-            <destinationToSource label="related to"/>
         </relationshipType>
     </relationshipTypes>
 </catalogue>

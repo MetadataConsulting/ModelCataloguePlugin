@@ -1,6 +1,5 @@
 import grails.plugin.springsecurity.acl.AclService
 import grails.util.Environment
-import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -17,7 +16,6 @@ import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Metadata
-import org.springframework.http.HttpMethod
 import org.springframework.security.acls.model.Acl
 import org.springframework.security.acls.model.NotFoundException
 import org.springframework.security.acls.model.ObjectIdentity
@@ -26,8 +24,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
+import org.modelcatalogue.core.util.test.TestDataHelper
+import groovy.util.logging.Log
 
-@Slf4j
+@Log
 class BootStrap {
 
     def initCatalogueService
@@ -70,18 +70,18 @@ class BootStrap {
             null
         }
 
-//        if (Environment.current in [ Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
-//            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
-//                initCatalogueService.initCatalogue(false)
-//                initPoliciesAndTags()
-//                initSecurity(false)
-//                setupDevTestStuff()
-//            }
-//        } else {
+        if (Environment.current in [ Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
+            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+                initCatalogueService.initCatalogue(false)
+                initPoliciesAndTags()
+                initSecurity(false)
+                setupDevTestStuff()
+            }
+        } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initPoliciesAndTags()
             initSecurity(!System.getenv('MC_BLANK_DEV'))
-//        }
+        }
 
         println 'completed:initCatalogueService'
         log.info "completed:initCatalogueService"
@@ -412,8 +412,6 @@ class BootStrap {
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
 
         Role.findByAuthority('ROLE_REGISTERED') ?: new Role(authority: 'ROLE_REGISTERED').save(failOnError: true)
-
-
 
         if (!production || System.getenv("METADATA_DEMO")) {
             def supervisor = User.findByNameOrUsername('supervisor', 'supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'supervisor', email: System.getenv(UserService.ENV_SUPERVISOR_EMAIL), apiKey: 'supervisorabcdef123456').save(failOnError: true)

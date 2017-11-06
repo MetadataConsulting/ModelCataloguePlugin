@@ -136,8 +136,8 @@ class DataModelServiceSpec extends AbstractIntegrationSpec {
         thrown(IllegalStateException)
     }
 
-    def "is able to return models classified by or are imported"() {
-        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create([model2], []).withImports())
+    def "is able to return classes classified by or are imported"() {
+        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create([model2], []).withImports([model3]))
 
         expect:
         criteria.count() == 2

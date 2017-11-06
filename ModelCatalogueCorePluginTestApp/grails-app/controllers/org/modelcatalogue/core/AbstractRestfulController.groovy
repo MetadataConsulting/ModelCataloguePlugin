@@ -13,7 +13,6 @@ import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.MetadataRolesUtils
-import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -477,8 +476,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected void methodNotAllowed() { render status: METHOD_NOT_ALLOWED }
 
     protected void notAcceptable() { render status: NOT_ACCEPTABLE }
-
-//TODO: REMOVE PUT INTO SERVICE AND CLASSES
 
     Long findDataModelId() {
         if ( resource == DataModel && params?.id ){
