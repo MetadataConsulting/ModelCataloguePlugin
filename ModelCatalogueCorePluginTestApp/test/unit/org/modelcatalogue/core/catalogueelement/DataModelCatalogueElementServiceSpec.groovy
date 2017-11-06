@@ -8,6 +8,7 @@ import org.modelcatalogue.core.events.CatalogueElementStatusNotDeprecatedEvent
 import org.modelcatalogue.core.events.CatalogueElementStatusNotFinalizedEvent
 import org.modelcatalogue.core.events.MetadataResponseEvent
 import org.modelcatalogue.core.events.NotFoundEvent
+import org.modelcatalogue.core.events.UnauthorizedEvent
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.DataModelAclService
 import spock.lang.Specification
@@ -27,6 +28,34 @@ class DataModelCatalogueElementServiceSpec extends Specification {
 
         then:
         responseEvent instanceof NotFoundEvent
+    }
+
+    def "finalize returns NotFound if data model does not exist"() {
+        given:
+        service.dataModelGormService = Stub(DataModelGormService) {
+            findById(_) >> null
+        }
+
+        when:
+        MetadataResponseEvent responseEvent = service.finalize(1, '0.0.1', 'bla bla bla')
+
+        then:
+        responseEvent instanceof NotFoundEvent
+    }
+
+    def "finalize returns unauthorized if the users does not have admin permission for the model"() {
+        given:
+        service.dataModelGormService = Stub(DataModelGormService) {
+            findById(_) >> new DataModel()
+        }
+        service.dataModelAclService = Stub(DataModelAclService) {
+            isAdminOrHasAdministratorPermission(_) >> false
+        }
+        when:
+        MetadataResponseEvent responseEvent = service.finalize(1, '0.0.1', 'bla bla bla')
+
+        then:
+        responseEvent instanceof UnauthorizedEvent
     }
 
     def "archive returns CatalogueElementStatusNotInFinalizedEvent if data model is not finalized"() {

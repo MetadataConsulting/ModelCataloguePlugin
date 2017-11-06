@@ -3,5 +3,5 @@ package org.modelcatalogue.core.events
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class DataModelNotFoundEvent implements MetadataResponseFailureEvent {
+class DataModelNotFoundEvent implements NotFoundEvent {
 }

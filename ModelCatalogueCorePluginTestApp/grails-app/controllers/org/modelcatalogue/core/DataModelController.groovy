@@ -8,6 +8,10 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.catalogueelement.DataModelCatalogueElementService
 import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.dataimport.excel.ExcelExporter
+import org.modelcatalogue.core.events.DataModelFinalizedEvent
+import org.modelcatalogue.core.events.DataModelWithErrorsEvent
+import org.modelcatalogue.core.events.MetadataResponseEvent
+import org.modelcatalogue.core.events.SourceDestinationEvent
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.persistence.DataModelGormService
@@ -153,60 +157,30 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      */
     @Transactional
     def finalizeElement() {
-
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
-            unauthorized()
-            return
-        }
-
         if (handleReadOnly()) {
             return
         }
 
-        T instance = findById(params.long('id'))
-        if (instance == null) {
+        Long dataModelId = params.long('id')
+        String semanticVersion = params.semanticVersion
+        String revisionNotes = params.revisionNotes
+
+        MetadataResponseEvent responseEvent = dataModelCatalogueElementService.finalize(dataModelId, semanticVersion, revisionNotes)
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
+            return
+        }
+        if ( responseEvent instanceof DataModelWithErrorsEvent) {
+            respond instance.errors, view: 'edit' // STATUS CODE 422
+            return
+        }
+        if ( !(responseEvent instanceof DataModelFinalizedEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
             notFound()
             return
         }
 
-        if (!instance.instanceOf(DataModel) && !instance.dataModel) {
-            instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model"
-            respond instance.errors
-            return
-        }
-
-
-        String semanticVersion = params.semanticVersion
-        String revisionNotes = params.revisionNotes
-
-        if (instance.instanceOf(DataModel)) {
-            instance.checkFinalizeEligibility(semanticVersion, revisionNotes)
-        }
-
-        if (instance.hasErrors()) {
-            respond instance.errors, view: 'edit' // STATUS CODE 422
-            return
-        }
-
-        Long id = instance.getId()
-
-        executorService.submit {
-            try {
-                CatalogueElement element = resource.get(id)
-                if (element.instanceOf(DataModel)) {
-                    elementService.finalizeDataModel(element as DataModel, semanticVersion, revisionNotes, BuildProgressMonitor.create("Finalizing $element", id))
-                } else {
-                    elementService.finalizeElement(element, BuildProgressMonitor.create("Finalizing $element", id))
-                }
-            } catch (e) {
-                log.error "Exception finalizing element on the background", e
-                CatalogueElement element = resource.get(id)
-                element.status = ElementStatus.DRAFT
-                element.save(flush: true)
-            }
-
-        }
-
+        DataModel instance = (responseEvent as DataModelFinalizedEvent).dataModel
         respond instance, [status: OK]
     }
 

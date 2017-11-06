@@ -1,12 +1,23 @@
 package org.modelcatalogue.core.catalogueelement
 
 import grails.util.GrailsNameUtils
-import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.events.DataModelFinalizedEvent
+import org.modelcatalogue.core.events.DataModelNotFoundEvent
+import org.modelcatalogue.core.events.DataModelWithErrorsEvent
+import org.modelcatalogue.core.events.MetadataResponseEvent
+import org.modelcatalogue.core.events.UnauthorizedEvent
+import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 
-@CompileStatic
+import java.util.concurrent.ExecutorService
+
+@Slf4j
 class DataModelCatalogueElementService extends AbstractCatalogueElementService {
+
+    ExecutorService executorService
 
     @Override
     CatalogueElement findById(Long id) {
@@ -16,5 +27,39 @@ class DataModelCatalogueElementService extends AbstractCatalogueElementService {
     @Override
     protected String resourceName() {
         GrailsNameUtils.getPropertyName(DataModel.class.name)
+    }
+
+    MetadataResponseEvent finalize(Long dataModelId, String semanticVersion, String revisionNotes) {
+
+        DataModel instance = dataModelGormService.findById(dataModelId)
+        if (instance == null) {
+            return new DataModelNotFoundEvent()
+        }
+
+        if ( !dataModelAclService.isAdminOrHasAdministratorPermission(instance) ) {
+            return new UnauthorizedEvent()
+        }
+
+        instance.checkFinalizeEligibility(semanticVersion, revisionNotes)
+
+        if (instance.hasErrors()) {
+            return new DataModelWithErrorsEvent(dataModel: instance)
+        }
+
+        Long id = instance.getId()
+
+        executorService.submit {
+            try {
+                DataModel element = dataModelGormService.findById(id)
+                elementService.finalizeDataModel(element, semanticVersion, revisionNotes, BuildProgressMonitor.create("Finalizing $element", id))
+
+            } catch (e) {
+                log.error "Exception finalizing element on the background", e
+                CatalogueElement element = dataModelGormService.findById(id)
+                catalogueElementGormService.updateCatalogueElementStatus(element, ElementStatus.DRAFT)
+            }
+        }
+        new DataModelFinalizedEvent(dataModel: instance)
+
     }
 }

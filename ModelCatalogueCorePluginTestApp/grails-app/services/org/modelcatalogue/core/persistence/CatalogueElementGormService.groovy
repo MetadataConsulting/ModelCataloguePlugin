@@ -9,6 +9,7 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 import org.springframework.transaction.annotation.Transactional
 
@@ -70,5 +71,11 @@ class CatalogueElementGormService {
             return dataModelGormService.findById(id)
         }
         return null
+    }
+
+    @Transactional
+    void updateCatalogueElementStatus(CatalogueElement catalogueElement, ElementStatus status) {
+            catalogueElement.status = status
+            catalogueElement.save(flush: true)
     }
 }
