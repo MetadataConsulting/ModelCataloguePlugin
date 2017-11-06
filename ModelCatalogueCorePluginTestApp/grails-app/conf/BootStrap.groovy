@@ -1,5 +1,6 @@
 import grails.plugin.springsecurity.acl.AclService
 import grails.util.Environment
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -25,9 +26,9 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
 import org.modelcatalogue.core.util.test.TestDataHelper
-import groovy.util.logging.Log
+import grails.plugins.rest.client.RestBuilder
 
-@Log
+@Slf4j
 class BootStrap {
 
     def initCatalogueService
