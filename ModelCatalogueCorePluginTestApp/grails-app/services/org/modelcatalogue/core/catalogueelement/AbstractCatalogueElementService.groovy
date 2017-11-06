@@ -73,7 +73,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
         }
 
         RelationshipType relationshipType = RelationshipType.readByName(type)
-        if (!element) {
+        if ( relationshipType == null ) {
             return new RelationshipTypeNotFoundEvent()
         }
 
@@ -195,7 +195,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
         }
         RelationshipType relationshipType = RelationshipType.readByName(type)
         if ( relationshipType == null ) {
-            return new RelationshipNotFoundEvent()
+            return new RelationshipTypeNotFoundEvent()
         }
 
         Object newDataModel = objectToBind['__dataModel'] ?: objectToBind['__classification']
