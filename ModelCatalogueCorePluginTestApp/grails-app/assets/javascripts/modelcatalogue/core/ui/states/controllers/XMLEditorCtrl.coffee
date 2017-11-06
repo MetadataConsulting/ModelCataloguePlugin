@@ -46,7 +46,7 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
 ])
 .config(['actionsProvider', 'actionRoleRegister', (actionsProvider, actionRoleRegister) ->
 
-  actionsProvider.registerActionInRole('load-xslt', actionRoleRegister.ROLE_XMLEDITOR_XSLT_ACTION, [
+  actionsProvider.registerActionInRole 'load-xslt', actionRoleRegister.ROLE_XMLEDITOR_XSLT_ACTION, [
     '$log', '$scope','messages', ($log, $scope, messages) ->
       {
         label: 'Load XSLT'
@@ -61,9 +61,9 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
           .then (resp) ->
             $scope.xslt = resp
       }
-  ])
+  ]
 
-  actionsProvider.registerActionInRole('save-xslt', actionRoleRegister.ROLE_XMLEDITOR_XSLT_ACTION, [
+  actionsProvider.registerActionInRole 'save-xslt', actionRoleRegister.ROLE_XMLEDITOR_XSLT_ACTION, [
     '$log', '$scope','messages', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($log, $scope, messages, Upload, modelCatalogueApiRoot, enhance) ->
       {
         label: 'Save Stylesheet'
@@ -93,9 +93,9 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
               messages.error "Could not save asset. #{reason}"
             )
       }
-  ])
+  ]
 
-  actionsProvider.registerActionInRole('save-xsd', actionRoleRegister.ROLE_XMLEDITOR_XSD_ACTION, [
+  actionsProvider.registerActionInRole 'save-xsd', actionRoleRegister.ROLE_XMLEDITOR_XSD_ACTION, [
     '$log', '$scope','messages', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($log, $scope, messages, Upload, modelCatalogueApiRoot, enhance) ->
       {
         label: 'Save Schema'
@@ -125,9 +125,9 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
               messages.error "Could not save asset. #{reason}"
             )
       }
-  ])
+  ]
 
-  actionsProvider.registerActionInRole('load-xslt', actionRoleRegister.ROLE_XMLEDITOR_XSD_ACTION, [ '$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'load-xslt', actionRoleRegister.ROLE_XMLEDITOR_XSD_ACTION, [ '$scope', ($scope) ->
 
     {
       label: 'Download Result'
@@ -135,6 +135,6 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
       action: ->
         $scope.download('Result.xsd', $scope.xsd)
     }
-  ])
+  ]
 
 ])

@@ -123,7 +123,7 @@ changes.config ['enhanceProvider', (enhanceProvider)->
 ###
 changes.config ['actionsProvider', 'actionRoleRegister', (actionsProvider, actionRoleRegister)->
 
-  actionsProvider.registerActionInRoles 'undo-change',[actionRoleRegister.ROLE_ITEM_ACTION], ['$scope', 'messages', 'security', '$http', 'modelCatalogueApiRoot', '$state', ($scope, messages, security, $http, modelCatalogueApiRoot, $state) ->
+  actionsProvider.registerActionInRole 'undo-change', actionRoleRegister.ROLE_ITEM_ACTION, ['$scope', 'messages', 'security', '$http', 'modelCatalogueApiRoot', '$state', ($scope, messages, security, $http, modelCatalogueApiRoot, $state) ->
     return undefined unless $scope.element
     return undefined unless $scope.element.changed
     return undefined unless $scope.element.changed.status == 'DRAFT' or ($scope.element.changed.isInstanceOf('asset') and $scope.element.changed.status == 'FINALIZED')

@@ -190,7 +190,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       }
   ]
 
-  actionsProvider.registerActionInRoles 'user-last-seen', [actionRoleRegister.ROLE_GLOBAL_ACTION], userLastSeen
+  actionsProvider.registerActionInRole 'user-last-seen', actionRoleRegister.ROLE_GLOBAL_ACTION, userLastSeen
   actionsProvider.registerChildAction 'admin-menu', 'user-last-seen-child', userLastSeen
 
   reindexCatalogue = [
@@ -210,7 +210,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       }
   ]
 
-  actionsProvider.registerActionInRoles 'reindex-catalogue', [actionRoleRegister.ROLE_GLOBAL_ACTION], reindexCatalogue
+  actionsProvider.registerActionInRole 'reindex-catalogue', actionRoleRegister.ROLE_GLOBAL_ACTION, reindexCatalogue
   actionsProvider.registerChildAction 'admin-menu', 'reindex-catalogue-child', reindexCatalogue
 
   actionsProvider.registerChildAction 'admin-menu', 'monitoring', ($window, security) ->

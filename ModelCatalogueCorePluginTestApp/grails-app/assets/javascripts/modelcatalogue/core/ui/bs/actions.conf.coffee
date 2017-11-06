@@ -123,7 +123,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
-  actionsProvider.registerActionInRoles 'archive-batch', [actionRoleRegister.ROLE_ITEM_ACTION], ['$rootScope', '$scope',
+  actionsProvider.registerActionInRole 'archive-batch', actionRoleRegister.ROLE_ITEM_ACTION, ['$rootScope', '$scope',
     'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot',
     ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
       return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('batch') or $scope.batch
@@ -202,7 +202,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
-  actionsProvider.registerActionInRoles 'transform-csv', [actionRoleRegister.ROLE_ITEM_ACTION], ['$scope', 'messages',
+  actionsProvider.registerActionInRole 'transform-csv', actionRoleRegister.ROLE_ITEM_ACTION, ['$scope', 'messages',
     'security', ($scope, messages, security) ->
       return undefined if not $scope.element
       return undefined if not angular.isFunction $scope.element.isInstanceOf
@@ -220,7 +220,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
-  actionsProvider.registerActionInRoles 'refresh-asset', [actionRoleRegister.ROLE_ITEM_DETAIL_ACTION], ['$scope',
+  actionsProvider.registerActionInRole 'refresh-asset', actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ['$scope',
     '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->
       return undefined if $scope.element?.elementType != 'org.modelcatalogue.core.Asset'
       return undefined if $scope.element.status != 'PENDING'
@@ -596,7 +596,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
 
-  actionsProvider.registerActionInRoles 'run-all-actions-in-batch', [actionRoleRegister.ROLE_ITEM_ACTION], ['$scope',
+  actionsProvider.registerActionInRole 'run-all-actions-in-batch', actionRoleRegister.ROLE_ITEM_ACTION, ['$scope',
     'messages', 'modelCatalogueApiRoot', 'enhance', 'rest', '$timeout', 'security',
     ($scope, messages, modelCatalogueApiRoot, enhance, rest, $timeout, security) ->
       return undefined if not security.hasRole('CURATOR')
