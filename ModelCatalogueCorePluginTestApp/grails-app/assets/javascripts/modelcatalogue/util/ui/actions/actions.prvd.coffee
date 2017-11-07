@@ -3,7 +3,7 @@ angular.module('mc.util.ui.actions').provider 'actions', ->
   # actionsChildrenByParentId[parentId][childId] = actionFactory
   # parent-child relation only goes one level deep.
   # according to this structure, a parent action is actually exactly like a role, just one level below.
-  actionsChildrenByParentId = {}
+  parentChildActionMap = {}
   # roleIdActionMap[role][actionId] = actionFactory
   # actions stored here are definitely not children
   roleIdActionMap      = {}
@@ -22,8 +22,8 @@ angular.module('mc.util.ui.actions').provider 'actions', ->
       if roles
         throw {message: rolesChildErrorMessage}
       else # no roles
-        actionsChildrenByParentId[parentId] ?= {}
-        actionsChildrenByParentId[parentId][id] = actionFactory
+        parentChildActionMap[parentId] ?= {}
+        parentChildActionMap[parentId][id] = actionFactory
     else # no parent
       if roles
         angular.forEach roles, (role)->
@@ -43,9 +43,14 @@ angular.module('mc.util.ui.actions').provider 'actions', ->
     registerActionInternal(parentId, id, actionFactory, undefined)
 
   actionsProvider.$get = [ '$injector', '$filter', '$rootScope', '$q', '$log', '$timeout', ($injector, $filter, $rootScope, $q, $log, $timeout) ->
+    printTwoLevelMap = (map, levelOneLabel, levelTwoLabel) ->
+      for id1 of map
+        console.log("#{levelOneLabel}: #{id1}")
+        for id2 of map[id1]
+          console.log("  #{levelTwoLabel}: #{id2}")
 
     createAction = (parentId, id, actionFactory, actionsService, $scope) ->
-      # use DI to invoke the factory
+# use DI to invoke the factory
       try
         action = $injector.invoke(actionFactory, undefined, {$scope: $scope, actions: actionsService})
       catch e
@@ -66,7 +71,7 @@ angular.module('mc.util.ui.actions').provider 'actions', ->
       else
         action.run = action.run ? ->
 
-      actionChildren = actionsChildrenByParentId[action.id]
+      actionChildren = parentChildActionMap[action.id]
 
       if actionChildren
         action.children = []
@@ -118,8 +123,12 @@ angular.module('mc.util.ui.actions').provider 'actions', ->
 
       return action
 
-
     actions = {}
+    actions.printRoleIdActionMap = () ->
+      printTwoLevelMap(roleIdActionMap, "Role", "Action ID")
+    actions.printParentChildActionMap = () ->
+      printTwoLevelMap(parentChildActionMap, "Parent", "Child")
+
 
     actions.getActions = ($scope, role) ->
       throw {message: "role undefined in #{$scope}"} if not role
