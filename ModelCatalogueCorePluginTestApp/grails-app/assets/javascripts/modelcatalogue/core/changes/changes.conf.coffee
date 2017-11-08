@@ -121,21 +121,20 @@ changes.config ['enhanceProvider', (enhanceProvider)->
 ###
   Configure Actions Provider
 ###
-changes.config ['actionsProvider', 'actionRoleRegister', (actionsProvider, actionRoleRegister)->
+changes.config ['actionsProvider', 'actionRoleRegister', 'actionClass', (actionsProvider, actionRoleRegister, actionClass)->
+  Action = actionClass
 
   actionsProvider.registerActionInRole 'undo-change', actionRoleRegister.ROLE_ITEM_ACTION, ['$scope', 'messages', 'security', '$http', 'modelCatalogueApiRoot', '$state', ($scope, messages, security, $http, modelCatalogueApiRoot, $state) ->
-    return undefined unless $scope.element
-    return undefined unless $scope.element.changed
-    return undefined unless $scope.element.changed.status == 'DRAFT' or ($scope.element.changed.isInstanceOf('asset') and $scope.element.changed.status == 'FINALIZED')
+    return undefined unless $scope.element?.changed?.status == 'DRAFT' or
+      ($scope.element?.changed?.isInstanceOf?('asset') and
+        $scope.element?.changed?.status == 'FINALIZED')
     return undefined if not security.hasRole('CURATOR')
 
-    {
+    Action.createStandardAction(
       position:   150
       label:      'Undo'
       icon:       'fa fa-undo'
       type:       'primary'
-      watches:    'element.undone'
-      disabled:   not $scope.element.undoSupported or $scope.element.undone
       action:     ->
         security.requireRole('CURATOR').then ->
           messages.confirm("Do you want to undo selected change?", "Current element will be reverted to the previous state if it is still possible. Undoing change does not check if the current state").then ->
@@ -147,7 +146,10 @@ changes.config ['actionsProvider', 'actionRoleRegister', (actionsProvider, actio
               if $scope.element.changes.total > 0
                 msg += " Try undo child actions one by one first."
               messages.error msg
-    }
+    )
+      .watching  'element.undone'
+      .disabledIf   not $scope.element.undoSupported or $scope.element.undone
+
   ]
 ]
 ###

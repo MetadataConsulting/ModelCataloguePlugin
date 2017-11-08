@@ -1,6 +1,7 @@
 angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security'])
-.config (actionsProvider, names, actionRoleRegister)->
+.config (actionsProvider, names, actionRoleRegister, actionClass)->
   'ngInject'
+  Action = actionClass
   ##############
   # Data Model #
   ##############
@@ -8,12 +9,9 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
   # Import
   actionsProvider.registerChildAction 'catalogue-element', 'add-import', ($scope, messages, names, security, catalogue) ->
     'ngInject'
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction($scope.element.isInstanceOf)
-    return undefined if not $scope.element.isInstanceOf('dataModel')
+    return undefined if not $scope.element?.isInstanceOf?('dataModel')
     return undefined if not security.hasRole('CURATOR')
-
-    {
+    Action.createStandardAction(
       position:   -1000
       label:      'Add Data Model Import'
       icon:       'fa fa-fw fa-puzzle-piece'
@@ -25,7 +23,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
             angular.forEach elements, (element) ->
               unless angular.isString(element)
                 $scope.element.imports.add element
-    }
+    )
 
   # Create
   angular.forEach [
@@ -41,16 +39,15 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         'ngInject'
         dataModel = dataModelService.anyParentDataModel($scope)
         return undefined unless security.hasRole('CURATOR')
-        return undefined unless messages.hasPromptFactory('create-' + resource) or messages.hasPromptFactory('edit-' + resource)
-        return undefined unless angular.isFunction($scope.element.isInstanceOf)
-        return undefined unless $scope.element.isInstanceOf('dataModel') or resource is 'dataClass' and $scope.element.isInstanceOf('dataClass')
+        return undefined unless messages.hasPromptFactory('create-' + resource) or
+          messages.hasPromptFactory('edit-' + resource)
+        return undefined unless $scope.element?.isInstanceOf?('dataModel') or resource is 'dataClass' and $scope.element?.isInstanceOf?('dataClass')
 
-        {
+        Action.createStandardAction(
+          position: 5000 + index
           label: "New #{names.getNaturalName(resource)}"
           icon: catalogue.getIcon(resource)
           type: 'success'
-          position: 5000 + index
-          disabled: $scope.element.status != 'DRAFT'
           action:     ->
             args =
               create: resource
@@ -66,7 +63,8 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
             , (errors)->
               $log.error errors
               messages.error('You don\'t have rights to create new elements')
-        }
+        )
+          .disabledIf $scope.element.status != 'DRAFT'
 
 
 
@@ -74,11 +72,11 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
   actionsProvider.registerActionInRole 'create-data-model', actionRoleRegister.ROLE_DATA_MODELS_ACTION ,['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
       return undefined unless security.hasRole('CURATOR')
 
-      {
+      Action.createStandardAction(
+        position:   0
         label:      "Create"
         icon:       'fa fa-fw fa-plus-circle'
         type:       'success'
-        position:   0
         action:     ->
           args      = {create: 'dataModel', type: 'create-dataModel'}
 
@@ -89,59 +87,68 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
           , (errors)->
             $log.error errors
             messages.error('You don\'t have rights to create new elements')
-      }
+      )
+
   ]
 
   actionsProvider.registerActionInRole 'all-data-models', actionRoleRegister.ROLE_GLOBAL_ACTION ,['security', '$scope', '$state', (security, $scope, $state) ->
     return undefined if not security.isUserLoggedIn()
 
-    {
+    Action.createStandardAction(
       position:   3000
       label: 'Show All Data Models'
       icon:  'fa fa-book fa-fw'
+      type: null
       action: ->
         $state.go 'dataModels'
-    }
+    )
   ]
+# do global-draft, global-pending, global-finalized really need to define the field 'run' instead of 'action' unlike every other action? Not really.
 
   actionsProvider.registerActionInRole 'global-draft', actionRoleRegister.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
     return undefined unless $state.current.name == 'mc.resource.list'
     return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
 
-    {
-      icon: 'fa fa-pencil'
+    Action.createStandardAction(
+      position: null
       label: 'Switch to Drafts'
-      run: -> $state.go '.', {status: 'draft'}, {reload: true}
-    }
+      icon: 'fa fa-pencil'
+      type: null
+      action: -> $state.go '.', {status: 'draft'}, {reload: true}
+    )
   ]
 
   actionsProvider.registerActionInRole 'global-pending', actionRoleRegister.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
     return undefined unless $state.current.name == 'mc.resource.list'
     return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
 
-    {
-      icon: 'fa fa-clock-o'
+    Action.createStandardAction(
+      position: null
       label: 'Switch to Pending'
-      run: -> $state.go '.', {status: 'pending'}, {reload: true}
-    }
+      icon: 'fa fa-clock-o'
+      type: null
+      action: -> $state.go '.', {status: 'pending'}, {reload: true}
+    )
   ]
 
   actionsProvider.registerActionInRole 'global-finalized', actionRoleRegister.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
     return undefined unless $state.current.name == 'mc.resource.list'
     return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
-
-    {
-      icon: 'fa fa-check'
+    Action.createStandardAction(
+      position: null
       label: 'Switch to Finalized'
-      run: -> $state.go '.', {status: undefined}, {reload: true}
-    }
+      icon: 'fa fa-check'
+      type: null
+      action: -> $state.go '.', {status: undefined}, {reload: true}
+    )
   ]
 
   actionsProvider.registerActionInRole 'about-dialog', actionRoleRegister.ROLE_GLOBAL_ACTION, ['messages', (messages) ->
-
-    {
-      icon: 'fa fa-question'
+    Action.createStandardAction(
+      position: null
       label: 'Model Catalogue Version'
+      icon: 'fa fa-question'
+      type: null
       action: ->  messages.prompt('','', type: 'about-dialog')
-    }
+    )
   ]

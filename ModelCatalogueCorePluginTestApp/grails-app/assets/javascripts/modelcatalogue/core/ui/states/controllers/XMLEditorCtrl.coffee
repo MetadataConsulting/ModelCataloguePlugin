@@ -44,13 +44,15 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
     $scope.$watchGroup ['xml', 'xslt'], transform
 
 ])
-.config(['actionsProvider', 'actionRoleRegister', (actionsProvider, actionRoleRegister) ->
-
+.config(['actionsProvider', 'actionRoleRegister', 'actionClass', (actionsProvider, actionRoleRegister, actionClass) ->
+  Action = actionClass
   actionsProvider.registerActionInRole 'load-xslt', actionRoleRegister.ROLE_XMLEDITOR_XSLT_ACTION, [
     '$log', '$scope','messages', ($log, $scope, messages) ->
-      {
+      Action.createStandardAction(
+        position: null
         label: 'Load XSLT'
         icon: 'fa fa-file-code-o'
+        type: null
         action: ->
           messages
           .prompt("Select Stylesheet", "Select stylesheet to be loaded", type: 'catalogue-element', resource: 'asset', contentType: 'text/xsl')
@@ -60,14 +62,16 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
             return asset.execute('content')
           .then (resp) ->
             $scope.xslt = resp
-      }
+      )
   ]
 
   actionsProvider.registerActionInRole 'save-xslt', actionRoleRegister.ROLE_XMLEDITOR_XSLT_ACTION, [
     '$log', '$scope','messages', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($log, $scope, messages, Upload, modelCatalogueApiRoot, enhance) ->
-      {
+      Action.createStandardAction(
+        position: null
         label: 'Save Stylesheet'
         icon: 'fa fa-save'
+        type: null
         action: ->
           messages
           .prompt("Save Stylesheet", "Asset name", type: 'catalogue-element', resource: 'asset', contentType: 'text/xsl', allowString: true, value: $scope.xsltAsset)
@@ -92,14 +96,16 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
               $log.error("asset was not saved", reason)
               messages.error "Could not save asset. #{reason}"
             )
-      }
+      )
   ]
 
   actionsProvider.registerActionInRole 'save-xsd', actionRoleRegister.ROLE_XMLEDITOR_XSD_ACTION, [
     '$log', '$scope','messages', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($log, $scope, messages, Upload, modelCatalogueApiRoot, enhance) ->
-      {
+      Action.createStandardAction(
+        position: null
         label: 'Save Schema'
         icon: 'fa fa-save'
+        type: null
         action: ->
           messages
           .prompt("Save Schema", "Asset name", type: 'catalogue-element', resource: 'asset', contentType: 'text/xml', allowString: true, value: $scope.xsdAsset)
@@ -124,17 +130,18 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
               $log.error("asset was not saved", reason)
               messages.error "Could not save asset. #{reason}"
             )
-      }
+      )
   ]
 
   actionsProvider.registerActionInRole 'load-xslt', actionRoleRegister.ROLE_XMLEDITOR_XSD_ACTION, [ '$scope', ($scope) ->
-
-    {
+    Action.createStandardAction(
+      position: null
       label: 'Download Result'
       icon: 'fa fa-download'
+      type: null
       action: ->
         $scope.download('Result.xsd', $scope.xsd)
-    }
+    )
   ]
 
 ])
