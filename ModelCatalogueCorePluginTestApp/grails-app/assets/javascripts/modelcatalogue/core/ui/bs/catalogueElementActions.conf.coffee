@@ -28,12 +28,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       return undefined if not $scope.element?.status
       return undefined if not security.hasRole('CURATOR')
 
-      action = new Action(
-        -1800
-        null
-        null
-        null
-        ->
+      action = Action.createStandardAction(
+        position: -1800
+        label: null
+        icon: null
+        type: null
+        action: ->
           if $scope.element.archived
             if security.hasRole('ADMIN')
               messages.confirm("Do you want to restore #{$scope.element.getElementTypeName()} #{$scope.element.name} as finalized?",
@@ -60,9 +60,6 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
 
       if $scope.element.archived
-        if not security.hasRole('ADMIN')
-          action.disabled = true
-        else
           action.label = 'Restore'
           action.icon = 'fa fa-fw fa-repeat'
           action.type = 'primary'
@@ -86,12 +83,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         $scope.element.isInstanceOf('dataType') or $scope.element.isInstanceOf('measurementUnit') or
         $scope.element.isInstanceOf('validationRule'))
 
-      new Action(
-        -1500
-        'Delete'
-        'fa fa-fw fa-times-circle'
-        'danger'
-        ->
+      Action.createStandardAction(
+        position: -1500
+        label: 'Delete'
+        icon: 'fa fa-fw fa-times-circle'
+        type: 'danger'
+        action: ->
           messages.confirm("Do you really want to delete #{$scope.element.getElementTypeName()} #{$scope.element.name}?",
             "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be deleted permanently. " +
               (if not security.hasRole('SUPERVISOR') then "This action cannot be undone. Be ware that only DRAFT can be deleted." else "This action cannot be undone."))
@@ -116,12 +113,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       'ngInject'
       return undefined if not $scope.element?.status
       return undefined if not security.hasRole('CURATOR')
-      new Action(
-        10000
-        'Merge'
-        'fa fa-fw fa-code-fork fa-rotate-180 fa-flip-vertical'
-        'danger'
-        ->
+      Action.createStandardAction(
+        position: 10000
+        label: 'Merge'
+        icon: 'fa fa-fw fa-code-fork fa-rotate-180 fa-flip-vertical'
+        type: 'danger'
+        action: ->
           messages.prompt("Merge #{$scope.element.getElementTypeName()} #{$scope.element.name} to another #{$scope.element.getElementTypeName()}",
             "All non-system relationships of the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be moved to the following destination and " +
               "than the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be archived",
@@ -149,12 +146,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element?.status
     return undefined if not $scope.element?.isInstanceOf?('dataModel')
     return undefined if not security.hasRole('CURATOR')
-    new Action(
-      -1900
-      'New Version'
-      'fa fa-fw fa-arrow-circle-up'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: -1900
+      label: 'New Version'
+      icon: 'fa fa-fw fa-arrow-circle-up'
+      type: 'primary'
+      action: ->
         messages.prompt(null, null, type: 'new-version', element: $scope.element)
     )
       .watching ['element.status', 'element.archived']
@@ -170,10 +167,10 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not angular.isFunction $scope.element.isInstanceOf
 
     Action.createAbstractAction(
-      0
-      names.getNaturalName(names.getPropertyNameFromQualifier($scope.element.elementType))
-      catalogue.getIcon($scope.element.elementType)
-      'primary'
+      position: 0
+      label: names.getNaturalName(names.getPropertyNameFromQualifier($scope.element.elementType))
+      icon: catalogue.getIcon($scope.element.elementType)
+      type: 'primary'
     )
       .watching ['element.elementType', 'element.status']
   ]
@@ -187,12 +184,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined unless not $scope.supportsInlineEdit?($scope.editableForm)
     return undefined unless (not $scope.element.isInstanceOf('dataModel') or $scope.element.status == 'DRAFT') # a bit weird. You can edit if it's not a draft but it's not a data model?
 
-    new Action(
-      -1000
-      'Edit'
-      'fa fa-edit'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: -1000
+      label: 'Edit'
+      icon: 'fa fa-edit'
+      type: 'primary'
+      action: ->
         messages.prompt('Edit ' + $scope.element.getElementTypeName(), '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
           $scope.element.updateFrom updated
     )
@@ -209,12 +206,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
     label = if $scope.element.enabled then "Disable User" else "Enable User"
 
-    new Action(
-      -2000
-      label
-      if $scope.element.enabled then 'fa fa-ban' else 'fa fa-check'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: -2000
+      label: label
+      icon: if $scope.element.enabled then 'fa fa-ban' else 'fa fa-check'
+      type: 'primary'
+      action: ->
         title = label
         desc = if $scope.element.enabled then "Do you want to disable user?" else "Do you want to enable user?"
         messages.confirm(title, desc).then ->
@@ -238,12 +235,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
     return undefined if not security.hasRole('ADMIN')
     return undefined if not $scope.element?.isInstanceOf?('user')
-    new Action(
-      -500
-      "Change Role"
-      "fa fa-users"
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: -500
+      label: "Change Role"
+      icon: "fa fa-users"
+      type: 'primary'
+      action: ->
         options = [
           {classes: 'btn btn-primary', icon: 'fa fa-cog', label: 'Admin', value: 'admin'}
           {classes: 'btn btn-primary', icon: 'fa fa-object-group', label: 'Curator', value: 'curator'}
@@ -262,12 +259,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     'ngInject'
 
     return undefined if not $scope.element?.internalModelCatalogueId
-    new Action(
-      10000
-      "Show Link"
-      "fa fa-link"
-      'default'
-      ->
+    Action.createStandardAction(
+      position: 10000
+      label: "Show Link"
+      icon: "fa fa-link"
+      type: 'default'
+      action: ->
         messages.prompt("Link for " + $scope.element.getLabel(), """
           <h4>Permanent Link</h4>
           <input type='text' class='form-control' value='#{$scope.element.internalModelCatalogueId}' readonly='readonly' select-on-click></input>
@@ -282,12 +279,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.editableForm
     return undefined if $scope.editableForm.$visible #so the editableForm has to be there, but not visible.
     return undefined unless not angular.isFunction($scope.supportsInlineEdit) or $scope.supportsInlineEdit($scope.editableForm) # so it's fine if supportsInlineEdit is not a function...
-    new Action(
-      -1000
-      'Inline Edit'
-      'fa fa-edit'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: -1000
+      label: 'Inline Edit'
+      icon: 'fa fa-edit'
+      type: 'primary'
+      action: ->
         $scope.editableForm.$show()
         $scope.$broadcast 'redrawContextualActions'
     )
@@ -297,12 +294,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerActionInRole 'inline-edit-submit', actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ['$scope', 'messages', 'names', 'security', ($scope) ->
     return undefined if not $scope.editableForm?.$visible
     return undefined unless not angular.isFunction($scope.supportsInlineEdit) or $scope.supportsInlineEdit($scope.editableForm)
-    action = new Action(
-      2000
-      'Save'
-      'fa fa-check'
-      'success'
-      ->
+    action = Action.createStandardAction(
+      position: 2000
+      label: 'Save'
+      icon: 'fa fa-check'
+      type: 'success'
+      action: ->
         $scope.$broadcast 'redrawContextualActions'
     )
     action.submit = true
@@ -312,12 +309,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerActionInRole 'inline-edit-cancel', actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ['$scope', 'messages', 'names', 'security', ($scope) ->
     return undefined if not $scope.editableForm?.$visible
     return undefined unless not angular.isFunction($scope.supportsInlineEdit) or $scope.supportsInlineEdit($scope.editableForm)
-    new Action(
-      3000
-      'Cancel'
-      'fa fa-ban'
-      'warning'
-      ->
+    Action.createStandardAction(
+      position: 3000
+      label: 'Cancel'
+      icon: 'fa fa-ban'
+      type: 'warning'
+      action: ->
         $scope.editableForm.$cancel()
         $scope.$broadcast 'redrawContextualActions'
     )
@@ -326,12 +323,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildAction 'catalogue-element', 'create-new-relationship', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element?.isInstanceOf?('catalogueElement')
     return undefined if not security.hasRole('CURATOR')
-    new Action(
-      200
-      'Create Relationship'
-      'fa fa-fw fa-chain'
-      'success'
-      ->
+    Action.createStandardAction(
+      position: 200
+      label: 'Create Relationship'
+      icon: 'fa fa-fw fa-chain'
+      type: 'success'
+      action: ->
         messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.element, currentDataModel: $scope.currentDataModel}).catch showErrorsUsingMessages(messages)
     )
       .watching ['element.status', 'element.archived']
@@ -349,7 +346,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     element = if elementPresent then $scope.element else $scope.elements[0]
     ids = if elementPresent then [element.id] else (e.id for e in $scope.elements)
 
-    {
+    Action.createStandardAction(
       position: -500
       label: if elementPresent then 'Compare' else 'Compare Another'
       icon: 'fa fa-fw fa-arrows-h'
@@ -358,7 +355,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         messages.prompt('Compare ' + element.getElementTypeName(), "Select the #{element.getElementTypeName()} for the comparison",
           {type: 'catalogue-element', resource: element.getResourceName(), global: true}).then (toBeCompared)->
             $state.go 'mc.resource.diff', dataModelId: element.dataModel.id, resource: element.getResourceName(), ids: ids.concat([toBeCompared.id]).join('|')
-    }
+    )
   ]
   ###
 
@@ -366,12 +363,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildAction 'catalogue-element', 'create-new-mapping', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element?.hasOwnProperty('mappings')
     return undefined if not security.hasRole('CURATOR')
-    new Action(
-      300
-      'Create Mapping'
-      'fa fa-fw fa-superscript'
-      'success'
-      ->
+    Action.createStandardAction(
+      position: 300
+      label: 'Create Mapping'
+      icon: 'fa fa-fw fa-superscript'
+      type: 'success'
+      action: ->
         messages.prompt('Create new mapping for ' + $scope.element.name, '', {type: 'new-mapping', element: $scope.element}).catch showErrorsUsingMessages(messages)
     )
   ]
@@ -379,12 +376,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   actionsProvider.registerChildAction 'catalogue-element', 'validate-value', [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element?.isInstanceOf?('dataType')
-    new Action(
-      1200
-      'Validate Value'
-      'fa fa-fw fa-check-circle-o'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: 1200
+      label: 'Validate Value'
+      icon: 'fa fa-fw fa-check-circle-o'
+      type: 'primary'
+      action: ->
         messages.prompt('', '', {type: 'validate-value-by-domain', domain: $scope.element})
     )
       .watching ['element.rule', 'element.dataType']
@@ -399,12 +396,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildAction 'catalogue-element', 'convert', [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined unless $scope.element?.isInstanceOf?('dataType') or
       $scope.element?.isInstanceOf?('mapping')
-    new Action(
-      1100
-      'Convert Value'
-      'fa fa-fw fa-long-arrow-right'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: 1100
+      label: 'Convert Value'
+      icon: 'fa fa-fw fa-long-arrow-right'
+      type: 'primary'
+      action: ->
         if $scope.element.isInstanceOf('dataType')
           messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element})
         else if $scope.element.isInstanceOf('mapping')
@@ -414,12 +411,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   actionsProvider.registerChildAction 'catalogue-element', 'validate-xsd-schema', [ '$scope', 'messages', 'catalogue', ($scope, messages, catalogue) ->
     return undefined if not catalogue.isInstanceOf($scope.element?.elementType, 'asset')
-    new Action(
-      1100
-      'Validate XML'
-      'fa fa-fw fa-check-circle-o'
-      'default'
-      ->
+    Action.createStandardAction(
+      position: 1100
+      label: 'Validate XML'
+      icon: 'fa fa-fw fa-check-circle-o'
+      type: 'default'
+      action: ->
         messages.prompt('', '', {type: 'validate-xml-by-schema', asset: $scope.element})
 
     )
@@ -428,12 +425,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   actionsProvider.registerActionInRole 'download-asset',actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, [ '$scope', '$window', ($scope, $window) ->
     return undefined if not $scope.element?.downloadUrl
-    new Action(
-      -50
-      ''
-      'fa fa-fw fa-download'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: -50
+      label: ''
+      icon: 'fa fa-fw fa-download'
+      type: 'primary'
+      action: ->
         $window.open "#{$scope.element.downloadUrl}?force=true", '_blank'; return true
     )
   ]
@@ -441,12 +438,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerActionInRole 'remove-relationship',actionRoleRegister.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
     return undefined if not $scope.element?.isInstanceOf?('relationship')
     return undefined if not security.hasRole('CURATOR')
-    new Action(
-      150
-      ''
-      'glyphicon glyphicon-remove'
-      'danger'
-      ->
+    Action.createStandardAction(
+      position: 150
+      label: ''
+      icon: 'glyphicon glyphicon-remove'
+      type: 'danger'
+      action: ->
         rel   = $scope.element
         deferred = $q.defer()
         messages.confirm('Remove Relationship', "Do you really want to remove relation '#{rel.element.name} #{rel.type[rel.direction]} #{rel.relation.name}'?").then () ->
@@ -478,12 +475,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildAction 'catalogue-element',  'restore-relationship', ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', 'rest', 'enhance', 'modelCatalogueApiRoot', ($rootScope, $scope, $state, messages, names, security, $q, rest, enhance, modelCatalogueApiRoot) ->
     return undefined if not $scope.element?.isInstanceOf?('relationship')
     return undefined if not security.hasRole('CURATOR')
-    new Action(
-      1000
-      'Restore Archived'
-      'glyphicon glyphicon-refresh'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: 1000
+      label: 'Restore Archived'
+      icon: 'glyphicon glyphicon-refresh'
+      type: 'primary'
+      action: ->
         rel   = $scope.element
         messages.confirm('Restore Relationship', "Do you really want to restore relation '#{rel.element.name} #{rel.type[rel.direction]} #{rel.relation.name}'?").then () ->
           enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/relationship/#{rel.id}/restore")).then ->
@@ -510,12 +507,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       $scope.element ? $scope.tab?.value
     return undefined if not getRelationship()?.isInstanceOf?('relationship')
     return undefined if not security.hasRole('CURATOR')
-    new Action(
-      100
-      ''
-      'glyphicon glyphicon-edit'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: 100
+      label: ''
+      icon: 'glyphicon glyphicon-edit'
+      type: 'primary'
+      action: ->
         rel   = getRelationship()
         rel.element.refresh().then (element) ->
           args = {relationshipType: rel.type, direction: rel.direction, type: 'update-relationship', currentDataModel: $scope.currentDataModel, update: true, element: element, relation: rel.relation, classification: rel.classification, metadata: angular.copy(rel.ext)}
@@ -536,12 +533,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element?.isInstanceOf?('mapping')
 
     catalogueElementEnhancer = enhance.getEnhancer('catalogueElement')
-    new Action (
-      100
-      ''
-      'glyphicon glyphicon-edit'
-      'primary'
-      ->
+    Action.createStandardAction (
+      position: 100
+      label: ''
+      icon: 'glyphicon glyphicon-edit'
+      type: 'primary'
+      action: ->
         $scope.element.source.refresh().then (element)->
           args = {type: 'new-mapping', update: true, element: element, mapping: $scope.element}
           messages.prompt('Update Mapping', '', args).then (updated)->
@@ -555,12 +552,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerActionInRole 'remove-mapping', actionRoleRegister.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
     return undefined if not $scope.element?.isInstanceOf?('mapping')
     return undefined if not security.hasRole('CURATOR')
-    new Action(
-      150
-      ''
-      'glyphicon glyphicon-remove'
-      'danger'
-      ->
+    Action.createStandardAction(
+      position: 150
+      label: ''
+      icon: 'glyphicon glyphicon-remove'
+      type: 'danger'
+      action: ->
         mapping   = $scope.element
         deferred = $q.defer()
         messages.confirm('Remove Mapping', "Do you really want to remove mapping from #{mapping.source.name} to #{mapping.destination.name}?").then ->
@@ -588,12 +585,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerActionInRole 'change-type',actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
     return undefined if not $scope.element?.isInstanceOf?('dataType')
     return undefined if not security.hasRole('CURATOR')
-    new Action(
-      10000
-      'Change Type'
-      'fa fa-fw fa-random'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: 10000
+      label: 'Change Type'
+      icon: 'fa fa-fw fa-random'
+      type: 'primary'
+      action: ->
         options =
           dataType: 'Data Type'
           enumeratedType: 'Enumerated Type'
@@ -616,12 +613,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildAction 'catalogue-element', 'clone', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.element?.isInstanceOf?('catalogueElement')
-    new Action(
-      20100
-      'Clone Current Element into Another Data Model'
-      'fa fa-fw fa-clone'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: 20100
+      label: 'Clone Current Element into Another Data Model'
+      icon: 'fa fa-fw fa-clone'
+      type: 'primary'
+      action: ->
         messages.prompt("Clone #{$scope.element.name}", "Please, select the destination data model for the cloned element.", type: 'catalogue-element', status: 'draft', resource: 'dataModel').then (destinationDataModel) ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/clone/#{destinationDataModel.id}", method: 'POST')).then (finalized) ->
             finalized.show()
@@ -632,13 +629,13 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildAction 'catalogue-element', 'clone-from', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.element?.isInstanceOf?('dataModel')
-    return undefined unless $scope.element.status == 'DRAFT'
-    new Action(
-      20000
-      'Clone Another Element into Current Data Model'
-      'fa fa-fw fa-clone fa-flip-horizontal'
-      'primary'
-      ->
+    return undefined unless $scope.element?.status == 'DRAFT'
+    Action.createStandardAction(
+      position: 20000
+      label: 'Clone Another Element into Current Data Model'
+      icon: 'fa fa-fw fa-clone fa-flip-horizontal'
+      type: 'primary'
+      action: ->
         messages.prompt("Clone into #{$scope.element.name}", null, type: 'clone-into', currentDataModel: $scope.element).then (elementToBeCloned) ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{elementToBeCloned.link}/clone/#{$scope.element.id}", method: 'POST')).then (finalized) ->
             finalized.show()
@@ -649,12 +646,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildAction 'catalogue-element', 'reindex-data-model', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not security.hasRole('ADMIN')
     return undefined if not $scope.element?.isInstanceOf?('dataModel')
-    new Action(
-      50500
-      'Reindex Data Model'
-      'fa fa-search fa-fw'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: 50500
+      label: 'Reindex Data Model'
+      icon: 'fa fa-search fa-fw'
+      type: 'primary'
+      action: ->
         messages.confirm("Reindex #{$scope.element.name}", "Do you want to reindex #{$scope.element.name}? This may have negative impact on application performance for large data models.").then ->
           $scope.element.execute('reindex', 'POST').then ->
             messages.success("Reindexing #{$scope.element.name} started")
@@ -667,12 +664,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined unless $scope.element?.status == 'DRAFT'
     return undefined unless $scope.element?.isInstanceOf?('dataModel')
 
-    new Action(
-      -2000
-      'Finalize'
-      'fa fa-fw fa-check-circle'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: -2000
+      label: 'Finalize'
+      icon: 'fa fa-fw fa-check-circle'
+      type: 'primary'
+      action: ->
         messages.prompt(null, null, type: 'finalize', element: $scope.element)
     )
       .watching ['element.status', 'element.archived']
@@ -682,12 +679,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   newAssetVersion = ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.element?.isInstanceOf?('asset')
-    new Action(
-      -1900
-      'Upload New Version'
-      'fa fa-fw fa-arrow-circle-up'
-      'primary'
-      ->
+    Action.createStandardAction(
+      position: -1900
+      label: 'Upload New Version'
+      icon: 'fa fa-fw fa-arrow-circle-up'
+      type: 'primary'
+      action: ->
         messages.prompt('Upload New Version', null, type: 'edit-asset', element: $scope.element, currentDataModel: $scope.element.dataModel).then (newOne) ->
           newOne.show()
     )

@@ -6,18 +6,6 @@ class Action
   ###
   The standard fields.
 
-  @example
-      finalize = new Action(
-        -2000 #position
-        'Finalize' #label
-        'fa fa-fw fa-check-circle' #icon
-        'primary' #type
-        -> #action
-          messages.prompt(null, null, type: 'finalize', element: $scope.element)
-      )
-      .disabledIf($scope.element?.status != 'DRAFT')
-      .watching(['element.status', 'element.archived'])
-
   @param [Number] position –Position according to which actions are sorted in whatever menu they appear in.
   @param [String] label -Human-readable label of action which appears in menu
   @param [String] icon –String which is used as the set of Bootstrap classes for icons
@@ -28,10 +16,28 @@ class Action
     @type ?= 'default'
     @abstract = true unless @action
 
-
-  ### An abstract action has no action. All abstract actions are parents and vice-versa.
   ###
-  @createAbstractAction: (position, label, icon, type) ->
+
+  @example
+    Action.createStandardAction(
+      position: 200
+      label: 'Create Relationship'
+      icon: 'fa fa-fw fa-chain'
+      type: 'success'
+      action: ->
+        messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.element, currentDataModel: $scope.currentDataModel}).catch showErrorsUsingMessages(messages)
+    )
+      .watching ['element.status', 'element.archived']
+      .disabledIf $scope.element.archived
+  Takes map of named parameters for the five standard fields of an action
+  ###
+  @createStandardAction: ({position, label, icon, type, action}) ->
+    return new Action(position, label, icon, type, action)
+
+  ###
+  An abstract action has no action. All abstract actions are parents and vice-versa.
+  ###
+  @createAbstractAction: ({position, label, icon, type}) ->
     return new Action(position, label, icon, type, null)
 
 
@@ -49,13 +55,14 @@ class Action
 
   ###
   initialize the run method with angularJS $q and $rootScope for promise and broadcast. Should have id set first.
+  For some reason using q as a variable makes it highlighted as if it were a method, so I used promiseQ. Also $broadcast is highlighted when accessed with dot.
   ###
-  initializeRun: (q, rootScope) ->
+  initializeRun: (promiseQ, rootScope) ->
   if @action
     @run = ->
       unless @disabled
-        q.when(@action()).then (result) ->
-          rootScope.$broadcast "actionPerformed", @id, q.when(result)
+        promiseQ.when(@action()).then (result) ->
+          rootScope['$broadcast'] "actionPerformed", @id, promiseQ.when(result)
   else
     @run ?= ->
 
