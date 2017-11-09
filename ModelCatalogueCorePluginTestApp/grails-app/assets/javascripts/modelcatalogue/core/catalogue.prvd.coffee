@@ -23,7 +23,7 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
   readMetadata = (type, name) ->
     type = names.getPropertyNameFromType(type)
     meta = typesMetadata[type]
-    return undefined if not meta?
+    return undefined unless meta?
     meta[name]
 
 

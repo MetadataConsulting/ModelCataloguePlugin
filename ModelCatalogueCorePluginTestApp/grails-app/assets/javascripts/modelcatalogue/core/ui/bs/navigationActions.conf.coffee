@@ -9,8 +9,8 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
   # Import
   actionsProvider.registerChildAction 'catalogue-element', 'add-import', ($scope, messages, names, security, catalogue) ->
     'ngInject'
-    return undefined if not $scope.element?.isInstanceOf?('dataModel')
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless $scope.element?.isInstanceOf?('dataModel')
+    return undefined unless security.hasRole('CURATOR')
     Action.createStandardAction(
       position:   -1000
       label:      'Add Data Model Import'
@@ -92,7 +92,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
   ]
 
   actionsProvider.registerActionInRole 'all-data-models', actionRoleRegister.ROLE_GLOBAL_ACTION ,['security', '$scope', '$state', (security, $scope, $state) ->
-    return undefined if not security.isUserLoggedIn()
+    return undefined unless security.isUserLoggedIn()
 
     Action.createStandardAction(
       position:   3000

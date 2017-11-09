@@ -128,7 +128,7 @@ changes.config ['actionsProvider', 'actionRoleRegister', 'actionClass', (actions
     return undefined unless $scope.element?.changed?.status == 'DRAFT' or
       ($scope.element?.changed?.isInstanceOf?('asset') and
         $scope.element?.changed?.status == 'FINALIZED')
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless security.hasRole('CURATOR')
 
     Action.createStandardAction(
       position:   150

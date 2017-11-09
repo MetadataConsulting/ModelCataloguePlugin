@@ -25,8 +25,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildAction 'catalogue-element', 'archive',
     ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
       'ngInject'
-      return undefined if not $scope.element?.status
-      return undefined if not security.hasRole('CURATOR')
+      return undefined unless $scope.element?.status
+      return undefined unless security.hasRole('CURATOR')
 
       action = Action.createStandardAction(
         position: -1800
@@ -74,11 +74,11 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildAction 'catalogue-element', 'delete',
     ($rootScope, $scope, $state, messages, names, security) ->
       'ngInject'
-      return undefined if not $scope.element
-      return undefined if not angular.isFunction($scope.element.delete)
-      return undefined if not angular.isFunction($scope.element.isInstanceOf)
-      return undefined if not security.hasRole('CURATOR')
-      return undefined if not ($scope.element.isInstanceOf('asset') or $scope.element.isInstanceOf('dataClass') or
+      return undefined unless $scope.element
+      return undefined unless angular.isFunction($scope.element.delete)
+      return undefined unless angular.isFunction($scope.element.isInstanceOf)
+      return undefined unless security.hasRole('CURATOR')
+      return undefined unless ($scope.element.isInstanceOf('asset') or $scope.element.isInstanceOf('dataClass') or
         $scope.element.isInstanceOf('dataElement') or $scope.element.isInstanceOf('dataModel') or
         $scope.element.isInstanceOf('dataType') or $scope.element.isInstanceOf('measurementUnit') or
         $scope.element.isInstanceOf('validationRule'))
@@ -111,8 +111,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildAction 'catalogue-element', 'merge',
     ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
       'ngInject'
-      return undefined if not $scope.element?.status
-      return undefined if not security.hasRole('CURATOR')
+      return undefined unless $scope.element?.status
+      return undefined unless security.hasRole('CURATOR')
       Action.createStandardAction(
         position: 10000
         label: 'Merge'
@@ -143,9 +143,9 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   newVersionAction = ($rootScope, $scope, messages, security) ->
     'ngInject'
-    return undefined if not $scope.element?.status
-    return undefined if not $scope.element?.isInstanceOf?('dataModel')
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless $scope.element?.status
+    return undefined unless $scope.element?.isInstanceOf?('dataModel')
+    return undefined unless security.hasRole('CURATOR')
     Action.createStandardAction(
       position: -1900
       label: 'New Version'
@@ -164,7 +164,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   actionsProvider.registerActionInRole 'catalogue-element',actionRoleRegister.ROLE_ITEM_ACTION, ['$scope', 'security', 'names', 'catalogue', ($scope, security, name, catalogue)->
     return undefined unless $scope.element
-    return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined unless angular.isFunction $scope.element.isInstanceOf
 
     Action.createAbstractAction(
       position: 0
@@ -176,11 +176,11 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   actionsProvider.registerActionInRole 'edit-catalogue-element',actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not angular.isFunction $scope.element.getResourceName
+    return undefined unless $scope.element
+    return undefined unless angular.isFunction $scope.element.isInstanceOf
+    return undefined unless angular.isFunction $scope.element.getResourceName
     return undefined unless messages.hasPromptFactory('create-' + $scope.element.getResourceName()) or messages.hasPromptFactory('edit-' + $scope.element.getResourceName())
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless security.hasRole('CURATOR')
     return undefined unless not $scope.supportsInlineEdit?($scope.editableForm)
     return undefined unless (not $scope.element.isInstanceOf('dataModel') or $scope.element.status == 'DRAFT') # a bit weird. You can edit if it's not a draft but it's not a data model?
 
@@ -201,8 +201,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerActionInRole 'update-user',actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ($scope, messages, names, security, $state) ->
     'ngInject'
 
-    return undefined if not security.hasRole('ADMIN')
-    return undefined if not $scope.element?.isInstanceOf?('user')
+    return undefined unless security.hasRole('ADMIN')
+    return undefined unless $scope.element?.isInstanceOf?('user')
 
     label = if $scope.element.enabled then "Disable User" else "Enable User"
 
@@ -233,8 +233,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerActionInRole 'update-role',actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ($scope, messages, names, security, $rootScope) ->
     'ngInject'
 
-    return undefined if not security.hasRole('ADMIN')
-    return undefined if not $scope.element?.isInstanceOf?('user')
+    return undefined unless security.hasRole('ADMIN')
+    return undefined unless $scope.element?.isInstanceOf?('user')
     Action.createStandardAction(
       position: -500
       label: "Change Role"
@@ -258,7 +258,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerActionInRole 'show-link',actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ($scope, messages, security) ->
     'ngInject'
 
-    return undefined if not $scope.element?.internalModelCatalogueId
+    return undefined unless $scope.element?.internalModelCatalogueId
     Action.createStandardAction(
       position: 10000
       label: "Show Link"
@@ -276,8 +276,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   actionsProvider.registerActionInRole 'inline-edit',actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ($scope, security) ->
     'ngInject'
-    return undefined if not $scope.editableForm
-    return undefined if $scope.editableForm.$visible #so the editableForm has to be there, but not visible.
+    return undefined unless $scope.editableForm
+    return undefined unless not $scope.editableForm.$visible #so the editableForm has to be there, but not visible.
     return undefined unless not angular.isFunction($scope.supportsInlineEdit) or $scope.supportsInlineEdit($scope.editableForm) # so it's fine if supportsInlineEdit is not a function...
     Action.createStandardAction(
       position: -1000
@@ -292,7 +292,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       .disabledIf not security.hasRole('SUPERVISOR') and ($scope.element.archived or $scope.element?.status == 'FINALIZED')
 
   actionsProvider.registerActionInRole 'inline-edit-submit', actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ['$scope', 'messages', 'names', 'security', ($scope) ->
-    return undefined if not $scope.editableForm?.$visible
+    return undefined unless $scope.editableForm?.$visible
     return undefined unless not angular.isFunction($scope.supportsInlineEdit) or $scope.supportsInlineEdit($scope.editableForm)
     action = Action.createStandardAction(
       position: 2000
@@ -307,7 +307,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   actionsProvider.registerActionInRole 'inline-edit-cancel', actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ['$scope', 'messages', 'names', 'security', ($scope) ->
-    return undefined if not $scope.editableForm?.$visible
+    return undefined unless $scope.editableForm?.$visible
     return undefined unless not angular.isFunction($scope.supportsInlineEdit) or $scope.supportsInlineEdit($scope.editableForm)
     Action.createStandardAction(
       position: 3000
@@ -321,8 +321,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   actionsProvider.registerChildAction 'catalogue-element', 'create-new-relationship', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
-    return undefined if not $scope.element?.isInstanceOf?('catalogueElement')
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless $scope.element?.isInstanceOf?('catalogueElement')
+    return undefined unless security.hasRole('CURATOR')
     Action.createStandardAction(
       position: 200
       label: 'Create Relationship'
@@ -341,7 +341,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('catalogueElement')
     diffView = $state.current.name == 'mc.resource.diff'
 
-    return undefined if not elementPresent and not diffView
+    return undefined unless elementPresent and not diffView
 
     element = if elementPresent then $scope.element else $scope.elements[0]
     ids = if elementPresent then [element.id] else (e.id for e in $scope.elements)
@@ -361,8 +361,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
 
   actionsProvider.registerChildAction 'catalogue-element', 'create-new-mapping', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
-    return undefined if not $scope.element?.hasOwnProperty('mappings')
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless $scope.element?.hasOwnProperty('mappings')
+    return undefined unless security.hasRole('CURATOR')
     Action.createStandardAction(
       position: 300
       label: 'Create Mapping'
@@ -375,7 +375,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
 
   actionsProvider.registerChildAction 'catalogue-element', 'validate-value', [ '$scope', 'messages', 'security', ($scope, messages) ->
-    return undefined if not $scope.element?.isInstanceOf?('dataType')
+    return undefined unless $scope.element?.isInstanceOf?('dataType')
     Action.createStandardAction(
       position: 1200
       label: 'Validate Value'
@@ -410,7 +410,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   actionsProvider.registerChildAction 'catalogue-element', 'validate-xsd-schema', [ '$scope', 'messages', 'catalogue', ($scope, messages, catalogue) ->
-    return undefined if not catalogue.isInstanceOf($scope.element?.elementType, 'asset')
+    return undefined unless catalogue.isInstanceOf($scope.element?.elementType, 'asset')
     Action.createStandardAction(
       position: 1100
       label: 'Validate XML'
@@ -424,7 +424,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
 
   actionsProvider.registerActionInRole 'download-asset',actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, [ '$scope', '$window', ($scope, $window) ->
-    return undefined if not $scope.element?.downloadUrl
+    return undefined unless $scope.element?.downloadUrl
     Action.createStandardAction(
       position: -50
       label: ''
@@ -436,8 +436,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   actionsProvider.registerActionInRole 'remove-relationship',actionRoleRegister.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
-    return undefined if not $scope.element?.isInstanceOf?('relationship')
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless $scope.element?.isInstanceOf?('relationship')
+    return undefined unless security.hasRole('CURATOR')
     Action.createStandardAction(
       position: 150
       label: ''
@@ -473,8 +473,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       .disabledIf $scope.element.inherited or ($scope.element.type.versionSpecific and getIsSourceFinalized($scope.element))
   ]
   actionsProvider.registerChildAction 'catalogue-element',  'restore-relationship', ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', 'rest', 'enhance', 'modelCatalogueApiRoot', ($rootScope, $scope, $state, messages, names, security, $q, rest, enhance, modelCatalogueApiRoot) ->
-    return undefined if not $scope.element?.isInstanceOf?('relationship')
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless $scope.element?.isInstanceOf?('relationship')
+    return undefined unless security.hasRole('CURATOR')
     Action.createStandardAction(
       position: 1000
       label: 'Restore Archived'
@@ -505,8 +505,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerActionInRole 'edit-relationship', actionRoleRegister.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
     getRelationship = ->
       $scope.element ? $scope.tab?.value
-    return undefined if not getRelationship()?.isInstanceOf?('relationship')
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless getRelationship()?.isInstanceOf?('relationship')
+    return undefined unless security.hasRole('CURATOR')
     Action.createStandardAction(
       position: 100
       label: ''
@@ -530,7 +530,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   actionsProvider.registerActionInRole 'edit-mapping', actionRoleRegister.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'enhance', ($scope, messages, enhance) ->
-    return undefined if not $scope.element?.isInstanceOf?('mapping')
+    return undefined unless $scope.element?.isInstanceOf?('mapping')
 
     catalogueElementEnhancer = enhance.getEnhancer('catalogueElement')
     Action.createStandardAction (
@@ -550,8 +550,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   actionsProvider.registerActionInRole 'remove-mapping', actionRoleRegister.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
-    return undefined if not $scope.element?.isInstanceOf?('mapping')
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless $scope.element?.isInstanceOf?('mapping')
+    return undefined unless security.hasRole('CURATOR')
     Action.createStandardAction(
       position: 150
       label: ''
@@ -583,8 +583,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   actionsProvider.registerActionInRole 'change-type',actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
-    return undefined if not $scope.element?.isInstanceOf?('dataType')
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless $scope.element?.isInstanceOf?('dataType')
+    return undefined unless security.hasRole('CURATOR')
     Action.createStandardAction(
       position: 10000
       label: 'Change Type'
@@ -611,8 +611,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
 
   actionsProvider.registerChildAction 'catalogue-element', 'clone', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
-    return undefined if not security.hasRole('CURATOR')
-    return undefined if not $scope.element?.isInstanceOf?('catalogueElement')
+    return undefined unless security.hasRole('CURATOR')
+    return undefined unless $scope.element?.isInstanceOf?('catalogueElement')
     Action.createStandardAction(
       position: 20100
       label: 'Clone Current Element into Another Data Model'
@@ -627,8 +627,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   actionsProvider.registerChildAction 'catalogue-element', 'clone-from', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
-    return undefined if not security.hasRole('CURATOR')
-    return undefined if not $scope.element?.isInstanceOf?('dataModel')
+    return undefined unless security.hasRole('CURATOR')
+    return undefined unless $scope.element?.isInstanceOf?('dataModel')
     return undefined unless $scope.element?.status == 'DRAFT'
     Action.createStandardAction(
       position: 20000
@@ -644,8 +644,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   actionsProvider.registerChildAction 'catalogue-element', 'reindex-data-model', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
-    return undefined if not security.hasRole('ADMIN')
-    return undefined if not $scope.element?.isInstanceOf?('dataModel')
+    return undefined unless security.hasRole('ADMIN')
+    return undefined unless $scope.element?.isInstanceOf?('dataModel')
     Action.createStandardAction(
       position: 50500
       label: 'Reindex Data Model'
@@ -677,8 +677,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   newAssetVersion = ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
-    return undefined if not security.hasRole('CURATOR')
-    return undefined if not $scope.element?.isInstanceOf?('asset')
+    return undefined unless security.hasRole('CURATOR')
+    return undefined unless $scope.element?.isInstanceOf?('asset')
     Action.createStandardAction(
       position: -1900
       label: 'Upload New Version'

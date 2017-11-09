@@ -30,7 +30,7 @@ class CatalogueElementTreeview
 
     getLastListFromRootScope = (base) ->
       return undefined unless base
-      return undefined if not $rootScope.$$lastTreeLists
+      return undefined unless $rootScope.$$lastTreeLists
       return $rootScope.$$lastTreeLists[base]
 
 

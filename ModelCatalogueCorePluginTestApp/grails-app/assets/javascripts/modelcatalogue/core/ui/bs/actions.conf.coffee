@@ -18,8 +18,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       if not resource and $state.current.name == 'mc.resource.list'
         resource = $state.params.resource
 
-      return undefined if not security.hasRole('CURATOR')
-      return undefined if not resource
+      return undefined unless security.hasRole('CURATOR')
+      return undefined unless resource
       return undefined unless resource != 'batch'
       return undefined unless messages.hasPromptFactory('create-' + resource) or messages.hasPromptFactory('edit-' + resource)
 
@@ -60,8 +60,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
         angular.isFunction($scope.element.isInstanceOf) and
         $scope.element.isInstanceOf('catalogueElement')
 
-      return undefined if not elementPresent
-      return undefined if not security.getCurrentUser()?.id
+      return undefined unless elementPresent
+      return undefined unless security.getCurrentUser()?.id
 
       action = Action.createStandardAction(
         position: -20000
@@ -101,8 +101,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
     actionRoleRegister.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', '$state', 'security', 'catalogueElementResource',
     'modelCatalogueApiRoot', 'enhance', 'rest',
     ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
-      return undefined if not $scope.list?.base?.indexOf('/outgoing/favourite') >= 0
-      return undefined if not security.getCurrentUser()?.id
+      return undefined unless $scope.list?.base?.indexOf('/outgoing/favourite') >= 0
+      return undefined unless security.getCurrentUser()?.id
 
       Action.createStandardAction(
         position: 200
@@ -128,7 +128,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
     'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot',
     ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
       return undefined unless $scope.element?.isInstanceOf?('batch') or $scope.batch
-      return undefined if not security.hasRole('CURATOR')
+      return undefined unless security.hasRole('CURATOR')
 
       Action.createStandardAction(
         position: 150
@@ -149,11 +149,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   actionsProvider.registerActionInRoles 'create-new-relationship-in-header', [actionRoleRegister.ROLE_LIST_HEADER_ACTION,
     actionRoleRegister.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue',
     ($scope, messages, names, security, catalogue) ->
-      return undefined if not $scope.list?.base
-      return undefined if not catalogue.isInstanceOf($scope.list.itemType, 'relationship')
-      return undefined if not $scope.$parent?.element
+      return undefined unless $scope.list?.base
+      return undefined unless catalogue.isInstanceOf($scope.list.itemType, 'relationship')
+      return undefined unless $scope.$parent?.element
       return undefined unless $scope.$parent.element.status not in ["FINALIZED", "DEPRECATED"]
-      return undefined if not security.hasRole('CURATOR')
+      return undefined unless security.hasRole('CURATOR')
 
       direction = if $scope.list.base?.indexOf('/incoming/') > -1 then 'destinationToSource' else 'sourceToDestination'
       relationshipType = $scope.list.base.substring($scope.list.base.lastIndexOf('/') + 1)
@@ -181,9 +181,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   actionsProvider.registerActionInRoles 'create-new-mapping-in-header', [actionRoleRegister.ROLE_LIST_HEADER_ACTION,
     actionRoleRegister.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue',
     ($scope, messages, names, security, catalogue) ->
-      return undefined if not $scope.$parent.element?.hasOwnProperty('mappings')
-      return undefined if not security.hasRole('CURATOR')
-      return undefined if not catalogue.isInstanceOf($scope.list?.itemType, 'mapping')
+      return undefined unless $scope.$parent.element?.hasOwnProperty('mappings')
+      return undefined unless security.hasRole('CURATOR')
+      return undefined unless catalogue.isInstanceOf($scope.list?.itemType, 'mapping')
 
       Action.createStandardAction(
         position: 300
@@ -200,8 +200,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
   actionsProvider.registerActionInRole 'transform-csv', actionRoleRegister.ROLE_ITEM_ACTION, ['$scope', 'messages',
     'security', ($scope, messages, security) ->
-      return undefined if not $scope.element?.isInstanceOf?('csvTransformation')
-      return undefined if not security.isUserLoggedIn()
+      return undefined unless $scope.element?.isInstanceOf?('csvTransformation')
+      return undefined unless security.isUserLoggedIn()
 
       Action.createStandardAction(
         position: 0
@@ -286,7 +286,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
   actionsProvider.registerChildAction 'export', 'export-cart', ['security', '$state', '$window',
     'modelCatalogueApiRoot', (security, $state, $window, modelCatalogueApiRoot) ->
-      return undefined if not security.isUserLoggedIn()
+      return undefined unless security.isUserLoggedIn()
       return undefined unless $state.current.name == 'mc.favorites'
 
       console.log $state.current.name
@@ -304,7 +304,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
   actionsProvider.registerChildAction 'export', 'edit-XML', ['security', '$state', '$window', 'modelCatalogueApiRoot',
     '$scope', (security, $state, $window, modelCatalogueApiRoot, $scope) ->
-      return undefined if not security.hasRole('CURATOR')
+      return undefined unless security.hasRole('CURATOR')
       return undefined unless $scope.element?.isInstanceOf?('dataClass')
       Action.createStandardAction(
         position: 100010
@@ -360,7 +360,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   actionsProvider.registerChildAction('export', 'catalogue-element-export-specific-reports',
     ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout',
       ($scope, $window, enhance, rest, $log, messages, $timeout) ->
-        return undefined if not $scope.element
+        return undefined unless $scope.element
 
         Action.createChildWithGenerator(
           position: 1000
@@ -388,7 +388,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   actionsProvider.registerChildAction('export', 'list-exports-current', actionRoleRegister.ROLE_LIST_ACTION,
     ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout',
       ($scope, $window, enhance, rest, $log, messages, $timeout) ->
-        return undefined if not $scope.list?
+        return undefined unless $scope.list?
 
         Action.createChildWithGenerator(
           position: 5000
@@ -586,7 +586,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   actionsProvider.registerActionInRole 'run-all-actions-in-batch', actionRoleRegister.ROLE_ITEM_ACTION, ['$scope',
     'messages', 'modelCatalogueApiRoot', 'enhance', 'rest', '$timeout', 'security',
     ($scope, messages, modelCatalogueApiRoot, enhance, rest, $timeout, security) ->
-      return undefined if not security.hasRole('CURATOR')
+      return undefined unless security.hasRole('CURATOR')
       return undefined unless $scope.element?.isInstanceOf?('batch') or $scope.batch
 
       action = Action.createStandardAction(
@@ -615,9 +615,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
   actionsProvider.registerActionInRole 'update-action-parameters', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', 'messages', 'names',
     'security', ($scope, messages, names, security) ->
-      return undefined if not $scope.action
+      return undefined unless $scope.action
       return undefined unless $scope.action.state not in ['PERFORMING', 'PERFORMED']
-      return undefined if not security.hasRole('CURATOR')
+      return undefined unless security.hasRole('CURATOR')
 
       Action.createStandardAction(
         position: 100
@@ -634,7 +634,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   ]
 
   actionsProvider.registerActionInRole 'modal-cancel', actionRoleRegister.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
-    return undefined if not angular.isFunction($scope.$dismiss)
+    return undefined unless angular.isFunction($scope.$dismiss)
 
     Action.createStandardAction(
       position: 10000

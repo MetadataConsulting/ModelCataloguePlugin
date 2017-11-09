@@ -38,9 +38,9 @@ angular.module('modelcatalogue.core.components.catalogueElementTreeview.item')
       isForCurrentCatalogueElement = (data) -> data[1].link is $scope.catalogueElement.link
 
       getLocalName = (item) ->
-        return undefined if not item
-        return undefined if not item.ext
-        return undefined if not angular.isFunction(item.ext.get)
+        return undefined unless item
+        return undefined unless item.ext
+        return undefined unless angular.isFunction(item.ext.get)
 
         return item.ext.get('name') ? item.ext.get('Name')
 

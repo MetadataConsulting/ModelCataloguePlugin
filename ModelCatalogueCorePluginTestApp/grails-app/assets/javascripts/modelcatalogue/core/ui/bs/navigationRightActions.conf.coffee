@@ -74,7 +74,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   actionsProvider.registerChildAction 'user-menu', 'user-favorites', (security, $state, $rootScope) ->
     'ngInject'
-    return undefined if not security.isUserLoggedIn()
+    return undefined unless security.isUserLoggedIn()
 
     Action.createDefaultTypeAction(
       position:   1000
@@ -87,7 +87,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   actionsProvider.registerChildAction 'user-menu', 'user-api-key', (messages, security, rest, modelCatalogueApiRoot) ->
     'ngInject'
-    return undefined if not security.isUserLoggedIn()
+    return undefined unless security.isUserLoggedIn()
     Action.createStandardAction(
       position:   10000
       label:      "API Key"
@@ -134,7 +134,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   actionsProvider.registerChildAction 'admin-menu', 'user-simple-admin', ($window, $state, security) ->
     "ngInject"
-    return undefined if security.hasRole('SUPERVISOR')
+    return undefined unless not security.hasRole('SUPERVISOR')
 
     Action.createDefaultTypeAction(
       position:   1000
@@ -177,7 +177,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   userLastSeen = [
     '$scope', 'names','security', '$state', 'messages',
     ($scope ,  names , security ,  $state ,  messages) ->
-      return undefined if not security.hasRole('ADMIN')
+      return undefined unless security.hasRole('ADMIN')
 
       Action.createStandardAction(
         position: 10100
@@ -270,9 +270,9 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerActionInRole 'new-import', actionRoleRegister.ROLE_LIST_ACTION, [
     '$scope', 'names','security', '$state',
     ($scope ,  names , security ,  $state ) ->
-      return undefined if not security.hasRole('CURATOR')
-      return undefined if $state.current.name != 'mc.resource.list'
-      return undefined if $scope.resource != 'asset'
+      return undefined unless security.hasRole('CURATOR')
+      return undefined unless $state.current.name == 'mc.resource.list'
+      return undefined unless $scope.resource == 'asset'
 
       Action.createAbstractAction(
         position: 10000
@@ -285,7 +285,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   loincImport = ($scope, messages, security) ->
     'ngInject'
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless security.hasRole('CURATOR')
 
     Action.createDefaultTypeAction(
       position: 13001
@@ -302,7 +302,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   excelImport = ($scope, messages, security) ->
     'ngInject'
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless security.hasRole('CURATOR')
 
     Action.createDefaultTypeAction(
       position: 13002
@@ -319,7 +319,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   oboImport = ($scope, messages, security) ->
     'ngInject'
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless security.hasRole('CURATOR')
     Action.createDefaultTypeAction(
       position: 13003
       label: "Import OBO"
@@ -334,7 +334,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   umlImport = ($scope, messages, security) ->
     'ngInject'
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless security.hasRole('CURATOR')
     Action.createDefaultTypeAction(
       position: 13004
       label: "Import Star Uml"
@@ -350,7 +350,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   mcImport = ($scope, messages, security) ->
     'ngInject'
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless security.hasRole('CURATOR')
     Action.createDefaultTypeAction(
       position: 13005
       label: "Import Model Catalogue DSL File"
@@ -365,7 +365,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   xmlImport = ($scope, messages, security) ->
     'ngInject'
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless security.hasRole('CURATOR')
     Action.createDefaultTypeAction(
       position: 13006
       label: "Import Catalogue XML"
@@ -380,7 +380,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   rareDiseaseCsvImport = ($scope, messages, security) ->
     'ngInject'
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless security.hasRole('CURATOR')
     Action.createDefaultTypeAction(
       position: 13007
       label: "Import Rare Disease Csv"

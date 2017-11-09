@@ -122,7 +122,7 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
             $scope.step = step
 
           $scope.next = ->
-            return undefined if not $scope.classification.name
+            return undefined unless $scope.classification.name
             for step, i in $scope.steps
               if step == $scope.step and i < $scope.steps.length - 1
                 nextStep = $scope.steps[i + 1]
@@ -133,7 +133,7 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
                   break
 
           $scope.previous = ->
-            return undefined if not $scope.classification.name
+            return undefined unless $scope.classification.name
             for step, i in $scope.steps
               if step == $scope.step and i != 0
                 $scope.step = $scope.steps[i - 1]
