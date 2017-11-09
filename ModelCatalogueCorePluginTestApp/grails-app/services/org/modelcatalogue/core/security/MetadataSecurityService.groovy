@@ -788,11 +788,21 @@ class MetadataSecurityService {
         secureMappings(MODEL_CATALOGUE_FORM_URL_MAPPINGS)
         secureMappings(MODEL_CATALOGUE_AUDIT_PLUGIN_MAPPINGS)
         secureModelCatalogueCorePluginUrlMappings()
+
+        secureDataModelPermissionEndpoints()
+    }
+
+    void secureDataModelPermissionEndpoints() {
+        requestmapGormService.createRequestmapIfMissing('/dataModelPermission/grant',                               'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/dataModelPermission/revoke',                               'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/dataModelPermission/show/*',                               'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/dataModelPermission/index',                               'ROLE_SUPERVISOR')
     }
 
     void secureSpringSecurityUiEndpoints() {
-        requestmapGormService.createRequestmapIfMissing('/role/**',                               'ROLE_SUPERVISOR')
+        //requestmapGormService.createRequestmapIfMissing('/user/*',                               'ROLE_SUPERVISOR')
         requestmapGormService.createRequestmapIfMissing('/userAdmin/**',                          'ROLE_SUPERVISOR')
+        requestmapGormService.createRequestmapIfMissing('/role/**',                               'ROLE_SUPERVISOR')
         requestmapGormService.createRequestmapIfMissing('/aclClass/**', 'ROLE_SUPERVISOR')
         requestmapGormService.createRequestmapIfMissing('/aclSid/**', 'ROLE_SUPERVISOR')
         requestmapGormService.createRequestmapIfMissing('/aclEntry/**', 'ROLE_SUPERVISOR')

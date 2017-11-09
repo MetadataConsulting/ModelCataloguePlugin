@@ -5,15 +5,19 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.acl.AclService
 import grails.plugin.springsecurity.acl.AclUtilService
+import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.util.DataModelFilter
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.acls.domain.BasePermission
 import org.springframework.security.acls.model.Acl
+import org.springframework.security.acls.model.AlreadyExistsException
 import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import org.springframework.security.acls.model.Permission
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 
 class DataModelAclService {
@@ -35,14 +39,7 @@ class DataModelAclService {
     }
 
     boolean hasReadPermission(DataModel dataModel) {
-        if ( dataModel == null) {
-            return true
-        }
-        Authentication authentication = springSecurityService.authentication
-        if ( authentication == null ) {
-            return false
-        }
-        aclUtilService.hasPermission(authentication, dataModel, BasePermission.READ)
+        hasPermission(dataModel, BasePermission.READ)
     }
 
     boolean hasAdministratorPermission(Object instance) {
@@ -54,6 +51,10 @@ class DataModelAclService {
     }
 
     boolean hasAdministratorPermission(DataModel dataModel) {
+        hasPermission(dataModel, BasePermission.ADMINISTRATION)
+    }
+
+    boolean hasPermission(DataModel dataModel, Permission permission) {
         if ( dataModel == null) {
             return true
         }
@@ -61,7 +62,7 @@ class DataModelAclService {
         if ( authentication == null ) {
             return false
         }
-        aclUtilService.hasPermission(authentication, dataModel, BasePermission.ADMINISTRATION)
+        aclUtilService.hasPermission(authentication, dataModel, permission)
     }
 
     boolean isAdminOrHasAdministratorPermission(DataModel dataModel) {
@@ -102,13 +103,14 @@ class DataModelAclService {
         addPermission(dataModel, BasePermission.READ)
     }
 
+    @PreAuthorize('hasRole("ROLE_SUPERVISOR")')
+    @Transactional
     void addPermission(DataModel dataModel, Permission permission) {
-        ObjectIdentity objectIdentity = objectIdentityRetrievalStrategy.getObjectIdentity(dataModel)
-        Acl acl = aclService.readAclById(objectIdentity)
-        if ( !acl ) {
-            aclService.createAcl(objectIdentity)
+        if ( hasPermission(dataModel, permission ) ) {
+            return
         }
-        aclUtilService.addPermission(dataModel, loggedUsername(), permission)
+        String username = loggedUsername()
+        aclUtilService.addPermission(dataModel, username, permission)
     }
 
     void copyPermissions(DataModel sourceModel, DataModel destinationModel){
@@ -122,6 +124,9 @@ class DataModelAclService {
 
     @CompileDynamic
     String loggedUsername() {
+        if ( springSecurityService.principal instanceof String ) {
+            return springSecurityService.principal
+        }
         springSecurityService.principal.username
     }
 

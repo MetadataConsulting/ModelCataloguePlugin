@@ -40,9 +40,8 @@ class BootStrap {
     def modelCatalogueSearchService
     def userService
     GrailsApplication grailsApplication
-    AclService aclService
+    DataModelAclService dataModelAclService
     ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy
-    RequestmapGormService requestmapGormService
     MetadataSecurityService metadataSecurityService
 
     def init = { servletContext ->
@@ -123,17 +122,7 @@ class BootStrap {
     private void configureAcl() {
         List<DataModel> dataModelList = DataModel.findAll()
         for ( DataModel dataModel : dataModelList ) {
-            ObjectIdentity objectIdentity = objectIdentityRetrievalStrategy.getObjectIdentity(dataModel)
-            try {
-                Acl acl = aclService.readAclById(objectIdentity)
-                if ( !acl ) {
-                    aclService.createAcl(objectIdentity)
-                }
-            } catch ( NotFoundException e ) {
-                log.warn "NotFoundException for ${dataModel.id}"
-                //aclService.createAcl(objectIdentity)
-            }
-
+            dataModelAclService.addAdministrationPermission(dataModel)
         }
     }
 
@@ -147,6 +136,8 @@ class BootStrap {
             SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(user.username,
                     user.password,
                     authorityList)
+        } else {
+            log.error('Did not find any User with ROLE_SUPERVISOR')
         }
 
     }

@@ -39,4 +39,13 @@ class UserGormService {
         user.save(flush: true)
         user
     }
+
+    @Transactional(readOnly = true)
+    List<String> findAllUsername() {
+        (User.where {}.projections {
+            property('username')
+        }.list() as List<String>).sort { String a, b ->
+            a <=> b
+        }
+    }
 }
