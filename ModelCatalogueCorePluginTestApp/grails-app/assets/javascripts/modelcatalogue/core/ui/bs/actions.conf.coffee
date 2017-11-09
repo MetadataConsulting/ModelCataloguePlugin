@@ -1,6 +1,6 @@
-angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsProvider, names, actionRoleRegister) ->
+angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsProvider, names, actionRoleRegister, actionClass) ->
   'ngInject'
-
+  Action = actionClass
   showErrorsUsingMessages = (messages) ->
     (response) ->
       if response?.data and response.data.errors
@@ -20,14 +20,14 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
       return undefined if not security.hasRole('CURATOR')
       return undefined if not resource
-      return undefined if resource == 'batch'
-      return undefined if not messages.hasPromptFactory('create-' + resource) and not messages.hasPromptFactory('edit-' + resource)
+      return undefined unless resource != 'batch'
+      return undefined unless messages.hasPromptFactory('create-' + resource) or messages.hasPromptFactory('edit-' + resource)
 
       dataModel = dataModelService.anyParentDataModel($scope)
 
-      return undefined if dataModel and dataModel.status isnt 'DRAFT'
+      return undefined unless not dataModel or dataModel.status == 'DRAFT'
 
-      {
+      Action.createStandardAction(
         position: 100
         label: "New #{names.getNaturalName(resource)}"
         icon: 'fa fa-plus-circle'
@@ -48,26 +48,26 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
           , (errors)->
             $log.error errors
             messages.error('You don\'t have rights to create new elements')
-      }
+      )
 
   actionsProvider.registerActionInRoles 'favorite-element',
     [actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, actionRoleRegister.ROLE_ITEM_INFINITE_LIST],
     ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest, $rootScope) ->
       'ngInject'
-      elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and
-        angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and
+      elementPresent = $scope.element and
+        angular.isFunction($scope.element.getResourceName) and
+        angular.isFunction($scope.element.getElementTypeName) and
+        angular.isFunction($scope.element.isInstanceOf) and
         $scope.element.isInstanceOf('catalogueElement')
 
       return undefined if not elementPresent
       return undefined if not security.getCurrentUser()?.id
 
-      action =
+      action = Action.createStandardAction(
         position: -20000
         label: 'Favourite'
-        iconOnly: true
         icon: 'fa fa-star'
         type: 'primary'
-        watches: ['element.favourite', 'element.id']
         action: ->
           catalogueElementResource('user').get(security.getCurrentUser()?.id).then (user) ->
             favourite = $scope.element.favourite
@@ -84,6 +84,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
                 $rootScope.$broadcast 'catalogueElementCreated', relation, url, $scope.element
 
               relation
+      ).withIconOnly()
+      .watching ['element.favourite', 'element.id']
+
 
       if $scope.element.favourite
         action.active = true
@@ -98,12 +101,10 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
     actionRoleRegister.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', '$state', 'security', 'catalogueElementResource',
     'modelCatalogueApiRoot', 'enhance', 'rest',
     ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
-      return undefined if not $scope.list
-      return undefined if not $scope.list.base
-      return undefined if $scope.list.base.indexOf('/outgoing/favourite') == -1
+      return undefined if not $scope.list?.base?.indexOf('/outgoing/favourite') >= 0
       return undefined if not security.getCurrentUser()?.id
 
-      {
+      Action.createStandardAction(
         position: 200
         label: 'Add to Favourites'
         icon: 'fa fa-plus-circle'
@@ -120,55 +121,49 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
                 messages.success "#{element.getLabel()} has been added to favourites"
                 relation
 
-      }
+      )
   ]
 
   actionsProvider.registerActionInRole 'archive-batch', actionRoleRegister.ROLE_ITEM_ACTION, ['$rootScope', '$scope',
     'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot',
     ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
-      return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('batch') or $scope.batch
+      return undefined unless $scope.element?.isInstanceOf?('batch') or $scope.batch
       return undefined if not security.hasRole('CURATOR')
 
-      {
+      Action.createStandardAction(
         position: 150
         label: 'Archive'
         icon: 'glyphicon glyphicon-compressed'
         type: 'danger'
-        watches: ['batch.archived', 'element.archived']
-        disabled: ($scope.batch ? $scope.element).archived
         action: ->
           batch = $scope.batch ? $scope.element
           messages.confirm("Do you want to archive batch #{batch.name} ?", "The batch #{batch.name} will be archived").then ->
             enhance(rest(url: "#{modelCatalogueApiRoot}#{batch.link}/archive", method: 'POST')).then (archived) ->
               batch.updateFrom archived
             , showErrorsUsingMessages(messages)
-      }
+      ).watching ['batch.archived', 'element.archived']
+      .disabledIf ($scope.batch ? $scope.element).archived
   ]
 
 
   actionsProvider.registerActionInRoles 'create-new-relationship-in-header', [actionRoleRegister.ROLE_LIST_HEADER_ACTION,
     actionRoleRegister.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue',
     ($scope, messages, names, security, catalogue) ->
-      return undefined if not $scope.list
-      return undefined if not $scope.list.base
+      return undefined if not $scope.list?.base
       return undefined if not catalogue.isInstanceOf($scope.list.itemType, 'relationship')
-      return undefined if not $scope.$parent
-      return undefined if not $scope.$parent.element
-      return undefined if $scope.$parent.element.status in ["FINALIZED", "DEPRECATED"]
+      return undefined if not $scope.$parent?.element
+      return undefined unless $scope.$parent.element.status not in ["FINALIZED", "DEPRECATED"]
       return undefined if not security.hasRole('CURATOR')
 
       direction = if $scope.list.base?.indexOf('/incoming/') > -1 then 'destinationToSource' else 'sourceToDestination'
       relationshipType = $scope.list.base.substring($scope.list.base.lastIndexOf('/') + 1)
 
-      {
+      Action.createStandardAction(
         position: 200
         label: 'Add'
         icon: 'fa fa-plus-circle'
         type: 'success'
-        watches: [
-          (scope) -> scope.$parent.element.status
-          (scope) -> scope.$parent.element.archived
-        ]
+
         action: ->
           messages.prompt('Create Relationship', '', {
             type: 'create-new-relationship',
@@ -177,19 +172,20 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
             direction: direction,
             relationshipTypeName: relationshipType
           }).catch showErrorsUsingMessages(messages)
-      }
+      ).watching [ # keep method call on same line as paren or could possibly have syntax problems with multiline list
+        (scope) -> scope.$parent.element.status
+        (scope) -> scope.$parent.element.archived
+      ]
   ]
 
   actionsProvider.registerActionInRoles 'create-new-mapping-in-header', [actionRoleRegister.ROLE_LIST_HEADER_ACTION,
     actionRoleRegister.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue',
     ($scope, messages, names, security, catalogue) ->
-      return undefined if not $scope.$parent.element
-      return undefined if not $scope.$parent.element.hasOwnProperty('mappings')
+      return undefined if not $scope.$parent.element?.hasOwnProperty('mappings')
       return undefined if not security.hasRole('CURATOR')
-      return undefined if not $scope.list
-      return undefined if not catalogue.isInstanceOf($scope.list.itemType, 'mapping')
+      return undefined if not catalogue.isInstanceOf($scope.list?.itemType, 'mapping')
 
-      {
+      Action.createStandardAction(
         position: 300
         label: 'Add'
         icon: 'fa fa-plus-circle'
@@ -199,17 +195,15 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
             type: 'new-mapping',
             element: $scope.$parent.element
           }).catch showErrorsUsingMessages(messages)
-      }
+      )
   ]
 
   actionsProvider.registerActionInRole 'transform-csv', actionRoleRegister.ROLE_ITEM_ACTION, ['$scope', 'messages',
     'security', ($scope, messages, security) ->
-      return undefined if not $scope.element
-      return undefined if not angular.isFunction $scope.element.isInstanceOf
-      return undefined if not $scope.element.isInstanceOf('csvTransformation')
+      return undefined if not $scope.element?.isInstanceOf?('csvTransformation')
       return undefined if not security.isUserLoggedIn()
 
-      {
+      Action.createStandardAction(
         position: 0
         label: 'Transform'
         icon: 'fa fa-long-arrow-right'
@@ -217,15 +211,15 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
         action: ->
           messages.prompt('Transform CSV File', '', {type: 'transform-csv-file', element: $scope.element})
 
-      }
+      )
   ]
 
   actionsProvider.registerActionInRole 'refresh-asset', actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, ['$scope',
     '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->
-      return undefined if $scope.element?.elementType != 'org.modelcatalogue.core.Asset'
-      return undefined if $scope.element.status != 'PENDING'
+      return undefined unless $scope.element?.elementType == 'org.modelcatalogue.core.Asset'
+      return undefined unless $scope.element.status == 'PENDING'
 
-      {
+      Action.createStandardAction(
         position: -100
         label: ''
         icon: 'glyphicon glyphicon-refresh'
@@ -235,8 +229,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
             $scope.element.updateFrom refreshed
             $rootScope.$broadcast 'redrawContextualActions'
             $rootScope.$broadcast 'catalogueElementUpdated', refreshed
-
-      }
+      )
   ]
   ###
   The action and the message type are both called generate-suggestions.
@@ -245,9 +238,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
     'catalogue', 'modelCatalogueApiRoot', 'enhance', 'rest', 'messages', '$state',
     ($scope, security, catalogue, modelCatalogueApiRoot, enhance, rest, messages, $state)->
       return undefined unless security.isUserLoggedIn()
-      return undefined unless $scope.list
-      return undefined unless catalogue.isInstanceOf($scope.list.itemType, 'batch')
-      {
+      return undefined unless catalogue.isInstanceOf($scope.list?.itemType, 'batch')
+      Action.createStandardAction(
         position: 100
         label: 'Generate Suggestions'
         icon: 'fa fa-flash'
@@ -255,83 +247,85 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
         action: ->
           messages.prompt('Generate Suggestions', "Select a type of optimization. Suggestions of this type will be generated when you submit your selection. This may take a long time, depending on complexity of the catalogue. You can rerun the action later to clean all resolved batches generated by this action.", {type: 'generate-suggestions'}).then ->
             $state.go('.', {page: undefined}, {reload: true})
-
-      }
+      )
   ]
 
   actionsProvider.registerActionInRole 'refresh-batches', actionRoleRegister.ROLE_LIST_ACTION, ['$state', '$scope',
     'security', 'catalogue', ($state, $scope, security, catalogue)->
       return undefined unless security.isUserLoggedIn()
-      return undefined unless $scope.list
-      return undefined unless catalogue.isInstanceOf($scope.list.itemType, 'batch')
-      {
+      return undefined unless catalogue.isInstanceOf($scope.list?.itemType, 'batch')
+      Action.createStandardAction(
         position: 0
         label: 'Refresh'
         icon: 'fa fa-refresh'
         type: 'primary'
         action: ->
           $state.go('.', {page: undefined}, {reload: true})
-      }
+      )
   ]
 
   actionsProvider.registerActionInRoles 'export', [actionRoleRegister.ROLE_LIST_ACTION, actionRoleRegister.ROLE_ITEM_ACTION,
     actionRoleRegister.ROLE_NAVIGATION_ACTION, actionRoleRegister.ROLE_LIST_HEADER_ACTION], ['$scope', 'security',
     ($scope, security)->
       return undefined unless security.hasRole('CURATOR')
-      return undefined unless $scope.list or $scope.element
-      if $scope.list
-        return undefined if $scope.resource == 'import'
-      if $scope.element
-        return undefined if not angular.isFunction $scope.element.isInstanceOf
-        return undefined if $scope.element.isInstanceOf('asset')
-      {
+      return undefined unless ($scope.list and
+                              not $scope.resource == 'import') or
+        ($scope.element and
+          angular.isFunction($scope.element.isInstanceOf) and
+          not $scope.element.isInstanceOf?('asset'))
+
+      action = Action.createAbstractAction(
         position: 100000
         label: 'Export'
         icon: 'glyphicon glyphicon-download-alt'
         type: 'primary'
-        expandToLeft: true
-      }
+      )
+      action.expandToLeft = true
+      action
   ]
 
   actionsProvider.registerChildAction 'export', 'export-cart', ['security', '$state', '$window',
     'modelCatalogueApiRoot', (security, $state, $window, modelCatalogueApiRoot) ->
       return undefined if not security.isUserLoggedIn()
-      return undefined if $state.current.name != 'mc.favorites'
+      return undefined unless $state.current.name == 'mc.favorites'
 
       console.log $state.current.name
 
-      {
+      Action.createStandardAction(
         position: 100000
         label: 'Export Favourites'
+        icon: null
+        type: null
         action: ->
           $window.open "#{modelCatalogueApiRoot}/user/#{security.getCurrentUser().id}/outgoing/favourite?format=xml"
 
-      }
+      )
   ]
 
   actionsProvider.registerChildAction 'export', 'edit-XML', ['security', '$state', '$window', 'modelCatalogueApiRoot',
     '$scope', (security, $state, $window, modelCatalogueApiRoot, $scope) ->
       return undefined if not security.hasRole('CURATOR')
-      return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('dataClass')
-      {
+      return undefined unless $scope.element?.isInstanceOf?('dataClass')
+      Action.createStandardAction(
         position: 100010
         label: 'Edit Xml Schema'
+        icon: null
+        type: null
         action: ->
           $state.go('mc.resource.xml-editor', {resource: 'dataClass', id: $scope.element.id})
-      }
+      )
   ]
 
   generateReports = ($scope, $window, enhance, rest, $log, messages, $timeout) ->
     (reports = []) ->
       for report in reports
-        {
+        Action.createActionFromReport(
           label: report.title
           defaultName: report.defaultName
           depth: report.depth
           includeMetadata: report.includeMetadata
           url: report.url
           type: report.type
-          watches: 'element'
           action: ->
             url = @url
             defaultValue = if @defaultName then @defaultName else ''
@@ -361,34 +355,34 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
             else
               $log.error "unknown type of report '#{@type}'"
             return true
-        }
+        ).watching 'element'
 
   actionsProvider.registerChildAction('export', 'catalogue-element-export-specific-reports',
     ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout',
       ($scope, $window, enhance, rest, $log, messages, $timeout) ->
         return undefined if not $scope.element
 
-        {
+        Action.createChildWithGenerator(
           position: 1000
           label: "#{$scope.element.name} Reports"
           disabled: not $scope.element?.availableReports?.length
           watches: 'element.availableReports'
           generator: (action) ->
             action.createActionsFrom 'element.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
-        }
+        )
     ])
 
   actionsProvider.registerChildAction('export', 'generic-reports',
     ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout',
       ($scope, $window, enhance, rest, $log, messages, $timeout) ->
-        {
+        Action.createChildWithGenerator(
           position: 2000
           label: "Other Reports"
           disabled: not $scope.reports?.length
           watches: 'reports'
           generator: (action) ->
             action.createActionsFrom 'reports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
-        }
+        )
     ])
 
   actionsProvider.registerChildAction('export', 'list-exports-current', actionRoleRegister.ROLE_LIST_ACTION,
@@ -396,125 +390,117 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       ($scope, $window, enhance, rest, $log, messages, $timeout) ->
         return undefined if not $scope.list?
 
-        {
+        Action.createChildWithGenerator(
           position: 5000
           label: "Current Reports"
           disabled: not $scope.list.availableReports?.length
           watches: 'list.availableReports'
           generator: (action) ->
             action.createActionsFrom 'list.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
-        }
+        )
     ])
 
   actionsProvider.registerActionInRole 'switch-archived-batches', actionRoleRegister.ROLE_LIST_ACTION, ['$state', '$scope',
     '$stateParams', ($state, $scope, $stateParams) ->
       return undefined unless $state.current.name == 'mc.resource.list' and $scope.list and $stateParams.resource == 'batch'
 
-      {
-        abstract: true
+      Action.createAbstractAction(
         position: 500
-
-        type: (->
-          return 'info'        if $stateParams.status == 'archived'
-          return 'glyphicon glyphicon-ok')()
-        label: (->
-          return 'Archived'    if $stateParams.status == 'archived'
-          return 'Active')()
-      }
+        label: if $stateParams.status == 'archived' then 'Archived' else 'Active'
+        icon: null
+        type: if $stateParams.status == 'archived' then 'info' else 'glyphicon glyphicon-ok'
+      )
   ]
 
   actionsProvider.registerChildAction 'switch-archived-batches', 'switch-archived-batches-active', ['$state',
     '$stateParams', ($state, $stateParams) ->
-      {
+      Action.createStandardAction(
         position: 300
         label: "Active"
         icon: 'glyphicon glyphicon-ok'
         type: 'primary'
-        active: !$stateParams.status
         action: ->
           newParams = angular.copy($stateParams)
           newParams.status = undefined
           $state.go 'mc.resource.list', newParams
-      }
+      ).activeIf !$stateParams.status
   ]
 
   actionsProvider.registerChildAction 'switch-archived-batches', 'switch-archived-batches-archived', ['$state',
     '$stateParams', ($state, $stateParams) ->
-      {
+      Action.createStandardAction(
         position: 200
         label: "Archived"
         icon: 'glyphicon glyphicon-time'
         type: 'warning'
-        active: $stateParams.status == 'archived'
         action: ->
           newParams = angular.copy($stateParams)
           newParams.status = 'archived'
           $state.go 'mc.resource.list', newParams
-      }
+      ).activeIf $stateParams.status == 'archived'
   ]
 
 
   actionsProvider.registerActionInRole 'run-action', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'PENDING'
 
-    {
+    Action.createStandardAction(
       position: 200
-      type: 'success'
-      icon: 'glyphicon glyphicon-play'
       label: 'Run'
+      icon: 'glyphicon glyphicon-play'
+      type: 'success'
       action: ->
         $scope.action.run().then ->
           $scope.reload() if angular.isFunction($scope.reload)
           $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
-
-    }
+    )
   ]
 
 
   actionsProvider.registerActionInRole 'dismiss-action', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'PENDING'
 
-    {
+    Action.createStandardAction(
       position: 500
-      type: 'danger'
-      icon: 'glyphicon glyphicon-remove'
       label: 'Dismiss'
+      icon: 'glyphicon glyphicon-remove'
+      type: 'danger'
       action: ->
         $scope.action.dismiss().then ->
           $scope.reload() if angular.isFunction($scope.reload)
-          $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
-    }
+          $scope.batch.$$reload() if angular.isFunction($scope.batch?.$$reload)
+    )
   ]
 
 
   actionsProvider.registerActionInRole 'reactivate-action', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'DISMISSED'
 
-    {
+    Action.createStandardAction(
       position: 200
-      type: 'success'
-      icon: 'glyphicon glyphicon-repeat'
       label: 'Reactivate'
+      icon: 'glyphicon glyphicon-repeat'
+      type: 'success'
       action: ->
         $scope.action.reactivate().then ->
           $scope.reload() if angular.isFunction($scope.reload)
           $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
-    }
+    )
   ]
 
   actionsProvider.registerActionInRole 'repeat-action', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'FAILED'
 
-    {
+    Action.createStandardAction(
       position: 900
-      type: 'success'
-      icon: 'glyphicon glyphicon-repeat'
       label: 'Retry'
+      icon: 'glyphicon glyphicon-repeat'
+      type: 'success'
       action: ->
         $scope.action.reactivate().then ->
           $scope.reload() if angular.isFunction($scope.reload)
           $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
-    }
+    )
   ]
 
 
@@ -522,30 +508,31 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
     actionRoleRegister.ROLE_NAVIGATION_ACTION], ['$scope', ($scope) ->
     return undefined unless angular.isFunction($scope.batch?.$$reload) and ($scope.action and $scope.action.state == 'PERFORMING') or ($scope.batch and not $scope.action)
 
-    {
+    Action.createStandardAction(
       position: 900
-      type: 'success'
-      icon: 'glyphicon glyphicon-refresh'
       label: 'Reload'
+      icon: 'glyphicon glyphicon-refresh'
+      type: 'success'
       action: ->
         if $scope.batch?.$$reload
           $scope.batch?.$$reload()
           return
           $scope.reload() if angular.isFunction($scope.reload)
           $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
-    }
+    )
   ]
 
   actionsProvider.registerActionInRole 'link-actions', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', '$rootScope', 'messages',
     ($scope, $rootScope, messages) ->
-      return undefined unless $scope.action and not ($scope.action.state == 'PERFORMING' or $scope.action.state == 'PERFORMED')
+      return undefined unless $scope.action and
+        $scope.action.state != 'PERFORMING' and
+        $scope.action.state != 'PERFORMED'
 
-      action = {
+      action = Action.createStandardAction(
         position: 950
-        type: 'primary'
-        icon: 'glyphicon glyphicon-open'
         label: 'Add or Remove Dependency'
-        watches: -> $rootScope.selectedAction
+        icon: 'glyphicon glyphicon-open'
+        type: 'primary'
         action: ->
           if $rootScope.selectedAction == $scope.action
             $rootScope.selectedAction = undefined
@@ -567,7 +554,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
               $rootScope.selectedAction = undefined
 
 
-      }
+      ).watching (-> $rootScope.selectedAction)
 
       if $rootScope.selectedAction
         if $rootScope.selectedAction == $scope.action
@@ -600,21 +587,20 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
     'messages', 'modelCatalogueApiRoot', 'enhance', 'rest', '$timeout', 'security',
     ($scope, messages, modelCatalogueApiRoot, enhance, rest, $timeout, security) ->
       return undefined if not security.hasRole('CURATOR')
-      return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('batch') or $scope.batch
+      return undefined unless $scope.element?.isInstanceOf?('batch') or $scope.batch
 
-      action = {
+      action = Action.createStandardAction(
         position: 200
-        type: 'success'
-        icon: 'glyphicon glyphicon-flash'
         label: 'Run All Pending'
-        watches: ['batch', 'element']
+        icon: 'glyphicon glyphicon-flash'
+        type: 'success'
         action: ->
           batch = $scope.batch ? $scope.element
           messages.confirm('Run All Actions', "Do you really wan to run all actions from '#{batch.name}' batch").then ->
             enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}#{batch.link}/run")).then (updated) ->
               batch.updateFrom(updated)
             $timeout($scope.reload, 1000) if angular.isFunction($scope.reload)
-      }
+      ).watching ['batch', 'element']
 
       updateDisabled = (batch) ->
         return unless batch
@@ -630,33 +616,33 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   actionsProvider.registerActionInRole 'update-action-parameters', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', 'messages', 'names',
     'security', ($scope, messages, names, security) ->
       return undefined if not $scope.action
-      return undefined if $scope.action.state in ['PERFORMING', 'PERFORMED']
+      return undefined unless $scope.action.state not in ['PERFORMING', 'PERFORMED']
       return undefined if not security.hasRole('CURATOR')
 
-      {
+      Action.createStandardAction(
         position: 100
         label: 'Update Action Parameters'
         icon: 'glyphicon glyphicon-edit'
         type: 'primary'
-        watches: 'action.state'
-        disabled: $scope.action.state in ['PERFORMING', 'PERFORMED']
+
         action: ->
           messages.prompt('Update Action Parameters', '', {type: 'update-action-parameters', action: $scope.action}).then (updated)->
             $scope.action = updated
-      }
+      ).watching 'action.state'
+      .disabledIf $scope.action.state in ['PERFORMING', 'PERFORMED']
 
   ]
 
   actionsProvider.registerActionInRole 'modal-cancel', actionRoleRegister.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
     return undefined if not angular.isFunction($scope.$dismiss)
 
-    {
+    Action.createStandardAction(
       position: 10000
       label: 'Cancel'
       icon: 'glyphicon glyphicon-ban-circle'
       type: 'warning'
       action: -> $scope.$dismiss()
-    }
+    )
   ]
 
 
@@ -664,16 +650,16 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
     ($scope) ->
       return undefined unless angular.isFunction($scope.finalizeElement)
 
-      {
+      Action.createStandardAction(
         position: 1000
         label: 'Finalize'
         icon: 'glyphicon glyphicon-ok'
         type: 'success'
-        watches: 'pending'
-        disabled: $scope.pending
         action: ->
           $scope.finalizeElement()
-      }
+      )
+        .watching 'pending'
+        .disabledIf $scope.pending
   ]
 
 
@@ -681,16 +667,16 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
     ($scope) ->
       return undefined unless angular.isFunction($scope.createDraftVersion)
 
-      {
+      Action.createStandardAction(
         position: 1000
         label: 'Create New Version'
         icon: 'glyphicon glyphicon-ok'
         type: 'success'
-        watches: 'pending'
-        disabled: $scope.pending
         action: ->
           $scope.createDraftVersion()
-      }
+      )
+        .watching 'pending'
+        .disabledIf $scope.pending
   ]
 
 
@@ -699,13 +685,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
     return undefined unless $scope.hasChanged and $scope.saveElement
 
-    {
+    Action.createStandardAction(
       position: 1000
       label: 'Save'
       icon: 'glyphicon glyphicon-ok'
       type: 'success'
-      watches: ['hasChanged()', 'saveInProgress']
-      disabled: not $scope.hasChanged() or $scope.saveInProgress
       action: ->
         if $scope.hasChanged() and not $scope.saveInProgress
           $scope.saveInProgress = true
@@ -714,20 +698,20 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
             return result
           .finally ->
             $scope.saveInProgress = false
-    }
+    )
+      .watching ['hasChanged()', 'saveInProgress']
+      .disabledIf not $scope.hasChanged() or $scope.saveInProgress
 
   actionsProvider.registerActionInRole 'modal-save-and-add-another', actionRoleRegister.ROLE_MODAL_ACTION, ($scope, $q) ->
     'ngInject'
 
     return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother
 
-    {
+    Action.createStandardAction(
       position: 2000
       label: 'Save and Create Another'
       icon: 'glyphicon glyphicon-ok'
       type: 'success'
-      watches: ['hasChanged()', 'saveInProgress']
-      disabled: not $scope.hasChanged() or $scope.saveInProgress
       action: ->
         if $scope.hasChanged() and not $scope.saveInProgress
           $scope.saveInProgress = true
@@ -737,19 +721,19 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
             return result
           .finally ->
             $scope.saveInProgress = false
-
-    }
+    )
+      .watching ['hasChanged()', 'saveInProgress']
+      .disabledIf not $scope.hasChanged() or $scope.saveInProgress
 
   actionsProvider.registerActionInRole 'expand-all-rows', actionRoleRegister.ROLE_LIST_HEADER_ACTION, ['$scope',
     ($scope) ->
       return undefined unless $scope.rows
 
-      {
+      Action.createStandardAction(
         position: -10000
         label: 'Expand All'
         icon: 'fa fa-plus-square-o'
         type: 'primary'
-        active: false
         action: ->
           $scope.$$expandAll = not @active
 
@@ -760,20 +744,20 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
           else
             @label = 'Expand All'
             @icon = 'fa fa-plus-square-o'
-
-      }
+      )
+        .activeIf false # what the. This is not even used?
   ]
 
   actionsProvider.registerActionInRole 'import-data-models-screen', actionRoleRegister.ROLE_DATA_MODELS_ACTION, [
     'security',
     (security) ->
       return undefined unless security.hasRole('CURATOR')
-      {
+      action = Action.createAbstractAction(
         position: 10000
         label: 'Import'
         icon: 'fa fa-fw fa-upload'
         type: 'primary'
-        abstract: true
-        expandToLeft: true
-      }
+      )
+      action.expandToLeft= true
+      return action
   ]

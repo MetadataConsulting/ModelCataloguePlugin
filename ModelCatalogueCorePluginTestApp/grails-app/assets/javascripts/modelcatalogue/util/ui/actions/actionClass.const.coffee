@@ -38,8 +38,54 @@ class Action
   An abstract action has no action. All abstract actions are parents and vice-versa.
   ###
   @createAbstractAction: ({position, label, icon, type}) ->
-    return new Action(position, label, icon, type, null)
+    return Action.createStandardAction(
+      position: position
+      label: label
+      icon: icon
+      type: type
+      action: null)
 
+  ###
+  Create a standard action but not specifying type.
+  ###
+  @createDefaultTypeAction: ({position, label, icon, action}) ->
+    return Action.createStandardAction(
+      position: position
+      label: label
+      icon: icon
+      type: null
+      action: action)
+
+  ###
+  Special case for action from report, used in a generator
+  ###
+  @createActionFromReport: ({label, defaultName, depth, includeMetadata, url, type, action}) ->
+    action2 = Action.createStandardAction(
+      position: null
+      label: label
+      icon: null
+      type: type
+      action: action)
+    action2.defaultName = defaultName
+    action2.depth = depth
+    action2.includeMetadata = includeMetadata
+    action2.url = url
+    return action2
+
+  ###
+  Special case for creating a child action with a generator
+  ###
+  @createChildWithGenerator: ({position, label, disabled, watches, generator}) ->
+    action = Action.createStandardAction(
+      position: position
+      label: label
+      icon: null
+      type: null
+      action: null)
+      .disabledIf disabled
+      .watching watches
+    action.generator = generator
+    return action
 
   ###the following are three special setters for commonly but not always used fields. The @param syntax automatically sets the parameter as the field with the same name.
   ###
@@ -51,10 +97,19 @@ class Action
   # @param [Boolean] disabled –when the button has its HTML disabled attribute set
   disabledIf: (@disabled) -> return @
 
-  # any other fields used will be rare. e.g. iconOnly, run, submit, mode, controller, generator.
+  # sets the action to display icon only, not label
+  withIconOnly: () ->
+    @iconOnly = true
+    return @
+
+
+  # any other fields used when registering the action will be rare and added directly. e.g. iconOnly, expandToLeft, submit, mode, controller, generator.
 
   ###
-  initialize the run method with angularJS $q and $rootScope for promise and broadcast. Should have id set first.
+  initialize the run method with angularJS $q and $rootScope for asynchronous behaviour/promise and event broadcasting. Should have id set first.
+
+  If @run but not @action is defined, the promise and broadcast stuff is skipped.
+
   For some reason using q as a variable makes it highlighted as if it were a method, so I used promiseQ. Also $broadcast is highlighted when accessed with dot.
   ###
   initializeRun: (promiseQ, rootScope) ->
