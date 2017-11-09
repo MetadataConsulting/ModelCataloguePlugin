@@ -160,14 +160,14 @@ class ElementService implements Publisher<CatalogueElement> {
 
         def matchNewScheme = theId.toString() =~ /\/(.\w+)\/(\d+)(@(.+))?$/
 
-        if (matchNewScheme) {
+        if (matchNewScheme.size()>0) {
             Long urlId = matchNewScheme[0][2] as Long
             String version = matchNewScheme[0][4] as String
             Long versionNumberFound = null
 
             def matchVersionNumber = version =~ /0\.0\.(\d+)/
 
-            if (matchVersionNumber) {
+            if (matchVersionNumber.size()>0) {
                 versionNumberFound = matchVersionNumber[0][1] as Long
             }
 
@@ -203,6 +203,7 @@ class ElementService implements Publisher<CatalogueElement> {
                     or {
                         eq 'latestVersionId', urlId
                         eq 'id', urlId
+                        eq 'modelCatalogueId', urlId
                     }
                     if (version) {
                         if (versionNumberFound) {
@@ -218,9 +219,37 @@ class ElementService implements Publisher<CatalogueElement> {
             }
 
 
+            //TODO: not sure why we have this line of code
+            // would like to get rid of it
+            // it's checking that the default model catalogue id id compatible with the 'fixed model catalogue id'
+            // but the default model catalogue id may not be the model catalogue id
+
             if (result && result.getDefaultModelCatalogueId(version == null).contains(Legacy.fixModelCatalogueId(theId).toString())) {
                 return result
             }
+
+
+            //added this in so that we can return element based on the model catalogue id
+            // i.e. if the model catalogue id has overriden the latest version id
+            if (resource == DataModel || resource == CatalogueElement && HibernateHelper.getEntityClass(CatalogueElement.findByLatestVersionId(urlId)) == DataModel) {
+                result = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
+                    or {
+                        eq 'modelCatalogueId', urlId
+                    }
+                    if (version) {
+                        if (versionNumberFound) {
+                            or {
+                                eq 'semanticVersion', version
+                                eq 'versionNumber', versionNumberFound
+                            }
+                        } else {
+                            eq 'semanticVersion', version
+                        }
+                    }
+                })
+            }
+
+            if(result) return result
 
             if (versionNumberFound) {
                 CatalogueElement byVersionNumber = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {

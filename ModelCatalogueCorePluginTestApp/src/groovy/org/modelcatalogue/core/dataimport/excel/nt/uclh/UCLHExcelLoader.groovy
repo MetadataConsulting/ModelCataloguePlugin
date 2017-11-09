@@ -32,6 +32,7 @@ class UCLHExcelLoader extends ExcelLoader{
 
     String ownerAndGELModelSuffix = ''
     String randomSuffix = ''
+
     UCLHExcelLoader(boolean test = false) {
         bTest = test
         if (test) {

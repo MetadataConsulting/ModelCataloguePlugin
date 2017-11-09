@@ -14,8 +14,6 @@ import org.modelcatalogue.core.dataimport.excel.HeadersMap
 @Log
 class LoincExcelLoader extends ExcelLoader {
 
-
-
     static protected Map<String, String> createRowMap(Row row, List<String> headers) {
         Map<String, String> rowMap = new LinkedHashMap<>()
         // Important that it's LinkedHashMap, for order to be kept, to get the last section which is metadata!

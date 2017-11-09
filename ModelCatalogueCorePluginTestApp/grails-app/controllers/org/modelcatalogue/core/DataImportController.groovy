@@ -429,11 +429,9 @@ class DataImportController  {
         executorService.submit {
             auditService.mute {
                 try {
-                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader(false)
-                    String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_openEHR')
-                    List<String> modelNames = loader.loadModel(wb, dataOwner)
-                    DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
-                    loader.addRelationshipsToModels(referenceModel, modelNames)
+                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader()
+                    String dataOwner = "Open EHR"
+                    loader.loadModel(wb, dataOwner)
                     finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {
                         it.instanceOf(DataModel)
                     } ?: defaultCatalogueBuilder.created.find { it.dataModel }?.dataModel), userId)

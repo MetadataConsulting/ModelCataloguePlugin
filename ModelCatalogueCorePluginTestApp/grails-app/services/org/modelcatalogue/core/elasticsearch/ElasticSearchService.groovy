@@ -84,7 +84,8 @@ class ElasticSearchService implements SearchCatalogue {
             full_version: 90,
             latest_id: 80,
             entity_id : 70,
-            description: 1
+            description: 1,
+            model_catalogue_id: 80
     ]
 
     GrailsApplication grailsApplication
@@ -918,6 +919,8 @@ class ElasticSearchService implements SearchCatalogue {
             Long dataModelId
                 if(params.get('dataModel') instanceof Long){
                     dataModelId = params.get('dataModel')
+                }else if(params.get('dataModel') instanceof Integer){
+                    dataModelId = new Long(params.get('dataModel'))
                 }else{
                     dataModelId = params.long('dataModel')
                 }
