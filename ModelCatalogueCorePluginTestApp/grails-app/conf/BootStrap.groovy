@@ -12,8 +12,6 @@ import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.test.TestDataHelper
-import org.modelcatalogue.core.security.InitSecurityService
-import org.modelcatalogue.core.security.MetadataSecurityService
 
 class BootStrap {
 
@@ -45,46 +43,105 @@ class BootStrap {
             null
         }
 
-        if (isTest() && !isBlankDev()) {
-            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
-                initCatalogueService.initCatalogue(false)
-                initPoliciesAndTagsService.initPoliciesAndTags()
-                log.info("start:initSecurity")
-                initSecurityService.initRoles()
-                initSecurityService.initUsers()
-                metadataSecurityService.secureUrlMappings()
-                log.info("completed:initSecurity")
-                setupDevTestStuff()
-            }
-        } else {
-            initCatalogueService.initDefaultRelationshipTypes()
-            initPoliciesAndTagsService.initPoliciesAndTags()
-            log.info("start:initSecurity")
-            initSecurityService.initRoles()
-            if (isBlankDev() || isDemo()) {
-                initSecurityService.initUsers()
-            }
-            metadataSecurityService.secureUrlMappings()
-            log.info("completed:initSecurity")
-        }
-
-        log.info 'completed:initCatalogueService'
-        modelCatalogueSearchService.reindex(true)
-
         initCatalogueService.setupStoredProcedures()
         log.info "completed:setupStoredProcedures"
-
-        if ( isProduction() ) {
-            userService.inviteAdmins()
-            log.info "completed:inviteAdmins"
-        }
 
         grailsApplication.mainContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
         log.info 'completed:registerMarshallers'
 
-        registerReportsService.register()
-        log.info "completed:inviteAdmins"
+
+        if ( isDev() ) {
+            initDev()
+
+        } else if ( isTest() ) {
+            initTest()
+
+        }  else if ( isProd() ) {
+            initProd()
+        }
     }
+
+
+    void initEmptyDataBase() {
+        log.info 'Setting up an empty Database'
+
+        log.info 'init default relationship types'
+        initCatalogueService.initDefaultRelationshipTypes()
+
+        log.info 'init policies and tags'
+        initPoliciesAndTagsService.initPoliciesAndTags()
+
+        log.info 'init roles'
+        initSecurityService.initRoles()
+
+        log.info 'init users'
+        initSecurityService.initUsers()
+
+        log.info 'init user roles'
+        initSecurityService.initUserRoles()
+
+        log.info 'init request maps'
+        metadataSecurityService.secureUrlMappings()
+
+        if ( !skipReindex() ) {
+            log.info 'init reindexing catalogue'
+            modelCatalogueSearchService.reindex(true)
+        }
+
+        log.info 'init register reports'
+        registerReportsService.register()
+    }
+
+    void initProd() {
+        if ( isBlankDev() ) {
+            initEmptyDataBase()
+            log.info 'init register reports'
+            userService.inviteAdmins()
+        }
+    }
+
+    void initDev() {
+        initEmptyDataBase()
+    }
+
+    void initTest() {
+
+        if ( isBlankDev() ) {
+            initEmptyDataBase()
+
+        } else {
+            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+
+                log.info 'init catalogue'
+                initCatalogueService.initCatalogue(false)
+
+                log.info 'init policies and tags'
+                initPoliciesAndTagsService.initPoliciesAndTags()
+
+                log.info 'init roles'
+                initSecurityService.initRoles()
+
+                log.info 'init users'
+                initSecurityService.initUsers()
+
+                log.info 'init user roles'
+                initSecurityService.initUserRoles()
+
+                log.info 'init request maps'
+                metadataSecurityService.secureUrlMappings()
+
+                log.info 'setting up dev test stuff'
+                setupDevTestStuff()
+            }
+            if ( !skipReindex() ) {
+                log.info 'init reindexing catalogue'
+                modelCatalogueSearchService.reindex(true)
+            }
+            log.info 'init register reports'
+            registerReportsService.register()
+        }
+    }
+
 
     boolean isDev() {
         Environment.current == Environment.DEVELOPMENT
@@ -97,6 +154,11 @@ class BootStrap {
     boolean isProduction() {
         Environment.current == Environment.PRODUCTION
     }
+
+    boolean skipReindex() {
+        System.getenv('SKIP_REINDEX') as boolean
+    }
+
 
     boolean isBlankDev() {
         System.getenv('MC_BLANK_DEV') as boolean
