@@ -84,7 +84,7 @@ class BootStrap {
 
         println 'completed:initCatalogueService'
         log.info "completed:initCatalogueService"
-        //modelCatalogueSearchService.reindex(true)
+        modelCatalogueSearchService.reindex(true)
 
         initCatalogueService.setupStoredProcedures()
         println 'completed:setupStoredProcedures'
