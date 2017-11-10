@@ -3,25 +3,17 @@ import groovy.util.logging.Log
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
-import org.modelcatalogue.core.reports.ReportsRegistry
-import org.modelcatalogue.core.security.Role
-import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserRole
-import org.modelcatalogue.core.security.UserService
-import org.modelcatalogue.core.testapp.Requestmap
-import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.reports.RegisterReportsService
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.Metadata
-import org.springframework.http.HttpMethod
 import org.modelcatalogue.core.util.test.TestDataHelper
-import org.modelcatalogue.core.reports.RegisterReportsService
 
 @Log
 class BootStrap {
@@ -36,6 +28,8 @@ class BootStrap {
     def userService
     GrailsApplication grailsApplication
     RegisterReportsService registerReportsService
+    InitSecurityService initSecurityService
+    MetadataSecurityService metadataSecurityService
 
     def init = { servletContext ->
         log.info "BootStrap:addExtensionModules()"
@@ -87,118 +81,18 @@ class BootStrap {
         log.info "completed:inviteAdmins"
     }
 
-    private static void initSecurity(boolean production) {
+    void initSecurity(boolean production) {
         final def var = log.info("start:initSecurity")
-        def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
-        def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
-        def roleSupervisor = Role.findByAuthority('ROLE_SUPERVISOR') ?: new Role(authority: 'ROLE_SUPERVISOR').save(failOnError: true)
-        def roleStacktrace = Role.findByAuthority('ROLE_STACKTRACE') ?: new Role(authority: 'ROLE_STACKTRACE').save(failOnError: true)
-        def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
-
-        Role.findByAuthority('ROLE_REGISTERED') ?: new Role(authority: 'ROLE_REGISTERED').save(failOnError: true)
+        initSecurityService.initRoles()
 
         if (!production || System.getenv("METADATA_DEMO")) {
-            def supervisor = User.findByNameOrUsername('supervisor', 'supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'supervisor', email: System.getenv(UserService.ENV_SUPERVISOR_EMAIL), apiKey: 'supervisorabcdef123456').save(failOnError: true)
-            def admin = User.findByNameOrUsername('admin', 'admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin', email: System.getenv('MC_ADMIN_EMAIL'), apiKey: 'adminabcdef123456').save(failOnError: true)
-            def viewer = User.findByNameOrUsername('viewer', 'viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer', apiKey: 'viewerabcdef123456').save(failOnError: true)
-            def curator = User.findByNameOrUsername('curator', 'curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'curator', apiKey: 'curatorabcdef123456').save(failOnError: true)
-            User.findByNameOrUsername('registered', 'registered') ?: new User(name: 'registered', username: 'registered', enabled: true, password: 'registered', apiKey: 'registeredabcdef123456').save(failOnError: true)
-
-
-            if (!supervisor.authorities.contains(roleSupervisor)) {
-                UserRole.create supervisor, roleUser
-                UserRole.create supervisor, metadataCurator
-                UserRole.create supervisor, roleStacktrace
-                UserRole.create supervisor, roleAdmin
-                UserRole.create supervisor, roleSupervisor
-            }
-
-            if (!admin.authorities.contains(roleAdmin)) {
-                UserRole.create admin, roleUser
-                UserRole.create admin, metadataCurator
-                UserRole.create admin, roleStacktrace
-                UserRole.create admin, roleAdmin
-            }
-
-            if (!curator.authorities.contains(metadataCurator)) {
-                UserRole.create curator, roleUser
-                UserRole.create curator, metadataCurator
-            }
-
-            if (!viewer.authorities.contains(viewer)) {
-                UserRole.create viewer, roleUser
-            }
-
-
-
+            initSecurityService.initUsers()
+            initUserRoles()
         }
 
-        //permit all for assets and initial pages
-        for (String url in [
-                '/',
-                '/**/favicon.ico',
-                '/fonts/**',
-                '/stomp/**',
-                '/assets/**',
-                '/plugins/**/js/**',
-                '/plugins/jquery-ui-*/**',
-                '/js/vendor/**',
-                '/**/*.less',
-                '/**/js/**',
-                '/**/css/**',
-                '/**/images/**',
-                '/**/img/**',
-                '/login', '/login.*', '/login/*',
-                '/logout', '/logout.*', '/logout/*',
-                '/register/*', '/errors', '/errors/*',
-                '/load',
-                '/index.gsp'
-        ]) {
-            createRequestmapIfMissing(url, 'permitAll', null)
-        }
-
-        createRequestmapIfMissing('/asset/download/*',                      'isAuthenticated()',   HttpMethod.GET)
-        createRequestmapIfMissing('/oauth/*/**',                            'IS_AUTHENTICATED_ANONYMOUSLY')
-        createRequestmapIfMissing('/user/current',                          'IS_AUTHENTICATED_ANONYMOUSLY',  HttpMethod.GET)
-        createRequestmapIfMissing('/catalogue/upload',                      'ROLE_METADATA_CURATOR',         HttpMethod.POST)
-        createRequestmapIfMissing('/catalogue/*/**',                        'isAuthenticated()',   HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',   HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'isAuthenticated()',   HttpMethod.POST) // post a comment
-        createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'isAuthenticated()',HttpMethod.POST) // favourite item
-        createRequestmapIfMissing('/api/modelCatalogue/core/user/apikey',    'isAuthenticated()',HttpMethod.POST) // get or create new api key
-        createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'isAuthenticated()',HttpMethod.DELETE) // unfavourite item
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.POST)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.PUT)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.DELETE)
-        createRequestmapIfMissing('/api/modelCatalogue/core/asset/*/validateXML',  'isAuthenticated()',   HttpMethod.POST) // validate xml
-
-        createRequestmapIfMissing('/sso/*/**',                              'isAuthenticated()',   HttpMethod.GET)
-
-        createRequestmapIfMissing('/role/**',                               'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/userAdmin/**',                          'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/requestMap/**',                         'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/registrationCode/**',                   'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/securityInfo/**',                       'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/console/**',                            'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/plugins/console*/**',                   'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/dbconsole/**',                          'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/monitoring/**',                         'ROLE_SUPERVISOR')
-        createRequestmapIfMissing('/plugins/console-1.5.0/**',              'ROLE_SUPERVISOR')
-
-//        createRequestmapIfMissing('/api/modelCatalogue/core/dataClass/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
-
-
-   //create some test models etc. for dev
-   //TODO: remove this and replace with a functional test
+        metadataSecurityService.secureUrlMappings()
 
         final def var1 = log.info("completed:initSecurity")
-
-
-
     }
 
     def initPoliciesAndTags() {
