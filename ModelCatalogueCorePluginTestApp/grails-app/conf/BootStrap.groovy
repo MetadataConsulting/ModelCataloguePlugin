@@ -1,4 +1,3 @@
-import grails.plugin.springsecurity.acl.AclService
 import grails.util.Environment
 import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -10,17 +9,12 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
-import org.modelcatalogue.core.persistence.RequestmapGormService
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.security.*
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Metadata
-import org.springframework.security.acls.model.Acl
-import org.springframework.security.acls.model.NotFoundException
-import org.springframework.security.acls.model.ObjectIdentity
-import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
