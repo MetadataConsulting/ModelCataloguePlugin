@@ -3,8 +3,13 @@ package org.modelcatalogue.core.dataimport.excel.loinc
 import groovy.util.logging.Log
 import org.apache.poi.ss.usermodel.*
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
+import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.publishing.PublishingContext
 
 /**
  * This used to be a class for one purpose ("importData", now called "buildXmlFromStandardWorkbookSheet"), but now we have made it a parent class of
@@ -13,6 +18,8 @@ import org.modelcatalogue.core.dataimport.excel.HeadersMap
  */
 @Log
 class LoincExcelLoader extends ExcelLoader {
+
+    static String dataModelName = "LOINC"
 
     static protected Map<String, String> createRowMap(Row row, List<String> headers) {
         Map<String, String> rowMap = new LinkedHashMap<>()
@@ -127,26 +134,50 @@ class LoincExcelLoader extends ExcelLoader {
         Sheet sheet = workbook.getSheetAt(index);
         List<Map<String,String>> rowMaps = getRowMaps(sheet)
 
-        catalogueBuilder.build {
-            copy relationships
+            //Iterate through the modelMaps to build new DataModel
             rowMaps.each { Map<String, String> rowMap ->
 
                 //take the LOINC class name and split to see if there is a hierarchy
                 def loincClassNames = tryHeader(LoincHeadersMap.containingDataClassName, headersMap, rowMap) ?: tryHeader(HeadersMap.containingDataClassName, headersMap, rowMap)
                 def parentClassName
-                def className
-                if(loincClassNames) {
-                    String[] parts = loincClassNames.split("\\.")
-                    if(parts.size() > 0){
-                        className = parts[parts.size()-1]
-                        parentClassName = parts[(parts.size() - 2)]
-                    }else{
-                        className = tryHeader(LoincHeadersMap.containingModelName, headersMap, rowMap) ?: tryHeader(HeadersMap.containingDataClassName, headersMap, rowMap)
+                String[] classNames = loincClassNames.split("\\.")
+
+                //see if an open EHR model already exists, if not create one
+                //could consider changing this - if there are multiple versions - should make sure we use the latest one.
+                DataModel loincModel =  DataModel.findAllByName(dataModelName, [sort: 'versionNumber', order: 'desc']).first()
+
+                if(!loincModel){
+                    loincModel = new DataModel(name: dataModelName).save()
+                }else{
+                    //if one exists, check to see if it's a draft
+                    // but if it's finalised create a new version
+                    if(loincModel.status != ElementStatus.DRAFT){
+                        DraftContext context = DraftContext.userFriendly()
+                        loincModel = elementService.createDraftVersion(loincModel, PublishingContext.nextPatchVersion(loincModel.semanticVersion), context)
                     }
                 }
 
-                dataModel(name: "LOINC") {
-                    globalSearchFor dataType
+                //if loinc "class" separated by .
+                //create class hierarchy if applicable,
+                //if not then populate the parent data class with the appropriate data element
+
+                DataClass parentDataClass = DataClass
+
+                classNames.each{ String className ->
+                    //see if there is a loinc data class with this name - if so make sure you get the right version i.e. highest version number
+                    DataClass dc = DataClass.findByAllByNameAndDataModel(className, loincModel, [sort: 'versionNumber', order: 'desc']).first()
+
+                    //if the data class doesn't already exist in the model then create it
+                    if(!dc) cd = new DataClass(name: className).save()
+                    if(parentDataClass) dc.addToChildOf(parentClass)
+
+                    //last one will be the one that contains the data element
+                    parentDataClass = dc
+                }
+
+
+
+
 
                     def createChildModel = {
                         def createDataElement = {
@@ -302,15 +333,8 @@ class LoincExcelLoader extends ExcelLoader {
                         }
                     }
 
-                    if (parentClassName) {
-                        dataClass(name: parentClassName, createChildModel)
-                    } else {
-                        catalogueBuilder.with createChildModel
-                    }
-
                 }
-            }
-        }
+
 
     }
 
