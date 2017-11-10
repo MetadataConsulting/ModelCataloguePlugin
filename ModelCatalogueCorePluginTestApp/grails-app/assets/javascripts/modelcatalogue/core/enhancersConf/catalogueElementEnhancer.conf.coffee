@@ -1,4 +1,4 @@
-angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot', 'mc.core.catalogue', 'mc.core.elementEnhancer', 'mc.core.serverPushUpdates', 'rx']).config [ 'enhanceProvider', (enhanceProvider) ->
+angular.module('modelcatalogue.core.enhancersConf.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot', 'mc.core.catalogue', 'modelcatalogue.core.enhancersConf.elementEnhancer', 'mc.core.serverPushUpdates', 'rx']).config [ 'enhanceProvider', (enhanceProvider) ->
   commaSeparatedList = (things)->
     names = []
     angular.forEach(things, (thing)->

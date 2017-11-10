@@ -1,4 +1,4 @@
-angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhanceProvider', (enhanceProvider)->
+angular.module('modelcatalogue.core.enhancersConf.orderedMapEnhancer', ['mc.util.enhance']).config ['enhanceProvider', (enhanceProvider)->
   condition = (orderedMap) -> orderedMap.hasOwnProperty('type') and orderedMap.type == 'orderedMap'
   factory   = [ 'enhance', (enhance)->
     orderedMapEnhancer = (orderedMap) ->

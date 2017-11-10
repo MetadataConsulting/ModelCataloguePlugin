@@ -3,21 +3,13 @@ angular.module 'mc.core', [
   'mc.util'
   'ui.bootstrap'
   # list of modules
-  'mc.core.catalogueElementEnhancer'
+
   'mc.core.catalogueElementResource'
   'mc.core.catalogue'
-  'mc.core.dateEnhancer'
-  'mc.core.elementEnhancer'
-  'mc.core.listEnhancer'
-  'mc.core.actionEnhancer'
-  'mc.core.promiseEnhancer'
-  'mc.core.listReferenceEnhancer'
+  'modelcatalogue.core.enhancersConf'
   'mc.core.modelCatalogueApiRoot'
   'mc.core.modelCatalogueSearch'
   'mc.core.modelCatalogueDataArchitect'
-  'mc.core.removableItemEnhancer'
-  'mc.core.actionableItemEnhancer'
-  'mc.core.orderedMapEnhancer'
   'mc.core.serverPushUpdates'
 ]
 angular.module('mc.core.modelCatalogueApiRoot', []).value 'modelCatalogueApiRoot', '/api/modelCatalogue/core'

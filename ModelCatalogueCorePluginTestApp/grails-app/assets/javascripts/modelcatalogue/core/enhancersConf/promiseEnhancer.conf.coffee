@@ -1,4 +1,4 @@
-angular.module('mc.core.promiseEnhancer', ['mc.util.rest', 'mc.util.enhance']).config ['enhanceProvider', (enhanceProvider)->
+angular.module('modelcatalogue.core.enhancersConf.promiseEnhancer', ['mc.util.rest', 'mc.util.enhance']).config ['enhanceProvider', (enhanceProvider)->
   condition = (result) -> result.then? and angular.isFunction(result.then)
   factory   = ['$q', 'enhance', ($q, enhance) ->
     promiseEnhancer = (result) ->

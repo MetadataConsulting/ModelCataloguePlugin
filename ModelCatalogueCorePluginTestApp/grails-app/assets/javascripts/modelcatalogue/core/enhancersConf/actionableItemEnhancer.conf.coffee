@@ -1,4 +1,4 @@
-angular.module('mc.core.actionableItemEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
+angular.module('modelcatalogue.core.enhancersConf.actionableItemEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
   condition = (item) -> angular.isObject(item) and item.hasOwnProperty('actionLinks')
   factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, enhance) ->
     (element) ->

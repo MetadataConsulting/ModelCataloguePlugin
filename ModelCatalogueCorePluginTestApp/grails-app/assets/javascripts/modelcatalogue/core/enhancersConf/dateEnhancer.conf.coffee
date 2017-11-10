@@ -1,4 +1,4 @@
-angular.module('mc.core.dateEnhancer', ['mc.util.enhance']).config ['enhanceProvider', (enhanceProvider)->
+angular.module('modelcatalogue.core.enhancersConf.dateEnhancer', ['mc.util.enhance']).config ['enhanceProvider', (enhanceProvider)->
   condition = (dateString) ->
     return false unless angular.isString(dateString)
     return false unless dateString.length == 20

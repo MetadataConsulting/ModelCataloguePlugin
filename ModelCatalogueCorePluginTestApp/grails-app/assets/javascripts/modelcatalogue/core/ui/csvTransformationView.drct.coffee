@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.csvTransformationView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'mc.util.ui.applicationTitle', 'ui.router', 'mc.core.ui.catalogueElementProperties', 'ngSanitize']).directive 'csvTransformationView',  [-> {
+angular.module('mc.core.ui.csvTransformationView', ['modelcatalogue.core.enhancersConf.catalogueElementEnhancer', 'modelcatalogue.core.enhancersConf.listReferenceEnhancer', 'modelcatalogue.core.enhancersConf.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'mc.util.ui.applicationTitle', 'ui.router', 'mc.core.ui.catalogueElementProperties', 'ngSanitize']).directive 'csvTransformationView',  [-> {
     restrict: 'E'
     replace: true
     scope:
