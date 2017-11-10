@@ -14,6 +14,8 @@ import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.test.TestDataHelper
+import org.modelcatalogue.core.security.InitSecurityService
+import org.modelcatalogue.core.security.MetadataSecurityService
 
 @Log
 class BootStrap {
@@ -94,7 +96,7 @@ class BootStrap {
 
         final def var1 = log.info("completed:initSecurity")
     }
-    
+
     def setupDevTestStuff(){
         actionService.resetAllRunningActions()
         try {
