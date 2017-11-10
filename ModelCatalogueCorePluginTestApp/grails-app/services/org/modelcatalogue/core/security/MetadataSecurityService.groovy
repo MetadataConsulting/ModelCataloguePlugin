@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.security
 
+import grails.util.Environment
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.grails.commons.env.GrailsEnvironment
 import org.modelcatalogue.core.persistence.RequestmapGormService
 import org.springframework.http.HttpMethod
 
@@ -772,7 +774,11 @@ class MetadataSecurityService {
 
         requestmapGormService.createRequestmapIfMissing('/console/**',                            'ROLE_SUPERVISOR')
         requestmapGormService.createRequestmapIfMissing('/plugins/console*/**',                   'ROLE_SUPERVISOR')
-        requestmapGormService.createRequestmapIfMissing('/dbconsole/**',                          'ROLE_SUPERVISOR')
+
+        if (Environment.current == Environment.DEVELOPMENT) {
+            requestmapGormService.createRequestmapIfMissing('/dbconsole/**', 'permitAll')
+        }
+
         requestmapGormService.createRequestmapIfMissing('/monitoring/**',                         'ROLE_SUPERVISOR')
         requestmapGormService.createRequestmapIfMissing('/plugins/console-1.5.0/**',              'ROLE_SUPERVISOR')
 
