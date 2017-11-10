@@ -2,9 +2,7 @@ package org.modelcatalogue.core.security
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
-import groovy.transform.CompileStatic
 
-@CompileStatic
 class RoleGormService {
 
     @Transactional(readOnly = true)
