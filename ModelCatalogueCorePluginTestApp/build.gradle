@@ -76,7 +76,7 @@ task cleanIdeaFiles(type: Delete) {
 task cleanData(type: Delete) {
     Properties properties = new Properties()
     properties.load(file('application.properties').newInputStream())
-    delete "${System.getProperty('java.io.tmpdir')}/ModelCatalogueCorePluginTestApp/${properties['app.version']}"
+    delete "${System.getenv("MC_TMP_LOCATION")}/ModelCatalogueCorePluginTestApp/${properties['app.version']}"
 }
 
 

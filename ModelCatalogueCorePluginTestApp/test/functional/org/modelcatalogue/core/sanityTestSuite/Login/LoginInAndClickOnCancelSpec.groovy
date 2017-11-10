@@ -5,8 +5,9 @@ package org.modelcatalogue.core.sanityTestSuite.Login
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 
 import org.openqa.selenium.WebDriver
+import spock.lang.IgnoreIf
 
-
+@IgnoreIf({ !System.getProperty('geb.env') })
 class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String cancel = "button.btn-warning"

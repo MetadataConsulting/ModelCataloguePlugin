@@ -12,9 +12,11 @@ import org.openqa.selenium.logging.LogEntries
 import org.openqa.selenium.logging.LogEntry
 import org.openqa.selenium.logging.LogType
 import org.openqa.selenium.Keys
+import spock.lang.IgnoreIf
 
 import static org.modelcatalogue.core.geb.Common.*
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     // keep the passwords simply stupid, they are only for dev/test or very first setup

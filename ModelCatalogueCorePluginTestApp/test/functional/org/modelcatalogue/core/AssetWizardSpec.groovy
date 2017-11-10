@@ -9,11 +9,14 @@ import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Issue
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 

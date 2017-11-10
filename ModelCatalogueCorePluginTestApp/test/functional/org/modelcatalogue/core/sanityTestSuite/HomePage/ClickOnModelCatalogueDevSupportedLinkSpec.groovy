@@ -6,8 +6,10 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
+import spock.lang.IgnoreIf
 
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 class ClickOnModelCatalogueDevSupportedLinkSpec extends AbstractModelCatalogueGebSpec  {
 
     public static final String model ="div.panel-body>div"

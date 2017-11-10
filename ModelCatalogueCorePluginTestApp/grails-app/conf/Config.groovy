@@ -19,6 +19,7 @@ grails.project.groupId = appName // change this to alter the default package nam
 
 grails.app.context = '/'
 
+
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
 grails.mime.types = [ // the first one is the default format
@@ -125,7 +126,9 @@ environments {
         mc.allow.signup = true
 
         grails.plugin.console.enabled = true
-       mc.search.elasticsearch.host = "127.0.0.1"
+
+        mc.search.elasticsearch.host = "127.0.0.1"
+
         mc.search.elasticsearch.port = "9300"
        // mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
         mc.css.custom = """
@@ -183,6 +186,10 @@ environments {
             }
         } else {
             //mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
+
+            mc.search.elasticsearch.host = "127.0.0.1"
+            mc.search.elasticsearch.port = "9300"
+
             grails.mail.disabled=true
         }
     }
