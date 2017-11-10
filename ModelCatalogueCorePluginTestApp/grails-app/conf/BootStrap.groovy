@@ -358,18 +358,6 @@ class BootStrap {
 
     def destroy = {}
 
-
-    private static Requestmap createRequestmapIfMissing(String url, String configAttribute, HttpMethod method = null) {
-        List<Requestmap> maps = Requestmap.findAllByUrlAndHttpMethod(url, method)
-        for(Requestmap map in maps) {
-            if (map.configAttribute == configAttribute) {
-                return map
-            }
-            println "Requestmap method: $method, url: $url has different config attribute - expected: $configAttribute, actual: $map.configAttribute"
-        }
-        Requestmap.findOrSaveByUrlAndConfigAttributeAndHttpMethod(url, configAttribute, method, [failOnError: true])
-    }
-
     protected static mergeConfig(GrailsApplication application){
         application.config.merge(loadConfig(application))
     }
