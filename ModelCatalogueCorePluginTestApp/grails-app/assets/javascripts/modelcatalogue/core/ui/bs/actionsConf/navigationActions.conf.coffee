@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security'])
+angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationActions', ['mc.util.ui.actions', 'mc.util.security'])
 .config (actionsProvider, names, actionRoleRegister, actionClass)->
   'ngInject'
   Action = actionClass

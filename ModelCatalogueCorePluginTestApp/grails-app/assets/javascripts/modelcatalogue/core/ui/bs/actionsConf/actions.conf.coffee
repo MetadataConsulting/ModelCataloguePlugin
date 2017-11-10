@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsProvider, names, actionRoleRegister, actionClass) ->
+angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.actions']).config (actionsProvider, names, actionRoleRegister, actionClass) ->
   'ngInject'
   Action = actionClass
   showErrorsUsingMessages = (messages) ->

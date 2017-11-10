@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', 'actionRoleRegister', 'actionClass', (actionsProvider, names, actionRoleRegister, actionClass)->
+angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationRightActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', 'actionRoleRegister', 'actionClass', (actionsProvider, names, actionRoleRegister, actionClass)->
   Action = actionClass
 
   actionsProvider.registerActionInRole 'search-menu', actionRoleRegister.ROLE_NAVIGATION_RIGHT_ACTION, [

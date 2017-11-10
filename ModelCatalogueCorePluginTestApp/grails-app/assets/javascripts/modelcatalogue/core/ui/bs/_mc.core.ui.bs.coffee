@@ -25,9 +25,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptNewCatalogueXmlImport'
   'mc.core.ui.bs.batchView'
   'mc.core.ui.bs.catalogueElementProperties'
-  'mc.core.ui.bs.actions'
-  'mc.core.ui.bs.catalogueElementActions'
-  'mc.core.ui.bs.navigationActions'
+  'modelcatalogue.core.ui.bs.actionsConf'
   'mc.core.ui.bs.columns'
   'mc.core.ui.bs.catalogue'
   'mc.core.ui.bs.columnsConfiguration'
@@ -75,7 +73,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.diffTable'
   'mc.core.ui.bs.withClassificationCtrlMixin'
   'modelcatalogue.core.sections.metadataEditors'
-  'mc.core.ui.bs.navigationRightActions'
   'mc.core.ui.bs.modalOptions'
 ]).run ['messages', '$rootScope', '$log', (messages, $rootScope, $log) ->
   $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
