@@ -110,6 +110,10 @@ class DataModelAclService {
             return
         }
         String username = loggedUsername()
+        if ( username == null ) {
+            log.warn 'username is not set, cannot add permission'
+            return
+        }
         aclUtilService.addPermission(dataModel, username, permission)
     }
 
@@ -127,7 +131,7 @@ class DataModelAclService {
         if ( springSecurityService.principal instanceof String ) {
             return springSecurityService.principal
         }
-        springSecurityService.principal.username
+        springSecurityService.principal?.username
     }
 
     void removePermissions(DataModel dataModel) {
