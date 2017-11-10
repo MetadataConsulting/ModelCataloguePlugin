@@ -1,4 +1,4 @@
-angular.module('mc.util.ui.contextualActions', ['mc.core.ui.utils'])
+angular.module('modelcatalogue.util.ui.actions.components.contextualActions')
 .directive('contextualActions', ($compile, $templateCache, actions, actionRoleAccess) -> {
   'ngInject'
   restrict: 'E'
@@ -12,15 +12,15 @@ angular.module('mc.util.ui.contextualActions', ['mc.core.ui.utils'])
     role: '@?'
     noActions: '@?'
 
-  templateUrl: '/mc/core/ui/utils/contextualActions.html'
+  templateUrl: '/modelcatalogue/util/ui/actions/components/contextualActions/contextualActions.html'
 
   link: ($scope, $element) ->
     getTemplate = (action) ->
-      templateName = '/mc/core/ui/utils/actionButtonSingle.html'
+      templateName = '/modelcatalogue/util/ui/actions/components/contextualActions/actionButtonSingle.html'
       if action.submit
-        templateName = '/mc/core/ui/utils/actionButtonSingleSubmit.html'
+        templateName = '/modelcatalogue/util/ui/actions/components/contextualActions/actionButtonSingleSubmit.html'
       if action.children?.length or action.abstract
-        templateName = '/mc/core/ui/utils/actionButtonDropdown.html'
+        templateName = '/modelcatalogue/util/ui/actions/components/contextualActions/actionButtonDropdown.html'
       $templateCache.get(templateName)
 
     scopes = []

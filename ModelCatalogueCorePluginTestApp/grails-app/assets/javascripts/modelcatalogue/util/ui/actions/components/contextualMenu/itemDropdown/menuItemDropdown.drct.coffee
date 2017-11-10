@@ -1,5 +1,5 @@
 #= require menuItemDropdown.tpl.coffee
-angular.module('mc.util.ui.contextualMenu.itemDropdown').directive 'menuItemDropdown',  [-> {
+angular.module('modelcatalogue.util.ui.actions.components.contextualMenu.itemDropdown').directive 'menuItemDropdown',  [-> {
   restrict: 'E'
   replace: true
   scope:

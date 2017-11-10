@@ -1,5 +1,5 @@
 #= require menuItemSingle.tpl.coffee
-angular.module('mc.util.ui.contextualMenu.itemSingle').directive 'menuItemSingle',  [-> {
+angular.module('modelcatalogue.util.ui.actions.components.contextualMenu.itemSingle').directive 'menuItemSingle',  [-> {
   restrict: 'E'
   replace: true
   scope:

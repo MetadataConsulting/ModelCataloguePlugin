@@ -1,5 +1,5 @@
 #= require contextualMenu.tpl.coffee
-angular.module('mc.util.ui.contextualMenu').directive 'contextualMenu',  ['$compile', '$templateCache', 'actions', 'actionRoleAccess', ($compile, $templateCache, actions, actionRoleAccess)-> {
+angular.module('modelcatalogue.util.ui.actions.components.contextualMenu').directive 'contextualMenu',  ['$compile', '$templateCache', 'actions', 'actionRoleAccess', ($compile, $templateCache, actions, actionRoleAccess)-> {
   restrict: 'E'
   replace:  true
   scope:

@@ -1,4 +1,4 @@
-angular.module('mc.util.ui.contextualMenu.itemDropdown', ['mc.util.ui.contextualMenu.itemSingle'])
+angular.module('modelcatalogue.util.ui.actions.components.contextualMenu.itemDropdown', ['modelcatalogue.util.ui.actions.components.contextualMenu.itemSingle'])
   .run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/util/ui/menuItemDropdown.html', '''
         <li id="{{::action.id}}-menu-item" class="dropdown" ng-class="::action.$$class" ng-show="action.children.length > 0 || action.show">
