@@ -41,7 +41,6 @@ class BootStrap {
     def userService
     GrailsApplication grailsApplication
     DataModelAclService dataModelAclService
-    ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy
     MetadataSecurityService metadataSecurityService
 
     def init = { servletContext ->
