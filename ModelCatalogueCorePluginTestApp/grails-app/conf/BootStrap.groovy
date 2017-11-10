@@ -1,15 +1,13 @@
 import grails.util.Environment
-import groovy.util.logging.Log
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
-import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
-import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.reports.RegisterReportsService
+import org.modelcatalogue.core.security.InitSecurityService
+import org.modelcatalogue.core.security.MetadataSecurityService
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -17,13 +15,11 @@ import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.core.security.InitSecurityService
 import org.modelcatalogue.core.security.MetadataSecurityService
 
-@Log
 class BootStrap {
 
     def initCatalogueService
     def elementService
     def actionService
-    def mappingService
     CatalogueBuilder catalogueBuilder
     def sessionFactory
     def modelCatalogueSearchService
@@ -32,11 +28,14 @@ class BootStrap {
     RegisterReportsService registerReportsService
     InitSecurityService initSecurityService
     MetadataSecurityService metadataSecurityService
+    InitPoliciesAndTagsService initPoliciesAndTagsService
+    SetupSimpleCsvTransformationService setupSimpleCsvTransformationService
 
     def init = { servletContext ->
         log.info "BootStrap:addExtensionModules()"
         ExtensionModulesLoader.addExtensionModules()
         log.info "BootStrap:addExtensionModules():complete"
+
         grailsApplication.domainClasses.each { GrailsDomainClass it ->
             if (CatalogueElement.isAssignableFrom(it.clazz)) {
                 CatalogueElementDynamicHelper.addShortcuts(it.clazz)
@@ -46,55 +45,65 @@ class BootStrap {
             null
         }
 
-        if (Environment.current in [ Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
+        if (isTest() && !isBlankDev()) {
             TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
                 initCatalogueService.initCatalogue(false)
                 initPoliciesAndTagsService.initPoliciesAndTags()
-                initSecurity(false)
+                log.info("start:initSecurity")
+                initSecurityService.initRoles()
+                initSecurityService.initUsers()
+                metadataSecurityService.secureUrlMappings()
+                log.info("completed:initSecurity")
                 setupDevTestStuff()
             }
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initPoliciesAndTagsService.initPoliciesAndTags()
-            initSecurity(!System.getenv('MC_BLANK_DEV'))
+            log.info("start:initSecurity")
+            initSecurityService.initRoles()
+            if (isBlankDev() || isDemo()) {
+                initSecurityService.initUsers()
+            }
+            metadataSecurityService.secureUrlMappings()
+            log.info("completed:initSecurity")
         }
 
-        println 'completed:initCatalogueService'
-        log.info "completed:initCatalogueService"
+        log.info 'completed:initCatalogueService'
         modelCatalogueSearchService.reindex(true)
 
         initCatalogueService.setupStoredProcedures()
-        println 'completed:setupStoredProcedures'
         log.info "completed:setupStoredProcedures"
 
-        if (Environment.current == Environment.PRODUCTION) {
+        if ( isProduction() ) {
             userService.inviteAdmins()
-            println 'completed:inviteAdmins'
             log.info "completed:inviteAdmins"
         }
 
-        //register custom json Marshallers
-        //ctx.domainModellerService.modelDomains()
         grailsApplication.mainContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
-        println 'completed:register'
-        log.info "completed:inviteAdmins"
+        log.info 'completed:registerMarshallers'
 
         registerReportsService.register()
         log.info "completed:inviteAdmins"
     }
 
-    void initSecurity(boolean production) {
-        final def var = log.info("start:initSecurity")
-        initSecurityService.initRoles()
+    boolean isDev() {
+        Environment.current == Environment.DEVELOPMENT
+    }
 
-        if (!production || System.getenv("METADATA_DEMO")) {
-            initSecurityService.initUsers()
-            initUserRoles()
-        }
+    boolean isTest() {
+        Environment.current == Environment.TEST
+    }
 
-        metadataSecurityService.secureUrlMappings()
+    boolean isProduction() {
+        Environment.current == Environment.PRODUCTION
+    }
 
-        final def var1 = log.info("completed:initSecurity")
+    boolean isBlankDev() {
+        System.getenv('MC_BLANK_DEV') as boolean
+    }
+
+    boolean isDemo() {
+        System.getenv('METADATA_DEMO') as boolean
     }
 
     def setupDevTestStuff(){
@@ -138,11 +147,11 @@ class BootStrap {
 
             Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.readByName('relatedTo'))
             if (createRelationshipAction.hasErrors()) {
-                println(FriendlyErrors.printErrors("Failed to create relationship actions", createRelationshipAction.errors))
+                log.error(FriendlyErrors.printErrors("Failed to create relationship actions", createRelationshipAction.errors))
                 throw new AssertionError("Failed to create relationship actions!")
             }
 
-            setupSimpleCsvTransformation()
+            setupSimpleCsvTransformationService.setupSimpleCsvTransformation()
 
             DataType theType = FriendlyErrors.failFriendlySave(new DataType(name: 'data type without any data model', modelCatalogueId: 'http://www.example.com/no-data-model'))
 
@@ -184,34 +193,6 @@ class BootStrap {
         } catch (e) {
             e.printStackTrace()
         }
-    }
-
-    def setupSimpleCsvTransformation() {
-        MeasurementUnit c = MeasurementUnit.findByName("celsius")
-        MeasurementUnit f = MeasurementUnit.findByName("fahrenheit")
-
-        DataType doubleType = DataType.findByName("Double")
-
-        assert c
-        assert f
-        assert doubleType
-
-        PrimitiveType temperatureUS = new PrimitiveType(name: "temperature US", measurementUnit: f, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
-        PrimitiveType temperature   = new PrimitiveType(name: "temperature",    measurementUnit: c, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
-
-
-        assert mappingService.map(temperature, temperatureUS, "(x as Double) * 9 / 5 + 32")
-        assert mappingService.map(temperatureUS, temperature, "((x as Double) - 32) * 5 / 9")
-
-        DataElement patientTemperature   = new DataElement(name: "patient temperature",    dataType: temperature).save(failOnError: true)
-        DataElement patientTemperatureUS = new DataElement(name: "patient temperature US", dataType: temperatureUS).save(failOnError: true)
-
-
-        CsvTransformation transformation = new CsvTransformation(name: "UK to US records").save(failOnError: true)
-
-        new ColumnTransformationDefinition(transformation: transformation, source: DataElement.findByName("PERSON GIVEN NAME"), header: "FIRST NAME").save(failOnError: true)
-        new ColumnTransformationDefinition(transformation: transformation, source: DataElement.findByName("PERSON FAMILY NAME"), header: "SURNAME").save(failOnError: true)
-        new ColumnTransformationDefinition(transformation: transformation, source: patientTemperature, destination: patientTemperatureUS, header: "PATIENT TEMPERATURE").save(failOnError: true)
     }
 
     def destroy = {}

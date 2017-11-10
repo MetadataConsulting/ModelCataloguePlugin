@@ -1,4 +1,4 @@
-package org.modelcatalogue
+package org.modelcatalogue.core
 
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.api.ModelCatalogueTypes

@@ -40,6 +40,8 @@ class InitSecurityService {
                 userGormService.save(user)
             }
         }
+
+        initUserRoles()
     }
 
     void initUserRoles() {

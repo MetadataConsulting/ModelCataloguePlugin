@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.apache.commons.io.input.CountingInputStream
@@ -19,7 +18,6 @@ import java.security.DigestOutputStream
 import java.security.MessageDigest
 import java.util.concurrent.ExecutorService
 
-@CompileStatic
 class AssetService {
 
     StorageService modelCatalogueStorageService
