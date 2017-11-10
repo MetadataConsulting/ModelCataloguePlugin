@@ -357,6 +357,8 @@ log4j.main = {
             'org.springframework',
             'org.hibernate',
             'net.sf.ehcache.hibernate'
+
+    info 'grails.app.conf.BootStrap'
 }
 grails.views.gsp.encoding = "UTF-8"
 

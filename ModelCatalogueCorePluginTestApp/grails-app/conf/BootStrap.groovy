@@ -101,8 +101,8 @@ class BootStrap {
         actionService.resetAllRunningActions()
         try {
 
-            println 'Running post init job'
-            println 'Finalizing all published elements'
+            log.info 'Running post init job'
+            log.info 'Finalizing all published elements'
 //            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
 //                if (it instanceof DataClass) {
 //                    elementService.finalizeElement(it)
@@ -113,7 +113,7 @@ class BootStrap {
 //            }
 
 
-            println "Creating some actions"
+            log.info "Creating some actions"
             Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
 
             15.times {
@@ -180,7 +180,7 @@ class BootStrap {
 
             FriendlyErrors.failFriendlySave(dataElement)
 
-            println "Init finished in ${new Date()}"
+            log.info "Init finished in ${new Date()}"
         } catch (e) {
             e.printStackTrace()
         }
