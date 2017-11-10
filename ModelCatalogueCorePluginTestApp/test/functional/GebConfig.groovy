@@ -7,6 +7,8 @@
 import io.github.bonigarcia.wdm.ChromeDriverManager
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.phantomjs.PhantomJSDriver
+
 
 ChromeOptions options = new ChromeOptions()
 options.addArguments("test-type")
@@ -15,13 +17,25 @@ options.addArguments("--disable-extensions")
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/'
-//baseUrl = 'https://gel-mc-test.metadata.org.uk/'
+
 
 ChromeDriverManager.getInstance().setup()
+environments {
 
-driver = {
-    new ChromeDriver(options)
+    chrome {
+        driver = {  new ChromeDriver(options) }
+    }
+
+
+
+    phantomJs {
+        driver = { new PhantomJSDriver() }
+    }
 }
+
+//driver = {
+  //  new ChromeDriver(options)
+//}
 
 waiting {
     timeout = 15
@@ -29,3 +43,7 @@ waiting {
 }
 
 atCheckWaiting = true
+
+
+
+
