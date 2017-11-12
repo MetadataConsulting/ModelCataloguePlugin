@@ -30,8 +30,15 @@ class TestDataHelper {
 
         //def tmp = ${System.getProperty('java.io.tmpdir')}
 
-        def tmpLocation = System.getenv('MC_TMP_LOCATION')
+        def tmpLocation = "${System.getenv('MC_TMP_LOCATION')}/${Metadata.getCurrent().getApplicationName()}"
+        def tmpDir = new File(tmpLocation)
 
+        if( tmpDir.exists()  ){
+            def result = tmpDir.deleteDir()  // Returns true if all goes well, false otherwise.
+            println result
+        }
+
+        tmpLocation = System.getenv('MC_TMP_LOCATION')
 
         println  tmpLocation
 
@@ -56,6 +63,7 @@ class TestDataHelper {
             new Sql(sessionFactory.currentSession.connection()).execute("RUNSCRIPT FROM ${clearScriptLocation}")
             println "Database cleared from $clearScriptLocation"
         }
+
 
         initCode()
 
