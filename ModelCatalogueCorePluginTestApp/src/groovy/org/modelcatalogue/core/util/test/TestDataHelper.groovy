@@ -39,11 +39,11 @@ class TestDataHelper {
         }
 
         tmpLocation = System.getenv('MC_TMP_LOCATION')
-
+        println "TEMP LOCATION"
         println  tmpLocation
 
         String scriptLocation = "${System.getenv('MC_TMP_LOCATION')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/${tempSqlFileName}"
-
+        println "SCRIPT LOCATION"
         println scriptLocation
 
         if (new File(scriptLocation).exists()) {
