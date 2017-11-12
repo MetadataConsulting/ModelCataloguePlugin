@@ -27,15 +27,10 @@ environments {
     }
 
 
-
     phantomJs {
         driver = { new PhantomJSDriver() }
     }
 }
-
-//driver = {
-  //  new ChromeDriver(options)
-//}
 
 waiting {
     timeout = 15
