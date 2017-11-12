@@ -4,6 +4,7 @@
  */
 
 
+import org.openqa.selenium.firefox.FirefoxDriver
 import io.github.bonigarcia.wdm.ChromeDriverManager
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
@@ -26,9 +27,12 @@ environments {
         driver = {  new ChromeDriver(options) }
     }
 
-
     phantomJs {
         driver = { new PhantomJSDriver() }
+    }
+
+    firefox {
+        driver = { new FirefoxDriver() }
     }
 }
 
