@@ -37,7 +37,7 @@ class SetupSimpleCsvTransformationService {
         assert mappingService.map(temperatureUS, temperature, "((x as Double) - 32) * 5 / 9")
 
         DataElement patientTemperature   = dataElementGormService.saveByNameAndPrimitiveType("patient temperature", temperature)
-        DataElement patientTemperatureUS = dataElementGormService.saveByNameAndPrimitiveType("patient temperature US", dataType: temperatureUS)
+        DataElement patientTemperatureUS = dataElementGormService.saveByNameAndPrimitiveType("patient temperature US", temperatureUS)
 
         CsvTransformation transformation = csvTransformationGormService.saveByName("UK to US records")
 
