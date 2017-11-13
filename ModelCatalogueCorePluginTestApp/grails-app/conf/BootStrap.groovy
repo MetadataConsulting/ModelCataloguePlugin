@@ -5,7 +5,9 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
+import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.UserRoleGormService
+import org.modelcatalogue.core.security.UserGormService
 import org.modelcatalogue.core.reports.RegisterReportsService
 import org.modelcatalogue.core.security.InitSecurityService
 import org.modelcatalogue.core.security.MetadataSecurityService
@@ -22,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.modelcatalogue.core.security.User
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import grails.plugin.springsecurity.acl.AclService
+import org.modelcatalogue.core.security.DataModelAclService
 
 class BootStrap {
 
@@ -39,8 +42,8 @@ class BootStrap {
     InitPoliciesAndTagsService initPoliciesAndTagsService
     SetupSimpleCsvTransformationService setupSimpleCsvTransformationService
     UserRoleGormService userRoleGormService
-    ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy
-    AclService aclService
+    UserGormService userGormService
+    DataModelAclService dataModelAclService
 
     def init = { servletContext ->
         log.info "BootStrap:addExtensionModules()"
@@ -96,7 +99,7 @@ class BootStrap {
         metadataSecurityService.secureUrlMappings()
 
         log.info 'configure acl'
-        loginAsSupervisor()
+        loginAs('curator')
         configureAcl()
 
         if ( !skipReindex() ) {
@@ -113,20 +116,14 @@ class BootStrap {
     private void configureAcl() {
         List<DataModel> dataModelList = DataModel.findAll()
         for ( DataModel dataModel : dataModelList ) {
-            ObjectIdentity objectIdentity = objectIdentityRetrievalStrategy.getObjectIdentity(dataModel)
-            Acl acl = aclService.readAclById(objectIdentity)
-            if ( !acl ) {
-                aclService.createAcl(objectIdentity)
-            }
-
+            dataModelAclService.addAdministrationPermission(dataModel)
         }
     }
 
-    private void loginAsSupervisor() {
-        String authority = 'ROLE_SUPERVISOR'
-        List<User> users = userRoleGormService.findAllByAuthority(authority)?.user
-        if ( users ) {
-            User user = users.getAt(0)
+
+    private void loginAs(String username, String authority = MetadataRoles.ROLE_CURATOR) {
+        User user = userGormService.findByUsername(username)
+        if ( user ) {
             // have to be authenticated as an admin to create ACLs
             List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(authority)
             SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(user.username,
@@ -174,12 +171,12 @@ class BootStrap {
                 log.info 'init request maps'
                 metadataSecurityService.secureUrlMappings()
 
-                log.info 'configure acl'
-                loginAsSupervisor()
-                configureAcl()
-
                 log.info 'setting up dev test stuff'
                 setupDevTestStuff()
+
+                log.info 'configure acl'
+                loginAs('curator')
+                configureAcl()
             }
             if ( !skipReindex() ) {
                 log.info 'init reindexing catalogue'
@@ -275,8 +272,8 @@ class BootStrap {
                         dataType(name: 'Same Name')
                     }
                 }
-
             }
+
             catalogueBuilder.build {
                 automatic dataType
                 dataModel(name: 'Test 2') {
