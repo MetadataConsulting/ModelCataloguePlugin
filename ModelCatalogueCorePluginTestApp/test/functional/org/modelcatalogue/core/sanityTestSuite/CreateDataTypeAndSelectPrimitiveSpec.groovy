@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.create
@@ -15,6 +16,7 @@ import static org.modelcatalogue.core.geb.Common.nameLabel
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import static org.modelcatalogue.core.geb.Common.save
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateDataTypeAndSelectPrimitiveSpec extends AbstractModelCatalogueGebSpec {
 

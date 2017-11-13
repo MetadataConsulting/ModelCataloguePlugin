@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.getCreate
@@ -17,6 +18,7 @@ import static org.modelcatalogue.core.geb.Common.messages
 import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.save
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 
