@@ -36,7 +36,7 @@ class InitSecurityService {
 
         ].each { Map m ->
             if ( !userGormService.findByNameOrUsername(m.username, m.username) ) {
-                User user = new User(name: 'supervisor', username: 'supervisor', enabled: true, password: m.password, email: m.email, apiKey: m.apiKey)
+                User user = new User(name: m.username, username: m.username, enabled: true, password: m.password, email: m.email, apiKey: m.apiKey)
                 userGormService.save(user)
             }
         }
