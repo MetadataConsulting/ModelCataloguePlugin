@@ -263,6 +263,8 @@ log4j.main = {
     info 'org.modelcatalogue.core.rx.BatchOperator'
     info 'org.modelcatalogue.core.rx.DetachedCriteriaOnSubscribe'
 
+    info 'org.modelcatalogue.core.util.test.TestHelper'
+
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
