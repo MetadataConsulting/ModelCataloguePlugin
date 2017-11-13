@@ -3,7 +3,10 @@ package org.modelcatalogue.core.util.test
 import grails.util.Metadata
 import groovy.sql.Sql
 import org.hibernate.SessionFactory
+import groovy.util.logging.Log4j
 
+
+@log4J
 class TestDataHelper {
 
     /**
@@ -40,11 +43,11 @@ class TestDataHelper {
 
         tmpLocation = System.getenv('MC_TMP_LOCATION')
 
-        println  tmpLocation
+        log.info  tmpLocation
 
         String scriptLocation = "${System.getenv('MC_TMP_LOCATION')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/${tempSqlFileName}"
 
-        println scriptLocation
+        log.info scriptLocation
 
         if (new File(scriptLocation).exists()) {
             long start = System.currentTimeMillis()
