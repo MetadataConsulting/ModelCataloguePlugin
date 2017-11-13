@@ -1,9 +1,7 @@
 package org.modelcatalogue.core.util.builder
 
-import grails.transaction.Transactional
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import groovy.util.logging.Log4j
 import org.modelcatalogue.builder.api.BuilderKeyword
 import org.modelcatalogue.builder.api.DataModelPolicyBuilder

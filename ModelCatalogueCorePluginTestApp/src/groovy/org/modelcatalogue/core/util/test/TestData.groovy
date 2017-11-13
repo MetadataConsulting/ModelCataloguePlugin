@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.util.test
 
-import grails.compiler.GrailsCompileStatic
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass

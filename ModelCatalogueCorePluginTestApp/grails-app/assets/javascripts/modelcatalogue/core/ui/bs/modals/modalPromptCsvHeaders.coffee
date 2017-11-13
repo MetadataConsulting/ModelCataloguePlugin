@@ -21,6 +21,9 @@ angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'ngFi
               </div>
             </form>
         </div>
+        <div class="modal-footer">
+            <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+        </div>
         '''
         controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, names, catalogueElementResource, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance) ->
           $scope.separator = ';'

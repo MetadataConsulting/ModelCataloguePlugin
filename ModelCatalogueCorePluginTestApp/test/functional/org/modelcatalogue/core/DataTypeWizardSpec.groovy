@@ -5,12 +5,15 @@ import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import org.modelcatalogue.core.geb.Common
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import org.openqa.selenium.Keys
 
 import static org.modelcatalogue.core.geb.Common.*
 
+import spock.lang.IgnoreIf
 @Stepwise
+@IgnoreIf({ !System.getProperty('geb.env') })
 class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     public static final String expandTableHeader = '.inf-table thead .inf-cell-expand'

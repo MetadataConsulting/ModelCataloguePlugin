@@ -6,9 +6,7 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.Legacy
-
 import java.lang.reflect.Modifier
-
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 @Log4j

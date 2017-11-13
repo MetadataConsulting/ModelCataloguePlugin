@@ -2,9 +2,12 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.Keys
+import spock.lang.IgnoreIf
+import spock.lang.IgnoreRest
 import spock.lang.Stepwise
 import static org.modelcatalogue.core.geb.Common.*
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateTagSpec extends AbstractModelCatalogueGebSpec {
 
@@ -13,6 +16,7 @@ class CreateTagSpec extends AbstractModelCatalogueGebSpec {
     private static final String  deleteButton = 'a#delete-menu-item-link>span:nth-child(3)'
     private static final String   dataElementButton = 'a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
 
+    @IgnoreRest
     def "login to model catalogue and select element"() {
 
         when:

@@ -11,6 +11,7 @@ import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserGormService
 import org.springframework.transaction.annotation.Transactional
 
 class CatalogueElementGormService {

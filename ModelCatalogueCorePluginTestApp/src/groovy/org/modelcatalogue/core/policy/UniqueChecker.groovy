@@ -5,6 +5,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.HibernateHelper
+import static com.google.common.base.Preconditions.checkNotNull
 
 class UniqueChecker implements ConventionChecker {
 

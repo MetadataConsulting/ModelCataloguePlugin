@@ -3,7 +3,6 @@ package org.modelcatalogue.core.security
 import grails.plugin.springsecurity.acl.AclService
 import grails.plugin.springsecurity.acl.AclUtilService
 import grails.transaction.Transactional
-import groovy.transform.CompileStatic
 import org.modelcatalogue.core.DataModel
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.acls.domain.DefaultPermissionFactory
@@ -12,7 +11,6 @@ import org.springframework.security.acls.model.AccessControlEntry
 import org.springframework.security.acls.model.MutableAcl
 import org.springframework.security.acls.model.Permission
 
-@CompileStatic
 class DataModelPermissionService {
 
     DefaultPermissionFactory aclPermissionFactory
@@ -20,7 +18,6 @@ class DataModelPermissionService {
     AclUtilService aclUtilService
 
     AclService aclService
-
 
     void addPermission(DataModel dataModel, String username, int permission) {
         addPermission(username, dataModel.id, aclPermissionFactory.buildFromMask(permission))

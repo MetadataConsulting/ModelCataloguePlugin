@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.Regression
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.create
@@ -13,6 +14,7 @@ import static org.modelcatalogue.core.geb.Common.nameLabel
 import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
 

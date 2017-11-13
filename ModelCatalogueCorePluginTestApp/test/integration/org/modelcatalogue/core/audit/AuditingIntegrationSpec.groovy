@@ -15,7 +15,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     def sessionFactory
     def mappingService
     def auditService
-
+    def springSecurityService
 
     def "creation of new element is logged"() {
         when:
@@ -29,7 +29,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change
         change.latestVersionId == type.id
         change.type == ChangeType.NEW_ELEMENT_CREATED
-        change.authorId != null
+        change.authorId == springSecurityService.principal?.id
         change.property == null
         change.newValue == null
         change.oldValue == null
@@ -50,7 +50,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         then:
         change
         change.latestVersionId == dataModel.id
-        change.authorId != null
+        change.authorId == springSecurityService.principal?.id
         change.property == null
         change.newValue == null
         change.oldValue == null
@@ -69,7 +69,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change
         change.changedId == vOne.id
         change.latestVersionId == vOne.id
-        change.authorId != null
+        change.authorId == springSecurityService.principal?.id
         change.property == 'status'
         change.newValue == LoggingAuditor.storeValue(ElementStatus.FINALIZED)
         change.oldValue == LoggingAuditor.storeValue(ElementStatus.DRAFT)
@@ -90,7 +90,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change
         change.changedId == vOne.id
         change.latestVersionId == vOne.id
-        change.authorId != null
+        change.authorId == springSecurityService.principal?.id
         change.property == 'status'
         change.newValue == LoggingAuditor.storeValue(ElementStatus.DEPRECATED)
         change.oldValue == LoggingAuditor.storeValue(ElementStatus.DRAFT)
@@ -114,7 +114,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.changedId == type.id
         change.latestVersionId == type.id
         change.type == ChangeType.PROPERTY_CHANGED
-        change.authorId != null
+        change.authorId == springSecurityService.principal?.id
         change.property == 'description'
         change.newValue
         change.oldValue
@@ -162,7 +162,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         then:
         change
         change.latestVersionId == type.id
-        change.authorId != null
+        change.authorId == springSecurityService.principal?.id
         change.property == null
         change.newValue == null
         change.oldValue == expectedOldValue
@@ -181,7 +181,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         change
         change.latestVersionId == type.id
-        change.authorId != null
+        change.authorId == springSecurityService.principal?.id
         change.property == 'foo'
         change.newValue
         change.oldValue == null
@@ -211,7 +211,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         change
         change.latestVersionId == type.id
-        change.authorId != null
+        change.authorId == springSecurityService.principal?.id
         change.property == 'foo'
         change.oldValue
         change.newValue
@@ -245,7 +245,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         change
         change.latestVersionId == type.id
-        change.authorId != null
+        change.authorId == springSecurityService.principal?.id
         change.property == 'foo'
         change.oldValue == LoggingAuditor.storeValue('bar')
         change.newValue == null
@@ -280,14 +280,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         change1
         change1.latestVersionId == type.id
-        change1.authorId != null
+        change1.authorId == springSecurityService.principal?.id
         change1.property == 'is based on'
         change1.newValue
         change1.oldValue == null
 
         change2
         change2.latestVersionId == base.id
-        change2.authorId != null
+        change2.authorId == springSecurityService.principal?.id
         change2.property == 'is base for'
         change2.newValue
         change2.oldValue == null
@@ -324,7 +324,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         change1
         change1.latestVersionId == type.id
-        change1.authorId != null
+        change1.authorId == springSecurityService.principal?.id
         change1.property == 'is based on'
         change1.oldValue == initialValue
         change1.newValue == null
@@ -332,7 +332,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         change2
         change2.latestVersionId == base.id
-        change2.authorId != null
+        change2.authorId == springSecurityService.principal?.id
         change2.property == 'is base for'
         change2.oldValue == initialValue
         change2.newValue == null
@@ -359,14 +359,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         expect:
         change1
         change1.latestVersionId == type.id
-        change1.authorId != null
+        change1.authorId == springSecurityService.principal?.id
         change1.property == 'is based on'
         change1.newValue == newValue
         change1.oldValue == null
 
         change2
         change2.latestVersionId == base.id
-        change2.authorId != null
+        change2.authorId == springSecurityService.principal?.id
         change2.property == 'is base for'
         change2.newValue == newValue
         change2.oldValue == null
@@ -404,14 +404,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         expect:
         change1
         change1.latestVersionId == type.id
-        change1.authorId != null
+        change1.authorId == springSecurityService.principal?.id
         change1.property == 'is based on'
         change1.newValue
         change1.oldValue == LoggingAuditor.storeValue('bar')
 
         change2
         change2.latestVersionId == base.id
-        change2.authorId != null
+        change2.authorId == springSecurityService.principal?.id
         change2.property == 'is base for'
         change2.newValue
         change2.oldValue == LoggingAuditor.storeValue('bar')
@@ -448,14 +448,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         expect:
         change1
         change1.latestVersionId == type.id
-        change1.authorId != null
+        change1.authorId == springSecurityService.principal?.id
         change1.property == 'is based on'
         change1.newValue == null
         change1.oldValue
 
         change2
         change2.latestVersionId == base.id
-        change2.authorId != null
+        change2.authorId == springSecurityService.principal?.id
         change2.property == 'is base for'
         change2.newValue == null
         change2.oldValue
@@ -510,14 +510,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         change1
         change1.latestVersionId == type.id
-        change1.authorId != null
+        change1.authorId == springSecurityService.principal?.id
         change1.newValue
         change1.oldValue == null
         !change1.otherSide
 
         change2
         change2.latestVersionId == base.id
-        change2.authorId != null
+        change2.authorId == springSecurityService.principal?.id
         change2.newValue
         change2.oldValue == null
         change2.otherSide
@@ -548,14 +548,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         expect:
         change1
         change1.latestVersionId == type.id
-        change1.authorId != null
+        change1.authorId == springSecurityService.principal?.id
         change1.newValue == null
         change1.oldValue
         !change1.otherSide
 
         change2
         change2.latestVersionId == base.id
-        change2.authorId != null
+        change2.authorId == springSecurityService.principal?.id
         change2.newValue == null
         change2.oldValue
         change2.otherSide
@@ -592,14 +592,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         change1
         change1.latestVersionId == type.id
-        change1.authorId != null
+        change1.authorId == springSecurityService.principal?.id
         change1.newValue
         change1.oldValue
         !change1.otherSide
 
         change2
         change2.latestVersionId == base.id
-        change2.authorId != null
+        change2.authorId == springSecurityService.principal?.id
         change2.newValue
         change2.oldValue
         change2.otherSide

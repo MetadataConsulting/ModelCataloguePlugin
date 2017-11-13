@@ -9,7 +9,7 @@ class RequestmapGormService {
     @Transactional
     Requestmap createRequestmapIfMissing(String url, String configAttribute, HttpMethod method = null) {
         List<Requestmap> maps = Requestmap.findAllByUrlAndHttpMethod(url, method)
-        for(Requestmap map in maps) {
+        for (Requestmap map in maps) {
             if (map.configAttribute == configAttribute) {
                 return map
             }
