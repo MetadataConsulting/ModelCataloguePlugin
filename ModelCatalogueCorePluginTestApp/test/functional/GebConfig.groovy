@@ -19,11 +19,14 @@ reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/'
 
+//ChromeDriverManager.getInstance().setup()
 
-ChromeDriverManager.getInstance().setup()
 environments {
 
     chrome {
+        ChromeOptions options = new ChromeOptions()
+        options.addArguments("test-type")
+        options.addArguments("--disable-extensions")
         driver = {  new ChromeDriver(options) }
     }
 
