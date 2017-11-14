@@ -6,7 +6,7 @@ import org.hibernate.SessionFactory
 import groovy.util.logging.Log4j
 
 
-@log4J
+@Log4J
 class TestDataHelper {
 
     /**
