@@ -30,7 +30,7 @@ class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
     def"search for a draft model"() {
 
         when: 'type in the search box'
-        fill searchInput2 with "cancel"
+        fill searchInput2 with "cancer"
 
         and: 'click on button next to search catalogue'
         click defaultButton
