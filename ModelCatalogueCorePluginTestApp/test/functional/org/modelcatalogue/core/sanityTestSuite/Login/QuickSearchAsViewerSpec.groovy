@@ -20,12 +20,12 @@ class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
 
     def"login to model catalogue"(){
 
-        loginViewer()
+        loginCurator()
 
         expect:
         check catalogueModels contains 'Catalogue Models'
-
     }
+
     def"navigate to the top menu and select quick search"(){
 
         when:
@@ -33,7 +33,7 @@ class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
         Thread.sleep(1000)
 
         and:'search for an element'
-        fill search with 'Clinical trial' and pick first  item
+        fill search with 'Clinical trial' and pick first item
         Thread.sleep(1000)
 
         then:
