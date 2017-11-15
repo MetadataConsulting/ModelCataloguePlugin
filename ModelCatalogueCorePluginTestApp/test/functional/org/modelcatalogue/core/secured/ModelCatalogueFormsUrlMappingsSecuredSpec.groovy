@@ -1,11 +1,9 @@
 package org.modelcatalogue.core.secured
 
-import grails.plugins.rest.client.RestBuilder
-import grails.plugins.rest.client.RestResponse
-import spock.lang.Specification
+import geb.spock.GebSpec
 import spock.lang.Unroll
 
-class ModelCatalogueFormsUrlMappingsSecuredSpec extends Specification {
+class ModelCatalogueFormsUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {
         'http://localhost:8080'
@@ -13,15 +11,11 @@ class ModelCatalogueFormsUrlMappingsSecuredSpec extends Specification {
 
     @Unroll
     def "ModelCatalogueFormsUrlMappings GET #endpoint is secured"(String endpoint) {
-        given:
-        RestBuilder rest = new RestBuilder()
-
         when:
-        RestResponse response = rest.get("${baseUrl}${endpoint}")
+        go "${baseUrl}${endpoint}"
 
         then:
-        noExceptionThrown()
-        response.status == 401
+        at LoginPage
 
         where:
         endpoint << [

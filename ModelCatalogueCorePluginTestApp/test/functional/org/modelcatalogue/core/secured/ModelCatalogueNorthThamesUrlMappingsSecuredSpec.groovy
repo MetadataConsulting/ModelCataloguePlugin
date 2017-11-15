@@ -1,27 +1,17 @@
 package org.modelcatalogue.core.secured
 
-import grails.plugins.rest.client.RestBuilder
-import grails.plugins.rest.client.RestResponse
-import spock.lang.Specification
+import geb.spock.GebSpec
 import spock.lang.Unroll
 
-class ModelCatalogueNorthThamesUrlMappingsSecuredSpec extends Specification {
-
-    protected String getBaseUrl() {
-        'http://localhost:8080'
-    }
+class ModelCatalogueNorthThamesUrlMappingsSecuredSpec extends GebSpec {
 
     @Unroll
     def "ModelCatalogueNorthThamesUrlMappings GET #endpoint is secured"(String endpoint) {
-        given:
-        RestBuilder rest = new RestBuilder()
-
         when:
-        RestResponse response = rest.get("${baseUrl}${endpoint}")
+        go "${baseUrl}${endpoint}"
 
         then:
-        noExceptionThrown()
-        response.status == 401
+        at LoginPage
 
         where:
         endpoint << [

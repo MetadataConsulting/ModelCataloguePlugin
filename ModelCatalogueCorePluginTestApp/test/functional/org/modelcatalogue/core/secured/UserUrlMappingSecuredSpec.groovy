@@ -1,44 +1,24 @@
 package org.modelcatalogue.core.secured
 
+import geb.spock.GebSpec
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class UserUrlMappingSecuredSpec extends Specification {
-
-
+class UserUrlMappingSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {
         'http://localhost:8080'
     }
-//
-//    def "UserUrlMapping GET /user/current is NOT secured"() {
-//        given:
-//        RestBuilder rest = new RestBuilder()
-//
-//        when:
-//        RestResponse response = rest.get("${baseUrl}/user/current") {
-//            accept('application/json')
-//        }
-//
-//        then:
-//        response.status == 200
-//        response.json.success == false
-//        response.json.username == null
-//    }
 
     @Unroll
     def "UserUrlMapping GET #endpoint is secured"(String endpoint) {
-        given:
-        RestBuilder rest = new RestBuilder()
-
         when:
-        RestResponse response = rest.get("${baseUrl}${endpoint}")
+        go "${baseUrl}${endpoint}"
 
         then:
-        noExceptionThrown()
-        response.status == 401
+        at LoginPage
 
         where:
         endpoint << [
@@ -72,7 +52,7 @@ class UserUrlMappingSecuredSpec extends Specification {
 
         then:
         noExceptionThrown()
-        response.status == 401
+        response.status == 302
 
         where:
         endpoint << [
@@ -104,7 +84,7 @@ class UserUrlMappingSecuredSpec extends Specification {
 
         then:
         noExceptionThrown()
-        response.status == 401
+        response.status == 302
 
         where:
         endpoint << [
@@ -124,7 +104,7 @@ class UserUrlMappingSecuredSpec extends Specification {
 
         then:
         noExceptionThrown()
-        response.status == 401
+        response.status == 302
 
         where:
         endpoint << [

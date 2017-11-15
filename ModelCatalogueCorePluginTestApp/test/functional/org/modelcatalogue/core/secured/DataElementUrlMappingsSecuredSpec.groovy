@@ -1,11 +1,12 @@
 package org.modelcatalogue.core.secured
 
+import geb.spock.GebSpec
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class DataElementUrlMappingsSecuredSpec extends Specification {
+class DataElementUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {
         'http://localhost:8080'
@@ -21,7 +22,7 @@ class DataElementUrlMappingsSecuredSpec extends Specification {
 
         then:
         noExceptionThrown()
-        response.status == 401
+        response.status == 302
 
         where:
         endpoint << [
@@ -40,15 +41,11 @@ class DataElementUrlMappingsSecuredSpec extends Specification {
 
     @Unroll
     def "DataElementUrlMappings GET #endpoint is secured"(String endpoint) {
-        given:
-        RestBuilder rest = new RestBuilder()
-
         when:
-        RestResponse response = rest.get("${baseUrl}${endpoint}")
+        go "${baseUrl}${endpoint}"
 
         then:
-        noExceptionThrown()
-        response.status == 401
+        at LoginPage
 
         where:
         endpoint << [
@@ -81,7 +78,7 @@ class DataElementUrlMappingsSecuredSpec extends Specification {
 
         then:
         noExceptionThrown()
-        response.status == 401
+        response.status == 302
 
         where:
         endpoint << [
@@ -102,7 +99,7 @@ class DataElementUrlMappingsSecuredSpec extends Specification {
 
         then:
         noExceptionThrown()
-        response.status == 401
+        response.status == 302
 
         where:
         endpoint << [

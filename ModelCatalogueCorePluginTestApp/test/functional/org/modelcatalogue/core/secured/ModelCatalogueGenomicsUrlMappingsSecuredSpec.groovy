@@ -1,11 +1,12 @@
 package org.modelcatalogue.core.secured
 
+import geb.spock.GebSpec
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class ModelCatalogueGenomicsUrlMappingsSecuredSpec extends Specification {
+class ModelCatalogueGenomicsUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {
         'http://localhost:8080'
@@ -21,7 +22,7 @@ class ModelCatalogueGenomicsUrlMappingsSecuredSpec extends Specification {
 
         then:
         noExceptionThrown()
-        response.status == 401
+        response.status == 302
 
         where:
         endpoint << [
@@ -31,16 +32,11 @@ class ModelCatalogueGenomicsUrlMappingsSecuredSpec extends Specification {
 
     @Unroll
     def "ModelCatalogueGenomicsUrlMappings GET #endpoint is secured"(String endpoint) {
-        given:
-        RestBuilder rest = new RestBuilder()
-
         when:
-        RestResponse response = rest.get("${baseUrl}${endpoint}")
+        go "${baseUrl}${endpoint}"
 
         then:
-        noExceptionThrown()
-        response.status == 401
-
+        at LoginPage
         where:
         endpoint << [
                 '/api/modelCatalogue/core/genomics/exportRareDiseaseHPOAndClinicalTestsAsJson/$id',
