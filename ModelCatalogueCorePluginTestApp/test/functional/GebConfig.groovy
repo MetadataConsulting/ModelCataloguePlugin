@@ -9,8 +9,12 @@ import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 
 ChromeOptions options = new ChromeOptions()
+options.addArguments("start-maximized")
+options.addArguments("window-size=1920,1080")
 options.addArguments("test-type")
 options.addArguments("--disable-extensions")
+options.addArguments("headless")
+options.addArguments("--disable-gpu")
 
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
