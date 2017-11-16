@@ -3,7 +3,7 @@ angular.module('modelcatalogue.core.ui.states.controllers.ShowCtrl', ['ui.router
   ($scope ,  $stateParams ,  $state ,  element) ->
 
     if (not $stateParams.dataModelId or $stateParams.dataModelId == 'catalogue') and element.getDataModelId() != 'catalogue'
-      $state.go 'mc.resource.show', {dataModelId: element.getDataModelId(), id: element.id, resource: $stateParams.resource}, {reload: true, location: 'replace'}
+      $state.go 'dataModel.resource.show', {dataModelId: element.getDataModelId(), id: element.id, resource: $stateParams.resource}, {reload: true, location: 'replace'}
       return
 
     $scope.element = element

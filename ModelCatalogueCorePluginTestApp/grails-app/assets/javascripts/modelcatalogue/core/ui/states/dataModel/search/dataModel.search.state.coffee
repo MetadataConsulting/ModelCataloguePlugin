@@ -1,6 +1,6 @@
 angular.module('modelcatalogue.core.ui.states.dataModel.search', ['modelcatalogue.core.ui.states.controllers.ListCtrl']).config(['$stateProvider', ($stateProvider) ->
 
-    $stateProvider.state('mc.search', {
+    $stateProvider.state('dataModel.search', {
       url: "/search/{q}",
       views:
         "":

@@ -1,7 +1,7 @@
 angular.module('modelcatalogue.core.ui.states.dataModel.resource.show', ['modelcatalogue.core.ui.states.controllers',
 'modelcatalogue.core.ui.states.dataModel.resource.show.property']).config(($stateProvider) ->
 
-    $stateProvider.state 'mc.resource.show', {
+    $stateProvider.state 'dataModel.resource.show', {
       url: '/{id:\\d+}'
 
       views:

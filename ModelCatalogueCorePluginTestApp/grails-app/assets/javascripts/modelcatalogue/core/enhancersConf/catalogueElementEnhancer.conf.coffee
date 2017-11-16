@@ -29,17 +29,17 @@ angular.module('modelcatalogue.core.enhancersConf.catalogueElementEnhancer', ['u
     if self.isInstanceOf "batch"
       return $state.href('simple.actions.show', {id: self.id})
     if self.isInstanceOf "csvTransformation"
-      return $state.href('mc.csvTransformations.show', {id: self.id})
+      return $state.href('dataModel.csvTransformations.show', {id: self.id})
     if self.isInstanceOf "dataModelPolicy"
       return $state.href('simple.resource.show', {id: self.id, resource: 'dataModelPolicy'})
     if self.isInstanceOf "relationships"
-      return $state.href('mc.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property})
+      return $state.href('dataModel.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property})
     if self.isInstanceOf "enumeratedValue"
-      return $state.href('mc.resource.show.property', {resource: 'enumeratedType', id: self.id, dataModelId: self.getDataModelId(), property: 'enumerations'})
+      return $state.href('dataModel.resource.show.property', {resource: 'enumeratedType', id: self.id, dataModelId: self.getDataModelId(), property: 'enumerations'})
     if self.isInstanceOf "versions"
-      return $state.href('mc.resource.show.property', {resource: 'dataModel', id:  self.getDataModelId(), dataModelId: self.getDataModelId(), property: 'history'})
+      return $state.href('dataModel.resource.show.property', {resource: 'dataModel', id:  self.getDataModelId(), dataModelId: self.getDataModelId(), property: 'history'})
     if self.getDataModelId() != 'catalogue'
-      return $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()})
+      return $state.href('dataModel.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()})
     $state.href('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
 
 
@@ -107,17 +107,17 @@ angular.module('modelcatalogue.core.enhancersConf.catalogueElementEnhancer', ['u
             if self.isInstanceOf "batch"
               return $state.go('simple.actions.show', {id: self.id}, {reload: reload}); self
             if self.isInstanceOf "csvTransformation"
-              return $state.go('mc.csvTransformations.show', {id: self.id}, {reload: reload}); self
+              return $state.go('dataModel.csvTransformations.show', {id: self.id}, {reload: reload}); self
             if self.isInstanceOf "dataModelPolicy"
               return $state.go('simple.resource.show', {id: self.id, resource: 'dataModelPolicy'}) ; self
             if self.isInstanceOf "relationships"
-              return $state.go('mc.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property}, {reload: reload})
+              return $state.go('dataModel.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property}, {reload: reload})
             if self.isInstanceOf "enumeratedValue"
-              return $state.go('mc.resource.show.property', {resource: 'enumeratedType', id: self.id, dataModelId: self.getDataModelId(), property: 'enumerations'}, {reload: reload}) ; self
+              return $state.go('dataModel.resource.show.property', {resource: 'enumeratedType', id: self.id, dataModelId: self.getDataModelId(), property: 'enumerations'}, {reload: reload}) ; self
             if self.isInstanceOf "versions"
-              return $state.go('mc.resource.show.property', {resource: 'dataModel', id:  self.getDataModelId(), dataModelId: self.getDataModelId(), property: 'history'}, {reload: reload}) ; self
+              return $state.go('dataModel.resource.show.property', {resource: 'dataModel', id:  self.getDataModelId(), dataModelId: self.getDataModelId(), property: 'history'}, {reload: reload}) ; self
             if self.getDataModelId() != 'catalogue'
-              return $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()}, {reload: reload})
+              return $state.go('dataModel.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()}, {reload: reload})
             $state.go('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}, {reload: reload}) ; self
 
           self.href = ->

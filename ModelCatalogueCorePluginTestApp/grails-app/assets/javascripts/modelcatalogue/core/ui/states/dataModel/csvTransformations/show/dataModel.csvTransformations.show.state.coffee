@@ -1,6 +1,6 @@
 angular.module('modelcatalogue.core.ui.states.dataModel.csvTransformations.show', ['modelcatalogue.core.ui.states.dataModel.csvTransformations.show.csvTransformationCtrl']).config(['$stateProvider', ($stateProvider) ->
 
-    $stateProvider.state 'mc.csvTransformations.show', {
+    $stateProvider.state 'dataModel.csvTransformations.show', {
       url: '/{id:\\d+}'
 
       views:

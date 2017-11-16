@@ -210,7 +210,7 @@ angular.module('mc.core.ui.catalogueElementView', ['modelcatalogue.core.enhancer
       $scope.tabs   = []
       $scope.detailSections = []
       $scope.select = (tab) ->
-        nextState = if $state.includes 'mc' then 'mc.resource.show.property' else 'simple.resource.show.property'
+        nextState = if $state.includes 'dataModel' then 'dataModel.resource.show.property' else 'simple.resource.show.property'
         $state.go nextState, {property: tab.name}
 
       $scope.isTableSortable = (tab) ->
@@ -299,7 +299,7 @@ angular.module('mc.core.ui.catalogueElementView', ['modelcatalogue.core.enhancer
       $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentElement).debounce(DEBOUNCE_TIME).subscribe refreshElement
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
-        return if state.name != 'mc.resource.show.property' and state.name != 'simple.resource.show.property'
+        return if state.name != 'dataModel.resource.show.property' and state.name != 'simple.resource.show.property'
         $scope.property = params.property
         if params.focused
           $scope.displayOnly = params.property

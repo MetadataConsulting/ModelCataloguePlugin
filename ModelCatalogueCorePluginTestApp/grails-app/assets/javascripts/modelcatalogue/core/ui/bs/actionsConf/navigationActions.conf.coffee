@@ -59,7 +59,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationActions', ['mc.u
             security.requireRole('CURATOR')
             .then ->
               messages.prompt('Create ' + names.getNaturalName(resource), '', args).then ->
-                $state.go 'mc.resource.list', {status: 'draft'}, {reload: true}
+                $state.go 'dataModel.resource.list', {status: 'draft'}, {reload: true}
             , (errors)->
               $log.error errors
               messages.error('You don\'t have rights to create new elements')
@@ -106,7 +106,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationActions', ['mc.u
 # do global-draft, global-pending, global-finalized really need to define the field 'run' instead of 'action' unlike every other action? Not really.
 
   actionsProvider.registerActionInRole 'global-draft', actionRoleRegister.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
-    return undefined unless $state.current.name == 'mc.resource.list'
+    return undefined unless $state.current.name == 'dataModel.resource.list'
     return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
 
     Action.createStandardAction(
@@ -119,7 +119,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationActions', ['mc.u
   ]
 
   actionsProvider.registerActionInRole 'global-pending', actionRoleRegister.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
-    return undefined unless $state.current.name == 'mc.resource.list'
+    return undefined unless $state.current.name == 'dataModel.resource.list'
     return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
 
     Action.createStandardAction(
@@ -132,7 +132,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationActions', ['mc.u
   ]
 
   actionsProvider.registerActionInRole 'global-finalized', actionRoleRegister.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
-    return undefined unless $state.current.name == 'mc.resource.list'
+    return undefined unless $state.current.name == 'dataModel.resource.list'
     return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
     Action.createStandardAction(
       position: null

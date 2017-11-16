@@ -8,7 +8,7 @@ angular.module('modelcatalogue.core.ui.states.dataModel', [
 .config ($stateProvider) ->
   'ngInject'
 
-  $stateProvider.state 'mc', {
+  $stateProvider.state 'dataModel', {
     abstract: true
     url: '/{dataModelId:[0-9]+}'
     views:

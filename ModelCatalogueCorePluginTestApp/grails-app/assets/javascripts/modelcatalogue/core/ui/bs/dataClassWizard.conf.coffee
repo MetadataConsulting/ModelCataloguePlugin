@@ -100,7 +100,7 @@ angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui
               $scope[propertyName] = {ext: orderedMapEnhancer.emptyOrderedMap()}
 
           $scope.openElementInNewWindow = (element) ->
-            url = $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})
+            url = $state.href('dataModel.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})
             $window.open(url,'_blank')
 
           $scope.finish = () ->

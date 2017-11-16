@@ -9,7 +9,7 @@ angular.module('modelcatalogue.core.ui.states.dataModel.resource', [
 
 ]).config(['$stateProvider', ($stateProvider) ->
 
-    $stateProvider.state 'mc.resource', {
+    $stateProvider.state 'dataModel.resource', {
       abstract: true
       url: '/:resource'
       views:

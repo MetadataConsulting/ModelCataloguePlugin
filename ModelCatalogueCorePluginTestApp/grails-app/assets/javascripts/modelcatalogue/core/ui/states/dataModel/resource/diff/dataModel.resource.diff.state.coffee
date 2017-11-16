@@ -3,7 +3,7 @@ angular.module('modelcatalogue.core.ui.states.dataModel.resource.diff',
 ['modelcatalogue.core.ui.states.dataModel.resource.diff.diffCtrl'])
   .config(['$stateProvider', ($stateProvider) ->
 
-    $stateProvider.state 'mc.resource.diff', {
+    $stateProvider.state 'dataModel.resource.diff', {
       views:
         "":
           templateUrl: 'modelcatalogue/core/ui/state/diff.html'

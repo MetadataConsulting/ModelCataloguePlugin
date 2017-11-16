@@ -96,7 +96,7 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch', 'mc.util.ui.actions'
             row.multiline = true
             if value.total > 0
               row.loaders[i] = value
-              row.hrefs[i]   = $state.href 'mc.resource.show.property', resource: element.getResourceName(), id: element.id, property: key
+              row.hrefs[i]   = $state.href 'dataModel.resource.show.property', resource: element.getResourceName(), id: element.id, property: key
 
 
 

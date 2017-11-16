@@ -5,7 +5,7 @@ angular.module('modelcatalogue.core.ui.states.dataModel.resource.list-imported',
 
     DEFAULT_ITEMS_PER_PAGE = 10
 
-    $stateProvider.state 'mc.resource.list-imported', {
+    $stateProvider.state 'dataModel.resource.list-imported', {
       url: '/from-{otherDataModelId:\\d+}?page&order&sort&status&q&max&classification&display'
 
       views:

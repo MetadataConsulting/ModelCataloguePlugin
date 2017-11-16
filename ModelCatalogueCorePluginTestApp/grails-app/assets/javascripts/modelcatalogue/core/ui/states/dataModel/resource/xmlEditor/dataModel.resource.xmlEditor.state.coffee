@@ -2,7 +2,7 @@ angular.module('modelcatalogue.core.ui.states.dataModel.resource.xmlEditor', ['u
 'modelcatalogue.core.ui.states.dataModel.resource.xmlEditor.xmlEditorCtrl']).config([
   '$stateProvider',
   ($stateProvider) ->
-    $stateProvider.state 'mc.resource.xml-editor', {
+    $stateProvider.state 'dataModel.resource.xml-editor', {
       url: '/xml-edit-{id:\\d+}?'
 
       views:

@@ -271,7 +271,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationRightActions', [
     '$scope', 'names','security', '$state',
     ($scope ,  names , security ,  $state ) ->
       return undefined unless security.hasRole('CURATOR')
-      return undefined unless $state.current.name == 'mc.resource.list'
+      return undefined unless $state.current.name == 'dataModel.resource.list'
       return undefined unless $scope.resource == 'asset'
 
       Action.createAbstractAction(

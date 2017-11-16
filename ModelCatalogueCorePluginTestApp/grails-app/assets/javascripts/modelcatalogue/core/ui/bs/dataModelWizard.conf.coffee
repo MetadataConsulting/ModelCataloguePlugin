@@ -56,7 +56,7 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
             $scope[propertyName] = {}
 
           $scope.openElementInNewWindow = (element) ->
-            url = $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})
+            url = $state.href('dataModel.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})
             $window.open(url,'_blank')
 
 
@@ -106,7 +106,7 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
 
               promise = promise.then (classification) ->
                 messages.success "Data Model #{classification.name} created"
-                $state.go 'mc.resource.show', {dataModelId: classification.id, resource: 'dataModel', id: classification.id}
+                $state.go 'dataModel.resource.show', {dataModelId: classification.id, resource: 'dataModel', id: classification.id}
                 $scope.finished = true
 
 

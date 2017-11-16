@@ -15,7 +15,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
     ($scope, names, security, messages, $state, $log, dataModelService) ->
       'ngInject'
       resource = $scope.resource
-      if not resource and $state.current.name == 'mc.resource.list'
+      if not resource and $state.current.name == 'dataModel.resource.list'
         resource = $state.params.resource
 
       return undefined unless security.hasRole('CURATOR')
@@ -42,7 +42,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
           security.requireRole('CURATOR')
           .then ->
             messages.prompt('Create ' + names.getNaturalName(resource), '', args).then ->
-              if (resource == 'model' || resource == 'dataClass') and $state.current.name == 'mc.resource.list'
+              if (resource == 'model' || resource == 'dataClass') and $state.current.name == 'dataModel.resource.list'
 # reload in draft mode
                 $state.go '.', {status: 'draft'}, {reload: true}
           , (errors)->
@@ -312,7 +312,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
         icon: null
         type: null
         action: ->
-          $state.go('mc.resource.xml-editor', {resource: 'dataClass', id: $scope.element.id})
+          $state.go('dataModel.resource.xml-editor', {resource: 'dataClass', id: $scope.element.id})
       )
   ]
 
@@ -402,7 +402,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
 
   actionsProvider.registerActionInRole 'switch-archived-batches', actionRoleRegister.ROLE_LIST_ACTION, ['$state', '$scope',
     '$stateParams', ($state, $scope, $stateParams) ->
-      return undefined unless $state.current.name == 'mc.resource.list' and $scope.list and $stateParams.resource == 'batch'
+      return undefined unless $state.current.name == 'dataModel.resource.list' and $scope.list and $stateParams.resource == 'batch'
 
       Action.createAbstractAction(
         position: 500
@@ -422,7 +422,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
         action: ->
           newParams = angular.copy($stateParams)
           newParams.status = undefined
-          $state.go 'mc.resource.list', newParams
+          $state.go 'dataModel.resource.list', newParams
       ).activeIf !$stateParams.status
   ]
 
@@ -436,7 +436,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
         action: ->
           newParams = angular.copy($stateParams)
           newParams.status = 'archived'
-          $state.go 'mc.resource.list', newParams
+          $state.go 'dataModel.resource.list', newParams
       ).activeIf $stateParams.status == 'archived'
   ]
 

@@ -5,7 +5,7 @@ angular.module('modelcatalogue.core.ui.states.dataModel.resource.list', ['modelc
 
     DEFAULT_ITEMS_PER_PAGE = 25
 
-    $stateProvider.state 'mc.resource.list', {
+    $stateProvider.state 'dataModel.resource.list', {
       url: '/all?page&order&sort&status&q&max&classification&display&tag'
 
       views:

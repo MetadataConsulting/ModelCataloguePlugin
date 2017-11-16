@@ -17,21 +17,21 @@ angular.module('modelcatalogue.core.ui.states.dataModel').controller('modelcatal
         if element.getDataModelId() == currentDataModel?.id
           if element.tagId
             if element.tagId == 'none'
-              $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: 'dataElement', status: 'active', tag: 'none'
+              $state.go 'dataModel.resource.list', dataModelId: currentDataModel?.id, resource: 'dataElement', status: 'active', tag: 'none'
               return
             else
-              $state.go 'mc.resource.show.property', dataModelId: currentDataModel?.id, resource: 'tag', id: element.tagId, property: 'tags'
+              $state.go 'dataModel.resource.show.property', dataModelId: currentDataModel?.id, resource: 'tag', id: element.tagId, property: 'tags'
               return
           else if element.resource == 'catalogueElement' && element.name == 'Deprecated Items'
-            $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: element.resource, status: 'deprecated'
+            $state.go 'dataModel.resource.list', dataModelId: currentDataModel?.id, resource: element.resource, status: 'deprecated'
             return
 
           else
-            $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: element.resource, status: 'active'
+            $state.go 'dataModel.resource.list', dataModelId: currentDataModel?.id, resource: element.resource, status: 'active'
             return
 
         else
-          $state.go 'mc.resource.list-imported', dataModelId: currentDataModel?.id, otherDataModelId: element.getDataModelId(), resource: element.resource, status: undefined
+          $state.go 'dataModel.resource.list-imported', dataModelId: currentDataModel?.id, otherDataModelId: element.getDataModelId(), resource: element.resource, status: undefined
           return
 
       else if element.elementType and element.id
@@ -65,7 +65,7 @@ angular.module('modelcatalogue.core.ui.states.dataModel').controller('modelcatal
         if type == 'asset' || type == 'validationRule'
           params.property = 'history'
 
-        $state.go 'mc.resource.show.property', params
+        $state.go 'dataModel.resource.show.property', params
 
     $scope.$on 'newVersionCreated', (ignored, element) ->
         $state.go '.', {dataModelId: element.getDataModelId(), resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'activity', page: undefined, q: undefined}

@@ -100,8 +100,8 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.catalogueElementActions', 
                 resource = names.getPropertyNameFromType($scope.element.elementType)
                 if resource == 'dataModel'
                   $state.go('dataModels')
-                else if $state.current.name.indexOf('mc.resource.show') >= 0
-                  $state.go('mc.resource.list', {resource: resource}, {reload: true})
+                else if $state.current.name.indexOf('dataModel.resource.show') >= 0
+                  $state.go('dataModel.resource.list', {resource: resource}, {reload: true})
               .catch showErrorsUsingMessages(messages)
       )
         .disabledIf $scope.element.status != 'DRAFT' and not security.hasRole('SUPERVISOR')
@@ -339,7 +339,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.catalogueElementActions', 
   # remove compare action until properly implemented
   actionsProvider.registerChildAction 'catalogue-element', 'compare-catalogue-element', ['$scope', 'messages', '$state', ($scope, messages, $state) ->
     elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('catalogueElement')
-    diffView = $state.current.name == 'mc.resource.diff'
+    diffView = $state.current.name == 'dataModel.resource.diff'
 
     return undefined unless elementPresent and not diffView
 
@@ -354,7 +354,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.catalogueElementActions', 
       action: ->
         messages.prompt('Compare ' + element.getElementTypeName(), "Select the #{element.getElementTypeName()} for the comparison",
           {type: 'catalogue-element', resource: element.getResourceName(), global: true}).then (toBeCompared)->
-            $state.go 'mc.resource.diff', dataModelId: element.dataModel.id, resource: element.getResourceName(), ids: ids.concat([toBeCompared.id]).join('|')
+            $state.go 'dataModel.resource.diff', dataModelId: element.dataModel.id, resource: element.getResourceName(), ids: ids.concat([toBeCompared.id]).join('|')
     )
   ]
   ###

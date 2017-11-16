@@ -2,7 +2,7 @@ angular.module('modelcatalogue.core.ui.states.dataModel.csvTransformations', ['m
 
   'ui.router', 'mc.util.ui']).config(['$stateProvider', ($stateProvider) ->
 
-    $stateProvider.state('mc.csvTransformations', {
+    $stateProvider.state('dataModel.csvTransformations', {
       abstract: true,
       url: "/transformations/csv"
       templateUrl: 'modelcatalogue/core/ui/state/parent.html'
