@@ -396,6 +396,44 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     outputs.files file('target/test-reports/')
 }
 
+task runIntegrationTests(type: Exec, dependsOn: [bowerInstall]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-integration']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds.addAll(testArgs.split(' '))
+    }
+    commandLine cmds
+    outputs.files file('/usr/workspace/testreports/Nov/16/target/test-reports1/')
+
+
+}
+task runFunctionalTests(type: Exec, dependsOn: [bowerInstall, runIntegrationTests]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+
+    //  def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-unit', '-integration', '-functional']
+    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-functional', 'org.modelcatalogue.core.generalTestSuit.*']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds.addAll(testArgs.split(' '))
+    }
+    commandLine cmds
+    outputs.files file('/usr/workspace/testreports/Nov/16/target/test-reports1/')
+
+
+}
+
+
 task runKarmaTests(type: NodeTask) {
     description = "Runs Karma tests"
     script = file('node_modules/karma/bin/karma')
