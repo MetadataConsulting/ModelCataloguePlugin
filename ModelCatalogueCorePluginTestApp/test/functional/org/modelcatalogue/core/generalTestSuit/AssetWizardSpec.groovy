@@ -115,7 +115,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check 'h3' contains 'Import for MET-523.mc'
     }
-
+    @Ignore
     def "upload excel file"() {
         click importExcel
 
