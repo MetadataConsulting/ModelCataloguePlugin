@@ -17,7 +17,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     def mappingService
     def auditService
 
-
+    @Ignore
     def "creation of new element is logged"() {
         when:
         DataType type = new DataType(name: "DT4CL").save(failOnError: true)
