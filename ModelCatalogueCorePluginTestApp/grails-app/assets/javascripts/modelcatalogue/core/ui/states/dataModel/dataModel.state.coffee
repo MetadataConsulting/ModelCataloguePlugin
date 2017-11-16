@@ -1,4 +1,8 @@
-angular.module('mc.core.ui.states.dataModel', ['mc.core.ui.states.controllers.DataModelTreeCtrl'])
+angular.module('mc.core.ui.states.dataModel', ['mc.core.ui.states.controllers.DataModelTreeCtrl',
+  'mc.core.ui.states.dataModel.csvTransformations',
+  'mc.core.ui.states.dataModel.resource',
+  'mc.core.ui.states.dataModel.search'
+  ])
 .config ($stateProvider) ->
   'ngInject'
 

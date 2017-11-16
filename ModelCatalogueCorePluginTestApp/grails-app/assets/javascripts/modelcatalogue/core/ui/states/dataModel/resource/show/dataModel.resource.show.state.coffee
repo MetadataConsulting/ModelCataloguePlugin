@@ -1,4 +1,5 @@
-angular.module('mc.core.ui.states.dataModel.resource.show', ['mc.core.ui.states.controllers']).config(($stateProvider) ->
+angular.module('mc.core.ui.states.dataModel.resource.show', ['mc.core.ui.states.controllers',
+'mc.core.ui.states.dataModel.resource.show.property']).config(($stateProvider) ->
 
     $stateProvider.state 'mc.resource.show', {
       url: '/{id:\\d+}'
