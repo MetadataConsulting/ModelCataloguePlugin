@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.simple.favorites', ['mc.core.ui.states.controllers.FavoritesCtrl'])
+angular.module('mc.core.ui.states.simple.favorites', ['modelcatalogue.core.ui.states.controllers.FavoritesCtrl'])
 
 .config(($stateProvider) ->
   'ngInject'
@@ -6,11 +6,11 @@ angular.module('mc.core.ui.states.simple.favorites', ['mc.core.ui.states.control
     views:
       '':
         templateUrl: '/mc/core/ui/states/favourites.html'
-        controller: 'mc.core.ui.states.controllers.FavoritesCtrl'
+        controller: 'modelcatalogue.core.ui.states.controllers.FavoritesCtrl'
 
       'navbar-left@':
         template: '<contextual-menu role="{{::actionRoleAccess.ROLE_LIST_ACTION}}"></contextual-menu>'
-        controller: 'mc.core.ui.states.controllers.FavoritesCtrl'
+        controller: 'modelcatalogue.core.ui.states.controllers.FavoritesCtrl'
 
     url: '/favourites'
 

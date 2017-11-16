@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.controllers.FavoritesCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.FavoritesCtrl', [
+angular.module('modelcatalogue.core.ui.states.controllers.FavoritesCtrl', ['ui.router', 'mc.util.ui']).controller('modelcatalogue.core.ui.states.controllers.FavoritesCtrl', [
   '$scope', 'modelCatalogueApiRoot', 'user', 'enhance', 'rest', 'columns', 'actionRoleAccess',
   ($scope ,  modelCatalogueApiRoot ,  user ,  enhance ,  rest ,  columns, actionRoleAccess) ->
 

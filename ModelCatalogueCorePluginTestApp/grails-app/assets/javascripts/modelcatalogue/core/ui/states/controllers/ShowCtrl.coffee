@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.controllers.ShowCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.ShowCtrl', [
+angular.module('modelcatalogue.core.ui.states.controllers.ShowCtrl', ['ui.router', 'mc.util.ui']).controller('modelcatalogue.core.ui.states.controllers.ShowCtrl', [
   '$scope', '$stateParams', '$state', 'element',
   ($scope ,  $stateParams ,  $state ,  element) ->
 

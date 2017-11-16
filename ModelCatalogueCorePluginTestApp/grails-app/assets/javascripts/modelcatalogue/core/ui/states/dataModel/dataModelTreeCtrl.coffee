@@ -1,7 +1,7 @@
 ###
   Must have something to do with the tree displayed on the left...
 ###
-angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.DataModelTreeCtrl', [
+angular.module('modelcatalogue.core.ui.states.dataModel').controller('modelcatalogue.core.ui.states.dataModel.dataModelTreeCtrl', [
   '$scope', 'currentDataModel', 'lastSelectedElementHolder', 'enhance', '$state' , 'names'
   ($scope ,  currentDataModel ,  lastSelectedElementHolder ,  enhance ,  $state  ,  names) ->
     $scope.currentDataModel = currentDataModel

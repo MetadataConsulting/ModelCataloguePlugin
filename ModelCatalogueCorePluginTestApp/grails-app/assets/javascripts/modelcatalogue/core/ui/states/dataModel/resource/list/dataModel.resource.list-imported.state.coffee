@@ -1,4 +1,5 @@
-angular.module('mc.core.ui.states.dataModel.resource.list-imported', ['mc.core.ui.states.controllers.ListCtrl']).config([
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.list-imported', ['modelcatalogue.core.ui.states.controllers.ListCtrl',
+'modelcatalogue.core.ui.states.dataModel.resource.listWithDataModelCtrl']).config([
   '$stateProvider', 'catalogueProvider',
   ($stateProvider ,  catalogueProvider) ->
 
@@ -10,11 +11,11 @@ angular.module('mc.core.ui.states.dataModel.resource.list-imported', ['mc.core.u
       views:
         "":
           templateUrl: 'modelcatalogue/core/ui/state/list.html'
-          controller: 'mc.core.ui.states.controllers.ListWithDataModelCtrl'
+          controller: 'modelcatalogue.core.ui.states.dataModel.resource.listWithDataModelCtrl'
 
         'navbar-left@':
           template: '<contextual-menu role="{{::actionRoleAccess.ROLE_LIST_ACTION}}"></contextual-menu>'
-          controller: 'mc.core.ui.states.controllers.ListWithDataModelCtrl'
+          controller: 'modelcatalogue.core.ui.states.dataModel.resource.listWithDataModelCtrl'
 
 
       resolve:

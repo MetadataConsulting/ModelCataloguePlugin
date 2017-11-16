@@ -1,4 +1,5 @@
-angular.module('mc.core.ui.states.controllers.DiffCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.DiffCtrl', [
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.diff.diffCtrl',
+['ui.router', 'mc.util.ui']).controller('modelcatalogue.core.ui.states.dataModel.resource.diff.diffCtrl', [
   '$scope', '$stateParams', '$state', 'elements', 'applicationTitle',
   ($scope ,  $stateParams ,  $state ,  elements ,  applicationTitle) ->
 

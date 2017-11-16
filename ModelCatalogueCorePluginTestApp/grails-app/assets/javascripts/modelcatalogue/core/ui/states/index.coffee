@@ -2,13 +2,13 @@ angular.module('mc.core.ui.states', [
   # depends on
   'mc.util'
   'mc.core.ui'
-  'mc.core.ui.states.controllers'
+  'modelcatalogue.core.ui.states.controllers'
   # list of modules
   'mc.core.ui.states.landing'
   'mc.core.ui.states.dataModels'
   'mc.core.ui.states.simple.actions.show'
   'mc.core.ui.states.simple.actions'
-  'mc.core.ui.states.dataModel'
+  'modelcatalogue.core.ui.states.dataModel'
   'mc.core.ui.states.simple.favorites'
   'mc.core.ui.states.simple.feedback'
   'mc.core.ui.states.simple.resource.show.property'

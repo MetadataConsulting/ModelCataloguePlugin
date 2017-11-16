@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.simple.resource.list', ['mc.core.ui.states.controllers.ListCtrl']).config([
+angular.module('mc.core.ui.states.simple.resource.list', ['modelcatalogue.core.ui.states.controllers.ListCtrl']).config([
   '$stateProvider', 'catalogueProvider',
   ($stateProvider ,  catalogueProvider) ->
 
@@ -9,11 +9,11 @@ angular.module('mc.core.ui.states.simple.resource.list', ['mc.core.ui.states.con
       views:
         "":
           templateUrl: 'modelcatalogue/core/ui/state/list.html'
-          controller: 'mc.core.ui.states.controllers.ListCtrl'
+          controller: 'modelcatalogue.core.ui.states.controllers.ListCtrl'
 
         'navbar-left@':
           template: '<contextual-menu role="{{::actionRoleAccess.ROLE_LIST_ACTION}}"></contextual-menu>'
-          controller: 'mc.core.ui.states.controllers.ListCtrl'
+          controller: 'modelcatalogue.core.ui.states.controllers.ListCtrl'
 
 
       resolve:

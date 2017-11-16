@@ -1,5 +1,5 @@
-angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFileSaver', 'mc.util.xsltTransformer', 'mc.util.ui.actions'])
-.controller('mc.core.ui.states.controllers.XmlEditorCtrl', [
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.xmlEditor.xmlEditorCtrl', ['ui.ace', 'ngFileSaver', 'mc.util.xsltTransformer', 'mc.util.ui.actions'])
+.controller('modelcatalogue.core.ui.states.dataModel.resource.xmlEditor.xmlEditorCtrl', [
   '$log', '$scope', '$stateParams', '$state', '$timeout', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'FileSaver', 'Blob', 'xsltTransformer', 'actionRoleAccess',
   ($log, $scope, $stateParams, $state, $timeout, element, applicationTitle, $http, catalogue, security, FileSaver, Blob, xsltTransformer, actionRoleAccess) ->
     $scope.actionRoleAccess = actionRoleAccess

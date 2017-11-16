@@ -1,4 +1,6 @@
-angular.module('mc.core.ui.states.dataModel.csvTransformations', ['mc.core.ui.states.dataModel.csvTransformations.show']).config(['$stateProvider', ($stateProvider) ->
+angular.module('modelcatalogue.core.ui.states.dataModel.csvTransformations', ['modelcatalogue.core.ui.states.dataModel.csvTransformations.show',
+
+  'ui.router', 'mc.util.ui']).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state('mc.csvTransformations', {
       abstract: true,

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.controllers.DashboardCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.DashboardCtrl', [
+angular.module('modelcatalogue.core.ui.states.controllers.DashboardCtrl', ['ui.router', 'mc.util.ui']).controller('modelcatalogue.core.ui.states.controllers.DashboardCtrl', [
   '$rootScope', '$scope', '$stateParams', '$state', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names',
   ($rootScope ,  $scope ,  $stateParams ,  $state ,  security ,  catalogue ,  modelCatalogueApiRoot ,  user ,  messages ,  applicationTitle ,  names ) ->
 

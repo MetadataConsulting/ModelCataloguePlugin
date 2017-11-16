@@ -1,5 +1,5 @@
-angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc.util.ui'])
-.controller 'mc.core.ui.states.controllers.DataModelsCtrl', ($scope, $state, $stateParams, list, applicationTitle,
+angular.module('modelcatalogue.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc.util.ui'])
+.controller 'modelcatalogue.core.ui.states.controllers.DataModelsCtrl', ($scope, $state, $stateParams, list, applicationTitle,
   catalogueElementResource, catalogue, names, $timeout, messages, dataModelsForPreload, modelCatalogueApiRoot, rest, actionRoleAccess) ->
   "ngInject"
   $scope.actionRoleAccess = actionRoleAccess

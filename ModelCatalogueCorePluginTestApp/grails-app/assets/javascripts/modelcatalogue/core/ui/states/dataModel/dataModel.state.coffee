@@ -1,7 +1,9 @@
-angular.module('mc.core.ui.states.dataModel', ['mc.core.ui.states.controllers.DataModelTreeCtrl',
-  'mc.core.ui.states.dataModel.csvTransformations',
-  'mc.core.ui.states.dataModel.resource',
-  'mc.core.ui.states.dataModel.search'
+angular.module('modelcatalogue.core.ui.states.dataModel', [
+  'modelcatalogue.core.ui.states.dataModel.csvTransformations',
+  'modelcatalogue.core.ui.states.dataModel.resource',
+  'modelcatalogue.core.ui.states.dataModel.search',
+
+  'ui.router', 'mc.util.ui' # for Ctrl
   ])
 .config ($stateProvider) ->
   'ngInject'
@@ -11,15 +13,15 @@ angular.module('mc.core.ui.states.dataModel', ['mc.core.ui.states.controllers.Da
     url: '/{dataModelId:[0-9]+}'
     views:
       "":
-        templateUrl: '/mc/core/ui/states/mc.html'
-        controller: 'mc.core.ui.states.controllers.DataModelTreeCtrl'
+        templateUrl: '/modelcatalogue/core/ui/states/dataModel/dataModel.html'
+        controller: 'modelcatalogue.core.ui.states.dataModel.dataModelTreeCtrl'
 
       'navbar-left@':
         template: '<contextual-menu></contextual-menu>'
 
       'navbar-right@':
         template: '<contextual-menu role="{{::actionRoleAccess.ROLE_NAVIGATION_RIGHT_ACTION}}" right="true"></contextual-menu>'
-        controller: 'mc.core.ui.states.controllers.DataModelCtrl'
+        controller: 'modelcatalogue.core.ui.states.dataModel.dataModelCtrl'
 
     resolve:
       currentDataModel: ['catalogue', '$rootScope', '$stateParams', '$q', 'catalogueElementResource',

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.dataModel.csvTransformations.show', ['mc.core.ui.states.controllers.CsvTransformationCtrl']).config(['$stateProvider', ($stateProvider) ->
+angular.module('modelcatalogue.core.ui.states.dataModel.csvTransformations.show', ['modelcatalogue.core.ui.states.dataModel.csvTransformations.show.csvTransformationCtrl']).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'mc.csvTransformations.show', {
       url: '/{id:\\d+}'
@@ -6,11 +6,11 @@ angular.module('mc.core.ui.states.dataModel.csvTransformations.show', ['mc.core.
       views:
         "":
           templateUrl: 'modelcatalogue/core/ui/state/csvTransformation.html'
-          controller: 'mc.core.ui.states.controllers.CsvTransformationCtrl'
+          controller: 'modelcatalogue.core.ui.states.dataModel.csvTransformations.show.csvTransformationCtrl'
 
         'navbar-left@':
           template: '<contextual-menu role="{{::actionRoleAccess.ROLE_ITEM_ACTION}}"></contextual-menu>'
-          controller: 'mc.core.ui.states.controllers.ElementCtrl'
+          controller: 'modelcatalogue.core.ui.states.controllers.ElementCtrl'
 
 
       resolve:

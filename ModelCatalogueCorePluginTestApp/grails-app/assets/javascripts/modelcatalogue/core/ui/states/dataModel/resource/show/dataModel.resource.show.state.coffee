@@ -1,5 +1,5 @@
-angular.module('mc.core.ui.states.dataModel.resource.show', ['mc.core.ui.states.controllers',
-'mc.core.ui.states.dataModel.resource.show.property']).config(($stateProvider) ->
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.show', ['modelcatalogue.core.ui.states.controllers',
+'modelcatalogue.core.ui.states.dataModel.resource.show.property']).config(($stateProvider) ->
 
     $stateProvider.state 'mc.resource.show', {
       url: '/{id:\\d+}'
@@ -7,11 +7,11 @@ angular.module('mc.core.ui.states.dataModel.resource.show', ['mc.core.ui.states.
       views:
         "":
           templateUrl: 'modelcatalogue/core/ui/state/show.html'
-          controller: 'mc.core.ui.states.controllers.ShowCtrl'
+          controller: 'modelcatalogue.core.ui.states.controllers.ShowCtrl'
 
         'navbar-left@':
           template: '<contextual-menu role="{{::actionRoleAccess.ROLE_ITEM_ACTION}}"></contextual-menu>'
-          controller: 'mc.core.ui.states.controllers.ElementWithDataModelCtrl'
+          controller: 'modelcatalogue.core.ui.states.dataModel.resource.ElementWithDataModelCtrl'
 
       resolve:
         element: ($stateParams , catalogueElementResource ,  lastSelectedElementHolder ,  $rootScope ,  $http ,  names, $log) ->

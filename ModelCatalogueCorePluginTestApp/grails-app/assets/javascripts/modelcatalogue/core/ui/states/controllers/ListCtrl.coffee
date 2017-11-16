@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.controllers.ListCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.ListCtrl', [
+angular.module('modelcatalogue.core.ui.states.controllers.ListCtrl', ['ui.router', 'mc.util.ui']).controller('modelcatalogue.core.ui.states.controllers.ListCtrl', [
   '$scope', '$stateParams', '$state', 'list', 'names', 'catalogue', 'enhance', 'applicationTitle', 'actionRoleAccess',
   ($scope ,  $stateParams ,  $state ,  list ,  names ,  catalogue ,  enhance ,  applicationTitle, actionRoleAccess) ->
     $scope.actionRoleAccess = actionRoleAccess

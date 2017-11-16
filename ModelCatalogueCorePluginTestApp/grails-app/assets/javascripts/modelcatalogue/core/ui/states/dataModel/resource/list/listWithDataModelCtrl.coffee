@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.controllers.ListWithDataModelCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.ListWithDataModelCtrl', [
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.listWithDataModelCtrl', ['ui.router', 'mc.util.ui']).controller('modelcatalogue.core.ui.states.dataModel.resource.listWithDataModelCtrl', [
   '$scope', '$stateParams', '$state', 'list', 'names', 'catalogue', 'enhance', 'applicationTitle', 'currentDataModel', 'actionRoleAccess',
   ($scope ,  $stateParams ,  $state ,  list ,  names ,  catalogue ,  enhance ,  applicationTitle ,  currentDataModel, actionRoleAccess) ->
     $scope.actionRoleAccess = actionRoleAccess

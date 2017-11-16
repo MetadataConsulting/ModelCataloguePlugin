@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.dataModel.resource.show.property', []).config(['$stateProvider', ($stateProvider) ->
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.show.property', []).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'mc.resource.show.property', {
       url: '/:property?page&sort&order&max&q&focused&path'
@@ -6,7 +6,7 @@ angular.module('mc.core.ui.states.dataModel.resource.show.property', []).config(
       views:
         "":
           templateUrl: 'modelcatalogue/core/ui/state/show.html'
-          controller: 'mc.core.ui.states.controllers.ShowCtrl'
+          controller: 'modelcatalogue.core.ui.states.controllers.ShowCtrl'
     }
 
 ])

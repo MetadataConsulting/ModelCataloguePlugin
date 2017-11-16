@@ -2,8 +2,8 @@
   Simple controller which passes the element resolved to the scope
 ###
 
-angular.module('mc.core.ui.states.controllers.ElementWithDataModelCtrl', ['ui.router', 'mc.util.ui'])
-.controller('mc.core.ui.states.controllers.ElementWithDataModelCtrl', [
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.ElementWithDataModelCtrl', ['ui.router', 'mc.util.ui'])
+.controller('modelcatalogue.core.ui.states.dataModel.resource.ElementWithDataModelCtrl', [
   '$scope', 'element', 'currentDataModel', 'actionRoleAccess',
   ($scope ,  element ,  currentDataModel, actionRoleAccess) ->
     $scope.actionRoleAccess = actionRoleAccess

@@ -1,9 +1,11 @@
-angular.module('mc.core.ui.states.dataModel.resource', [
-  'mc.core.ui.states.dataModel.resource.diff',
-  'mc.core.ui.states.dataModel.resource.list',
-  'mc.core.ui.states.dataModel.resource.list-imported',
-  'mc.core.ui.states.dataModel.resource.show',
-  'mc.core.ui.states.dataModel.resource.xml-editor'
+angular.module('modelcatalogue.core.ui.states.dataModel.resource', [
+  'modelcatalogue.core.ui.states.dataModel.resource.diff',
+  'modelcatalogue.core.ui.states.dataModel.resource.list',
+  'modelcatalogue.core.ui.states.dataModel.resource.list-imported',
+  'modelcatalogue.core.ui.states.dataModel.resource.show',
+  'modelcatalogue.core.ui.states.dataModel.resource.xmlEditor',
+
+  'modelcatalogue.core.ui.states.dataModel.resource.ElementWithDataModelCtrl'
 
 ]).config(['$stateProvider', ($stateProvider) ->
 

@@ -1,4 +1,5 @@
-angular.module('mc.core.ui.states.dataModel.resource.xml-editor', ['ui.ace']).config([
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.xmlEditor', ['ui.ace',
+'modelcatalogue.core.ui.states.dataModel.resource.xmlEditor.xmlEditorCtrl']).config([
   '$stateProvider',
   ($stateProvider) ->
     $stateProvider.state 'mc.resource.xml-editor', {
@@ -6,12 +7,12 @@ angular.module('mc.core.ui.states.dataModel.resource.xml-editor', ['ui.ace']).co
 
       views:
         "":
-          templateUrl: '/mc/core/ui/states/xmlEditor.html'
-          controller: 'mc.core.ui.states.controllers.XmlEditorCtrl'
+          templateUrl: '/modelcatalogue/core/ui/states/dataModel/resource/xmlEditor/xmlEditor.html'
+          controller: 'modelcatalogue.core.ui.states.dataModel.resource.xmlEditor.xmlEditorCtrl'
 
       'navbar-left@':
         template: '<contextual-menu role="{{::actionRoleAccess.ROLE_ITEM_ACTION}}"></contextual-menu>'
-        controller: 'mc.core.ui.states.controllers.ElementWithDataModelCtrl'
+        controller: 'modelcatalogue.core.ui.states.dataModel.resource.ElementWithDataModelCtrl'
 
       resolve:
         element: [

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.controllers.FastActionsCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.FastActionsCtrl', [
+angular.module('modelcatalogue.core.ui.states.controllers.FastActionsCtrl', ['ui.router', 'mc.util.ui']).controller('modelcatalogue.core.ui.states.controllers.FastActionsCtrl', [
   '$scope', 'messages',
   ($scope ,  messages)->
     $scope.showFastActions = ->
