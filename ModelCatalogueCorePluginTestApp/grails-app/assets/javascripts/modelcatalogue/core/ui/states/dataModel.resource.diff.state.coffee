@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.mc.resource.diff', ['mc.core.ui.states.controllers.DiffCtrl']).config(['$stateProvider', ($stateProvider) ->
+angular.module('mc.core.ui.states.dataModel.resource.diff', ['mc.core.ui.states.controllers.DiffCtrl']).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'mc.resource.diff', {
       views:

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.mc.search', ['mc.core.ui.states.controllers.ListCtrl']).config(['$stateProvider', ($stateProvider) ->
+angular.module('mc.core.ui.states.dataModel.search', ['mc.core.ui.states.controllers.ListCtrl']).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state('mc.search', {
       url: "/search/{q}",

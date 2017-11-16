@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.mc.resource', []).config(['$stateProvider', ($stateProvider) ->
+angular.module('mc.core.ui.states.dataModel.resource', []).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'mc.resource', {
       abstract: true

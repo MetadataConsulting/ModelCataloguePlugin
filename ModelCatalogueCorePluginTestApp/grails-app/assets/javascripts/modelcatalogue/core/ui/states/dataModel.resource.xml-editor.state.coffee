@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.mc.resource.xml-editor', ['ui.ace']).config([
+angular.module('mc.core.ui.states.dataModel.resource.xml-editor', ['ui.ace']).config([
   '$stateProvider',
   ($stateProvider) ->
     $stateProvider.state 'mc.resource.xml-editor', {

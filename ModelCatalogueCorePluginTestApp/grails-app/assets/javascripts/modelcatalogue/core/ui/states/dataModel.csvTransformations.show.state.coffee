@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.mc.csvTransformations.show', ['mc.core.ui.states.controllers.CsvTransformationCtrl']).config(['$stateProvider', ($stateProvider) ->
+angular.module('mc.core.ui.states.dataModel.csvTransformations.show', ['mc.core.ui.states.controllers.CsvTransformationCtrl']).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'mc.csvTransformations.show', {
       url: '/{id:\\d+}'
