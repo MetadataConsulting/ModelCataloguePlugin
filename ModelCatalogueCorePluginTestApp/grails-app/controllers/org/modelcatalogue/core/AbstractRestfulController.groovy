@@ -289,6 +289,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         try {
             catalogueElementService.delete(instance)
+            if ( instance instanceof DataModel ) {
+                dataModelAclService.removePermissions(instance as DataModel)
+            }
+
             noContent()
         } catch (e) {
             response.status = INTERNAL_SERVER_ERROR.value()

@@ -231,11 +231,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         }
     }
 
-    def beforeDelete(){
-        //if this is a data model add this data model, otherwise add the data model of the class.
-        if( this.instanceOf(DataModel) ) {
-            dataModelAclService.removePermissions(this)
-        }
+    def beforeDelete() {
         auditService.logElementDeleted(this)
     }
 
