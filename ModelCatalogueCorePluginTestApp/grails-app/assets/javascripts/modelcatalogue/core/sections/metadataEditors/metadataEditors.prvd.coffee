@@ -55,38 +55,36 @@ angular.module('modelcatalogue.core.sections.metadataEditors').provider 'metadat
     Type is either element type or relationship pattern definition "sourceType=[relationshipType]=>destinationType"
     where every part is optional e.g. "model=>", "=[base]=>dataType", "=>"
   ###
-  metadataEditorsProvider.register = (configuration) ->
-    throw new Error('Please provide supported types configuration ("types" configuration property)') unless configuration.types?
-    throw new Error('Provided types configuration must be an array ("types" configuration property)') unless angular.isArray(configuration.types)
-    throw new Error('Please provide supported keys configuration ("keys" configuration property)') unless configuration.keys?
-    throw new Error('Provided keys configuration must be an array ("keys" configuration property)') unless angular.isArray(configuration.keys)
-    throw new Error('Please provide supported template configuration ("template" configuration property)') unless configuration.template?
-    throw new Error('Provided template configuration must be a string ("template" configuration property)') unless angular.isString(configuration.template)
-    throw new Error('Please provide supported template configuration ("title" configuration property)') unless configuration.title?
-    throw new Error('Provided title configuration must be a string ("title" configuration property)') unless angular.isString(configuration.title)
+  metadataEditorsProvider.register = (editorConfiguration) ->
+    throw new Error('Please provide supported types configuration ("types" configuration property)') unless editorConfiguration.types?
+    throw new Error('Provided types configuration must be an array ("types" configuration property)') unless angular.isArray(editorConfiguration.types)
+    throw new Error('Please provide supported keys configuration ("keys" configuration property)') unless editorConfiguration.keys?
+    throw new Error('Provided keys configuration must be an array ("keys" configuration property)') unless angular.isArray(editorConfiguration.keys)
+    throw new Error('Please provide supported template configuration ("template" configuration property)') unless editorConfiguration.template?
+    throw new Error('Provided template configuration must be a string ("template" configuration property)') unless angular.isString(editorConfiguration.template)
+    throw new Error('Please provide supported template configuration ("title" configuration property)') unless editorConfiguration.title?
+    throw new Error('Provided title configuration must be a string ("title" configuration property)') unless angular.isString(editorConfiguration.title)
 
     editors.push {
       isAvailableFor: (owner) ->
-        return false if not owner
-        return false if not owner.ext
-        return false if not owner.ext.type == 'orderedMap'
-        for type in configuration.types
-          if type.indexOf('=>') > -1
+        return false if not owner?.ext?.type == 'orderedMap'
+        for editorType in editorConfiguration.types
+          if editorType.indexOf('=>') > -1
             continue if not catalogueProvider.isInstanceOf(owner.elementType, 'relationship')
-            return true if isMeetingRelationshipCriteria(owner, type)
-          else if catalogueProvider.isInstanceOf(owner.elementType, type)
+            return true if isMeetingRelationshipCriteria(owner, editorType)
+          else if catalogueProvider.isInstanceOf(owner.elementType, editorType)
             return true
 
         return false
       isEnabledFor: (orderedMap) ->
         return false if not orderedMap
         return false if not orderedMap.type == 'orderedMap'
-        for key in configuration.keys
+        for key in editorConfiguration.keys
           return true if orderedMap.get(key)?
         return false
-      getTemplate: -> configuration.template
-      getTitle: -> configuration.title
-      getKeys: -> angular.copy configuration.keys
+      getTemplate: -> editorConfiguration.template
+      getTitle: -> editorConfiguration.title
+      getKeys: -> angular.copy editorConfiguration.keys
     }
 
   metadataEditorsProvider.createFakeOwner = (criteria) -> createFakeOwner(criteria)

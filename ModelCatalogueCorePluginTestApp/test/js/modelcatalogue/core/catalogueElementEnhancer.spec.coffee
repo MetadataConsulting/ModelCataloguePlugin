@@ -1,7 +1,7 @@
-describe "mc.core.catalogueElementEnhancer", ->
+describe "modelcatalogue.core.enhancersConf.catalogueElementEnhancer", ->
 
   beforeEach module 'mc.core.ui.states'
-  beforeEach module 'mc.core.catalogueElementEnhancer'
+  beforeEach module 'modelcatalogue.core.enhancersConf.catalogueElementEnhancer'
   beforeEach module 'mc.core.ui.bs.catalogue'
   beforeEach module 'mc.util'
 

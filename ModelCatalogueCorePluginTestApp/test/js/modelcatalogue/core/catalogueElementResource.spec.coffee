@@ -7,9 +7,9 @@ describe "mc.core.catalogueElementResource", ->
 
 
   beforeEach module "mc.core.catalogueElementResource"
-  beforeEach module "mc.core.catalogueElementEnhancer"
-  beforeEach module "mc.core.listReferenceEnhancer"
-  beforeEach module "mc.core.promiseEnhancer"
+  beforeEach module "modelcatalogue.core.enhancersConf.catalogueElementEnhancer"
+  beforeEach module "modelcatalogue.core.enhancersConf.listReferenceEnhancer"
+  beforeEach module "modelcatalogue.core.enhancersConf.promiseEnhancer"
 
   beforeEach module ($provide) ->
     $provide.value('objectVisitor', {visit: (value) -> value})

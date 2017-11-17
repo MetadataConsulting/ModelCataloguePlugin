@@ -1,6 +1,6 @@
 describe "mc.core.ui.simpleObjectEditor", ->
 
-  beforeEach module 'mc.core.ui.bs.simpleObjectEditor'
+  beforeEach module 'mc.core.ui.simpleObjectEditor'
 
   it "element get compiled",  inject ($compile, $rootScope) ->
 

@@ -1,5 +1,5 @@
 if window.fixtures
-  describe "mc.core.listEnhancer", ->
+  describe "modelcatalogue.core.enhancersConf.listEnhancer", ->
 
     rest                  = null
     enhance               = null
@@ -7,8 +7,8 @@ if window.fixtures
     $rootScope            = null
     modelCatalogueApiRoot = null
 
-    beforeEach module "mc.core.listEnhancer"
-    beforeEach module "mc.core.promiseEnhancer"
+    beforeEach module "modelcatalogue.core.enhancersConf.listEnhancer"
+    beforeEach module "modelcatalogue.core.enhancersConf.promiseEnhancer"
 
     beforeEach inject (_rest_, _enhance_, _$httpBackend_, _$rootScope_, _modelCatalogueApiRoot_) ->
       rest                  = _rest_

@@ -1,9 +1,9 @@
 describe "mc.core.ui.expectCatalogueElement", ->
   beforeEach module 'mc.core.ui.expectCatalogueElement'
-  beforeEach module 'mc.core.catalogueElementEnhancer'
+  beforeEach module 'modelcatalogue.core.enhancersConf.catalogueElementEnhancer'
 
   return unless window.fixtures
-  
+
   it "doesn't do anything as long as the model is falsy", inject ($compile, $rootScope) ->
 
     $rootScope.classification = ''

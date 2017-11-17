@@ -1,4 +1,4 @@
-describe "mc.core.ui.catalogueElementTreeview", ->
+describe "modelcatalogue.core.components.catalogueElementTreeview", ->
 
   beforeEach module 'mc.core.ui'
   beforeEach module 'sly'

@@ -1,6 +1,6 @@
-describe "mc.core.ui.metadataEditors", ->
+describe "modelcatalogue.core.sections.metadataEditors", ->
 
-  beforeEach module 'mc.core.ui.metadataEditors'
+  beforeEach module 'modelcatalogue.core.sections.metadataEditors'
 
   beforeEach module (metadataEditorsProvider) ->
 
@@ -48,7 +48,7 @@ describe "mc.core.ui.metadataEditors", ->
 
     return undefined
 
-  rel = (source, type, destination) ->
+  relationship = (source, type, destination) ->
     {
       elementType: 'org.modelcatalogue.core.Relationship'
       type:
@@ -62,7 +62,7 @@ describe "mc.core.ui.metadataEditors", ->
       direction: "sourceToDestination"
     }
 
-  el = (type) ->
+  element = (type) ->
     {
     elementType: "org.modelcatalogue.core.#{type}"
     ext:
@@ -70,7 +70,7 @@ describe "mc.core.ui.metadataEditors", ->
     }
 
   it "check enabled for relationship types",  inject (metadataEditors) ->
-    expect(metadataEditors.getAvailableEditors(rel 'Model', 'hierarchy', 'Model').length).toBe(3)
-    expect(metadataEditors.getAvailableEditors(rel 'Model', 'contains', 'DataElement').length).toBe(4)
-    expect(metadataEditors.getAvailableEditors(el 'DataElement').length).toBe(0)
-    expect(metadataEditors.getAvailableEditors(el 'Model').length).toBe(1)
+    expect(metadataEditors.getAvailableEditors(relationship 'Model', 'hierarchy', 'Model').length).toBe(5) # 3 from the test + 2 from metadataEditors.conf.coffee
+    expect(metadataEditors.getAvailableEditors(relationship 'Model', 'contains', 'DataElement').length).toBe(4)
+    expect(metadataEditors.getAvailableEditors(element 'DataElement').length).toBe(0)
+    expect(metadataEditors.getAvailableEditors(element 'Model').length).toBe(1)

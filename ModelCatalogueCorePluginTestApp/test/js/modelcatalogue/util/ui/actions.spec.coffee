@@ -1,11 +1,10 @@
 describe "mc.util.ui.actions", ->
-
+  testRole = 'TEST_ROLE'
   beforeEach module 'mc.util.ui.actions'
   beforeEach module 'mc.util.security'
 
   beforeEach module (actionsProvider) ->
-
-    actionsProvider.registerAction 'edit-catalogue-element', ['security', '$scope', (security, $scope)->
+    actionsProvider.registerActionInRole 'edit-catalogue-element', testRole, ['security', '$scope', (security, $scope)->
       {
         position:   100
         label:      'Edit'
@@ -25,16 +24,16 @@ describe "mc.util.ui.actions", ->
       }
     ]
 
-    actionsProvider.registerAction 'update-catalogue-element', ['security', '$scope', (security, $scope)->
+    actionsProvider.registerActionInRole 'update-catalogue-element', testRole, ['security', '$scope', (security, $scope)->
       {
-        position:   100
-        label:      'Edit'
-        icon:       'edit'
+        position:   200
+        label:      'Update'
+        icon:       'update'
         type:       'primary'
         action: ->
           $scope.element.update()
       }
-    ], ['navigation']
+    ]
 
     return
 
@@ -46,10 +45,10 @@ describe "mc.util.ui.actions", ->
       update: -> updateCalled = true
       name: "Foo"
 
-    currentActions = actions.getActions({element: element})
+    currentActions = actions.getActions({element: element}, testRole)
 
     expect(editCalled).toBeFalsy()
-    expect(currentActions.length).toBe(1)
+    expect(currentActions.length).toBe(2)
 
     editAction = currentActions[0]
 
@@ -66,7 +65,7 @@ describe "mc.util.ui.actions", ->
 
     expect(editCalled).toBeTruthy()
 
-    byId = actions.getActionById('edit-catalogue-element', {element: element})
+    byId = actions.getActionById('edit-catalogue-element', {element: element}, testRole)
 
     expect(byId).toBeDefined()
     expect(byId.position).toBe(100)

@@ -50,7 +50,14 @@ module.exports = function(config) {
             'test/js/**/*.fixture.coffee',
 
             // App under test
-            'grails-app/assets/javascripts/modelcatalogue/modelcatalogue.coffee',
+            'grails-app/assets/javascripts/modelcatalogue.coffee',
+            //load the files that declare angular modules first
+            'grails-app/assets/javascripts/**/index*',
+            'grails-app/assets/javascripts/**/_modelcatalogue.*',
+            'grails-app/assets/javascripts/**/modelcatalogue.*',
+            'grails-app/assets/javascripts/**/_mc.*',
+            'grails-app/assets/javascripts/**/mc.*',
+
             'grails-app/assets/javascripts/**/*.es6',
             'grails-app/assets/javascripts/**/*.coffee',
             'grails-app/assets/javascripts/**/*.js',

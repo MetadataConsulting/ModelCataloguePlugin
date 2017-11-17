@@ -1,6 +1,6 @@
-describe "mc.core.orderedMapEnhancer", ->
+describe "modelcatalogue.core.enhancersConf.orderedMapEnhancer", ->
 
-  beforeEach module "mc.core.orderedMapEnhancer"
+  beforeEach module "modelcatalogue.core.enhancersConf.orderedMapEnhancer"
 
   it "can easy get the values by key", inject (enhance) ->
     map =

@@ -1,6 +1,6 @@
 describe "mc.core.ui.catalogueElementPicker", ->
   beforeEach module 'mc.core.ui.catalogueElementPicker'
-  beforeEach module 'mc.core.catalogueElementEnhancer'
+  beforeEach module 'modelcatalogue.core.enhancersConf.catalogueElementEnhancer'
 
   return unless window.fixtures
 
