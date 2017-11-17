@@ -434,6 +434,9 @@ class AuditService {
                 return null
             }
         }
-        springSecurityService.principal?.id as Long
+        if ( springSecurityService.principal.respondsTo('id') ) {
+            return springSecurityService.principal.id as Long
+        }
+        null
     }
 }
