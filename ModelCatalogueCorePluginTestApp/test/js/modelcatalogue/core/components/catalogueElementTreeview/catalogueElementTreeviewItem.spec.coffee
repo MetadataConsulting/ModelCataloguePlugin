@@ -18,7 +18,7 @@ describe "modelcatalogue.core.components.catalogueElementTreeview.item", ->
       getDescend: -> 'outgoingRelationships'
 
     element = $compile('''
-      <catalogue-element-treeview-item element="element" treeview="treeview"></catalogue-element-treeview-item>
+      <catalogue-element-treeview-item catalogue-element="element" treeview="treeview"></catalogue-element-treeview-item>
     ''')($rootScope)
 
     $rootScope.$digest()

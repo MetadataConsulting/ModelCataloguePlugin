@@ -1,6 +1,6 @@
-<!-- This is a template for recursive directive catalogue-element-treeview-item.
-It assumes the directive is called within a ul element. -->
 <li class="catalogue-element-treeview-item">
+  <!-- This is a template for recursive directive catalogue-element-treeview-item.
+It assumes the directive is called within a ul element. -->
   <!-- Content of the node itself -->
   <div class="catalogue-element-treeview-text-content"
        ng-class="{'active': node.active,
@@ -80,19 +80,21 @@ It assumes the directive is called within a ul element. -->
       </span>
     </li>
   </ul>
-</li>
-<!--
-This used to be in the div with class="catalogue-element-treeview-text-content":-->
 
-<!--
-The following displays a "total" number of children of a node in the treeview.
-  It doesn't seem to display what we want for certain elements such as the Data Model. It does seem to be useful for Data Classes and Data Element Tags.
-At the top level numberOfChildren seems to come from DataModelController's "content" method. (descend="content").
-We're turning it off for now since we don't understand how to fine-tune it. --James 7 June 2017
--->
-<!--
-<span class="badge pull-right" ng-if="node.numberOfChildren" ng-switch="node.numberOfChildren">
-<span ng-switch-default>{{::node.numberOfChildren}}</span>
-          <span ng-switch-when="2147483647" class="fa fa-question fa-inverse"></span>
-</span>
-        -->
+  <!--
+  This used to be in the div with class="catalogue-element-treeview-text-content":-->
+
+  <!--
+  The following displays a "total" number of children of a node in the treeview.
+    It doesn't seem to display what we want for certain elements such as the Data Model. It does seem to be useful for Data Classes and Data Element Tags.
+  At the top level numberOfChildren seems to come from DataModelController's "content" method. (descend="content").
+  We're turning it off for now since we don't understand how to fine-tune it. --James 7 June 2017
+  -->
+  <!--
+  <span class="badge pull-right" ng-if="node.numberOfChildren" ng-switch="node.numberOfChildren">
+  <span ng-switch-default>{{::node.numberOfChildren}}</span>
+            <span ng-switch-when="2147483647" class="fa fa-question fa-inverse"></span>
+  </span>
+          -->
+
+</li>
