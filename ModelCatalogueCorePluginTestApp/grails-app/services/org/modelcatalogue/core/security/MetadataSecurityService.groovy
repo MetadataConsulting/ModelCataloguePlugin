@@ -651,7 +651,7 @@ class MetadataSecurityService {
     ]
 
     public static final List<List> USER_MAPPINGS = [
-            ["/api/modelCatalogue/core/user", 'ROLE_SUPERVISOR', HttpMethod.GET],
+            ["/api/modelCatalogue/core/user", MetadataRolesUtils.roles('ADMIN'), HttpMethod.GET],
             ["/api/modelCatalogue/core/user", MetadataRolesUtils.roles('SUPERVISOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/user/search/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/user/search/", 'isAuthenticated()', HttpMethod.GET],
