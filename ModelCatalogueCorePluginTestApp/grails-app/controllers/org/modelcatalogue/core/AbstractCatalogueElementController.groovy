@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
+import groovy.transform.CompileDynamic
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
@@ -764,10 +765,12 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         render "DELETED"
     }
 
+    @CompileDynamic
     protected DestinationClass destinationClassFromJsonPayload()  {
         DestinationClass destination = new DestinationClass()
-        destination.className = otherSide.elementType
-        destination.id = otherSide.id
+        Object otherSide = parseOtherSide()
+        destination.className = otherSide.elementType as String
+        destination.id = otherSide.id as Long
         destination
     }
 
