@@ -1011,7 +1011,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         def dataModels = objectToBind.classifications ?: objectToBind.dataModels
         if (dataModels) {
             Long dataModelId = dataModels.first().id as Long
-            effectiveDataModel = dataModelGormService.findById(dataModelId)
+            if ( dataModelId != null ) {
+                effectiveDataModel = dataModelGormService.findById(dataModelId)
+            }
         }
 
         if (!effectiveDataModel && resource == DataModel) {
