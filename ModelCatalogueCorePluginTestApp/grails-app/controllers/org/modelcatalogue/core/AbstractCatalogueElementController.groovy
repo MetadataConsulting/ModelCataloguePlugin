@@ -369,8 +369,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             dataModel = instance.dataModel
         }
 
-        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('CURATOR'))
-        if ( dataModel && ( isCuratorOrAdminOrSupervisor || dataModelAclService.hasAdministratorPermission(dataModel)) ) {
+        if ( dataModel && !dataModelAclService.isAdminOrHasAdministratorPermission(dataModel) ) {
             unauthorized()
             return
         }
