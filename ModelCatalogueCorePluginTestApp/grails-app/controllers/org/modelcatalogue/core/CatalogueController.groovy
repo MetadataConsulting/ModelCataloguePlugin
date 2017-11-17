@@ -108,7 +108,10 @@ class CatalogueController {
 
 
     def feedback(String key) {
-        render(BuildProgressMonitor.get(key) as JSON)
+        BuildProgressMonitor buildProgressMonitor = BuildProgressMonitor.get(key)
+        if (buildProgressMonitor != null) {
+            render(buildProgressMonitor as JSON)
+        }
     }
 
     def feedbacks() {

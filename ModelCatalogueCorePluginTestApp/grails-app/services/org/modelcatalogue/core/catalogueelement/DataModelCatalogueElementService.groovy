@@ -46,19 +46,13 @@ class DataModelCatalogueElementService extends AbstractCatalogueElementService {
             return new DataModelWithErrorsEvent(dataModel: instance)
         }
 
-        Long id = instance.getId()
-
-        executorService.submit {
-            try {
-                DataModel element = dataModelGormService.findById(id)
-                elementService.finalizeDataModel(element, semanticVersion, revisionNotes, BuildProgressMonitor.create("Finalizing $element", id))
-
-            } catch (e) {
-                log.error "Exception finalizing element on the background", e
-                CatalogueElement element = dataModelGormService.findById(id)
-                catalogueElementGormService.updateCatalogueElementStatus(element, ElementStatus.DRAFT)
-            }
+        try {
+            elementService.finalizeDataModel(instance, semanticVersion, revisionNotes, BuildProgressMonitor.create("Finalizing $instance", instance?.id))
+        } catch (e) {
+            log.error "Exception finalizing element on the background", e
+            catalogueElementGormService.updateCatalogueElementStatus(instance, ElementStatus.DRAFT)
         }
+
         new DataModelFinalizedEvent(dataModel: instance)
 
     }
