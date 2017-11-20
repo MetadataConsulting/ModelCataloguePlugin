@@ -356,7 +356,7 @@ class ElasticSearchService implements SearchCatalogue {
 
 
     // may want to build on this query at a later date
-    public <T> ElasticSearchQueryList<T> fuzzySearch(Class<T> resource, Map params) {
+    public <T> ElasticSearchQueryList<T> fuzzySearch(Class<T> resource, SearchParams params) {
         String search = params.search
         Double minScore = params.minScore
         QueryBuilder qb
