@@ -2,11 +2,13 @@ package org.modelcatalogue.core.Regression
 
 import groovy.transform.NotYetImplemented
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
 import static org.modelcatalogue.core.geb.Common.description
 
-@IgnoreIf({ !System.getProperty('geb.env') })
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String create = "a#role_data-models_create-data-modelBtn>span:nth-child(2)"

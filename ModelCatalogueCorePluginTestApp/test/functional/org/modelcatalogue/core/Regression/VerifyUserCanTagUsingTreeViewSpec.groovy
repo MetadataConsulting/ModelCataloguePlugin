@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.Regression
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
@@ -16,6 +17,7 @@ import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import static org.modelcatalogue.core.geb.Common.save
 
 @IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
 

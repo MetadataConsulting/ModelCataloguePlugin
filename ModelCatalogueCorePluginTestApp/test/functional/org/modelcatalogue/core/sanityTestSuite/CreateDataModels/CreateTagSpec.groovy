@@ -2,12 +2,14 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.Keys
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.IgnoreRest
 import spock.lang.Stepwise
 import static org.modelcatalogue.core.geb.Common.*
 
-@IgnoreIf({ !System.getProperty('geb.env') })
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class CreateTagSpec extends AbstractModelCatalogueGebSpec {
 

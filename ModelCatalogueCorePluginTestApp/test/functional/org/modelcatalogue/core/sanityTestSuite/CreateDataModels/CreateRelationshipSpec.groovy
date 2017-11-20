@@ -9,7 +9,8 @@ import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
 
-@IgnoreIf({ !System.getProperty('geb.env') })
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
 
