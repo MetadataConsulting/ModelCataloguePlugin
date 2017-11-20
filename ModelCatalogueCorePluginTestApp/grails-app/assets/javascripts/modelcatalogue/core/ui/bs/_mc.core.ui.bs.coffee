@@ -11,7 +11,6 @@ angular.module('mc.core.ui.bs', [
   'infinite-scroll'
   # list of modules
   'mc.core.ui.bs.catalogueElementView'
-  'mc.core.ui.bs.csvTransformationView'
   'mc.core.ui.bs.importCtrl'
   'mc.core.ui.bs.modalAlert'
   'mc.core.ui.bs.modalPromptNewExcelImport'

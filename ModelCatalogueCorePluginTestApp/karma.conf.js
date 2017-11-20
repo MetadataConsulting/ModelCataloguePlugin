@@ -57,6 +57,7 @@ module.exports = function(config) {
             'grails-app/assets/javascripts/**/modelcatalogue.*',
             'grails-app/assets/javascripts/**/_mc.*',
             'grails-app/assets/javascripts/**/mc.*',
+            'grails-app/assets/javascripts/**/*.state*',
 
             'grails-app/assets/javascripts/**/*.es6',
             'grails-app/assets/javascripts/**/*.coffee',

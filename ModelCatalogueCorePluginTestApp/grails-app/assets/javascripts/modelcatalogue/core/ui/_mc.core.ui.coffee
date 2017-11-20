@@ -8,7 +8,6 @@ angular.module('mc.core.ui', [
   'mc.core.ui.infiniteListCtrl'
   'mc.core.ui.columnsSupportCtrl'
   'mc.core.ui.catalogueElementView'
-  'mc.core.ui.csvTransformationView'
   'mc.core.ui.batchView'
   'modelcatalogue.core.components.catalogueElementTreeview'
   'mc.core.ui.catalogueElementIcon'
