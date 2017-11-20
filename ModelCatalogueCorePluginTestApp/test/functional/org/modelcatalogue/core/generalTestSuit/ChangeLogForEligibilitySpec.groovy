@@ -5,8 +5,10 @@ import org.modelcatalogue.core.gebUtils.CatalogueAction
 import org.modelcatalogue.core.gebUtils.CatalogueContent
 import org.modelcatalogue.core.gebUtils.Common
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 @Ignore
 class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {

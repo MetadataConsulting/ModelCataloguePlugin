@@ -2,6 +2,7 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.gebUtils.Common.getModalPrimaryButton
@@ -10,6 +11,8 @@ import static org.modelcatalogue.core.gebUtils.Common.item
 import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
 import static org.modelcatalogue.core.gebUtils.Common.pick
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
 

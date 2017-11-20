@@ -7,8 +7,9 @@ import geb.spock.GebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import spock.lang.Stepwise
+import spock.lang.IgnoreIf
 
-@Stepwise
+@IgnoreIf({ !System.getProperty('geb.env') })
 class InvalidRegistrationSpec extends GebSpec {
 
     public static final String model = "div.panel-body>div"

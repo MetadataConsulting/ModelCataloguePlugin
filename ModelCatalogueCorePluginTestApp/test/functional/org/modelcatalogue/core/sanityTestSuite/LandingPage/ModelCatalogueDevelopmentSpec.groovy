@@ -4,8 +4,10 @@ import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 class ModelCatalogueDevelopmentSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String modelDevBox="footer.row>div>div>div"

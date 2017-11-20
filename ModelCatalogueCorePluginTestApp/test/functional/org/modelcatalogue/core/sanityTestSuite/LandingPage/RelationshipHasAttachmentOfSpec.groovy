@@ -1,7 +1,10 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+
 import org.modelcatalogue.core.generalTestSuit.AssetWizardSpec
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
+
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.gebUtils.Common.getCreate
@@ -13,7 +16,7 @@ import static org.modelcatalogue.core.gebUtils.Common.getPick
 import static org.modelcatalogue.core.gebUtils.Common.getSave
 import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
-
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
 

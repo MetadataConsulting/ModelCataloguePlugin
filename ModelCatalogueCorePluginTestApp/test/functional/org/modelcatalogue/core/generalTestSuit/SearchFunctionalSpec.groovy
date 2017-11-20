@@ -4,7 +4,12 @@ import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.gebUtils.CatalogueAction
 import org.modelcatalogue.core.gebUtils.Common
 import spock.lang.Stepwise
+import spock.lang.IgnoreIf
 
+import static org.modelcatalogue.core.geb.Common.*
+
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
 

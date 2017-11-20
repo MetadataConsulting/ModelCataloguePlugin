@@ -7,9 +7,11 @@ import geb.waiting.WaitTimeoutException
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.Keys
+import spock.lang.IgnoreIf
 
 import static org.modelcatalogue.core.gebUtils.Common.*
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     // keep the passwords simply stupid, they are only for dev/test or very first setup

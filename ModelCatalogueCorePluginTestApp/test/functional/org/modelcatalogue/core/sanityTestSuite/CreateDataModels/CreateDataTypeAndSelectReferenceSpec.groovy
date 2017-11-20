@@ -3,6 +3,8 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.interactions.Actions
+import spock.lang.IgnoreIf
+
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.gebUtils.Common.delete
@@ -16,6 +18,8 @@ import static org.modelcatalogue.core.gebUtils.Common.modalHeader
 import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
 import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec {
     private static final String reference= "input#pickReferenceType"

@@ -1,9 +1,14 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
+
 import spock.lang.Stepwise
 import static org.modelcatalogue.core.gebUtils.Common.*
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateTagSpec extends AbstractModelCatalogueGebSpec {
 

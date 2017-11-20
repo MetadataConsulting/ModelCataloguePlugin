@@ -1,10 +1,10 @@
 package org.modelcatalogue.core.regressionTestSuit
 
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
-
+import spock.lang.IgnoreIf
 import static org.modelcatalogue.core.gebUtils.Common.description
 
-
+@IgnoreIf({ !System.getProperty('geb.env') })
 class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String create = "a#role_data-models_create-data-modelBtn>span:nth-child(2)"

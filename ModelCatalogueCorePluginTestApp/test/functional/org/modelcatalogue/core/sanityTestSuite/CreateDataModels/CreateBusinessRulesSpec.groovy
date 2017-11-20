@@ -2,10 +2,12 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.gebUtils.CatalogueContent
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import static org.modelcatalogue.core.gebUtils.Common.*
 
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
 

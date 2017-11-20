@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.gebUtils.Common.admin
@@ -10,6 +11,8 @@ import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
 import static org.modelcatalogue.core.gebUtils.Common.pick
 import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
     private static final String  creates  = "a#role_data-models_create-data-modelBtn"

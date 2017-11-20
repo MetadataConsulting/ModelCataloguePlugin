@@ -4,10 +4,13 @@ import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.gebUtils.Common
 import org.modelcatalogue.core.gebUtils.ScrollDirection
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.gebUtils.Common.*
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebSpec {
 

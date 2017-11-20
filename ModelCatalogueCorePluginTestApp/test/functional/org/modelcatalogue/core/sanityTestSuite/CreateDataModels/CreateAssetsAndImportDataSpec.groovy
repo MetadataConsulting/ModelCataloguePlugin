@@ -1,8 +1,10 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 
+
 import org.modelcatalogue.core.generalTestSuit.AssetWizardSpec
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
 
 import spock.lang.Stepwise
 
@@ -14,6 +16,8 @@ import static org.modelcatalogue.core.gebUtils.Common.nameLabel
 import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 import static org.modelcatalogue.core.gebUtils.Common.save
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
     private static final String asset ="input#asset"

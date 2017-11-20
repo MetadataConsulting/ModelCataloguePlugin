@@ -4,9 +4,12 @@
  */
 
 
+import org.openqa.selenium.firefox.FirefoxDriver
 import io.github.bonigarcia.wdm.ChromeDriverManager
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.phantomjs.PhantomJSDriver
+
 
 ChromeOptions options = new ChromeOptions()
 options.addArguments("start-maximized")
@@ -19,12 +22,25 @@ options.addArguments("--disable-gpu")
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/'
-//baseUrl = 'https://gel-mc-test.metadata.org.uk/'
 
-ChromeDriverManager.getInstance().setup()
+//ChromeDriverManager.getInstance().setup()
 
-driver = {
-    new ChromeDriver(options)
+environments {
+
+    chrome {
+        ChromeOptions options = new ChromeOptions()
+        options.addArguments("test-type")
+        options.addArguments("--disable-extensions")
+        driver = {  new ChromeDriver(options) }
+    }
+
+    phantomJs {
+        driver = { new PhantomJSDriver() }
+    }
+
+    firefox {
+        driver = { new FirefoxDriver() }
+    }
 }
 
 waiting {
@@ -33,3 +49,7 @@ waiting {
 }
 
 atCheckWaiting = true
+
+
+
+

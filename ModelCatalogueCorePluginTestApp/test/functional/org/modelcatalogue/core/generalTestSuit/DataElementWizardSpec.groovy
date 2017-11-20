@@ -3,7 +3,10 @@ package org.modelcatalogue.core.generalTestSuit
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.gebUtils.Common
 import spock.lang.Stepwise
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ !System.getProperty('geb.env') })
+>>>>>>> origin/Jenkins:ModelCatalogueCorePluginTestApp/test/functional/org/modelcatalogue/core/DataElementWizardSpec.groovy
 @Stepwise
 class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 

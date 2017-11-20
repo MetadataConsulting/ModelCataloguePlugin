@@ -5,6 +5,9 @@ import org.modelcatalogue.core.gebUtils.CatalogueAction
 import org.modelcatalogue.core.gebUtils.Common
 import spock.lang.Stepwise
 
+
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class ChangesSpec extends AbstractModelCatalogueGebSpec {
 

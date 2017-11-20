@@ -4,6 +4,7 @@ import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.gebUtils.CatalogueContent
 import org.openqa.selenium.By
 import org.openqa.selenium.interactions.Actions
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.gebUtils.Common.delete
@@ -21,6 +22,8 @@ import static org.modelcatalogue.core.gebUtils.Common.pick
 import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 import static org.modelcatalogue.core.gebUtils.Common.save
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 

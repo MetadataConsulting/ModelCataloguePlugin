@@ -1,8 +1,10 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.interactions.Actions
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.gebUtils.Common.delete
@@ -17,6 +19,8 @@ import static org.modelcatalogue.core.gebUtils.Common.nameLabel
 import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 import static org.modelcatalogue.core.gebUtils.Common.save
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class RelationshipRelatedToSpec extends AbstractModelCatalogueGebSpec{
 

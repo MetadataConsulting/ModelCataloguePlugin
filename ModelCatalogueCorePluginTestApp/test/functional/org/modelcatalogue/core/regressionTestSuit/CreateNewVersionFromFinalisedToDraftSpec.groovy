@@ -2,6 +2,7 @@ package org.modelcatalogue.core.regressionTestSuit
 
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.interactions.Actions
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import static org.modelcatalogue.core.gebUtils.Common.create
 import static org.modelcatalogue.core.gebUtils.Common.getDescription
@@ -13,6 +14,7 @@ import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
 import static org.modelcatalogue.core.gebUtils.Common.pick
 import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGebSpec {
 

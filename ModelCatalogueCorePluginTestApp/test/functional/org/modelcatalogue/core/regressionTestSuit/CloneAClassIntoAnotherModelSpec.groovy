@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.regressionTestSuit
 
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
@@ -12,6 +14,7 @@ import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
 import static org.modelcatalogue.core.gebUtils.Common.pick
 import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CloneAClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
 

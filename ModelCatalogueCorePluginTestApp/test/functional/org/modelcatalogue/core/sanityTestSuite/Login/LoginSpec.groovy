@@ -1,7 +1,11 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import geb.spock.GebSpec
+import spock.lang.IgnoreIf
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 class LoginSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String createButton = 'a#role_data-models_create-data-modelBtn'

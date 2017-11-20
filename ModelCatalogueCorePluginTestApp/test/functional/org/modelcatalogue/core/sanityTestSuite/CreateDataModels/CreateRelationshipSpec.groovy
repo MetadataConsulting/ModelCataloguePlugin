@@ -3,11 +3,13 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 import geb.module.Select
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.gebUtils.Common.*
 
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
 

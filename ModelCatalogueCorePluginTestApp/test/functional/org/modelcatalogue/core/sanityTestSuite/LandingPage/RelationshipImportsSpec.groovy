@@ -1,6 +1,9 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
+
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.gebUtils.Common.getItem
@@ -9,6 +12,8 @@ import static org.modelcatalogue.core.gebUtils.Common.getPick
 import static org.modelcatalogue.core.gebUtils.Common.getRightSideTitle
 import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class RelationshipImportsSpec extends AbstractModelCatalogueGebSpec{
 

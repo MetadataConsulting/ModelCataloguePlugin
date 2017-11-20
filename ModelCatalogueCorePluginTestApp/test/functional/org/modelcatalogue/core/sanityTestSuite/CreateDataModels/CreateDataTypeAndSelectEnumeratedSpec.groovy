@@ -1,8 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
-
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import spock.lang.Title
 import spock.lang.Unroll
@@ -17,7 +16,7 @@ import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 import static org.modelcatalogue.core.gebUtils.Common.save
 
 
-
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 @Title("This test is to create a data type base on enumeration")
 class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpec{

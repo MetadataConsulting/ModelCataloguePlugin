@@ -1,6 +1,9 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+
 import org.modelcatalogue.core.generalTestSuit.AssetWizardSpec
+import spock.lang.IgnoreIf
+
 
 import static org.modelcatalogue.core.gebUtils.Common.admin
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
@@ -13,6 +16,8 @@ import static org.modelcatalogue.core.gebUtils.Common.item
 import static org.modelcatalogue.core.gebUtils.Common.pick
 import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 

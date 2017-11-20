@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.gebUtils.Common.getItem
@@ -10,6 +12,7 @@ import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
 import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
 

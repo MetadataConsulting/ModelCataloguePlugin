@@ -3,8 +3,10 @@ package org.modelcatalogue.core.sanityTestSuite.Login
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.WebDriver
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 class ValidateRegistrationSpec extends  AbstractModelCatalogueGebSpec {
     private static final String newUsername="input#username-new"
     private static final String newEmail="input#email-new"
