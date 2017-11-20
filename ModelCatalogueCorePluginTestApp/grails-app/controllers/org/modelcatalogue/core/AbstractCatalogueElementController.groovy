@@ -651,8 +651,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     def typeHierarchy(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        CatalogueElement element = findById(params.long('id'))
-         if(!element) {
+        Long id = params.long('id')
+        CatalogueElement element = findById(id)
+         if ( element == null ) {
             notFound()
             return
         }
