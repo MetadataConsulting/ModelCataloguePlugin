@@ -243,7 +243,7 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
         Relationship rel = relationshipService.link(definition.definition)
 
         if (rel.hasErrors()) {
-            return new RelationshipWithErrorsEvent(rel: rel)
+            return new RelationshipWithErrorsEvent(relationship: rel)
         }
 
         RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
