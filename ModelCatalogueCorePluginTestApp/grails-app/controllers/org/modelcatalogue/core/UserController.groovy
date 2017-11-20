@@ -140,7 +140,7 @@ class UserController extends AbstractCatalogueElementController<User> {
 
 
     def apiKey(Boolean regenerate) {
-        render([apiKey: userService.getApiKey(modelCatalogueSecurityService.currentUser, regenerate)] as JSON)
+        render([apiKey: userService.findApiKeyByUsername(springSecurityService.principal.username, regenerate ?: false)] as JSON)
     }
 
 
