@@ -190,7 +190,7 @@ class GenomicsController {
 
         dataClass.parentOf.eachWithIndex{ DataClass child, idx ->
             String documentName = "Rare Disease Eligibility and Phenotypes for $child.name"
-            genomicsService.genSplitDocAsset(child)
+            assetId = genomicsService.genSplitDocAsset(child)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
