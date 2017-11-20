@@ -70,7 +70,11 @@ class RelationshipService {
         if (!params.sort) {
             params.sort = direction.sortProperty
         }
-        Lists.fromCriteria(params, direction.composeWhere(element, type, ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
+        Lists.fromCriteria(params,
+                direction.composeWhere(element,
+                        type,
+                        ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/),
+                        element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(currentUser())))
     }
 
     /**
@@ -451,8 +455,19 @@ class RelationshipService {
         relationship
     }
 
+    User currentUser() {
+        Long userId = loggedUserId()
+        if ( userId == null ) {
+            return null
+        }
+        userGormService.findById(userId)
+    }
+
     Long loggedUserId() {
-        if ( springSecurityService instanceof String ) {
+        if ( springSecurityService.principal == null ) {
+            return null
+        }
+        if ( springSecurityService.principal instanceof String ) {
             return null
         }
         springSecurityService.principal.id as Long

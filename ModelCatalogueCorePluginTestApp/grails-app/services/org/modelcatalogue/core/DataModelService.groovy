@@ -1,12 +1,16 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.util.Holders
+import groovy.transform.CompileDynamic
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.lists.DetachedListWithTotalAndType
@@ -21,9 +25,10 @@ class DataModelService {
 
     static transactional = false
 
-    def modelCatalogueSecurityService
     def grailsApplication
     def sessionFactory
+    UserGormService userGormService
+    SpringSecurityService springSecurityService
 
     private boolean legacyDataModels
 
@@ -147,16 +152,29 @@ class DataModelService {
     }
 
     public DataModelFilter getDataModelFilter() {
-        if (!modelCatalogueSecurityService.isUserLoggedIn()) {
+        if (!springSecurityService.isLoggedIn()) {
             return DataModelFilter.NO_FILTER
         }
 
-        if (!modelCatalogueSecurityService.currentUser) {
+        Long userId = loggedUserId()
+        if (userId == null) {
+            return DataModelFilter.NO_FILTER
+        }
+        User user = userGormService.findById(userId)
+        if (user == null) {
             return DataModelFilter.NO_FILTER
         }
 
 
-        DataModelFilter.from(modelCatalogueSecurityService.currentUser)
+        DataModelFilter.from(user)
+    }
+
+    @CompileDynamic
+    Long loggedUserId() {
+        if ( springSecurityService.principal instanceof String ) {
+            return null
+        }
+        springSecurityService.principal.id as Long
     }
 
     public boolean isLegacyDataModels() {
