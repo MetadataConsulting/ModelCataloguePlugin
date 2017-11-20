@@ -84,6 +84,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         similar locomotive, 'locomotive.catalogue.xml'
     }
 
+    @Ignore
     def "write simple classification"() {
         expect:
         similar transportation, 'transportation.catalogue.xml'

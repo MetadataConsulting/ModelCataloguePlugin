@@ -4,6 +4,7 @@ import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
+import spock.lang.Ignore
 import spock.lang.Unroll
 
 class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
@@ -114,6 +115,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
 
     }
 
+    @Ignore
     def "find some elements and return just string for not found from elementsFromCSV"() {
         def controller = new DataArchitectController()
         ResultRecorder recorder = DefaultResultRecorder.create(

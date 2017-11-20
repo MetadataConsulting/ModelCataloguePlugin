@@ -6,8 +6,9 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.builder.ProgressMonitor
+import spock.lang.Ignore
 
-
+@Ignore
 class AuditingIntegrationSpec extends IntegrationSpec {
 
     def elementService
