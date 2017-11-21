@@ -11,6 +11,12 @@ class DataModelGormService {
 
     @Transactional(readOnly = true)
     @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    List<DataModel> findAllByNameNotEqual(String nameParam) {
+        DataModel.where { name != nameParam }.list()
+    }
+
+    @Transactional(readOnly = true)
+    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
     List<DataModel> findAll() {
         DataModel.findAll()
     }

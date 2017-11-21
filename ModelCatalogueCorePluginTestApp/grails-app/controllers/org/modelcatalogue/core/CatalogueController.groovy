@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.cache.CacheService
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.HibernateHelper
@@ -27,6 +28,7 @@ class CatalogueController {
     def modelCatalogueSecurityService
     def executorService
     DataModelAclService dataModelAclService
+    DataModelGormService dataModelGormService
 
     def xref() {
         CatalogueElement element = elementService.findByModelCatalogueId(CatalogueElement, request.forwardURI.replace('/export', ''))
@@ -136,11 +138,12 @@ class CatalogueController {
 
     //TODO: Remove/find out why this is needed
     def dataModelsForPreload() {
+
+        List<DataModel> dataModelList = dataModelGormService.findAllByNameNotEqual('Clinical Tags')
         // only render data models for preload if there is no data model in the catalogue (very likely the first run)
-        if (DataModel.findByNameNotEqual('Clinical Tags') /*|| !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)*/) {
+        if ( !dataModelList.isEmpty() /*|| !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)*/) {
             render([] as JSON)
             return
-
         }
 
         render((grailsApplication.config.mc.preload ?: []) as JSON)
