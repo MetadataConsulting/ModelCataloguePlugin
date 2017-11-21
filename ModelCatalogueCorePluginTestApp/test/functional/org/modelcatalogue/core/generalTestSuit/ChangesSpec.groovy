@@ -3,6 +3,7 @@ package org.modelcatalogue.core.generalTestSuit
 import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.gebUtils.CatalogueAction
 import org.modelcatalogue.core.gebUtils.Common
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 
