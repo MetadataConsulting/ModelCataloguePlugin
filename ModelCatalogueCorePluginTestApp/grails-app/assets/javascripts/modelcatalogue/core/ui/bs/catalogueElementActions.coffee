@@ -100,11 +100,11 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
               $scope.element.delete()
               .then ->
                 messages.success "#{$scope.element.getElementTypeName()} #{$scope.element.name} deleted."
-                $rootScope.$broadcast 'catalogueElementDeleted', $scope.element
                 resource = names.getPropertyNameFromType($scope.element.elementType)
                 if resource == 'dataModel'
                   $state.go('dataModels')
                 else if $state.current.name.indexOf('mc.resource.show') >= 0
+                  $rootScope.$broadcast 'catalogueElementDeleted', $scope.element
                   $state.go('mc.resource.list', {resource: resource}, {reload: true})
               .catch showErrorsUsingMessages(messages)
         }
