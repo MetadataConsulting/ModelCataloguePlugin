@@ -70,8 +70,8 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
 
 
         where:
-        newModelName                | versionElement | catalogue | policy   | text
-        "TESTING_DATA_MODEL"    | "2.1.28"| "MT-234"   | "c"      | "c"
+        newModelName         | versionElement | catalogue | policy   | text
+        "TESTING_DATA_MODEL" | "2.1.28"       | "MT-234"  | "c"      | "c"
 
     }
 
