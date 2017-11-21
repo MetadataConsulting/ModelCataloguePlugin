@@ -3,10 +3,7 @@ package org.modelcatalogue.core.util.test
 import grails.util.Metadata
 import groovy.sql.Sql
 import org.hibernate.SessionFactory
-import groovy.util.logging.Log4j
 
-
-@Log4j
 class TestDataHelper {
 
     /**
@@ -31,23 +28,7 @@ class TestDataHelper {
             return initCode()
         }
 
-        //def tmp = ${System.getProperty('java.io.tmpdir')}
-
-        def tmpLocation = "${System.getenv('MC_TMP_LOCATION')}/${Metadata.getCurrent().getApplicationName()}"
-        def tmpDir = new File(tmpLocation)
-
-        if( tmpDir.exists()  ){
-            def result = tmpDir.deleteDir()  // Returns true if all goes well, false otherwise.
-            println result
-        }
-
-        tmpLocation = System.getenv('MC_TMP_LOCATION')
-
-        log.info  tmpLocation
-
         String scriptLocation = "${System.getenv('MC_TMP_LOCATION')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/${tempSqlFileName}"
-
-        log.info scriptLocation
 
         if (new File(scriptLocation).exists()) {
             long start = System.currentTimeMillis()
@@ -60,13 +41,12 @@ class TestDataHelper {
         long start = System.currentTimeMillis()
 
         if (drop) {
-            String clearScriptLocation = "${System.getenv("MC_TMP_LOCATION")}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/dropfiles/$tempSqlFileName"
+            String clearScriptLocation = "${System.getenv('MC_TMP_LOCATION')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/dropfiles/$tempSqlFileName"
             new Sql(sessionFactory.currentSession.connection()).execute("SCRIPT NODATA DROP TO ${clearScriptLocation}")
             println "Clear script created in $clearScriptLocation"
             new Sql(sessionFactory.currentSession.connection()).execute("RUNSCRIPT FROM ${clearScriptLocation}")
             println "Database cleared from $clearScriptLocation"
         }
-
 
         initCode()
 
@@ -81,3 +61,4 @@ class TestDataHelper {
         sessionFactory.currentSession.connection().metaData.databaseProductName != 'H2'
     }
 }
+
