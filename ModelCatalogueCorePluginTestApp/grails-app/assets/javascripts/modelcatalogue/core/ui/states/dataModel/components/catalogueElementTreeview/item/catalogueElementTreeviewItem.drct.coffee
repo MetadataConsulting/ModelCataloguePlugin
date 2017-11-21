@@ -1,7 +1,7 @@
 #= require catalogueElementTreeviewItem.tpl.coffee
 nodeid = 0
 
-angular.module('modelcatalogue.core.components.catalogueElementTreeview.item')
+angular.module('modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview.item')
 .config(['$uibTooltipProvider', ($uibTooltipProvider) ->
   $uibTooltipProvider.setTriggers mouseover: 'mouseout'
 ])
@@ -15,7 +15,7 @@ angular.module('modelcatalogue.core.components.catalogueElementTreeview.item')
       treeview: '='
       extraParameters: '=?' # bidirectional optional binding
 
-    templateUrl: '/modelcatalogue/core/components/catalogueElementTreeview/item/catalogueElementTreeviewItem.html'
+    templateUrl: '/modelcatalogue/core/ui/states/dataModel/components/catalogueElementTreeview/item/catalogueElementTreeviewItem.html'
 
     compile: recursiveCompile.compile
 

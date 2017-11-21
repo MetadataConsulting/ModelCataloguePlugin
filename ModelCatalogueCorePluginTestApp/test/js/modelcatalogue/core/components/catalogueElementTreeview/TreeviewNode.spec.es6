@@ -1,6 +1,6 @@
 describe('TreeviewNode', function() {
 
-    beforeEach(module('modelcatalogue.core.components.catalogueElementTreeview.model'));
+    beforeEach(module('modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview.model'));
 
     it('can construct new treeview node', inject(function(TreeviewNodeFactory){
         const id = '/foo/bar/123';

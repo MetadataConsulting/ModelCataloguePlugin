@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.catalogueElementView', ['modelcatalogue.core.enhancersConf.catalogueElementEnhancer', 'modelcatalogue.core.enhancersConf.listReferenceEnhancer', 'modelcatalogue.core.enhancersConf.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'mc.util.ui.applicationTitle', 'ui.router', 'mc.core.ui.catalogueElementProperties', 'ngSanitize', 'mc.core.ui.messagesPanel', 'modelcatalogue.core.components.catalogueElementTreeview.model']).directive 'catalogueElementView',  [-> {
+angular.module('mc.core.ui.catalogueElementView', ['modelcatalogue.core.enhancersConf.catalogueElementEnhancer', 'modelcatalogue.core.enhancersConf.listReferenceEnhancer', 'modelcatalogue.core.enhancersConf.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'mc.util.ui.applicationTitle', 'ui.router', 'mc.core.ui.catalogueElementProperties', 'ngSanitize', 'mc.core.ui.messagesPanel', 'modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview.model']).directive 'catalogueElementView',  [-> {
     restrict: 'E'
     replace: true
     scope:

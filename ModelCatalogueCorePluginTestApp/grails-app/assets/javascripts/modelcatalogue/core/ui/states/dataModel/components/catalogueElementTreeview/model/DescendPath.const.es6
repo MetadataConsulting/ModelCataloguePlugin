@@ -1,4 +1,4 @@
-//= require _modelcatalogue.core.components.catalogueElementTreeview.model
+//= require _modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview.model
 (function (window, angular) {
   const symbols = {
     path: Symbol('path')
@@ -23,6 +23,6 @@
 
   }
 
-  angular.module('modelcatalogue.core.components.catalogueElementTreeview.model')
+  angular.module('modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview.model')
     .constant('DescendPath', DescendPath)
 })(window, angular);

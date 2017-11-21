@@ -1,7 +1,7 @@
 describe "modelcatalogue.core.components.catalogueElementTreeview.item", ->
 
   beforeEach module 'mc.core.ui.states.bs'
-
+  beforeEach module 'modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview.item'
   beforeEach module 'sly'
 
   return unless window.fixtures

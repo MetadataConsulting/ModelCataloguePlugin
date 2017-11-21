@@ -1,6 +1,6 @@
-angular.module('modelcatalogue.core.components.catalogueElementTreeview.item', [
+angular.module('modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview.item', [
   'mc.util.names'
-  'modelcatalogue.core.components.catalogueElementTreeview.model'
+  'modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview.model'
   'modelcatalogue.core.enhancersConf.catalogueElementEnhancer'
   'modelcatalogue.core.enhancersConf.listReferenceEnhancer'
   'modelcatalogue.core.enhancersConf.listEnhancer'

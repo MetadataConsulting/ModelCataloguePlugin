@@ -1,6 +1,7 @@
 describe "modelcatalogue.core.components.catalogueElementTreeview", ->
 
   beforeEach module 'mc.core.ui'
+  beforeEach module 'modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview'
   beforeEach module 'sly'
 
   return unless window.fixtures

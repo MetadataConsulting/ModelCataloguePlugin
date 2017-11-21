@@ -123,7 +123,7 @@ class CatalogueElementTreeview
           $scope.path.segments = args[1]
 
       $element.find('.catalogue-element-treeview-root-list-root').on 'scroll', loadMoreIfNeeded
-angular.module('modelcatalogue.core.components.catalogueElementTreeview').directive 'catalogueElementTreeview',  [-> {
+angular.module('modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview').directive 'catalogueElementTreeview',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -134,7 +134,7 @@ angular.module('modelcatalogue.core.components.catalogueElementTreeview').direct
       descend: '@' # one way from parent to child using {{}}
       onSelect: '&?' # lets directive invoke parent scope action
 
-    templateUrl: '/modelcatalogue/core/components/catalogueElementTreeview/catalogueElementTreeview.html'
+    templateUrl: '/modelcatalogue/core/ui/states/dataModel/components/catalogueElementTreeview/catalogueElementTreeview.html'
 
     controllerAs: 'treeview'
 
