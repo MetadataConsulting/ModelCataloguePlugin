@@ -347,10 +347,10 @@ class MetadataSecurityService {
     ]
 
     public static final List<List> DATA_MODEL_POLICY_MAPPINGS = [
-            ["/api/modelCatalogue/core/dataModelPolicy", MetadataRolesUtils.roles('ADMIN'), HttpMethod.GET],
+            ["/api/modelCatalogue/core/dataModelPolicy", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/dataModelPolicy", MetadataRolesUtils.roles('ADMIN'), HttpMethod.POST],
-            ["/api/modelCatalogue/core/dataModelPolicy/search", MetadataRolesUtils.roles('ADMIN'), HttpMethod.GET],
-            ["/api/modelCatalogue/core/dataModelPolicy/search/*", MetadataRolesUtils.roles('ADMIN'), HttpMethod.GET],
+            ["/api/modelCatalogue/core/dataModelPolicy/search", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+            ["/api/modelCatalogue/core/dataModelPolicy/search/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/dataModelPolicy/*/validate", MetadataRolesUtils.roles('ADMIN'), HttpMethod.POST],
             ["/api/modelCatalogue/core/dataModelPolicy/validate", MetadataRolesUtils.roles('ADMIN'), HttpMethod.POST],
             ["/api/modelCatalogue/core/dataModelPolicy/*", MetadataRolesUtils.roles('ADMIN'), HttpMethod.GET],
