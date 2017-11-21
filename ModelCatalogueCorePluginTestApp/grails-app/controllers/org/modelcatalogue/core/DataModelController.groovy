@@ -128,13 +128,16 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         instance.save flush: true
 
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
+
+        dataModelAclService.addAdministrationPermission(instance)
+
         bindRelations(instance, false)
 
         instance.save flush: true
-
-        if (!params.skipPolicies) {
-            validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, objectToBind)
-        }
 
         if (instance.hasErrors()) {
             respond instance.errors
@@ -144,8 +147,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         if (favoriteAfterUpdate && modelCatalogueSecurityService.userLoggedIn && instance) {
             favouriteService.favouriteModel(instance)
         }
-
-        dataModelAclService.addAdministrationPermission(instance)
 
         respond instance, [status: CREATED]
     }
