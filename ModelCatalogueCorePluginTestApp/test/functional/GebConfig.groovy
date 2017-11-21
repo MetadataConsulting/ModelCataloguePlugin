@@ -11,34 +11,51 @@ import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 
 
-ChromeOptions options = new ChromeOptions()
-options.addArguments("start-maximized")
-options.addArguments("window-size=1920,1080")
-options.addArguments("test-type")
-options.addArguments("--disable-extensions")
-options.addArguments("headless")
-options.addArguments("--disable-gpu")
+
 
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/'
 
 //ChromeDriverManager.getInstance().setup()
+println "GEB SETUP general"
 
-environments {
-
-    chrome {
+println "GEB SETUP chrome"
+        ChromeOptions options = new ChromeOptions()
+        options.addArguments("start-maximized")
+        options.addArguments("window-size=1920,1080")
+        options.addArguments("test-type")
+        options.addArguments("--disable-extensions")
+        options.addArguments("headless")
+        options.addArguments("--disable-gpu")
         driver = {  new ChromeDriver(options) }
-    }
+        ChromeDriverManager.getInstance().setup()
 
-    phantomJs {
-        driver = { new PhantomJSDriver() }
-    }
-
-    firefox {
-        driver = { new FirefoxDriver() }
-    }
-}
+//environments {
+//
+//    chrome {
+//        println "GEB SETUP chrome"
+//        ChromeOptions options = new ChromeOptions()
+//        options.addArguments("start-maximized")
+//        options.addArguments("window-size=1920,1080")
+//        options.addArguments("test-type")
+//        options.addArguments("--disable-extensions")
+//        options.addArguments("headless")
+//        options.addArguments("--disable-gpu")
+//        driver = {  new ChromeDriver(options) }
+//        ChromeDriverManager.getInstance().setup()
+//    }
+//
+//    phantomJs {
+//        println "GEB SETUP phantomJs"
+//        driver = { new PhantomJSDriver() }
+//    }
+//
+//    firefox {
+//        println "GEB SETUP firefox"
+//        driver = { new FirefoxDriver() }
+//    }
+//}
 
 waiting {
     timeout = 15
