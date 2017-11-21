@@ -1,15 +1,18 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.getItem
-import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.getPick
-import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
+import static org.modelcatalogue.core.gebUtils.Common.getItem
+import static org.modelcatalogue.core.gebUtils.Common.getModalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.getPick
+import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
 
@@ -22,7 +25,7 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
     private static final String  removeButton="a#role_item_remove-relationshipBtn"
     private static final String  tableImported ="td.col-md-5"
     private static final String  modelCatalogue ="span.mc-name"
-    private static final String  importedDataModel="ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(9)>div>span"
+    private static final String  importedDataModel="ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(9)>div>span>span"
 
 
     def "login to model catalogue and select a data model"(){
@@ -64,7 +67,7 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
         click importedDataModel
 
         then:'verify the title'
-        check rightSideTitle contains 'Test 3 Imports'
+        check rightSideTitle contains 'Imports'
 
         when:'click on the plus button'
         click plusButton

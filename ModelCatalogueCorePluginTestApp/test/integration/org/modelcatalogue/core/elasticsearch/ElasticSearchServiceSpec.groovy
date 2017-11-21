@@ -26,6 +26,8 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
         elasticSearchService.reindex(false).toBlocking().subscribe()
     }
 
+
+
 //    def "play with elasticsearch"() {
 //        catalogueBuilder.build {
 //            skip draft
@@ -160,6 +162,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
 //        policyIndexed.get()
 //        retry (10, 300) { elasticSearchService.search(DataModelPolicy, [search: 'test policy', max: '1']).total == 1L }
 //    }
+
 
     def "index user"() {
         BlockingVariable<Boolean> userIndexed = new BlockingVariable<>(60, TimeUnit.SECONDS)

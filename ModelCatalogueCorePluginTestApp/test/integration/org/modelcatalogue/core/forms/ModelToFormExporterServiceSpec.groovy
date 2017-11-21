@@ -31,7 +31,7 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
     public static final String TEST_SECTION_SUBTITLE_1 = "This is section one subtitle"
     public static final String TEST_SECTION_INSTRUCTIONS_1 = "These ase section one instructions"
     public static final String TEST_SECTION_PAGE_NUMBER_1 = "13"
-    public static final String TEST_GRID_MODEL_NAME = "Test Grid"
+    public static final String TEST_GRID_MODEL_NAME = "FirstTestSpec_Grid"
     public static final String TEST_GRID_MODEL_LABEL = "Test_Grid"
     public static final String TEST_GRID_REPEAT_NUM = '10'
     public static final String TEST_GRID_REPEAT_MAX = '200'
@@ -60,8 +60,8 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
                 ext ModelToFormExporterService.EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
                 ext ModelToFormExporterService.EXT_FORM_VERSION, TEST_FORM_VERSION
 
-                dataElement(name: 'Test Element') {
-                    description "Test Element Description"
+                dataElement(name: 'FirstTestSpec Element') {
+                    description "FirstTestSpec Element Description"
                 }
             }
         }
@@ -152,7 +152,7 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
         section1
 
         when:
-        Group gridGroup = section1.groups[TEST_GRID_MODEL_LABEL]
+        Group gridGroup = section1.groups[TEST_GRID_MODEL_NAME]
 
         then:
         gridGroup instanceof GridGroup
@@ -160,8 +160,8 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
         gridGroup.repeatNum == TEST_GRID_REPEAT_NUM as Integer
         gridGroup.repeatMax == TEST_GRID_REPEAT_MAX as Integer
     }
-
-    @Requires({ !System.getenv('TRAVIS') })
+    @Ignore
+    //@Requires({ !System.getenv('TRAVIS') })
     def "various item types"(){
         given:
         DataClass formModel = build {

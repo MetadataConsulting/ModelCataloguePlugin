@@ -1,21 +1,22 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.AssetWizardSpec
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+
+import org.modelcatalogue.core.generalTestSuit.AssetWizardSpec
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
+
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.getCreate
-import static org.modelcatalogue.core.geb.Common.getItem
-import static org.modelcatalogue.core.geb.Common.getModalDialog
-import static org.modelcatalogue.core.geb.Common.getModalDialog
-import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.getNameLabel
-import static org.modelcatalogue.core.geb.Common.getPick
-import static org.modelcatalogue.core.geb.Common.getRightSideTitle
-import static org.modelcatalogue.core.geb.Common.getSave
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
+import static org.modelcatalogue.core.gebUtils.Common.getCreate
+import static org.modelcatalogue.core.gebUtils.Common.getItem
+import static org.modelcatalogue.core.gebUtils.Common.getModalDialog
+import static org.modelcatalogue.core.gebUtils.Common.getModalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.getNameLabel
+import static org.modelcatalogue.core.gebUtils.Common.getPick
+import static org.modelcatalogue.core.gebUtils.Common.getSave
+import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
-
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
 
@@ -35,7 +36,8 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
 
         when:
         loginAdmin()
-        select "Test 3" select "Assets"
+        select "Test 1"
+        selectInTree"Assets"
 
         then:
         check rightSideTitle is 'Active Assets'
@@ -66,10 +68,10 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         click modelCatalogue
 
         and:
-        select 'Test 3'
+        select 'Test 1'
 
         then:
-        check rightSideTitle contains 'Test 3'
+        check rightSideTitle contains 'Test 1'
     }
     def"navigate to the top menu and select create relationship "(){
 
@@ -87,6 +89,7 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         click hasAttachmentOf
         and: ' select destination'
         click destinationIcon
+        Thread.sleep(2000L)
         fill search with "example TESTING" and pick first item
         click ModalPrimaryButton
 

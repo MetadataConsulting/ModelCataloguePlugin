@@ -89,67 +89,68 @@ class GelJsonExporterSpec extends IntegrationSpec {
         final String clinical_test3_id = DataClass.findByName('clinical test3').getCombinedVersion()  ?: DataClass.findByName('clinical test3').getId()
         final String clinical_test4_id = DataClass.findByName('clinical test4').getCombinedVersion()  ?: DataClass.findByName('clinical test4').getId()
 
-        return """
-            {
-               "DiseaseGroups":[
-                  {
-                     "id":$NESTED_LEVEL_1_DATA_CLASS_NAME_ID,
-                     "name":"rare disease subgroup 1.1",
-                     "subGroups":[
+        return """{
+                    "DiseaseGroups": [
                         {
-                           "id":$NESTED_LEVEL_2_DATA_CLASS_NAME_ID,
-                           "name":"rare disease disorder 1.1.1",
-                           "specificDisorders":[
-                              {
-                                 "id":$NESTED_LEVEL_3_DATA_CLASS_NAME_ID,
-                                 "name":"rare disease 1.1.1.1",
-                                 "eligibilityQuestion":{
-                                    "date":"$TODAY",
-                                    "version":"1"
-                                 },
-                                 "shallowPhenotypes": [
-                                    {
-                                      "name": "hpo terms 1",
-                                      "id": "HP:111"
-                                    },
-                                    {
-                                        "name": "hpo terms 2",
-                                        "id": "HP:222"
-                                    },
-                                    {
-                                        "name": "hpo terms 3",
-                                        "id": "HP:333"
-                                    },
-                                    {
-                                        "name": "hpo terms 4",
-                                        "id": "HP:444"
-                                    }
-                                ],
-                                "tests": [
-                                    {
-                                        "name": "clinical test1",
-                                        "id": "$clinical_test1_id"
-                                    },
-                                    {
-                                        "name": "clinical test2",
-                                        "id": "$clinical_test2_id"
-                                    },
-                                    {
-                                        "name": "clinical test3",
-                                        "id": "$clinical_test3_id"
-                                    },
-                                    {
-                                        "name": "clinical test4",
-                                        "id": "$clinical_test4_id"
-                                    }
-                                ]
-                              }
-                           ]
+                            "id": 1200,
+                            "name": "rare disease subgroup 1.1",
+                            "subGroups": [
+                                {
+                                    "id": 1201,
+                                    "name": "rare disease disorder 1.1.1",
+                                    "specificDisorders": [
+                                        {
+                                            "id": 1202,
+                                            "name": "rare disease 1.1.1.1",
+                                            "eligibilityQuestion": {
+                                                "date": "2017-11-20",
+                                                "version": "1"
+                                            },
+                                            "shallowPhenotypes": [
+                                                {
+                                                    "name": "hpo terms 1",
+                                                    "id": "HP:111"
+                                                },
+                                                {
+                                                    "name": "hpo terms 2",
+                                                    "id": "HP:222"
+                                                },
+                                                {
+                                                    "name": "hpo terms 3",
+                                                    "id": "HP:333"
+                                                },
+                                                {
+                                                    "name": "hpo terms 4",
+                                                    "id": "HP:444"
+                                                }
+                                            ],
+                                            "tests": [
+                                                {
+                                                    "name": "clinical test1",
+                                                    "id": 1211
+                                                },
+                                                {
+                                                    "name": "clinical test2",
+                                                    "id": 1212
+                                                },
+                                                {
+                                                    "name": "clinical test3",
+                                                    "id": 1213
+                                                },
+                                                {
+                                                    "name": "clinical test4",
+                                                    "id": 1214
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
                         }
-                     ]
-                  }
-               ]
-            }
+                    ]
+                }
+
+
         """
     }
 

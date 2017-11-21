@@ -44,7 +44,7 @@ class BootStrap {
                 CatalogueElementDynamicHelper.addShortcuts(it.clazz)
             }
         }
-        JSONObject.Null.metaClass.getId = {->
+        JSONObject.Null.metaClass.getId = { ->
             null
         }
 

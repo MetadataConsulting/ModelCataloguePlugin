@@ -64,7 +64,7 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
             skip draft
             dataModel(name: typesDataModelName, status: finalized) {
                 for (int i in 1..3) {
-                    dataType name: "Test Data Type ${i}"
+                    dataType name: "FirstTestSpec Data Type ${i}"
                 }
             }
 
@@ -84,7 +84,7 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
                             for (int j in 1..3) {
                                 dataElement name: "Data Class $i Data Element $j", {
                                     description "This is a description for Data Class $i Data Element $j"
-                                    dataType name: "Test Data Type ${i}", dataModel: typesDataModelName
+                                    dataType name: "FirstTestSpec Data Type ${i}", dataModel: typesDataModelName
 
                                     relationship {
                                         ext 'Min Occurs': '0', 'Max Occurs': "$j"
@@ -98,7 +98,7 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
                                     for (int k in 1..3) {
                                         dataElement name: "Data Class $i Inner Data Class $j Data Element $k", {
                                             description "This is a description for Data Class $i Inner Data Class $j Data Element $k"
-                                            dataType name: "Test Data Type ${i}", dataModel: typesDataModelName
+                                            dataType name: "FirstTestSpec Data Type ${i}", dataModel: typesDataModelName
                                         }
                                     }
                                 }
@@ -144,7 +144,7 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
             create DataType called 'New Data Type'
 
             create draft of 'Data Class 1 Inner Data Class 2 Data Element 1'
-            update 'dataType' of 'Data Class 1 Inner Data Class 2 Data Element 1' to 'New Data Type'
+            update 'dataTypes' of 'Data Class 1 Inner Data Class 2 Data Element 1' to 'New Data Type'
 
             finalize 'C4C'
 

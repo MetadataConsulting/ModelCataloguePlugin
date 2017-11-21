@@ -23,7 +23,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     public static final String CLASS_MEF_NAME = 'Class from MEF'
     public static final String ELEMENT_MEF_1_NAME = 'Data Element from MEF 1'
     public static final String DATA_TYPE_TOM_NAME = 'tom:string'
-    public static final String MODEL_TOM_NAME = 'Test Other Model'
+    public static final String MODEL_TOM_NAME = 'FirstTestSpec Other Model'
     public static final String DATA_TYPE_TOM_ID = "http://example.com/tom/string"
     public static final String ELEMENT_MEF_2_NAME = 'Data Element from MEF 2'
     public static final String DATA_MODEL_FOR_TAG_TESTING_NAME = 'Data Model for tag testing'
@@ -178,7 +178,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         when:
         build {
-            dataModel(name: "TestClassificationA") {
+            dataModelMenuBar(name: "TestClassificationA") {
                 measurementUnit(name: 'ExistingUnit2') {description: "A"}
                 measurementUnit(name: 'ExistingUnit2') {description: "B"}
             }
@@ -737,7 +737,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     def "order from builder is persisted"() {
         when:
         build {
-            dataModel (name: 'Order Test') {
+            dataModel (name: 'Order FirstTestSpec') {
                 dataClass (name: 'OT Parent') {
                     dataElement (name: 'OT Child 002')
                     dataElement (name: 'OT Child 001')
@@ -757,7 +757,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         when:
         build {
-            dataModel (name: 'Order Test') {
+            dataModel (name: 'Order FirstTestSpec') {
                 dataClass (name: 'OT Parent') {
                     dataElement (name: 'OT Child 001')
                     dataElement (name: 'OT Child 002')
@@ -1027,8 +1027,8 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "ignores missing references"() {
         final String assetModelName = 'Asset Model'
-        final String testAssetName = 'Test Asset'
-        final String dataClassName = 'Test Data Class'
+        final String testAssetName = 'FirstTestSpec Asset'
+        final String dataClassName = 'FirstTestSpec Data Class'
         final String valueDomainName = 'ValueDomain IMR'
         final String valueDomainId1 = 'http://www.example.com/200'
         final String valueDomainId2 = 'http://www.example.com/201'
@@ -1104,9 +1104,9 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "adds a data model if there is an attempt to add classification or declaration relationship"() {
         build {
-            dataModel name: 'DTDMCDR Test'
+            dataModel name: 'DTDMCDR FirstTestSpec'
             dataType name: 'DTDMCDR', {
-                rel 'declaration' from 'DTDMCDR Test'
+                rel 'declaration' from 'DTDMCDR FirstTestSpec'
             }
         }
 
@@ -1115,7 +1115,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         expect:
         dataType
         dataType.dataModel
-        dataType.dataModel.name == 'DTDMCDR Test'
+        dataType.dataModel.name == 'DTDMCDR FirstTestSpec'
     }
 
     def "updating relationship to deprecated item will trigger new draft"() {
@@ -1145,7 +1145,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         then:
         noExceptionThrown()
         DataClass.countByName(dc1name) == 2
-        // and the original deprecated
+        // and the original deprecatedAndRestore
         DataClass.countByNameAndStatus(dc1name, ElementStatus.DEPRECATED) == 2
     }
 
@@ -1275,7 +1275,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "import multiple versions at once"() {
         given:
-            final String dataModelName = "Test Import at Once"
+            final String dataModelName = "FirstTestSpec Import at Once"
             final String semanticVersion1 = "v2005"
             final String semanticVersion2 = "v2011"
             final String semanticVersion3 = "v2017"
