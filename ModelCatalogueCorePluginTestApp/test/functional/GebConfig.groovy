@@ -28,9 +28,6 @@ baseUrl = 'http://localhost:8080/'
 environments {
 
     chrome {
-        ChromeOptions options = new ChromeOptions()
-        options.addArguments("test-type")
-        options.addArguments("--disable-extensions")
         driver = {  new ChromeDriver(options) }
     }
 
