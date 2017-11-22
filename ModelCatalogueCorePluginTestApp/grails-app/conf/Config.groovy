@@ -166,8 +166,9 @@ environments {
             }
         }
         mc.allow.signup = true
-        mc.search.elasticsearch.host = "127.0.0.1"
-        mc.search.elasticsearch.port = "9300"
+        mc.search.elasticsearch.local="${System.getenv('MC_TMP_LOCATION')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
+        //mc.search.elasticsearch.host = "127.0.0.1"
+        //mc.search.elasticsearch.port = "9300"
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}"
         if (System.getenv('DOCKERIZED_TESTS') && System.properties["grails.test.phase"] == 'functional') {
@@ -185,10 +186,10 @@ environments {
                 }
             }
         } else {
-            //mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
+            mc.search.elasticsearch.local="${System.getenv('MC_TMP_LOCATION')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
 
-            mc.search.elasticsearch.host = "127.0.0.1"
-            mc.search.elasticsearch.port = "9300"
+            //mc.search.elasticsearch.host = "127.0.0.1"
+            //mc.search.elasticsearch.port = "9300"
 
             grails.mail.disabled=true
         }

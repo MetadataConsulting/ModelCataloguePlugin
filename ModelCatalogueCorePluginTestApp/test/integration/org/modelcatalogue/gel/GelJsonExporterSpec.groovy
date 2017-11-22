@@ -88,22 +88,27 @@ class GelJsonExporterSpec extends IntegrationSpec {
         final String clinical_test2_id = DataClass.findByName('clinical test2').getCombinedVersion()  ?: DataClass.findByName('clinical test2').getId()
         final String clinical_test3_id = DataClass.findByName('clinical test3').getCombinedVersion()  ?: DataClass.findByName('clinical test3').getId()
         final String clinical_test4_id = DataClass.findByName('clinical test4').getCombinedVersion()  ?: DataClass.findByName('clinical test4').getId()
+        String ctest1 = clinical_test1_id.split("@")[0]
+        String ctest2 = clinical_test2_id.split("@")[0]
+        String ctest3 = clinical_test3_id.split("@")[0]
+        String ctest4 = clinical_test4_id.split("@")[0]
+
 
         return """{
                     "DiseaseGroups": [
                         {
-                            "id": 1200,
+                            "id": $NESTED_LEVEL_1_DATA_CLASS_NAME_ID,
                             "name": "rare disease subgroup 1.1",
                             "subGroups": [
                                 {
-                                    "id": 1201,
+                                    "id": $NESTED_LEVEL_2_DATA_CLASS_NAME_ID,
                                     "name": "rare disease disorder 1.1.1",
                                     "specificDisorders": [
                                         {
-                                            "id": 1202,
+                                            "id": $NESTED_LEVEL_3_DATA_CLASS_NAME_ID,
                                             "name": "rare disease 1.1.1.1",
                                             "eligibilityQuestion": {
-                                                "date": "2017-11-20",
+                                                "date": "$TODAY",
                                                 "version": "1"
                                             },
                                             "shallowPhenotypes": [
@@ -127,19 +132,19 @@ class GelJsonExporterSpec extends IntegrationSpec {
                                             "tests": [
                                                 {
                                                     "name": "clinical test1",
-                                                    "id": 1211
+                                                    "id": $ctest1
                                                 },
                                                 {
                                                     "name": "clinical test2",
-                                                    "id": 1212
+                                                    "id": $ctest2
                                                 },
                                                 {
                                                     "name": "clinical test3",
-                                                    "id": 1213
+                                                    "id": $ctest3
                                                 },
                                                 {
                                                     "name": "clinical test4",
-                                                    "id": 1214
+                                                    "id": $ctest4
                                                 }
                                             ]
                                         }

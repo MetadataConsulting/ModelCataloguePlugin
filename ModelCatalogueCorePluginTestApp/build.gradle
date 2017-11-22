@@ -396,11 +396,29 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     outputs.files file('target/test-reports/')
 }
 
+task runUnitTests(type: Exec, dependsOn: [bowerInstall]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-unit']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds.addAll(testArgs.split(' '))
+    }
+    commandLine cmds
+    outputs.files file('/usr/workspace/testreports/target/test-reports-unit/')
+
+
+}
+
 task runIntegrationTests(type: Exec, dependsOn: [bowerInstall]) {
     description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
 
     assertJava8()
-    environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
     environment 'FILE_OPENER_SKIP', "true"
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
 
@@ -409,15 +427,15 @@ task runIntegrationTests(type: Exec, dependsOn: [bowerInstall]) {
         cmds.addAll(testArgs.split(' '))
     }
     commandLine cmds
-    outputs.files file('/usr/workspace/testreports/Nov/16/target/test-reports1/')
+    outputs.files file('/usr/workspace/testreports/target/test-reports-integration/')
 
 
 }
-task runFunctionalTests(type: Exec, dependsOn: [bowerInstall, runIntegrationTests]) {
+task runFunctionalTests(type: Exec, dependsOn: [bowerInstall]) {
     description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
 
     assertJava8()
-    environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
     environment 'FILE_OPENER_SKIP', "true"
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
 
@@ -428,7 +446,7 @@ task runFunctionalTests(type: Exec, dependsOn: [bowerInstall, runIntegrationTest
         cmds.addAll(testArgs.split(' '))
     }
     commandLine cmds
-    outputs.files file('/usr/workspace/testreports/Nov/16/target/test-reports1/')
+    outputs.files file('/usr/workspace/testreports/target/test-reports-functional/')
 
 
 }
