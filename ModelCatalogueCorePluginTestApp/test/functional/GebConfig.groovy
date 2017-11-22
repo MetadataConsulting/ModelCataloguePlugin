@@ -40,15 +40,7 @@ environments {
 
     chrome {
         println "GEB SETUP chrome"
-        ChromeOptions options = new ChromeOptions()
-        options.addArguments("start-maximized")
-        options.addArguments("window-size=1920,1080")
-        options.addArguments("test-type")
-        options.addArguments("--disable-extensions")
-        options.addArguments("headless")
-        options.addArguments("--disable-gpu")
-        driver = {  new ChromeDriver(options) }
-        ChromeDriverManager.getInstance().setup()
+       
     }
 
     phantomJs {
