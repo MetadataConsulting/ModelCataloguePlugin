@@ -653,12 +653,12 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         params.max = Math.min(max ?: 10, 100)
         Long id = params.long('id')
         CatalogueElement element = findById(id)
-         if ( element == null ) {
+        if ( !element ) {
             notFound()
             return
         }
-
-        respond Lists.wrap(params, "/${resourceName}/${params.id}/typeHierarchy", elementService.getTypeHierarchy(params, element))
+        String base = "/${resourceName}/${id}/typeHierarchy" as String
+        respond Lists.wrap(params, base, elementService.getTypeHierarchy(params, element))
     }
 
     /**
