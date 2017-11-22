@@ -11,6 +11,7 @@ import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
+import spock.lang.Ignore
 
 class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
 
@@ -34,7 +35,7 @@ class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
         dataModel = DataModel.findByNameAndSemanticVersion('TestDataModel', '2')
 
     }
-
+    @Ignore
     def "export model to excel"() {
         setup:
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")

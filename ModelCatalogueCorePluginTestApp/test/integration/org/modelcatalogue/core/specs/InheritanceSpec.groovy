@@ -20,11 +20,11 @@ import spock.lang.Ignore
 class InheritanceSpec extends AbstractIntegrationSpec  {
 
     public static final String DUMMY_DATA_CLASS_NAME = 'IS Dummy'
-    public static final String TEST_PARENT_DATA_CLASS_NAME = 'IS Test Parent Class'
-    public static final String TEST_DATA_ELEMENT_1_NAME = 'IS Test Data Element 1'
-    public static final String TEST_DATA_ELEMENT_2_NAME = 'IS Test Data Element 2'
-    public static final String TEST_DATA_ELEMENT_3_NAME = 'IS Test Data Element 3'
-    public static final String TEST_DATA_ELEMENT_4_NAME = 'IS Test Data Element 4'
+    public static final String TEST_PARENT_DATA_CLASS_NAME = 'IS FirstTestSpec Parent Class'
+    public static final String TEST_DATA_ELEMENT_1_NAME = 'IS FirstTestSpec Data Element 1'
+    public static final String TEST_DATA_ELEMENT_2_NAME = 'IS FirstTestSpec Data Element 2'
+    public static final String TEST_DATA_ELEMENT_3_NAME = 'IS FirstTestSpec Data Element 3'
+    public static final String TEST_DATA_ELEMENT_4_NAME = 'IS FirstTestSpec Data Element 4'
     public static final String METADATA_KEY_1 = 'IS one'
     public static final String METADATA_KEY_2 = 'IS two'
     public static final String METADATA_KEY_3 = 'IS three'
@@ -36,16 +36,16 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
     public static final String METADATA_VALUE_4 = 'IS 4'
     public static final String METADATA_VALUE_5 = 'IS 5'
     public static final String METADATA_VALUE_5_ALT = 'IS V'
-    public static final String TEST_CHILD_DATA_CLASS_NAME = 'IS Test Child Class'
-    public static final String TEST_PARENT_VALUE_DOMAIN_NAME = 'IS Test Parent Value Domain'
-    public static final String TEST_CHILD_VALUE_DOMAIN_NAME = 'IS Test Child Value Domain'
-    public static final String TEST_DATA_TYPE_1_NAME = 'IS Test Data Type 1'
-    public static final String TEST_DATA_TYPE_2_NAME = 'IS Test Data Type 2'
-    public static final String TEST_ENUM_TYPE_1_NAME = 'IS Test Enum Type 1'
-    public static final String TEST_ENUM_TYPE_2_NAME = 'IS Test Enum Type 2'
-    public static final String TEST_ENUM_TYPE_3_NAME = 'IS Test Enum Type 3'
-    public static final String TEST_DATA_MODEL_1_NAME = 'IS Test Data Model 1'
-    public static final String TEST_DATA_MODEL_2_NAME = 'IS Test Data Model 2'
+    public static final String TEST_CHILD_DATA_CLASS_NAME = 'IS FirstTestSpec Child Class'
+    public static final String TEST_PARENT_VALUE_DOMAIN_NAME = 'IS FirstTestSpec Parent Value Domain'
+    public static final String TEST_CHILD_VALUE_DOMAIN_NAME = 'IS FirstTestSpec Child Value Domain'
+    public static final String TEST_DATA_TYPE_1_NAME = 'IS FirstTestSpec Data Type 1'
+    public static final String TEST_DATA_TYPE_2_NAME = 'IS FirstTestSpec Data Type 2'
+    public static final String TEST_ENUM_TYPE_1_NAME = 'IS FirstTestSpec Enum Type 1'
+    public static final String TEST_ENUM_TYPE_2_NAME = 'IS FirstTestSpec Enum Type 2'
+    public static final String TEST_ENUM_TYPE_3_NAME = 'IS FirstTestSpec Enum Type 3'
+    public static final String TEST_DATA_MODEL_1_NAME = 'IS FirstTestSpec Data Model 1'
+    public static final String TEST_DATA_MODEL_2_NAME = 'IS FirstTestSpec Data Model 2'
 
     ElementService elementService
     CatalogueBuilder catalogueBuilder
@@ -285,7 +285,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
         dataElement1 in childClass.contains
         dataElement2 in childClass.contains
 
-        when: "metadata in the child relationship are overridden"
+        when: "metadataStep in the child relationship are overridden"
         rc1.ext[METADATA_KEY_5] = METADATA_VALUE_5_ALT
 
         and: "the relation is removed from the parent"
@@ -294,10 +294,10 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
         then: "the relation is persisted in the child as it was already customized"
         dataElement1 in childClass.contains
 
-        when: "metadata are added to the parent relationship"
+        when: "metadataStep are added to the parent relationship"
         rp2.ext[METADATA_KEY_5] = METADATA_VALUE_5
 
-        then: "the metadata are added to child relationships as well"
+        then: "the metadataStep are added to child relationships as well"
         rc2.ext[METADATA_KEY_5] == METADATA_VALUE_5
 
         when: "we try to remove relationship from child"
@@ -336,7 +336,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
 
     def "inherit metadata"() {
         addBasedOn()
-        expect: "metadata are inherited"
+        expect: "metadataStep are inherited"
         parentClass.ext.size() == 3
         childClass.ext.size() == 4
 
@@ -586,13 +586,13 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
 
 
     def "data element inheritance"() {
-        final String dataModelName = 'Test Data Element Inheritance'
-        final String inheritedName = 'Test Element 1'
-        final String firstInheritedDescription = 'Test Element 1 Description'
-        final String secondInheritedDescription = 'Test Element 1 Description Changed'
-        final String inheritingName = 'Test Element 2'
-        final String firstInheritedTypeName = 'Test Type 1'
-        final String secondInheritedTypeName = 'Test Type 2'
+        final String dataModelName = 'FirstTestSpec Data Element Inheritance'
+        final String inheritedName = 'FirstTestSpec Element 1'
+        final String firstInheritedDescription = 'FirstTestSpec Element 1 Description'
+        final String secondInheritedDescription = 'FirstTestSpec Element 1 Description Changed'
+        final String inheritingName = 'FirstTestSpec Element 2'
+        final String firstInheritedTypeName = 'FirstTestSpec Type 1'
+        final String secondInheritedTypeName = 'FirstTestSpec Type 2'
         catalogueBuilder.build {
             skip draft
             dataModel(name: dataModelName) {

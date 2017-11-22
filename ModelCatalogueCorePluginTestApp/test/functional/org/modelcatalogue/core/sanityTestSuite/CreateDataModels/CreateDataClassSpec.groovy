@@ -1,24 +1,26 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
+
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.create
-import static org.modelcatalogue.core.geb.Common.delete
-import static org.modelcatalogue.core.geb.Common.description
-import static org.modelcatalogue.core.geb.Common.getItem
-import static org.modelcatalogue.core.geb.Common.getPick
-import static org.modelcatalogue.core.geb.Common.modalHeader
-import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.modelCatalogueId
-import static org.modelcatalogue.core.geb.Common.nameLabel
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
-import static org.modelcatalogue.core.geb.Common.modalSuccessButton
+import static org.modelcatalogue.core.gebUtils.Common.create
+import static org.modelcatalogue.core.gebUtils.Common.description
+import static org.modelcatalogue.core.gebUtils.Common.getItem
+import static org.modelcatalogue.core.gebUtils.Common.getPick
+import static org.modelcatalogue.core.gebUtils.Common.modalHeader
+import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.modelCatalogueId
+import static org.modelcatalogue.core.gebUtils.Common.nameLabel
+import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
+import static org.modelcatalogue.core.gebUtils.Common.modalSuccessButton
 
 
 
 
-
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     private static final String metadataStep ="button#step-metadata"
@@ -40,7 +42,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     private static final String dataClass = 'td.col-md-4>span>span>a'
     private static final String modelCatalogue= 'span.mc-name'
     private static final String exitButton= 'button#exit-wizard'
-    private static final String deleteBtton = 'a#delete-menu-item-link>span:nth-child(3)'
+    private static final String deleteButton = 'a#delete-menu-item-link>span:nth-child(3)'
     private static final String dataClassButton = 'a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
     private static final String   greenButton='div#isBasedOn-changes>div:nth-child(3)>table>tfoot>tr>td>table>tfoot>tr>td:nth-child(1)>span'
     private static final String  destinationTable='div#isBasedOn-changes>div:nth-child(3)>table>tbody>tr>td:nth-child(2)'
@@ -86,7 +88,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         then:
         check metadataStep enabled
 
-        when: 'fill metadata step'
+        when: 'fill metadataStep step'
         click metadataStep
         fillMetadata foo: 'one', bar: 'two', baz: 'three', fubor: 'four'
 
@@ -129,12 +131,10 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         and: 'click green button'
         click finishButton
         Thread.sleep(2000L)
-        click exitButton
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         then:
-
         check wizardSummary contains "NEW_TESTING_MODEL"
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         cleanup:
         click exitButton
@@ -171,16 +171,14 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
 
         when:
         click exitButton
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         and:
+
         selectInTree 'Data Classes'
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
-        then:
-        $(dataClassCreated).text().contains('TESTING_CLASS')
-
-
-        when:'select the created data class and created a relationship based on'
+        and:'select the created data class and created a relationship based on'
         click dataClassCreated
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
@@ -189,8 +187,9 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
 
         and:
         click greenButton
-        fill search with 'NEW_TESTING_MODEL' and Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS) and pick first item
+        fill search with 'NEW_TESTING_MODEL' and pick first item
         click modalPrimaryButton
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         then:
         check destinationTable contains 'NEW_TESTING_MODEL'
@@ -204,10 +203,6 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     def "delete the created data class"() {
 
         when:
-        click modelCatalogue
-
-        and:
-        select 'Test 3'
         selectInTree 'Data Classes'
 
         then:
@@ -221,7 +216,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         click dataClassButton
 
         and:
-        click deleteBtton
+        click deleteButton
 
         and:
         click modalPrimaryButton

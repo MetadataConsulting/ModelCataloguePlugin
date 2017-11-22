@@ -17,7 +17,7 @@ import org.modelcatalogue.gel.RareDiseaseCsvExporter
  */
 class AbstractDataModelExporterSpec extends AbstractIntegrationSpec {
 
-    public static final String DATA_MODEL_EXPORTER_DATA_MODEL_NAME = 'Data Exporter Test Data Model'
+    public static final String DATA_MODEL_EXPORTER_DATA_MODEL_NAME = 'Data Exporter FirstTestSpec Data Model'
     AuditService auditService
     DataClassService dataClassService
     ElementService elementService

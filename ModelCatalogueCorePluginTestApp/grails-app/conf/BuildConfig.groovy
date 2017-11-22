@@ -147,7 +147,10 @@ grails.project.dependency.resolution = {
         test "org.seleniumhq.selenium:selenium-remote-driver:${webDriverVersion}"
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 
+
         test 'io.github.bonigarcia:webdrivermanager:1.5.1'
+        test "com.codeborne:phantomjsdriver:1.3.0"
+
     }
 
     plugins {
@@ -167,6 +170,7 @@ grails.project.dependency.resolution = {
         test ":geb:$gebVersion"
         test ':build-test-data:2.1.2'
         test ':fixtures:1.3'
+        test "org.grails.plugins:geb:$gebVersion"
 
         compile ":asset-pipeline:2.9.1"
         compile ":coffee-asset-pipeline:2.9.1"

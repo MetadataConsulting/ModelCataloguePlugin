@@ -25,6 +25,7 @@ docker {
     if (System.getenv('DOCKER_CERT_PATH'))  {
         certPath = file(System.getenv('DOCKER_CERT_PATH'))
     }
+
 }
 
 String host = dockerHost
@@ -76,7 +77,7 @@ task cleanIdeaFiles(type: Delete) {
 task cleanData(type: Delete) {
     Properties properties = new Properties()
     properties.load(file('application.properties').newInputStream())
-    delete "${System.getProperty('java.io.tmpdir')}/ModelCatalogueCorePluginTestApp/${properties['app.version']}"
+    delete "${System.getenv("MC_TMP_LOCATION")}/ModelCatalogueCorePluginTestApp/${properties['app.version']}"
 }
 
 
@@ -370,7 +371,7 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
 }
 
 task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMySQLContainer]) {
-    description = "Run all Grails MX tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
 
     assertJava8()
     environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
@@ -380,7 +381,7 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     environment 'MC_DOCKER_HOST', host
 
 
-    def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-integration', '-unit']
+    def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-unit', '-integration', '-functional']
     if (project.hasProperty('testArgs')) { // get arguments for grails test-app
         cmds.addAll(testArgs.split(' '))
     }
@@ -389,13 +390,67 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     inputs.files files('grails-app')
     inputs.files files('src')
     inputs.files files('web-app')
-    // we are not doing functional tests until they work robustly and independently of each other.
-    //inputs.files files('test/functional')
-    inputs.files files('test/integration')
     inputs.files files('test/unit')
-
+    inputs.files files('test/integration')
+    inputs.files files('test/functional')
     outputs.files file('target/test-reports/')
 }
+
+task runUnitTests(type: Exec, dependsOn: [bowerInstall]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-unit']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds.addAll(testArgs.split(' '))
+    }
+    commandLine cmds
+    outputs.files file('/usr/workspace/testreports/target/test-reports-unit/')
+
+
+}
+
+task runIntegrationTests(type: Exec, dependsOn: [bowerInstall]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-integration']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds.addAll(testArgs.split(' '))
+    }
+    commandLine cmds
+    outputs.files file('/usr/workspace/testreports/target/test-reports-integration/')
+
+
+}
+task runFunctionalTests(type: Exec, dependsOn: [bowerInstall]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+
+    //  def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-unit', '-integration', '-functional']
+    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-functional', 'org.modelcatalogue.core.generalTestSuit.*']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds.addAll(testArgs.split(' '))
+    }
+    commandLine cmds
+    outputs.files file('/usr/workspace/testreports/target/test-reports-functional/')
+
+
+}
+
 
 task runKarmaTests(type: NodeTask) {
     description = "Runs Karma tests"

@@ -6,7 +6,7 @@ import static junit.framework.Assert.assertEquals
 import static org.modelcatalogue.core.util.test.FileOpener.open
 
 /**
- * Test for RD eligibility criteria change log reports class using test model with similar format to expected data.
+ * TestSpec for RD eligibility criteria change log reports class using test model with similar format to expected data.
  */
 class RareDiseaseEligibilityChangeLogXlsExporterSpec extends AbstractRareDiseasesExporterSpec {
 

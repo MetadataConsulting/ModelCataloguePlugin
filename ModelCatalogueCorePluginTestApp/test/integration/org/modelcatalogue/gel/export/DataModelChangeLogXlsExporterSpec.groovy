@@ -4,15 +4,16 @@ import org.hibernate.SessionFactory
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.util.DataModelFilter
+import spock.lang.Ignore
 
 import static junit.framework.Assert.assertEquals
 import static org.modelcatalogue.core.util.test.FileOpener.open
 
 /**
- * Test for Data Spec change log reports class.
+ * TestSpec for Data Spec change log reports class.
  */
 class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
-
+    @Ignore
     def "Export data spec change logs to xls"() {
         when:
         DataModel dataModel = buildTestModel()

@@ -65,7 +65,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
         )
         when:
         controller.response.format = "json"
-        controller.params.put("key", "metadata")
+        controller.params.put("key", "metadataStep")
         controller.metadataKeyCheck(10)
         JSONElement json = controller.response.json
         String list = "metadataKey_missing_key_metadata"
@@ -79,7 +79,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
         json.page == 10
         json.list
         json.list.size() == 10
-        //json.next == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
+        //json.next == "/dataArchitect/metadataKeyCheck?max=10&key=metadataStep&offset=10"
         json.previous == ""
 
     }
@@ -109,7 +109,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
         json.page == 10
         json.list
         json.list.size() == 1
-        //json.next == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
+        //json.next == "/dataArchitect/metadataKeyCheck?max=10&key=metadataStep&offset=10"
         json.previous == ""
 
     }

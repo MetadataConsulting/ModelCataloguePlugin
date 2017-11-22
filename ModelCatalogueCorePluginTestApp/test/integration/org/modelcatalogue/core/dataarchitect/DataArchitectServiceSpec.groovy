@@ -29,7 +29,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         de2.save()
         de1.ext.put("localIdentifier", "test")
         de4.ext.put("test2", "test2")
-        de4.ext.put("metadata", "test2")
+        de4.ext.put("metadataStep", "test2")
         de4.ext.put("test3", "test2")
         de4.ext.put("test4", "test2")
         de1.ext.put("Data item No.", "C1031")  // used in def "find relationships"
@@ -61,7 +61,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
 
     def "find data elements without particular extension key"() {
         when:
-        ListWithTotal dataElements = dataArchitectService.metadataKeyCheck(max:12, key: 'metadata')
+        ListWithTotal dataElements = dataArchitectService.metadataKeyCheck(max:12, key: 'metadataStep')
 
         then:
         dataElements.items.contains(de2)

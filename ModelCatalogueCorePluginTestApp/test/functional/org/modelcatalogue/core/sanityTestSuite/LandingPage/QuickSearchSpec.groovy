@@ -1,18 +1,23 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.AssetWizardSpec
 
-import static org.modelcatalogue.core.geb.Common.admin
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.generalTestSuit.AssetWizardSpec
+import spock.lang.IgnoreIf
+
+
+import static org.modelcatalogue.core.gebUtils.Common.admin
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.getModalDialog
-import static org.modelcatalogue.core.geb.Common.getNameLabel
-import static org.modelcatalogue.core.geb.Common.getSave
-import static org.modelcatalogue.core.geb.Common.item
-import static org.modelcatalogue.core.geb.Common.pick
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
+import static org.modelcatalogue.core.gebUtils.Common.getModalDialog
+import static org.modelcatalogue.core.gebUtils.Common.getNameLabel
+import static org.modelcatalogue.core.gebUtils.Common.getSave
+import static org.modelcatalogue.core.gebUtils.Common.item
+import static org.modelcatalogue.core.gebUtils.Common.pick
+import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 
@@ -22,7 +27,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
     private static final String   createButton = "span.text-success"
     public static final String infiniteTableRow = '.inf-table tbody .inf-table-item-row'
     public static final String asset = 'asset'
-    public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 2000
+    public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
 
 
     def "go to login"() {
@@ -43,12 +48,12 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         check modalDialog displayed
 
         when:
-        fill 'name' with 'TESTING Validation Rule'
+        fill 'name' with 'Demo Model Validation'
 
         click save
 
         then:
-        check { infTableCell(1, 1) } contains 'TESTING Validation Rule'
+        check { infTableCell(1, 1) } contains 'Demo Model Validation'
     }
 
 
@@ -126,6 +131,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         click quickSearch
 
         and:
+        Thread.sleep(3000L)
         fill search with "xs:string" and pick first item
 
         then:
@@ -156,11 +162,12 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         and:
-        fill search with "TESTING Validation Rule" and pick first item
+        Thread.sleep(3000L)
+        fill search with "Demo Model Validation" and pick first item
 
         then:
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        check rightSideTitle contains "TESTING Validation Rule"
+        check rightSideTitle contains "Demo Model Validation"
 
     }
 

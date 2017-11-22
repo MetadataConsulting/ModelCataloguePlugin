@@ -13,8 +13,8 @@ class DataTypeRuleScriptSpec extends Specification {
     @Unroll @ConfineMetaClassChanges(DataType)
     def "for x='#value' the expression '#expression' is #expected"() {
         when:
-        DataType base = new DataType(name: "Test Base Domain", rule: "x != 'abrakadabra'")
-        DataType dataType = new DataType(name: "Test Domain")
+        DataType base = new DataType(name: "FirstTestSpec Base Domain", rule: "x != 'abrakadabra'")
+        DataType dataType = new DataType(name: "FirstTestSpec Domain")
 
         dataType.metaClass.getBasedOn = {->
             [base]

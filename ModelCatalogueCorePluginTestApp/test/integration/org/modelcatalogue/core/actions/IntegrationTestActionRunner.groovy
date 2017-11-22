@@ -7,7 +7,7 @@ class IntegrationTestActionRunner extends AbstractActionRunner {
 
     @Override
     String getMessage() {
-        "Integration Test Action Runner"
+        "Integration FirstTestSpec Action Runner"
     }
 
     @Override

@@ -1,19 +1,24 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
+
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.getAdmin
-import static org.modelcatalogue.core.geb.Common.getModalHeader
-import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.getAdmin
+import static org.modelcatalogue.core.gebUtils.Common.getModalHeader
+import static org.modelcatalogue.core.gebUtils.Common.getModalPrimaryButton
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class FastActionsVersionSpec extends AbstractModelCatalogueGebSpec{
 
 
     private static final String create="a#role_data-models_create-data-modelBtn"
     private static final String  fastActions="a#role_navigation-right_fast-action-menu-item-link>span:nth-child(1)"
-    private static final String  catalogueVersion ="div.modal-body>div:nth-child(2)>div>a:nth-child(7)"
+    private static final String  catalogueVersion ="div.modal-body>div:nth-child(2)>div>a:nth-child(7)>h4"
     private static final String  version = "div.modal-body"
 
 

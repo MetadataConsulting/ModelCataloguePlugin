@@ -14,7 +14,7 @@ class ActionServiceSpec extends IntegrationSpec {
 
     def setup() {
         service = Holders.applicationContext.getBean(ActionService)
-        batch = new Batch(name: "Test Batch").save(failOnError: true)
+        batch = new Batch(name: "FirstTestSpec Batch").save(failOnError: true)
     }
 
     def "performing action does all necessary steps"() {

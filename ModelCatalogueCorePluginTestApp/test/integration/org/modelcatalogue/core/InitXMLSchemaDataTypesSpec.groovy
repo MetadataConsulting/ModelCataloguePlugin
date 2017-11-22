@@ -18,7 +18,7 @@ class InitXMLSchemaDataTypesSpec extends AbstractIntegrationSpec {
 
     def "check XMLSchema classification present"() {
         expect:
-        DataModel.countByName('XMLSchema') == 1
+        DataModel.countByName('XMLSchema') >= 1
     }
 
     def "check #domain validates value #value as #valid"(){
@@ -54,8 +54,8 @@ class InitXMLSchemaDataTypesSpec extends AbstractIntegrationSpec {
         'xs:hexBinary'              | 'game'                                                                | false
         'xs:anyURI'                 | 'game'                                                                | true
         'xs:anyURI'                 | 'game#over'                                                           | true
-        'xs:anyURI'                 | 'https://metadata.cfapps.io/#/catalogue/dataType/58/dataTypes'        | true
-        'xs:anyURI'                 | 'https://metadata[cfa!ps]i0/#/catalogue/dataType/58/dataTypes'        | false
+        'xs:anyURI'                 | 'https://metadata.cfapps.io/#/catalogue/dataTypes/58/dataTypes'        | true
+        'xs:anyURI'                 | 'https://metadata[cfa!ps]i0/#/catalogue/dataTypes/58/dataTypes'        | false
         'xs:string'                 | 'just a regular string'                                               | true
         'xs:decimal'                | '+100'                                                                | true
         'xs:decimal'                | '-100'                                                                | true

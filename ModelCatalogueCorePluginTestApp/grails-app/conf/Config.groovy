@@ -19,6 +19,7 @@ grails.project.groupId = appName // change this to alter the default package nam
 
 grails.app.context = '/'
 
+
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
 grails.mime.types = [ // the first one is the default format
@@ -125,10 +126,11 @@ environments {
         mc.allow.signup = true
 
         grails.plugin.console.enabled = true
-//        mc.search.elasticsearch.host = "127.0.0.1"
-        // Elasticsearch bind port, defaults to 9300
-//        mc.search.elasticsearch.port = "9300"
-        mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
+
+        mc.search.elasticsearch.host = "127.0.0.1"
+
+        mc.search.elasticsearch.port = "9300"
+       // mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
         mc.css.custom = """
           /* green for dev mode to show it's safe to do any changes */
           .navbar-default {
@@ -164,7 +166,9 @@ environments {
             }
         }
         mc.allow.signup = true
-
+        mc.search.elasticsearch.local="${System.getenv('MC_TMP_LOCATION')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
+        //mc.search.elasticsearch.host = "127.0.0.1"
+        //mc.search.elasticsearch.port = "9300"
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}"
         if (System.getenv('DOCKERIZED_TESTS') && System.properties["grails.test.phase"] == 'functional') {
@@ -182,7 +186,11 @@ environments {
                 }
             }
         } else {
-            mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
+            mc.search.elasticsearch.local="${System.getenv('MC_TMP_LOCATION')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
+
+            //mc.search.elasticsearch.host = "127.0.0.1"
+            //mc.search.elasticsearch.port = "9300"
+
             grails.mail.disabled=true
         }
     }
@@ -255,6 +263,8 @@ log4j.main = {
 
     info 'org.modelcatalogue.core.rx.BatchOperator'
     info 'org.modelcatalogue.core.rx.DetachedCriteriaOnSubscribe'
+
+    info 'org.modelcatalogue.core.util.test.TestHelper'
 
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'

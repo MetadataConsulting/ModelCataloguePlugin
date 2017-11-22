@@ -4,7 +4,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
 
 /**
- * Test for RD reports class using test model with similar format to expected data.
+ * FirstTestSpec for RD reports class using test model with similar format to expected data.
  */
 class RareDiseaseCsvExporterSpec extends AbstractRareDiseasesExporterSpec {
 

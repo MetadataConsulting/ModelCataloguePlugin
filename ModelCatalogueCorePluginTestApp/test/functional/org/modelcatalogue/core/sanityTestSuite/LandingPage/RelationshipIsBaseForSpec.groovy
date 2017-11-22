@@ -1,15 +1,13 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
-import static org.modelcatalogue.core.geb.Common.item
-import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.item
+import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.pick
 
-
-import static org.modelcatalogue.core.geb.Common.getRightSideTitle
-import static org.modelcatalogue.core.geb.Common.pick
-
-
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class RelationshipIsBaseForSpec extends AbstractModelCatalogueGebSpec {
     private static final String dataModel ="a#role_item_catalogue-element-menu-item-link"

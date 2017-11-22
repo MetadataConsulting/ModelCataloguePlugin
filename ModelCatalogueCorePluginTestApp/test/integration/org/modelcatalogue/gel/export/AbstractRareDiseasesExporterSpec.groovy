@@ -19,7 +19,7 @@ import org.modelcatalogue.gel.RareDiseaseCsvExporter
  */
 class AbstractRareDiseasesExporterSpec extends AbstractIntegrationSpec {
 
-    public static final String RARE_DISEASE_DATA_MODEL_NAME = 'Rare Diseases Test Data Model'
+    public static final String RARE_DISEASE_DATA_MODEL_NAME = 'Rare Diseases FirstTestSpec Data Model'
     AuditService auditService
     DataClassService dataClassService
     ElementService elementService

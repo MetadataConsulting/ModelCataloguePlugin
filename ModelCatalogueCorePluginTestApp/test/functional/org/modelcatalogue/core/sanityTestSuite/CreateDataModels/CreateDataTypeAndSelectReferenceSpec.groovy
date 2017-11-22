@@ -1,43 +1,123 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import org.openqa.selenium.By
+import org.openqa.selenium.interactions.Actions
+import spock.lang.IgnoreIf
+
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.getCreate
-import static org.modelcatalogue.core.geb.Common.getDescription
-import static org.modelcatalogue.core.geb.Common.getItem
-import static org.modelcatalogue.core.geb.Common.getModalHeader
-import static org.modelcatalogue.core.geb.Common.getModelCatalogueId
-import static org.modelcatalogue.core.geb.Common.getNameLabel
-import static org.modelcatalogue.core.geb.Common.getPick
-import static org.modelcatalogue.core.geb.Common.getRightSideTitle
-import static org.modelcatalogue.core.geb.Common.getSave
-import static org.modelcatalogue.core.geb.Common.messages
-import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.delete
+import static org.modelcatalogue.core.gebUtils.Common.getCreate
+import static org.modelcatalogue.core.gebUtils.Common.getDescription
+import static org.modelcatalogue.core.gebUtils.Common.getModelCatalogueId
+import static org.modelcatalogue.core.gebUtils.Common.getNameLabel
+import static org.modelcatalogue.core.gebUtils.Common.getSave
+import static org.modelcatalogue.core.gebUtils.Common.messages
+import static org.modelcatalogue.core.gebUtils.Common.modalHeader
+import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.rightSideTitle
 
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec {
     private static final String reference= "input#pickReferenceType"
-    private static final String  dataClass="form.ng-dirty>div:nth-child(11)>div>span>span"
-    private static final String addImport="div.search-lg>p>span>a"
-    private static final String  search ="input#elements"
-    private static final String OK = "div.messages-modal-prompt>div>div>div:nth-child(3)>button:nth-child(1)"
-    private static final String clickX ="div.input-group-addon"
+    private static final String   alert ="body > div.modal.fade.ng-isolate-scope.basic-edit-modal-prompt.in > div > div > div.modal-body.ng-scope > form > div.in.collapse > div > label"
     private static final String table ="tr.inf-table-item-row>td:nth-child(1)"
-    private static final String referenceType="a#role_item_catalogue-element-menu-item-link"
-    private static final String deleteButton="a#delete-menu-item-link>span:nth-child(3)"
-    private static final String dataType="tr.inf-table-item-row>td:nth-child(1)>span>span>a"
+    private static final String createButton="a#role_data-models_create-data-modelBtn"
+    private static final String finishStep ="button#step-finish"
+    private static final String closeStep ="div.modal-footer>button:nth-child(2)"
+    private static final String finishButton ="button#step-finish"
+    private static final String wizardSummary = 'td.col-md-4'
+    private static final String exitButton = "#exit-wizard"
+    private static final String menuBar = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
+    private static Actions actions=null
 
 
 
-    def"login to Model Catalogue and select Model"(){
+
+    def"login to Model Catalogue and create Data Model"() {
         when:
-               loginCurator()
-              select 'Test 3'
+        loginCurator()
+
+        then:
+        check createButton displayed
+
+
+        when:
+        click createButton
+
+        then:
+        check modalHeader is 'Data Model Wizard'
+
+
+        when:
+        fill nameLabel with 'Reference'
+        fill modelCatalogueId with 'METT-001'
+        fill description with 'THIS IS DATA FROM ANOTHER MODEL'
+        Thread.sleep(3000L)
+        click finishStep
+
+        then:
+        check 'div#summary>h4' is 'Data Model Reference created'
+
+        when:
+        click closeStep
+
+        then:
+        check rightSideTitle contains 'Reference METT-001@0.0.1'
+    }
+
+    def"create a Data Class"(){
+
+        when:
+
+        selectInTree 'Data Classes'
+
+        then:
+        check rightSideTitle is 'Active Data Classes'
+
+        when:
+        click create
+        then:
+        check modalHeader contains 'Data Class Wizard'
+
+        when:
+        fill nameLabel with "Class 1"
+
+        fill modelCatalogueId with "MET-2233"
+
+        fill description with "my description of data type${System.currentTimeMillis()}"
+
+
+
+        and: 'click green button'
+        click finishButton
+        Thread.sleep(2000L)
+
+        then:
+        check wizardSummary contains "Class 1"
+        Thread.sleep(3000L)
+
+        cleanup:
+        click exitButton
+
+
+
+    }
+
+    def"Select Data Types"(){
+
+
+        when:
               selectInTree 'Data Types'
 
         then:
         check rightSideTitle contains 'Active Data Types'
+
+
+
     }
     def"Navigate to data type page"() {
         when:
@@ -45,44 +125,57 @@ class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec
         then:
              check modalHeader contains 'Create Data Type'
     }
+
+
+
+
     def " fill the create data type form"(){
+
+
         when:
         fill nameLabel with "TESTING_DATA_TYPE"
 
         fill modelCatalogueId with "MET-333"
 
-        fill description with "my description of data type${System.currentTimeMillis()}"
 
         and: 'select references button and save'
         click reference
-        click dataClass
 
-        and: 'import a data'
-        click addImport
-        fill search with("clinical Tags 0.0.1")
+        then:
+        check alert contains 'Data Class'
+
+        when:
+        Thread.sleep(3000)
+        fill 'input#dataClass' with'Class 1'
         remove messages
 
-        and:
-        click OK
-        click clickX
+
 
         and:
         click save
 
         then:
-        check table contains 'TESTING_DATA_TYPE'
+        check { infTableCell(1, 1) } contains "TESTING_DATA_TYPE"
 
     }
-    def"delete the created data type"(){
+    def"delete the created Data Model"(){
 
-        when:'click on the created data type'
-        click dataType
+        when:
+        selectInTree 'Reference'
 
-        and:'navigate to the top menu and click on the reference type button'
-        click referenceType
+        then:
+        check rightSideTitle contains 'Reference METT-001@0.0.1'
+
+
+        when:
+        actions = new Actions(driver)
+        actions.clickAndHold(driver.findElement(By.cssSelector(menuBar)))
 
         and:
-        click deleteButton
+        click delete
+
+        then:
+        check modalHeader is 'Do you really want to delete Data Model Reference?'
 
         and:'confirmation'
         click modalPrimaryButton

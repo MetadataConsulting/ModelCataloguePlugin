@@ -1,27 +1,30 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+
+import org.modelcatalogue.core.gebUtils.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
+
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.create
-import static org.modelcatalogue.core.geb.Common.description
-import static org.modelcatalogue.core.geb.Common.getRightSideTitle
-import static org.modelcatalogue.core.geb.Common.item
-import static org.modelcatalogue.core.geb.Common.messages
-import static org.modelcatalogue.core.geb.Common.modalHeader
-import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.modelCatalogueId
-import static org.modelcatalogue.core.geb.Common.nameLabel
-import static org.modelcatalogue.core.geb.Common.pick
-import static org.modelcatalogue.core.geb.Common.save
+import static org.modelcatalogue.core.gebUtils.Common.create
+import static org.modelcatalogue.core.gebUtils.Common.description
+import static org.modelcatalogue.core.gebUtils.Common.getRightSideTitle
+import static org.modelcatalogue.core.gebUtils.Common.messages
+import static org.modelcatalogue.core.gebUtils.Common.modalHeader
+import static org.modelcatalogue.core.gebUtils.Common.modalPrimaryButton
+import static org.modelcatalogue.core.gebUtils.Common.modelCatalogueId
+import static org.modelcatalogue.core.gebUtils.Common.nameLabel
 
+
+
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String  delete = "a#delete-menu-item-link"
     private static final String  modelCatalogue = "span.mc-name"
     private static final String  saveElement = "a#role_modal_modal-save-elementBtn"
-    private static final String search = "input#dataType"
+    private static final String search = 'input#dataType'
     private static final String dataElement = "a#role_item_catalogue-element-menu-item-link"
     private static final String table = "td.col-md-4"
     private static final String  myElement = "td.col-md-4>span>span>a"
