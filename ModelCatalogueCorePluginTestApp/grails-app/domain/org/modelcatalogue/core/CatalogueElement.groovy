@@ -86,8 +86,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     ]
 
     static constraints = {
-        name size: 1..255
-        description nullable: true, maxSize: 20000
+        name nullable: false, blank: false, size: 1..255
+        description nullable: true, blank: true, maxSize: 20000
 		modelCatalogueId nullable: true, size: 1..255
         dateCreated bindable: false
         lastUpdated bindable: false
