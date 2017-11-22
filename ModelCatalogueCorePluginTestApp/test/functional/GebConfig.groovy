@@ -21,20 +21,6 @@ baseUrl = 'http://localhost:8080/'
 println "GEB SETUP general"
 
 println "GEB SETUP chrome"
-        ChromeOptions options = new ChromeOptions()
-        options.addArguments("start-maximized")
-        options.addArguments("window-size=1920,1080")
-        options.addArguments("test-type")
-        options.addArguments("--disable-extensions")
-        options.addArguments("headless")
-        options.addArguments("--disable-gpu")
-        driver = {  new ChromeDriver(options) }
-        ChromeDriverManager.getInstance().setup()
-
-//environments {
-//
-//    chrome {
-//        println "GEB SETUP chrome"
 //        ChromeOptions options = new ChromeOptions()
 //        options.addArguments("start-maximized")
 //        options.addArguments("window-size=1920,1080")
@@ -44,18 +30,32 @@ println "GEB SETUP chrome"
 //        options.addArguments("--disable-gpu")
 //        driver = {  new ChromeDriver(options) }
 //        ChromeDriverManager.getInstance().setup()
-//    }
-//
-//    phantomJs {
-//        println "GEB SETUP phantomJs"
-//        driver = { new PhantomJSDriver() }
-//    }
-//
-//    firefox {
-//        println "GEB SETUP firefox"
-//        driver = { new FirefoxDriver() }
-//    }
-//}
+
+environments {
+
+    chrome {
+        println "GEB SETUP chrome"
+        ChromeOptions options = new ChromeOptions()
+        options.addArguments("start-maximized")
+        options.addArguments("window-size=1920,1080")
+        options.addArguments("test-type")
+        options.addArguments("--disable-extensions")
+        options.addArguments("headless")
+        options.addArguments("--disable-gpu")
+        driver = {  new ChromeDriver(options) }
+        ChromeDriverManager.getInstance().setup()
+    }
+
+    phantomJs {
+        println "GEB SETUP phantomJs"
+        driver = { new PhantomJSDriver() }
+    }
+
+    firefox {
+        println "GEB SETUP firefox"
+        driver = { new FirefoxDriver() }
+    }
+}
 
 waiting {
     timeout = 15
