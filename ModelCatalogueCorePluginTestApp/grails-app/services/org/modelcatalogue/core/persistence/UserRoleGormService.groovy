@@ -8,7 +8,6 @@ import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.springframework.context.MessageSource
-import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 @CompileStatic
 class UserRoleGormService implements WarnGormErrors {
@@ -38,7 +37,7 @@ class UserRoleGormService implements WarnGormErrors {
         userRole = new UserRole(role: role, user: user)
         if ( !userRole.save() ) {
             warnErrors(userRole, messageSource)
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
+            transactionStatus.setRollbackOnly()
         }
         userRole
     }

@@ -6,17 +6,12 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.acl.AclUtilService
 import grails.util.Holders
-import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.LogoutListeners
 import org.modelcatalogue.core.SecurityService
-import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.MetadataRolesUtils
-import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserRole
-import org.springframework.security.acls.domain.BasePermission
 import org.modelcatalogue.core.persistence.UserGormService
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.logout.LogoutHandler

@@ -5,7 +5,6 @@ import grails.transaction.Transactional
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.security.Role
 import org.springframework.context.MessageSource
-import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 class RoleGormService implements WarnGormErrors {
 
@@ -24,7 +23,7 @@ class RoleGormService implements WarnGormErrors {
     Role saveByAuthority(String authority) {
         Role role = new Role(authority: authority)
         if ( !role.save() ) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
+            transactionStatus.setRollbackOnly()
             warnErrors(role, messageSource)
         }
         role

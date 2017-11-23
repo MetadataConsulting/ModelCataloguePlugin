@@ -6,7 +6,6 @@ import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserService
 import org.springframework.context.MessageSource
-import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 class UserGormService implements WarnGormErrors {
 
@@ -64,7 +63,7 @@ class UserGormService implements WarnGormErrors {
     User save(User user) {
         if ( !user.save() ) {
             warnErrors(user, messageSource)
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
+            transactionStatus.setRollbackOnly()
         }
         user
     }

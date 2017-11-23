@@ -9,7 +9,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.persistence.RelationshipGormService
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserGormService
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
