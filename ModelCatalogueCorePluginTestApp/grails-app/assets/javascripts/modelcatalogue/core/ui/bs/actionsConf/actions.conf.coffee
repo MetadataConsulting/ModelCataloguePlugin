@@ -385,7 +385,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
         )
     ])
 
-  actionsProvider.registerChildAction('export', 'list-exports-current', actionRoleRegister.ROLE_LIST_ACTION,
+  actionsProvider.registerChildAction('export', 'list-exports-current',
     ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout',
       ($scope, $window, enhance, rest, $log, messages, $timeout) ->
         return undefined unless $scope.list?
