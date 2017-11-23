@@ -1,9 +1,13 @@
 package org.modelcatalogue.core.persistence
 
 import grails.transaction.Transactional
+import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.springframework.context.MessageSource
 
-class CsvTransformationGormService {
+class CsvTransformationGormService implements WarnGormErrors {
+
+    MessageSource messageSource
 
     @Transactional
     CsvTransformation findById(long id) {
@@ -14,7 +18,8 @@ class CsvTransformationGormService {
     CsvTransformation saveByName(String name) {
         CsvTransformation transformation = new CsvTransformation(name: name)
         if ( !transformation.save() ) {
-            log.error 'unable to save transformation'
+            warnErrors(transformation, messageSource)
+            transactionStatus.setRollbackOnly()
         }
         transformation
     }

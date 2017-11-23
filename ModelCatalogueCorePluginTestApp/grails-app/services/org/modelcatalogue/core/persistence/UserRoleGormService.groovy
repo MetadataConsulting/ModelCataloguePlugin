@@ -2,14 +2,12 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
-import groovy.transform.CompileStatic
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.springframework.context.MessageSource
 
-@CompileStatic
 class UserRoleGormService implements WarnGormErrors {
 
     MessageSource messageSource
