@@ -1,6 +1,8 @@
 #= require diffCtrl
 angular.module('modelcatalogue.core.ui.states.dataModel.resource.diff',
-['modelcatalogue.core.ui.states.dataModel.resource.diff.diffCtrl'])
+['modelcatalogue.core.ui.states.dataModel.resource.diff.diffCtrl',
+  'modelcatalogue.core.ui.states.dataModel.resource.diff.components.diffTable',
+  'modelcatalogue.core.ui.states.dataModel.resource.diff.html'])
   .config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'dataModel.resource.diff', {

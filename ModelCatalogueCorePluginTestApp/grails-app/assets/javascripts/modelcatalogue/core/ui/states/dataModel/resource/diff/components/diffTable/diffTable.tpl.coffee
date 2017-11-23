@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.diffTable', ['mc.core.ui.diffTable']).run [ '$templateCache', ($templateCache) ->
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.diff.components.diffTable.html', []).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/diffTable.html', '''
       <div class="diff-table">
         <table class="table diff-table">

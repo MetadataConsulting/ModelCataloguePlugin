@@ -1,4 +1,6 @@
-angular.module('mc.core.ui.diffTable', ['diff-match-patch', 'mc.util.ui.actions']).directive 'diffTable',  [-> {
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.diff.components.diffTable', ['diff-match-patch',
+  'modelcatalogue.core.ui.states.dataModel.resource.diff.components.diffTable.html',
+  'mc.util.ui.actions']).directive 'diffTable',  [-> {
   restrict: 'E'
   replace: true
   scope:

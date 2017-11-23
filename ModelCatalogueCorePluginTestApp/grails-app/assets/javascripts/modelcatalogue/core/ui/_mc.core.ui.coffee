@@ -19,7 +19,6 @@ angular.module('mc.core.ui', [
   'mc.core.ui.columnsConfiguration'
   'mc.core.ui.simpleObjectEditor'
   'mc.core.ui.elementsAsTags'
-  'mc.core.ui.diffTable'
   'modelcatalogue.core.sections.metadataEditors'
   'modelcatalogue.core.sections.detailSections'
   'modelcatalogue.core.sections.detailSections.metadata'

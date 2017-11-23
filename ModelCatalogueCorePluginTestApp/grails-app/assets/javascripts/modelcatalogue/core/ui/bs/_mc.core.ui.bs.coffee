@@ -69,7 +69,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptValidateValue'
   'mc.core.ui.bs.dataClassWizard'
   'mc.core.ui.bs.dataModelWizard'
-  'mc.core.ui.bs.diffTable'
   'mc.core.ui.bs.withClassificationCtrlMixin'
   'modelcatalogue.core.sections.metadataEditors'
   'mc.core.ui.bs.modalOptions'

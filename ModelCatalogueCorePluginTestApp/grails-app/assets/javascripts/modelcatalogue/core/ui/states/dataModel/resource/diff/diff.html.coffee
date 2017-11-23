@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.bs.diff.html', []).run(['$templateCache', ($templateCache) ->
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.diff.html', []).run(['$templateCache', ($templateCache) ->
 
   $templateCache.put 'modelcatalogue/core/ui/state/diff.html', '''
     <h2>Comparison</h2>
