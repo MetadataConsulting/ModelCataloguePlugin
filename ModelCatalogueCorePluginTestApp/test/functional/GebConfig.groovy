@@ -33,8 +33,11 @@ if(System.getenv('geb.env') == "chrome") {
     options.addArguments("--disable-extensions")
     options.addArguments("headless")
     options.addArguments("--disable-gpu")
+
+
     driver = {  new ChromeDriver(options) }
     ChromeDriverManager.getInstance().setup()
+    TimeUnit.SECONDS.sleep(1)
 
 environments {
 
