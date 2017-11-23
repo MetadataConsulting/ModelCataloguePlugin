@@ -5,7 +5,7 @@
         Saxon = window.Saxon
     };
 
-    angular.module("mc.util.xsltTransformer", []).factory('xsltTransformer', function($q, $log, $window, vkbeautify) {
+    angular.module("modelcatalogue.core.ui.states.dataModel.resource.xmlEditor.xsltTransformer", []).factory('xsltTransformer', function($q, $log, $window, vkbeautify) {
 
         function XsltTransformer() {
             var SaxonPromise;

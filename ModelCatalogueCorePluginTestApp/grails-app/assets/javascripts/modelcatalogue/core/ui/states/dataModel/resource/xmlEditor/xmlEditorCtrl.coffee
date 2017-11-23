@@ -1,4 +1,4 @@
-angular.module('modelcatalogue.core.ui.states.dataModel.resource.xmlEditor.xmlEditorCtrl', ['ui.ace', 'ngFileSaver', 'mc.util.xsltTransformer', 'mc.util.ui.actions'])
+angular.module('modelcatalogue.core.ui.states.dataModel.resource.xmlEditor.xmlEditorCtrl', ['ui.ace', 'ngFileSaver', 'modelcatalogue.core.ui.states.dataModel.resource.xmlEditor.xsltTransformer', 'mc.util.ui.actions'])
 .controller('modelcatalogue.core.ui.states.dataModel.resource.xmlEditor.xmlEditorCtrl', [
   '$log', '$scope', '$stateParams', '$state', '$timeout', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'FileSaver', 'Blob', 'xsltTransformer', 'actionRoleAccess',
   ($log, $scope, $stateParams, $state, $timeout, element, applicationTitle, $http, catalogue, security, FileSaver, Blob, xsltTransformer, actionRoleAccess) ->
