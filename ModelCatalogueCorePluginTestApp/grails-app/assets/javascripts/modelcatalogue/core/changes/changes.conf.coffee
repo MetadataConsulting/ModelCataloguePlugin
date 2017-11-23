@@ -17,7 +17,7 @@ changes = angular.module('mc.core.changes', ['mc.core.ui.columns', 'mc.util.ui.a
 Insert history-tab into template cache
 ###
 changes.run ['$templateCache', ($templateCache) ->
-  $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/history-tab.html', '''
+  $templateCache.put 'modelcatalogue/core/ui/elementView/history-tab.html', '''
       <div class="history-tab">
         <catalogue-element-treeview  no-resize id="{{tab.name}}-table" list="tab.value" descend="changes"></catalogue-element-treeview>
       </div>

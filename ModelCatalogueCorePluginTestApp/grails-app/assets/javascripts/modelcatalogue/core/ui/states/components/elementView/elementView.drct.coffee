@@ -1,6 +1,7 @@
-angular.module('modelcatalogue.core.ui.states.components.catalogueElementView', [
-  'modelcatalogue.core.ui.states.components.catalogueElementView.html',
-  'modelcatalogue.core.enhancersConf.catalogueElementEnhancer', 'modelcatalogue.core.enhancersConf.listReferenceEnhancer', 'modelcatalogue.core.enhancersConf.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'mc.util.ui.applicationTitle', 'ui.router', 'mc.core.ui.catalogueElementProperties', 'ngSanitize', 'mc.core.ui.messagesPanel', 'modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview.model']).directive 'catalogueElementView',  [-> {
+# used to be called catalogueElementView but it is used for all "elements" which includes "resources" (e.g. relationshipType) and "catalogueElements".
+angular.module('modelcatalogue.core.ui.states.components.elementView', [
+  'modelcatalogue.core.ui.states.components.elementView.html',
+  'modelcatalogue.core.enhancersConf.catalogueElementEnhancer', 'modelcatalogue.core.enhancersConf.listReferenceEnhancer', 'modelcatalogue.core.enhancersConf.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'mc.util.ui.applicationTitle', 'ui.router', 'mc.core.ui.catalogueElementProperties', 'ngSanitize', 'mc.core.ui.messagesPanel', 'modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview.model']).directive 'elementView',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -9,7 +10,7 @@ angular.module('modelcatalogue.core.ui.states.components.catalogueElementView', 
       id: '@'
       displayOnly: '=?'
 
-    templateUrl: '/modelcatalogue/core/ui/states/components/catalogueElementView/catalogueElementView.html'
+    templateUrl: '/modelcatalogue/core/ui/states/components/elementView/elementView.html'
 
     controller: [
      '$scope', '$filter', '$q', '$timeout', '$state', 'enhance', 'names', 'columns', 'messages', '$element', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'catalogueElementResource', 'detailSections', 'rest', 'modelCatalogueApiRoot', 'actionRoleAccess',

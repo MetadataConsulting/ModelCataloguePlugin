@@ -1,6 +1,6 @@
 ###
   Usages of simple-object-editor
-catalogueElementView.tpl.coffee defines some templates using simple-object-editor:
+elementView.tpl.coffee defines some templates using simple-object-editor:
   simple-object-editor.html and simple-object-editor-for-enumerations.html. These don't
   appear to be referenced anywhere.
 

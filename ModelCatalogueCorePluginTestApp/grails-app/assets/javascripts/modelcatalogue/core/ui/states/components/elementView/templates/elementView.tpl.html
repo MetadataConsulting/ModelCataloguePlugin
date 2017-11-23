@@ -1,4 +1,4 @@
-<div class="row catalogue-element-view">
+<div class="row element-view">
   <div ng-if="!displayOnly">
     <div class="col-md-12">
       <form editable-form name="editableForm" onaftersave="inlineUpdateElement()">
@@ -73,7 +73,7 @@
 
       <div ng-repeat="tab in tabs track by tab.name" class="tab-pane">
         <div id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
-          <ng-include src="'modelcatalogue/core/ui/catalogueElementView/' + tab.type + '.html'"></ng-include>
+          <ng-include src="'modelcatalogue/core/ui/elementView/' + tab.type + '.html'"></ng-include>
         </div>
       </div>
     </div>
@@ -100,7 +100,7 @@
               </span>
             </small>
           </h3>
-          <ng-include src="'modelcatalogue/core/ui/catalogueElementView/' + tab.type + '.html'"></ng-include>
+          <ng-include src="'modelcatalogue/core/ui/elementView/' + tab.type + '.html'"></ng-include>
         </div>
       </div>
     </div>
