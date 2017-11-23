@@ -7,7 +7,6 @@ angular.module('mc.core.ui', [
   'mc.core.ui.infiniteTable'
   'mc.core.ui.infiniteListCtrl'
   'mc.core.ui.columnsSupportCtrl'
-  'mc.core.ui.catalogueElementView'
   'mc.core.ui.batchView'
   'mc.core.ui.catalogueElementIcon'
   'mc.core.ui.catalogueElementPicker'

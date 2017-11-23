@@ -1,4 +1,6 @@
-angular.module('mc.core.ui.states.bs.show.html', []).run(['$templateCache', ($templateCache) ->
+angular.module('mc.core.ui.states.bs.show.html', [
+  'modelcatalogue.core.ui.states.components.catalogueElementView'
+]).run(['$templateCache', ($templateCache) ->
 
 
   $templateCache.put 'modelcatalogue/core/ui/state/show.html', '''

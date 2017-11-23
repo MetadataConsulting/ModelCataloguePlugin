@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueElementView', 'mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor', 'ui.bootstrap', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
+angular.module('modelcatalogue.core.ui.states.components.catalogueElementView.html', ['mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor', 'ui.bootstrap', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/simple-object-editor.html', '''
         <div>
           <simple-object-editor object="tab.value" title="Key" value-title="Value"></simple-object-editor>

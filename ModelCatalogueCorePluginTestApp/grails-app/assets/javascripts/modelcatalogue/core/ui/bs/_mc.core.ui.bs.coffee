@@ -10,7 +10,6 @@ angular.module('mc.core.ui.bs', [
   'ngCookies'
   'infinite-scroll'
   # list of modules
-  'mc.core.ui.bs.catalogueElementView'
   'mc.core.ui.bs.importCtrl'
   'mc.core.ui.bs.modalAlert'
   'mc.core.ui.bs.modalPromptNewExcelImport'
