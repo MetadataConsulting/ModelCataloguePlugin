@@ -3,7 +3,7 @@ package org.modelcatalogue.core.security
 import groovy.transform.CompileStatic
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.persistence.DataModelGormService
-import org.modelcatalogue.core.security.UserGormService
+import org.modelcatalogue.core.persistence.UserGormService
 import org.springframework.security.acls.model.Permission
 
 @CompileStatic

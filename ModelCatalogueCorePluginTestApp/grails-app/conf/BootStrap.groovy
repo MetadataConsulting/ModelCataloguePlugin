@@ -6,8 +6,8 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.security.MetadataRoles
-import org.modelcatalogue.core.security.UserRoleGormService
-import org.modelcatalogue.core.security.UserGormService
+import org.modelcatalogue.core.persistence.UserRoleGormService
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.reports.RegisterReportsService
 import org.modelcatalogue.core.security.InitSecurityService
 import org.modelcatalogue.core.security.MetadataSecurityService

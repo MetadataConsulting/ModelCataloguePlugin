@@ -1,5 +1,9 @@
 package org.modelcatalogue.core.security
 
+import org.modelcatalogue.core.persistence.RoleGormService
+import org.modelcatalogue.core.persistence.UserGormService
+import org.modelcatalogue.core.persistence.UserRoleGormService
+
 class InitSecurityService {
 
     RoleGormService roleGormService

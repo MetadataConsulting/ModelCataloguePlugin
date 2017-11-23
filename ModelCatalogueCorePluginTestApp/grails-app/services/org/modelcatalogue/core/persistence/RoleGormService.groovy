@@ -1,9 +1,15 @@
-package org.modelcatalogue.core.security
+package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import org.modelcatalogue.core.WarnGormErrors
+import org.modelcatalogue.core.security.Role
+import org.springframework.context.MessageSource
+import org.springframework.transaction.interceptor.TransactionAspectSupport
 
-class RoleGormService {
+class RoleGormService implements WarnGormErrors {
+
+    MessageSource messageSource
 
     @Transactional(readOnly = true)
     Role findByAuthority(String authority) {
@@ -18,7 +24,8 @@ class RoleGormService {
     Role saveByAuthority(String authority) {
         Role role = new Role(authority: authority)
         if ( !role.save() ) {
-            log.error('unable to save role')
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
+            warnErrors(role, messageSource)
         }
         role
     }

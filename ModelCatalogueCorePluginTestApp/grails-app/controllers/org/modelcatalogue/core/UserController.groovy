@@ -8,7 +8,7 @@ import org.modelcatalogue.core.catalogueelement.UserCatalogueElementService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserGormService
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.security.UserService
 import org.modelcatalogue.core.util.DataModelFilter

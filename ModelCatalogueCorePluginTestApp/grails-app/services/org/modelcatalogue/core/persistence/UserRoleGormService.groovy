@@ -1,11 +1,19 @@
-package org.modelcatalogue.core.security
+package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
+import org.modelcatalogue.core.WarnGormErrors
+import org.modelcatalogue.core.security.Role
+import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserRole
+import org.springframework.context.MessageSource
+import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 @CompileStatic
-class UserRoleGormService {
+class UserRoleGormService implements WarnGormErrors {
+
+    MessageSource messageSource
 
     RoleGormService roleGormService
 
@@ -19,21 +27,21 @@ class UserRoleGormService {
         }
         User user = userGormService.findByUsername(username)
         if ( user == null ) {
-            log.warn('unable to find user with username' + username)
+            log.warn("unable to find user with username ${username}".toString())
             return
         }
         Role role = roleGormService.findByAuthority(authority)
         if ( role == null ) {
-            log.warn('unable to find role with authority' + authority)
+            log.warn("unable to find role with authority ${authority}".toString())
             return
         }
         userRole = new UserRole(role: role, user: user)
         if ( !userRole.save() ) {
-            log.error('error while saving user role')
+            warnErrors(userRole, messageSource)
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
         }
         userRole
     }
-
 
 
     protected DetachedCriteria<UserRole> findQueryByUsernameAndAuthority(String username, String authority) {

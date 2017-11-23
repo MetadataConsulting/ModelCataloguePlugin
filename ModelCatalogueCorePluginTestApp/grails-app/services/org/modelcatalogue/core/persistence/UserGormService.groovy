@@ -1,9 +1,16 @@
-package org.modelcatalogue.core.security
+package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import org.modelcatalogue.core.WarnGormErrors
+import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserService
+import org.springframework.context.MessageSource
+import org.springframework.transaction.interceptor.TransactionAspectSupport
 
-class UserGormService {
+class UserGormService implements WarnGormErrors {
+
+    MessageSource messageSource
 
     @Transactional
     User findById(long id) {
@@ -56,7 +63,8 @@ class UserGormService {
     @Transactional
     User save(User user) {
         if ( !user.save() ) {
-            log.error('unable to save user')
+            warnErrors(user, messageSource)
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
         }
         user
     }

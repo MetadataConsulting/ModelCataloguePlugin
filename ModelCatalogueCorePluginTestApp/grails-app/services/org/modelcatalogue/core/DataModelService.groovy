@@ -10,14 +10,13 @@ import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserGormService
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.lists.DetachedListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
 import org.modelcatalogue.core.util.lists.ListWrapper
-import org.modelcatalogue.core.util.lists.Lists
 
 import javax.annotation.PostConstruct
 
