@@ -345,6 +345,8 @@ log4j.main = {
 
     info 'org.modelcatalogue'
     info 'grails.app.domain.org.modelcatalogue'
+    warn 'org.modelcatalogue.core.persistence'
+    warn 'org.modelcatalogue.core.security'
 
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP
