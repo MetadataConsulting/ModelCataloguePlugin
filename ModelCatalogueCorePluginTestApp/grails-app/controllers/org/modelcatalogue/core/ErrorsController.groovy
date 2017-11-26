@@ -1,10 +1,9 @@
 package org.modelcatalogue.core
 
-import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.acls.model.NotFoundException
 import groovy.transform.CompileStatic
 import grails.plugin.springsecurity.annotation.Secured
 import static org.springframework.http.HttpStatus.UNAUTHORIZED
+import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 
 @Secured('permitAll')
@@ -20,7 +19,7 @@ class ErrorsController {
     }
 
     def handleNotFoundException() {
-        render status: UNAUTHORIZED
+        render status: NOT_FOUND
     }
 
     def error500() {

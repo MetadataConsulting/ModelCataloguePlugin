@@ -132,8 +132,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             respond instance.errors
             return
         }
-
-        dataModelAclService.addAdministrationPermission(instance)
+        
 
         bindRelations(instance, false)
 

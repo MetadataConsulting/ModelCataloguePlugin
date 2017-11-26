@@ -9,6 +9,7 @@ import org.springframework.security.acls.domain.DefaultPermissionFactory
 import org.springframework.security.acls.domain.PrincipalSid
 import org.springframework.security.acls.model.AccessControlEntry
 import org.springframework.security.acls.model.MutableAcl
+import org.springframework.security.acls.model.NotFoundException
 import org.springframework.security.acls.model.Permission
 
 class DataModelPermissionService {
@@ -47,19 +48,23 @@ class DataModelPermissionService {
 
     @PreAuthorize("hasRole('ROLE_SUPERVISOR')")
     List<UserPermissionList> findAllUserPermissions(Long dataModelId) {
-        MutableAcl acl = (MutableAcl)aclUtilService.readAcl(DataModel, dataModelId)
-        Map<String, UserPermissionList> m = [:] as HashMap<String, UserPermissionList>
-        acl.entries.eachWithIndex { AccessControlEntry entry, int i ->
-            if ( entry.sid instanceof PrincipalSid ) {
-                String username = ((PrincipalSid)entry.sid).principal
-                if ( !m.containsKey(username) ) {
-                    m[username] = new UserPermissionList(username: username, permissionList: [])
+        try {
+            MutableAcl acl = (MutableAcl)aclUtilService.readAcl(DataModel, dataModelId)
+            Map<String, UserPermissionList> m = [:] as HashMap<String, UserPermissionList>
+            acl.entries.eachWithIndex { AccessControlEntry entry, int i ->
+                if ( entry.sid instanceof PrincipalSid ) {
+                    String username = ((PrincipalSid)entry.sid).principal
+                    if ( !m.containsKey(username) ) {
+                        m[username] = new UserPermissionList(username: username, permissionList: [])
+                    }
+                    m[username].permissionList.add(entry.permission)
                 }
-                m[username].permissionList.add(entry.permission)
+
             }
 
+            m.values() as List<UserPermissionList>
+        } catch (NotFoundException notFoundException ) {
+            return [] as List<UserPermissionList>
         }
-
-        m.values() as List<UserPermissionList>
     }
 }

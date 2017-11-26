@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import com.google.common.base.Function
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
+import grails.plugin.springsecurity.acl.AclEntry
 import grails.util.GrailsNameUtils
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.proxy.HibernateProxyHelper
@@ -13,6 +14,8 @@ import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import rx.Observer
+
+import java.security.acl.Acl
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
@@ -453,6 +456,12 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     void afterMerge(CatalogueElement destination) {}
 
     void afterInsert() {
+        if ( this instanceof DataModel ) {
+            final Long dataModelId = this.id
+            AclEntry.withNewSession {
+                dataModelAclService.addAdministrationPermission(dataModelId)
+            }
+        }
         auditService.logElementCreated(this)
     }
 

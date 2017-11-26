@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.security
 
-import com.google.common.collect.ImmutableSet
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.acl.AclService
@@ -9,16 +8,12 @@ import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.util.DataModelFilter
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.acls.domain.BasePermission
-import org.springframework.security.acls.model.Acl
-import org.springframework.security.acls.model.AlreadyExistsException
-import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import org.springframework.security.acls.model.Permission
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.transaction.annotation.Propagation
 
 class DataModelAclService {
 
@@ -99,11 +94,24 @@ class DataModelAclService {
         addPermission(dataModel, BasePermission.ADMINISTRATION)
     }
 
+    void addAdministrationPermission(Long dataModelId) {
+        addPermission(dataModelId, BasePermission.ADMINISTRATION)
+    }
+
     void addReadPermission(DataModel dataModel) {
         addPermission(dataModel, BasePermission.READ)
     }
 
-    @PreAuthorize('hasRole("ROLE_SUPERVISOR")')
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void addPermission(Long dataModelId, Permission permission) {
+        String username = loggedUsername()
+        if ( username == null ) {
+            log.warn 'username is not set, cannot add permission'
+            return
+        }
+        aclUtilService.addPermission(DataModel, dataModelId, username, permission)
+    }
+
     @Transactional
     void addPermission(DataModel dataModel, Permission permission) {
         if ( hasPermission(dataModel, permission ) ) {
