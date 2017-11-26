@@ -30,6 +30,10 @@ class DataModelPermissionController {
         Long id = params.long('id')
         List<String> usernameList = userGormService.findAllUsername()
         DataModel dataModel = dataModelGormService.findById(id)
+        if ( !dataModel ) {
+            redirect action: 'index'
+            return
+        }
         List<UserPermissionList> userPermissionsList = dataModelPermissionService.findAllUserPermissions(id)
         [
                 usernameList: usernameList,
