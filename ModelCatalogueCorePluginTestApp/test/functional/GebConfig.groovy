@@ -18,12 +18,12 @@ reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/'
 
 //ChromeDriverManager.getInstance().setup()
-println "GEB SETUP general"
-
+println "GEB SETUP chrome"
 //environments not registering on Jenkins hence
 if(System.getenv('geb.env') == "chrome") {
     println "GEB SETUP chrome - geb.env"
 }
+
     ChromeOptions options = new ChromeOptions()
     options.addArguments("start-maximized")
     options.addArguments("window-size=1920,1080")
@@ -34,20 +34,11 @@ if(System.getenv('geb.env') == "chrome") {
     driver = {  new ChromeDriver(options) }
     ChromeDriverManager.getInstance().setup()
 
-
 environments {
 
     chrome {
         println "GEB SETUP chrome"
-        ChromeOptions options = new ChromeOptions()
-        options.addArguments("start-maximized")
-        options.addArguments("window-size=1920,1080")
-        options.addArguments("test-type")
-        options.addArguments("--disable-extensions")
-        options.addArguments("headless")
-        options.addArguments("--disable-gpu")
-        driver = {  new ChromeDriver(options) }
-        ChromeDriverManager.getInstance().setup()
+
     }
 
     phantomJs {
@@ -60,17 +51,6 @@ environments {
         driver = { new FirefoxDriver() }
     }
 }
-
-println "GEB SETUP chrome"
-//        ChromeOptions options = new ChromeOptions()
-//        options.addArguments("start-maximized")
-//        options.addArguments("window-size=1920,1080")
-//        options.addArguments("test-type")
-//        options.addArguments("--disable-extensions")
-//        options.addArguments("headless")
-//        options.addArguments("--disable-gpu")
-//        driver = {  new ChromeDriver(options) }
-//        ChromeDriverManager.getInstance().setup()
 
 waiting {
     timeout = 15

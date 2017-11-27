@@ -217,7 +217,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       type:       'primary'
       watches:    ['element.enabled']
       action:     ->
-        title = if $scope.element.enabled then "Disable User" else "Disable User"
+        title = if $scope.element.enabled then "Disable User" else "Enable User"
         desc = if $scope.element.enabled then "Do you want to disable user?" else "Do you want to enable user?"
         messages.confirm(title, desc).then ->
           if $scope.element.enabled
