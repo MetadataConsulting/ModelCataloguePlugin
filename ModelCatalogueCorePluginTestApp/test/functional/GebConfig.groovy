@@ -18,6 +18,8 @@ reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/'
 
 //ChromeDriverManager.getInstance().setup()
+println "GEB SETUP general"
+
 println "GEB SETUP chrome"
 //environments not registering on Jenkins hence
 if(System.getenv('geb.env') == "chrome") {
@@ -31,14 +33,17 @@ if(System.getenv('geb.env') == "chrome") {
     options.addArguments("--disable-extensions")
     options.addArguments("headless")
     options.addArguments("--disable-gpu")
+
+
     driver = {  new ChromeDriver(options) }
     ChromeDriverManager.getInstance().setup()
+    TimeUnit.SECONDS.sleep(1)
 
 environments {
 
     chrome {
         println "GEB SETUP chrome"
-
+       
     }
 
     phantomJs {
