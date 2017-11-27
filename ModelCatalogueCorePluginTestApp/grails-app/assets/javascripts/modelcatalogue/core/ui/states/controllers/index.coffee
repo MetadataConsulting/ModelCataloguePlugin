@@ -3,7 +3,6 @@ angular.module('modelcatalogue.core.ui.states.controllers', [
   'mc.util'
   'mc.core.ui'
   # list of modules
-  'modelcatalogue.core.ui.states.controllers.DashboardCtrl'
   'modelcatalogue.core.ui.states.controllers.ShowCtrl'
   'modelcatalogue.core.ui.states.controllers.BatchCtrl'
   'modelcatalogue.core.ui.states.controllers.BatchOnlyCtrl'
