@@ -7,6 +7,8 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.security.User
+import groovy.json.JsonSlurper
+
 
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
@@ -125,7 +127,7 @@ environments {
         mc.allow.signup = true
 
         grails.plugin.console.enabled = true
-//        mc.search.elasticsearch.host = "127.0.0.1"
+        mc.search.elasticsearch.host = "127.0.0.1"
         // Elasticsearch bind port, defaults to 9300
 //        mc.search.elasticsearch.port = "9300"
         mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
@@ -187,16 +189,88 @@ environments {
         }
     }
     production {
+        //Pickup setting from environment variables
         grails.logging.jul.usebridge = false
 
-        // ---
-        // you can overrides in your mc-config.groovy
         mc.sync.relationshipTypes=true
         grails.assets.minifyJs = true
         // configure the default storage
         mc.storage.directory = "/tmp/mc/storage"
         mc.storage.maxSize = 50 * 1024 * 1024
         // ---
+        grails.logging.jul.usebridge = false
+        println "ServerURL:" + grails.serverURL
+        println "MDX_SERVER_URL:" + System.getenv('MDX_SERVER_URL')
+        grails.serverURL = System.getenv('MDX_SERVER_URL')//"https://localhost:8899/mc"
+        //println "ServerURL:" + grails.serverURL
+        println "ServerURL:${grails.serverURL} END"
+        println "MDX_DB_URL:" + System.getenv('MDX_DB_URL')
+        println "MDX_DB_USERNAME:" + System.getenv('MDX_DB_USERNAME')
+        println "MDX_DB_PASSWORD:" + System.getenv('MDX_DB_PASSWORD')
+        println "MDX_ELASTIC_HOST:" + System.getenv('MDX_ELASTIC_HOST')
+        println "MDX_ELASTIC_PORT:" + System.getenv('MDX_ELASTIC_PORT')
+        println "MC_MAIL_FROM:" + System.getenv('MC_MAIL_FROM')
+        println "MDX_MAIL_HOST:" + System.getenv('MDX_MAIL_HOST')
+        println "MDX_MAIL_PORT:" + System.getenv('MDX_MAIL_PORT')
+        println "MDX_MAIL_USERNAME:" + System.getenv('MDX_MAIL_USERNAME')
+        println "MDX_MAIL_PASSWORD:" + System.getenv('MDX_MAIL_PASSWORD')
+        println "MDX_NAME:" + System.getenv('MDX_NAME')
+        println "MDX_WELCOME:" + System.getenv('MDX_WELCOME')
+        println "MDX_INFO:" + System.getenv('MDX_INFO')
+        println "MDX_ALLOW_SIGNUP:" + System.getenv('MDX_ALLOW_SIGNUP')
+
+        grails.plugin.springsecurity.auth.loginFormUrl = grails.serverURL + "/login/auth"
+        println grails.serverURL + "/login/ajaxSuccess"
+        grails.plugin.springsecurity.successHandler.ajaxSuccessUrl = grails.serverURL + "/login/ajaxSuccess"
+        grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl = grails.serverURL + "/login/authfail"
+        grails.plugin.springsecurity.logout.afterLogoutUrl = grails.serverURL
+        grails.plugin.springsecurity.successHandler.defaultTargetUrl = grails.serverURL
+        //println "ServerURL" + grails.serverURL
+
+        mc.search.elasticsearch.host=System.getenv('MDX_ELASTIC_HOST')
+        mc.ssearch.elasticsearch.port=System.getenv('MDX_ELASTIC_PORT')
+
+        grails.plugin.console.enabled=true
+        mc.legacy.dataModels=true
+        grails.mail.default.from = System.getenv("MC_MAIL_FROM")//"admin@datalink.org.uk"//System.getenv("MC_MAIL_FROM")
+        grails.plugin.springsecurity.ui.register.emailFrom = System.getenv("MC_MAIL_FROM")//"david@metadataconsulting.co.uk"//System.getenv("MC_MAIL_FROM")
+        grails.plugin.springsecurity.ui.forgotPassword.emailFrom = System.getenv("MC_MAIL_FROM")//"david@metadataconsulting.co.uk"//System.getenv("MC_MAIL_FROM")
+
+        grails {
+            mail {
+                host = System.getenv('MDX_MAIL_HOST')//"vps.beenleigh.com"
+                port = System.getenv('MDX_MAIL_PORT')//"25" as Integer
+                username = System.getenv('MDX_MAIL_USERNAME')//"testadmin@datalink.org.uk"//System.getenv("MC_MAIL_USERNAME")
+                password = System.getenv('MDX_MAIL_PASSWORD')//"adm1nAtB33nl31gh"//System.getenv("MC_MAIL_PASSWORD")
+                if (System.getenv("MC_MAIL_PROPS")) {
+                    props = new JsonSlurper().parseText(System.getenv("MC_MAIL_PROPS"))
+                }
+            }
+        }
+
+
+
+        mc.name = System.getenv('MDX_NAME')//"Metadata Exchange"
+        mc.welcome.jumbo = System.getenv('MDX_WELCOME')//"The Metadata Exchange is loaded with some test data"
+        mc.welcome.info = System.getenv('MDX_INFO')//"Welcome to the Metadata Exchange"
+        mc.allow.signup = System.getenv('MDX_ALLOW_SIGNUP')//true
+
+
+
+        if (System.getenv("MC_CSS_CUSTOM")) {
+            mc.css.custom = System.getenv("MC_CSS_CUSTOM")
+        }
+
+        if (System.getenv('MC_MAX_ACTIVE_USERS')) {
+            mc.max.active.users = System.getenv('MC_MAX_ACTIVE_USERS')
+        }
+
+        if (System.getenv('MC_PRELOAD')) {
+            try {
+                mc.preload = new JsonSlurper().parseText(System.getenv('MC_PRELOAD'))
+            } catch (ignored) {}
+        }
+
 
         grails.assets.minifyOptions = [
                 strictSemicolons: false,
@@ -260,6 +334,9 @@ log4j.main = {
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
 
+
+
+
 //    if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
 //        trace 'org.hibernate.type'
 //        trace 'org.hibernate.stat'
@@ -268,6 +345,8 @@ log4j.main = {
 
     info 'org.modelcatalogue'
     info 'grails.app.domain.org.modelcatalogue'
+    warn 'org.modelcatalogue.core.persistence'
+    warn 'org.modelcatalogue.core.security'
 
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP
@@ -280,6 +359,8 @@ log4j.main = {
             'org.springframework',
             'org.hibernate',
             'net.sf.ehcache.hibernate'
+
+    info 'grails.app.conf.BootStrap'
 }
 grails.views.gsp.encoding = "UTF-8"
 
@@ -289,6 +370,10 @@ grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatal
 grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.security.Role'
 grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
+
+//this is so that spring econtext can be accessed in seperate threads i.e. in the executer service
+grails.plugin.springsecurity.sch.strategyName = org.springframework.security.core.context.SecurityContextHolder.MODE_INHERITABLETHREADLOCAL
+
 
 // this doesn't work properly, only reliable way is to his in setup-frontend.sh script
 def assetExcludes = [
@@ -380,25 +465,28 @@ mc.welcome.jumbo = """
 """
 
 mc.welcome.info = """
-<div class="col-sm-4">
-<h2>Data Quality</h2>
-<p>Build up datasets using existing data elements from existing datasets and add them to new data elements to compose new data models.</p>
-<p>
 
-</p>
-</div>
-<div class="col-sm-4">
-<h2>Dataset Curation</h2>
-<p>Link and compose data-sets to create uniquely identified and versioned "metadata-sets", thus ensuring preservation of data semantics between applications</p>
-<p>
+        <div class="panel panel-default">
+          <div class="panel-heading">NHS Digital Sandbox</div>
+          <div class="panel-body">
+            <p width=50% style="text-align: center" >This is a sandbox instance of the metadata exchange, in short we are aiming to demo the following: </p>
+                <li>Metadata Data Management</li>
+                <li>Modelling</li>
+                <li>Master Data Management</li>
+                <li>Rules Management</li>
+            </p>
+            <p>User documentation is available <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages">here</a>:
 
-</p>
-</div>
-      <div class="col-sm-4">
-<h2>Dataset Comparison</h2>
-<p>Discover synonyms, hyponyms and duplicate data elements within datasets, and compare data elements from differing datasets.</p>
-<p></p>
-</div>
+            </p>
+            <p>...probably the best place to start is <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/32997386/Starting+Out+-+A+quick+look+around">here</a>
+
+            </p>
+            <p>and <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/45419911/Editing+Metadata">here</a>
+
+            </p>
+          </div>
+        </div>
+
 """
 
 grails.plugin.springsecurity.ui.register.defaultRoleNames = [] // no roles

@@ -72,4 +72,16 @@ class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIn
         false
     }
 
+    def getPaginationParameters(String baseLink) {
+        [
+                // no,size, max , off. tot. next                           , previous
+                [1, 10, 10, 0, 11, "${baseLink}?max=10&offset=10", ""],
+                [2, 5, 5, 0, 11, "${baseLink}?max=5&offset=5", ""],
+                [3, 5, 5, 5, 11, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
+                [4, 4, 4, 8, 11, "", "${baseLink}?max=4&offset=4"],
+                [5, 2, 10, 10, 11, "", "${baseLink}?max=10&offset=0"],
+                [6, 2, 2, 10, 11, "", "${baseLink}?max=2&offset=8"]
+        ]
+    }
+
 }

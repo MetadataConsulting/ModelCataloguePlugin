@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.util.test
 
-import grails.compiler.GrailsCompileStatic
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
@@ -26,7 +25,7 @@ import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.security.User
 
-@GrailsCompileStatic class TestData {
+class TestData {
 
     static void createTestData() {
         Batch B_archived = new Batch(name: "Archived Batch").save(failOnError: true)

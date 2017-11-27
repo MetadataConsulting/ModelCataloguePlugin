@@ -1,11 +1,17 @@
 package org.modelcatalogue.core
 
+import grails.plugin.springsecurity.annotation.Secured
 import org.springframework.http.HttpStatus
 
 class RelationshipController {
 
     static responseFormats = ['json']
 
+    def modelCatalogueSecurityService
+
+    //TODO: check that we need this method at all
+    //not sure that we do
+    //only allowing supervisors to do this
     def restore() {
         Long id = params.long('id')
 

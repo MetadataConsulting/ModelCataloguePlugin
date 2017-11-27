@@ -29,7 +29,8 @@ grails.project.fork = [
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
 
-    final String gebVersion = '0.13.1'
+    final String gebVersion = '1.0'
+    final String seleniumVersion = '2.51.0'
 
     // inherit Grails' default dependencies
     inherits("global") {
@@ -84,6 +85,7 @@ grails.project.dependency.resolution = {
         compile 'org.apache.poi:poi:3.13'
         compile 'org.apache.poi:poi-ooxml:3.13'
         compile 'org.apache.poi:ooxml-schemas:1.1'
+        compile 'org.apache.commons:commons-lang3:3.0'
 
         compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
         compile 'net.sourceforge.owlapi:owlapi-api:3.5.1'
@@ -136,18 +138,10 @@ grails.project.dependency.resolution = {
         runtime 'mysql:mysql-connector-java:5.1.24'
         runtime "org.apache.httpcomponents:httpclient:4.3.1"
 
-        // Selenium WebDriver, for use in Geb
-        def webDriverVersion = System.getenv('WEB_DRIVER_VERSION') ?: "2.53.1"
-
         // Testing modules
         test "org.gebish:geb-spock:$gebVersion"
-        test "org.seleniumhq.selenium:selenium-support:${webDriverVersion}"
-        test "org.seleniumhq.selenium:selenium-firefox-driver:${webDriverVersion}"
-        test "org.seleniumhq.selenium:selenium-chrome-driver:${webDriverVersion}"
-        test "org.seleniumhq.selenium:selenium-remote-driver:${webDriverVersion}"
+        test "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
-
-        test 'io.github.bonigarcia:webdrivermanager:1.5.1'
     }
 
     plugins {
@@ -176,8 +170,7 @@ grails.project.dependency.resolution = {
 
         runtime ":angular-template-asset-pipeline:2.3.0"
 
-//        runtime ":hibernate4:4.3.5.5"
-        runtime  ":hibernate:3.6.10.18"
+        runtime ":hibernate4:4.3.10" // or ":hibernate:3.6.10.18"
 
         compile ":executor:0.3"
 
@@ -198,6 +191,9 @@ grails.project.dependency.resolution = {
         compile ':spring-security-oauth-google:0.1'
         compile ':spring-security-oauth-twitter:0.1'
         compile ':spring-security-oauth-facebook:0.1'
+
+        compile ':spring-security-acl:2.0.1'
+        compile 'org.grails.plugins:rest-client-builder:2.1.1'
     }
 }
 

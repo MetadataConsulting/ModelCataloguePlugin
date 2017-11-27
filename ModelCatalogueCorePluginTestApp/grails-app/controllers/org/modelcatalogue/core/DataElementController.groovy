@@ -1,8 +1,10 @@
 package org.modelcatalogue.core
 
-import grails.util.Environment
 import org.hibernate.SessionFactory
-import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.catalogueelement.DataElementCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
+import org.modelcatalogue.core.persistence.DataElementGormService
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
@@ -11,13 +13,17 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
 
     DataElementService dataElementService
     SessionFactory sessionFactory
+    DataModelGormService dataModelGormService
+    DataElementGormService dataElementGormService
+    DataElementCatalogueElementService dataElementCatalogueElementService
 
     DataElementController() {
         super(DataElement, false)
     }
 
     def content() {
-        DataElement dataElement = DataElement.get(params.id)
+        long dataElementId = params.long('id')
+        DataElement dataElement = dataElementGormService.findById(dataElementId)
         if (!dataElement) {
             notFound()
             return
@@ -31,7 +37,7 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
             return []
         }
 
-        respond Lists.wrap(params, "/${resourceName}/${params.id}/content", list)
+        respond Lists.wrap(params, "/${resourceName}/${dataElementId}/content", list)
     }
 
     @Override
@@ -39,13 +45,17 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
         return isDatabaseFallback() && params.containsKey('tag')
     }
 
+    @Override
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        dataElementCatalogueElementService
+    }
 
     @Override
     protected ListWrapper<DataElement> getAllEffectiveItems(Integer max) {
         if (isDatabaseFallback()) {
             return super.getAllEffectiveItems(max)
         }
-        return Lists.wrap(params, "/${resourceName}/", dataElementService.findAllDataElementsInModel(params, DataModel.get(params.long('dataModel'))))
+        return Lists.wrap(params, "/${resourceName}/", dataElementService.findAllDataElementsInModel(params, dataModelGormService.findById(params.long('dataModel'))))
     }
 
     private boolean isDatabaseFallback() {
@@ -81,6 +91,10 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
                 eq 'relationshipType', RelationshipType.tagType
             }
         }
+    }
+
+    protected DataElement findById(long id) {
+        dataElementGormService.findById(id)
     }
 
 }

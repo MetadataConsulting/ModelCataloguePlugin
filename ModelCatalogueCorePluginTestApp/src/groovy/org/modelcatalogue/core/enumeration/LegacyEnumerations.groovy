@@ -23,18 +23,21 @@ import groovy.transform.CompileStatic
     @CompileDynamic
     static Map<String, String> stringToMap(String s) {
         if (!s) return ImmutableMap.of()
-        Map<String, String> ret = [:]
-        s.split(/\|/).each { String part ->
-            if (!part) return
-            String[] pair = part.split("(?<!\\\\):")
-            if (pair.length > 2) throw new IllegalArgumentException("Wrong enumerated value '$part' in encoded enumeration '$s'")
-            if (pair.length == 1) {
-                ret[unquote(pair[0])] = ''
-            } else {
-                ret[unquote(pair[0])] = unquote(pair[1])
+        try {
+            Map<String, String> ret = [:]
+            s.split(/\|/).each { String part ->
+                if (!part) return
+                String[] pair = part.split("(?<!\\\\):")
+                if (pair.length > 2) throw new IllegalArgumentException("Wrong enumerated value '$part' in encoded enumeration '$s'")
+                if (pair.length == 1) {
+                    ret[unquote(pair[0])] = ''
+                } else {
+                    ret[unquote(pair[0])] = unquote(pair[1])
+                }
             }
-        }
-        return ImmutableMap.copyOf(ret)
+            return ImmutableMap.copyOf(ret)
+        }catch (Exception ignored) {}
+
     }
 
     static String quote(String s) {

@@ -2,11 +2,12 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class MenuBarSpec extends AbstractModelCatalogueGebSpec {
 

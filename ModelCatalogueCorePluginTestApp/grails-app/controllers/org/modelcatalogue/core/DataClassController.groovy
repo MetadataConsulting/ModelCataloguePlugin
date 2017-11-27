@@ -1,9 +1,11 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.DataClassCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
-import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
+import org.modelcatalogue.core.persistence.DataClassGormService
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWrapper
@@ -13,8 +15,9 @@ import org.modelcatalogue.core.util.lists.Relationships
 
 class DataClassController extends AbstractCatalogueElementController<DataClass> {
 
-    def dataClassService
     PerformanceUtilService performanceUtilService
+    DataClassGormService dataClassGormService
+    DataClassCatalogueElementService dataClassCatalogueElementService
 
     DataClassController() {
         super(DataClass, false)
@@ -25,7 +28,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         Boolean all = params.boolean('all')
 
-        DataClass dataClass = queryForResource(params.id)
+        DataClass dataClass = findById(params.long('id'))
         if (!dataClass) {
             notFound()
             return
@@ -47,7 +50,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         params.sort = 'outgoingIndex'
 
-        DataClass element = queryForResource(params.id)
+        DataClass element = findById(params.long('id'))
 
         if (!element) {
             notFound()
@@ -86,7 +89,11 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def inventoryDoc(String name, Integer depth) {
-        DataClass dataClass = DataClass.get(params.id)
+        if (handleReadOnly()) {
+            return
+        }
+
+        DataClass dataClass = dataClassGormService.findById(params.long('id'))
         def assetId =  assetService.storeReportAsAsset(
                 dataClass.dataModel,
                 name: name ? name : "${dataClass.name} report as MS Excel Document",
@@ -101,7 +108,11 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def inventorySpreadsheet(String name, Integer depth) {
-        DataClass dataClass = DataClass.get(params.id)
+        if (handleReadOnly()) {
+            return
+        }
+
+        DataClass dataClass = dataClassGormService.findById(params.long('id'))
 
         Long dataClassId = dataClass.id
         def assetId= assetService.storeReportAsAsset(
@@ -118,7 +129,11 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def changelogDoc(String name, Integer depth, Boolean includeMetadata) {
-        DataClass dataClass = DataClass.get(params.id)
+        if (handleReadOnly()) {
+            return
+        }
+
+        DataClass dataClass = dataClassGormService.findById(params.long('id'))
 
         Long dataClassId = dataClass.id
         def assetId = assetService.storeReportAsAsset(
@@ -136,10 +151,19 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     @Override
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        dataClassCatalogueElementService
+    }
+
+    @Override
     protected ListWrapper<DataClass> getAllEffectiveItems(Integer max) {
         if (!params.boolean("toplevel")) {
             return super.getAllEffectiveItems(max)
         }
         return Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelDataClasses(overridableDataModelFilter, params))
+    }
+
+    protected DataClass findById(long id) {
+        dataClassGormService.findById(id)
     }
 }

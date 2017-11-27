@@ -10,9 +10,9 @@ class ModelCatalogueCorePluginCustomObjectMarshallers {
     List<AbstractMarshaller> marshallers = []
 
     void register() {
-        marshallers.each {
-            autowireCapableBeanFactory.autowireBean(it)
-            it.register()
+        for ( AbstractMarshaller marshaller : marshallers ) {
+            autowireCapableBeanFactory.autowireBean(marshaller)
+            marshaller.register()
         }
     }
 

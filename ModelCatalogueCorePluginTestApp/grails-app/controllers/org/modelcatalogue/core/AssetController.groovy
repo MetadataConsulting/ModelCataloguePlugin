@@ -1,6 +1,9 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.catalogueelement.AssetCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.dataarchitect.SchemaValidatorService
+import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.web.multipart.MultipartFile
 
@@ -8,6 +11,8 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
 
     StorageService modelCatalogueStorageService
     SchemaValidatorService schemaValidatorService
+    AssetGormService assetGormService
+    AssetCatalogueElementService assetCatalogueElementService
 
     static allowedMethods = [upload: 'POST', download: 'GET']
 
@@ -29,10 +34,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     }
 
     def upload() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
+
         MultipartFile file = request.getFile('asset')
 
         Asset asset = assetService.upload(params.long('id'), params.long('dataModel'), params.name, params.description, file, params.filename ?: file.originalFilename)
@@ -51,16 +53,17 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     }
 
     def validateXml() {
-        Asset currentAsset = Asset.get(params.id)
+        Long assetId = params.long('id')
+        Asset currentAsset = findById(assetId)
         if (!currentAsset) {
-            respond(errors: [[message: "Current asset ${params.id} not found"]])
+            respond(errors: [[message: "Current asset ${assetId} not found"]])
             return
         }
 
         Asset asset =  getAssetWithContent(currentAsset)
 
         if (!asset) {
-            respond(errors: [[message: "Asset with content for ${params.id} not found"]])
+            respond(errors: [[message: "Asset with content for ${assetId} not found"]])
             return
         }
 
@@ -84,6 +87,10 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         serveOrDownload(false)
     }
 
+    protected Asset findById(long id) {
+        assetGormService.findById(id)
+    }
+
     @Override
     def delete() {
         def response = super.delete()
@@ -94,7 +101,8 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     }
 
     protected serveOrDownload(boolean serve) {
-        Asset currentAsset = Asset.get(params.id)
+        Long assetId = params.long('id')
+        Asset currentAsset = findById(assetId)
         if (!currentAsset) {
             notFound()
             return
@@ -152,12 +160,18 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         return null
     }
 
+    @Override
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        assetCatalogueElementService
+    }
+
     def history(Integer max) {
         String name = getResourceName()
         Class type = resource
 
+        Long assetId = params.long('id')
         params.max = Math.min(max ?: 10, 100)
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = findById(assetId)
         if (!element) {
             notFound()
             return
@@ -166,7 +180,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         Long id = element.id
 
         if (!element.latestVersionId) {
-            respond Lists.wrap(params, "/${name}/${params.id}/history", Lists.lazy(params, type, {
+            respond Lists.wrap(params, "/${name}/${assetId}/history", Lists.lazy(params, type, {
                 [type.get(id)]
             }, { 1 }))
             return
@@ -180,9 +194,8 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         customParams.sort = 'versionNumber'
         customParams.order = 'desc'
 
-        respond Lists.fromCriteria(customParams, type, "/${name}/${params.id}/history") {
+        respond Lists.fromCriteria(customParams, type, "/${name}/${assetId}/history") {
             eq 'latestVersionId', latestVersionId
         }
     }
-
 }

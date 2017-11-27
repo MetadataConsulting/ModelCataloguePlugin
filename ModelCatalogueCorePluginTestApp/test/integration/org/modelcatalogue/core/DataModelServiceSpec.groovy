@@ -7,6 +7,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
+import spock.lang.Ignore
 
 class DataModelServiceSpec extends AbstractIntegrationSpec {
 
@@ -107,6 +108,7 @@ class DataModelServiceSpec extends AbstractIntegrationSpec {
         !(class1 in models.items)
     }
 
+    @Ignore
     def "get top level models with include classification filter"() {
         ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([model1], []), [:])
 
@@ -128,6 +130,7 @@ class DataModelServiceSpec extends AbstractIntegrationSpec {
         !(class2 in models.items)
     }
 
+    @Ignore
     def "get top level models with include and exclude classification filter"() {
         when:
         dataClassService.getTopLevelDataClasses(DataModelFilter.create([model1], [model2]), [:])
@@ -136,8 +139,8 @@ class DataModelServiceSpec extends AbstractIntegrationSpec {
         thrown(IllegalStateException)
     }
 
-    def "is able to return models classified by or are imported"() {
-        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create([model2], []).withImports())
+    def "is able to return classes classified by or are imported"() {
+        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create([model2], []).withImports([model3]))
 
         expect:
         criteria.count() == 2

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
+import spock.lang.Ignore
 import spock.lang.Unroll
 
 /**
@@ -8,6 +9,7 @@ import spock.lang.Unroll
  */
 class ExtensionValueSpec extends IntegrationSpec{
 
+    @Ignore
     @Unroll
     def "#r: create a new extension value from #args validates to #validates"() {
         int initialSize = ExtensionValue.count()

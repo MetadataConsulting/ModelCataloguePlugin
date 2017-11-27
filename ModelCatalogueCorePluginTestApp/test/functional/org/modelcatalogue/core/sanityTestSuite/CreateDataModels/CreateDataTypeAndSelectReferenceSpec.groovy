@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.getCreate
@@ -15,6 +17,8 @@ import static org.modelcatalogue.core.geb.Common.getSave
 import static org.modelcatalogue.core.geb.Common.messages
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec {
     private static final String reference= "input#pickReferenceType"

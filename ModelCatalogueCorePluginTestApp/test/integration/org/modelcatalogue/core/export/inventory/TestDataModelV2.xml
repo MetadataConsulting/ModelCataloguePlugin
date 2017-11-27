@@ -107,7 +107,7 @@ This is a number used to identify a PATIENT uniquely within a Health Care Provid
                       <enumeration value="04">Trace attempted - No match or multiple match found</enumeration>
                       <enumeration value="05">Trace needs to be resolved - (NHS Number or patient detail conflict)</enumeration>
                       <enumeration value="06" deprecated="true">Trace in progress</enumeration>
-                      <enumeration value="08" deprecated="true">Trace postponed (baby too tiny)</enumeration>
+                      <enumeration value="08" >Trace postponed (baby too tiny)</enumeration>
                       <enumeration value="10">Trace needs to be resolved - (NHS Number or patient detail conflict)</enumeration>
                     </enumerations>
                   </dataType>
@@ -613,7 +613,7 @@ The side of the body that is the subject of an Imaging or Radiodiagnostic Event.
                     </enumerations>
                   </dataType>
                 </dataElement>
-                <dataElement name="gender2">
+                <dataElement name="gender2 element">
                   <description>gender test stuff</description>
                   <extensions>
                     <extension key="NHIC_Identifier:">TEST_GENDER</extension>

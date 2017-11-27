@@ -5,12 +5,13 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.cache.CacheService
+import org.modelcatalogue.core.security.Role
 import rx.Observable
 import spock.lang.Specification
 import spock.util.concurrent.BlockingVariable
 
 @TestFor(CatalogueElementService)
-@Mock([DataClass, ReferenceType])
+@Mock([DataClass, ReferenceType, Role])
 class CatalogueElementServiceSpec extends Specification {
 
     def "test if modelCatalogueSearchService unindex method is called when deleting CatalogueElement"() {
@@ -18,6 +19,7 @@ class CatalogueElementServiceSpec extends Specification {
             def searchCatalogue = Mock(SearchCatalogue)
             def auditService = Mock(AuditService)
             def cacheService = Mock(CacheService)
+            def securityService = Mock(ModelCatalogueSecurityService)
 
             auditService.modelCatalogueSearchService = searchCatalogue
 
@@ -25,6 +27,7 @@ class CatalogueElementServiceSpec extends Specification {
 
             def dataClass = new DataClass(name: "Alexander Lukashenko")
             dataClass.auditService = auditService // there is no better way how to mock collaborating service
+            dataClass.modelCatalogueSecurityService = securityService
             dataClass.save()
 
             def subscribed = new BlockingVariable<CatalogueElement>()

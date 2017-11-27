@@ -1,12 +1,10 @@
 package org.modelcatalogue.core.elasticsearch
 
-
 import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClass
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder
@@ -27,7 +25,6 @@ import org.elasticsearch.index.engine.VersionConflictEngineException
 import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
-import org.elasticsearch.indices.IndexAlreadyExistsException
 import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
 import org.elasticsearch.threadpool.ThreadPool
@@ -35,26 +32,30 @@ import org.hibernate.ObjectNotFoundException
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.rx.RxService
+import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.Lists
-import rx.Observable
+import org.modelcatalogue.core.util.SearchParams
+import org.springframework.security.acls.model.NotFoundException
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
-import java.util.concurrent.TimeUnit
+import groovy.transform.CompileStatic
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
 import static rx.Observable.just
+import rx.Observable
+import grails.plugin.springsecurity.SpringSecurityUtils
 
 class ElasticSearchService implements SearchCatalogue {
 
     static transactional = false
-
 
     private static final int ELEMENTS_PER_BATCH = readFromEnv('MC_ES_ELEMENTS_PER_BATCH', 30)
 
@@ -72,7 +73,6 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private static final String ENV_MC_ES_PREFIX = 'MC_INDEX_PREFIX'
-
     private static final String MC_PREFIX = "${System.getenv(ENV_MC_ES_PREFIX) ?:  System.getProperty(ENV_MC_ES_PREFIX) ?: ''}mc_"
     private static final String GLOBAL_PREFIX = "${MC_PREFIX}global_"
     private static final String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
@@ -92,7 +92,8 @@ class ElasticSearchService implements SearchCatalogue {
     DataModelService dataModelService
     ElementService elementService
     SecurityService modelCatalogueSecurityService
-    RxService rxService
+    DataModelGormService dataModelGormService
+
     Node node
     Client client
 
@@ -167,7 +168,7 @@ class ElasticSearchService implements SearchCatalogue {
     * */
 
     @Override
-    ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
+    ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, SearchParams params) {
         if (!type.searchable) {
             return Lists.emptyListWithTotalAndType(Relationship)
         }
@@ -191,16 +192,18 @@ class ElasticSearchService implements SearchCatalogue {
         List<String> states = []
 
         //if the role is viewer, don't return elements that they shouldn't see i.e. drafts .
+        //TODO: NEED TO REMOVE THIS????????
+
         if (params.status) {
-            states = ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()
+            states = ElementService.findAllElementStatus(params.status, isViewer())*.toString()
         }
 
         List<String> types = []
 
 
         //if you only want to search for a particular element class and subclasses of it
-        if (params.elementType) {
-            String elementType = params.elementType.toString()
+        if ( params.elementType ) {
+            String elementType = params.elementType
             if (!elementType.contains('.')) {
                 GrailsClass clazz = grailsApplication.getDomainClasses().find { it.logicalPropertyName == elementType }
                 if (clazz && clazz.clazz) {
@@ -260,11 +263,11 @@ class ElasticSearchService implements SearchCatalogue {
                 .setQuery(boolQuery)
 
 
-        return ElasticSearchQueryList.search(params,Relationship, request)
+        return ElasticSearchQueryList.search(params, Relationship, request)
     }
 
     @Override
-    public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
+    public <T> ListWithTotalAndType<T> search(Class<T> resource, SearchParams params) {
         String search = params.search
         QueryBuilder qb
         List<String> indicies
@@ -272,26 +275,38 @@ class ElasticSearchService implements SearchCatalogue {
         if (CatalogueElement.isAssignableFrom(resource)) {
             indicies = resource == DataModel ? [getGlobalIndexName(DataModel)] : collectDataModelIndicies(params, elementService.collectSubclasses(resource))
 
-            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+            QueryBuilder boolQuery = QueryBuilders.boolQuery()
 
             if (search != '*') {
                 boolQuery.minimumNumberShouldMatch(1)
             }
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.findAllElementStatus(params.status, isViewer())*.toString()))
             }
 
             if (params.contentType) {
                 boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
-            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
-                boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
-            }
+            if(!search.contains("*")) {
 
-            boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
-            boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
+                CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+                    boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
+                }
+
+                boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
+                boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
+            }else{
+
+                CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+                    boolQuery.should(QueryBuilders.wildcardQuery(property, search).boost(boost))
+                }
+
+                boolQuery.should(QueryBuilders.wildcardQuery('name', search.toLowerCase()).boost(200))
+                boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.wildcardQuery('ext.value', search)).boost(10))
+
+            }
 
             qb = boolQuery
         } else if (RelationshipType.isAssignableFrom(resource)) {
@@ -334,9 +349,14 @@ class ElasticSearchService implements SearchCatalogue {
         return ElasticSearchQueryList.search(params,resource, request)
     }
 
+    @CompileStatic
+    protected boolean isViewer() {
+        SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('VIEWER'))
+    }
+
 
     // may want to build on this query at a later date
-    public <T> ElasticSearchQueryList<T> fuzzySearch(Class<T> resource, Map params) {
+    public <T> ElasticSearchQueryList<T> fuzzySearch(Class<T> resource, SearchParams params) {
         String search = params.search
         Double minScore = params.minScore
         QueryBuilder qb
@@ -353,7 +373,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.findAllElementStatus(params.status, isViewer())*.toString()))
             }
 
             if (params.contentType) {
@@ -419,9 +439,21 @@ class ElasticSearchService implements SearchCatalogue {
         "${ORPHANED_INDEX}_${getTypeName(resource)}"
     }
 
+    protected List<DataModel> subscribedModels() {
+        List<DataModel> subscribedModels = []
+        try {
+
+            subscribedModels = dataModelGormService.findAll()
+
+        } catch(NotFoundException notFoundException) {
+            log.warn('ACL not found exception captured when fetching all the data models')
+        }
+        subscribedModels
+    }
+
     //get all of the indicies associated with a data model
-    private List<String> collectDataModelIndicies(Map params, List<Class> types) {
-        DataModelFilter filter = getOverridableDataModelFilter(params)
+    private List<String> collectDataModelIndicies(SearchParams params, List<Class> types) {
+        DataModelFilter filter = getOverridableDataModelFilter(params, subscribedModels())
 
         if (!filter) {
             return types.collect { ElasticSearchService.getGlobalIndexName(it) }
@@ -433,7 +465,14 @@ class ElasticSearchService implements SearchCatalogue {
 
         if (filter.includes) {
             // excludes are ignored if there are includes
-            return filter.includes.collect { types.collect { type -> ElasticSearchService.getDataModelIndex(it, getTypeName(type)) } }.flatten()
+            List<String> indices
+            indices =  filter.includes.collect { types.collect { type -> ElasticSearchService.getDataModelIndex(it, getTypeName(type)) } }.flatten()
+
+            //add favourite relationships index - i.e. if you have favourited something it should appear
+            // if access is taken away then you won't be able to navigate to it and will only have the basic info
+            if(types.contains(Relationship) && params?.type=="favourite")indices.add(ElasticSearchService.getGlobalIndexName(Relationship))
+
+            return indices
         }
 
         if (filter.excludes) {
@@ -444,7 +483,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     @Override
-    ListWithTotalAndType<CatalogueElement> search(Map params) {
+    ListWithTotalAndType<CatalogueElement> search(SearchParams params) {
         search CatalogueElement, params
     }
 
@@ -570,7 +609,6 @@ class ElasticSearchService implements SearchCatalogue {
         //index Data Models
         indexDomains(DataModel, session)
 
-
         //index DataClasses
         indexDomains(DataClass, session)
 
@@ -608,7 +646,7 @@ class ElasticSearchService implements SearchCatalogue {
 
 
 
-    private void deleteIndexes(){
+    void deleteIndexes(){
         def indexList = client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().concreteAllIndices()
 
         for (String index : indexList) {
@@ -647,8 +685,12 @@ class ElasticSearchService implements SearchCatalogue {
             //split indexing into batches
             if ((i + 1) % ELEMENTS_PER_BATCH == 0 || (i + 1) == count) {
                 //TODO: can we get rid of placeholder for last
-                indexSimpleIndexRequests(singleRequests).toBlocking().last()
-                singleRequests.clear()
+                try {
+                    indexSimpleIndexRequests(singleRequests).toBlocking().last()
+                    singleRequests.clear()
+                }catch(Error e){
+                    log.error e
+                }
             }
         }
 
@@ -891,20 +933,28 @@ class ElasticSearchService implements SearchCatalogue {
         return current
     }
 
-    private DataModelFilter getOverridableDataModelFilter(Map params) {
-        if (params.dataModel) {
-            Long dataModelId
-            if(params.get('dataModel') instanceof Long){
-                dataModelId = params.get('dataModel')
-            }else{
-                dataModelId = params.long('dataModel')
-            }
-            DataModel dataModel = DataModel.get(dataModelId)
-            if (dataModel) {
-                return DataModelFilter.includes(dataModel).withImports()
-            }
+    private DataModelFilter getOverridableDataModelFilter(SearchParams params, List<DataModel> subscribedModels) {
+        if (params.dataModelId) {
+            Long dataModelId = params.dataModelId
+                //check that there is a data model is
+                // and check that you should include the results for the imports as well in search results
+                if (dataModelId) {
+                        if (subscribedModels.findResults { it.id }.contains(dataModelId)) {
+                            DataModel dataModel = dataModelGormService.findById(dataModelId)
+                            if (dataModel) {
+                                if ( params.searchImports != 'false' ) {
+                                    return DataModelFilter.includes(dataModel).withImports(subscribedModels)
+                                }else{
+                                    return DataModelFilter.includes(dataModel)
+                                }
+                            }
+                        }
+
+                }
+        }else{
+            return DataModelFilter.includes(subscribedModels)
         }
-        dataModelService.dataModelFilter.withImports()
+
     }
 
     List<String> collectTypes(Class<?> resource) {

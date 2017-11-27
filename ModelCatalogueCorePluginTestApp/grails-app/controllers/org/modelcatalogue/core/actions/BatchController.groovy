@@ -1,35 +1,28 @@
 package org.modelcatalogue.core.actions
 
+import grails.plugin.springsecurity.annotation.Secured
 import org.modelcatalogue.core.AbstractRestfulController
+import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.util.lists.Lists
 
 class BatchController extends AbstractRestfulController<Batch> {
 
     def actionService
-
+    BatchGormService batchGormService
     static allowedMethods = [index: 'GET', actions: 'GET', run: 'POST', reactivate: 'POST', dismiss: 'POST', updateActionParameters: 'PUT', addDependency: 'POST', removeDependency: 'DELETE']
-
-    @Override
-    protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('ADMIN')
-    }
 
     BatchController() {
         super(Batch)
     }
 
     def archive() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
 
         if (!params.id) {
             notFound()
             return
         }
 
-        Batch batch = Batch.get(params.id)
+        Batch batch = findById(params.long('id'))
 
         if (!batch) {
             notFound()
@@ -42,17 +35,13 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def runAll() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
 
         if (!params.id) {
             notFound()
             return
         }
 
-        Batch batch = Batch.get(params.id)
+        Batch batch = findById(params.long('id'))
 
         if (!batch) {
             notFound()
@@ -68,23 +57,15 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     @Override
     def index(Integer max) {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
+
         handleParams(max)
         respond Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'archived', params.boolean('archived') || params.status == 'archived'
         }
     }
 
-
     def updateActionParameters() {
 
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
 
         if (!params.actionId) {
             notFound()
@@ -112,10 +93,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def listActions(Integer max) {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
+
         handleParams(max)
 
         if (!params.id) {
@@ -136,10 +114,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def dismiss() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
+
 
         if (!params.actionId) {
             notFound()
@@ -158,10 +133,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def reactivate() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
+
         if (!params.actionId) {
             notFound()
             return
@@ -178,12 +150,7 @@ class BatchController extends AbstractRestfulController<Batch> {
         ok()
     }
 
-
     def run() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
 
         if (!params.actionId) {
             notFound()
@@ -202,10 +169,6 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def addDependency() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
 
         if (!params.actionId || !params.providerId || !params.role) {
             notFound()
@@ -239,10 +202,6 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def removeDependency() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
 
         if (!params.actionId || !params.role) {
             notFound()
@@ -265,5 +224,9 @@ class BatchController extends AbstractRestfulController<Batch> {
         }
 
         respond action
+    }
+
+    protected Batch findById(long id) {
+        batchGormService.findById(id)
     }
 }

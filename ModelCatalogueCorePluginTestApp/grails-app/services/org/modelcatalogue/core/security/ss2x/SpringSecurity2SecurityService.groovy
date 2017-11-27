@@ -4,22 +4,34 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.acl.AclUtilService
 import grails.util.Holders
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.LogoutListeners
 import org.modelcatalogue.core.SecurityService
+import org.modelcatalogue.core.security.DataModelAclService
+import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.persistence.UserGormService
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.logout.LogoutHandler
-
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.TimeUnit
 
 class SpringSecurity2SecurityService implements SecurityService, LogoutListeners, LogoutHandler {
 
+    //TODO: How do we handle imports - this needs work
+
     static transactional = false
 
     SpringSecurityService springSecurityService
+
+    DataModelAclService dataModelAclService
+
+    UserGormService userGormService
+
+    AclUtilService aclUtilService
 
     Cache<String, Long> lastSeenCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1, TimeUnit.DAYS).build()
 
@@ -27,23 +39,30 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         return springSecurityService.isLoggedIn()
     }
 
-    boolean hasRole(String role) {
-        if (!role) {
-            return true
+
+    //check if a user is authorised for a particular model
+    boolean hasRole(String authority, DataModel dataModel) {
+        //if no role is passed, can't have that role
+        if (!authority) {
+            return false
         }
-        String translated = role
-        if (role == "VIEWER") {
-            translated = "ROLE_USER,ROLE_METADATA_CURATOR,ROLE_ADMIN,ROLE_SUPERVISOR"
-        }  else if (role == "CURATOR") {
-            translated = "ROLE_METADATA_CURATOR,ROLE_ADMIN,ROLE_SUPERVISOR"
-        } else if (role == "ADMIN") {
-            translated = "ROLE_ADMIN,ROLE_SUPERVISOR"
-        } else if (role == "SUPERVISOR") {
-            translated = "ROLE_SUPERVISOR"
-        } else if (!translated.startsWith('ROLE_')) {
-            translated = "ROLE_${translated}"
+        Collection<String> roles = MetadataRolesUtils.getRolesFromAuthority(authority)
+        if ( !SpringSecurityUtils.ifAnyGranted(roles.join(',')) ) {
+            return false
         }
-        return SpringSecurityUtils.ifAnyGranted(translated)
+        dataModelAclService.hasReadPermission(dataModel)
+    }
+
+    //check if a user a general role
+    //this is used for very general activities like creating models or viewing draft models
+
+    boolean hasRole(String authority) {
+        //if no role is passed, can't have that role
+        if (!authority) {
+            return false
+        }
+        String roles = MetadataRolesUtils.getRolesFromAuthority(authority).join(',')
+        return SpringSecurityUtils.ifAnyGranted(roles)
     }
 
     String encodePassword(String password) {
@@ -61,7 +80,8 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) {
         def id = authentication?.principal?.id
         if (id) {
-            userLoggedOut(User.get(id as Long))
+            User user = userGormService.findById(id as Long)
+            userLoggedOut(user)
         }
     }
 

@@ -4,12 +4,15 @@ import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.persistence.EnumeratedTypeGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
 import static org.springframework.http.HttpStatus.OK
 
 class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
+
+    EnumeratedTypeGormService enumeratedTypeGormService
 
     EnumeratedTypeController() {
         super(EnumeratedType)
@@ -23,7 +26,8 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
     }
 
     def content() {
-        EnumeratedType type = EnumeratedType.get(params.id)
+        long enumeratedTypeId = params.long('id')
+        EnumeratedType type = enumeratedTypeGormService.findById(enumeratedTypeId)
         if (!type) {
             notFound()
             return
@@ -39,12 +43,17 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
             descriptors
         }
 
-        respond Lists.wrap(params, "/${resourceName}/${params.id}/content", list)
+        respond Lists.wrap(params, "/${resourceName}/${enumeratedTypeId}/content", list)
     }
 
     def setDeprecated() {
+        if (handleReadOnly()) {
+            return
+        }
+
         def jsonPayload = request.JSON
-        def enumeratedType = EnumeratedType.get(params.id)
+        long enumeratedTypeId = params.long('id')
+        EnumeratedType enumeratedType = enumeratedTypeGormService.findById(enumeratedTypeId)
 
         if (!enumeratedType) {
             notFound()

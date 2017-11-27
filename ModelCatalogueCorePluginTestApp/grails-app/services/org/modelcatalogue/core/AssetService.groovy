@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.apache.commons.io.input.CountingInputStream
@@ -10,6 +9,7 @@ import org.apache.commons.io.output.CountingOutputStream
 import org.codehaus.groovy.runtime.InvokerInvocationException
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.publishing.CloningContext
 import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
@@ -19,7 +19,7 @@ import java.security.DigestOutputStream
 import java.security.MessageDigest
 import java.util.concurrent.ExecutorService
 
-@CompileStatic
+//@CompileStatic
 class AssetService {
 
     StorageService modelCatalogueStorageService
@@ -27,6 +27,7 @@ class AssetService {
     ExecutorService executorService
     SecurityService modelCatalogueSecurityService
     AuditService auditService
+    DataModelGormService dataModelGormService
 
     private static final long GIGA = 1024 * 1024 * 1024
     private static final long MEGA = 1024 * 1024
@@ -44,7 +45,7 @@ class AssetService {
     }
 
     Asset upload(Long id, Long dataModelId, String name, String description, MultipartFile file, String filename = file.originalFilename) {
-        Asset asset = dataModelId ? new Asset(dataModel: DataModel.get(dataModelId)) : new Asset()
+        Asset asset = dataModelId ? new Asset(dataModel: dataModelGormService.findById(dataModelId)) : new Asset()
 
         if (file.size > modelCatalogueStorageService.maxFileSize) {
             asset.errors.rejectValue('md5', 'asset.uploadfailed', "You cannot upload files greater than ${toBytes(modelCatalogueStorageService.maxFileSize)}")
@@ -237,7 +238,7 @@ class AssetService {
                     updated.refresh()
                     updated.status = ElementStatus.FINALIZED
                     updated.name = updated.name + " - Error during generation"
-                    updated.description = "Error generating report" +":$e"
+                    updated.description = "Error generating report: $e"
                     updated.save(flush: true, failOnError: true)
                 }
             }

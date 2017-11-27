@@ -19,7 +19,7 @@ dataSource {
     def metadataJdbcString = System.getenv('METADATA_JDBC_URL')
 
     if (!metadataJdbcString && System.getenv("MC_MYSQL_NAME")) {
-        metadataJdbcString = "mc-test-db2.cv0pol2cf5cc.eu-west-1.rds.amazonaws.com
+        metadataJdbcString = "mc-test-db2.cv0pol2cf5cc.eu-west-1.rds.amazonaws.com"
     }
 
     if (!metadataJdbcString && System.getenv("RDS_HOSTNAME")) {

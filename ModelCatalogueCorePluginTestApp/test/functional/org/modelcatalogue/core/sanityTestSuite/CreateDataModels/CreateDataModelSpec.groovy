@@ -3,10 +3,13 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.openqa.selenium.Keys
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
@@ -66,8 +69,8 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
 
 
         where:
-        newModelName                | versionElement | catalogue | policy   | text
-        "TESTING_DATA_MODEL"    | "2.1.28"| "MT-234"   | "c"      | "c"
+        newModelName         | versionElement | catalogue | policy   | text
+        "TESTING_DATA_MODEL" | "2.1.28"       | "MT-234"  | "c"      | "c"
 
     }
 
