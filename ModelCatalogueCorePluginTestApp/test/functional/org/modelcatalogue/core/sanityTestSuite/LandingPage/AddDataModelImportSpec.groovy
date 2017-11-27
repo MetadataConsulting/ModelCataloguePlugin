@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
@@ -11,8 +10,7 @@ import static org.modelcatalogue.core.geb.Common.getPick
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
 
@@ -36,8 +34,7 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
         then:'verify title of the page '
         check rightSideTitle contains 'Test 3'
     }
-    def"navigate to the top menu and select create relationship "(){
-
+    def "navigate to the top menu and select create relationship"(){
         when:'navigate to createRelationship page'
         click dataModel
         click addImport
@@ -46,11 +43,11 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
         check  modelHeader displayed
 
     }
-    def"select a data model "(){
-
+    def "select a data model"(){
         when: 'select a model'
         fill search with "cancer" and pick first item
         click ModalPrimaryButton
+        refresh(browser) // TODO: It should not be necessary to refresh the page
 
         then: 'verify that  imports is displayed inside table'
         check table contains "imports"
@@ -78,7 +75,5 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
 
         then:'verify that imported is removed'
         check tableImported gone
-
-
     }
 }
