@@ -5,7 +5,7 @@ angular.module('mc.core.ui.states', [
   'modelcatalogue.core.ui.states.controllers'
   # list of modules
   'modelcatalogue.core.ui.states.landing'
-  'mc.core.ui.states.dataModels'
+  'modelcatalogue.core.ui.states.dataModels'
   'mc.core.ui.states.simple.actions.show'
   'mc.core.ui.states.simple.actions'
   'modelcatalogue.core.ui.states.dataModel'

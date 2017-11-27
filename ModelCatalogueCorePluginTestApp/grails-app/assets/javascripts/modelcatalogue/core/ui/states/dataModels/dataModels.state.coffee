@@ -1,4 +1,5 @@
-angular.module('mc.core.ui.states.dataModels', ['modelcatalogue.core.ui.states.controllers.PanelsCtrl']).config([
+angular.module('modelcatalogue.core.ui.states.dataModels', ['modelcatalogue.core.ui.states.controllers.PanelsCtrl',
+  'modelcatalogue.core.ui.states.dataModels.DataModelsCtrl']).config([
   '$stateProvider',
   ($stateProvider) ->
 
@@ -7,8 +8,8 @@ angular.module('mc.core.ui.states.dataModels', ['modelcatalogue.core.ui.states.c
 
       views:
         "":
-          templateUrl: '/mc/core/ui/states/dataModels.html'
-          controller: 'modelcatalogue.core.ui.states.controllers.DataModelsCtrl'
+          templateUrl: '/modelcatalogue/core/ui/states/dataModels/dataModels.html'
+          controller: 'modelcatalogue.core.ui.states.dataModels.DataModelsCtrl'
 
       resolve:
         list: (catalogueElementResource ,  modelCatalogueApiRoot ,  enhance ,  rest ,  $state ,  $q ,  $stateParams ,  security) ->
