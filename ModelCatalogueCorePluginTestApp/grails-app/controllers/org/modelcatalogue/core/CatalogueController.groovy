@@ -2,16 +2,22 @@ package org.modelcatalogue.core
 
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
-import grails.util.Environment
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.cache.CacheService
-import org.modelcatalogue.core.security.UserService
+import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.security.DataModelAclService
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
+
+import javax.servlet.http.HttpServletResponse
+
+import static org.springframework.http.HttpStatus.UNAUTHORIZED
+
 
 class CatalogueController {
 
@@ -21,6 +27,8 @@ class CatalogueController {
     def initCatalogueService
     def modelCatalogueSecurityService
     def executorService
+    DataModelAclService dataModelAclService
+    DataModelGormService dataModelGormService
 
     def xref() {
         CatalogueElement element = elementService.findByModelCatalogueId(CatalogueElement, request.forwardURI.replace('/export', ''))
@@ -30,23 +38,32 @@ class CatalogueController {
             return
         }
 
+        if ( !dataModelAclService.hasReadPermission((element)) ) {
+            response.sendError HttpServletResponse.SC_UNAUTHORIZED
+            return false
+        }
+
         if (params.format == 'xml') {
             response.contentType = 'application/xml'
             response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.xml\"")
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
             printer.bind(element){
                 idIncludeVersion = true
+
                 if (params.full == 'false') {
                     keepInside = element.instanceOf(DataModel) ? element : element.dataModel
                 }
-                if (params.repetitive != 'false') {
-                    repetitive = true
-                }
+
             }.writeTo(response.writer)
             return
         }
 
-        redirect controller: params.resource, action: 'show', id: element.id
+
+
+        redirect controller: params.resource, action: 'show', id: element.id, params: params
+
+
+        return
     }
 
     def ext() {
@@ -88,11 +105,15 @@ class CatalogueController {
         }
 
         redirect url: "${grailsApplication.config.grails.serverURL}/catalogue/${GrailsNameUtils.getPropertyName(HibernateHelper.getEntityClass(element))}/${element.id}"
+        return
     }
 
 
     def feedback(String key) {
-        render(BuildProgressMonitor.get(key) as JSON)
+        BuildProgressMonitor buildProgressMonitor = BuildProgressMonitor.get(key)
+        if (buildProgressMonitor != null) {
+            render(buildProgressMonitor as JSON)
+        }
     }
 
     def feedbacks() {
@@ -100,18 +121,29 @@ class CatalogueController {
             params.max = params.long('max')
         }
         render(Lists.lazy(params, ProgressMonitor, '/feedback', {
-            CacheService.MONITORS_CACHE.asMap().entrySet().sort{ a, b -> -(a.value.lastUpdated <=> b.value.lastUpdated) }.collect { [key: it.key, name: it.value.name, status: it.value.status.toElementStatusEquivalent().toString(), ] }
+            CacheService.MONITORS_CACHE.asMap().entrySet().sort{ a, b ->
+                -(a.value.lastUpdated <=> b.value.lastUpdated)
+            }.collect {
+                [
+                        key: it.key,
+                        name: it.value.name,
+                        status: it.value.status.toElementStatusEquivalent().toString(),
+                ]
+            }
         }, {
             CacheService.MONITORS_CACHE.size()
         }) as JSON)
+
     }
 
+    //TODO: Remove/find out why this is needed
     def dataModelsForPreload() {
+
+        List<DataModel> dataModelList = dataModelGormService.findAllByNameNotEqual('Clinical Tags')
         // only render data models for preload if there is no data model in the catalogue (very likely the first run)
-        if (DataModel.findByNameNotEqual('Clinical Tags') || !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)) {
+        if ( !dataModelList.isEmpty() /*|| !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)*/) {
             render([] as JSON)
             return
-
         }
 
         render((grailsApplication.config.mc.preload ?: []) as JSON)
@@ -139,5 +171,13 @@ class CatalogueController {
 
         render([id: logId] as JSON)
     }
+
+
+
+    protected DataModel getDataModel(CatalogueElement ce){
+        if(ce instanceof DataModel) return ce
+        return ce.dataModel
+    }
+
 
 }

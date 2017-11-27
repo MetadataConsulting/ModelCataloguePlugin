@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 
 /**
@@ -16,6 +17,11 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
 
     @Override
     boolean hasRole(String role) {
+        return true
+    }
+
+    @Override
+    boolean hasRole(String role, DataModel dataModel) {
         return true
     }
 

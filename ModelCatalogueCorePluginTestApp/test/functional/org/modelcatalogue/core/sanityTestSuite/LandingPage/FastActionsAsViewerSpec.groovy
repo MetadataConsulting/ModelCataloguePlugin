@@ -1,11 +1,15 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.getModalHeader
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class FastActionsAsViewerSpec extends AbstractModelCatalogueGebSpec {
 

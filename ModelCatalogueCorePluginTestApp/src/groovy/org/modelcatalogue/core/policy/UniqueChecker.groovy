@@ -1,15 +1,13 @@
 package org.modelcatalogue.core.policy
 
-import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.HibernateHelper
-
 import static com.google.common.base.Preconditions.checkNotNull
 
-@GrailsCompileStatic class UniqueChecker implements ConventionChecker {
+class UniqueChecker implements ConventionChecker {
 
     @Override
     def <T extends CatalogueElement & GroovyObject> void check(VerificationPhase phase, DataModel model, Class<T> resource, T item, String property, String ignored, String messageOverride, boolean errorsToItem) {

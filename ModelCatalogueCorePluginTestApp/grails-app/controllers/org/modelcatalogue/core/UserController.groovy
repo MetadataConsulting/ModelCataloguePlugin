@@ -1,9 +1,14 @@
 package org.modelcatalogue.core
 
 import grails.converters.JSON
-import org.modelcatalogue.core.api.ElementStatus
+import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.SpringSecurityUtils
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.UserCatalogueElementService
+import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.security.UserService
 import org.modelcatalogue.core.util.DataModelFilter
@@ -11,6 +16,14 @@ import org.modelcatalogue.core.util.DataModelFilter
 class UserController extends AbstractCatalogueElementController<User> {
 
     UserService userService
+
+    UserGormService userGormService
+
+    SpringSecurityService springSecurityService
+
+    FavouriteService favouriteService
+
+    UserCatalogueElementService userCatalogueElementService
 
     UserController() {
         super(User, false)
@@ -21,8 +34,13 @@ class UserController extends AbstractCatalogueElementController<User> {
      * @param id The id of the resource
      * @return The rendered resource or a 404 if it doesn't exist
      */
-    def show() {
-        User element = queryForResource(params.id)
+    def show(Long id) {
+        if ( !isAdminOrSupervisorOrLoggedUser(id) ) {
+            unauthorized()
+            return
+        }
+
+        User element = findById(id)
 
         if (!element) {
             notFound()
@@ -32,53 +50,65 @@ class UserController extends AbstractCatalogueElementController<User> {
         respond element
     }
 
-    @Override
-    protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('ADMIN')
+    protected isAdminOrSupervisorOrLoggedUser(Long id) {
+        String roles = MetadataRolesUtils.roles('ADMIN')
+        boolean requestedIdIsForTheLoggedUser = id == springSecurityService.principal.id
+        requestedIdIsForTheLoggedUser || SpringSecurityUtils.ifAnyGranted(roles)
+    }
+
+    protected User findById(long id) {
+        userGormService.findById(id)
     }
 
     def classifications() {
-        if (!modelCatalogueSecurityService.isUserLoggedIn()) {
-            unauthorized()
-            return
-        }
-
-        DataModelFilter.from(request.JSON).to(modelCatalogueSecurityService.currentUser)
-
+        Long userId = springSecurityService.principal.id
+        User user = userGormService.findById(userId)
+        DataModelFilter.from(request.JSON).to(user)
         redirect controller: 'user', action: 'current'
     }
 
     def current() {
-        if (!modelCatalogueSecurityService.currentUser) {
+        if ( !springSecurityService.isLoggedIn() ) {
             render([success: false, username: null, roles: [], id: null, classifications: []] as JSON)
             return
         }
 
-        DataModelFilter filter = DataModelFilter.from(modelCatalogueSecurityService.currentUser)
+        Long userId = springSecurityService.principal.id
+        User currentUser = userGormService.findById(userId)
+        DataModelFilter filter = DataModelFilter.from(currentUser)
 
-        render([
+        Map m = [
                 success: true,
-                username: modelCatalogueSecurityService.currentUser.username,
-                roles: modelCatalogueSecurityService.currentUser.authorities*.authority,
-                id: modelCatalogueSecurityService.currentUser.hasProperty('id') ? modelCatalogueSecurityService.currentUser.id : null,
+                username: currentUser.username,
+                roles: currentUser.getAuthorities()*.authority,
+                id: currentUser.hasProperty('id') ? currentUser.id : null,
                 dataModels: filter.toMap()
-        ] as JSON)
+        ]
+        render(m as JSON)
     }
 
     def lastSeen() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            notFound()
-            return
-        }
         respond modelCatalogueSecurityService.usersLastSeen.sort { it.value }.collect { [username: it.key, lastSeen: new Date(it.value)] }.reverse()
     }
 
-    def addFavourite(Long id) {
-        addRelation(id, 'favourite', true, null)
+    def addFavourite() {
+        if ( !isAdminOrSupervisorOrLoggedUser(params.long('id')) ) {
+            unauthorized()
+            return
+        }
+        Long dataModelId = request.JSON.id as Long
+        favouriteService.favouriteModelById(dataModelId)
+        render status: 200
     }
 
-    def removeFavourite(Long id) {
-        removeRelation(id, 'favourite', true, null)
+    def removeFavourite() {
+        if ( !isAdminOrSupervisorOrLoggedUser(params.long('id')) ) {
+            unauthorized()
+            return
+        }
+        Long dataModelId = request.JSON.id as Long
+        favouriteService.unfavouriteModelById(dataModelId)
+        render status: 200
     }
 
     def enable() {
@@ -90,12 +120,7 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def role() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            notFound()
-            return
-        }
-
-        User user = User.get(params.id)
+        User user = findById(params.long('id'))
         if (!user) {
             notFound()
             return
@@ -113,36 +138,21 @@ class UserController extends AbstractCatalogueElementController<User> {
         respond user
     }
 
-    def apiKey(Boolean regenerate) {
-        if (!modelCatalogueSecurityService.isUserLoggedIn()) {
-            notFound()
-            return
-        }
 
-        render([apiKey: userService.getApiKey(modelCatalogueSecurityService.currentUser, regenerate)] as JSON)
+    def apiKey(Boolean regenerate) {
+        render([apiKey: userService.findApiKeyByUsername(springSecurityService.principal.username, regenerate ?: false)] as JSON)
     }
 
+
     private switchEnabled(boolean enabled) {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+
+        long userId = params.long('id')
+        User user = userGormService.switchEnabled(userId, enabled)
+        if ( !user ) {
             notFound()
             return
         }
-
-        User user = User.get(params.id)
-        if (!user) {
-            notFound()
-            return
-        }
-
-        if (user.authorities.contains(UserService.ROLE_SUPERVISOR)) {
-            user.errors.rejectValue('enabled', 'user.cannot.edit.supervisor', 'Cannot edit supervisor account')
-            respond user.errors
-            return
-        }
-
-        user.enabled = enabled
-
-        if (!user.save(flush: true)) {
+        if ( user.hasErrors() ) {
             respond user.errors
             return
         }
@@ -150,6 +160,11 @@ class UserController extends AbstractCatalogueElementController<User> {
         modelCatalogueSecurityService.logout(user.username)
 
         respond user
+    }
+
+    @Override
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        userCatalogueElementService
     }
 
     protected boolean hasAdditionalIndexCriteria() { return true }
@@ -161,6 +176,9 @@ class UserController extends AbstractCatalogueElementController<User> {
             }
         }
     }
+
+
+
 
 
 }

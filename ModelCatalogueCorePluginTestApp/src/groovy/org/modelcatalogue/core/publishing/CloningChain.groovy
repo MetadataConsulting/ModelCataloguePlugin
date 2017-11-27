@@ -2,7 +2,6 @@ package org.modelcatalogue.core.publishing
 
 import grails.util.Holders
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -15,7 +14,7 @@ import rx.Observer
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
-@Log4j @CompileStatic
+@Log4j
 class CloningChain extends PublishingChain {
 
     private final CloningContext context
@@ -49,7 +48,7 @@ class CloningChain extends PublishingChain {
 
         for (Collection<CatalogueElement> elements in queue) {
             for (CatalogueElement element in elements) {
-                if (context.dataModel && context.dataModel != element.dataModel && context.dataModel != element) {
+                if (context.destination && context.destination != element.dataModel && context.destination != element) {
                     if (element.instanceOf(DataModel)) {
                         context.addImport(element as DataModel)
                     } else {

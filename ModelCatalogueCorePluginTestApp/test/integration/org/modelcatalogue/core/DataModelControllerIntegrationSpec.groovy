@@ -1,7 +1,9 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import spock.lang.Ignore
 
+@Ignore
 class DataModelControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override

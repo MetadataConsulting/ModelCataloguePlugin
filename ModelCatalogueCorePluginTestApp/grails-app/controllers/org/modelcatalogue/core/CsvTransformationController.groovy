@@ -3,12 +3,15 @@ package org.modelcatalogue.core
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.modelcatalogue.core.persistence.CsvTransformationGormService
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.web.multipart.MultipartFile
 
 class CsvTransformationController extends AbstractRestfulController<CsvTransformation>{
 
     def dataArchitectService
+
+    CsvTransformationGormService csvTransformationGormService
 
     static allowedMethods = [transform: "POST"]
 
@@ -21,12 +24,7 @@ class CsvTransformationController extends AbstractRestfulController<CsvTransform
             notFound()
         }
 
-        if (!modelCatalogueSecurityService.hasRole('USER')) {
-            unauthorized()
-            return
-        }
-
-        CsvTransformation transformation = CsvTransformation.get(params.id)
+        CsvTransformation transformation = csvTransformationGormService.findById(params.long('id'))
 
         if (!transformation) {
             notFound()
@@ -66,6 +64,10 @@ class CsvTransformationController extends AbstractRestfulController<CsvTransform
 
     // column definitions deleted on cascade
     protected checkAssociationsBeforeDelete(CsvTransformation instance) { }
+
+    protected CsvTransformation findById(long id) {
+        csvTransformationGormService.findById(id)
+    }
 
     @Override
     protected cleanRelations(CsvTransformation instance) {

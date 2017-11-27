@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.create
@@ -15,10 +17,8 @@ import static org.modelcatalogue.core.geb.Common.nameLabel
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import static org.modelcatalogue.core.geb.Common.modalSuccessButton
 
-
-
-
-
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     private static final String metadataStep ="button#step-metadata"

@@ -12,12 +12,15 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftChain
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
+import org.modelcatalogue.core.security.DataModelAclService
+import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
@@ -43,26 +46,24 @@ class ElementService implements Publisher<CatalogueElement> {
     def sessionFactory
     def elasticSearchService
 
-    public static Long MATCH_SCORE_LEVEL_75 = 75
-    public static Long MATCH_SCORE_LEVEL_CLOSE = 95
-    public static Long MATCH_SCORE_LEVEL_EXACT = 100
+    DataModelAclService dataModelAclService
 
-
-    List<CatalogueElement> list(Map params = [:]) {
-        CatalogueElement.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
-    }
-
-    public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
-        resource.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
-    }
-
-    Long count(params = [:]) {
-        CatalogueElement.countByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')))
-    }
-
-    public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
-        resource.countByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')))
-    }
+//    NONE OF THESE ARE USED OR IMPLEMENTED - Commenting them out - will remove
+//    List<CatalogueElement> list(Map params = [:]) {
+//        CatalogueElement.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
+//    }
+//
+//    public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
+//        resource.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
+//    }
+//
+//    Long count(params = [:]) {
+//        CatalogueElement.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+//    }
+//
+//    public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
+//        resource.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+//    }
 
     public DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {
         dataModel.checkNewSemanticVersion(newSemanticVersion)
@@ -84,6 +85,8 @@ class ElementService implements Publisher<CatalogueElement> {
 
                 // TODO: better target the changes
                 CacheService.VERSION_COUNT_CACHE.invalidateAll()
+
+                dataModelAclService.copyPermissions(dataModel, draft)
 
                 return draft
             }
@@ -383,6 +386,19 @@ class ElementService implements Publisher<CatalogueElement> {
             return ImmutableList.of(params.status as ElementStatus)
         }
         return ImmutableList.of(ElementStatus.valueOf(params.status.toString().toUpperCase()))
+    }
+
+    static List<ElementStatus> findAllElementStatus(String status, boolean canViewDrafts) {
+        if (!status) {
+            return ImmutableList.copyOf(ElementStatus.values().toList())
+        }
+        if (status == 'active') {
+            if (canViewDrafts) {
+                return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
+            }
+            return ImmutableList.of(ElementStatus.FINALIZED)
+        }
+        ImmutableList.of(ElementStatus.valueOf(status.toUpperCase()))
     }
 
 

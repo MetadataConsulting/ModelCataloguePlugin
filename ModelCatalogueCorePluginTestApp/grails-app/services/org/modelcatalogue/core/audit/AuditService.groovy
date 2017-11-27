@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.audit
 
 import grails.gorm.DetachedCriteria
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.util.Holders
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
@@ -31,6 +32,7 @@ class AuditService {
     def executorService
     def sessionFactory
     MessageSendingOperations brokerMessagingTemplate
+    SpringSecurityService springSecurityService
 
     static Callable<Auditor> auditorFactory = { throw new IllegalStateException("Application is not initialized yet") }
 
@@ -46,7 +48,7 @@ class AuditService {
        auditorFactory =  { return CompoundAuditor.from(new DefaultAuditor(executorService), new EventNotifier(brokerMessagingTemplate, executorService)) }
        if (modelCatalogueSearchService.indexingManually) {
         Callable<Auditor> oldFactory = auditorFactory
-        auditorFactory = { CompoundAuditor.from(oldFactory(), new SearchNotifier(modelCatalogueSearchService), new EventNotifier(brokerMessagingTemplate, executorService))}
+        auditorFactory = { CompoundAuditor.from(oldFactory(), new SearchNotifier(modelCatalogueSearchService))}
        }
    }
 
@@ -326,7 +328,7 @@ class AuditService {
     }
 
     CatalogueElement logNewVersionCreated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        Long changeId = auditor.get().logNewVersionCreated(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first()
+        Long changeId = auditor.get().logNewVersionCreated(element, loggedUserId()).toBlocking().first()
         CatalogueElement ce = withParentId(changeId, createDraftBlock)
         if (!ce) {
             return ce
@@ -351,78 +353,90 @@ class AuditService {
     }
 
     CatalogueElement logElementFinalized(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        withParentId(auditor.get().logElementFinalized(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), createDraftBlock)
+        withParentId(auditor.get().logElementFinalized(element, loggedUserId()).toBlocking().first(), createDraftBlock)
     }
 
 
     CatalogueElement logElementDeprecated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        withParentId(auditor.get().logElementDeprecated(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), createDraftBlock)
+        withParentId(auditor.get().logElementDeprecated(element, loggedUserId()).toBlocking().first(), createDraftBlock)
     }
 
     CatalogueElement logExternalChange(CatalogueElement source, Long authorId, String message, Closure<CatalogueElement> createDraftBlock) {
-        withDefaultAuthorAndParentAction(authorId ,auditor.get().logExternalChange(source, message, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), createDraftBlock)
+        withDefaultAuthorAndParentAction(authorId ,auditor.get().logExternalChange(source, message, loggedUserId()).toBlocking().first(), createDraftBlock)
     }
 
 
     void logNewMetadata(ExtensionValue extension) {
-        auditor.get().logNewMetadata(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logNewMetadata(extension, loggedUserId())
     }
 
     void logMetadataUpdated(ExtensionValue extension) {
-        auditor.get().logMetadataUpdated(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logMetadataUpdated(extension, loggedUserId())
     }
 
     void logMetadataDeleted(ExtensionValue extension) {
-        auditor.get().logMetadataDeleted(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logMetadataDeleted(extension, loggedUserId())
     }
 
     void logNewRelationshipMetadata(RelationshipMetadata extension) {
-        auditor.get().logNewRelationshipMetadata(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logNewRelationshipMetadata(extension, loggedUserId())
     }
 
     void logRelationshipMetadataUpdated(RelationshipMetadata extension) {
-        auditor.get().logRelationshipMetadataUpdated(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logRelationshipMetadataUpdated(extension, loggedUserId())
     }
 
     void logRelationshipMetadataDeleted(RelationshipMetadata extension) {
-        auditor.get().logRelationshipMetadataDeleted(extension, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logRelationshipMetadataDeleted(extension, loggedUserId())
     }
 
     void logElementCreated(CatalogueElement element) {
-        auditor.get().logElementCreated(element, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logElementCreated(element, loggedUserId())
     }
 
     void logElementDeleted(CatalogueElement element) {
-        auditor.get().logElementDeleted(element, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logElementDeleted(element, loggedUserId())
     }
 
     void logElementUpdated(CatalogueElement element) {
-        auditor.get().logElementUpdated(element, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logElementUpdated(element, loggedUserId())
     }
 
     void logMappingCreated(Mapping mapping) {
-        auditor.get().logMappingCreated(mapping, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logMappingCreated(mapping, loggedUserId())
     }
 
     void logMappingDeleted(Mapping mapping) {
-        auditor.get().logMappingDeleted(mapping, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logMappingDeleted(mapping, loggedUserId())
     }
 
     void logMappingUpdated(Mapping mapping) {
-        auditor.get().logMappingUpdated(mapping, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logMappingUpdated(mapping, loggedUserId())
     }
 
     void logNewRelation(Relationship relationship) {
-        auditor.get().logNewRelation(relationship, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logNewRelation(relationship, loggedUserId())
     }
 
     void logRelationRemoved(Relationship relationship) {
-        auditor.get().logRelationRemoved(relationship, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logRelationRemoved(relationship, loggedUserId())
     }
 
     void logRelationArchived(Relationship relationship) {
-        auditor.get().logRelationArchived(relationship, modelCatalogueSecurityService.currentUser?.id)
+        auditor.get().logRelationArchived(relationship, loggedUserId())
     }
 
-
+    Long loggedUserId() {
+        if ( springSecurityService.principal instanceof String ) {
+            try {
+                return springSecurityService.principal as Long
+            } catch(NumberFormatException e) {
+                return null
+            }
+        }
+        if ( springSecurityService.principal.respondsTo('id') ) {
+            return springSecurityService.principal.id as Long
+        }
+        null
+    }
 }

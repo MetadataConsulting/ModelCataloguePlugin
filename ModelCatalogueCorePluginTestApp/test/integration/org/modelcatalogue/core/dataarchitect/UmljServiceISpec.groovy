@@ -2,6 +2,7 @@ package org.modelcatalogue.core.dataarchitect
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataClass
+import spock.lang.Ignore
 import spock.lang.Requires
 
 @Requires({ !System.getenv('TRAVIS') })
@@ -10,6 +11,7 @@ class UmljServiceISpec extends AbstractIntegrationSpec {
     def umljService
     def catalogueBuilder
 
+    @Ignore
     def "test import"() {
         initCatalogue()
         def filenameXsd = "test/integration/resources/CLLDataModel0.1.umlj"

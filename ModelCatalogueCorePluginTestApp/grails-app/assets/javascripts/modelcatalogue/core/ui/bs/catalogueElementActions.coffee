@@ -62,10 +62,14 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
           action.label = 'Restore'
           action.icon = 'fa fa-fw fa-repeat'
           action.type = 'primary'
+          if $scope.element.status != 'DEPRECATED'
+            action.disabled = true
       else
         action.label = 'Deprecate'
         action.icon = 'fa fa-fw fa-ban'
         action.type = 'danger'
+        if $scope.element.status != 'FINALIZED'
+          action.disabled = true
 
       action
 
@@ -96,11 +100,11 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
               $scope.element.delete()
               .then ->
                 messages.success "#{$scope.element.getElementTypeName()} #{$scope.element.name} deleted."
-                $rootScope.$broadcast 'catalogueElementDeleted', $scope.element
                 resource = names.getPropertyNameFromType($scope.element.elementType)
                 if resource == 'dataModel'
                   $state.go('dataModels')
                 else if $state.current.name.indexOf('mc.resource.show') >= 0
+                  $rootScope.$broadcast 'catalogueElementDeleted', $scope.element
                   $state.go('mc.resource.list', {resource: resource}, {reload: true})
               .catch showErrorsUsingMessages(messages)
         }
@@ -157,7 +161,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         messages.prompt(null, null, type: 'new-version', element: $scope.element)
     }
   actionsProvider.registerChildActionInRole 'catalogue-element', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, newVersionAction
-  actionsProvider.registerActionInRoles 'create-new-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INFINITE_LIST], newVersionAction
+#  actionsProvider.registerActionInRoles 'create-new-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INFINITE_LIST], newVersionAction
 
 
 
@@ -165,6 +169,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerActionInRoles 'catalogue-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'security', 'names', 'catalogue', ($scope, security, name, catalogue)->
     return undefined unless $scope.element
     if $scope.element
+      return undefined if $scope.element.classifiedName=="Not authorised to view details"
       return undefined if not angular.isFunction $scope.element.isInstanceOf
 
     {
@@ -264,7 +269,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
     }
 
-  actionsProvider.registerActionInRoles 'show-link',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ($scope, messages, security) ->
+  actionsProvider.registerActionInRoles 'show-link',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ($scope, messages, security, rest, modelCatalogueApiRoot) ->
     'ngInject'
 
     return undefined if not $scope.element
@@ -276,14 +281,14 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       icon:       "fa fa-link"
       type:       'default'
       action:     ->
-        messages.prompt("Link for " + $scope.element.getLabel(), """
-          <h4>Permanent Link</h4>
-          <input type='text' class='form-control' value='#{$scope.element.internalModelCatalogueId}' readonly='readonly' select-on-click></input>
-          <h4>cURL</h4>
-          <input type='text' class='form-control' value='curl -L -u #{security.getCurrentUser()?.username ? 'username'}:&lt;API Key&gt; #{$scope.element.internalModelCatalogueId}/export' readonly='readonly' select-on-click></input>
-          <p class='help-block small'>You can view your API key using the action in user top right menu <span class='fa fa-fw fa-user'></span></p>
-        """, type: 'alert', size: 'lg')
-
+        openApiKey = (response) ->
+          messages.prompt("Link for " + $scope.element.getLabel(), """
+            <h4>Permanent Link</h4>
+            <input type='text' class='form-control' value='#{$scope.element.internalModelCatalogueId}' readonly='readonly' select-on-click></input>
+            <h4>cURL</h4>
+            <input type='text' class='form-control' value='curl -L -u #{security.getCurrentUser()?.username ? 'username'}:#{response.apiKey} #{$scope.element.internalModelCatalogueId}/export' readonly='readonly' select-on-click></input>
+          """, type: 'alert', size: 'lg')
+        rest(url: "#{modelCatalogueApiRoot}/user/apikey", method: 'POST').then(openApiKey)
     }
 
   actionsProvider.registerActionInRoles 'inline-edit',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ($scope, security) ->

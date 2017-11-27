@@ -89,7 +89,7 @@ class EnumeratedType extends DataType {
     }
 
     String prettyPrint() {
-        enumerations.collect { key, value -> "$key: $value" }.join('\n')
+        enumerations.sort().collect { key, value -> "$key: $value" }.join('\n')
     }
 
     @Override

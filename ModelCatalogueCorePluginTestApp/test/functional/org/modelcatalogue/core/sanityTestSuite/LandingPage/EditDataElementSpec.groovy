@@ -1,11 +1,15 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.curator
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class EditDataElementSpec extends AbstractModelCatalogueGebSpec {
 

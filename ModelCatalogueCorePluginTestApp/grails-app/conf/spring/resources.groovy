@@ -45,12 +45,16 @@ import org.modelcatalogue.core.util.marshalling.TagMarshaller
 import org.modelcatalogue.core.util.marshalling.UserMarshaller
 import org.modelcatalogue.core.util.marshalling.ValidationRuleMarshaller
 import org.modelcatalogue.core.xml.render.RelationshipsXmlRenderer
-
+import org.modelcatalogue.core.errors.MetadataExceptionResolver
 import java.util.concurrent.Executors
 import  grails.plugin.executor.PersistenceContextExecutorWrapper
 
 // Place your Spring DSL code here
 beans = {
+    exceptionHandler(MetadataExceptionResolver) {
+        exceptionMappings = ['java.lang.Exception': '/error']
+    }
+
     authenticationEntryPoint(AjaxAwareLoginUrlAuthenticationEntryPoint) {
         loginFormUrl = '/login/auth' // has to be specified even though it's ignored
         portMapper = ref('portMapper')

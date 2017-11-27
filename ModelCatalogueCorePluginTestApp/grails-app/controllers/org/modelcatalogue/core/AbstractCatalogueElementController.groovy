@@ -1,20 +1,42 @@
 package org.modelcatalogue.core
 
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
+import groovy.transform.CompileDynamic
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.RemoveRelationService
+import org.modelcatalogue.core.events.CatalogueElementArchivedEvent
+import org.modelcatalogue.core.events.CatalogueElementRestoredEvent
+import org.modelcatalogue.core.events.CatalogueElementStatusNotInDraftEvent
+import org.modelcatalogue.core.events.CatalogueElementWithErrorsEvent
+import org.modelcatalogue.core.events.MappingSavedEvent
+import org.modelcatalogue.core.events.MappingWithErrorsEvent
+import org.modelcatalogue.core.events.NotFoundEvent
+import org.modelcatalogue.core.events.RelationAddedEvent
+import org.modelcatalogue.core.events.RelationshipMovedEvent
+import org.modelcatalogue.core.events.RelationshipRemovedEvent
+import org.modelcatalogue.core.events.RelationshipWithErrorsEvent
+import org.modelcatalogue.core.events.RelationshipsEvent
+import org.modelcatalogue.core.events.SourceDestinationEvent
+import org.modelcatalogue.core.events.UnauthorizedEvent
 import org.modelcatalogue.core.path.PathFinder
 import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.DestinationClass
 import org.modelcatalogue.core.util.OrderedMap
+import org.modelcatalogue.core.util.ParamArgs
+import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.lists.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
+import org.modelcatalogue.core.events.MetadataResponseEvent
 
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
@@ -24,12 +46,32 @@ import static org.springframework.http.HttpStatus.OK
 abstract class AbstractCatalogueElementController<T extends CatalogueElement> extends AbstractRestfulController<T> {
 
     static responseFormats = ['json', 'xml']
-    static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE", mappings: "GET", removeMapping: "DELETE", addMapping: "POST"]
+    static allowedMethods = [
+            outgoing: "GET",
+            incoming: "GET",
+            addIncoming: "POST",
+            addOutgoing: "POST",
+            removeIncoming: "DELETE",
+            removeOutgoing: "DELETE",
+            mappings: "GET",
+            removeMapping: "DELETE",
+            addMapping: "POST",
+            update: "PUT"
+    ]
 
     def relationshipService
     def mappingService
     def auditService
+    def dataModelService
+    def dataClassService
+    RelationshipsInternalService relationshipsInternalService
+    AddMappingService addMappingService
+    SourceDestinationService sourceDestinationService
+    RemoveRelationService removeRelationService
 
+    abstract protected ManageCatalogueElementService getManageCatalogueElementService()
+
+    //used to run reports in background thread
     ExecutorService executorService
 
     AbstractCatalogueElementController(Class<T> resource, boolean readOnly) {
@@ -40,377 +82,241 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         super(resource, false)
     }
 
+
+    /**
+     * get all incoming relationships for a catalogue element
+     * if they do not have the correct access thye are requested to login
+     * @param id, catalogue element - source of relationshipsxs you want to
+     * @param type, the type of relationship you want to return
+     */
+
     def incoming(Integer max, String type) {
         relationshipsInternal(max, type, RelationshipDirection.INCOMING)
     }
+
+
+    /**
+     * get all outgoing relationships or a catalogue element
+     * if they do not have the correct access thye are requested to login
+     * @param id, catalogue element - source of relationshipsxs you want to
+     * @param type, the type of relationship you want to return
+     */
 
     def outgoing(Integer max, String type) {
         relationshipsInternal(max, type, RelationshipDirection.OUTGOING)
     }
 
 
+    /**
+     * add an outgoing relationship to a catalogue element
+     * security checked in the add relation method
+     * @param id, catalogue element - source of relationshipsxs you want to
+     * @param type, the type of relationship you want to return
+     */
     def addOutgoing(Long id, String type) {
         addRelation(id, type, true)
     }
 
-
+    /**
+     * add an incoming relationship to a catalogue element
+     * security checked in the add relation method
+     * @param id, catalogue element - source of relationshipsxs you want to
+     * @param type, the type of relationship you want to return
+     */
     def addIncoming(Long id, String type) {
         addRelation(id, type, false)
     }
 
+    /**
+     * remove an outgoing relationship to a catalogue element
+     * security checked in the removeRelation method
+     * @param id, catalogue element - source of relationshipsxs you want to
+     * @param type, the type of relationship you want to return
+     */
     def removeOutgoing(Long id, String type) {
         removeRelation(id, type, true)
     }
 
+    /**
+     * remove an incoming relationship to a catalogue element
+     * security checked in the removeRelation method
+     * @param id, catalogue element - source of relationshipsxs you want to
+     * @param type, the type of relationship you want to return
+     */
 
     def removeIncoming(Long id, String type) {
         removeRelation(id, type, false)
     }
 
 
+    /**
+     * reorder relationships i.e. if you want one data element contained in a class to come before another
+     * security checked in the reorderInternal  method
+     * @param id, catalogue element - source of relationshipsxs you want to
+     * @param type, the type of relationship you want to return
+     */
     def reorderOutgoing(Long id, String type) {
         reorderInternal(RelationshipDirection.OUTGOING, id, type)
     }
 
+
+    /**
+     * reorder relationships i.e. if you want one data element contained in a class to come before another
+     * security checked in the reorderInternal  method
+     * @param id, catalogue element - source of relationshipsxs you want to
+     * @param type, the type of relationship you want to return
+     */
     def reorderIncoming(Long id, String type) {
         reorderInternal(RelationshipDirection.INCOMING, id, type)
     }
 
-    private reorderInternal(RelationshipDirection direction, Long id, String type) {
-        // begin sanity checks
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
 
-
-        CatalogueElement owner = resource.get(id)
-        if (!owner) {
-            notFound()
-            return
-        }
-
-        if (!RelationshipType.readByName(type)) {
-            notFound()
-            return
-        }
-        // end sanity checks
-
-        Long movedId = objectToBind?.moved?.id
-        Long currentId = objectToBind?.current?.id
-
-        if (!movedId) {
-            notAcceptable()
-            return
-        }
-
-        Relationship rel = Relationship.get(movedId)
-
-        if (!rel) {
-            notFound()
-            return
-        }
-
-        Relationship current = currentId ? Relationship.get(currentId) : null
-
-        if (!current && currentId) {
-            notFound()
-            return
-        }
-
-        if (current && current.relationshipType.versionSpecific && current.source.status != ElementStatus.DRAFT) {
-            respond(error: 'You can only reorder items when the element is draft!')
-            return
-        }
-
-
-        rel = relationshipService.moveAfter(direction, owner, rel, current)
-
-        respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: rel.source, relation: rel.destination, direction: 'sourceToDestination', removeLink: RelationshipsMarshaller.getDeleteLink(rel.source, rel), archived: rel.archived, elementType: Relationship.name)
-    }
-
-    private void removeRelation(Long id, String type, boolean outgoing, String minRole = 'CURATOR') {
-        withRetryingTransaction {
-            if (!modelCatalogueSecurityService.hasRole(minRole)) {
-                unauthorized()
-                return
-            }
-
-            def otherSide = parseOtherSide()
-
-            CatalogueElement source = resource.get(id)
-            if (!source) {
-                notFound()
-                return
-            }
-            RelationshipType relationshipType = RelationshipType.readByName(otherSide.type ? otherSide.type.name : type)
-            if (!relationshipType) {
-                notFound()
-                return
-
-            }
-            Class otherSideType
-            try {
-                otherSideType = Class.forName (otherSide.relation ? otherSide.relation.elementType : otherSide.elementType)
-            } catch (ClassNotFoundException ignored) {
-                notFound()
-                return
-            }
-
-            CatalogueElement destination = otherSideType.get(otherSide.relation ? otherSide.relation.id : otherSide.id )
-            if (!destination) {
-                notFound()
-                return
-            }
-
-            def dataModelObject = otherSide.dataModel ?: otherSide.classification
-            DataModel dataModel = dataModelObject ? DataModel.get(dataModelObject.id) : null
-
-            Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType, dataModel) :  relationshipService.unlink(destination, source, relationshipType, dataModel)
-            if (!old) {
-                notFound()
-                return
-            }
-
-            if (old.hasErrors()) {
-                respond old.errors
-                return
-            }
-
-            response.status = HttpServletResponse.SC_NO_CONTENT
-            render "DELETED"
-        }
-    }
-
-    private void addRelation(Long id, String type, boolean outgoing, String minRole = 'CURATOR') {
-        withRetryingTransaction {
-            if (minRole && !modelCatalogueSecurityService.hasRole(minRole)) {
-                unauthorized()
-                return
-            }
-
-            def otherSide = parseOtherSide()
-
-            CatalogueElement source = resource.get(id)
-            if (!source) {
-                notFound()
-                return
-            }
-            RelationshipType relationshipType = RelationshipType.readByName(type)
-            if (!relationshipType) {
-                notFound()
-                return
-
-            }
-
-            def newDataModel = objectToBind['__dataModel'] ?: objectToBind['__classification']
-            Long dataModelId = newDataModel instanceof Map ? newDataModel.id as Long : null
-
-            DataModel dataModel = dataModelId ? DataModel.get(dataModelId) : null
-
-
-            def oldDataModel = objectToBind['__oldDataModel'] ?: objectToBind['__oldClassification']
-            Long oldDataModelId = oldDataModel instanceof Map ? oldDataModel.id as Long : null
-
-            DataModel oldDataModelInstance = oldDataModelId ? DataModel.get(oldDataModelId) : null
-
-            if (dataModelId && !dataModel) {
-                notFound()
-                return
-            }
-
-            Class otherSideType
-            try {
-                otherSideType = Class.forName otherSide.elementType
-            } catch (ClassNotFoundException ignored) {
-                notFound()
-                return
-            }
-
-            CatalogueElement destination = otherSideType.get(otherSide.id)
-            if (!destination) {
-                notFound()
-                return
-            }
-
-            if (oldDataModelInstance != dataModel) {
-                if (outgoing) {
-                    relationshipService.unlink(source, destination, relationshipType, oldDataModelInstance)
-                } else {
-                    relationshipService.unlink(destination, source, relationshipType, oldDataModelInstance)
-                }
-            }
-
-            RelationshipDefinitionBuilder definition = outgoing ? RelationshipDefinition.create(source, destination, relationshipType) : RelationshipDefinition.create(destination, source, relationshipType)
-
-            definition.withDataModel(dataModel).withMetadata(OrderedMap.fromJsonMap(objectToBind.metadata ?: [:]))
-
-            if (modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
-                definition.withIgnoreRules(true)
-            }
-
-            Relationship rel = relationshipService.link(definition.definition)
-
-            if (rel.hasErrors()) {
-                respond rel.errors
-                return
-            }
-
-            response.status = HttpServletResponse.SC_CREATED
-            RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
-
-            rel.save(flush: true, deepValidate: false, validate: false)
-
-            respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name, classification: rel.dataModel, dataModel: rel.dataModel)
-        }
-    }
-
-    protected parseOtherSide() {
-        request.getJSON()
-    }
-
-    private relationshipsInternal(Integer max, String typeParam, RelationshipDirection direction) {
-        handleParams(max)
-
-        if (!params.sort) {
-            params.sort = direction.sortProperty
-        }
-
-        CatalogueElement element = queryForResource(params.id)
-        if (!element) {
-            notFound()
-            return
-        }
-
-        RelationshipType type = typeParam ? RelationshipType.readByName(typeParam) : null
-        if (typeParam && !type) {
-            notFound()
-            return
-        }
-
-        respond new Relationships(
-                type: type,
-                owner: element,
-                direction: direction,
-                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, ElementService.getStatusFromParams(params, true), overridableDataModelFilter))
-        )
-    }
-
+    /**
+     * search incoming relationships i.e. if you want to search the data elements that are contained within a class
+     * security checked in the reorderInternal  method
+     * @param max - number of results
+     * @param type, the type of relationship you want to return
+     * @param id, the id of th catalogue element source of the relationship
+     */
     def searchIncoming(Integer max, String type) {
         searchWithinRelationshipsInternal(max, type, RelationshipDirection.INCOMING)
     }
+
+
+    /**
+     * search outoging relationships i.e. if you want to search the data elements that are contained within a class
+     * security checked in the reorderInternal  method
+     * @param max - number of results
+     * @param type, the type of relationship you want to return
+     * @param id, the id of th catalogue element source of the relationship
+     */
 
     def searchOutgoing(Integer max, String type) {
         searchWithinRelationshipsInternal(max, type, RelationshipDirection.OUTGOING)
     }
 
-    private searchWithinRelationshipsInternal(Integer max, String type, RelationshipDirection direction){
-        CatalogueElement element = queryForResource(params.id)
-
+    /**
+     * return mappings that have been assocaited with a particular catalogue element
+     * @param max - number of results
+     * @param id, the id of th catalogue element source of the relationship
+     */
+    def mappings(Integer max) {
+        handleParams(max)
+        long catalogueElementId = params.long('id')
+        CatalogueElement element = findById(catalogueElementId)
         if (!element) {
             notFound()
             return
         }
 
-        RelationshipType relationshipType = RelationshipType.readByName(type)
-
-        handleParams(max)
-
-        if (!params.search) {
-            respond errors: "No query string to search on"
-            return
-        }
-
-        ListWithTotalAndType<Relationship> results =  modelCatalogueSearchService.search(element, relationshipType, direction, params)
-
-        respond new Relationships(owner: element,
-                direction: direction,
-                type: relationshipType,
-                list: Lists.wrap(params, "/${resourceName}/${params.id}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${params.search?.encodeAsURL() ?: ''}", results))
-    }
-
-
-    def mappings(Integer max){
-        handleParams(max)
-        CatalogueElement element = queryForResource(params.id)
-        if (!element) {
-            notFound()
-            return
-        }
-
-        respond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${params.id}/mapping") {
+        respond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${catalogueElementId}/mapping") {
             eq 'source', element
         })
     }
 
+    /**
+     * remove mappings that have been assocaited with a particular catalogue element
+     * * security checked in the add relation method
+     * @param max - number of results
+     * @param id, the id of th catalogue element source of the relationship
+     */
     def removeMapping() {
-        addOrRemoveMapping(false)
-    }
 
-    def addMapping() {
-        addOrRemoveMapping(true)
-    }
+        Long destinationId = params.long('destination')
+        Long sourceId = params.long('id')
 
-    private addOrRemoveMapping(boolean add) {
-        withRetryingTransaction {
-            if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-                unauthorized()
-                return
-            }
-
-            if (!params.destination || !params.id) {
-                notFound()
-                return
-            }
-            CatalogueElement element = queryForResource(params.id)
-            if (!element) {
-                notFound()
-                return
-            }
-
-            CatalogueElement destination = queryForResource(params.destination)
-            if (!destination) {
-                notFound()
-                return
-            }
-            if (add) {
-                String mappingString = request.getJSON().mapping
-                Mapping mapping = mappingService.map(element, destination, mappingString)
-                if (mapping.hasErrors()) {
-                    respond mapping.errors
-                    return
-                }
-                response.status = HttpServletResponse.SC_CREATED
-                respond mapping
-                return
-            }
-            Mapping old = mappingService.unmap(element, destination)
-            if (old) {
-                response.status = HttpServletResponse.SC_NO_CONTENT
-                render "DELETED"
-            } else {
-                notFound()
-            }
+        MetadataResponseEvent responseEvent = sourceDestinationService.findSourceDestination(sourceId, destinationId)
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
+            return
         }
+
+        if ( !(responseEvent instanceof SourceDestinationEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+        SourceDestinationEvent sourceDestinationEvent = responseEvent as SourceDestinationEvent
+
+        Mapping old = mappingService.unmap(sourceDestinationEvent.source, sourceDestinationEvent.destination)
+        if ( !old ) {
+            notFound()
+            return
+        }
+        response.status = HttpServletResponse.SC_NO_CONTENT
+        render "DELETED"
     }
 
-    protected getDefaultSort()  { actionName == 'index' ? 'name'  : null }
-    protected getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
 
-    def dataModelService
+    /**
+     * add mappings that have been associated with a particular catalogue element
+     * @param id, the id of th catalogue element source of the relationship
+     *
+     */
+    def addMapping() {
+        Long destinationId = params.long('destination')
+        Long sourceId = params.long('id')
+
+        MetadataResponseEvent responseEvent = sourceDestinationService.findSourceDestination(sourceId, destinationId)
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
+            return
+        }
+
+        if ( !(responseEvent instanceof SourceDestinationEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+        SourceDestinationEvent sourceDestinationEvent = responseEvent as SourceDestinationEvent
+
+        String mappingString = request.getJSON().mapping
+
+        responseEvent = addMappingService.add(sourceDestinationEvent.source, sourceDestinationEvent.destination, mappingString)
+
+        if ( responseEvent instanceof MappingWithErrorsEvent ) {
+            MappingWithErrorsEvent mappingWithErrorsEvent = responseEvent as MappingWithErrorsEvent
+            respond mappingWithErrorsEvent.mapping.errors
+            return
+
+        }
+        if ( !(responseEvent instanceof MappingSavedEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+
+        MappingSavedEvent mappingSavedEvent = responseEvent as MappingSavedEvent
+        response.status = HttpServletResponse.SC_CREATED
+        respond mappingSavedEvent.mapping
+    }
+
+
+    /**
+     * Get a list of catalouge elements
+     * @param max, maximum number of results
+     * check if the the user has a role of viewer - otherwise they can't see draft elements
+     * @param status, filter by status
+     */
 
     @Override
     def index(Integer max) {
         handleParams(max)
 
-        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+        //before interceptor deals with this security - this is only applicable to data models and users
+        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())) {
             unauthorized()
             return
         }
 
+        ListWithTotalAndType<T> items
 
-        ListWithTotalAndType<T> items = getAllEffectiveItems(max)
-        //TODO - review usage - is this used? and when?
+        //use elasticsearch for anything that isn't a data model or a user list
+        // allows you to filter imports etc quickly and easilt
+
+        items = getAllEffectiveItems(max)
+
+
         if (params.boolean('minimal') && items instanceof ListWithTotalAndTypeWrapper) {
             ListWithTotalAndTypeWrapper<T> listWrapper = items as ListWithTotalAndTypeWrapper<T>
 
@@ -421,54 +327,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 }
             }
         }
-
         respond items
-    }
-
-    protected ListWrapper<T> getAllEffectiveItems(Integer max) {
-        if (params.status?.toLowerCase() == 'active') {
-            if (modelCatalogueSecurityService.hasRole('VIEWER')){
-                return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                    'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
-                }), overridableDataModelFilter)
-            }
-            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'eq' 'status', ElementStatus.FINALIZED
-            }), overridableDataModelFilter)
-        }
-
-        if (params.status) {
-            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))
-            }), overridableDataModelFilter)
-        }
-
-        return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
-    }
-
-    private <T> ListWrapper<T> withAdditionalIndexCriteria(ListWrapper<T> list) {
-        if (!hasAdditionalIndexCriteria()) {
-            return list
-        }
-
-        if (!(list instanceof ListWithTotalAndTypeWrapper)) {
-            throw new IllegalArgumentException("Cannot add additional criteria list $list. Only ListWithTotalAndTypeWrapper is currently supported")
-        }
-        if (!(list.list instanceof DetachedListWithTotalAndType)) {
-            throw new IllegalArgumentException("Cannot add additional criteria list $list. Only DetachedListWithTotalAndType is currently supported")
-        }
-
-        list.list.criteria.with buildAdditionalIndexCriteria()
-
-        return list
-    }
-
-    protected boolean hasAdditionalIndexCriteria() {
-        return false
-    }
-
-    protected Closure buildAdditionalIndexCriteria() {
-        return {}
     }
 
     /**
@@ -477,15 +336,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @return The rendered resource or a 404 if it doesn't exist
      */
     def show() {
-        T element = queryForResource(params.id)
+        T element = findById(params.long('id'))
 
         if (!element) {
             notFound()
-            return
-        }
-
-        if (!modelCatalogueSecurityService.hasRole('VIEWER') && !(element.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED])) {
-            unauthorized()
             return
         }
 
@@ -498,17 +352,25 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def update() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
         if(handleReadOnly()) {
             return
         }
 
-        T instance = queryForResource(params.id)
+        T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
+            return
+        }
+
+        DataModel dataModel
+        if ( instance instanceof DataModel ) {
+            dataModel = instance as DataModel
+        } else if ( CatalogueElement.class.isAssignableFrom(instance.class) ) {
+            dataModel = instance.dataModel
+        }
+
+        if ( dataModel && !dataModelAclService.isAdminOrHasAdministratorPermission(dataModel) ) {
+            unauthorized()
             return
         }
 
@@ -577,83 +439,54 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             modelCatalogueSecurityService.currentUser?.createLinkTo(instance, RelationshipType.favouriteType)
         }
 
-
         instance.save flush:true
 
         respond instance, [status: OK]
     }
 
-    /**
-     * Updates a resource for the given id
-     * @param id
-     */
-    @Transactional
-    def newVersion() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
-            return
+    protected boolean hasAuthorityOrHasAdministrationPermission(String authority, Object instance) {
+
+        DataModel dataModel
+        if ( instance instanceof DataModel ) {
+            dataModel = instance as DataModel
+        } else if ( CatalogueElement.class.isAssignableFrom(instance.class) ) {
+            dataModel = instance.dataModel
         }
 
-        if(handleReadOnly()) {
-            return
-        }
-
-        T instance = queryForResource(params.id)
-        if (instance == null) {
-            notFound()
-            return
-        }
-
-        String semanticVersion = params.semanticVersion ?: objectToBind.semanticVersion
-        String preferDrafts = params.preferDrafts ?: objectToBind.preferDrafts
-
-        Long id = instance.getId()
-
-        executorService.submit {
-            try {
-                CatalogueElement element = resource.get(id)
-                DraftContext context = DraftContext.userFriendly().withMonitor(BuildProgressMonitor.create("Create new version of $element", id))
-
-                if (preferDrafts) {
-                    preferDrafts.split(/\s*,\s*/).each {
-                        context.preferDraftFor(Long.parseLong(it, 10))
-                    }
-                }
-
-                if (element.instanceOf(DataModel)) {
-                    elementService.createDraftVersion((DataModel) element, semanticVersion, context) as T
-                } else {
-                    elementService.createDraftVersion(element, context) as T
-                }
-            } catch (e) {
-                log.error "Exception creating draft in the background", e
-            }
-        }
-
-        respond instance, [status: OK]
+        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles(authority))
+        dataModel && ( isCuratorOrAdminOrSupervisor || dataModelAclService.hasAdministratorPermission(dataModel))
     }
 
+    /**
+     * Merge an element with another element i.e. if two elements have been created for the same item
+     * @param id cloned element id
+     * @param source, destination elements to be merged
+     */
     @Transactional
     def merge() {
-
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
 
         if (handleReadOnly()) {
             return
         }
 
-        T source = queryForResource(params.source)
+        T source = findById(params.source)
         if (source == null) {
             notFound()
             return
         }
 
-        T destination = queryForResource(params.destination)
+        if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', source) ) {
+            unauthorized()
+            return
+        }
+
+        T destination = findById(params.destination)
         if (destination == null) {
             notFound()
+            return
+        }
+        if ( !hasAuthorityOrHasAdministrationPermission('CURATOR', destination) ) {
+            unauthorized()
             return
         }
 
@@ -667,67 +500,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond merged, [status: OK]
     }
 
-    /**
-     * Archive element
-     * @param id
-     */
-    def finalizeElement() {
-        // TODO: this should be moved to DataModelController
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
-
-        if (handleReadOnly()) {
-            return
-        }
-
-        T instance = queryForResource(params.id)
-        if (instance == null) {
-            notFound()
-            return
-        }
-
-        if (!instance.instanceOf(DataModel) && !instance.dataModel) {
-            instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model"
-            respond instance.errors
-            return
-        }
-
-
-        String semanticVersion = params.semanticVersion
-        String revisionNotes = params.revisionNotes
-
-        if (instance.instanceOf(DataModel)) {
-            instance.checkFinalizeEligibility(semanticVersion, revisionNotes)
-        }
-
-        if (instance.hasErrors()) {
-            respond instance.errors, view: 'edit' // STATUS CODE 422
-            return
-        }
-
-        Long id = instance.getId()
-
-        executorService.submit {
-            try {
-                CatalogueElement element = resource.get(id)
-                if (element.instanceOf(DataModel)) {
-                    elementService.finalizeDataModel(element as DataModel, semanticVersion, revisionNotes, BuildProgressMonitor.create("Finalizing $element", id))
-                } else {
-                    elementService.finalizeElement(element, BuildProgressMonitor.create("Finalizing $element", id))
-                }
-             } catch (e) {
-                log.error "Exception finalizing element on the background", e
-                CatalogueElement element = resource.get(id)
-                element.status = ElementStatus.DRAFT
-                element.save(flush: true)
-            }
-
-        }
-
-        respond instance, [status: OK]
-    }
 
     /**
      * Clone element
@@ -736,24 +508,31 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def cloneElement() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
-
         if (handleReadOnly()) {
             return
         }
 
-        T instance = queryForResource(params.id)
+        T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
             return
         }
+        if ( CatalogueElement.class.isAssignableFrom(instance.class) )  {
+            DataModel dataModel = instance.dataModel
+            if ( !dataModelAclService.hasReadPermission(dataModel) ) {
+                unauthorized()
+                return
+            }
+        }
 
-        DataModel destinationDataModel = DataModel.get(params.destinationDataModelId)
+        long destinationDataModelId = params.long('destinationDataModelId')
+        DataModel destinationDataModel = dataModelGormService.findById(destinationDataModelId)
         if (destinationDataModel == null) {
             notFound()
+            return
+        }
+        if ( !dataModelAclService.isAdminOrHasAdministratorPermission(destinationDataModel) ) {
+            unauthorized()
             return
         }
 
@@ -782,109 +561,114 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     }
 
     /**
-     * Archive element
+     * Used to Archive an element
      * @param id
      */
     @Transactional
     def archive() {
-        // TODO: this should be moved to DataModelController
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
-
         if (handleReadOnly()) {
             return
         }
 
-        T instance = queryForResource(params.id)
-        if (instance == null) {
+        Long catalogueElementId = params.long('id')
+        MetadataResponseEvent responseEvent = manageCatalogueElementService.archive(catalogueElementId)
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
+            return
+        }
+        if (!responseEvent instanceof CatalogueElementArchivedEvent) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
             notFound()
             return
         }
 
-        // do not archive relationships as we need to transfer the deprecated elements to the new versions
-        instance = elementService.archive(instance, false)
+        T instance = (responseEvent as CatalogueElementArchivedEvent).catalogueElement
+        respond instance, [status: OK]
+    }
 
-        if (instance.hasErrors()) {
-            respond instance.errors, view: 'edit' // STATUS CODE 422
+    /**
+     * Used on an Archived element to restore it i.e. bring it's status back
+     * @param id
+     */
+    //TODO: this always makes the element finalised - if it's contained in a draft model it should be brought back to a draft state
+    @Transactional
+    def restore() {
+
+        Long catalogueElementId = params.long('id')
+        MetadataResponseEvent responseEvent = manageCatalogueElementService.restore(catalogueElementId)
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
             return
         }
+        if (!responseEvent instanceof CatalogueElementRestoredEvent) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+        T instance = (responseEvent as CatalogueElementRestoredEvent).catalogueElement
 
         respond instance, [status: OK]
     }
 
     /**
-     * Archive element
-     * @param id
+     * Return all the changes assocaited with a catalouge element
+     * @param id, if of the catalogue element
+     * @param max, maximum results
      */
-    @Transactional
-    def restore() {
-        // TODO: this should be moved to DataModelController
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            unauthorized()
-            return
-        }
-
-        if (handleReadOnly()) {
-            return
-        }
-
-        T instance = queryForResource(params.id)
-        if (instance == null) {
-            notFound()
-            return
-        }
-
-        // do not archive relationships as we need to transfer the deprecated elements to the new versions
-        instance = elementService.restore(instance)
-
-        if (instance.hasErrors()) {
-            respond instance.errors, view: 'edit' // STATUS CODE 422
-            return
-        }
-
-        respond instance, [status: OK]
-    }
-
+    //TODO: this needs some work - not sure why we need this and the below
     def changes(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = findById(params.long('id'))
         if (!element) {
             notFound()
             return
         }
 
-        respond Lists.wrap(params, "/${resourceName}/${params.id}/changes", auditService.getChanges(params, element))
+        respond Lists.wrap(params, "/${resourceName}/${params.long('id')}/changes", auditService.getChanges(params, element))
     }
 
-    def typeHierarchy(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        CatalogueElement element = queryForResource(params.id)
-        if (!element) {
-            notFound()
-            return
-        }
-
-        respond Lists.wrap(params, "/${resourceName}/${params.id}/typeHierarchy", elementService.getTypeHierarchy(params, element))
-    }
-
+    /**
+     * Return all the history of a element
+     * @param id, if of the catalogue element
+     * @param max, maximum results
+     */
+    //TODO: this needs some work - not sure why we need this and the above
     def history(Integer max) {
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = findById(params.long('id'))
         if (!element) {
             notFound()
             return
         }
 
         params.max = Math.min(max ?: 10, 100)
-
-
         respond Lists.wrap(params,  "/${resourceName}/${params.id}/history", auditService.getElementChanges(params, element.latestVersionId ?: element.id))
     }
 
+    /**
+     * Return all the elements that this inherits ?
+     * @param id,        id of the catalogue element
+     * @param max, maximum results
+     */
+    def typeHierarchy(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        Long id = params.long('id')
+        CatalogueElement element = findById(id)
+        if ( !element ) {
+            notFound()
+            return
+        }
+        String base = "/${resourceName}/${id}/typeHierarchy" as String
+        respond Lists.wrap(params, base, elementService.getTypeHierarchy(params, element))
+    }
 
+    /**
+     * Get the path for a catalogue element - this is used in the ui to open an element in context
+     * For example        id a data element appears in two classes this will give you the specific path within one of the classes
+     * @param id, id of the catalogue element
+     * @param max, maximum results
+     */
     def path() {
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = findById(params.long('id'))
         if (!element) {
             notFound()
             return
@@ -893,16 +677,297 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond new PathFinder().findPath(element)
     }
 
+    /**
+     * GENERAL reorder relationships METHOD used for internal and external relationships i.e. if you want one data element contained in a class to come before another
+     * @param id, id of the catalogue element
+     * @param type,type of relationship
+     * @param max, maximum results
+     */
+    private def reorderInternal(RelationshipDirection direction, Long catalogueElementId, String type) {
+        Long movedId = objectToBind?.moved?.id as Long
+        if (!movedId) {
+            notAcceptable()
+            return
+        }
+        Long currentId = objectToBind?.current?.id as Long
+
+        MetadataResponseEvent responseEvent = manageCatalogueElementService.reorderInternal(direction, catalogueElementId, type, movedId, currentId)
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
+            return
+        }
+        if (responseEvent instanceof CatalogueElementStatusNotInDraftEvent) {
+            respond(error: 'You can only reorder items when the element is draft!')
+            return
+        }
+        if (!(responseEvent instanceof RelationshipMovedEvent)) {
+            log.warn "got an unexpected response event {responsEvent.class.name} in reorderInternal"
+            return
+        }
+
+        Relationship rel = (RelationshipMovedEvent as RelationshipMovedEvent).relationship
+        respond(id: rel.id,
+                type: rel.relationshipType,
+                ext: OrderedMap.toJsonMap(rel.ext),
+                element: rel.source, relation:
+                rel.destination,
+                direction: 'sourceToDestination',
+                removeLink: RelationshipsMarshaller.getDeleteLink(rel.source, rel),
+                archived: rel.archived,
+                elementType: Relationship.name)
+    }
+
+    //TODO: this should all go into a service
+    //general remove any relation from a catalogue element based on the relationship type
+    // used by the directional remove relation methods
+    private void removeRelation(Long id, String type, boolean outgoing) {
+        Object otherSide = parseOtherSide()
+        DestinationClass destinationClass = new DestinationClass(
+            className: otherSide.relation ? otherSide.relation.elementType : otherSide.elementType,
+            id: otherSide.relation ? otherSide.relation.id : otherSide.id
+        )
+        String relationshipTypeName = otherSide.type ? otherSide.type.name : type
+        def dataModelObject = otherSide.dataModel ?: otherSide.classification
+        Long dataModelId = dataModelObject?.id as Long
+
+        MetadataResponseEvent responseEvent = sourceDestinationService.findSourceDestination(id, destinationClass)
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
+            return
+        }
+
+        if ( !(responseEvent instanceof SourceDestinationEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+        SourceDestinationEvent sourceDestinationEvent = responseEvent as SourceDestinationEvent
+
+        CatalogueElement source = sourceDestinationEvent.source
+        CatalogueElement destination = sourceDestinationEvent.destination
+        responseEvent = removeRelationService.removeRelation(relationshipTypeName,
+                                             dataModelId,
+                                             outgoing,
+                                             source,
+                                             destination)
+        handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
+            return
+        }
+
+        if ( !(responseEvent instanceof RelationshipRemovedEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+
+        response.status = HttpServletResponse.SC_NO_CONTENT
+        render "DELETED"
+    }
+
+    @CompileDynamic
+    protected DestinationClass destinationClassFromJsonPayload()  {
+        DestinationClass destination = new DestinationClass()
+        Object otherSide = parseOtherSide()
+        destination.className = otherSide.elementType as String
+        destination.id = otherSide.id as Long
+        destination
+    }
+
+
+   /**
+    * general add any relation from a catalogue element based on the relationship type used by the directional add relation methods
+    */
+//    @CompileStatic
+    protected def addRelation(Long catalogueElementId, String type, boolean outgoing) {
+
+        try {
+            def otherSide = parseOtherSide()
+            DestinationClass destinationClass = destinationClassFromJsonPayload()
+            def objectToBindParam = getObjectToBind()
+            MetadataResponseEvent metadataResponse = manageCatalogueElementService.addRelation(catalogueElementId,
+                    type,
+                    outgoing as Boolean,
+                    objectToBindParam as Object,
+                    destinationClass)
+
+            boolean handled = handleMetadataResponseEvent(metadataResponse)
+            if ( handled ) {
+                return
+            }
+
+            if( !(metadataResponse instanceof RelationAddedEvent)) {
+                notFound()
+                return
+            }
+            RelationAddedEvent relationAddedEvent = metadataResponse as RelationAddedEvent
+            response.status = HttpServletResponse.SC_CREATED
+            respond(id: relationAddedEvent.rel.id,
+                    type: relationAddedEvent.rel.relationshipType,
+                    ext: OrderedMap.toJsonMap(relationAddedEvent.rel.ext),
+                    element: CatalogueElementMarshaller.minimalCatalogueElementJSON(relationAddedEvent.direction.getElement(relationAddedEvent.source, relationAddedEvent.rel)),
+                    relation: relationAddedEvent.direction.getRelation(relationAddedEvent.source, relationAddedEvent.rel),
+                    direction: relationAddedEvent.direction.getDirection(relationAddedEvent.source, relationAddedEvent.rel),
+                    removeLink: RelationshipsMarshaller.getDeleteLink(relationAddedEvent.source, relationAddedEvent.rel),
+                    archived: relationAddedEvent.rel.archived, elementType: Relationship.name,
+                    classification: relationAddedEvent.rel.dataModel,
+                    dataModel: relationAddedEvent.rel.dataModel)
+        } catch (ClassNotFoundException ignored) {
+            notFound()
+        }
+    }
+
+    //TODO: not sure what this does
+    protected Object parseOtherSide() {
+        request.getJSON()
+    }
+
+    /**
+     * returns a list of internal relationships
+     * @param id, id of the catalogue element
+     * @param type,type of relationship
+     * @param max, maximum results
+     */
+    private relationshipsInternal(Integer max, String typeParam, RelationshipDirection direction) {
+        ParamArgs paramArgs = instantiateParamArgs(max)
+        if (!params.sort) {
+            paramArgs.sort = direction.sortProperty
+        }
+
+        Long catalogueElementId = params.long('id')
+        MetadataResponseEvent responseEvent = relationshipsInternalService.relationshipsInternal(catalogueElementId,
+                typeParam,
+                direction,
+                resourceName,
+                paramArgs,
+                overridableDataModelFilter)
+
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
+            return
+        }
+
+        if ( !(responseEvent instanceof RelationshipsEvent) ) {
+            log.warn "got an unexpected response event {responsEvent.class.name} in relationshipsInternal"
+            return
+        }
+
+        RelationshipsEvent relationshipsEvent = responseEvent as RelationshipsEvent
+        Relationships relationships = relationshipsEvent.relationships
+        respond relationships
+    }
+
+    protected void searchWithinRelationshipsInternal(Integer max, String type, RelationshipDirection direction){
+        String search = params.search
+        if (!search) {
+            respond errors: "No query string to search on"
+            return
+        }
+        Long catalogueElementId = params.long('id')
+        ParamArgs paramArgs = instantiateParamArgs(max)
+        SearchParams searchParams = SearchParams.of(params, paramArgs)
+        MetadataResponseEvent responseEvent = manageCatalogueElementService.searchWithinRelationships(catalogueElementId,
+                type,
+                direction,
+                searchParams)
+
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
+            return
+        }
+
+        if ( !(responseEvent instanceof RelationshipsEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
+            notFound()
+            return
+        }
+        RelationshipsEvent relationshipsEvent = responseEvent as RelationshipsEvent
+        respond relationshipsEvent.relationships
+    }
+
+    protected String getDefaultSort()  { actionName == 'index' ? 'name'  : null }
+    protected String getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
+
+
+    /**
+     * returns all effective items for a user as a list of data models based on the specific data model role
+     * i.e. we can view the basic info of data models that we aren't subscribed to
+     * @param id of catalogue element - if there is one
+     */
+    protected ListWrapper<T> getAllEffectiveItems(Integer max) {
+
+        if (params.status?.toLowerCase() == 'active') {
+            if (modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())){
+                return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                    'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
+                }), overridableDataModelFilter)
+            }
+            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                'eq' 'status', ElementStatus.FINALIZED
+            }), overridableDataModelFilter)
+        }
+
+        if (params.status) {
+            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER', getDataModel()))
+            }), overridableDataModelFilter)
+        }
+
+        return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
+    }
+
+
+
+    //TODO: not sure what this does
+    private <T> ListWrapper<T> withAdditionalIndexCriteria(ListWrapper<T> list) {
+        if (!hasAdditionalIndexCriteria()) {
+            return list
+        }
+
+        if (!(list instanceof ListWithTotalAndTypeWrapper)) {
+            throw new IllegalArgumentException("Cannot add additional criteria list $list. Only ListWithTotalAndTypeWrapper is currently supported")
+        }
+        if (!(list.list instanceof DetachedListWithTotalAndType)) {
+            throw new IllegalArgumentException("Cannot add additional criteria list $list. Only DetachedListWithTotalAndType is currently supported")
+        }
+
+        list.list.criteria.with buildAdditionalIndexCriteria()
+
+        return list
+    }
+
+    //TODO: not sure what this does
+    protected boolean hasAdditionalIndexCriteria() {
+        return false
+    }
+
+    //TODO: not sure what this does
+    protected Closure buildAdditionalIndexCriteria() {
+        return {}
+    }
+
+    //TODO: not sure what this does - remove
     protected String getHistoryOrderDirection() {
         'desc'
     }
 
+    //TODO: not sure what this does - remove
     protected String getHistorySortProperty() {
         'versionNumber'
     }
 
+    //TODO: not sure what this does
     // classifications are marshalled with the published element so no need for special method to fetch them
     protected bindRelations(T instance, boolean newVersion, Object objectToBind) {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         if (!instance.readyForQueries) {
             return
         }
@@ -915,7 +980,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
         for (domain in dataModels) {
-            DataModel dataModel = DraftContext.userFriendly().findExisting(DataModel.get(domain.id as Long)) as DataModel
+            DataModel dataModel = DraftContext.userFriendly().findExisting(dataModelGormService.findById(domain.id as Long)) as DataModel
             if (!dataModel) {
                 log.error "No data model exists for $domain"
                 continue
@@ -929,6 +994,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
     }
 
+    /**
+     * not sure what this does - think it collects the fields used in the json - removes the ones we don't want?
+     * @param id of data model
+     */
     @Override
     protected getIncludeFields(){
         def fields = super.includeFields
@@ -936,11 +1005,16 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         fields
     }
 
+
+    //TODO: not sure what this does
     protected void validatePolicies(VerificationPhase phase, T instance, Object objectToBind) {
         DataModel effectiveDataModel = instance.dataModel
         def dataModels = objectToBind.classifications ?: objectToBind.dataModels
         if (dataModels) {
-            effectiveDataModel = DataModel.get(dataModels.first().id as Long)
+            Long dataModelId = dataModels.first().id as Long
+            if ( dataModelId != null ) {
+                effectiveDataModel = dataModelGormService.findById(dataModelId)
+            }
         }
 
         if (!effectiveDataModel && resource == DataModel) {
@@ -956,9 +1030,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
     }
 
+    //TODO: not sure what this does
     protected DataModelFilter getOverridableDataModelFilter() {
         if (params.dataModel) {
-            DataModel dataModel = DataModel.get(params.long('dataModel'))
+            DataModel dataModel = dataModelGormService.findById(params.long('dataModel'))
             if (dataModel) {
                 return DataModelFilter.includes(dataModel)
             }
@@ -966,4 +1041,28 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         dataModelService.dataModelFilter
     }
 
+    /**
+     * @return true if the event was handled, false if it was not
+     */
+    protected boolean handleMetadataResponseEvent(MetadataResponseEvent responseEvent) {
+        if (responseEvent instanceof NotFoundEvent) {
+            notFound()
+            return true
+        }
+        if (responseEvent instanceof UnauthorizedEvent) {
+            unauthorized()
+            return true
+        }
+        if (responseEvent instanceof CatalogueElementWithErrorsEvent) {
+            respond responseEvent.catalogueElement.errors, view: 'edit' // STATUS CODE 422
+            return true
+        }
+        if ( responseEvent instanceof RelationshipWithErrorsEvent ) {
+            RelationshipWithErrorsEvent relationshipWithErrorsEvent = responseEvent as RelationshipWithErrorsEvent
+            respond relationshipWithErrorsEvent.relationship.errors
+            return true
+        }
+
+        false
+    }
 }

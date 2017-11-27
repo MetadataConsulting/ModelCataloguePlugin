@@ -17,21 +17,22 @@ import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.lists.JsonAwareListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.SearchParams
 
 @Log4j
 class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
 
-    final Map<String, Object> params
+    final SearchParams params
     final Class<T> type
     final SearchRequestBuilder searchRequest
 
     SearchResponse response
 
-    static <T> ListWithTotalAndType<T> search(Map<String, Object> params, Class<T> type, SearchRequestBuilder searchRequest) {
+    static <T> ListWithTotalAndType<T> search(SearchParams params, Class<T> type, SearchRequestBuilder searchRequest) {
         return new ElasticSearchQueryList<T>(params, type, searchRequest)
     }
 
-    private ElasticSearchQueryList(Map<String, Object> params, Class<T> type, SearchRequestBuilder searchRequest) {
+    private ElasticSearchQueryList(SearchParams params, Class<T> type, SearchRequestBuilder searchRequest) {
         this.params = params
         this.type = type
         this.searchRequest = searchRequest
@@ -56,11 +57,15 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
 
     private SearchResponse initializeResponse() {
         try {
-            if (params.offset) {
-                searchRequest.setFrom(Integer.parseInt(params.offset.toString(), 10))
+
+
+            if (params.paramArgs?.offset) {
+                int offset = params.paramArgs?.offset
+                searchRequest.setFrom(offset)
             }
-            if (params.max) {
-                searchRequest.setSize(Integer.parseInt(params.max.toString(), 10))
+            if (params.paramArgs?.max) {
+                int max = params.paramArgs?.max
+                searchRequest.setSize(max)
             }
             if (params.explain) {
                 log.info searchRequest.toString()

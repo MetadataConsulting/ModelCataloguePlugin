@@ -1,7 +1,15 @@
 package org.modelcatalogue.core.security
 
+import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.authentication.dao.NullSaltSource
+import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.DataModel
+
 class UserAdminController extends grails.plugin.springsecurity.ui.UserController {
 
+    /**
+     * show the create user page - see supercalss
+     */
     def create(){
         super.create()
     }
@@ -12,7 +20,7 @@ class UserAdminController extends grails.plugin.springsecurity.ui.UserController
             def user = User.findByEmail(params.email)
             if (user) {
                 user.errors.rejectValue("email", "default.unique.message",
-                    ["email", User.class, params.email] as Object[], "Email value needs to be unique.")
+                        ["email", User.class, params.email] as Object[], "Email value needs to be unique.")
                 render view: 'create', model: [user: user, authorityList: sortedRoles()]
                 return
             }
@@ -28,7 +36,7 @@ class UserAdminController extends grails.plugin.springsecurity.ui.UserController
             def user = User.findByEmailAndIdNotEqual(params.email, params.id)
             if (user) {
                 user.errors.rejectValue("email", "default.unique.message",
-                    ["email", User.class, params.email] as Object[], "Email value needs to be unique.")
+                        ["email", User.class, params.email] as Object[], "Email value needs to be unique.")
                 render view: 'edit', model: buildUserModel(user)
                 return
             }

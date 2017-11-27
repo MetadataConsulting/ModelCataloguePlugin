@@ -216,11 +216,13 @@ class Lists {
 
         def nextLink = ""
         def previousLink = ""
-        if (params?.max && params.max < total) {
-            def offset = (params?.offset) ? params?.offset?.toInteger() : 0
-            def prev = offset - params?.max
-            def next = offset + params?.max
-            if (next < total) {
+        int totalInt = total.toInteger()
+        int max = params.max ? params.max as int : 0
+        if (max && max < totalInt) {
+            int offset = params.offset ? params.offset as int : 0
+            int prev = offset - max
+            int next = offset + max
+            if (next < totalInt) {
                 nextLink = "${link}&offset=${next}"
             }
             if (prev >= 0) {

@@ -1,20 +1,21 @@
 package org.modelcatalogue.core.security
 
 import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.RegisterCommand
 import grails.plugin.springsecurity.ui.RegistrationCode
-import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.RegisterService
+import org.modelcatalogue.core.TransactionalEmailService
 import org.springframework.security.core.context.SecurityContextHolder
 
 class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
 
     UserService userService
 
+    TransactionalEmailService transactionalEmailService
+
+    RegisterService registerService
+
     def register(RegisterCommand command) {
-        def adminEmail = System.getenv(UserService.ENV_ADMIN_EMAIL)
-        def supervisorEmail = System.getenv(UserService.ENV_SUPERVISOR_EMAIL)
-        def conf = SpringSecurityUtils.securityConfig
 
         if (!grailsApplication.config.mc.allow.signup) {
             flash.error = "Registration is not enabled for this application"
@@ -27,24 +28,19 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             return
         }
 
-        String salt = saltSource instanceof NullSaltSource ? null : command.username
-        def user = lookupUserClass().newInstance(email: command.email, username: command.username, accountLocked: false, enabled: false)
-
-        if ((adminEmail && user.email != adminEmail) && (supervisorEmail && user.email != supervisorEmail)) {
+        def adminEmail = System.getenv(UserService.ENV_ADMIN_EMAIL)
+        def supervisorEmail = System.getenv(UserService.ENV_SUPERVISOR_EMAIL)
+        boolean shouldUserBeDisabled =  (adminEmail && command.email != adminEmail) && (supervisorEmail && command.email != supervisorEmail)
+        boolean enabled = !shouldUserBeDisabled
+        if ( shouldUserBeDisabled ) {
             // notify admin
-            mailService.sendMail {
-                to adminEmail
-                from conf.ui.register.emailFrom
-                subject "Metadata Registry - new user"
-                html "New user registered to your Metadata Registry. Please enable that account in user administration."
-            }
-        } else {
-            // enable should do the admin
-            user.enabled = true
+            transactionalEmailService.sendEmail(adminEmail,
+                    conf.ui.register.emailFrom,
+                    "Metadata Registry - new user",
+                    "New user registered to your Metadata Registry. Please enable that account in user administration.")
         }
 
-        // the user is saved in following method
-        RegistrationCode registrationCode = springSecurityUiService.register(user, command.password, salt)
+        RegistrationCode registrationCode = registerService.register(command.username, command.password, command.email, enabled)
         if (registrationCode == null || registrationCode.hasErrors()) {
             // null means problem creating the user
             flash.error = message(code: 'spring.security.ui.register.miscError')
@@ -55,16 +51,17 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
         String url = generateLink('verifyRegistration', [t: registrationCode.token])
 
+        def conf = SpringSecurityUtils.securityConfig
         def body = conf.ui.register.emailBody
         if (body.contains('$')) {
-            body = evaluate(body, [user: user, url: url])
+            body = evaluate(body, [user: command, url: url])
         }
-        mailService.sendMail {
-            to command.email
-            from conf.ui.register.emailFrom
-            subject conf.ui.register.emailSubject
-            html body.toString()
-        }
+
+        transactionalEmailService.sendEmail(command.email,
+                conf.ui.register.emailFrom as String,
+                conf.ui.register.emailSubject as String,
+                body.toString())
+
 
         render view: 'index', model: [emailSent: true]
     }

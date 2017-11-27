@@ -537,13 +537,13 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
                 dataType name: wd40name
             }
             dataModel name: other234Name, {
+                copy relationships
                 dataType name: vd1Name
                 dataType name: vd2Name
                 dataType name: vd3Name
                 dataType name: vd4Name, {
                     rel 'synonym'   to      dataType called vd2Name
                     rel 'synonym'   from    vd1Name
-
 
                     rel 'relatedTo' to      other123Name, wd40name
                     rel 'base'      to      other123Name, wd40name
@@ -1074,7 +1074,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     }
 
 
-    def "data models in paramters will create new data models"() {
+    def "data models in parameters will create new data models"() {
         final String parentDataClassName = 'Parent DMIP'
         final String childDataClassName = 'Child DMIP'
         final String modelOneName = 'Model #001'
@@ -1214,7 +1214,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             grandChild.dataModel == dataModel
     }
 
-    def "when creating refrence data type don't create hierarchy"() {
+    def "when creating reference data type don't create hierarchy"() {
         given:
             build {
                 dataModel(name: DATA_MODEL_NO_HIERARCHY) {

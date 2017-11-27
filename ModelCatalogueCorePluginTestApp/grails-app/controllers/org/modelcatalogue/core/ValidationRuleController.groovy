@@ -1,12 +1,17 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ValidationRuleCatalogueElementService
+import org.modelcatalogue.core.persistence.ValidationRuleGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 
-
 class ValidationRuleController extends AbstractCatalogueElementController<ValidationRule> {
+
+    ValidationRuleGormService validationRuleGormService
+    ValidationRuleCatalogueElementService validationRuleCatalogueElementService
 
     ValidationRuleController() {
         super(ValidationRule, false)
@@ -17,7 +22,7 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
 
         params.sort = 'incomingIndex'
 
-        ValidationRule element = queryForResource(params.id)
+        ValidationRule element = findById(params.long('id'))
 
         if (!element) {
             notFound()
@@ -53,6 +58,15 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
                 sort('incomingIndex')
             }
         )
+    }
+
+    protected ValidationRule findById(long id) {
+        validationRuleGormService.findById(id)
+    }
+
+    @Override
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        validationRuleCatalogueElementService
     }
 
     @Override

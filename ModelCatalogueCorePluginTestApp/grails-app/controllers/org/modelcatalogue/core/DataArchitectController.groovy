@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.dataarchitect.CSVService
+import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
@@ -15,7 +16,8 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
     def dataArchitectService
     def executorService
     def dataClassService
-    @Autowired CSVService csvService
+    CSVService csvService
+    CatalogueElementGormService catalogueElementGormService
 
     DataArchitectController() {
         super(CatalogueElement, false)
@@ -109,6 +111,15 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
     }
 
     def generateSuggestions() {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         String suggestion = params.suggestion
         String dataModel1ID = params.dataModel1
         String dataModel2ID = params.dataModel2
@@ -123,6 +134,15 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
 
     def deleteSuggestions() {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         executorService.execute {
             dataArchitectService.deleteSuggestions()
         }
@@ -130,4 +150,7 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     }
 
+    protected CatalogueElement findById(long id) {
+        catalogueElementGormService.findById(id)
+    }
 }

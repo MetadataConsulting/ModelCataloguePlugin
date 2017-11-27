@@ -2,7 +2,9 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
+import spock.lang.Ignore
 
+@Ignore
 class PrimitiveTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override

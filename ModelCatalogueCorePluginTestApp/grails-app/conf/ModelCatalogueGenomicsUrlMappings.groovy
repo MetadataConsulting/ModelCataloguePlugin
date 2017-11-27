@@ -5,7 +5,6 @@ class ModelCatalogueGenomicsUrlMappings {
     static mappings = {
         "/api/modelCatalogue/core/genomics/imports/upload" (controller: "rareDiseaseImport", action: 'upload', method: HttpMethod.POST)
 
-        "/api/modelCatalogue/core/genomics/exportGelSpecification/$id" (controller: 'genomics', action: 'exportGelSpecification', method: HttpMethod.GET)
         "/api/modelCatalogue/core/genomics/exportRareDiseaseHPOAndClinicalTestsAsJson/$id" (controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsJson', method: HttpMethod.GET)
         "/api/modelCatalogue/core/genomics/exportRareDiseaseListAsJson/$id" (controller: 'genomics', action: 'exportRareDiseaseListAsJson', method: HttpMethod.GET)
         "/api/modelCatalogue/core/genomics/exportRareDiseaseHPOEligibilityCriteriaAsJson/$id" (controller: 'genomics', action: 'exportRareDiseaseHPOEligibilityCriteriaAsJson', method: HttpMethod.GET)

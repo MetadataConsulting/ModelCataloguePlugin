@@ -3,14 +3,19 @@ package org.modelcatalogue.core
 import com.google.common.base.Function
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
+import grails.plugin.springsecurity.acl.AclEntry
 import grails.util.GrailsNameUtils
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.*
+import org.modelcatalogue.core.security.Role
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import rx.Observer
+
+import java.security.acl.Acl
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
@@ -22,11 +27,14 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 * */
 abstract class  CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement, DataModelAware {
 
-    def grailsLinkGenerator
-    def relationshipService
-    def auditService
-    def mappingService
-    def elementService
+    transient grailsLinkGenerator
+    transient relationshipService
+    transient auditService
+    transient mappingService
+    transient elementService
+    transient modelCatalogueSecurityService
+
+    transient dataModelAclService
 
     DataModel dataModel
 
@@ -81,8 +89,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     ]
 
     static constraints = {
-        name size: 1..255
-        description nullable: true, maxSize: 20000
+        name nullable: false, blank: false, size: 1..255
+        description nullable: true, blank: true, maxSize: 20000
 		modelCatalogueId nullable: true, size: 1..255
         dateCreated bindable: false
         lastUpdated bindable: false
@@ -117,7 +125,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     @Deprecated
     List getRelations() {
-        getOutgoingRelations() + getIncomingRelations()
+        [getOutgoingRelations(), getIncomingRelations()].flatten().unique()
     }
 
     List getIncomingRelations() {
@@ -147,7 +155,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     @Deprecated
     List getRelationsByType(RelationshipType type) {
-        [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten()
+        [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten().unique()
     }
 
     List<Relationship> getIncomingRelationshipsByType(RelationshipType type) {
@@ -226,7 +234,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         }
     }
 
-    def beforeDelete(){
+    def beforeDelete() {
         auditService.logElementDeleted(this)
     }
 
@@ -448,6 +456,12 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     void afterMerge(CatalogueElement destination) {}
 
     void afterInsert() {
+        if ( this instanceof DataModel ) {
+            final Long dataModelId = this.id
+            AclEntry.withNewSession {
+                dataModelAclService.addAdministrationPermission(dataModelId)
+            }
+        }
         auditService.logElementCreated(this)
     }
 

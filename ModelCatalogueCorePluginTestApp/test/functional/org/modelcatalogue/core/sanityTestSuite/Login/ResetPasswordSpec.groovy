@@ -3,8 +3,9 @@ package org.modelcatalogue.core.sanityTestSuite.Login
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.WebDriver
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 
-
+@IgnoreIf({ !System.getProperty('geb.env') })
 class ResetPasswordSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String login ="button.btn"

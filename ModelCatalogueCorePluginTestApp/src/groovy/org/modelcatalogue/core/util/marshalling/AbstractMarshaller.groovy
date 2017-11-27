@@ -4,6 +4,7 @@ import grails.converters.JSON
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.reports.ReportDescriptor
 import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.security.DataModelAclService
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
@@ -15,6 +16,7 @@ abstract class AbstractMarshaller {
 
     @Autowired ReportsRegistry reportsRegistry
     @Autowired SecurityService modelCatalogueSecurityService
+    @Autowired DataModelAclService dataModelAclService
     @Autowired JsonMarshallingCustomizerRegistry jsonMarshallingCustomizerRegistry
 
     final Class type

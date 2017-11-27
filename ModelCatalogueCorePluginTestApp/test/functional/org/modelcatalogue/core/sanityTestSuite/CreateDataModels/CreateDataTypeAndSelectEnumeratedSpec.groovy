@@ -2,6 +2,8 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import groovy.transform.NotYetImplemented
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.create
@@ -14,6 +16,8 @@ import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.save
 
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpec{
 
