@@ -6,15 +6,7 @@ angular.module('mc.core.ui.states', [
   # list of modules
   'modelcatalogue.core.ui.states.landing'
   'modelcatalogue.core.ui.states.dataModels'
-  'mc.core.ui.states.simple.actions.show'
-  'mc.core.ui.states.simple.actions'
   'modelcatalogue.core.ui.states.dataModel'
-  'mc.core.ui.states.simple.favorites'
-  'mc.core.ui.states.simple.feedback'
-  'mc.core.ui.states.simple.resource.show.property'
-  'mc.core.ui.states.simple.resource.show'
-  'mc.core.ui.states.simple.resource.list'
-  'mc.core.ui.states.simple.resource'
   'mc.core.ui.states.simple'
 ])
 

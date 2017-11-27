@@ -1,4 +1,5 @@
-angular.module('mc.core.ui.states.simple.resource.show', ['modelcatalogue.core.ui.states.controllers']).config(['$stateProvider', ($stateProvider) ->
+angular.module('mc.core.ui.states.simple.resource.show', ['modelcatalogue.core.ui.states.controllers',
+'mc.core.ui.states.simple.resource.show.property']).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'simple.resource.show', {
       url: '/{id:\\d+}'

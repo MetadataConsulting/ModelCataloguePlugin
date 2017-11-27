@@ -1,4 +1,6 @@
-angular.module('mc.core.ui.states.simple.actions', []).config(['$stateProvider', ($stateProvider) ->
+angular.module('mc.core.ui.states.simple.actions', [
+  'mc.core.ui.states.simple.actions.show'
+]).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state('simple.actions', {
       abstract: true,
