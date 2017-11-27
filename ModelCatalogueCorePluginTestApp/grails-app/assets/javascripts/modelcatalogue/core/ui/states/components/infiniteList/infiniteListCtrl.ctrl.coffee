@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteListCtrl', ['modelcatalogue.core.enhancersConf.listEnhancer']).controller 'infiniteListCtrl', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, actionRoleAccess, $controller, names, security, enhance, catalogue) ->
+angular.module('modelcatalogue.core.ui.states.components.infiniteListCtrl', ['modelcatalogue.core.enhancersConf.listEnhancer']).controller 'infiniteListCtrl', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, actionRoleAccess, $controller, names, security, enhance, catalogue) ->
   'ngInject'
 
   angular.extend(this, $controller('columnsSupportCtrl', {$scope: $scope}))

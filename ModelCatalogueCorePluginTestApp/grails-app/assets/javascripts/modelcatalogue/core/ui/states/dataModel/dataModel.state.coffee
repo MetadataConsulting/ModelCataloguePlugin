@@ -3,6 +3,7 @@ angular.module('modelcatalogue.core.ui.states.dataModel', [
   'modelcatalogue.core.ui.states.dataModel.resource',
   'modelcatalogue.core.ui.states.dataModel.search',
   'modelcatalogue.core.ui.states.dataModel.components.catalogueElementTreeview'
+  'modelcatalogue.core.ui.states.components.infiniteList'
 
   'ui.router', 'mc.util.ui' # for Ctrl
   ])

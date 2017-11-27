@@ -1,5 +1,7 @@
 
-angular.module('mc.core.ui.states.bs.panels.html', []).run(['$templateCache', ($templateCache) ->
+angular.module('mc.core.ui.states.bs.panels.html', [
+  'modelcatalogue.core.ui.states.components.infiniteList'
+]).run(['$templateCache', ($templateCache) ->
 
   #language=HTML
   $templateCache.put 'modelcatalogue/core/ui/state/panels.html', '''

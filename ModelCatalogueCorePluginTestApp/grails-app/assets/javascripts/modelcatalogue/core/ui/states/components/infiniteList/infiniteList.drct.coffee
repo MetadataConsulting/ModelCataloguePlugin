@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteList').directive 'infiniteList', -> {
+angular.module('modelcatalogue.core.ui.states.components.infiniteList').directive 'infiniteList', -> {
   restrict: 'E'
   replace: true
   scope:
@@ -8,7 +8,7 @@ angular.module('mc.core.ui.infiniteList').directive 'infiniteList', -> {
     transform: '&?'
 
   templateUrl: (el, attr) ->
-    if attr.type == 'short' then '/mc/core/ui/infinite-list/infinitePanelsShort.html' else '/mc/core/ui/infinite-list/infinitePanels.html'
+    if attr.type == 'short' then '/modelcatalogue/core/ui/states/components/infiniteList/infinitePanelsShort.html' else '/modelcatalogue/core/ui/states/components/infiniteList/infinitePanels.html'
 
   controller: ($scope, $animate, $window, $controller, $element, $attrs, detailSections) ->
     'ngInject'

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.core.ui.columnsSupportCtrl', 'ngAnimate', 'mc.util.ui.sortable', 'mc.util.ui.actions']).directive 'infiniteTable',  [-> {
+angular.module('mc.core.ui.infiniteTable', ['modelcatalogue.core.ui.states.components.infiniteListCtrl', 'mc.core.ui.columnsSupportCtrl', 'ngAnimate', 'mc.util.ui.sortable', 'mc.util.ui.actions']).directive 'infiniteTable',  [-> {
     restrict: 'E'
     replace: true
     scope:
