@@ -16,8 +16,8 @@ import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.save
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
+//@Ignore
 @Stepwise
 class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpec{
 

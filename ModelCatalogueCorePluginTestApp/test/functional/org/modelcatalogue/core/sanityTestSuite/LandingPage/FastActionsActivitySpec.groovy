@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
@@ -34,6 +35,8 @@ class FastActionsActivitySpec extends AbstractModelCatalogueGebSpec{
         check modalHeader contains "Recent Activity"
 
     }
+
+    @Ignore // TODO: Discuss last seen feature
     def "verify the most recent active users"(){
 
        expect:

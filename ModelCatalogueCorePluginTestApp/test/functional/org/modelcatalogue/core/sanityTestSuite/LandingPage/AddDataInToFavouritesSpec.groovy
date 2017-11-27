@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
@@ -12,8 +11,7 @@ import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
     private static final String  creates  = "a#role_data-models_create-data-modelBtn"
@@ -33,9 +31,8 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check creates displayed
-
-
     }
+
     def "navigate to favourites"(){
         when:
         click user
@@ -44,6 +41,7 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
         then:
         check catalogueID contains "Model Catalogue ID"
     }
+
      def" add data to favourite"(){
          when:
          click greenButton
@@ -51,24 +49,20 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
          then:
          check modalHeader is "Add to Favourites"
 
-
          when:
          fill searchField with 'Ovarian Cancer (NHIC 0.0.1)' and pick first item
          click modalPrimaryButton
 
          then:
          check firstRow displayed
-
      }
 
     def" remove favourite data model"(){
-
         when:
         click favouriteModel
 
         then:
         check rightSideTitle contains 'Cancer'
-
 
         when:
         click removeFavourite
@@ -80,7 +74,4 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
         then:
         check firstRow isGone()
     }
-
-  }
-
-
+}
