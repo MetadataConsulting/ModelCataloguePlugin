@@ -81,8 +81,8 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationRightActions', [
       label:      'Favourites'
       icon:       'fa fa-star fa-fw'
       action: ->
-        $state.go 'simple.favourites'
-    ).activeIf $state.current.name == 'simple.favourites'
+        $state.go 'catalogue.favourites'
+    ).activeIf $state.current.name == 'catalogue.favourites'
       .watching '$stateChangeSuccess'
 
   actionsProvider.registerChildAction 'user-menu', 'user-api-key', (messages, security, rest, modelCatalogueApiRoot) ->
@@ -141,7 +141,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationRightActions', [
       label:      'Users'
       icon:       'fa fa-fw fa-user-plus'
       action: ->
-        $state.go 'simple.resource.list', resource: 'user'
+        $state.go 'catalogue.resource.list', resource: 'user'
     )
 
   actionsProvider.registerChildAction 'admin-menu', 'relationship-types', ['$state', ($state) ->
@@ -150,7 +150,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationRightActions', [
       label:      'Relationship Types'
       icon:       'fa fa-chain fa-fw'
       action: ->
-        $state.go 'simple.resource.list', resource: 'relationshipType'
+        $state.go 'catalogue.resource.list', resource: 'relationshipType'
     )
   ]
 
@@ -160,7 +160,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationRightActions', [
       label:      'Data Model Policies'
       icon:       'fa fa-check-square-o fa-fw'
       action: ->
-        $state.go 'simple.resource.list', resource: 'dataModelPolicy'
+        $state.go 'catalogue.resource.list', resource: 'dataModelPolicy'
     )
   ]
 
@@ -170,7 +170,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationRightActions', [
       label:      'Action Batches'
       icon:       'fa fa-flash fa-fw'
       action: ->
-        $state.go 'simple.resource.list', resource: 'batch'
+        $state.go 'catalogue.resource.list', resource: 'batch'
     )
   ]
 
@@ -239,7 +239,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationRightActions', [
       label:      'CSV Transformations'
       icon:       'fa fa-long-arrow-right fa-fw'
       action: ->
-        $state.go 'simple.resource.list', resource: 'csvTransformation'
+        $state.go 'catalogue.resource.list', resource: 'csvTransformation'
     )
   ]
 
@@ -251,7 +251,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationRightActions', [
       label:      'Feedbacks'
       icon:       'fa fa-tasks fa-fw'
       action: ->
-        $state.go 'simple.resource.list', resource: 'feedback'
+        $state.go 'catalogue.resource.list', resource: 'feedback'
     )
 
   actionsProvider.registerChildAction 'admin-menu', 'logs', (messages,  enhance, rest,  modelCatalogueApiRoot) ->

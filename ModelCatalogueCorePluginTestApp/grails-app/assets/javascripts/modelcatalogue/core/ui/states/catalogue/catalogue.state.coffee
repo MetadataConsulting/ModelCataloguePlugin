@@ -5,10 +5,10 @@ angular.module('modelcatalogue.core.ui.states.catalogue', [
   'modelcatalogue.core.ui.states.catalogue.resource'
 ]).config(['$stateProvider', ($stateProvider) ->
 
-    $stateProvider.state 'simple', {
+    $stateProvider.state 'catalogue', {
       abstract: true
       url: '/catalogue'
-      templateUrl: '/modelcatalogue/core/ui/states/catalogue/simple.html'
+      templateUrl: '/modelcatalogue/core/ui/states/catalogue/catalogue.html'
     }
 
 ])

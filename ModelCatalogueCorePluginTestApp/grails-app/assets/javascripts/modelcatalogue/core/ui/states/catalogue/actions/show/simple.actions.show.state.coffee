@@ -1,6 +1,6 @@
 angular.module('modelcatalogue.core.ui.states.catalogue.actions.show', ['modelcatalogue.core.ui.states.controllers.BatchCtrl']).config(['$stateProvider', ($stateProvider) ->
 
-    $stateProvider.state 'simple.actions.show', {
+    $stateProvider.state 'catalogue.actions.show', {
       url: '/{id:\\d+}'
 
       views:

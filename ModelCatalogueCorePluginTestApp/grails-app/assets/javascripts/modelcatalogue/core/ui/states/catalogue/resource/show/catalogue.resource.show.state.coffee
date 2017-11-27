@@ -1,7 +1,7 @@
 angular.module('modelcatalogue.core.ui.states.catalogue.resource.show', ['modelcatalogue.core.ui.states.controllers',
 'modelcatalogue.core.ui.states.catalogue.resource.show.property']).config(['$stateProvider', ($stateProvider) ->
 
-    $stateProvider.state 'simple.resource.show', {
+    $stateProvider.state 'catalogue.resource.show', {
       url: '/{id:\\d+}'
 
       views:

@@ -4,7 +4,7 @@ angular.module('modelcatalogue.core.ui.states.catalogue.resource.list', ['modelc
 
     DEFAULT_ITEMS_PER_PAGE = 10
 
-    $stateProvider.state 'simple.resource.list', {
+    $stateProvider.state 'catalogue.resource.list', {
       url: '/all?page&order&sort&status&q&max&classification&display'
       views:
         "":

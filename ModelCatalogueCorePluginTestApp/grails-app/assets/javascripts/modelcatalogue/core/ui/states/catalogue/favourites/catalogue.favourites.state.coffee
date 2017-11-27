@@ -3,7 +3,7 @@ angular.module('modelcatalogue.core.ui.states.catalogue.favourites', ['modelcata
 
 .config(($stateProvider) ->
   'ngInject'
-  $stateProvider.state 'simple.favourites', {
+  $stateProvider.state 'catalogue.favourites', {
     views:
       '':
         templateUrl: '/modelcatalogue/core/ui/states/catalogue/favourites/favourites.html'

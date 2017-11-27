@@ -27,11 +27,11 @@ angular.module('modelcatalogue.core.enhancersConf.catalogueElementEnhancer', ['u
 
   computeHref = (self, $state, names) ->
     if self.isInstanceOf "batch"
-      return $state.href('simple.actions.show', {id: self.id})
+      return $state.href('catalogue.actions.show', {id: self.id})
     if self.isInstanceOf "csvTransformation"
       return $state.href('dataModel.csvTransformations.show', {id: self.id})
     if self.isInstanceOf "dataModelPolicy"
-      return $state.href('simple.resource.show', {id: self.id, resource: 'dataModelPolicy'})
+      return $state.href('catalogue.resource.show', {id: self.id, resource: 'dataModelPolicy'})
     if self.isInstanceOf "relationships"
       return $state.href('dataModel.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property})
     if self.isInstanceOf "enumeratedValue"
@@ -40,7 +40,7 @@ angular.module('modelcatalogue.core.enhancersConf.catalogueElementEnhancer', ['u
       return $state.href('dataModel.resource.show.property', {resource: 'dataModel', id:  self.getDataModelId(), dataModelId: self.getDataModelId(), property: 'history'})
     if self.getDataModelId() != 'catalogue'
       return $state.href('dataModel.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()})
-    $state.href('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
+    $state.href('catalogue.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
 
 
   condition = (element) -> angular.isObject(element) and element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
@@ -105,11 +105,11 @@ angular.module('modelcatalogue.core.enhancersConf.catalogueElementEnhancer', ['u
 
           self.show           = (reload = false) ->
             if self.isInstanceOf "batch"
-              return $state.go('simple.actions.show', {id: self.id}, {reload: reload}); self
+              return $state.go('catalogue.actions.show', {id: self.id}, {reload: reload}); self
             if self.isInstanceOf "csvTransformation"
               return $state.go('dataModel.csvTransformations.show', {id: self.id}, {reload: reload}); self
             if self.isInstanceOf "dataModelPolicy"
-              return $state.go('simple.resource.show', {id: self.id, resource: 'dataModelPolicy'}) ; self
+              return $state.go('catalogue.resource.show', {id: self.id, resource: 'dataModelPolicy'}) ; self
             if self.isInstanceOf "relationships"
               return $state.go('dataModel.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property}, {reload: reload})
             if self.isInstanceOf "enumeratedValue"
@@ -118,7 +118,7 @@ angular.module('modelcatalogue.core.enhancersConf.catalogueElementEnhancer', ['u
               return $state.go('dataModel.resource.show.property', {resource: 'dataModel', id:  self.getDataModelId(), dataModelId: self.getDataModelId(), property: 'history'}, {reload: reload}) ; self
             if self.getDataModelId() != 'catalogue'
               return $state.go('dataModel.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()}, {reload: reload})
-            $state.go('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}, {reload: reload}) ; self
+            $state.go('catalogue.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}, {reload: reload}) ; self
 
           self.href = ->
             return self.$$href if self.$$href

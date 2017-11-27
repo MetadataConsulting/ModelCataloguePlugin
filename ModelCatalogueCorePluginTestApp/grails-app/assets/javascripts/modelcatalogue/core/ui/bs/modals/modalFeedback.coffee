@@ -40,7 +40,7 @@ angular.module('mc.core.ui.bs.modalFeedback', ['mc.util.messages']).config (mess
           $scope.feedback = feedback
 
           $scope.open = ->
-            $window.open($state.href('simple.feedback', {id: args.id}), '_blank')
+            $window.open($state.href('catalogue.feedback', {id: args.id}), '_blank')
             return
       }
 
