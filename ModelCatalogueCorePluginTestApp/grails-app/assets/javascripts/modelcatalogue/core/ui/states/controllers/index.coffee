@@ -6,7 +6,7 @@ angular.module('modelcatalogue.core.ui.states.controllers', [
   'modelcatalogue.core.ui.states.controllers.ShowCtrl'
   'modelcatalogue.core.ui.states.controllers.BatchCtrl'
   'modelcatalogue.core.ui.states.controllers.BatchOnlyCtrl'
-  'modelcatalogue.core.ui.states.controllers.FavoritesCtrl'
+  'modelcatalogue.core.ui.states.controllers.FavouritesCtrl'
   'modelcatalogue.core.ui.states.controllers.FeedbackCtrl'
   'modelcatalogue.core.ui.states.controllers.ListCtrl'
   'modelcatalogue.core.ui.states.controllers.UserCtrl'

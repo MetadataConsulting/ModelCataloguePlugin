@@ -72,7 +72,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationRightActions', [
     )
   ]
 
-  actionsProvider.registerChildAction 'user-menu', 'user-favorites', (security, $state, $rootScope) ->
+  actionsProvider.registerChildAction 'user-menu', 'user-favourites', (security, $state, $rootScope) ->
     'ngInject'
     return undefined unless security.isUserLoggedIn()
 
@@ -81,8 +81,8 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.navigationRightActions', [
       label:      'Favourites'
       icon:       'fa fa-star fa-fw'
       action: ->
-        $state.go 'simple.favorites'
-    ).activeIf $state.current.name == 'simple.favorites'
+        $state.go 'simple.favourites'
+    ).activeIf $state.current.name == 'simple.favourites'
       .watching '$stateChangeSuccess'
 
   actionsProvider.registerChildAction 'user-menu', 'user-api-key', (messages, security, rest, modelCatalogueApiRoot) ->

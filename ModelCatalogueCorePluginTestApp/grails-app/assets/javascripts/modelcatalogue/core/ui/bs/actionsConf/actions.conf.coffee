@@ -50,7 +50,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
             messages.error('You don\'t have rights to create new elements')
       )
 
-  actionsProvider.registerActionInRoles 'favorite-element',
+  actionsProvider.registerActionInRoles 'favourite-element',
     [actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, actionRoleRegister.ROLE_ITEM_INFINITE_LIST],
     ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest, $rootScope) ->
       'ngInject'
@@ -97,7 +97,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
 
       action
 
-  actionsProvider.registerActionInRoles 'favorite-element-in-header', [actionRoleRegister.ROLE_LIST_HEADER_ACTION,
+  actionsProvider.registerActionInRoles 'favourite-element-in-header', [actionRoleRegister.ROLE_LIST_HEADER_ACTION,
     actionRoleRegister.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', '$state', 'security', 'catalogueElementResource',
     'modelCatalogueApiRoot', 'enhance', 'rest',
     ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
@@ -287,7 +287,7 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
   actionsProvider.registerChildAction 'export', 'export-cart', ['security', '$state', '$window',
     'modelCatalogueApiRoot', (security, $state, $window, modelCatalogueApiRoot) ->
       return undefined unless security.isUserLoggedIn()
-      return undefined unless $state.current.name == 'mc.favorites'
+      return undefined unless $state.current.name == 'mc.favourites'
 
       console.log $state.current.name
 

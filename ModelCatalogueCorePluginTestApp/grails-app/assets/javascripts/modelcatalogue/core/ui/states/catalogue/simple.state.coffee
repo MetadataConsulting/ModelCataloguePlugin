@@ -1,6 +1,6 @@
 angular.module('modelcatalogue.core.ui.states.catalogue', [
   'modelcatalogue.core.ui.states.catalogue.actions',
-  'modelcatalogue.core.ui.states.catalogue.favorites',
+  'modelcatalogue.core.ui.states.catalogue.favourites',
   'modelcatalogue.core.ui.states.catalogue.feedback',
   'modelcatalogue.core.ui.states.catalogue.resource'
 ]).config(['$stateProvider', ($stateProvider) ->

@@ -1,17 +1,17 @@
-angular.module('modelcatalogue.core.ui.states.catalogue.favorites', ['modelcatalogue.core.ui.states.controllers.FavoritesCtrl',
+angular.module('modelcatalogue.core.ui.states.catalogue.favourites', ['modelcatalogue.core.ui.states.controllers.FavouritesCtrl',
   'modelcatalogue.core.ui.states.components.infiniteTable'])
 
 .config(($stateProvider) ->
   'ngInject'
-  $stateProvider.state 'simple.favorites', {
+  $stateProvider.state 'simple.favourites', {
     views:
       '':
-        templateUrl: '/modelcatalogue/core/ui/states/catalogue/favorites/favorites.html'
-        controller: 'modelcatalogue.core.ui.states.controllers.FavoritesCtrl'
+        templateUrl: '/modelcatalogue/core/ui/states/catalogue/favourites/favourites.html'
+        controller: 'modelcatalogue.core.ui.states.controllers.FavouritesCtrl'
 
       'navbar-left@':
         template: '<contextual-menu role="{{::actionRoleAccess.ROLE_LIST_ACTION}}"></contextual-menu>'
-        controller: 'modelcatalogue.core.ui.states.controllers.FavoritesCtrl'
+        controller: 'modelcatalogue.core.ui.states.controllers.FavouritesCtrl'
 
     url: '/favourites'
 
