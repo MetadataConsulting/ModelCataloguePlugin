@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteTable', ['modelcatalogue.core.ui.states.components.infiniteListCtrl', 'mc.core.ui.columnsSupportCtrl', 'ngAnimate', 'mc.util.ui.sortable', 'mc.util.ui.actions']).directive 'infiniteTable',  [-> {
+angular.module('modelcatalogue.core.ui.states.components.infiniteTable', ['modelcatalogue.core.ui.states.components.infiniteListCtrl', 'mc.core.ui.columnsSupportCtrl', 'ngAnimate', 'mc.util.ui.sortable', 'mc.util.ui.actions']).directive 'infiniteTable',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -9,7 +9,7 @@ angular.module('mc.core.ui.infiniteTable', ['modelcatalogue.core.ui.states.compo
       transform: '&?'
       manualLoad: '=?'
 
-    templateUrl: '/mc/core/ui/infiniteTable.html'
+    templateUrl: '/modelcatalogue/core/ui/states/components/infiniteTable/infiniteTable.html'
 
     compile: (element, attrs) ->
       attrs.transform = '$element' unless attrs.transform

@@ -3,7 +3,6 @@ angular.module('mc.core.ui', [
   'ui.router',
   'mc.core'
   # list of modules
-  'mc.core.ui.infiniteTable'
   'mc.core.ui.columnsSupportCtrl'
   'mc.core.ui.batchView'
   'mc.core.ui.catalogueElementIcon'

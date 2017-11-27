@@ -1,5 +1,6 @@
 angular.module('mc.core.ui.states.bs.list.html', [
-  'modelcatalogue.core.ui.states.components.infiniteList'
+  'modelcatalogue.core.ui.states.components.infiniteList',
+  'modelcatalogue.core.ui.states.components.infiniteTable'
 ]).run(['$templateCache', ($templateCache) ->
 
   #language=HTML

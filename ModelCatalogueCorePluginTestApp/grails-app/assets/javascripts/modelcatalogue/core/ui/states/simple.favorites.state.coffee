@@ -1,4 +1,5 @@
-angular.module('mc.core.ui.states.simple.favorites', ['modelcatalogue.core.ui.states.controllers.FavoritesCtrl'])
+angular.module('mc.core.ui.states.simple.favorites', ['modelcatalogue.core.ui.states.controllers.FavoritesCtrl',
+  'modelcatalogue.core.ui.states.components.infiniteTable'])
 
 .config(($stateProvider) ->
   'ngInject'
