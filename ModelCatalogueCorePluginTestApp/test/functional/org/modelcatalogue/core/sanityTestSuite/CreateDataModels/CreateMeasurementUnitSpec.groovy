@@ -7,8 +7,8 @@ import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
+//@Ignore
 @Stepwise
 class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
     private static final String name="input#name"
@@ -17,8 +17,6 @@ class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
     private static final String  deleteButton="a#delete-menu-item-link>span:nth-child(3)"
     private static final String  measurementUnit="td.col-md-4>a"
     private static final String  measurementUnitButton="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
-
-
 
 
     def"login to model catalogue and navigate to the model"(){
