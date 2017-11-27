@@ -53,6 +53,8 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
          fill searchField with 'Ovarian Cancer (NHIC 0.0.1)' and pick first item
          click modalPrimaryButton
 
+         refresh(browser) // TODO: It should not be necessary to refresh the page
+
          then:
          check firstRow displayed
      }

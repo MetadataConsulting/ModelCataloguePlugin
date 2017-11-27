@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
@@ -11,8 +10,7 @@ import static org.modelcatalogue.core.geb.Common.getPick
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class RelationshipIsImportedBySpec extends AbstractModelCatalogueGebSpec{
 
@@ -27,9 +25,7 @@ class RelationshipIsImportedBySpec extends AbstractModelCatalogueGebSpec{
     private static final String  plusButton="span.fa-plus-square-o"
     private static final String  table ="#importedBy-changes > div.inf-table-body > table > tbody > tr > td:nth-child(1) > span > span"
 
-
     def "login to model catalogue and select a data model"() {
-
         when:
         loginAdmin()
         select 'Test 3'
@@ -46,25 +42,24 @@ class RelationshipIsImportedBySpec extends AbstractModelCatalogueGebSpec{
 
         then: 'verify that the text Destination is displayed'
         check destination displayed
-
     }
 
     def "select is imported by,destination and create relationship"() {
-
         when: 'select relation'
         click isImportedBy
+
         and: ' select destination'
         click destinationIcon
         fill search with "" and pick first item
         click ModalPrimaryButton
+
         and: 'click on the imported tag'
         click imported_by
 
+        refresh(browser) // TODO: It should not be necessary to refresh the page
 
         then: 'verify that is imported by  is displayed inside table'
         check table contains "is imported by"
-
-
     }
 
     def "delete the imported by data model"() {
@@ -79,7 +74,5 @@ class RelationshipIsImportedBySpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check table isGone()
-
     }
-
 }
