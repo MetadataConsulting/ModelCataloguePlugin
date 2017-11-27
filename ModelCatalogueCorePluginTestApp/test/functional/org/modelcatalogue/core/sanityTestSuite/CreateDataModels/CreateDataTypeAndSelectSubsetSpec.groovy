@@ -19,8 +19,7 @@ import static org.modelcatalogue.core.geb.Common.messages
 import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.save
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 
@@ -31,8 +30,7 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
     private static final String  enumeratedType ="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
     private static final String table = "tr.inf-table-item-row>td:nth-child(1)"
 
-
-    def " login and navigate to Data model"() {
+    def "login and navigate to Data model"() {
 
         when:
         loginCurator()
