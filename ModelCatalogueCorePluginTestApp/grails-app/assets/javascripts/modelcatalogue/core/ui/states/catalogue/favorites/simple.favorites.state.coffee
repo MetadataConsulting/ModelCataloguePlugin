@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.simple.favorites', ['modelcatalogue.core.ui.states.controllers.FavoritesCtrl',
+angular.module('modelcatalogue.core.ui.states.catalogue.favorites', ['modelcatalogue.core.ui.states.controllers.FavoritesCtrl',
   'modelcatalogue.core.ui.states.components.infiniteTable'])
 
 .config(($stateProvider) ->
@@ -6,7 +6,7 @@ angular.module('mc.core.ui.states.simple.favorites', ['modelcatalogue.core.ui.st
   $stateProvider.state 'simple.favorites', {
     views:
       '':
-        templateUrl: '/mc/core/ui/states/favourites.html'
+        templateUrl: '/modelcatalogue/core/ui/states/catalogue/favorites/favorites.html'
         controller: 'modelcatalogue.core.ui.states.controllers.FavoritesCtrl'
 
       'navbar-left@':

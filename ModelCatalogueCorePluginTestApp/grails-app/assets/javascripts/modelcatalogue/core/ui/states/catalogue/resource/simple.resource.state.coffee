@@ -1,6 +1,6 @@
-angular.module('mc.core.ui.states.simple.resource', [
-  'mc.core.ui.states.simple.resource.list',
-  'mc.core.ui.states.simple.resource.show'
+angular.module('modelcatalogue.core.ui.states.catalogue.resource', [
+  'modelcatalogue.core.ui.states.catalogue.resource.list',
+  'modelcatalogue.core.ui.states.catalogue.resource.show'
 ]).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'simple.resource', {

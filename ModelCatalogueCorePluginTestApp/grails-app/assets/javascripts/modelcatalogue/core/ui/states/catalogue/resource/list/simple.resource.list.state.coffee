@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.simple.resource.list', ['modelcatalogue.core.ui.states.controllers.ListCtrl']).config([
+angular.module('modelcatalogue.core.ui.states.catalogue.resource.list', ['modelcatalogue.core.ui.states.controllers.ListCtrl']).config([
   '$stateProvider', 'catalogueProvider',
   ($stateProvider ,  catalogueProvider) ->
 

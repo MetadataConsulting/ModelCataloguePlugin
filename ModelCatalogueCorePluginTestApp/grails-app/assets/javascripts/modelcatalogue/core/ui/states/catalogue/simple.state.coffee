@@ -1,14 +1,14 @@
-angular.module('mc.core.ui.states.simple', [
-  'mc.core.ui.states.simple.actions',
-  'mc.core.ui.states.simple.favorites',
-  'mc.core.ui.states.simple.feedback',
-  'mc.core.ui.states.simple.resource'
+angular.module('modelcatalogue.core.ui.states.catalogue', [
+  'modelcatalogue.core.ui.states.catalogue.actions',
+  'modelcatalogue.core.ui.states.catalogue.favorites',
+  'modelcatalogue.core.ui.states.catalogue.feedback',
+  'modelcatalogue.core.ui.states.catalogue.resource'
 ]).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'simple', {
       abstract: true
       url: '/catalogue'
-      templateUrl: '/mc/core/ui/states/simple.html'
+      templateUrl: '/modelcatalogue/core/ui/states/catalogue/simple.html'
     }
 
 ])

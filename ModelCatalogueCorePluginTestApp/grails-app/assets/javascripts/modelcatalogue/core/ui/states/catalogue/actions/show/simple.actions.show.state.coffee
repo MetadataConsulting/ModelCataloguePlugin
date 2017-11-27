@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.simple.actions.show', ['modelcatalogue.core.ui.states.controllers.BatchCtrl']).config(['$stateProvider', ($stateProvider) ->
+angular.module('modelcatalogue.core.ui.states.catalogue.actions.show', ['modelcatalogue.core.ui.states.controllers.BatchCtrl']).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'simple.actions.show', {
       url: '/{id:\\d+}'

@@ -7,7 +7,7 @@ angular.module('mc.core.ui.states', [
   'modelcatalogue.core.ui.states.landing'
   'modelcatalogue.core.ui.states.dataModels'
   'modelcatalogue.core.ui.states.dataModel'
-  'mc.core.ui.states.simple'
+  'modelcatalogue.core.ui.states.catalogue'
 ])
 
 .run(($rootScope, $log, $state, $stateParams, messages) ->

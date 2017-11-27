@@ -1,8 +1,8 @@
-angular.module('mc.core.ui.states.simple.feedback', ['modelcatalogue.core.ui.states.controllers.FeedbackCtrl']).config(($stateProvider, actionsProvider, actionRoleRegister, actionClass) ->
+angular.module('modelcatalogue.core.ui.states.catalogue.feedback', ['modelcatalogue.core.ui.states.controllers.FeedbackCtrl']).config(($stateProvider, actionsProvider, actionRoleRegister, actionClass) ->
     Action = actionClass
     $stateProvider.state 'simple.feedback', {
 
-      templateUrl: '/mc/core/ui/states/feedback.html'
+      templateUrl: '/modelcatalogue/core/ui/states/catalogue/feedback/feedback.html'
       controller: 'modelcatalogue.core.ui.states.controllers.FeedbackCtrl'
 
       url: '/feedback/{id:\\d+}'
