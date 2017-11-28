@@ -22,7 +22,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPrompt'
   'mc.core.ui.bs.modalFinalize'
   'mc.core.ui.bs.modalFeedback'
-  'mc.core.ui.bs.modalExport'
   'mc.core.ui.bs.modalNewVersion'
   'mc.core.ui.bs.modalPromptCsvHeaders'
   'mc.core.ui.bs.modalPromptCsvTransform'
