@@ -420,8 +420,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
         Long dataModelId = dataModel.id
 
-
-        def assetId = assetService.storeReportAsAsset(
+        Long assetId = assetService.storeReportAsAsset(
                 dataModel,
                 name: name ? name : "${dataModel.name} report as MS Excel Document",
                 originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
