@@ -50,6 +50,7 @@ class DataModelPermissionController {
         Permission permissionInstance = cmd.aclPermission()
         dataModelPermissionService.deletePermission(cmd.id, cmd.username, permissionInstance)
         redirect(action: 'show', id: cmd.id)
+        return
     }
 
     def grant(DataModelPermissionCommand cmd) {
@@ -60,6 +61,7 @@ class DataModelPermissionController {
         Permission permissionInstance = cmd.aclPermission()
         dataModelPermissionService.addPermission(cmd.username, cmd.id, permissionInstance)
         redirect(action: 'show', id: cmd.id)
+        return
     }
 
 

@@ -14,11 +14,10 @@ class ModelCatalogueIDFilters {
                         return
                     }
 
-
-
                     String dataModelId = element.dataModel ? element.dataModel.getId() : 'catalogue'
 
                     redirect(uri: "/#/${dataModelId}/${controllerName}/${params.id}")
+                    return
                 }
             }
         }
