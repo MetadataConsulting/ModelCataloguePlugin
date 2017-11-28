@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.bs.list.html', [
+angular.module('modelcatalogue.core.ui.states.html.list.html', [
   'modelcatalogue.core.ui.states.components.infiniteList',
   'modelcatalogue.core.ui.states.components.infiniteTable'
 ]).run(['$templateCache', ($templateCache) ->

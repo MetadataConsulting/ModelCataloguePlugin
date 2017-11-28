@@ -1,7 +1,7 @@
 ###
   Not used anywhere
 ###
-angular.module('mc.core.ui.states.bs.panels.html', [
+angular.module('modelcatalogue.core.ui.states.html.panels.html', [
   'modelcatalogue.core.ui.states.components.infiniteList'
 ]).run(['$templateCache', ($templateCache) ->
 

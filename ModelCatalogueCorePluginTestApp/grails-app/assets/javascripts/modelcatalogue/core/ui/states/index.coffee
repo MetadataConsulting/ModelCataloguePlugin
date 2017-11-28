@@ -1,8 +1,9 @@
-angular.module('mc.core.ui.states', [
+angular.module('modelcatalogue.core.ui.states', [
   # depends on
   'mc.util'
   'mc.core.ui'
   'modelcatalogue.core.ui.states.controllers'
+  'modelcatalogue.core.ui.states.html'
   # list of modules
   'modelcatalogue.core.ui.states.landing'
   'modelcatalogue.core.ui.states.dataModels'
@@ -46,3 +47,7 @@ angular.module('mc.core.ui.states', [
 
   $uibModalProvider.options.backdrop = 'static'
 )
+
+
+
+window.modelcatalogue.registerModule 'modelcatalogue.core.ui.states'
