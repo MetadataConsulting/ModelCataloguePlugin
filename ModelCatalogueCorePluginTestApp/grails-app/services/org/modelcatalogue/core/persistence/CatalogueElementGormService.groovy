@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import grails.transaction.Transactional
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
@@ -11,7 +12,6 @@ import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
-import org.springframework.transaction.annotation.Transactional
 
 class CatalogueElementGormService {
 

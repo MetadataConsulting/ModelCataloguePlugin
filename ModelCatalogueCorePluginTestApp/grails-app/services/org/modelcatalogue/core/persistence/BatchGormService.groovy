@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.persistence
 
+import grails.transaction.Transactional
 import org.modelcatalogue.core.actions.Batch
-import org.springframework.transaction.annotation.Transactional
 
 class BatchGormService {
 

@@ -1,8 +1,8 @@
 package org.modelcatalogue.core.persistence
 
+import grails.transaction.Transactional
 import groovy.transform.CompileStatic
 import org.modelcatalogue.core.ValidationRule
-import org.springframework.transaction.annotation.Transactional
 
 @CompileStatic
 class ValidationRuleGormService {

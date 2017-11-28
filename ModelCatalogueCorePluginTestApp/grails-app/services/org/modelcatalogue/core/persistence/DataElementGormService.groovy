@@ -4,7 +4,6 @@ package org.modelcatalogue.core.persistence
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.WarnGormErrors
 import org.springframework.context.MessageSource
-import org.springframework.transaction.annotation.Transactional
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.DataElement

@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.persistence
 
+import grails.transaction.Transactional
 import org.modelcatalogue.core.Asset
-import org.springframework.transaction.annotation.Transactional
 import groovy.transform.CompileStatic
 
 @CompileStatic
