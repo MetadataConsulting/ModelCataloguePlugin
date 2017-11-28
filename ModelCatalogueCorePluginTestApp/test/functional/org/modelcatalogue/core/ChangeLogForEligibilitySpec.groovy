@@ -7,9 +7,9 @@ import org.modelcatalogue.core.geb.Common
 import spock.lang.Ignore
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
+
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
-@Ignore
 class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 
     public static final CatalogueAction exportAction = CatalogueAction.runFirst('item', 'export')

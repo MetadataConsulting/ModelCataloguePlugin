@@ -17,7 +17,6 @@ import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import static org.modelcatalogue.core.geb.Common.save
 
 @IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
 @Stepwise
 class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
 
@@ -38,9 +37,7 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
     private static final String  createdDataElement='tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a'
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 2000
 
-
-    def " login to model catalogue and select a draft data model"() {
-
+    def "login to model catalogue and select a draft data model"() {
         when:
         loginAdmin()
         select 'Test 3' select 'Tags'
@@ -57,11 +54,9 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
         then:
         noExceptionThrown()
         check modalHeader is 'Create Tag'
-
     }
 
-    def " create a tag "() {
-
+    def "create a tag "() {
         when:
         fill nameLabel with 'TESTING_TAG'
         fill modelCatalogueId with 'MET-002'
@@ -75,8 +70,7 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
         check table contains 'TESTING_TAG'
     }
 
-    def " create a data element"() {
-
+    def "create a data element"() {
         when:
         click modelCatalogue
 
@@ -136,11 +130,9 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
 
         and:
         check createdTag contains 'TESTING_TAG'
-
-
     }
 
-    def " delete the created tag"() {
+    def "delete the created tag"() {
 
         when:
         click modelCatalogue

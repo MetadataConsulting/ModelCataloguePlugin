@@ -8,8 +8,7 @@ import org.openqa.selenium.WebElement
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 class ClickOnModelCatalogueDevSupportedLinkSpec extends AbstractModelCatalogueGebSpec  {
 
     public static final String model ="div.panel-body>div"

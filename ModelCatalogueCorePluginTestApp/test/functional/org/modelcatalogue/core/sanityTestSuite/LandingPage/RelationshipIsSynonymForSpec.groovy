@@ -4,10 +4,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
-
-import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.getPick
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
@@ -17,7 +14,6 @@ import static org.modelcatalogue.core.geb.Common.pick
 @Ignore
 @Stepwise
 class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
-
 
     private static final String dataModel ="a#role_item_catalogue-element-menu-item-link"
     private static final String createRelationship ="a#create-new-relationship-menu-item-link>span:nth-child(3)"
@@ -62,11 +58,9 @@ class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
 
         then: 'verify that is synonym for is displayed inside table'
         check table contains "is synonym for"
-
     }
-     @ Ignore
-    def"remove the is synonym for that was created"(){
 
+    def "remove the is synonym for that was created"() {
         when: 'click on the plus button to expand the file'
         click plusButton
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)

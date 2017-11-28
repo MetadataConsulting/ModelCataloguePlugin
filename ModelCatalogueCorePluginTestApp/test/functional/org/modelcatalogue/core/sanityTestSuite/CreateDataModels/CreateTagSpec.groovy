@@ -9,7 +9,6 @@ import spock.lang.Stepwise
 import static org.modelcatalogue.core.geb.Common.*
 
 @IgnoreIf({ !System.getProperty('geb.env') })
-//@Ignore
 @Stepwise
 class CreateTagSpec extends AbstractModelCatalogueGebSpec {
 

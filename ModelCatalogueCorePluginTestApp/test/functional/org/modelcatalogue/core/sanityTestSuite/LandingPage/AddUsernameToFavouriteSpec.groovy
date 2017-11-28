@@ -7,8 +7,7 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
 

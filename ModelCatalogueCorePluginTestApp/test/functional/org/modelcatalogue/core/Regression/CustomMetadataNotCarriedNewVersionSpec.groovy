@@ -13,10 +13,7 @@ class CustomMetadataNotCarriedNewVersionSpec extends AbstractModelCatalogueGebSp
     private static final String first_row ='tr.inf-table-item-row>td:nth-child(1)'
     private static final String version ='div.active>span:nth-child(2)>span'
 
-
-
-    def"login to model catalogue and select version"(){
-
+    def "login to model catalogue and select version"() {
         when:
         loginAdmin()
         select 'Clinical Tags' open 'Versions'

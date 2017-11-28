@@ -7,8 +7,7 @@ import spock.lang.IgnoreIf
 
 import static org.modelcatalogue.core.geb.Common.description
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String create = "a#role_data-models_create-data-modelBtn>span:nth-child(2)"

@@ -8,8 +8,7 @@ import spock.lang.Stepwise
 import static org.modelcatalogue.core.geb.Common.getModalHeader
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class FastActionsAsViewerSpec extends AbstractModelCatalogueGebSpec {
 

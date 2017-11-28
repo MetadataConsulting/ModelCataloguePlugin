@@ -15,10 +15,10 @@ class ShowAllDataModelsSpec  extends AbstractModelCatalogueGebSpec {
     private static final String  showAllModels="div.modal-body>div:nth-child(2)>div>a:nth-child(7)>h4"
 
     def "login to model catalogue"() {
-
+        when:
         login curator
 
-        expect:
+        then:
         check create displayed
     }
 
@@ -27,7 +27,7 @@ class ShowAllDataModelsSpec  extends AbstractModelCatalogueGebSpec {
         click fastActions
         click  showAllModels
 
-        expect:
+        then:
         check create displayed
     }
 }

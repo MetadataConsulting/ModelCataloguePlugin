@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
@@ -58,7 +59,8 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
          check firstRow displayed
      }
 
-    def" remove favourite data model"(){
+    @Ignore
+    def "remove favourite data model"() {
         when:
         click favouriteModel
 

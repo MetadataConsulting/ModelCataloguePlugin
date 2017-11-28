@@ -18,6 +18,7 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
     private static final String favourites_menu = "a#user-favorites-menu-item-link>span:nth-child(3)"
     private static final String Model_Catalogue_ID = "tr.inf-table-header-row>th:nth-child(1)>span"
     private static final String plus_button = "tbody.ng-scope>tr:nth-child(4)>td:nth-child(1)>a:nth-child(1)>span"
+
     private static final String data_model = "button#role_item_catalogue-elementBtn"
     public static final String measurement_button = "a#catalogue-element-create-measurementUnitBtn>span:nth-child(2)"
     private static final String name = "input#name"

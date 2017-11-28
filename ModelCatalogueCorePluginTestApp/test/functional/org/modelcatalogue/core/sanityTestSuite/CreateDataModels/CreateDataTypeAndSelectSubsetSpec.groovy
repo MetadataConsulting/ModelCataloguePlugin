@@ -6,19 +6,16 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import static org.modelcatalogue.core.geb.Common.getCreate
 import static org.modelcatalogue.core.geb.Common.getDescription
-import static org.modelcatalogue.core.geb.Common.getMessages
 import static org.modelcatalogue.core.geb.Common.getModalHeader
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.getModelCatalogueId
 import static org.modelcatalogue.core.geb.Common.getNameLabel
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
-import static org.modelcatalogue.core.geb.Common.getSave
-import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.messages
-import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.save
 
-@IgnoreIf({ !System.getProperty('geb.env') })
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 
@@ -47,7 +44,7 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
         check modalHeader contains 'Create Data Type'
     }
 
-    def " fill the create data type form"() {
+    def "fill the create data type form"() {
         when:
         fill nameLabel with "TESTING_DATA_TYPE_SUBSET"
 
@@ -66,11 +63,9 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check table contains 'TESTING_DATA_TYPE_SUBSET'
-
-
     }
-    def" delete the created data type"(){
 
+    def "delete the created data type"() {
         when:'click on the created data type'
         click dataType
 
@@ -85,6 +80,5 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check table gone
-
     }
 }

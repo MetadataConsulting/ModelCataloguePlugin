@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
@@ -27,7 +28,9 @@ class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
         then:
         check catalogueModels isDisplayed()
     }
-    def"search for a draft model"() {
+
+    @Ignore
+    def "search for a draft model"() {
 
         when: 'type in the search box'
         fill searchInput2 with "cancer"
@@ -39,8 +42,9 @@ class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
         then: 'verify that draft is displayed'
         check defaultButton contains  "Draft"
     }
-     def "search for finalized model"(){
 
+    @Ignore
+    def "search for finalized model"() {
          when: 'click on button next to search catalogue'
          click defaultButton
          Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
@@ -48,8 +52,5 @@ class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
 
          then:
          check defaultButton is "Finalized"
-
-     }
-
-
+    }
 }

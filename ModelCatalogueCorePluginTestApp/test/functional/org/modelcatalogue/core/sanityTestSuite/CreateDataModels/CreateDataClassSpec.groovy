@@ -135,7 +135,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         click exitButton
     }
 
-    def "create a data class and create a relationship is based on"(){
+    def "create a data class and create a relationship is based on"() {
         when:
         selectInTree 'Data Classes'
 

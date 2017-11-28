@@ -17,8 +17,7 @@ import static org.modelcatalogue.core.geb.Common.nameLabel
 import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.save
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
 
@@ -44,14 +43,15 @@ class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle is 'Active Data Elements'
     }
 
-    def " navigate to data element creation page"() {
+    def "navigate to data element creation page"() {
         when:
         click create
         then:
         check modalHeader contains 'Create Data Element'
     }
 
-    def " fill the create data element form"() {
+    @Ignore
+    def "fill the create data element form"() {
         when:
         fill nameLabel with myName
 
@@ -70,9 +70,9 @@ class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
 
         then: 'verify that data is created'
         check table contains 'testing data element'
-
     }
 
+    @Ignore
     def "delete the created data model"() {
 
         when: 'click on the model catalogue'
@@ -91,6 +91,5 @@ class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check table gone
-
     }
 }

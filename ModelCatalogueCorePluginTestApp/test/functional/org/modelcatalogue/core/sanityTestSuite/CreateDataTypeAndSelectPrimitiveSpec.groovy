@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
@@ -17,8 +16,7 @@ import static org.modelcatalogue.core.geb.Common.nameLabel
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import static org.modelcatalogue.core.geb.Common.save
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateDataTypeAndSelectPrimitiveSpec extends AbstractModelCatalogueGebSpec {
 
@@ -30,55 +28,58 @@ class CreateDataTypeAndSelectPrimitiveSpec extends AbstractModelCatalogueGebSpec
     private static final String dataTypeCreated = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a"
     private static final String firstRow = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)"
 
-   def "login to Model Catalogue and select model"() {
-    when:
-    loginCurator()
-    select 'Test 3'
-    selectInTree 'Data Types'
-    then:
-    check rightSideTitle contains 'Active Data Types'
-}
+    def "login to Model Catalogue and select model"() {
+        when:
+        loginCurator()
+        select 'Test 3'
+        selectInTree 'Data Types'
 
-def "Navigate to data type page"() {
-    when:
-    click create
-    then:
-    check modalHeader contains 'Create Data Type'
-}
+        then:
+        check rightSideTitle contains 'Active Data Types'
+    }
 
-def " fill the create data type form"() {
-    when:
-    fill nameLabel with "TESTING_DATA_TYPE"
+    def "Navigate to data type page"() {
+        when:
+        click create
 
-    fill modelCatalogueId with "MET-4567"
+        then:
+        check modalHeader contains 'Create Data Type'
+    }
 
-    fill description with "my description of data type${System.currentTimeMillis()}"
+    def "fill the create data type form"() {
+        when:
+        fill nameLabel with "TESTING_DATA_TYPE"
 
-    and: 'select primitive button'
-    click primitive
-    fill measurementUnit with 'boolean'
-    remove messages
-    and:
-    click save
-    then:
-    check firstRow contains 'TESTING_DATA_TYPE'
+        fill modelCatalogueId with "MET-4567"
 
-}
+        fill description with "my description of data type${System.currentTimeMillis()}"
 
-def "delete the created data type"() {
+        and: 'select primitive button'
+        click primitive
+        fill measurementUnit with 'boolean'
+        remove messages
 
-    when:
-    click dataTypeCreated
+        and:
+        click save
 
-    and:
-    click primitiveTypeButton
-    and:
-    click deleteButton
-    and:
-    click modalPrimaryButton
+        then:
+        check firstRow contains 'TESTING_DATA_TYPE'
+    }
 
-    then:
-    check firstRow isGone()
+    def "delete the created data type"() {
+        when:
+        click dataTypeCreated
 
-  }
+        and:
+        click primitiveTypeButton
+
+        and:
+        click deleteButton
+
+        and:
+        click modalPrimaryButton
+
+        then:
+        check firstRow isGone()
+    }
 }

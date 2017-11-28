@@ -44,6 +44,7 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
         check createRelationship displayed
     }
 
+    @Ignore
     def "create relationship"() {
         when:'select relation'
 
@@ -70,9 +71,9 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
         noExceptionThrown()
         //check table contains 'is based on'
     }
-     @Ignore
-    def" remove the created relationship "(){
 
+    @Ignore
+    def "remove the created relationship"() {
         when:
         click plusButton
         and:
