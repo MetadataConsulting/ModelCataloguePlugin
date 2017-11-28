@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor', 'ui.bootstrap', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
+angular.module('modelcatalogue.core.ui.states.catalogue.actions.show.components.batchView.html', ['mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor', 'ui.bootstrap', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/batchView.html', '''
     <div>
       <h3 class="ce-name">{{batch.name}} <small ng-show="batch.getElementTypeName()"><span class="label" ng-show="batch.archived" ng-class="{'label-danger': batch.archived}">{{batch.status}}</span> (created {{batch.dateCreated | date:'short'}}, last updated {{batch.lastUpdated | date: 'short'}})</small></h3>

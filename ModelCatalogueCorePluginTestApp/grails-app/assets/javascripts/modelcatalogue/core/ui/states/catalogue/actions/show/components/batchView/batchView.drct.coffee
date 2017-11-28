@@ -1,4 +1,8 @@
-angular.module('mc.core.ui.batchView', ['modelcatalogue.core.enhancersConf.catalogueElementEnhancer', 'modelcatalogue.core.enhancersConf.listReferenceEnhancer', 'modelcatalogue.core.enhancersConf.listEnhancer','mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'ui.router', 'mc.core.ui.catalogueElementProperties']).directive 'batchView',  [-> {
+angular.module('modelcatalogue.core.ui.states.catalogue.actions.show.components.batchView', [
+  'modelcatalogue.core.ui.states.catalogue.actions.show.components.batchView.html',
+  'modelcatalogue.core.enhancersConf.catalogueElementEnhancer', 'modelcatalogue.core.enhancersConf.listReferenceEnhancer', 'modelcatalogue.core.enhancersConf.listEnhancer',
+
+  'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'ui.router', 'mc.core.ui.catalogueElementProperties']).directive 'batchView',  [-> {
     restrict: 'E'
     replace: true
     scope:

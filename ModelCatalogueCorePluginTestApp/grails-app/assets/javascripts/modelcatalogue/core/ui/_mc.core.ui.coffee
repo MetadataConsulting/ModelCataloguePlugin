@@ -4,7 +4,6 @@ angular.module('mc.core.ui', [
   'mc.core'
   # list of modules
   'mc.core.ui.columnsSupportCtrl'
-  'mc.core.ui.batchView'
   'mc.core.ui.catalogueElementIcon'
   'mc.core.ui.catalogueElementPicker'
   'mc.core.ui.expectCatalogueElement'
