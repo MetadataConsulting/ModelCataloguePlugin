@@ -1,12 +1,11 @@
 package org.modelcatalogue.core.sanityTestSuite.Favourites
 
+import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.ScrollDirection
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
-
-import static org.modelcatalogue.core.geb.Common.*
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore

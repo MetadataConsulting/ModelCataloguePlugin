@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import static org.springframework.http.HttpStatus.*
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.acl.AclUtilService
@@ -21,8 +22,6 @@ import org.springframework.dao.ConcurrencyFailureException
 import org.springframework.security.acls.domain.BasePermission
 import org.springframework.security.core.Authentication
 import org.springframework.validation.Errors
-
-import static org.springframework.http.HttpStatus.*
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 

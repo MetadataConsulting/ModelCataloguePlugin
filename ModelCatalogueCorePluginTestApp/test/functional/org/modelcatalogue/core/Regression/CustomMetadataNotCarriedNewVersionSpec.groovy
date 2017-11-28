@@ -1,10 +1,9 @@
 package org.modelcatalogue.core.Regression
 
+import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
-
-import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import static org.springframework.http.HttpStatus.OK
 import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.rx.LoggingSubscriber
 import org.modelcatalogue.core.util.ParamArgs
@@ -7,8 +8,6 @@ import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.Lists
 
 import java.util.concurrent.ExecutorService
-
-import static org.springframework.http.HttpStatus.OK
 
 class SearchController extends AbstractRestfulController<CatalogueElement> {
 

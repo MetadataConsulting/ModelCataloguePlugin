@@ -1,11 +1,10 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
-
-import static org.modelcatalogue.core.geb.Common.*
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise

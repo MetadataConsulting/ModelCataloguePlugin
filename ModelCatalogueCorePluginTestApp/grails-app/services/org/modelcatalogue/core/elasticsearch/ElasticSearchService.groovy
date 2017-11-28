@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.elasticsearch
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
+import static rx.Observable.from
+import static rx.Observable.just
 import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
@@ -47,9 +50,6 @@ import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import groovy.transform.CompileStatic
 
-import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
-import static rx.Observable.from
-import static rx.Observable.just
 import rx.Observable
 import grails.plugin.springsecurity.SpringSecurityUtils
 

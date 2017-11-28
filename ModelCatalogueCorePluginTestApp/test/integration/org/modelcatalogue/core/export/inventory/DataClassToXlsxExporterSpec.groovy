@@ -1,11 +1,10 @@
 package org.modelcatalogue.core.export.inventory
 
+import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.*
-
-import static org.modelcatalogue.core.util.test.FileOpener.open
 
 class DataClassToXlsxExporterSpec extends AbstractIntegrationSpec {
 

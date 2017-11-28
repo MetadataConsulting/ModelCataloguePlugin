@@ -1,10 +1,10 @@
 package org.modelcatalogue.core.elasticsearch
 
+import static org.modelcatalogue.core.elasticsearch.CatalogueElementDocumentSerializer.safePut
 import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.DataModelPolicy
 import org.modelcatalogue.core.Relationship
 
-import static org.modelcatalogue.core.elasticsearch.CatalogueElementDocumentSerializer.safePut
 
 class DataModelPolicyDocumentSerializer implements DocumentSerializer<DataModelPolicy> {
 

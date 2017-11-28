@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import com.google.common.base.Function
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
@@ -16,8 +17,6 @@ import org.modelcatalogue.core.util.*
 import rx.Observer
 
 import java.security.acl.Acl
-
-import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model

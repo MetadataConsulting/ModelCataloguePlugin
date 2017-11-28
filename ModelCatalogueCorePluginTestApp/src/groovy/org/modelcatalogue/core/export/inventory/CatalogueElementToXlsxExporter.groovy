@@ -1,5 +1,10 @@
 package org.modelcatalogue.core.export.inventory
 
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_NEW
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_REMOVAL
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_UPDATE
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H2
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableMultimap
@@ -38,12 +43,6 @@ import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
-
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_NEW
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_REMOVAL
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_UPDATE
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H2
 
 /**
  * For the Inventory Report.

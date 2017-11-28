@@ -1,10 +1,8 @@
 package org.modelcatalogue.core.publishing.changelog
 
+import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.api.ElementStatus
-
-import static org.modelcatalogue.core.util.test.FileOpener.open
-
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.AbstractIntegrationSpec

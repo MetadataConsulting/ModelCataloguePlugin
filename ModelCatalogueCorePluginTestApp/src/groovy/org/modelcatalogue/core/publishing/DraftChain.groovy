@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.publishing
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -10,8 +11,6 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import rx.Observer
-
-import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 @Log4j
 class DraftChain extends PublishingChain {

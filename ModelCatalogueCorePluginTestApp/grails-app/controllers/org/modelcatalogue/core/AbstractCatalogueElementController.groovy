@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import static org.springframework.http.HttpStatus.OK
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
@@ -40,8 +41,6 @@ import org.modelcatalogue.core.events.MetadataResponseEvent
 
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
-
-import static org.springframework.http.HttpStatus.OK
 
 abstract class AbstractCatalogueElementController<T extends CatalogueElement> extends AbstractRestfulController<T> {
 

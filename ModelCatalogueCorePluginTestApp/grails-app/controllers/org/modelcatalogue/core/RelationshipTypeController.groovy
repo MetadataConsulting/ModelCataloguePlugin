@@ -1,13 +1,12 @@
 package org.modelcatalogue.core
 
+import static org.springframework.http.HttpStatus.OK
 import grails.transaction.Transactional
 import org.modelcatalogue.core.persistence.RelationshipTypeGormService
 import org.modelcatalogue.core.util.CatalogueElementFinder
 import org.modelcatalogue.core.util.lists.Lists
 
 import javax.servlet.http.HttpServletResponse
-
-import static org.springframework.http.HttpStatus.OK
 
 class RelationshipTypeController extends AbstractRestfulController<RelationshipType>{
 

@@ -1,12 +1,11 @@
 package org.modelcatalogue.core.elasticsearch
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import grails.util.GrailsNameUtils
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
-
-import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements DocumentSerializer<T> {
 

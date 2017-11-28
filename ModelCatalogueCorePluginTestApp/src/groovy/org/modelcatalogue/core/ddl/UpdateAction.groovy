@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.ddl
 
+import static org.modelcatalogue.core.util.HibernateHelper.*
 import grails.util.Holders
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
@@ -7,8 +8,6 @@ import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.FriendlyErrors
-
-import static org.modelcatalogue.core.util.HibernateHelper.*;
 
 class UpdateAction {
 

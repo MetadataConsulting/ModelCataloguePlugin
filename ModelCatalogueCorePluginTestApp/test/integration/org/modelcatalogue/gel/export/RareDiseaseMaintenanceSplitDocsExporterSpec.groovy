@@ -1,5 +1,6 @@
 package org.modelcatalogue.gel.export
 
+import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.*
@@ -7,8 +8,6 @@ import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.gel.GenomicsService
-import static org.modelcatalogue.core.util.test.FileOpener.open
-
 
 /**
  * Created by amilward on 11/07/2017.

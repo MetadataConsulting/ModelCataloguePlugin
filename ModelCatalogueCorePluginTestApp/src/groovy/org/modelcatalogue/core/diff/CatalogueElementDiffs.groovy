@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.diff
 
+import static com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableMultimap
@@ -16,8 +17,6 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.HibernateHelper
-
-import static com.google.common.base.Preconditions.checkNotNull
 
 class CatalogueElementDiffs {
 

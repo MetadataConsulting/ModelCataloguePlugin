@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import static org.springframework.http.HttpStatus.UNAUTHORIZED
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
@@ -15,9 +16,6 @@ import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
 
 import javax.servlet.http.HttpServletResponse
-
-import static org.springframework.http.HttpStatus.UNAUTHORIZED
-
 
 class CatalogueController {
 

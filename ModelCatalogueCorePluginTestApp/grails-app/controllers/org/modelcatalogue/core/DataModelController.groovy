@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
 import com.google.common.collect.ImmutableSet
 import grails.transaction.Transactional
 import grails.util.GrailsNameUtils
@@ -34,8 +36,6 @@ import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import grails.plugin.springsecurity.acl.AclService
 import org.springframework.validation.Errors
-import static org.springframework.http.HttpStatus.CREATED
-import static org.springframework.http.HttpStatus.OK
 import grails.plugin.springsecurity.SpringSecurityService
 
 class DataModelController<T extends CatalogueElement> extends AbstractCatalogueElementController<DataModel> {

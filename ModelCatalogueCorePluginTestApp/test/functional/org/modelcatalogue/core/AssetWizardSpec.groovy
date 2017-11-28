@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import static org.modelcatalogue.core.geb.Common.*
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.builder.api.CatalogueBuilder
@@ -11,7 +12,6 @@ import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Stepwise
-import static org.modelcatalogue.core.geb.Common.*
 import spock.lang.IgnoreIf
 
 //@IgnoreIf({ !System.getProperty('geb.env') })

@@ -1,10 +1,9 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import static org.modelcatalogue.core.geb.Common.curator
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
-
-import static org.modelcatalogue.core.geb.Common.curator
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise

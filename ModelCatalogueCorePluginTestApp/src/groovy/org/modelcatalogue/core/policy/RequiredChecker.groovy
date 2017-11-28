@@ -1,9 +1,8 @@
 package org.modelcatalogue.core.policy
 
+import static com.google.common.base.Preconditions.checkNotNull
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
-
-import static com.google.common.base.Preconditions.checkNotNull
 
 class RequiredChecker implements ConventionChecker {
 

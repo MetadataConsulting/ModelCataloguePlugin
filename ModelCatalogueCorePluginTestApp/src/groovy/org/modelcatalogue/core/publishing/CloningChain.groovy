@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.publishing
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import grails.util.Holders
 import groovy.transform.CompileDynamic
 import groovy.util.logging.Log4j
@@ -11,8 +12,6 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 import rx.Observer
-
-import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 @Log4j
 class CloningChain extends PublishingChain {

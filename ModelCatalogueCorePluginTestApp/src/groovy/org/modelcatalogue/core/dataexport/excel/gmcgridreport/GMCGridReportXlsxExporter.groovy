@@ -1,12 +1,11 @@
 package org.modelcatalogue.core.dataexport.excel.gmcgridreport
 
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.*
 import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
-
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 
 /**
  * GridReportXlsxExporter.groovy

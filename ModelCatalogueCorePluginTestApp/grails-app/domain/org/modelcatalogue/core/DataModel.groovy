@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import static org.modelcatalogue.core.policy.VerificationPhase.FINALIZATION_CHECK
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables
 import groovy.transform.EqualsAndHashCode
@@ -9,9 +10,6 @@ import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
-
-import static org.modelcatalogue.core.policy.VerificationPhase.FINALIZATION_CHECK
-
 
 class DataModel extends CatalogueElement {
 
