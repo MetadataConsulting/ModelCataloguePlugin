@@ -330,10 +330,7 @@ class UCLHExcelLoader extends ExcelLoader{
                     Date stopAddRelate = new Date()
                     TimeDuration tdAddRelate = TimeCategory.minus( stopAddRelate, startAddRelate )
                     log.info("Complete relate dest: " + destinationDataElement.name + ",source: NOT AVAILABLE"  + "duration:" + tdAddRelate )
-
                 }
-
-
             }
         }
     }
