@@ -196,6 +196,10 @@ class BootStrap {
         Environment.current == Environment.TEST
     }
 
+    boolean isProd() {
+        Environment.current == Environment.PRODUCTION
+    }
+
     boolean isProduction() {
         Environment.current == Environment.PRODUCTION
     }
