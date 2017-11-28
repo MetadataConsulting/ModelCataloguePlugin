@@ -1,3 +1,6 @@
+###
+  Not used anywhere
+###
 angular.module('modelcatalogue.core.ui.states.controllers.PanelsCtrl', ['ui.router', 'mc.util.ui']).controller('modelcatalogue.core.ui.states.controllers.PanelsCtrl', [
   '$scope', '$state', 'list', 'applicationTitle', 'catalogueElementResource', 'catalogue', 'messages',
   ($scope ,  $state ,  list ,  applicationTitle ,  catalogueElementResource ,  catalogue ,  messages) ->

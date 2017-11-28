@@ -1,4 +1,4 @@
-angular.module('modelcatalogue.core.ui.states.dataModels', ['modelcatalogue.core.ui.states.controllers.PanelsCtrl',
+angular.module('modelcatalogue.core.ui.states.dataModels', [#'modelcatalogue.core.ui.states.controllers.PanelsCtrl',
   'modelcatalogue.core.ui.states.dataModels.DataModelsCtrl']).config([
   '$stateProvider',
   ($stateProvider) ->

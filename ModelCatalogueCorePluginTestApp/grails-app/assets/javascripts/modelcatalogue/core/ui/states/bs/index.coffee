@@ -5,7 +5,7 @@ angular.module('mc.core.ui.states.bs', [
   'mc.core.ui.states.bs.parent.html'
   'mc.core.ui.states.bs.list.html'
   'mc.core.ui.states.bs.show.html'
-  'mc.core.ui.states.bs.panels.html'
+  # 'mc.core.ui.states.bs.panels.html'
 ])
 
 window.modelcatalogue.registerModule 'mc.core.ui.states.bs'
