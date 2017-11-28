@@ -5,9 +5,9 @@ angular.module('modelcatalogue.core.ui.states.catalogue.actions.actionsConf',['m
   'ngInject'
   Action = actionClass
 
-###
-  Individual Action actions
-###
+  ###
+    Individual Action actions
+  ###
 
   actionsProvider.registerActionInRole 'run-action', actionRoleRegister.ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'PENDING'
@@ -175,9 +175,9 @@ angular.module('modelcatalogue.core.ui.states.catalogue.actions.actionsConf',['m
   ]
 
 
-###
-  Batches actions (actually seen from catalogue/resource=batch/list). There might be a better place to put this but for now it's with the Action actions.
-###
+  ###
+    Batches actions (actually seen from catalogue/resource=batch/list). There might be a better place to put this but for now it's with the Action actions.
+  ###
 
   actionsProvider.registerActionInRole 'generate-suggestions', actionRoleRegister.ROLE_LIST_ACTION, ['$scope', 'security',
     'catalogue', 'modelCatalogueApiRoot', 'enhance', 'rest', 'messages', '$state',
