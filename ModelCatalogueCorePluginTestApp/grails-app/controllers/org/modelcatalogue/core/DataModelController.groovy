@@ -430,7 +430,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             CatalogueElementToXlsxExporter.forDataModel(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
-        response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
         return
     }
