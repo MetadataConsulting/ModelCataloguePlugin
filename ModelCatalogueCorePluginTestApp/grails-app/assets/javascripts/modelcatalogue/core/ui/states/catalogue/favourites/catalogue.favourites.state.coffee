@@ -1,4 +1,4 @@
-angular.module('modelcatalogue.core.ui.states.catalogue.favourites', ['modelcatalogue.core.ui.states.controllers.FavouritesCtrl',
+angular.module('modelcatalogue.core.ui.states.catalogue.favourites', ['modelcatalogue.core.ui.states.catalogue.favourites.FavouritesCtrl',
   'modelcatalogue.core.ui.states.components.infiniteTable'])
 
 .config(($stateProvider) ->
@@ -7,11 +7,11 @@ angular.module('modelcatalogue.core.ui.states.catalogue.favourites', ['modelcata
     views:
       '':
         templateUrl: '/modelcatalogue/core/ui/states/catalogue/favourites/favourites.html'
-        controller: 'modelcatalogue.core.ui.states.controllers.FavouritesCtrl'
+        controller: 'modelcatalogue.core.ui.states.catalogue.favourites.FavouritesCtrl'
 
       'navbar-left@':
         template: '<contextual-menu role="{{::actionRoleAccess.ROLE_LIST_ACTION}}"></contextual-menu>'
-        controller: 'modelcatalogue.core.ui.states.controllers.FavouritesCtrl'
+        controller: 'modelcatalogue.core.ui.states.catalogue.favourites.FavouritesCtrl'
 
     url: '/favourites'
 

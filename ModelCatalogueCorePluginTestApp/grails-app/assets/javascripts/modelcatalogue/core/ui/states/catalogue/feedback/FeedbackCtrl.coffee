@@ -1,4 +1,4 @@
-angular.module('modelcatalogue.core.ui.states.controllers.FeedbackCtrl', ['ui.router', 'mc.util.ui']).controller 'modelcatalogue.core.ui.states.controllers.FeedbackCtrl', ($scope, feedback, MessagingClient, $stateParams, $http, modelCatalogueApiRoot, actionRoleAccess) ->
+angular.module('modelcatalogue.core.ui.states.catalogue.feedback.FeedbackCtrl', ['ui.router', 'mc.util.ui']).controller 'modelcatalogue.core.ui.states.catalogue.feedback.FeedbackCtrl', ($scope, feedback, MessagingClient, $stateParams, $http, modelCatalogueApiRoot, actionRoleAccess) ->
     $scope.actionRoleAccess = actionRoleAccess
     $scope.feedback = feedback ? {}
     $scope.feedback.log = $scope.feedback.log ? ''

@@ -4,8 +4,6 @@ angular.module('modelcatalogue.core.ui.states.controllers', [
   'mc.core.ui'
   # list of modules
   'modelcatalogue.core.ui.states.controllers.ShowCtrl'
-  'modelcatalogue.core.ui.states.controllers.FavouritesCtrl'
-  'modelcatalogue.core.ui.states.controllers.FeedbackCtrl'
   'modelcatalogue.core.ui.states.controllers.ListCtrl'
   'modelcatalogue.core.ui.states.controllers.UserCtrl'
   'modelcatalogue.core.ui.states.controllers.FastActionsCtrl'

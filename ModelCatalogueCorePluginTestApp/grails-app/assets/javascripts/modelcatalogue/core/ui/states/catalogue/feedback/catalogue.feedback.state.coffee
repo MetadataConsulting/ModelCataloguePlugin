@@ -1,9 +1,9 @@
-angular.module('modelcatalogue.core.ui.states.catalogue.feedback', ['modelcatalogue.core.ui.states.controllers.FeedbackCtrl']).config(($stateProvider, actionsProvider, actionRoleRegister, actionClass) ->
+angular.module('modelcatalogue.core.ui.states.catalogue.feedback', ['modelcatalogue.core.ui.states.catalogue.feedback.FeedbackCtrl']).config(($stateProvider, actionsProvider, actionRoleRegister, actionClass) ->
     Action = actionClass
     $stateProvider.state 'catalogue.feedback', {
 
       templateUrl: '/modelcatalogue/core/ui/states/catalogue/feedback/feedback.html'
-      controller: 'modelcatalogue.core.ui.states.controllers.FeedbackCtrl'
+      controller: 'modelcatalogue.core.ui.states.catalogue.feedback.FeedbackCtrl'
 
       url: '/feedback/{id:\\d+}'
 
