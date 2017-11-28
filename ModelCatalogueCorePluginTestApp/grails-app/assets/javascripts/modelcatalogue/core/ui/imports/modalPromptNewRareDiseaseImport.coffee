@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptNewRareDiseaseImport', ['mc.util.messages', 'ngFileUpload']).config ['messagesProvider', (messagesProvider)->
+angular.module('modelcatalogue.core.ui.imports.modalPromptNewRareDiseaseImport', ['mc.util.messages', 'ngFileUpload']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$uibModal', ($uibModal) ->
     (title, body, args) ->
       dialog = $uibModal.open {
@@ -8,7 +8,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRareDiseaseImport', ['mc.util.messag
         resolve:
           title: -> title
           args: -> args
-        templateUrl: '/mc/core/ui/modals/modalRareDiseaseImport.html'
+        templateUrl: '/modelcatalogue/core/ui/imports/modalRareDiseaseImport.html'
         controller: ($uibModalInstance, $scope, Upload, catalogue, enhance, messages, modelCatalogueApiRoot) ->
           'ngInject'
           $scope.title = title

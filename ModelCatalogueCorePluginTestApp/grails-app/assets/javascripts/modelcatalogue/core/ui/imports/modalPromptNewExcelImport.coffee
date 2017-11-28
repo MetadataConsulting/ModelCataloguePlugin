@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', 'mc.core.ui.bs.importCtrl']).config ['messagesProvider', (messagesProvider)->
+angular.module('modelcatalogue.core.ui.imports.modalPromptNewExcelImport', ['mc.util.messages', 'modelcatalogue.core.ui.imports.importCtrl']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$uibModal', ($uibModal) ->
     (title, body, args) ->
       dialog = $uibModal.open {

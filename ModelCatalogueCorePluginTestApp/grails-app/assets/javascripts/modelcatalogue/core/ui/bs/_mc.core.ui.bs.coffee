@@ -10,17 +10,8 @@ angular.module('mc.core.ui.bs', [
   'ngCookies'
   'infinite-scroll'
   # list of modules
-  'mc.core.ui.bs.importCtrl'
   'mc.core.ui.bs.modalAlert'
-  'mc.core.ui.bs.modalPromptNewExcelImport'
-  'mc.core.ui.bs.modalPromptNewLoincImport'
-  'mc.core.ui.bs.modalPromptNewOboImport'
-  'mc.core.ui.bs.modalPromptNewRareDiseaseImport'
-  'mc.core.ui.bs.modalPromptNewUmljImport'
-  'mc.core.ui.bs.modalPromptNewXsdImport'
-  'mc.core.ui.bs.modalPromptNewMCImport'
   'mc.core.ui.bs.modalPromptCloneIntoDataModel'
-  'mc.core.ui.bs.modalPromptNewCatalogueXmlImport'
   'mc.core.ui.bs.catalogueElementProperties'
   'modelcatalogue.core.ui.bs.actionsConf'
   'mc.core.ui.bs.columns'
@@ -44,7 +35,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptXmlValidate'
   'mc.core.ui.bs.modalPromptForCatalogueElement'
   'mc.core.ui.bs.modalSearchForCatalogueElement'
-  'mc.core.ui.bs.modalSearchForActions'
   'mc.core.ui.bs.modalPromptForCatalogueElements'
   'mc.core.ui.bs.modalPromptAssetEdit'
   'mc.core.ui.bs.modalPromptLogin'
@@ -69,6 +59,8 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.withClassificationCtrlMixin'
   'modelcatalogue.core.sections.metadataEditors'
   'mc.core.ui.bs.modalOptions'
+  # This modal is actually used right here in this module:
+  'modelcatalogue.core.ui.navigationRight.global.modalSearchForActions'
 ]).run ['messages', '$rootScope', '$log', (messages, $rootScope, $log) ->
   $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
     $log.error "Error changing state:", event, toState, toParams, fromState, fromParams, error

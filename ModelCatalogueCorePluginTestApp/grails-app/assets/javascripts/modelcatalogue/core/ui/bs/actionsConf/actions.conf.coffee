@@ -464,17 +464,3 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
       )
         .activeIf false # what the. This is not even used?
   ]
-
-  actionsProvider.registerActionInRole 'import-data-models-screen', actionRoleRegister.ROLE_DATA_MODELS_ACTION, [
-    'security',
-    (security) ->
-      return undefined unless security.hasRole('CURATOR')
-      action = Action.createAbstractAction(
-        position: 10000
-        label: 'Import'
-        icon: 'fa fa-fw fa-upload'
-        type: 'primary'
-      )
-      action.expandToLeft= true
-      return action
-  ]

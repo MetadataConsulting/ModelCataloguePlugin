@@ -1,4 +1,4 @@
-module = angular.module('mc.core.ui.bs.modalSearchForActions', ['mc.util.messages', 'mc.util.ui.focusMe'])
+module = angular.module('modelcatalogue.core.ui.navigationRight.global.modalSearchForActions', ['mc.util.messages', 'mc.util.ui.focusMe', 'modelcatalogue.core.ui.navigationRight.globalActions'])
 module.config ['messagesProvider', (messagesProvider)->
   messagesProvider.setPromptFactory 'search-action',  [ '$uibModal', 'names',  ($uibModal) ->
     ->

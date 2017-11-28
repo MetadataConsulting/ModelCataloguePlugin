@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload']).controller 'importCtrl', ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', 'catalogue', 'args', ($scope, messages, names, modelCatalogueDataArchitect, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance, catalogue, args) ->
+angular.module('modelcatalogue.core.ui.imports.importCtrl', ['mc.util.messages', 'ngFileUpload']).controller 'importCtrl', ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', 'catalogue', 'args', ($scope, messages, names, modelCatalogueDataArchitect, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance, catalogue, args) ->
     $scope.copy     = angular.copy(args.element ? {})
     $scope.original = args.element ? {}
     $scope.messages = messages.createNewMessages()

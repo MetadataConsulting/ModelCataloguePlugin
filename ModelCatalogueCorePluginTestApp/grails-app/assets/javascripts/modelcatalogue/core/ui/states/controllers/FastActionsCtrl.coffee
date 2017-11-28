@@ -1,7 +1,8 @@
 ###
   Not used anywhere.
 ###
-angular.module('modelcatalogue.core.ui.states.controllers.FastActionsCtrl', ['ui.router', 'mc.util.ui']).controller('modelcatalogue.core.ui.states.controllers.FastActionsCtrl', [
+angular.module('modelcatalogue.core.ui.states.controllers.FastActionsCtrl', ['ui.router', 'mc.util.ui',
+  'modelcatalogue.core.ui.navigationRight.global.modalSearchForActions']).controller('modelcatalogue.core.ui.states.controllers.FastActionsCtrl', [
   '$scope', 'messages',
   ($scope ,  messages)->
     $scope.showFastActions = ->
