@@ -5,26 +5,18 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
-import org.modelcatalogue.core.security.MetadataRoles
-import org.modelcatalogue.core.persistence.UserRoleGormService
 import org.modelcatalogue.core.persistence.UserGormService
+import org.modelcatalogue.core.persistence.UserRoleGormService
 import org.modelcatalogue.core.reports.RegisterReportsService
-import org.modelcatalogue.core.security.InitSecurityService
-import org.modelcatalogue.core.security.MetadataSecurityService
+import org.modelcatalogue.core.security.*
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.test.TestDataHelper
-import org.springframework.security.acls.model.Acl
-import org.springframework.security.acls.model.ObjectIdentity
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
-import org.modelcatalogue.core.security.User
-import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
-import grails.plugin.springsecurity.acl.AclService
-import org.modelcatalogue.core.security.DataModelAclService
 
 class BootStrap {
 
