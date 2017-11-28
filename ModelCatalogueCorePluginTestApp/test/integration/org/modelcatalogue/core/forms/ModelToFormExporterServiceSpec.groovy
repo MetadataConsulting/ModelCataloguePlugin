@@ -10,12 +10,10 @@ import org.modelcatalogue.crf.model.Item
 import org.modelcatalogue.crf.model.ResponseLayout
 import org.modelcatalogue.crf.model.ResponseType
 import org.modelcatalogue.crf.model.Section
-
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.springframework.validation.Errors
-import spock.lang.Ignore
 
 class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
 
@@ -160,9 +158,6 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
         gridGroup.repeatMax == TEST_GRID_REPEAT_MAX as Integer
     }
 
-
-    //@Requires({ !System.getenv('TRAVIS') })
-    @Ignore
     def "various item types"() {
         given:
         DataClass formModel = build {
