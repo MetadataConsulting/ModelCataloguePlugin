@@ -9,9 +9,4 @@ class TagMarshaller extends CatalogueElementMarshaller {
     TagMarshaller() {
         super(Tag)
     }
-
 }
-
-
-
-

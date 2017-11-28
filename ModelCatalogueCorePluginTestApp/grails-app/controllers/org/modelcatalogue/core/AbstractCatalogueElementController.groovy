@@ -38,7 +38,6 @@ import org.modelcatalogue.core.util.lists.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
 import org.modelcatalogue.core.events.MetadataResponseEvent
-
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
 

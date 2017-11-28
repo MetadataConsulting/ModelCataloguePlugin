@@ -33,8 +33,6 @@ import org.springframework.transaction.TransactionStatus
 import rx.Observer as RxObserver
 
 class ElementService implements Publisher<CatalogueElement> {
-
-
     static transactional = false
 
     GrailsApplication grailsApplication

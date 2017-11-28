@@ -28,12 +28,9 @@ class GMCGridReportHeaders {
     static String timely = 'Timely'
     static String comments = 'Comments'
 
-
-
     static List<String> ntElementMetadataHeaders =
         [semanticMatching, knownIssue, immediateSolution, immediateSolutionOwner, longTermSolution, longTermSolutionOwner, dataItemUniqueCode, relatedTo, partOfStandardDataSet, dataCompleteness, estimatedQuality, timely, comments]
     static List<String> ntElementMetadataKeys = ntElementMetadataHeaders //ntElementMetadataHeaders.collect{ it.replace(/Related To Metadata/, 'Related To')}
     static List<String> excelHeaders = // v0.2
         [id, dataElement, multiplicity, dataType, validationRule, businessRule, placeholder, sourceSystem, previouslyInSourceSystem] + ntElementMetadataHeaders
-
 }

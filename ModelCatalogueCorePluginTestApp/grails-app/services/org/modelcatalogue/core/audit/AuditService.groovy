@@ -11,7 +11,6 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.messaging.core.MessageSendingOperations
-
 import javax.annotation.PostConstruct
 import java.util.concurrent.Callable
 

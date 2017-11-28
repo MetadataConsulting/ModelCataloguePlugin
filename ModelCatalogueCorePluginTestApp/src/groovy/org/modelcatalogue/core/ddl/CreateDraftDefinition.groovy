@@ -16,5 +16,4 @@ class CreateDraftDefinition {
     void of(String name) {
         Holders.applicationContext.getBean(ElementService).createDraftVersion(ddl.find(CatalogueElement, name), DraftContext.userFriendly())
     }
-
 }

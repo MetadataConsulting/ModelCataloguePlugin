@@ -5,12 +5,11 @@ import org.modelcatalogue.core.geb.CatalogueContent
 import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.ScrollDirection
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.*
-
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
+
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {

@@ -15,5 +15,4 @@ class DataModelDocumentSerializer extends CatalogueElementDocumentSerializer<Dat
 
         return builder
     }
-
 }

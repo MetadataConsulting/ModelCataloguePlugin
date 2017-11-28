@@ -16,7 +16,6 @@ import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxE
 @Log4j
 class GMCGridReportExcelLoaderDirect extends GMCGridReportExcelLoader {
 
-
     GMCGridReportExcelLoaderDirect() {
     }
 

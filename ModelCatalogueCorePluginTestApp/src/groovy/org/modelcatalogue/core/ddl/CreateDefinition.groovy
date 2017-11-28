@@ -39,11 +39,6 @@ class CreateDefinition<T extends CatalogueElement> {
         if (ddl.dataModel) {
             element.dataModel = ddl.dataModel
         }
-
-
         FriendlyErrors.failFriendlySave(element)
-
-
     }
-
 }

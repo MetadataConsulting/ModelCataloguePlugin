@@ -2,7 +2,6 @@ package org.modelcatalogue.core.Regression
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getPick
 //@Ignore

@@ -14,7 +14,6 @@ import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
-
 import javax.servlet.http.HttpServletResponse
 
 class CatalogueController {

@@ -13,5 +13,4 @@ class MeasurementUnitDocumentSerializer extends CatalogueElementDocumentSerializ
 
         return builder
     }
-
 }

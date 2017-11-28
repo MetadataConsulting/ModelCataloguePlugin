@@ -316,5 +316,4 @@ class ExcelExporter {
     protected static String getModelCatalogueIdToPrint(CatalogueElement element) {
         element.hasModelCatalogueId() && !element.modelCatalogueId.startsWith('http') ? element.modelCatalogueId : element.combinedVersion
     }
-
 }

@@ -16,13 +16,11 @@ import org.modelcatalogue.core.ddl.DataDefinitionLanguage
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
-
 /*
 *
 * THE CHANGE LOG STUFF DOESN'T REALLY WORK SO NOT SURE IT's worth fixing this test
 *
 * */
-
 class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
 
     AuditService auditService

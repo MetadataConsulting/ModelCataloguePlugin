@@ -33,5 +33,4 @@ interface Auditor {
     Observable<Long> logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId)
     Observable<Long> logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId)
     Observable<Long> logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId)
-
 }

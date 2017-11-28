@@ -6,7 +6,6 @@ import org.modelcatalogue.core.rx.LoggingSubscriber
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.Lists
-
 import java.util.concurrent.ExecutorService
 
 class SearchController extends AbstractRestfulController<CatalogueElement> {

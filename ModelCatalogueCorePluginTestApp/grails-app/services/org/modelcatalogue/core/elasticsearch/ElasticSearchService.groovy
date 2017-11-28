@@ -45,11 +45,9 @@ import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.SearchParams
 import org.springframework.security.acls.model.NotFoundException
-
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import groovy.transform.CompileStatic
-
 import rx.Observable
 import grails.plugin.springsecurity.SpringSecurityUtils
 

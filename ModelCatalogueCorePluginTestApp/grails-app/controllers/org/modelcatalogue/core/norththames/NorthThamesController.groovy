@@ -3,7 +3,6 @@ package org.modelcatalogue.core.norththames
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
-
 import org.springframework.http.HttpStatus
 
 /**

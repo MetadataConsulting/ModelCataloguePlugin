@@ -14,7 +14,6 @@ import org.openqa.selenium.logging.LogType
 import org.openqa.selenium.Keys
 
 import static org.modelcatalogue.core.geb.Common.*
-
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     // keep the passwords simply stupid, they are only for dev/test or very first setup

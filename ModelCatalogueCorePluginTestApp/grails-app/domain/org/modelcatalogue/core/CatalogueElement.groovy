@@ -15,7 +15,6 @@ import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import rx.Observer
-
 import java.security.acl.Acl
 
 /**

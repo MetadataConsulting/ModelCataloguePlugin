@@ -40,7 +40,6 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle contains "Active Data Classes"
     }
 
-
     def "Add new data class"() {
         click create
         expect: 'the model dialog opens'
@@ -154,7 +153,6 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then: 'the number of children of Another New must be 1'
         $('span.catalogue-element-treeview-name', text: startsWith("Another New")).parent().parent() displayed
-
     }
 
     def "edit child data class"() {
@@ -173,7 +171,6 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         then: "same number of children are still shown"
 
         $('span.catalogue-element-treeview-name', text: startsWith("Changed Name")) displayed
-
     }
 
     def "xml editor"() {

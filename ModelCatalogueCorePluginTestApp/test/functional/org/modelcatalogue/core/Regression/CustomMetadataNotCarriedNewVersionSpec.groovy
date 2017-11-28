@@ -26,7 +26,5 @@ class CustomMetadataNotCarriedNewVersionSpec extends AbstractModelCatalogueGebSp
 
         and:
         check first_row contains '0.0.1'
-
     }
-
 }

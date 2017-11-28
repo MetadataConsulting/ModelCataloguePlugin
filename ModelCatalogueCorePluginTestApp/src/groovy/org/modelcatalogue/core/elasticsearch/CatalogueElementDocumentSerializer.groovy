@@ -9,7 +9,6 @@ import org.modelcatalogue.core.CatalogueElement
 
 class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements DocumentSerializer<T> {
 
-
     @Override
     ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, T element, ImmutableMap.Builder<String, Object> builder) {
         Class<? extends CatalogueElement> clazz = getEntityClass(element)
@@ -32,8 +31,6 @@ class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements 
         safePut(builder, 'version_created', new Date(element.versionCreated.time))
         safePut(builder, 'last_updated', new Date(element.lastUpdated.time))
         safePut(builder, 'ext', getExtensions(element.ext))
-
-
         return builder
     }
 
@@ -46,7 +43,6 @@ class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements 
             safePut(mapBuilder, 'value', entry.value.toString())
             listBuilder.add(mapBuilder.build())
         }
-
         listBuilder.build()
     }
 
@@ -56,5 +52,4 @@ class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements 
         }
         return builder
     }
-
 }

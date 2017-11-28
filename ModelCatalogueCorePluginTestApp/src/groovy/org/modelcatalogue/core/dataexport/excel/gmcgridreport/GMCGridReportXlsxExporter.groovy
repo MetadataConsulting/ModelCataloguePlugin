@@ -402,8 +402,4 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
             noSourceMessage
         }
     }
-
-
-
-
 }

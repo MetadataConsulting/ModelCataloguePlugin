@@ -13,7 +13,6 @@ import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.publishing.CloningContext
 import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
-
 import java.security.DigestInputStream
 import java.security.DigestOutputStream
 import java.security.MessageDigest

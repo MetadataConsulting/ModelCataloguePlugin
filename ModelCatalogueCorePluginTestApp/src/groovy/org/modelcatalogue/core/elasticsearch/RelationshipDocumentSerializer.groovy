@@ -20,5 +20,4 @@ class RelationshipDocumentSerializer implements DocumentSerializer<Relationship>
         safePut(builder, 'ext', CatalogueElementDocumentSerializer.getExtensions(relationship.ext))
         return builder
     }
-
 }

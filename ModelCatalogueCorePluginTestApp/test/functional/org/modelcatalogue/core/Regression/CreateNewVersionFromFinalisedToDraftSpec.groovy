@@ -5,7 +5,6 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import spock.lang.Unroll
-
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.getDescription
 import static org.modelcatalogue.core.geb.Common.getModalHeader

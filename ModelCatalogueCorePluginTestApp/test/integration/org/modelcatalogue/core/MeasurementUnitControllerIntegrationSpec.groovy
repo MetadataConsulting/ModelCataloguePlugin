@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.api.ElementStatus
 
-
 class MeasurementUnitControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override

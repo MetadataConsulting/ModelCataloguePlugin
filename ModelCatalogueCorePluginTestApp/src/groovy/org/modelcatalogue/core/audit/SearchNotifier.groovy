@@ -11,7 +11,6 @@ import org.modelcatalogue.core.rx.ErrorSubscriber
 import rx.Observable
 import rx.subjects.PublishSubject
 import rx.subjects.Subject
-
 import java.util.concurrent.TimeUnit
 
 class SearchNotifier extends AbstractAuditor {

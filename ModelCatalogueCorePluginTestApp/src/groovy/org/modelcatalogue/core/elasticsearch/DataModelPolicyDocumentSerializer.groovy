@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.DataModelPolicy
 import org.modelcatalogue.core.Relationship
 
-
 class DataModelPolicyDocumentSerializer implements DocumentSerializer<DataModelPolicy> {
 
     @Override
@@ -14,5 +13,4 @@ class DataModelPolicyDocumentSerializer implements DocumentSerializer<DataModelP
         safePut(builder, 'policy_text', relationship.policyText)
         return builder
     }
-
 }

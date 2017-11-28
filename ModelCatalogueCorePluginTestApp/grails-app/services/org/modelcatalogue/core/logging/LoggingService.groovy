@@ -2,7 +2,6 @@ package org.modelcatalogue.core.logging
 
 import org.modelcatalogue.core.AssetService
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
-
 import java.nio.file.Files
 import java.text.SimpleDateFormat
 import java.util.zip.ZipEntry

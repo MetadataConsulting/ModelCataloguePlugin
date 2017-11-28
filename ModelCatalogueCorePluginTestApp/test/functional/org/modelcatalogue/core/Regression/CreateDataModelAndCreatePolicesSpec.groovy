@@ -6,7 +6,6 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
 import static org.modelcatalogue.core.geb.Common.description
-
 @IgnoreIf({ !System.getProperty('geb.env') })
 class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec {
 

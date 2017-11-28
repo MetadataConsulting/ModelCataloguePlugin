@@ -11,7 +11,6 @@ import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipMarshallers
 import rx.Observable
 import rx.subjects.AsyncSubject
-
 import java.util.concurrent.ExecutorService
 
 /**

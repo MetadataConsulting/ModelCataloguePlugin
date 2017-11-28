@@ -3,7 +3,6 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
-
 import static org.modelcatalogue.core.geb.Common.getModalCloseButton
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.pick
