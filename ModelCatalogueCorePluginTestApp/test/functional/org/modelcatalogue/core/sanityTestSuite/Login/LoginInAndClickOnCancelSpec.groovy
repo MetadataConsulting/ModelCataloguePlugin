@@ -14,9 +14,7 @@ class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
     private static final String primaryBtn = "button.btn"
 
     void clickOnCancel() {
-
         when:
-        WebDriver driver = browser.driver
         go(baseUrl)
         click login
         then:

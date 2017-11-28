@@ -17,7 +17,6 @@ class LoginAsViewerSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue as a viewer"() {
         when:
-        WebDriver driver = browser.driver
         go(baseUrl)
         click login
 
