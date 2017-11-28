@@ -242,7 +242,7 @@ class AssetService {
                 }
             }
         }
-        return asset.id;
+        asset.id
     }
 
 }
