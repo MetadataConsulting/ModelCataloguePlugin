@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.plugin.springsecurity.annotation.Secured
 import org.springframework.http.HttpStatus
 
 class RelationshipController {

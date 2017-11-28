@@ -13,7 +13,6 @@ import org.modelcatalogue.core.dataimport.excel.ExcelExporter
 import org.modelcatalogue.core.events.DataModelFinalizedEvent
 import org.modelcatalogue.core.events.DataModelWithErrorsEvent
 import org.modelcatalogue.core.events.MetadataResponseEvent
-import org.modelcatalogue.core.events.SourceDestinationEvent
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.persistence.DataModelGormService
@@ -31,10 +30,6 @@ import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import grails.plugin.springsecurity.acl.AclUtilService
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.springframework.http.HttpStatus
-import org.springframework.security.acls.domain.BasePermission
-import org.springframework.security.acls.model.ObjectIdentity
-import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
-import grails.plugin.springsecurity.acl.AclService
 import org.springframework.validation.Errors
 import grails.plugin.springsecurity.SpringSecurityService
 

@@ -2,7 +2,6 @@ package org.modelcatalogue.core.elasticsearch
 
 import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.MeasurementUnit
 
 class DataModelDocumentSerializer extends CatalogueElementDocumentSerializer<DataModel> {
 

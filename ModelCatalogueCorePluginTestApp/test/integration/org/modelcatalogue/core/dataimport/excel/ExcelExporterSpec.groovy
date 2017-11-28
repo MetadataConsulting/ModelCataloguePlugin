@@ -4,10 +4,8 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.export.inventory.DataModelToXlsxExporterSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
-import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery

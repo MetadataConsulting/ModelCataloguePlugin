@@ -8,7 +8,6 @@ import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.acls.domain.BasePermission
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import org.springframework.security.acls.model.Permission

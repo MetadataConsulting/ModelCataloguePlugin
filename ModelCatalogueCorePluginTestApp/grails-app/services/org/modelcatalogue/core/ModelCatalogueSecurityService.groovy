@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 
 /**

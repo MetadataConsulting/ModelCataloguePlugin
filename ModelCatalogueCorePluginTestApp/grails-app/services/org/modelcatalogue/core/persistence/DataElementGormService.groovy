@@ -1,7 +1,5 @@
 package org.modelcatalogue.core.persistence
 
-
-import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.WarnGormErrors
 import org.springframework.context.MessageSource
 import grails.gorm.DetachedCriteria

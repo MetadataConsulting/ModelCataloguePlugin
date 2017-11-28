@@ -7,7 +7,6 @@ import org.modelcatalogue.core.events.MetadataResponseEvent
 import org.modelcatalogue.core.events.SourceDestinationEvent
 import org.modelcatalogue.core.events.UnauthorizedEvent
 import org.modelcatalogue.core.persistence.CatalogueElementGormService
-import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DestinationClass
 

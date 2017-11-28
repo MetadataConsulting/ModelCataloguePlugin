@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.api.ElementStatus
-import spock.lang.Unroll
 
 class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 

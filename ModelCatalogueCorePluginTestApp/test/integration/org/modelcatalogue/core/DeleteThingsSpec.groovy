@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
-import groovy.util.slurpersupport.GPathResult
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder

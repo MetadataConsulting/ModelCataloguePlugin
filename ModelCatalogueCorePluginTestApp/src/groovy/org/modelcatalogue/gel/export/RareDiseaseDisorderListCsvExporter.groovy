@@ -1,7 +1,5 @@
 package org.modelcatalogue.gel.export
 
-import groovy.json.JsonOutput
-import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 
 /**

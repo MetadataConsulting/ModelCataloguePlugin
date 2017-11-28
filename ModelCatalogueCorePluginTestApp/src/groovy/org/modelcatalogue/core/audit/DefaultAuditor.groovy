@@ -1,14 +1,8 @@
 package org.modelcatalogue.core.audit
 
-import grails.web.JSONBuilder
-import groovy.json.JsonSlurper
 import groovy.util.logging.Log4j
-import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
-import org.modelcatalogue.core.util.marshalling.RelationshipMarshallers
 import rx.Observable
 import rx.subjects.AsyncSubject
 import java.util.concurrent.ExecutorService

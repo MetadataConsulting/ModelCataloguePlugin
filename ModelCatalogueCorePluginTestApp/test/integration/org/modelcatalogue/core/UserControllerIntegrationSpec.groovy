@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 
 class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {

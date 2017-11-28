@@ -2,10 +2,7 @@ package org.modelcatalogue.core.util.marshalling
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.lists.Relationships
 

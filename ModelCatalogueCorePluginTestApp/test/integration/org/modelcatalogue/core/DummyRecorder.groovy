@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.modelcatalogue.core.util.ResultRecorder
 

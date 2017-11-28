@@ -9,7 +9,6 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.ResultRecorder
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import spock.lang.Unroll
 
 import javax.servlet.http.HttpServletResponse

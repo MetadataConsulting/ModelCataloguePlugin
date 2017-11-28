@@ -12,7 +12,6 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.enumeration.Enumerations
-import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftChain
 import org.modelcatalogue.core.publishing.DraftContext
@@ -20,7 +19,6 @@ import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.security.DataModelAclService
-import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper

@@ -2,8 +2,6 @@ package org.modelcatalogue.core.util.marshalling
 
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.modelcatalogue.core.Asset
-import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.springframework.beans.factory.annotation.Autowired
 
 class AssetMarshaller extends CatalogueElementMarshaller {
