@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptGenerateSuggestions', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
+angular.module('modelcatalogue.core.ui.states.catalogue.actions.modalPromptGenerateSuggestions', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
  messagesProvider.setPromptFactory 'generate-suggestions',  [ '$uibModal', ($uibModal) ->
    (title, body) ->
       dialog = $uibModal.open {

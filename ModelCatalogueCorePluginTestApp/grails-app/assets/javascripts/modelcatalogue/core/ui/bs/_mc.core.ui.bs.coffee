@@ -56,7 +56,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptModel'
   'mc.core.ui.bs.modalPromptRelationshipTypeEdit'
   'mc.core.ui.bs.modalPromptDatModelPolicyEdit'
-  'mc.core.ui.bs.modalPromptGenerateSuggestions'
   'mc.core.ui.bs.modalPromptDataElementEdit'
   'mc.core.ui.bs.modalAbout'
   'mc.core.ui.bs.saveOrUpdatePublishedElementCtrl'
