@@ -1,11 +1,9 @@
 package org.modelcatalogue.core.Regression
 
-import groovy.transform.NotYetImplemented
+import static org.modelcatalogue.core.geb.Common.description
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
-import static org.modelcatalogue.core.geb.Common.description
 @IgnoreIf({ !System.getProperty('geb.env') })
 class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec {
 

@@ -1,10 +1,9 @@
 package org.modelcatalogue.gel.export
 
-import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.DataElement
-
 import static junit.framework.Assert.assertEquals
 import static org.modelcatalogue.core.util.test.FileOpener.open
+import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataElement
 
 /**
  * Created by rickrees on 18/04/2016.

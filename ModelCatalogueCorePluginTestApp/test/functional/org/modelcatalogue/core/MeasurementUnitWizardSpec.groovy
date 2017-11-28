@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
-import spock.lang.IgnoreIf
 import static org.modelcatalogue.core.geb.Common.*
+import spock.lang.IgnoreIf
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 

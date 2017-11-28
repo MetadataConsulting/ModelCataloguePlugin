@@ -1,10 +1,5 @@
 package org.modelcatalogue.core.Regression
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
-import spock.lang.IgnoreIf
-import spock.lang.Stepwise
-import spock.lang.Unroll
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.getDescription
 import static org.modelcatalogue.core.geb.Common.getModalHeader
@@ -14,6 +9,10 @@ import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.IgnoreIf
+import spock.lang.Stepwise
+import spock.lang.Unroll
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise

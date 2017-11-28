@@ -1,9 +1,5 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
-import spock.lang.IgnoreIf
-import spock.lang.Stepwise
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.delete
 import static org.modelcatalogue.core.geb.Common.description
@@ -15,6 +11,10 @@ import static org.modelcatalogue.core.geb.Common.modelCatalogueId
 import static org.modelcatalogue.core.geb.Common.nameLabel
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import static org.modelcatalogue.core.geb.Common.modalSuccessButton
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
+import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore

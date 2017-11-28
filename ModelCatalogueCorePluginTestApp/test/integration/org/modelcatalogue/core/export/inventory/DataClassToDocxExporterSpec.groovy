@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.export.inventory
 
-import org.modelcatalogue.core.AbstractIntegrationSpec
 import static org.modelcatalogue.core.util.test.FileOpener.open
+import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.junit.Rule

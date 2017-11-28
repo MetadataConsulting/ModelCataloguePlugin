@@ -3,7 +3,7 @@ package org.modelcatalogue.core.ddl
 import grails.util.Holders
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ElementService
-import org.modelcatalogue.core.publishing.DraftContext;
+import org.modelcatalogue.core.publishing.DraftContext
 
 class CreateDraftDefinition {
 

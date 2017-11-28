@@ -1,15 +1,16 @@
 package org.modelcatalogue.core
 
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
-import spock.lang.Ignore
 import spock.lang.Stepwise
-
 import spock.lang.IgnoreIf
-@IgnoreIf({ !System.getProperty('geb.env') })
 
+@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
