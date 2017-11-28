@@ -5,7 +5,6 @@ angular.module('mc.core.ui.states.bs', [
   'mc.core.ui.states.bs.parent.html'
   'mc.core.ui.states.bs.list.html'
   'mc.core.ui.states.bs.show.html'
-  'mc.core.ui.states.bs.batch.html'
   'mc.core.ui.states.bs.panels.html'
 ])
 
