@@ -166,7 +166,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
         if ( responseEvent instanceof DataModelWithErrorsEvent) {
-            respond instance.errors, view: 'edit' // STATUS CODE 422
+            DataModel dataModel = (responseEvent as DataModelWithErrorsEvent).dataModel
+            respond dataModel.errors, view: 'edit' // STATUS CODE 422
             return
         }
         if ( !(responseEvent instanceof DataModelFinalizedEvent) ) {
