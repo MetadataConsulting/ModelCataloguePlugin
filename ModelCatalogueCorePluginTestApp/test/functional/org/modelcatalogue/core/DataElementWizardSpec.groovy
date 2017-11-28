@@ -1,9 +1,9 @@
 package org.modelcatalogue.core
 
+import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
-import static org.modelcatalogue.core.geb.Common.*
 import spock.lang.IgnoreIf
 
 @IgnoreIf({ !System.getProperty('geb.env') })
