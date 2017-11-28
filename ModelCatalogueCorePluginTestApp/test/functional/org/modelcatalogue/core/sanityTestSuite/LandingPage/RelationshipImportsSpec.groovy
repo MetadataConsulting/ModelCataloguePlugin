@@ -28,10 +28,7 @@ class RelationshipImportsSpec extends AbstractModelCatalogueGebSpec{
     private static final String  removeImportedModel ="a#role_item_remove-relationshipBtn"
     private static final String  table ="#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-7 > span > span > code"
 
-
-
-    def "login to model catalogue and select a data model"(){
-
+    def "login to model catalogue and select a data model"() {
         when:
         loginAdmin()
         select'Test 3'
@@ -39,17 +36,16 @@ class RelationshipImportsSpec extends AbstractModelCatalogueGebSpec{
         then:'verify title of the page '
         check rightSideTitle contains 'Test 3'
     }
-    def"navigate to the top menu and select create relationship "(){
-
+    def "navigate to the top menu and select create relationship"() {
         when:'navigate to createRelationship page'
         click dataModel
         click createRelationship
 
         then:'verify that the text Destination is displayed'
         check destination displayed
-
     }
-    def"select imports,destination and create relationship"(){
+
+    def "select imports,destination and create relationship"() {
 
         when: 'select relation'
         click  imports
@@ -58,14 +54,13 @@ class RelationshipImportsSpec extends AbstractModelCatalogueGebSpec{
         fill search with "" and pick first item
         click ModalPrimaryButton
 
+        refresh(browser) // TODO: It should not be necessary to refresh the page
 
         then:'verify that imports is displayed inside table'
         check table contains "imports"
-
     }
 
-    def"delete the imported data model"(){
-
+    def "delete the imported data model"() {
         when:
         click modelCatalogue
 
@@ -83,6 +78,5 @@ class RelationshipImportsSpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check tableImport isGone()
-
     }
 }

@@ -7,17 +7,17 @@ import org.modelcatalogue.core.api.ElementStatus
 class MeasurementUnitControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "changedName", description: "edited description ", symbol: "R", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
        [symbol: "FS", name: "Something", description: "blah blah blah", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
 

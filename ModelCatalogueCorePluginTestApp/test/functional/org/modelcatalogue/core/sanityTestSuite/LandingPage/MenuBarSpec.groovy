@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
@@ -58,7 +57,7 @@ class MenuBarSpec extends AbstractModelCatalogueGebSpec {
          check activeUsers contains 'Most Recent Active Users'
          click OK
      }
-     def"navigate to the user tag"(){
+     def "navigate to the user tag"() {
 
          when: 'select user '
          click userMenu

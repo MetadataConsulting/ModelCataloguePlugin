@@ -24,7 +24,7 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
     private static final String  tableImported ="td.col-md-5"
     private static final String  modelCatalogue ="span.mc-name"
 
-    def "login to model catalogue and select a data model"(){
+    def "login to model catalogue and select a data model"() {
 
         when:
         loginAdmin()
@@ -34,7 +34,7 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
         then:'verify title of the page '
         check rightSideTitle contains 'Test 3'
     }
-    def "navigate to the top menu and select create relationship"(){
+    def "navigate to the top menu and select create relationship"() {
         when:'navigate to createRelationship page'
         click dataModel
         click addImport
@@ -43,7 +43,7 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
         check  modelHeader displayed
 
     }
-    def "select a data model"(){
+    def "select a data model"() {
         when: 'select a model'
         fill search with "cancer" and pick first item
         click ModalPrimaryButton

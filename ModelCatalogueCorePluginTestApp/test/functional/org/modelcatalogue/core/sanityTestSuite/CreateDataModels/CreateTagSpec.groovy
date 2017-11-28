@@ -35,7 +35,7 @@ class CreateTagSpec extends AbstractModelCatalogueGebSpec {
         check modalHeader is "Create Data Element"
     }
 
-    def " create a tag"() {
+    def "create a tag"() {
         when:
         fill nameLabel with("TESTING_TAG")
         fill modelCatalogueId with "M-234"
@@ -46,7 +46,7 @@ class CreateTagSpec extends AbstractModelCatalogueGebSpec {
         check table contains 'TESTING_TAG'
     }
 
-    def"delete the created tag"(){
+    def "delete the created tag"() {
 
         when:
         click tagCreated

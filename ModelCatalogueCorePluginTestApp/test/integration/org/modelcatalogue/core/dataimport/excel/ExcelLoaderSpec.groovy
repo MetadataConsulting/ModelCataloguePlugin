@@ -112,13 +112,9 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
 
         then:
         noExceptionThrown()
-
-
-
     }
 
-    def "test default catalogue builder imports dataset"(){
-
+    def "test default catalogue builder imports dataset"() {
         when: "I load the Excel file"
 
         excelLoader.buildModelFromStandardWorkbookSheet(
@@ -130,11 +126,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         then: "new model is created"
 
         DataModel.findByName("MET-522")
-
-
     }
-
-
 
     String standardExcelLoaderXmlResult(String sampleFile, Map<String,String> headersMap, int index = 0) {
         return excelLoader.buildXmlFromStandardWorkbookSheet(headersMap,
@@ -143,7 +135,6 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
             //getClass().getResourceAsStream(sampleFile)),
             index)
     }
-
 
     Pair<String, List<String>> excelLoaderXmlResult(String sampleFile, int index=0) {
         excelLoader.buildXmlFromWorkbookSheet(

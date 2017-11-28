@@ -4,22 +4,20 @@ import grails.util.GrailsNameUtils
 
 class TagControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
-
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "Tag #13", description: "edited description ", symbol: "R", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
        [symbol: "Tag #14", name: "Something", description: "blah blah blah", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
-
 
     @Override
     Class getResource() {

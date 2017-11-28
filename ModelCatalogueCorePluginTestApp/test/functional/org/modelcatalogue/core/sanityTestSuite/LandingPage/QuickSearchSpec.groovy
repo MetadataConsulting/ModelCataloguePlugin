@@ -81,12 +81,9 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check infiniteTableRow displayed
-
     }
 
-
-    def "navigate to quick search and search a data model"(){
-
+    def "navigate to quick search and search a data model"() {
         when:
         click modelCatalogue
         click quickSearch
@@ -97,7 +94,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         then:
         check rightSideTitle contains "Cancer Model"
     }
-    def"navigate to the quick search and search for a data class"(){
+    def "navigate to the quick search and search for a data class"() {
 
         click modelCatalogue
         click quickSearch
@@ -110,7 +107,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 
 
     }
-    def" navigate to quick search and search for a data element"(){
+    def "navigate to quick search and search for a data element"() {
 
         when:
         click modelCatalogue
@@ -123,7 +120,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         check rightSideTitle contains "Test Element 1"
 
     }
-    def" quick search a data type"(){
+    def "quick search a data type"() {
 
         when:
         click modelCatalogue
@@ -134,10 +131,9 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check rightSideTitle contains'xs:strin'
-
     }
 
-    def"quick search a Measurement unit"(){
+    def "quick search a Measurement unit"() {
 
         when:
         click modelCatalogue
@@ -149,10 +145,9 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check rightSideTitle contains "second"
-
     }
 
-    def"quick search a business rule"(){
+    def "quick search a business rule"() {
 
         when:
         click modelCatalogue
@@ -165,10 +160,9 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         then:
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         check rightSideTitle contains "TESTING Validation Rule"
-
     }
 
-    def"quick search an asset"(){
+    def "quick search an asset"() {
 
         when:
         click modelCatalogue

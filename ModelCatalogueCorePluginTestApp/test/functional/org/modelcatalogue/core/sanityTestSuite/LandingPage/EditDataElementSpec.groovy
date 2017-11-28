@@ -20,25 +20,24 @@ class EditDataElementSpec extends AbstractModelCatalogueGebSpec {
     private static final String submit="button#role_item-detail_inline-edit-submitBtn"
     private static final String change="#history-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-8 > span > span > code"
 
-    def" login to model catalogue and select a draft model"(){
+    def "login to model catalogue and select a draft model"() {
 
         login curator
         select 'Test 3' open 'Data Elements'
 
         expect:
         check rightSideTitle is 'Active Data Elements'
-
-
     }
-    def" select a data element"(){
+
+    def "select a data element"() {
 
         when:'select an element'
         click Element
         then:
         check editButton displayed
-
     }
-    def"edit description ,data type and save"(){
+
+    def "edit description ,data type and save"() {
 
         when:
         click editButton

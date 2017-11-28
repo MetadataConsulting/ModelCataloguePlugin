@@ -51,7 +51,7 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
     DefaultCatalogueBuilder catalogueBuilder
     ModelToFormExporterService modelToFormExporterService
 
-    def "there must be a top level model representing a form and at least one model representing the section"(){
+    def "there must be a top level model representing a form and at least one model representing the section"() {
         given:
         DataClass formModel = build {
             dataClass(name: TEST_FORM_NAME) {
@@ -84,7 +84,7 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
         errors.errorCount == 0
     }
 
-    def "nested models represent sections"(){
+    def "nested models represent sections"() {
         given:
         DataClass formModel = build {
             dataClass(name: TEST_FORM_NAME) {
@@ -121,7 +121,7 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
         section1.pageNumber == TEST_SECTION_PAGE_NUMBER_1
     }
 
-    def "grids are signaled with flag"(){
+    def "grids are signaled with flag"() {
         given:
         DataClass formModel = build {
             dataClass(name: TEST_FORM_NAME) {
@@ -163,7 +163,7 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
 
     //@Requires({ !System.getenv('TRAVIS') })
     @Ignore
-    def "various item types"(){
+    def "various item types"() {
         given:
         DataClass formModel = build {
             dataClass(name: TEST_FORM_NAME) {

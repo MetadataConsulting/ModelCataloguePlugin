@@ -6,20 +6,19 @@ import org.modelcatalogue.core.util.OrderedMap
 class DataElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "changedName", description: "edited description ", code: "AA123", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
        [name:"new data element", description: "the DE_author of the book", code: "12312312308", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
-
 
     @Override
     Class getResource() {

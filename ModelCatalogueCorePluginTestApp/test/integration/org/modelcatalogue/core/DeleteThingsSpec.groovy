@@ -19,7 +19,7 @@ class DeleteThingsSpec extends IntegrationSpec{
     String controllerName
     ResultRecorder recorder
 
-    def setup(){
+    def setup() {
         controller = new MeasurementUnitController()
         controllerName = "$controller.resourceName"
         recorder = DefaultResultRecorder.create(
@@ -30,8 +30,7 @@ class DeleteThingsSpec extends IntegrationSpec{
     }
 
     @Unroll
-    def "json bad delete i.e. MU used in another resource, returns errors"(){
-
+    def "json bad delete i.e. MU used in another resource, returns errors"() {
         def m, dm
 
         expect:

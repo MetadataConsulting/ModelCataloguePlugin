@@ -21,7 +21,7 @@ class InitXMLSchemaDataTypesSpec extends AbstractIntegrationSpec {
         DataModel.countByName('XMLSchema') == 1
     }
 
-    def "check #domain validates value #value as #valid"(){
+    def "check #domain validates value #value as #valid"() {
         when:
         DataType dataType       = DataType.findByName(domain)
 

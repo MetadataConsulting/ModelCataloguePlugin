@@ -7,12 +7,12 @@ import org.modelcatalogue.core.security.User
 class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "changedName", description: "edited description ", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
         [name: 'user', username: 'user', password: 'password', dataModel: dataModelForSpec]
     }
 

@@ -6,7 +6,6 @@ import org.openqa.selenium.Keys
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.*
 
 @IgnoreIf({ !System.getProperty('geb.env') })

@@ -7,7 +7,7 @@ class RelationshipControllerIntegrationSpec extends AbstractIntegrationSpec {
         loadFixtures()
     }
 
-    def "restore relationship"(){
+    def "restore relationship"() {
         def controller = new RelationshipController()
 
         Relationship relationship = new Relationship(

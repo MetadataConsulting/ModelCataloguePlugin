@@ -57,11 +57,9 @@ class GelJsonExporterSpec extends IntegrationSpec {
                 }
             }
         }
-
     }
 
-
-    def "export model to json"(){
+    def "export model to json"() {
         OutputStream out = new ByteArrayOutputStream()
         when:
         DataClass model = DataClass.findByName(ROOT_DATA_CLASS_NAME)

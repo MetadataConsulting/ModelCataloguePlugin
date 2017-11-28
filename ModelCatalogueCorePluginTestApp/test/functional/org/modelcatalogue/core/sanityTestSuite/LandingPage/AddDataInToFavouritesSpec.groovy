@@ -24,8 +24,7 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
     private static final String   favouriteModel ="tr.inf-table-item-row>td:nth-child(2)>a"
     public static final String  greenButton ="#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > ui-view > div > div > div > div.inf-table-body > table > tfoot > tr > td > table > tfoot > tr > td.text-center > span"
 
-
-    def " login to model catalogue "(){
+    def "login to model catalogue"() {
         when:
         login admin
 
@@ -33,7 +32,7 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
         check creates displayed
     }
 
-    def "navigate to favourites"(){
+    def "navigate to favourites"() {
         when:
         click user
         click favouriteButton
@@ -42,7 +41,7 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
         check catalogueID contains "Model Catalogue ID"
     }
 
-     def" add data to favourite"(){
+     def "add data to favourite"() {
          when:
          click greenButton
 

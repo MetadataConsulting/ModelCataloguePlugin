@@ -40,7 +40,7 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 2, text: 'Foos') } displayed
     }
 
-    def "check the unit shows up with own detail page"(){
+    def "check the unit shows up with own detail page"() {
         remove messages
         click { infTableCell(1, 2).find('a') }
 

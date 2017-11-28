@@ -8,7 +8,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
     def relationshipService
 
-    def setup(){
+    def setup() {
         loadFixtures()
     }
 

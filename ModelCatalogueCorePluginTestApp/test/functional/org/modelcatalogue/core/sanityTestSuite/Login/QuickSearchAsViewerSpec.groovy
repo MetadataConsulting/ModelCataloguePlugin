@@ -17,8 +17,7 @@ class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
      private static final String  quickSearch='a#role_navigation-right_search-menu-menu-item-link>span:nth-child(1)'
      private static final String   search  ='input#value'
 
-
-    def"login to model catalogue"(){
+    def "login to model catalogue"() {
 
         loginCurator()
 
@@ -26,7 +25,7 @@ class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
         check catalogueModels contains 'Catalogue Models'
     }
 
-    def"navigate to the top menu and select quick search"(){
+    def "navigate to the top menu and select quick search"() {
 
         when:
         click quickSearch

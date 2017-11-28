@@ -23,7 +23,7 @@ class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec{
     private static String  searchData="TESTING_POLICY"
 
     @Ignore
-    def " search option"() {
+    def "search option"() {
 
         when:
          loginAdmin()

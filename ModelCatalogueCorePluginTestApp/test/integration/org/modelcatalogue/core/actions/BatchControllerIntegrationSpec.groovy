@@ -11,20 +11,19 @@ class BatchControllerIntegrationSpec extends AbstractControllerIntegrationSpec {
     }
 
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "New Name", archived: Boolean.TRUE]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
         [name:"New Batch", archive: Boolean.FALSE]
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300]
     }
-
 
     @Override
     Class getResource() {

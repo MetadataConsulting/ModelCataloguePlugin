@@ -29,10 +29,7 @@ class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
     private static final String  table ="#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-7 > span > span > code"
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
 
-
-
-    def "login to model catalogue and select a data model"(){
-
+    def "login to model catalogue and select a data model"() {
         when:
         loginAdmin()
         select'Test 3'
@@ -40,7 +37,8 @@ class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
         then:'verify title of the page '
         check rightSideTitle contains 'Test 3'
     }
-    def"navigate to the top menu and select create relationship "(){
+
+    def "navigate to the top menu and select create relationship "() {
 
         when:'navigate to createRelationship page'
         click dataModel
@@ -49,10 +47,9 @@ class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
 
         then:'verify that the text Destination is displayed'
         check destination displayed
-
     }
-    def"select is synonym for,destination and create relationship"(){
 
+    def "select is synonym for, destination and create relationship"() {
         when: 'select relation'
         click isSynonymFor
 
@@ -85,7 +82,5 @@ class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
 
         then:'check that undo button is disabled'
         check undo isDisabled()
-
     }
-
 }

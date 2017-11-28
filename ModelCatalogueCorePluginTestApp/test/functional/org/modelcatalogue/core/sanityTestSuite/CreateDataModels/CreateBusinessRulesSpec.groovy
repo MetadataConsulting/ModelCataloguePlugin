@@ -27,11 +27,7 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
     private static final String validationRuleButton ="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
     private static final String deleteButton ="a#delete-menu-item-link>span:nth-child(3)"
 
-
-
-
-    def"login to model catalogue and select business rules"(){
-
+    def "login to model catalogue and select business rules"(){
         when:
         loginAdmin()
         select'Test 3' select 'Business Rules'
@@ -40,13 +36,15 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
         then:
         check rightSideTitle  contains 'Active Validation Rules'
     }
-     def" Navigate to business rules page"(){
+
+     def "Navigate to business rules page"(){
          when:
          click create
          then:
          check modalHeader is "New Validation Rule"
      }
-    def" fill the form and save business rule"() {
+
+     def "fill the form and save business rule"() {
         when:
         fill nameLabel with "my validation Rule ${System.currentTimeMillis()}"
         fill component with "component ${System.currentTimeMillis()}"
@@ -65,10 +63,9 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check table contains 'my validation Rule'
-
     }
-    def"delete the validation rules from the data model "(){
 
+    def "delete the validation rules from the data model"(){
         when:
         click modelCatalogue
 
@@ -94,8 +91,5 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
         then:
         Thread.sleep(2000L)
         check table gone
-
     }
-
-
 }

@@ -16,7 +16,7 @@ class CompareTwoDataModelSpec extends AbstractModelCatalogueGebSpec{
     private static final String clickOK="button.btn-primary"
      private static String text ="cancer Model"
 
-    def"compare two models"(){
+    def "compare two models"() {
         when:
              // login into model catalogue
              loginCurator()
@@ -49,12 +49,5 @@ class CompareTwoDataModelSpec extends AbstractModelCatalogueGebSpec{
 
         then:
             noExceptionThrown()
-
-
-
-
-
-
-
     }
 }

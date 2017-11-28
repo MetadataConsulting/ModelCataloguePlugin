@@ -31,9 +31,7 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
     private static final String  measurementUnitButton="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
     private static final String  deleteButton="a#delete-menu-item-link>span:nth-child(3)"
 
-
-
-    def " Login to model catalogue and select a data model"() {
+    def "Login to model catalogue and select a data model"() {
         when:
         loginAdmin()
         select 'Test 3'
@@ -54,9 +52,9 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
         then:
         check Model_Catalogue_ID displayed
 
-
         when: 'click on plus button to expand model'
         click plus_button
+
         then:
         check data_model displayed
 
@@ -65,12 +63,11 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
         scroll(ScrollDirection.DOWN)
         click measurement_button
 
-
         then:
         check modalHeader contains('Create Measurement Unit')
     }
 
-    def" create Measurement unit"(){
+    def "create Measurement unit"() {
         when:
         click icon
         Thread.sleep(3000L)
@@ -86,11 +83,9 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
 
          then:
          check model_link displayed
+    }
 
- }
-
-    def"delete the created measurement unit"(){
-
+    def "delete the created measurement unit"() {
         when:
         click modelCatalogue
 
@@ -114,7 +109,5 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
         then:
         Thread.sleep(2000L)
         check table isGone()
-
     }
-
 }

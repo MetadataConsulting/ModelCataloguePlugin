@@ -14,7 +14,7 @@ class ClickOnModelCatalogueDevSupportedLinkSpec extends AbstractModelCatalogueGe
 
     public static final String model ="div.panel-body>div"
      static WebDriver driver
-    void modelDevelopmentLinks(){
+    void modelDevelopmentLinks() {
         when:
         driver = browser.driver
         driver.manage().deleteAllCookies()

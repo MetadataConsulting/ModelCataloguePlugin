@@ -30,8 +30,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         springContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
     }
 
-
-    void initRelationshipTypes(){
+    void initRelationshipTypes() {
         relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'reltypes.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
@@ -39,7 +38,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         cacheService.clearCache()
     }
 
-    void initCatalogue(){
+    void initCatalogue() {
         relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'initcatalogue.sql') {
             initCatalogueService.initCatalogue(true)
@@ -47,7 +46,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         cacheService.clearCache()
     }
 
-    void loadFixtures(){
+    void loadFixtures() {
         relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'testdata.sql') {
             initCatalogueService.initDefaultRelationshipTypes()

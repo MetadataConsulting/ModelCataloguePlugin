@@ -22,17 +22,12 @@ class ShowAllDataModelsSpec  extends AbstractModelCatalogueGebSpec {
         check create displayed
     }
 
-    def "navigate to the top menu and select fast action"(){
-
+    def "navigate to the top menu and select fast action"() {
+        when:
         click fastActions
         click  showAllModels
 
         expect:
         check create displayed
-
-
     }
-
-
 }
-

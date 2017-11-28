@@ -5,8 +5,6 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
-
-
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import static org.modelcatalogue.core.geb.Common.pick
 
@@ -31,9 +29,9 @@ class RelationshipIsBaseForSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle contains 'NHIC'
         and:
         Thread.sleep(2000l)
-
     }
-    def"Navigate to the top menu and select create relationship"(){
+
+    def "Navigate to the top menu and select create relationship"() {
 
         when:''
         click dataModel
@@ -42,7 +40,8 @@ class RelationshipIsBaseForSpec extends AbstractModelCatalogueGebSpec {
         then:'verify that destination is displayed'
         check destination displayed
     }
-    def "choose relation and create relationship"(){
+
+    def "choose relation and create relationship"() {
 
         when: 'select relation'
         click isBaseFor
@@ -54,11 +53,8 @@ class RelationshipIsBaseForSpec extends AbstractModelCatalogueGebSpec {
         Thread.sleep(2000L)
         click modalPrimaryButton
 
-
         then:'check that alert message is displayed'
         Thread.sleep(2000l)
         check alert displayed
-
-
     }
 }

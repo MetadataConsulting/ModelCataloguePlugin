@@ -5,7 +5,6 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.getDescription
 import static org.modelcatalogue.core.geb.Common.getModalCloseButton
@@ -58,6 +57,7 @@ class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpe
         and: 'click on enumerated type'
         click enumerated
         fillMetadata '01': 'one', '02': 'two', '03': 'three', '04': 'four', '05': 'five'
+
         and:
         click paste
 

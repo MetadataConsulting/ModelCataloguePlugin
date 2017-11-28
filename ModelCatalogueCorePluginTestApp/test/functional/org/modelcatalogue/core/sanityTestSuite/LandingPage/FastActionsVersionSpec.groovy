@@ -19,24 +19,23 @@ class FastActionsVersionSpec extends AbstractModelCatalogueGebSpec{
     private static final String  version = "div.modal-body"
 
 
-    def "login to model catalogue "(){
+    def "login to model catalogue "() {
         login admin
 
         expect:
         check create displayed
     }
 
-    def " select fast actions and click on the activity "(){
+    def "select fast actions and click on the activity"() {
 
         click fastActions
         click catalogueVersion
 
         expect:
         check modalHeader contains "Model Catalogue Version"
-
     }
-    def "verify the Model Catalogue Version"(){
 
+    def "verify the Model Catalogue Version"() {
         expect:
         check version contains "Version"
         click modalPrimaryButton

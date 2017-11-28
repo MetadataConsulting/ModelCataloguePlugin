@@ -34,7 +34,7 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
     public static final String  modelCatalogue = 'span.mc-name'
 
 
-    def "login to model catalogue and select a data model"(){
+    def "login to model catalogue and select a data model"() {
 
         when:
         loginAdmin()
@@ -62,9 +62,8 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         and:
         check modalDialog gone
     }
-    def"navigate back to data model"(){
 
-
+    def "navigate back to data model"() {
         when:
         click modelCatalogue
 
@@ -74,7 +73,8 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         then:
         check rightSideTitle contains 'Test 3'
     }
-    def"navigate to the top menu and select create relationship "(){
+
+    def "navigate to the top menu and select create relationship"() {
 
         when:'navigate to createRelationship page'
         click dataModel
@@ -84,8 +84,7 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         check destination displayed
 
     }
-    def"select based on,destination and create relationship"(){
-
+    def "select based on,destination and create relationship"() {
         when: 'select relation'
         click hasAttachmentOf
         and: ' select destination'

@@ -21,17 +21,15 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
 
         expect:
         json.size() == CatalogueElementFinder.catalogueElementClasses.size()
-
     }
 
-
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "changedName", sourceClass: CatalogueElement, destinationClass: CatalogueElement]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
         [name:"NewInstanceAntonym",
                 sourceToDestination: "NewInstanceAntonymWith",
                 destinationToSource: "NewInstanceAntonymWith",
@@ -40,7 +38,7 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300, sourceToDestination: "NewInstanceAntonymWith", destinationToSource: "NewInstanceAntonymWith", sourceClass: DataElement, destinationClass: DataElement]
     }
 

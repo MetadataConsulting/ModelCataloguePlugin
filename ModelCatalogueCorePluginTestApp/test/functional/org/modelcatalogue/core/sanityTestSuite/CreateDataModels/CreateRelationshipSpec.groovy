@@ -25,7 +25,6 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
     private static final String cancel="div.messages-modal-confirm>div>div>div:nth-child(3)>form>button:nth-child(3)"
     private static final String plusButton="tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>a>span"
 
-
     def "login to model catalogue and navigate to data model"() {
         when:
         loginAdmin()
@@ -46,7 +45,6 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "create relationship"() {
-
         when:'select relation'
 
         def select = $(selectRelation).module(Select)
@@ -61,7 +59,6 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
         when:
         fill search with text and pick first item
         Thread.sleep(2000l)
-
 
         and:
         click cancel
@@ -87,8 +84,5 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         noExceptionThrown()
-
-
-
     }
 }

@@ -29,8 +29,7 @@ class RelationshipRelatedToSpec extends AbstractModelCatalogueGebSpec{
     private static final String  table ="#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-7 > span > span > code"
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
 
-
-    def "login to model catalogue and select a data model"(){
+    def "login to model catalogue and select a data model"() {
 
         when:
         loginAdmin()
@@ -39,7 +38,8 @@ class RelationshipRelatedToSpec extends AbstractModelCatalogueGebSpec{
         then:'verify title of the page '
         check rightSideTitle contains 'Test 3'
     }
-    def"navigate to the top menu and select create relationship "(){
+
+    def "navigate to the top menu and select create relationship"() {
 
         when:'navigate to createRelationship page'
         click dataModel
@@ -47,9 +47,9 @@ class RelationshipRelatedToSpec extends AbstractModelCatalogueGebSpec{
 
         then:'verify that the text Destination is displayed'
         check destination displayed
-
     }
-    def"select related to,destination and create relationship"(){
+
+    def "select related to,destination and create relationship"() {
 
         when: 'select relation'
         click  relatedTo
@@ -62,10 +62,9 @@ class RelationshipRelatedToSpec extends AbstractModelCatalogueGebSpec{
         then:'verify that related to is displayed inside table'
         check table contains "related to"
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-
     }
 
-    def" remove the related to relationship that was created"(){
+    def" remove the related to relationship that was created"() {
 
         when:'click on the related to tag'
         click relatedToButton

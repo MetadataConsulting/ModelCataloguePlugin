@@ -20,7 +20,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
     DataElement de2
     DataElement de3
 
-    def setup(){
+    def setup() {
         loadFixtures()
         parent1 = new DataClass(name: 'book').save(failOnError: true)
         parent2 = new DataClass(name: 'chapter1').save(failOnError: true)
@@ -75,7 +75,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         dataElements.items.contains(de3)
     }
 
-    def "test infinite recursion"(){
+    def "test infinite recursion"() {
         when:
         ListWithTotal subModels = dataClassService.getInnerClasses(parent1)
 

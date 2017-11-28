@@ -36,7 +36,7 @@ class ValidationRuleWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 1) } contains 'Test Validation Rule'
     }
 
-    def "check the unit shows up with own detail page"(){
+    def "check the unit shows up with own detail page"() {
         check closeGrowlMessage gone
         click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
 

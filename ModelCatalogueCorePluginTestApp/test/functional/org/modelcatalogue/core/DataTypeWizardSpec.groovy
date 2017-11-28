@@ -249,11 +249,11 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     @Ignore
-    def "check it shows up with own detail page"(){
+    def "check it shows up with own detail page"() {
         when:
         click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
-        then:
 
+        then:
         check rightSideTitle contains 'New Data Type'
     }
 

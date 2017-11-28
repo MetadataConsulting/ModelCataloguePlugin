@@ -36,7 +36,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         check 'h3' is 'Changes'
     }
 
-    def "check the unit shows up with own detail page"(){
+    def "check the unit shows up with own detail page"() {
         when:
 
         click FIRST_NEW_ELEMENT_CREATED_CHANGE

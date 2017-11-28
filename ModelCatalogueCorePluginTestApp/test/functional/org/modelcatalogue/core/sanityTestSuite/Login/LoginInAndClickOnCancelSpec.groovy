@@ -13,7 +13,6 @@ class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
     private static final String login = "button.btn"
     private static final String primaryBtn = "button.btn"
 
-
     void clickOnCancel() {
 
         when:

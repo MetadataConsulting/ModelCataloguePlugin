@@ -6,14 +6,14 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     def md1, de1, md2
 
-    def setup(){
+    def setup() {
         loadFixtures()
         md1 = new DataClass(name: "book").save(failOnError: true)
         md2 = new DataClass(name: "chapter1").save(failOnError: true)
         de1 = new DataElement(name: "DE_author1").save(failOnError: true)
     }
 
-    def "data elements can be contained in models, models can contain data elements"(){
+    def "data elements can be contained in models, models can contain data elements"() {
 
         def model = new DataClass(name: "tester12343124").save()
         def element =  DataElement.get(de1.id)
@@ -53,10 +53,9 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
         cleanup:
         model.delete()
-
     }
 
-    def "model can be a parent of another model, model can be child of another model)"(){
+    def "model can be a parent of another model, model can be child of another model)"() {
 
         def book = DataClass.get(md1.id)
         def chapter = DataClass.get(md2.id)
