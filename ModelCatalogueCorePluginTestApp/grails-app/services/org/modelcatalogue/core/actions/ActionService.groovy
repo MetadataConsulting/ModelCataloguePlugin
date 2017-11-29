@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.actions
 
 import grails.gorm.DetachedCriteria
+import grails.plugin.springsecurity.SpringSecurityService
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
 import org.modelcatalogue.core.SecurityService
@@ -20,9 +21,8 @@ class ActionService {
 
     ExecutorService executorService
     @Autowired AutowireCapableBeanFactory autowireBeanFactory
-    @Autowired SecurityService modelCatalogueSecurityService
-    @Autowired AuditService auditService
-
+    AuditService auditService
+    SpringSecurityService springSecurityService
 
     /**
      * Performs the action in the background thread. Follow the action state to see weather the action has been already
@@ -130,12 +130,22 @@ class ActionService {
 
         }
         if (async) {
-            Long authorId = modelCatalogueSecurityService.currentUser?.id
+            Long authorId = loggedUserId()
             return executorService.submit({ auditService.withDefaultAuthorId(authorId, job) } as Callable<ActionResult>)
         }
         FutureTask<ActionResult> task = new FutureTask(job)
         task.run()
         task
+    }
+
+    Long loggedUserId() {
+        if ( springSecurityService.principal == null ) {
+            return null
+        }
+        if ( springSecurityService.principal instanceof String ) {
+            return null
+        }
+        springSecurityService.principal.id as Long
     }
 
     void dismiss(Action action){
