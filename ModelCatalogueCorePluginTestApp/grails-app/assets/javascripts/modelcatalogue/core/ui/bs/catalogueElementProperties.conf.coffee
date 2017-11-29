@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
+angular.module('mc.core.ui.bs.catalogueElementProperties', ['mc.core.ui.catalogueElementProperties']).config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
 
   nameAndIdent = -> [
     {

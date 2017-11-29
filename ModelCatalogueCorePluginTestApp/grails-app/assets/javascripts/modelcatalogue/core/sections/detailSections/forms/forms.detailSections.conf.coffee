@@ -1,8 +1,3 @@
-window.modelcatalogue.registerModule 'modelcatalogue.core.sections.detailSections.forms'
-
-
-# Angular modules declared in anticipation of the templates
-
 # core/ui/metadataEditors doesn't even exist, it's called metadata-editor
 angular.module('modelcatalogue.core.sections.detailSections.forms')
   .config [

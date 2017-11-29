@@ -2,6 +2,9 @@ angular.module 'mc.core', [
   # depends on util
   'mc.util'
   'ui.bootstrap'
+  'mc.core.ui'
+  'mc.core.changes'
+  'mc.core.genomics'
   # list of modules
   'modelcatalogue.core.domain'
 
@@ -19,3 +22,6 @@ angular.module('mc.core').config(
     $animateProvider.classNameFilter(/^((?!(fa-spinner)).)*$/)
   ]
 )
+
+
+window.modelcatalogue.registerModule 'mc.core'

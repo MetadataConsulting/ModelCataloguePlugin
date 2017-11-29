@@ -1,4 +1,6 @@
-angular.module('modelcatalogue.core.sections.detailSections').provider 'detailSections', ['catalogueProvider', (catalogueProvider) ->
+angular.module('modelcatalogue.core.sections.detailSections.prvd', [
+  'mc.core.catalogue'
+]).provider 'detailSections', ['catalogueProvider', (catalogueProvider) ->
 # detailSections gives a provider that relies on catalogueProvider
   # are these providers dependency-injected?
   isMeetingRelationshipCriteria = (owner, criteria) ->

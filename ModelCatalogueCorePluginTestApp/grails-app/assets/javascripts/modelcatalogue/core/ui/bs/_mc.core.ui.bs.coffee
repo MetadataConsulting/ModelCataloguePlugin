@@ -1,11 +1,7 @@
 angular.module('mc.core.ui.bs', [
   # depends on
-  'mc.core.ui'
   'mc.util.ui'
-  'mc.core.ui.general'
   'modelcatalogue.core.components.metadataEditor'
-  'mc.core.ui.modals'
-  'mc.core.ui.utils'
   'ui.bootstrap'
   'ngCookies'
   'infinite-scroll'
@@ -68,5 +64,3 @@ angular.module('mc.core.ui.bs', [
         $('#ROLE_NAVIGATION_ACTION-right_search-menu-menu-item-link').click()
         e.preventDefault()
 ]
-
-window.modelcatalogue.registerModule 'mc.core.ui.bs'

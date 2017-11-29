@@ -1,5 +1,3 @@
-window.modelcatalogue.registerModule 'mc.core.changes'
-
 ###
   safe (fn, defaultValue) returns a multi-variable function which tries to apply fn and returns
   defaultValue if it fails.

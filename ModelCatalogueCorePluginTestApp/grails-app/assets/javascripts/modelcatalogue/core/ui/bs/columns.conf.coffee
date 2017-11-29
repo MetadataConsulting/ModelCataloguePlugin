@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvider', (columnsProvider)->
+angular.module('mc.core.ui.bs.columns', ['mc.util.names', 'mc.core.ui.columns']).config ['columnsProvider', (columnsProvider)->
   getEnumerations = (enumeratedType) ->
     return '' if not enumeratedType
     return """

@@ -1,7 +1,15 @@
 angular.module('mc.core.ui', [
   # depends on
   'ui.router',
-  'mc.core'
+  'mc.core.ui.bs'
+  'mc.core.ui.modals'
+  'mc.core.ui.utils'
+  'mc.core.ui.general'
+
+  'modelcatalogue.core.ui.imports'
+  'modelcatalogue.core.ui.exports'
+  'modelcatalogue.core.ui.navigationRight'
+  'modelcatalogue.core.ui.states'
   # list of modules
   'mc.core.ui.columnsSupportCtrl'
   'mc.core.ui.catalogueElementIcon'
@@ -14,9 +22,6 @@ angular.module('mc.core.ui', [
   'mc.core.ui.columnsConfiguration'
   'mc.core.ui.simpleObjectEditor'
   'mc.core.ui.elementsAsTags'
-  'modelcatalogue.core.ui.imports'
-  'modelcatalogue.core.ui.exports'
-  'modelcatalogue.core.ui.navigationRight'
   'modelcatalogue.core.sections.metadataEditors'
   'modelcatalogue.core.sections.detailSections'
   'modelcatalogue.core.sections.detailSections.metadata'
