@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptValidationRuleEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin', 'mc.util.ui.actions']).config (messagesProvider)->
+angular.module('modelcatalogue.core.domain.catalogueElement.edit.modalPromptValidationRuleEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin', 'mc.util.ui.actions']).config (messagesProvider)->
   factory = ($uibModal, $q, messages) ->
     "ngInject"
     (title, body, args) ->
@@ -9,7 +9,7 @@ angular.module('mc.core.ui.bs.modalPromptValidationRuleEdit', ['mc.util.messages
       dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
-        templateUrl: '/mc/core/ui/modals/modalValidationRuleEdit.html'
+        templateUrl: '/modelcatalogue/core/domain/catalogueElement/edit/modalValidationRuleEdit.html'
         controller: ($scope, messages, $controller, $uibModalInstance, actionRoleAccess) ->
           'ngInject'
           $scope.actionRoleAccess = actionRoleAccess

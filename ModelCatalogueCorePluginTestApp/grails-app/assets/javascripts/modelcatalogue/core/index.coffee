@@ -3,6 +3,7 @@ angular.module 'mc.core', [
   'mc.util'
   'ui.bootstrap'
   # list of modules
+  'modelcatalogue.core.domain'
 
   'mc.core.catalogueElementResource'
   'mc.core.catalogue'

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui.focusMe', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config (messagesProvider)->
+angular.module('modelcatalogue.core.domain.catalogueElement.create.dataClassWizard', ['mc.util.messages', 'mc.util.ui.focusMe', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config (messagesProvider)->
   factory = ($uibModal, $q, messages, $rootScope) ->
     'ngInject'
     (title, body, args) ->
@@ -13,7 +13,7 @@ angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui
         resolve:
           args: -> args
 
-        templateUrl: '/mc/core/ui/modals/dataClassWizard.html'
+        templateUrl: '/modelcatalogue/core/domain/catalogueElement/create/dataClassWizard.html'
         controller: ($scope, $state, $window, messages, names, catalogueElementResource, $uibModalInstance, $timeout,
           args, delayedQueueExecutor, $q, $log, enhance, metadataEditors, catalogue, $controller) ->
           'ngInject'

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl', 'mc.util.ui.actions']).config ['messagesProvider', (messagesProvider)->
+angular.module('modelcatalogue.core.domain.catalogueElement.edit.modalPromptEnumeratedTypeEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl', 'mc.util.ui.actions']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
       dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
-        templateUrl: '/mc/core/ui/modals/modalPromptEnumeratedTypeEdit.html'
+        templateUrl: '/modelcatalogue/core/domain/catalogueElement/edit/modalPromptEnumeratedTypeEdit.html'
         controller: ['$scope', 'messages', '$controller', '$uibModalInstance', 'enhance', 'names', 'catalogueElementResource', 'actionRoleAccess', ($scope, messages, $controller, $uibModalInstance, enhance, names, catalogueElementResource, actionRoleAccess) ->
           $scope.actionRoleAccess = actionRoleAccess
           orderedMapEnhancer = enhance.getEnhancer('orderedMap')

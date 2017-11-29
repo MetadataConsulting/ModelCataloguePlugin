@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptModel', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('modelcatalogue.core.domain.catalogueElement.edit.modalPromptModelEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?

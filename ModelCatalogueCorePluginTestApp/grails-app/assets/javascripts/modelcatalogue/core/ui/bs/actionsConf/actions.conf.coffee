@@ -10,45 +10,6 @@ angular.module('modelcatalogue.core.ui.bs.actionsConf.actions', ['mc.util.ui.act
           for err in response.data.errors
             messages.error err.message
 
-  actionsProvider.registerActionInRoles 'create-catalogue-element',
-    [actionRoleRegister.ROLE_LIST_ACTION, actionRoleRegister.ROLE_LIST_FOOTER_ACTION],
-    ($scope, names, security, messages, $state, $log, dataModelService) ->
-      'ngInject'
-      resource = $scope.resource
-      if not resource and $state.current.name == 'dataModel.resource.list'
-        resource = $state.params.resource
-
-      return undefined unless security.hasRole('CURATOR')
-      return undefined unless resource
-      return undefined unless resource != 'batch'
-      return undefined unless messages.hasPromptFactory('create-' + resource) or messages.hasPromptFactory('edit-' + resource)
-
-      dataModel = dataModelService.anyParentDataModel($scope)
-
-      return undefined unless not dataModel or dataModel.status == 'DRAFT'
-
-      Action.createStandardAction(
-        position: 100
-        label: "New #{names.getNaturalName(resource)}"
-        icon: 'fa fa-plus-circle'
-        type: 'success'
-        action: ->
-          args = {create: (resource), currentDataModel: dataModelService.anyParentDataModel($scope)}
-          args.type = if messages.hasPromptFactory('create-' + resource) then "create-#{resource}" else "edit-#{resource}"
-
-          if (resource == 'model' || resource == 'dataClass') and $scope.element and $scope.elementSelectedInTree
-            args.parent = $scope.element
-
-          security.requireRole('CURATOR')
-          .then ->
-            messages.prompt('Create ' + names.getNaturalName(resource), '', args).then ->
-              if (resource == 'model' || resource == 'dataClass') and $state.current.name == 'dataModel.resource.list'
-# reload in draft mode
-                $state.go '.', {status: 'draft'}, {reload: true}
-          , (errors)->
-            $log.error errors
-            messages.error('You don\'t have rights to create new elements')
-      )
 
   actionsProvider.registerActionInRoles 'favourite-element',
     [actionRoleRegister.ROLE_ITEM_DETAIL_ACTION, actionRoleRegister.ROLE_ITEM_INFINITE_LIST],

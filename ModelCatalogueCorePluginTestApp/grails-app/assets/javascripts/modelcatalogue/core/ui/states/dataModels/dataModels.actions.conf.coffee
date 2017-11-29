@@ -1,4 +1,5 @@
-angular.module('modelcatalogue.core.ui.states.dataModels.actionConf', ['mc.util.ui.actions']).config (actionsProvider, names, actionRoleRegister, actionClass) ->
+angular.module('modelcatalogue.core.ui.states.dataModels.actionConf', ['mc.util.ui.actions',
+'modelcatalogue.core.domain.catalogueElement.create.dataModelWizard']).config (actionsProvider, names, actionRoleRegister, actionClass) ->
   'ngInject'
   Action = actionClass
 

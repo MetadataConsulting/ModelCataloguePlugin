@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui.focusMe']).config (messagesProvider)->
+angular.module('modelcatalogue.core.domain.catalogueElement.create.dataModelWizard', ['mc.util.messages', 'mc.util.ui.focusMe']).config (messagesProvider)->
   factory = ($uibModal, $q, messages, $rootScope) ->
     'ngInject'
     (title, body, args) ->
@@ -12,7 +12,7 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
           args: -> args
 
         #language=HTML
-        templateUrl: '/mc/core/ui/dataModelWizard.html'
+        templateUrl: '/modelcatalogue/core/domain/catalogueElement/create/dataModelWizard.html'
         controller: ($scope, $state, $window, messages, names, catalogueElementResource, $q, $uibModalInstance,
           catalogue, $rootScope, delayedQueueExecutor) ->
           'ngInject'

@@ -1,6 +1,7 @@
 angular.module('modelcatalogue.core.ui.states.dataModels', [#'modelcatalogue.core.ui.states.controllers.PanelsCtrl',
   'modelcatalogue.core.ui.states.dataModels.actionConf'
-  'modelcatalogue.core.ui.states.dataModels.DataModelsCtrl']).config([
+  'modelcatalogue.core.ui.states.dataModels.DataModelsCtrl'
+  'modelcatalogue.core.domain.catalogueElement.create.dataModelWizard']).config([
   '$stateProvider',
   ($stateProvider) ->
 

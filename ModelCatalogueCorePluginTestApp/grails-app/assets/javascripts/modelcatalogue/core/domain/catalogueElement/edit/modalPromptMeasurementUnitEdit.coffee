@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin', 'mc.util.ui.actions']).config ['messagesProvider', (messagesProvider)->
+angular.module('modelcatalogue.core.domain.catalogueElement.edit.modalPromptMeasurementUnitEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin', 'mc.util.ui.actions']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
