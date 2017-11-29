@@ -131,6 +131,9 @@ class BootStrap {
             log.info 'init register reports'
             userService.inviteAdmins()
         }
+
+        loginAs('supervisor')
+        configureAcl()
     }
 
     void initDev() {
