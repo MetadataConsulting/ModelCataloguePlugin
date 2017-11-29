@@ -325,6 +325,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             paramArgs.order = params.order
         }
 
+        paramArgs.offset = params.int('offset') ?: 0
+
         paramArgs
     }
 
