@@ -13,8 +13,12 @@ class ColumnTransformationDefinitionGormService implements WarnGormErrors {
 
     @Transactional
     ColumnTransformationDefinition saveByTransformationAndSourceAndDestinationAndHeader(CsvTransformation transformation, DataElement source, DataElement destination, String header) {
-        ColumnTransformationDefinition instance  = new ColumnTransformationDefinition(source: source, transformation: transformation, destination: destination, header: header)
-        save(instance)
+        save(new ColumnTransformationDefinition(source: source, transformation: transformation, destination: destination, header: header))
+    }
+
+    @Transactional
+    ColumnTransformationDefinition saveByTransformationAndSourceAndDestination(CsvTransformation transformation, DataElement source, DataElement destination) {
+        save(new ColumnTransformationDefinition(source: source, transformation: transformation, destination: destination))
     }
 
     @Transactional

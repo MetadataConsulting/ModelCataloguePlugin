@@ -1,11 +1,13 @@
 package org.modelcatalogue.core.persistence
 
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.WarnGormErrors
+import org.modelcatalogue.core.api.ElementStatus
 import org.springframework.context.MessageSource
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.PrimitiveType
 
 class DataElementGormService implements WarnGormErrors {
 
@@ -22,16 +24,45 @@ class DataElementGormService implements WarnGormErrors {
     }
 
     @Transactional
-    DataElement saveByNameAndPrimitiveType(String name, PrimitiveType temperature) {
-        DataElement dataElement = new DataElement(name: name, dataType: temperature)
-        if ( !dataElement.save() ) {
-            warnErrors(dataElement, messageSource)
-            transactionStatus.setRollbackOnly()
-        }
-        dataElement
+    DataElement saveByNameAndPrimitiveType(String name, DataType dataType) {
+        save(new DataElement(name: name, dataType: dataType))
     }
 
-    DetachedCriteria<DataElement> findQueryByName(String nameParam) {
+    @Transactional
+    DataElement save(DataElement dataElementInstance) {
+        if ( !dataElementInstance.save() ) {
+            warnErrors(dataElementInstance, messageSource)
+            transactionStatus.setRollbackOnly()
+        }
+        dataElementInstance
+    }
+
+    @Transactional
+    DataElement saveWithNameAndDescription(String name, String description) {
+        save(new DataElement(name: name, description: description))
+    }
+
+    @Transactional
+    DataElement saveWithNameAndDescriptionAndDataType(String name, String description, DataType dataType) {
+        save(new DataElement(name: name, description: description, dataType: dataType))
+    }
+
+    @Transactional
+    DataElement saveWithNameAndDescriptionAndStatus(String name, String description, ElementStatus status) {
+        save(new DataElement(name: name, description: description, status: status))
+    }
+
+    @Transactional
+    DataElement saveWithNameAndDescriptionAndStatusAndDataType(String name, String description, ElementStatus status, DataType dataType) {
+        save(new DataElement(name: name, description: description, status: status, dataType: dataType))
+    }
+
+    @Transactional
+    DataElement saveWithNameAndDescriptionAndStatusAndDataModel(String name, String description, ElementStatus status, DataModel dataModel) {
+        save(new DataElement(name: name, description: description, status: status, dataModel: dataModel))
+    }
+
+    protected DetachedCriteria<DataElement> findQueryByName(String nameParam) {
         DataElement.where { name == nameParam }
     }
 }
