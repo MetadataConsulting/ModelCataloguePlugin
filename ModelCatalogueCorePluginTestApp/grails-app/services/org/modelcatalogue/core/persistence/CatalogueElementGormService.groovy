@@ -7,6 +7,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
@@ -32,6 +33,8 @@ class CatalogueElementGormService {
     ValidationRuleGormService validationRuleGormService
 
     DataModelGormService dataModelGormService
+
+    EnumeratedTypeGormService enumeratedTypeGormService
 
     @Transactional
     CatalogueElement findById(long id) {
@@ -69,6 +72,9 @@ class CatalogueElementGormService {
 
         } else if ( catalogueElementClass == DataModel ) {
             return dataModelGormService.findById(id)
+
+        } else if ( catalogueElementClass == EnumeratedType ) {
+            return enumeratedTypeGormService.findById(id)
         }
         return null
     }
