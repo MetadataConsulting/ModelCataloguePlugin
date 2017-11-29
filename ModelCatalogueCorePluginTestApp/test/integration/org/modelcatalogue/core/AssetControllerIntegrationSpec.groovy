@@ -3,8 +3,10 @@ package org.modelcatalogue.core
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
 import org.modelcatalogue.core.util.OrderedMap
+import spock.lang.Ignore
 import spock.lang.Unroll
 
+@Ignore
 class AssetControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Unroll
