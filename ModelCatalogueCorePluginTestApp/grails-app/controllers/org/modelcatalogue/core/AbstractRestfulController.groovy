@@ -495,7 +495,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     protected DataModel getDataModel() {
         if ( resource!=DataModel && resource!=RelationshipType && resource && params?.id ){
-            return (findById(params.long('id'))?.dataModel)
+            def instance = findById(params.long('id'))
+            if ( instance?.respondsTo('dataModel') ) {
+                return instance.dataModel
+            }
         } else {
             Long dataModelId = findDataModelId()
             if (dataModelId) {
