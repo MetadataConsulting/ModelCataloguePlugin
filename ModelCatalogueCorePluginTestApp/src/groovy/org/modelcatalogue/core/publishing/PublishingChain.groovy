@@ -84,7 +84,7 @@ abstract class PublishingChain {
             CatalogueElement result = doRun(publisher, monitor)
             monitor.onCompleted()
             return result
-        } catch (Exception e) {
+        } catch (Exception e) { // WARNING: This just silently logs errors. Particularly if the DraftChain throws an error, the following code returns the old, finalized model.
             log.error("Error processing chain", e)
             monitor.onError(e)
             published.errors.reject('publishing.error', e.toString())
