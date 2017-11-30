@@ -2,8 +2,10 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
+import spock.lang.IgnoreIf
 import spock.lang.Unroll
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class RelationshipISpec extends AbstractIntegrationSpec{
 
     def relationshipService

@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.actions
 
+import spock.lang.IgnoreIf
+
 import static org.modelcatalogue.core.actions.AbstractActionRunner.encodeEntity
 import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDescription
 import org.modelcatalogue.core.AbstractIntegrationSpec
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import spock.lang.Shared
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
     def relationshipService

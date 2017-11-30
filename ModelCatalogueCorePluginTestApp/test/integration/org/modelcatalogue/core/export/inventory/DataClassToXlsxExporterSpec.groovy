@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.export.inventory
 
+import spock.lang.IgnoreIf
+
 import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule
@@ -20,6 +22,7 @@ class DataClassToXlsxExporterSpec extends AbstractIntegrationSpec {
         buildComplexModel(dataModelService, elementService)
     }
 
+    @IgnoreIf( { System.getProperty('spock.ignore.slow') })
     def "export model to excel"() {
         when:
         File file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")

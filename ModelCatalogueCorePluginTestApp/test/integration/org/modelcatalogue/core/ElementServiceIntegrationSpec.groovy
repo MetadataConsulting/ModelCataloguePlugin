@@ -6,9 +6,11 @@ import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import spock.lang.IgnoreIf
 import spock.lang.Issue
 import spock.lang.Unroll
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def setup() {

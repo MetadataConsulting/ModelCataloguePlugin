@@ -1,5 +1,7 @@
 package org.modelcatalogue.gel.export
 
+import spock.lang.IgnoreIf
+
 import static RareDiseasesDocExporter.standardTemplate
 import static org.modelcatalogue.core.genomics.GenomicsController.getDOC_IMAGE_PATH
 import static org.modelcatalogue.core.util.test.FileOpener.open
@@ -8,6 +10,7 @@ import org.modelcatalogue.core.DataClass
 /**
  * Created by rickrees on 10/03/2016.
  */
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class RareDiseasesDocExporterSpec extends AbstractRareDiseasesExporterSpec {
 
     def "export eligibility dataClasses to docx"() {

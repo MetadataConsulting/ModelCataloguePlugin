@@ -5,7 +5,9 @@ import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder {
 
     def fileName, recorder, filenameXsd, filenameXsd2, fileNameStarUML

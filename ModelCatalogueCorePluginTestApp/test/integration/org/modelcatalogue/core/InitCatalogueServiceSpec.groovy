@@ -1,8 +1,11 @@
 package org.modelcatalogue.core
 
+import spock.lang.IgnoreIf
+
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class InitCatalogueServiceSpec extends AbstractIntegrationSpec {
 
     def setup() {

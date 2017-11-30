@@ -5,7 +5,9 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     CatalogueBuilder catalogueBuilder

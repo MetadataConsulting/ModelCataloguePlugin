@@ -15,6 +15,7 @@ import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxE
 import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
+import spock.lang.IgnoreIf
 import spock.lang.Shared
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportHeaders as Headers
 
@@ -29,6 +30,7 @@ import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportHeade
  * Created by james on 17/08/2017.
  */
 @Log4j
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class GMCGridReportExcelLoaderSpec extends AbstractIntegrationSpec {
     @Shared DataModelService dataModelService
     @Shared ElementService elementService

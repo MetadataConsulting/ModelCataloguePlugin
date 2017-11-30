@@ -1,7 +1,11 @@
 package org.modelcatalogue.core
+
+import spock.lang.IgnoreIf
+
 /**
  * Created by ladin on 10.02.14.
  */
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     def md1, de1, md2
