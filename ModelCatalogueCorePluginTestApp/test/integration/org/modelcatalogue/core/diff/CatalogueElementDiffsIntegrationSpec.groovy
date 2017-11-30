@@ -8,7 +8,9 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class CatalogueElementDiffsIntegrationSpec extends AbstractIntegrationSpec {
 
     CatalogueBuilder catalogueBuilder

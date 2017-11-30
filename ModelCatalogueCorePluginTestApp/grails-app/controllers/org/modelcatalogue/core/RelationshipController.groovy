@@ -11,14 +11,7 @@ class RelationshipController {
     //TODO: check that we need this method at all
     //not sure that we do
     //only allowing supervisors to do this
-
     def restore() {
-
-        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
-            render status: HttpStatus.UNAUTHORIZED
-            return
-        }
-
         Long id = params.long('id')
 
         if (!id) {

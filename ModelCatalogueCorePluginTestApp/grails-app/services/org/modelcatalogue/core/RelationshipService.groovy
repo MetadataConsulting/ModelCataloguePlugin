@@ -2,11 +2,14 @@ package org.modelcatalogue.core
 
 import com.google.common.collect.ImmutableMap
 import grails.gorm.DetachedCriteria
+import grails.plugin.springsecurity.SpringSecurityService
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.cache.CacheService
+import org.modelcatalogue.core.persistence.RelationshipGormService
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
@@ -31,6 +34,9 @@ class RelationshipService {
     def modelCatalogueSecurityService
     def auditService
     def dataModelService
+    SpringSecurityService springSecurityService
+    UserGormService userGormService
+    RelationshipGormService relationshipGormService
 
     /**
      * Executes the callback for each relationship found.
@@ -64,7 +70,11 @@ class RelationshipService {
         if (!params.sort) {
             params.sort = direction.sortProperty
         }
-        Lists.fromCriteria(params, direction.composeWhere(element, type, ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
+        Lists.fromCriteria(params,
+                direction.composeWhere(element,
+                        type,
+                        ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/),
+                        element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(currentUser())))
     }
 
     /**
@@ -445,18 +455,39 @@ class RelationshipService {
         relationship
     }
 
+    User currentUser() {
+        Long userId = loggedUserId()
+        if ( userId == null ) {
+            return null
+        }
+        userGormService.findById(userId)
+    }
+
+    Long loggedUserId() {
+        if ( springSecurityService.principal == null ) {
+            return null
+        }
+        if ( springSecurityService.principal instanceof String ) {
+            return null
+        }
+        springSecurityService.principal.id as Long
+    }
+
     boolean isFavorite(CatalogueElement el) {
-        if (modelCatalogueSecurityService.currentUser) {
-            Set<Long> favorites = CacheService.FAVORITE_CACHE.getIfPresent(modelCatalogueSecurityService.currentUser.getId())
+        if ( springSecurityService.isLoggedIn() ) {
+            Long loggedUserId = loggedUserId() as Long
+            if ( loggedUserId == null ) {
+                return false
+            }
+            Set<Long> favorites = CacheService.FAVORITE_CACHE.getIfPresent(loggedUserId)
             if (favorites == null) {
                 RelationshipType favorite = RelationshipType.favouriteType
                 if (!favorite) {
                     return [] as Set<Long>
                 }
-                favorites = Relationship.where {
-                    relationshipType == favorite && source == modelCatalogueSecurityService.currentUser
-                }.list().collect { it.destination.id }.toSet()
-                CacheService.FAVORITE_CACHE.put(modelCatalogueSecurityService.currentUser.getId(), favorites)
+                List<Relationship> relationshipList = relationshipGormService.findAllByRelationshipTypeAndSource(favorite, userGormService.findById(loggedUserId))
+                favorites = relationshipList.collect { it.destination.id }.toSet()
+                CacheService.FAVORITE_CACHE.put(loggedUserId, favorites)
             }
             return el.getId() in favorites
         }

@@ -1,8 +1,10 @@
 package org.modelcatalogue.core
 
-import grails.util.Environment
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.DataTypeCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
+import org.modelcatalogue.core.persistence.DataTypeGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
@@ -11,6 +13,8 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
 
     DataTypeService dataTypeService
     SessionFactory sessionFactory
+    DataTypeGormService dataTypeGormService
+    DataTypeCatalogueElementService dataTypeCatalogueElementService
 
     DataTypeController() {
         super(DataType, false)
@@ -20,9 +24,9 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
         super(resource, false)
     }
 
-    def dataElements(Integer max){
+    def dataElements(Integer max) {
         handleParams(max)
-        DataType dataType = queryForResource(params.id)
+        DataType dataType = findById(params.long('id'))
         if (!dataType) {
             notFound()
             return
@@ -39,13 +43,13 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
     }
 
     def convert() {
-        DataType dataType = queryForResource(params.id)
+        DataType dataType = findById(params.long('id'))
         if (!dataType) {
             notFound()
             return
         }
 
-        DataType other = queryForResource(params.destination)
+        DataType other = findById(params.destination)
         if (!other) {
             notFound()
             return
@@ -81,7 +85,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
 
 
     def validateValue() {
-        DataType dataType = queryForResource(params.id)
+        DataType dataType = findById(params.long('id'))
         if (!dataType) {
             notFound()
             return
@@ -106,22 +110,30 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
         respond result: result
     }
 
-   @Override
+    @Override
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        dataTypeCatalogueElementService
+    }
+
+    @Override
     protected ListWrapper<DataType> getAllEffectiveItems(Integer max) {
 
-       if (!params.long("dataModel") || sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL'){
+        if (!params.long("dataModel") || sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL') {
             return super.getAllEffectiveItems(max)
         }
 
-       String resourceName = "/${resourceName}/"
+        String resourceName = "/${resourceName}/"
 
-       DataModel dataModel = DataModel.get(params.long('dataModel'))
+        DataModel dataModel = dataModelGormService.findById(params.long('dataModel'))
 
-       ListWithTotalAndType<DataType>  typeListing = dataTypeService.findAllDataTypesInModel(params, dataModel)
+        ListWithTotalAndType<DataType> typeListing = dataTypeService.findAllDataTypesInModel(params, dataModel)
 
-       ListWrapper<DataType> rapper = Lists.wrap(params, resourceName, typeListing )
+        ListWrapper<DataType> rapper = Lists.wrap(params, resourceName, typeListing)
 
-       return rapper
+        return rapper
+    }
 
+    protected DataType findById(long id) {
+        dataTypeGormService.findById(id)
     }
 }

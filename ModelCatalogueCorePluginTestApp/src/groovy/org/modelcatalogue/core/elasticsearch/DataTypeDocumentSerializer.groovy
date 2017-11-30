@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.elasticsearch
 
-import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.*
 

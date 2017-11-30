@@ -6,9 +6,11 @@ import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import spock.lang.IgnoreIf
 import spock.lang.Issue
 import spock.lang.Unroll
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def setup() {
@@ -261,11 +263,9 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md1.delete()
         md2.delete()
         md3.delete()
-
-
     }
 
-    def "finalize element"(){
+    def "finalize element"() {
         when:
         DataElement author = DataElement.findByName('auth5')
         author.dataModel = new DataModel(name: "fe", semanticVersion: "1.0.0", status: ElementStatus.FINALIZED).save(failOnError: true)
@@ -283,7 +283,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         author.status   == ElementStatus.DEPRECATED
     }
 
-    def "finalize tree"(){
+    def "finalize tree"() {
 
         setup:
         DataClass md1      = new DataClass(name:"test1").save()
@@ -331,11 +331,9 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md3.delete()
         md2.delete()
         md1.delete()
-
     }
 
-    def "finalize tree infinite loop"(){
-
+    def "finalize tree infinite loop"() {
         setup:
         DataClass md1      = new DataClass(name:"test1").save()
         DataClass md2      = new DataClass(name:"test2").save()
@@ -366,8 +364,6 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md1.delete()
         md2.delete()
         md3.delete()
-
-
     }
 
     def "change value domains in data elements while merging value domains"() {
@@ -386,7 +382,6 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         de.dataType == vd2
     }
 
-
     def "mappings are transferred to the new draft"() {
         DataModel dataModel = new DataModel(name: "mattnd", semanticVersion: "1.0.0", status: ElementStatus.FINALIZED).save(failOnError: true)
         DataType d1 = new DataType(name: "VD4MT1", status: ElementStatus.FINALIZED, dataModel: dataModel).save(failOnError: true, flush: true)
@@ -396,7 +391,6 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         expect:
         mapping.errors.errorCount == 0
-
 
         when:
         DraftContext context = DraftContext.userFriendly()
@@ -409,7 +403,6 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         d1draft.outgoingMappings
         d1draft.outgoingMappings.size() == 1
         d1draft.outgoingMappings[0].destination == d2draft
-
     }
 
     def "draft elements has the draft model I"() {

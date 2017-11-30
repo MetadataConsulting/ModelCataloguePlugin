@@ -45,7 +45,7 @@ class CatalogueXmlLoaderSpec extends Specification {
         similar 'gender.catalogue.xml'
     }
 
-    def "write simple value domain"() {
+    def "write simple primitive type"() {
         expect:
         similar 'force.catalogue.xml'
     }

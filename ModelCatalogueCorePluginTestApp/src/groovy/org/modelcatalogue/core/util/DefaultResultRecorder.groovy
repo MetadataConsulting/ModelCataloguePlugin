@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.util
 
 import grails.converters.JSON
-import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 
 class DefaultResultRecorder implements ResultRecorder {

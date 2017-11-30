@@ -2,12 +2,17 @@ package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
+import org.springframework.security.acls.model.NotFoundException
 import rx.Observable
+import org.modelcatalogue.core.util.SearchParams
 
 /**
  * Poor man's search service searching in name and description
@@ -21,6 +26,9 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     def modelCatalogueSecurityService
     def elementService
 
+    DataModelGormService dataModelGormService
+    DataModelAclService dataModelAclService
+
     @Override
     boolean isIndexingManually() {
         return false
@@ -29,13 +37,41 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     //Search relationships
     // i.e. search for anything that is a favourite on the home screen
 
+
+    protected List<DataModel> subscribedModels() {
+        List<DataModel> subscribedModels = []
+        try {
+
+            subscribedModels = dataModelGormService.findAll()
+
+        } catch(NotFoundException notFoundException) {
+            log.warn('ACL not found exception captured when fetching all the data models')
+        }
+        subscribedModels
+    }
+
     @Override
-    ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
-        String query = "%$params.search%"
+    ListWithTotalAndType<Relationship> search(CatalogueElement element,
+                                              RelationshipType type,
+                                              RelationshipDirection direction,
+                                              SearchParams searchParams) {
+        String search = searchParams.search
+        String status = searchParams.status
+        Long dataModelId = searchParams.dataModelId
+        ParamArgs paramArgs = searchParams.paramArgs
 
-        Set<DataModel> subscribedModels = modelCatalogueSecurityService.getSubscribed()
+        String query = "%$search%"
+        Map params = paramArgs.toMap()
 
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params, modelCatalogueSecurityService.isSubscribed(element)), getOverridableDataModelFilter(params, subscribedModels))
+        List<DataModel> subscribedModels = subscribedModels()
+
+        boolean hasReadPermission = dataModelAclService.hasReadPermission(element)
+
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element,
+                type,
+                ElementService.findAllElementStatus(status, hasReadPermission),
+                getOverridableDataModelFilter(dataModelId, subscribedModels)
+        )
 
         if (query != '%*%') {
             switch (direction) {
@@ -60,18 +96,22 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         return Lists.fromCriteria(params, criteria)
     }
 
-    public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
+    public <T> ListWithTotalAndType<T> search(Class<T> resource,
+                                              SearchParams searchParams) {
+        String search = searchParams.search
+        String status = searchParams.status
+        Long dataModelId = searchParams.dataModelId
+        ParamArgs paramArgs = searchParams.paramArgs
 
-        //find the data models that the user is subscribed to and only search those
-        Set<DataModel> subscribedModels = modelCatalogueSecurityService.getSubscribed()
-
+        Map params = paramArgs.toMap()
+        List<DataModel> subscribedModels = subscribedModels()
 
         // if the user doesn't have at least VIEWER role, don't return other elements than finalized
 //        if (!params.status && !false /*modelCatalogueSecurityService.hasRole('VIEWER')*/) {
 //            params.status = 'FINALIZED'
 //        }
 
-        String query = "%$params.search%"
+        String query = "%${search}%"
 
         //TODO: check why measurement unit is included here
 
@@ -85,16 +125,16 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
             criteria.'in'('id', subscribedModels.collect{it.id})
 
-            if (params.status) {
-                criteria.'in'('status', ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+            if (status) {
+                criteria.'in'('status', ElementService.findAllElementStatus(status, false))
             }
-            return Lists.fromCriteria(params, criteria).customize {
+            return Lists.fromCriteria(paramArgs.toMap(), criteria).customize {
                 it.collect { item -> CatalogueElementMarshaller.minimalCatalogueElementJSON(item) }
             }
         }
 
         if (CatalogueElement.isAssignableFrom(resource)) {
-            DataModelFilter dataModels = getOverridableDataModelFilter(params, subscribedModels).withImports(subscribedModels)
+            DataModelFilter dataModels = getOverridableDataModelFilter(dataModelId, subscribedModels).withImports(subscribedModels)
 
 
             String alias = resource.simpleName[0].toLowerCase()
@@ -112,8 +152,8 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
             List<ElementStatus> statuses = [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED]
 
-            if (params.status) {
-                statuses = [ElementStatus.valueOf(params.status.toString().toUpperCase())]
+            if (status) {
+                statuses = [ElementStatus.valueOf(status.toUpperCase())]
             }
 
             Map<String, Object> arguments = [
@@ -187,8 +227,8 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         }
     }
 
-    ListWithTotalAndType<CatalogueElement> search(Map params){
-        search CatalogueElement, params
+    ListWithTotalAndType<CatalogueElement> search(SearchParams searchParams) {
+        search(CatalogueElement, searchParams)
     }
 
     Observable<Boolean> index(Object element) {
@@ -213,15 +253,15 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         Observable.just(true)
     }
 
-    protected DataModelFilter getOverridableDataModelFilter(Map params, List<DataModel> subscribedModels) {
-        if (params.dataModel) {
-            if(subscribedModels.find{it.id}==params.dataModel) {
-                DataModel dataModel = DataModel.get(params.long('dataModel'))
+    protected DataModelFilter getOverridableDataModelFilter(Long dataModelId, List<DataModel> subscribedModels) {
+        if ( dataModelId ) {
+            if( subscribedModels.find { it.id == dataModelId } ) {
+                DataModel dataModel = dataModelGormService.findById(dataModelId)
                 if (dataModel) {
                     return DataModelFilter.includes(dataModel)
                 }
             }
-        }else{
+        } else{
             return DataModelFilter.includes(subscribedModels)
         }
         dataModelService.dataModelFilter

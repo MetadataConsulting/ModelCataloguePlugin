@@ -1,7 +1,5 @@
 package org.modelcatalogue.core.actions
 
-import org.modelcatalogue.core.CatalogueElement
-
 /**
  * Created by ladin on 04.08.14.
  */

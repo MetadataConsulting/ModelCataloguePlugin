@@ -3,8 +3,10 @@ package org.modelcatalogue.core
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.integration.obo.OboLoader
+import spock.lang.IgnoreIf
 import spock.lang.Unroll
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class HPOUpdatesSpec extends AbstractIntegrationSpec  {
 
     CatalogueBuilder catalogueBuilder

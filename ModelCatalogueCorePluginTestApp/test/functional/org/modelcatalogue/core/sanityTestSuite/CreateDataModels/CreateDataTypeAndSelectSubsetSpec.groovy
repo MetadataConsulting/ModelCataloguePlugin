@@ -1,22 +1,21 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.getCreate
 import static org.modelcatalogue.core.geb.Common.getDescription
-import static org.modelcatalogue.core.geb.Common.getMessages
 import static org.modelcatalogue.core.geb.Common.getModalHeader
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.getModelCatalogueId
 import static org.modelcatalogue.core.geb.Common.getNameLabel
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
-import static org.modelcatalogue.core.geb.Common.getSave
-import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.messages
-import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.save
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
+import spock.lang.Stepwise
 
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 
@@ -27,8 +26,7 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
     private static final String  enumeratedType ="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
     private static final String table = "tr.inf-table-item-row>td:nth-child(1)"
 
-
-    def " login and navigate to Data model"() {
+    def "login and navigate to Data model"() {
 
         when:
         loginCurator()
@@ -46,7 +44,7 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
         check modalHeader contains 'Create Data Type'
     }
 
-    def " fill the create data type form"() {
+    def "fill the create data type form"() {
         when:
         fill nameLabel with "TESTING_DATA_TYPE_SUBSET"
 
@@ -65,11 +63,9 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check table contains 'TESTING_DATA_TYPE_SUBSET'
-
-
     }
-    def" delete the created data type"(){
 
+    def "delete the created data type"() {
         when:'click on the created data type'
         click dataType
 
@@ -84,6 +80,5 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check table gone
-
     }
 }

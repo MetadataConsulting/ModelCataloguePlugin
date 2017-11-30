@@ -3,15 +3,7 @@ package org.modelcatalogue.core.elasticsearch
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.collect.ImmutableMap
-import org.elasticsearch.indices.IndexAlreadyExistsException
-import org.elasticsearch.transport.RemoteTransportException
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.util.HibernateHelper
-import rx.Observable
-
-import javax.management.InstanceAlreadyExistsException
-
-import static rx.Observable.just
 
 class IndexingSession {
 

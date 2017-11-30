@@ -8,7 +8,6 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.util.HibernateHelper
-
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -239,8 +238,6 @@ class Diff {
         if (isPropertyChange()) {
             builder << "${GrailsNameUtils.getNaturalName(key)}"
         }
-
-
         return builder.toString()
     }
 }

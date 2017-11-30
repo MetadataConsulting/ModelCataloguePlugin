@@ -1,14 +1,11 @@
 package org.modelcatalogue.core.elasticsearch
 
 import groovy.transform.CompileStatic
-
-
 /*
 *
 *     creates the names of the the indices and then creates teh document associated with entities
 *     indices are usually one for global search and one for data model search
 * */
-
 @CompileStatic
 class SimpleIndexRequest implements Serializable {
 

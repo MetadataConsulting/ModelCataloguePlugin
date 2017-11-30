@@ -1,10 +1,11 @@
 package org.modelcatalogue.gel.export
 
-import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.DataElement
+import spock.lang.IgnoreIf
 
 import static junit.framework.Assert.assertEquals
 import static org.modelcatalogue.core.util.test.FileOpener.open
+import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataElement
 
 /**
  * Created by rickrees on 18/04/2016.
@@ -15,6 +16,7 @@ class RareDiseasePhenotypeChangeLogXlsExporterSpec extends AbstractRareDiseasesE
     String new_guidance_id, new_dataElement_id1, new_dataElement_id2, nestedPheno_id1, nestedPheno_id2, nestedPheno_id3
 
     // content & file generation test combined as second one fails if run separately
+    @IgnoreIf( { System.getProperty('spock.ignore.slow') })
     def "Export rare disease phenotype changelogs to xls"() {
         when:
         buildTestModel(true)

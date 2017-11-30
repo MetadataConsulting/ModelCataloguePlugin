@@ -1,8 +1,8 @@
 package org.modelcatalogue.core.publishing
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import grails.util.Holders
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -14,9 +14,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 import rx.Observer
 
-import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
-
-@Log4j @CompileStatic
+@Log4j
 class CloningChain extends PublishingChain {
 
     private final CloningContext context

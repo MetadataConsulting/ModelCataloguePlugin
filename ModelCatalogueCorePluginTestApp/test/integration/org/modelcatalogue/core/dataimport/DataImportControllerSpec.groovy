@@ -5,7 +5,9 @@ import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder {
 
     def fileName, recorder, filenameXsd, filenameXsd2, fileNameStarUML
@@ -23,8 +25,8 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         )
     }
 
-    def testHeaderSetup(){
-        HeadersMap headersMap = HeadersMap.createForStandardExcelLoader()
+    def testHeaderSetup() {
+        Map<String,String> headersMap = HeadersMap.createForStandardExcelLoader()
         expect:
         headersMap.dataElementCode == "Data Item Unique Code"
         headersMap.dataElementName == "Data Item Name"
@@ -40,29 +42,29 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         headersMap.measurementSymbol == "Measurement Unit Symbol"
         headersMap.classification == "Classification"
         headersMap.metadata == "Metadata"
-
     }
 
-    def testCustomHeaderSetup(){
+    def testCustomHeaderSetup() {
 
-        Map<String,String> params = [:]
+        Map<String,Object> params = [:]
 
-        params.dataElementCode = "Data Item UC"
-        params.dataElementName = "DataI Name"
-        params.dataElementDescription = "Description"
-        params.dataTypeClassification = "DataTypeClassification"
-        params.dataTypeCode = "DataTypeUniqueCode"
-        params.dataTypeName = "DataType"
-        params.parentModelName = "parentModel"
-        params.parentModelCode = "Parent Model UC"
-        params.containingModelName = "ModelName"
-        params.containingModelCode = "ModelUC"
-        params.measurementUnitName = "measurement"
-        params.measurementSymbol = "MeasurementSymbol"
-        params.classification = "Classification"
-        params.metadata = "metadata"
+        params.put("dataElementCode", "Data Item UC")
+        params.put("dataElementName", "DataI Name")
+        params.put("dataElementDescription", "Description")
+        params.put("dataTypeClassification", "DataTypeClassification")
+        params.put("dataTypeCode", "DataTypeUniqueCode")
+        params.put("dataTypeName", "DataType")
+        params.put("parentModelName", "parentModel")
+        params.put("parentModelCode", "Parent Model UC")
+        params.put("containingModelName", "ModelName")
+        params.put("containingModelCode", "ModelUC")
+        params.put("measurementUnitName", "measurement")
+        params.put("measurementSymbol", "MeasurementSymbol")
+        params.put("classification", "Classification")
+        params.put("metadata", "metadata")
 
-        HeadersMap headersMap = HeadersMap.createForStandardExcelLoader(params)
+        Map<String,String> headersMap = HeadersMap.createForStandardExcelLoader(params)
+
         expect:
         headersMap.dataElementCode == "Data Item UC"
         headersMap.dataElementName == "DataI Name"

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.audit
 
 import grails.gorm.DetachedCriteria
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.util.Holders
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
@@ -10,7 +11,6 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.messaging.core.MessageSendingOperations
-
 import javax.annotation.PostConstruct
 import java.util.concurrent.Callable
 
@@ -31,6 +31,7 @@ class AuditService {
     def executorService
     def sessionFactory
     MessageSendingOperations brokerMessagingTemplate
+    SpringSecurityService springSecurityService
 
     static Callable<Auditor> auditorFactory = { throw new IllegalStateException("Application is not initialized yet") }
 
@@ -329,7 +330,7 @@ class AuditService {
         Auditor auditor = auditorThreadLocalVar.get()
         if (auditor.getSystem()) { // muted
             return createDraftBlock()
-        }
+
         else {
             Long changeId = auditor.logNewVersionCreated(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first()
             CatalogueElement ce = withParentId(changeId, createDraftBlock)
@@ -385,6 +386,7 @@ class AuditService {
         else {
             withDefaultAuthorAndParentAction(authorId ,auditor.logExternalChange(source, message, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), externalChangeBlock)
         }
+
 
     }
 
@@ -447,7 +449,20 @@ class AuditService {
 
     void logRelationArchived(Relationship relationship) {
         auditorThreadLocalVar.get().logRelationArchived(relationship, modelCatalogueSecurityService.currentUser?.id)
+
     }
 
-
+    Long loggedUserId() {
+        if ( springSecurityService.principal instanceof String ) {
+            try {
+                return springSecurityService.principal as Long
+            } catch(NumberFormatException e) {
+                return null
+            }
+        }
+        if ( springSecurityService.principal.respondsTo('id') ) {
+            return springSecurityService.principal.id as Long
+        }
+        null
+    }
 }

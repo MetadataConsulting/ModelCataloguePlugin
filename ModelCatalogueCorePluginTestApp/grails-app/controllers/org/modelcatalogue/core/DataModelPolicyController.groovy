@@ -1,10 +1,13 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.persistence.DataModelPolicyGormService
+
 class DataModelPolicyController extends AbstractRestfulController<DataModelPolicy>{
 
-    @Override
-    protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())
+    DataModelPolicyGormService dataModelPolicyGormService
+
+    protected DataModelPolicy findById(long id) {
+        dataModelPolicyGormService.findById(id)
     }
 
     DataModelPolicyController() {

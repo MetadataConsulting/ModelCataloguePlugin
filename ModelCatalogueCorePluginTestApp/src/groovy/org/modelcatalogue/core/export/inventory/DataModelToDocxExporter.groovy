@@ -4,19 +4,11 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ElementService
-import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.PrimitiveType
-import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.enumeration.Enumeration
-import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
-
 import java.text.SimpleDateFormat
 
 @Log4j

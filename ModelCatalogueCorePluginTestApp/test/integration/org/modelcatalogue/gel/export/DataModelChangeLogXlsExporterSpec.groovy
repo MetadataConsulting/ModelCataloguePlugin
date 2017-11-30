@@ -1,16 +1,17 @@
 package org.modelcatalogue.gel.export
 
+import static junit.framework.Assert.assertEquals
+import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.util.DataModelFilter
-
-import static junit.framework.Assert.assertEquals
-import static org.modelcatalogue.core.util.test.FileOpener.open
+import spock.lang.Ignore
 
 /**
  * Test for Data Spec change log reports class.
  */
+@Ignore
 class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
 
     def "Export data spec change logs to xls"() {

@@ -8,10 +8,12 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Shared
 
 import java.nio.charset.StandardCharsets
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class CatalogueXmlImportSpec extends AbstractIntegrationSpec {
 
     @Shared

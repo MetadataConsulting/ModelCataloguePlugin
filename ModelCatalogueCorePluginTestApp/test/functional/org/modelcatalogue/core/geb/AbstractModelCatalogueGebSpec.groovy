@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.geb
 
+import static org.modelcatalogue.core.geb.Common.*
 import geb.Browser
 import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
@@ -12,8 +13,6 @@ import org.openqa.selenium.logging.LogEntries
 import org.openqa.selenium.logging.LogEntry
 import org.openqa.selenium.logging.LogType
 import org.openqa.selenium.Keys
-
-import static org.modelcatalogue.core.geb.Common.*
 
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 

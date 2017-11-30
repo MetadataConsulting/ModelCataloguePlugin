@@ -5,7 +5,7 @@ import org.modelcatalogue.core.api.ElementStatus
 
 class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
-    def setupSpec(){
+    def setupSpec() {
         totalCount = resource.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
@@ -15,20 +15,19 @@ class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElement
     }
 
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "changedName", description: "edited description ", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
        [name: "Something", description: "blah blah blah", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
-
 
     @Override
     Class getResource() {

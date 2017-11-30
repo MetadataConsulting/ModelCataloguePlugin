@@ -1,10 +1,10 @@
 package org.modelcatalogue.core.publishing.changelog
 
-import org.modelcatalogue.core.PerformanceUtilService
-import org.modelcatalogue.core.api.ElementStatus
+import spock.lang.IgnoreIf
 
 import static org.modelcatalogue.core.util.test.FileOpener.open
-
+import org.modelcatalogue.core.PerformanceUtilService
+import org.modelcatalogue.core.api.ElementStatus
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.AbstractIntegrationSpec
@@ -18,13 +18,12 @@ import org.modelcatalogue.core.ddl.DataDefinitionLanguage
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
-
 /*
 *
 * THE CHANGE LOG STUFF DOESN'T REALLY WORK SO NOT SURE IT's worth fixing this test
 *
 * */
-
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
 
     AuditService auditService

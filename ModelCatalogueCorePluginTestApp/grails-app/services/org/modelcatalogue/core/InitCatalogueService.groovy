@@ -42,7 +42,7 @@ class InitCatalogueService {
         List<Resource> forSecondPass = []
 
         // first pass
-        for (Resource resource in resolver.getResources('classpath*:**/*.mc')) {
+        for (Resource resource in resolver.getResources('classpath*:**/mc_resources/*.mc')) {
             if (isTestResource(resource)) {
                 continue
             }
@@ -63,7 +63,7 @@ class InitCatalogueService {
         forSecondPass.clear()
 
         // load xml files
-        for (Resource resource in resolver.getResources('classpath*:**/*.mc.xml')) {
+        for (Resource resource in resolver.getResources('classpath*:**/mc_resources/*.mc.xml')) {
             if (isTestResource(resource)) {
                 continue
             }

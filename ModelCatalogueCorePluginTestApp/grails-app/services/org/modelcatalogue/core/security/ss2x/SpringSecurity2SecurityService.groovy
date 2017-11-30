@@ -4,29 +4,34 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.acl.AclUtilService
 import grails.util.Holders
-import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.LogoutListeners
 import org.modelcatalogue.core.SecurityService
-import org.modelcatalogue.core.security.Role
+import org.modelcatalogue.core.security.DataModelAclService
+import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserRole
+import org.modelcatalogue.core.persistence.UserGormService
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.logout.LogoutHandler
-
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.TimeUnit
 
 class SpringSecurity2SecurityService implements SecurityService, LogoutListeners, LogoutHandler {
 
-
     //TODO: How do we handle imports - this needs work
 
     static transactional = false
 
-    def springSecurityService
+    SpringSecurityService springSecurityService
+
+    DataModelAclService dataModelAclService
+
+    UserGormService userGormService
+
+    AclUtilService aclUtilService
 
     Cache<String, Long> lastSeenCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1, TimeUnit.DAYS).build()
 
@@ -41,17 +46,11 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if (!authority) {
             return false
         }
-        String translated = getRolesFromAuthority(authority)
-        Set<Role> roles = []
-        translated.split(",").each{
-            Role role = Role.findByAuthority(it)
-            if(role) roles.add(role)
+        Collection<String> roles = MetadataRolesUtils.getRolesFromAuthority(authority)
+        if ( !SpringSecurityUtils.ifAnyGranted(roles.join(',')) ) {
+            return false
         }
-
-        if(roles.size()==0) false
-
-        //find if the user has a role for a model, i.e. if they are authorised, for any of the roles
-        return isAuthorised(dataModel, roles)
+        dataModelAclService.hasReadPermission(dataModel)
     }
 
     //check if a user a general role
@@ -62,24 +61,8 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if (!authority) {
             return false
         }
-        String translated = getRolesFromAuthority(authority)
-        return SpringSecurityUtils.ifAnyGranted(translated)
-    }
-
-    private String getRolesFromAuthority(String authority){
-        String translated = authority
-        if (authority == "VIEWER") {
-            translated = "ROLE_USER,ROLE_METADATA_CURATOR,ROLE_ADMIN,ROLE_SUPERVISOR"
-        }  else if (authority == "CURATOR") {
-            translated = "ROLE_METADATA_CURATOR,ROLE_ADMIN,ROLE_SUPERVISOR"
-        } else if (authority == "ADMIN") {
-            translated = "ROLE_ADMIN,ROLE_SUPERVISOR"
-        } else if (authority == "SUPERVISOR") {
-            translated = "ROLE_SUPERVISOR"
-        } else if (!translated.startsWith('ROLE_')) {
-            translated = "ROLE_${translated}"
-        }
-        translated
+        String roles = MetadataRolesUtils.getRolesFromAuthority(authority).join(',')
+        return SpringSecurityUtils.ifAnyGranted(roles)
     }
 
     String encodePassword(String password) {
@@ -97,7 +80,8 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) {
         def id = authentication?.principal?.id
         if (id) {
-            userLoggedOut(User.get(id as Long))
+            User user = userGormService.findById(id as Long)
+            userLoggedOut(user)
         }
     }
 
@@ -110,154 +94,4 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     void logout(String username) {
         Holders.applicationContext.getBean('userCache').removeUserFromCache(username)
     }
-
-
-
-    //check if the user is subscribed to a data model
-    boolean isSubscribed(DataModel dataModel) {
-
-        //check if the user is a supervisor - if they are, they are subscribed to everything
-        if(isSupervisor()) return true
-
-        //if no data model , then there's nothing to be subscribed to
-        if(!dataModel) return false
-
-        //otherwise check that a userrole exists with this user and this data model - if so you have a subscription otherwise you don't
-        UserRole userRole = UserRole.findByUserAndDataModel(getCurrentUser(), dataModel)
-
-        if(userRole && dataModel){
-            return true
-        }
-
-        return false
-    }
-
-
-    //check if the user is subscribed to a list of data models
-    boolean isSubscribed(Set<Long> dataModelIds) {
-
-        Boolean subscribed = false
-
-        //check if the user is a supervisor - if they are, they are subscribed to everything
-        if(isSupervisor()) return true
-
-        //if no data models have been included then there's nothing to be subscribed to
-        if(!dataModelIds) return subscribed
-
-        //otherwise check that a userrole exists for all the data models in the list and this data model - if so you have a subscription otherwise you don't
-        dataModelIds.each{ dataModelId ->
-            DataModel dataModel = DataModel.get(dataModelId)
-            UserRole userRole
-            if(dataModel) userRole = UserRole.findByUserAndDataModel(getCurrentUser(), dataModel)
-            if(userRole && dataModel){
-                subscribed = true
-            }else{
-                return false
-            }
-        }
-
-        return subscribed
-    }
-
-
-//check if the user is subscribed to a catalogueElement
-    boolean isSubscribed(CatalogueElement ce){
-
-        //check if the user is a supervisor - if they are, they are subscribed to everything
-        if(isSupervisor()) return true
-
-        //if the catalogue element doesn't have a data model it is an orphan and you can't be subscribed to it.
-        if(!ce?.dataModel) return false
-
-        isSubscribed(ce?.dataModel)
-    }
-
-    //check if the user is a supervisor
-    //if they are they can do most things
-
-    boolean isSupervisor(){
-        if(UserRole.findByUserAndRole(getCurrentUser(), Role.findByAuthority('ROLE_SUPERVISOR'))) return true
-        return false
-    }
-
-
-    //check if a user has the a specific role for a data model
-    boolean isAuthorised(DataModel dataModel, Set<Role> roles) {
-
-        //check if the user is a supervisor - if they are, they are authorised to do everything
-        if(isSupervisor()) return true
-
-        //if there isn't a data model they cannot be authorised
-        if(!dataModel) return false
-
-
-        // if a user has any of the roles included then they are authorised
-        boolean hasRole = false
-        roles.any { Role role ->
-            if (UserRole.findAllByUserAndDataModelAndRole(getCurrentUser(), dataModel, role)) {
-                hasRole = true
-                return true
-            }
-        }
-        return hasRole
-    }
-
-    //get all the data models that this user is subscribed to regardless of the role
-    List<DataModel> getSubscribed(){
-
-        if(isSupervisor()) return DataModel.list()
-
-        //get all the user roles for the user
-        List<UserRole> userRoles = UserRole.findAllByUser(getCurrentUser())
-
-        //filter the roles where the role isn't general and has a data model and return the list
-        List<DataModel> dataModels = []
-        dataModels = userRoles.findResults{it.dataModel}
-        return dataModels
-    }
-
-
-    //get all the roles that the user has for a model i.e. are they just a user or also an admin
-    //this is used by the json marshaller and which passes the info to
-    // the front end angular interface
-    Set getRoles(String dataModelId){
-
-        //check if the user is a supervisor - if they are, they are subscribed to everything
-        if(isSupervisor()) return Role.list().collect{it.authority}
-
-        DataModel dataModel = DataModel.get(dataModelId)
-
-        //if there is a data model then return the roles for that data model
-        if(dataModel){
-            Set<UserRole> userRoles = UserRole.findAllByUserAndDataModel(getCurrentUser(), dataModel)
-            return userRoles.collect{it.role.authority}
-        }
-
-        //if not just return the general roles
-        Set<UserRole> userRoles = UserRole.findAllByUserAndDataModelIsNull(getCurrentUser())
-        return userRoles.collect{it.role.authority}
-
-    }
-
-    void addUserRoleModel(User user, Role role, DataModel model, boolean flush = false){
-        UserRole.create user, role, model, flush
-    }
-
-    void removeUserRoleModel(User user, Role role, DataModel model){
-        UserRole.remove user, role, model
-    }
-
-    void removeAllUserRoleModel(User user, DataModel model){
-        UserRole.executeUpdate 'DELETE FROM UserRole WHERE user=:user AND dataModel=:dataModel', [user: user, dataModel: model]
-    }
-
-    void copyUserRoles(DataModel sourceModel, DataModel destinationModel){
-
-        List<UserRole> userRolesSourceModel = UserRole.findAllByDataModel(sourceModel)
-        userRolesSourceModel.each{ UserRole userRole ->
-            addUserRoleModel userRole.user, userRole.role, destinationModel
-        }
-
-    }
-
 }

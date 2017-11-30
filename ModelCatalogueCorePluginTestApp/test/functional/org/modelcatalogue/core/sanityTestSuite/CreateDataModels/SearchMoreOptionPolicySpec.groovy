@@ -1,12 +1,13 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.getModalCloseButton
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.pick
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec{
 
     private static final String create="a#role_data-models_create-data-modelBtn>span:nth-child(2)"
@@ -21,7 +22,7 @@ class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec{
     private static String  searchData="TESTING_POLICY"
 
     @Ignore
-    def " search option"() {
+    def "search option"() {
 
         when:
          loginAdmin()

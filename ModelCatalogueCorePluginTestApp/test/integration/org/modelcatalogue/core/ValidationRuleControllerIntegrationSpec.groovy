@@ -4,19 +4,18 @@ import grails.util.GrailsNameUtils
 
 class ValidationRuleControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
-
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "changedName", description: "edited description", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
        [name:"new validation rule", description: "for validating something", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
 

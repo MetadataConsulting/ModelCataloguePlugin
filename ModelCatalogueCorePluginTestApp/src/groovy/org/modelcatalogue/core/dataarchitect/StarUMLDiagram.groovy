@@ -1,11 +1,10 @@
 package org.modelcatalogue.core.dataarchitect
+
 /**
  * Based on work by James Welch
  */
 class StarUMLDiagram {
-
     //test
-
     Object json;
     // The top-level JSON object
 
@@ -84,8 +83,4 @@ class StarUMLDiagram {
                 println("Top Level Element: " + elem.name)
         }
     }
-
-
-
-
 }

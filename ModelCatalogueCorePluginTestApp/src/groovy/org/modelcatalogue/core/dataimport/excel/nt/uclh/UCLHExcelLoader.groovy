@@ -8,7 +8,6 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
-
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.DataElement
@@ -19,7 +18,6 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
-import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 
 /**
  * Created by david on 04/08/2017.
@@ -267,8 +265,6 @@ class UCLHExcelLoader extends ExcelLoader{
 
 
 
-    //String defaultGMCMetadataValue = GMCGridReportExcelLoader.defaultGMCMetadataValue
-
 
 
     @Override
@@ -302,7 +298,7 @@ class UCLHExcelLoader extends ExcelLoader{
                 rowMaps.each { Map<String, String> rowMap ->
                     dataElement(name: getNTElementName(rowMap)) {
                         metadataHeaders.each {k, v ->
-                            ext v, (rowMap[k] ?: defaultGMCMetadataValue)
+                            ext v, (rowMap[k] ?: '')
                         }
                         ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
                         //id('mcID1000')
@@ -332,10 +328,7 @@ class UCLHExcelLoader extends ExcelLoader{
                     Date stopAddRelate = new Date()
                     TimeDuration tdAddRelate = TimeCategory.minus( stopAddRelate, startAddRelate )
                     log.info("Complete relate dest: " + destinationDataElement.name + ",source: NOT AVAILABLE"  + "duration:" + tdAddRelate )
-
                 }
-
-
             }
         }
     }

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.util
 
+import static org.modelcatalogue.core.util.HibernateHelper.*
 import grails.util.Holders
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
@@ -9,8 +10,6 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import spock.lang.Issue
-
-import static org.modelcatalogue.core.util.HibernateHelper.*
 
 class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
@@ -537,13 +536,13 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
                 dataType name: wd40name
             }
             dataModel name: other234Name, {
+                copy relationships
                 dataType name: vd1Name
                 dataType name: vd2Name
                 dataType name: vd3Name
                 dataType name: vd4Name, {
                     rel 'synonym'   to      dataType called vd2Name
                     rel 'synonym'   from    vd1Name
-
 
                     rel 'relatedTo' to      other123Name, wd40name
                     rel 'base'      to      other123Name, wd40name

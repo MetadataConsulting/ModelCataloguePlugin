@@ -3,13 +3,15 @@ package org.modelcatalogue.core
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import org.custommonkey.xmlunit.DetailedDiff
+import org.custommonkey.xmlunit.Diff
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.core.util.test.TestData
 import org.modelcatalogue.core.util.test.TestDataHelper
+import org.modelcatalogue.core.util.test.TestDataService
 import org.springframework.web.context.support.WebApplicationContextUtils
 
 abstract class AbstractIntegrationSpec extends IntegrationSpec {
@@ -21,6 +23,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     def sessionFactory
     def cacheService
     def relationshipTypeService
+    TestDataService testDataService
 
     void loadMarshallers() {
         relationshipTypeService.clearCache()
@@ -28,8 +31,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         springContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
     }
 
-
-    void initRelationshipTypes(){
+    void initRelationshipTypes() {
         relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'reltypes.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
@@ -37,7 +39,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         cacheService.clearCache()
     }
 
-    void initCatalogue(){
+    void initCatalogue() {
         relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'initcatalogue.sql') {
             initCatalogueService.initCatalogue(true)
@@ -45,11 +47,11 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         cacheService.clearCache()
     }
 
-    void loadFixtures(){
+    void loadFixtures() {
         relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'testdata.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
-            TestData.createTestData()
+            testDataService.createTestData()
         }
         cacheService.clearCache()
         Role adminRole = Role.findOrCreateWhere(authority: 'ROLE_SUPERVISOR').save(failOnError: true)
@@ -132,12 +134,27 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         return notNull(DataModel.findByName(COMPLEX_MODEL_NAME))
     }
 
+    boolean similar(String sampleXml, String expectedXml) {
 
+        println "==ACTUAL=="
+        println sampleXml
+
+        println "==EXPECTED=="
+        println expectedXml
+
+        Diff diff = new Diff(sampleXml, expectedXml)
+        DetailedDiff detailedDiff = new DetailedDiff(diff)
+
+        assert detailedDiff.similar(), detailedDiff.toString()
+        return true
+    }
 
 
     public <T> T notNull(T item) {
         assert item
         item
     }
+
+
 
 }

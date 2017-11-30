@@ -11,7 +11,6 @@ import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
-
 import org.modelcatalogue.gel.export.DataModelChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
 import org.modelcatalogue.gel.export.RareDiseaseEligibilityChangeLogXlsExporter

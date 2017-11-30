@@ -1,5 +1,6 @@
 package org.modelcatalogue.gel.export
 
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import com.google.common.collect.ImmutableMap
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.CatalogueElement
@@ -14,13 +15,10 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
 import org.modelcatalogue.core.util.DataModelFilter
-
 import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
 import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
-
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 
 /**
  * GridReportXlsxExporter.groovy

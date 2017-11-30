@@ -174,8 +174,4 @@ class OpenEhrExcelLoader extends UCLHExcelLoader {
         }
         return rowMapList
     }
-
-
-
-
 }

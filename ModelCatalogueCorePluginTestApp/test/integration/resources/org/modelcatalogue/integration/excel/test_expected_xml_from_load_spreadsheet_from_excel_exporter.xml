@@ -1,499 +1,642 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
-    <copyRelationships>true</copyRelationships>
-    <dataModel name="Fresh Model Imported From ExcelExporter Spreadsheet">
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="PATIENT IDENTITY DETAILS" id="14@2">
-                <dataElement name="NHS NUMBER*" id="16@2">
-                    <description>*For linkage purposes NHS NUMBER
-                        and/or
-                        LOCAL PATIENT IDENTIFIER
-                        is required.
+  <copyRelationships>true</copyRelationships>
+  <dataModel name="Fresh Model Imported From ExcelExporter Spreadsheet">
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="PATIENT IDENTITY DETAILS" id="14@2">
+        <dataElement name="NHS NUMBER*" id="16@2">
+          <description>*For linkage purposes NHS NUMBER
+and/or
+ LOCAL PATIENT IDENTIFIER
+is required.
 
-                        The NHS NUMBER, the primary identifier of a PERSON, is a unique identifier for aPATIENTwithin the NHS in England and Wales. This will not vary by any ORGANISATION of which a P</description>
-                    <extensions>
-                        <extension key="Metadata">Notes_from_GD_JCIS: orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="PATIENT IDENTITY DETAILS" id="14@2">
-                <dataElement name="LOCAL PATIENT IDENTIFIER*" id="17@2">
-                    <description>*For linkage purposes NHS NUMBER
-                        and/or
-                        LOCAL PATIENT IDENTIFIER
-                        is required.
+The NHS NUMBER, the primary identifier of a PERSON, is a unique identifier for aPATIENTwithin the NHS in England and Wales. This will not vary by any ORGANISATION of which a P</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="Number" id="92@2" />
+          <extensions>
+            <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="PATIENT IDENTITY DETAILS" id="14@2">
+        <dataElement name="LOCAL PATIENT IDENTIFIER*" id="17@2">
+          <description>*For linkage purposes NHS NUMBER
+and/or
+ LOCAL PATIENT IDENTIFIER
+is required.
 
-                        This is a number used to identify a PATIENT uniquely within a Health Care Provider. It may be different from the PATIENT's casenote number and may be assigned automatically by</description>
-                    <extensions>
-                        <extension key="Metadata">F: When Patient demographics entered.
-                            NHIC_Identifier:: TEST_2
-                            Link_to_existing definition:: LOCAL PATIENT IDENTIFIER
-                            E2: from source
-                            G: GC 124
-                            E: hard
-                            D: 1
-                            H: NEO4J
-                            B: 2
-                            Notes_from_GD_JCIS: orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="PATIENT IDENTITY DETAILS" id="14@2">
-                <dataElement name="nhsNumberStatusIndicatorCode" id="19@2">
-                    <description>The NHS NUMBER STATUS  INDICATOR CODE indicates the verification status of the NHS number provided.</description>
-                    <extensions>
-                        <extension key="Metadata">Link_to_existing definition:: NHS NUMBER STATUS INDICATOR CODE
-                            A: 2
-                            E2: from source
-                            E: 1
-                            NHIC_Identifier:: TEST_3
-                            Notes_from_GD_JCIS: orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendre</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="PATIENT IDENTITY DETAILS" id="14@2">
-                <dataElement name="ORGANISATION CODE (CODE OF PROVIDER)" id="93@2">
-                    <description>ORGANISATION CODE (CODE OF PROVIDER) is the ORGANISATION CODE of the ORGANISATION acting as a Health Care Provider.
-                        (an6 not applicable to COSD)</description>
-                    <extensions>
-                        <extension key="Metadata">B: 1
-                            Notes_from_GD_JCIS: null
-                            A: 2
-                            Link_to_existing definition:: ORGANISATION CODE (CODE OF PROVIDER)
-                            [Optional]_Local_Identifier: XXXXXXX0030
-                            E2: from source
-                            E: 1
-                            NHIC_Identifier:: TEST_5
-                            G: GC 127
-                            F: When referral details entered.
-                            C: 1
-                            D: 1
-                            H: NEO4J</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="DIAGNOSTIC DETAILS" id="21@2">
-                <dataElement name="PRIMARY DIAGNOSIS (ICD)" id="22@2">
-                    <description>See DIAGNOSTIC CODING for details on coding and PRIMARY DIAGNOSES for the standardised definition of primary diagnosis.</description>
-                    <extensions>
-                        <extension key="Metadata">E: 1
-                            H: NEO4J
-                            F: MDT Meeting
-                            G: GC 128
-                            NHIC_Identifier:: TEST_6
-                            E2: from source
-                            B: 1
-                            Link_to_existing definition:: PRIMARY DIAGNOSIS (ICD)
-                            [Optional]_Local_Identifier: XXXXXXX0370
-                            C: 1
-                            D: 1
-                            A: 1
-                            Notes_from_GD_JCIS:</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="DIAGNOSTIC DETAILS" id="21@2">
-                <dataElement name="DATE OF DIAGNOSIS (CLINICALLY AGREED)*" id="23@2">
-                    <description>*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED)
-                        or
-                        DATE OF RECURRENCE (CLINICALLY AGREED)
-                        is required as mandatory.
+This is a number used to identify a PATIENT uniquely within a Health Care Provider. It may be different from the PATIENT's casenote number and may be assigned automatically by</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="B">2</extension>
+            <extension key="D">1</extension>
+            <extension key="E">hard</extension>
+            <extension key="F">When Patient demographics entered.</extension>
+            <extension key="G">GC 124</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="E2">from source</extension>
+            <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="PATIENT IDENTITY DETAILS" id="14@2">
+        <dataElement name="nhsNumberStatusIndicatorCode" id="19@2">
+          <description>The NHS NUMBER STATUS  INDICATOR CODE indicates the verification status of the NHS number provided.</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="nhsNumberStatusIndicatorCode" id="18@2">
+            <enumerations>
+              <enumeration value="02">Number present but not traced</enumeration>
+              <enumeration value="03">Trace required</enumeration>
+              <enumeration value="04">Trace attempted - No match or multiple match found</enumeration>
+              <enumeration value="05">Trace needs to be resolved - (NHS Number or patient detail conflict)</enumeration>
+              <enumeration value="06">Trace in progress</enumeration>
+              <enumeration value="08">Trace postponed (baby too tiny)</enumeration>
+              <enumeration value="10">Trace needs</enumeration>
+            </enumerations>
+          </dataType>
+          <extensions>
+            <extension key="A">2</extension>
+            <extension key="E">1</extension>
+            <extension key="E2">from source</extension>
+            <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendre</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="PATIENT IDENTITY DETAILS" id="14@2">
+        <dataElement name="ORGANISATION CODE (CODE OF PROVIDER)" id="93@2">
+          <description>ORGANISATION CODE (CODE OF PROVIDER) is the ORGANISATION CODE of the ORGANISATION acting as a Health Care Provider.
+(an6 not applicable to COSD)</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="Number" id="92@2" />
+          <extensions>
+            <extension key="A">2</extension>
+            <extension key="B">1</extension>
+            <extension key="C">1</extension>
+            <extension key="D">1</extension>
+            <extension key="E">1</extension>
+            <extension key="F">When referral details entered.</extension>
+            <extension key="G">GC 127</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="[Optional]_Local_Identifier">XXXXXXX0030</extension>
+            <extension key="E2">from source</extension>
+            <extension key="Notes_from_GD_JCIS">null</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="DIAGNOSTIC DETAILS" id="21@2">
+        <dataElement name="PRIMARY DIAGNOSIS (ICD)" id="22@2">
+          <description>See DIAGNOSTIC CODING for details on coding and PRIMARY DIAGNOSES for the standardised definition of primary diagnosis.</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">1</extension>
+            <extension key="B">1</extension>
+            <extension key="C">1</extension>
+            <extension key="D">1</extension>
+            <extension key="E">1</extension>
+            <extension key="F">MDT Meeting</extension>
+            <extension key="G">GC 128</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="E2">from source</extension>
+            <extension key="[Optional]_Local_Identifier">XXXXXXX0370</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="DIAGNOSTIC DETAILS" id="21@2">
+        <dataElement name="DATE OF DIAGNOSIS (CLINICALLY AGREED)*" id="23@2">
+          <description>*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED)
+or
+ DATE OF RECURRENCE (CLINICALLY AGREED)
+is required as mandatory.
 
-                        Record the date  where TESTcer was confirmed or diagnosis agreed (This will normally be  the date of the authorised  patholo</description>
-                    <extensions>
-                        <extension key="Metadata">[Optional]_Local_Identifier: XXXXXXX2030
-                            E2: from source
-                            B: 2
-                            H: NEO4J
-                            Link_to_existing definition:: DATE OF DIAGNOSIS (TESTCER CLINICALLY AGREED)
-                            C: 1
-                            A: 2
-                            Notes_from_GD_JCIS: orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="DIAGNOSTIC DETAILS" id="21@2">
-                <dataElement name="WEIGHT" id="96@2">
-                    <description>null</description>
-                    <extensions>
-                        <extension key="Metadata"></extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="DIAGNOSTIC DETAILS" id="21@2">
-                <dataElement name="DATE OF RECURRENCE (CLINICALLY AGREED)*" id="24@2">
-                    <description>*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED)
-                        or
-                        DATE OF RECURRENCE (CLINICALLY AGREED)
-                        is required as mandatory.
+Record the date  where TESTcer was confirmed or diagnosis agreed (This will normally be  the date of the authorised  patholo</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">2</extension>
+            <extension key="B">2</extension>
+            <extension key="C">1</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="[Optional]_Local_Identifier">XXXXXXX2030</extension>
+            <extension key="E2">from source</extension>
+            <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="DIAGNOSTIC DETAILS" id="21@2">
+        <dataElement name="WEIGHT" id="96@2">
+          <description>null</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="Grams" id="95@2">
+            <rule>x.isNumber()</rule>
+            <measurementUnit name="Grams" id="94@2" />
+          </dataType>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="DIAGNOSTIC DETAILS" id="21@2">
+        <dataElement name="DATE OF RECURRENCE (CLINICALLY AGREED)*" id="24@2">
+          <description>*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED)
+or
+ DATE OF RECURRENCE (CLINICALLY AGREED)
+is required as mandatory.
 
-                        (Recurrences only.)
-                        Record the date where TESTcer recurrence was confirmed or diagnosis of recurrence was agreed (This will</description>
-                    <extensions>
-                        <extension key="Metadata">B: 2
-                            C: 1
-                            H: NEO4J
-                            NHIC_Identifier:: TEST_8
-                            E2: from source
-                            E: hard
-                            A: 2
-                            [Optional]_Local_Identifier: XXXXXXX0440
-                            F: MDT Meeting - From MDT against which definitive diagnosis recorded, or final pre-treatment diagnosis recorded. Recurrence radio button nee</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="REFERRALS" id="37@2">
-                <dataElement name="sourceOfReferralForOutPatients" id="39@2">
-                    <description>This identifies the source of referral of each Consultant Out-Patient Episode.
-                        (See User Guide for further details)</description>
-                    <extensions>
-                        <extension key="Metadata">C: 1
-                            D: 1
-                            Notes_from_GD_JCIS: orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="REFERRALS" id="37@2">
-                <dataElement name="REFERRAL TO TREATMENT PERIOD START DATE" id="40@2">
-                    <description>The start date of a REFERRAL TO TREATMENT PERIOD. Date that the initial referral to Secondary care was received for this diagnosis. This may be different from TESTCER REFERRAL TO TREATMENT PERIOD START DATE if initial referral was not to the TESTcer servi</description>
-                    <extensions>
-                        <extension key="Metadata">[Optional]_Local_Identifier: XXXXXXX1580
-                            F: When referral details entered.
-                            D: 1
-                            NHIC_Identifier:: TEST_19
-                            A: 2
-                            C: 2
-                            H: NEO4J
-                            E2: from source
-                            E: 2
-                            G: GC 141
-                            B: 2
-                            Link_to_existing definition:: REFERRAL TO TREATMENT PERIOD START DATE
-                            Notes_from_GD_JCIS:</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="REFERRALS" id="37@2">
-                <dataElement name="DATE FIRST SEEN" id="41@2">
-                    <description>This is the date that the PATIENT is first seen in the Trust that receives the first referral.</description>
-                    <extensions>
-                        <extension key="Metadata">D: 1
-                            G: GC 142
-                            E2: from source
-                            E: 2
-                            Link_to_existing definition:: DATE FIRST SEEN
-                            C: 2
-                            NHIC_Identifier:: TEST_20
-                            B: 2
-                            [Optional]_Local_Identifier: XXXXXXX0230
-                            A: 2
-                            H: NEO4J
-                            F: When referral details entered.
-                            Notes_from_GD_JCIS:</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="REFERRALS" id="37@2">
-                <dataElement name="CONSULTANT CODE" id="42@2">
-                    <description>A code uniquely identifying a CONSULTANT. (Referred to CONSULTANT CODE).</description>
-                    <extensions>
-                        <extension key="Metadata">G: GC 143
-                            E: 2 - Backlog of consultant codes will need to be entered
-                            C: 4
-                            D: 4
-                            H: NEO4J
-                            Notes_from_GD_JCIS: Imported activities do not have this field completed, but it TEST be derived from the Clinic code, which is imported. Check with VT.
-                            A: 2
-                            F: Visit</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="REFERRALS" id="37@2">
-                <dataElement name="CARE PROFESSIONAL MAIN SPECIALTY CODE" id="43@2">
-                    <description>A unique code identifying each MAIN SPECIALTY designated by Royal Colleges. This is the same as the OCCUPATION CODES desXXXXXXXibing specialties. (TEST be derived from consultant code).</description>
-                    <extensions>
-                        <extension key="Metadata">C: 4
-                            F: NOT SHOWN ON JCIS
-                            (A field is available in Consultants table, but often empty)
-                            Notes_from_GD_JCIS: NOT SHOWN ON JCIS
-                            (A field is available in Consultants table, but often empty)
-                            E: 3
-                            A: 4
-                            D: 4
-                            Link_to_existing definition:: CARE PROFESSIONAL MAIN S</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="REFERRALS" id="37@2">
-                <dataElement name="ORGANISATION SITE CODE (PROVIDER FIRST SEEN)" id="44@2">
-                    <description>The  ORGANISATION SITE CODE of the Health Care Provider at the first contact with the PATIENT.</description>
-                    <extensions>
-                        <extension key="Metadata">A: 2
-                            H: NEO4J
-                            [Optional]_Local_Identifier: XXXXXXX1410
-                            E: 2
-                            G: GC 145
-                            C: 2
-                            B: 2
-                            Link_to_existing definition:: SITE CODE (OF PROVIDER FIRST SEEN)
-                            D: 3
-                            NHIC_Identifier:: TEST_23
-                            E2: from source
-                            Notes_from_GD_JCIS: Name shown. Code available in JCIS tables.</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="REFERRALS" id="37@2">
-                <dataElement name="DATE FIRST SEEN (TESTCER SPECIALIST)" id="45@2">
-                    <description>This is the date that the PATIENT is first seen by the appropriate specialist for TESTcer care within a TESTcer Care Spell. This is the PERSON or PERSONS who are most able to progress the diagnosis of the primary tumour.</description>
-                    <extensions>
-                        <extension key="Metadata">E: 2
-                            C: 2
-                            [Optional]_Local_Identifier: XXXXXXX1360
-                            NHIC_Identifier:: TEST_24
-                            H: NEO4J
-                            G: GC 146
-                            Link_to_existing definition:: DATE FIRST SEEN (TESTCER SPECIALIST)
-                            F: Visit
-                            eg Initial visit or Radiological visit used as first seen in wait time table.
-                            E2: f</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="REFERRALS" id="37@2">
-                <dataElement name="ORGANISATION SITE CODE (PROVIDER FIRST TESTCER SPECIALIST)" id="46@2">
-                    <description>The  ORGANISATION SITE CODE of the ORGANISATION acting as Health Care Provider where the PATIENT is first seen by an appropriate TESTcer specialist on the DATE FIRST SEEN (TESTCER SPECIALIST).</description>
-                    <extensions>
-                        <extension key="Metadata">A: 2
-                            E: 2
-                            C: 2
-                            B: 2
-                            F: Visit
-                            eg Initial visit or Radiological visit used as first seen in wait time table.
-                            Notes_from_GD_JCIS: Name shown. Code available in JCIS tables.
-                            Link_to_existing definition:: SITE CODE (OF PROVIDER FIRST TESTCER SPECIALIST)
-                            E2: fr</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="REFERRALS" id="37@2">
-                <dataElement name="testcerOrSymptomaticBreastReferralPatientStatus" id="48@2">
-                    <description>TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS is recorded to enable tracking of the status of REFERRAL REQUESTS for PATIENTS referred with a suspected TESTcer, or referred with breast symptoms with TESTcer not originally suspected.
-                        For COSD this T</description>
-                    <extensions>
-                        <extension key="Metadata">[Optional]_Local_Identifier: XXXXXXX0270
-                            A: TBA
-                            C: TBA
-                            G: GC 148
-                            F: When referral details entered.
-                            D: TBA
-                            NHIC_Identifier:: TEST_26
-                            Link_to_existing definition:: TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS
-                            B: TBA
-                            E: 3
-                            E2: from source
-                            H: NEO4J
-                            No</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="REFERRALS" id="37@2">
-                <dataElement name="TESTCER SYMPTOMS FIRST NOTED DATE" id="49@2">
-                    <description>Record the time when the symptoms were first noted related to this diagnosis as agreed between the consultant and the patient.   Depending on the length of time this should normally include at least month and year. Day should also be included if known. If</description>
-                    <extensions>
-                        <extension key="Metadata">A: TBA
-                            D: TBA
-                            G: GC 149
-                            NHIC_Identifier:: TEST_27
-                            B: TBA
-                            E2: from source
-                            [Optional]_Local_Identifier: XXXXXXX2000
-                            F: Calculated from date of visit / duration of symptoms
-                            Notes_from_GD_JCIS: orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="IMAGING" id="97@2">
-                <dataElement name="SITE CODE (OF IMAGING)" id="98@2">
-                    <description>This is the ORGANISATION SITE CODE of the Organisation  where the imaging took place.</description>
-                    <extensions>
-                        <extension key="Metadata">D: 2
-                            F: Name shown. Code available in JCIS tables.
-                            E: 5
-                            G: GC 150
-                            Notes_from_GD_JCIS: orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Su</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="IMAGING" id="97@2">
-                <dataElement name="PROCEDURE DATE (TESTCER IMAGING)" id="99@2">
-                    <description>The DATE the TESTcer Imaging was carried out.</description>
-                    <extensions>
-                        <extension key="Metadata">E2: from source
-                            C: 2
-                            [Optional]_Local_Identifier: XXXXXXX0320
-                            Link_to_existing definition:: PROCEDURE DATE (TESTCER IMAGING)
-                            B: 2
-                            E: 6
-                            H: NEO4J
-                            NHIC_Identifier:: TEST_29
-                            D: 2
-                            Notes_from_GD_JCIS: null
-                            G: GC 151
-                            A: 1
-                            F: null</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="IMAGING" id="97@2">
-                <dataElement name="IMAGING CODE (NICIP)*" id="100@2">
-                    <description>*IMAGING CODE (NICIP)
-                        and/or
-                        (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
-                        is required.
+(Recurrences only.)
+Record the date where TESTcer recurrence was confirmed or diagnosis of recurrence was agreed (This will</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">2</extension>
+            <extension key="B">2</extension>
+            <extension key="C">1</extension>
+            <extension key="E">hard</extension>
+            <extension key="F">MDT Meeting - From MDT against which definitive diagnosis recorded, or final pre-treatment diagnosis recorded. Recurrence radio button nee</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="E2">from source</extension>
+            <extension key="[Optional]_Local_Identifier">XXXXXXX0440</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="REFERRALS" id="37@2">
+        <dataElement name="sourceOfReferralForOutPatients" id="39@2">
+          <description>This identifies the source of referral of each Consultant Out-Patient Episode.
+(See User Guide for further details)</description>
+          <metadata>
+            <extension key="Min Occurs">2</extension>
+            <extension key="Max Occurs">5</extension>
+          </metadata>
+          <dataType name="sourceOfReferralForOutPatients" id="38@2">
+            <enumerations>
+              <enumeration value="11">other - initiated by the CONSULTANT responsible for the Consultant Out-Patient Episode</enumeration>
+              <enumeration value="01">following an emergency admission</enumeration>
+              <enumeration value="12">referral from a GENERAL PRACTITIONER with a Special Interest (GPwSI) or dentist with a Special Interest (DwSI)</enumeration>
+              <enumeration value="02">followin</enumeration>
+            </enumerations>
+          </dataType>
+          <extensions>
+            <extension key="C">1</extension>
+            <extension key="D">1</extension>
+            <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="REFERRALS" id="37@2">
+        <dataElement name="REFERRAL TO TREATMENT PERIOD START DATE" id="40@2">
+          <description>The start date of a REFERRAL TO TREATMENT PERIOD. Date that the initial referral to Secondary care was received for this diagnosis. This may be different from TESTCER REFERRAL TO TREATMENT PERIOD START DATE if initial referral was not to the TESTcer servi</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">2</extension>
+            <extension key="B">2</extension>
+            <extension key="C">2</extension>
+            <extension key="D">1</extension>
+            <extension key="E">2</extension>
+            <extension key="F">When referral details entered.</extension>
+            <extension key="G">GC 141</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="[Optional]_Local_Identifier">XXXXXXX1580</extension>
+            <extension key="E2">from source</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="REFERRALS" id="37@2">
+        <dataElement name="DATE FIRST SEEN" id="41@2">
+          <description>This is the date that the PATIENT is first seen in the Trust that receives the first referral.</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">2</extension>
+            <extension key="B">2</extension>
+            <extension key="C">2</extension>
+            <extension key="D">1</extension>
+            <extension key="E">2</extension>
+            <extension key="F">When referral details entered.</extension>
+            <extension key="G">GC 142</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="E2">from source</extension>
+            <extension key="[Optional]_Local_Identifier">XXXXXXX0230</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="REFERRALS" id="37@2">
+        <dataElement name="CONSULTANT CODE" id="42@2">
+          <description>A code uniquely identifying a CONSULTANT. (Referred to CONSULTANT CODE).</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">2</extension>
+            <extension key="C">4</extension>
+            <extension key="D">4</extension>
+            <extension key="E">2 - Backlog of consultant codes will need to be entered</extension>
+            <extension key="F">Visit</extension>
+            <extension key="G">GC 143</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="Notes_from_GD_JCIS">Imported activities do not have this field completed, but it TEST be derived from the Clinic code, which is imported. Check with VT.</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="REFERRALS" id="37@2">
+        <dataElement name="CARE PROFESSIONAL MAIN SPECIALTY CODE" id="43@2">
+          <description>A unique code identifying each MAIN SPECIALTY designated by Royal Colleges. This is the same as the OCCUPATION CODES desXXXXXXXibing specialties. (TEST be derived from consultant code).</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">4</extension>
+            <extension key="C">4</extension>
+            <extension key="D">4</extension>
+            <extension key="E">3</extension>
+            <extension key="F">NOT SHOWN ON JCIS</extension>
+            <extension key="Notes_from_GD_JCIS">NOT SHOWN ON JCIS</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="REFERRALS" id="37@2">
+        <dataElement name="ORGANISATION SITE CODE (PROVIDER FIRST SEEN)" id="44@2">
+          <description>The  ORGANISATION SITE CODE of the Health Care Provider at the first contact with the PATIENT.</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">2</extension>
+            <extension key="B">2</extension>
+            <extension key="C">2</extension>
+            <extension key="D">3</extension>
+            <extension key="E">2</extension>
+            <extension key="G">GC 145</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="[Optional]_Local_Identifier">XXXXXXX1410</extension>
+            <extension key="E2">from source</extension>
+            <extension key="Notes_from_GD_JCIS">Name shown. Code available in JCIS tables.</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="REFERRALS" id="37@2">
+        <dataElement name="DATE FIRST SEEN (TESTCER SPECIALIST)" id="45@2">
+          <description>This is the date that the PATIENT is first seen by the appropriate specialist for TESTcer care within a TESTcer Care Spell. This is the PERSON or PERSONS who are most able to progress the diagnosis of the primary tumour.</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="C">2</extension>
+            <extension key="E">2</extension>
+            <extension key="F">Visit</extension>
+            <extension key="G">GC 146</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="[Optional]_Local_Identifier">XXXXXXX1360</extension>
+            <extension key="E2">f</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="REFERRALS" id="37@2">
+        <dataElement name="ORGANISATION SITE CODE (PROVIDER FIRST TESTCER SPECIALIST)" id="46@2">
+          <description>The  ORGANISATION SITE CODE of the ORGANISATION acting as Health Care Provider where the PATIENT is first seen by an appropriate TESTcer specialist on the DATE FIRST SEEN (TESTCER SPECIALIST).</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">2</extension>
+            <extension key="B">2</extension>
+            <extension key="C">2</extension>
+            <extension key="E">2</extension>
+            <extension key="F">Visit</extension>
+            <extension key="E2">fr</extension>
+            <extension key="Notes_from_GD_JCIS">Name shown. Code available in JCIS tables.</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="REFERRALS" id="37@2">
+        <dataElement name="testcerOrSymptomaticBreastReferralPatientStatus" id="48@2">
+          <description>TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS is recorded to enable tracking of the status of REFERRAL REQUESTS for PATIENTS referred with a suspected TESTcer, or referred with breast symptoms with TESTcer not originally suspected.
+For COSD this T</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="testcerOrSymptomaticBreastReferralPatientStatus" id="47@2">
+            <enumerations>
+              <enumeration value="11">Diagnosis of new TESTcer confirmed - English NHS first treatment planned</enumeration>
+              <enumeration value="12">Diagnosis of new TESTcer confirmed - subsequent treatment not yet planned</enumeration>
+              <enumeration value="13">Diagnosis of new TESTcer confirmed - subsequent English NHS treatment planned</enumeration>
+              <enumeration value="14">Suspected prim</enumeration>
+            </enumerations>
+          </dataType>
+          <extensions>
+            <extension key="A">TBA</extension>
+            <extension key="B">TBA</extension>
+            <extension key="C">TBA</extension>
+            <extension key="D">TBA</extension>
+            <extension key="E">3</extension>
+            <extension key="F">When referral details entered.</extension>
+            <extension key="G">GC 148</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="[Optional]_Local_Identifier">XXXXXXX0270</extension>
+            <extension key="E2">from source</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="REFERRALS" id="37@2">
+        <dataElement name="TESTCER SYMPTOMS FIRST NOTED DATE" id="49@2">
+          <description>Record the time when the symptoms were first noted related to this diagnosis as agreed between the consultant and the patient.   Depending on the length of time this should normally include at least month and year. Day should also be included if known. If</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">TBA</extension>
+            <extension key="B">TBA</extension>
+            <extension key="D">TBA</extension>
+            <extension key="F">Calculated from date of visit / duration of symptoms</extension>
+            <extension key="G">GC 149</extension>
+            <extension key="E2">from source</extension>
+            <extension key="[Optional]_Local_Identifier">XXXXXXX2000</extension>
+            <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="IMAGING" id="97@2">
+        <dataElement name="SITE CODE (OF IMAGING)" id="98@2">
+          <description>This is the ORGANISATION SITE CODE of the Organisation  where the imaging took place.</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="D">2</extension>
+            <extension key="E">5</extension>
+            <extension key="F">Name shown. Code available in JCIS tables.</extension>
+            <extension key="G">GC 150</extension>
+            <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Su</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="IMAGING" id="97@2">
+        <dataElement name="PROCEDURE DATE (TESTCER IMAGING)" id="99@2">
+          <description>The DATE the TESTcer Imaging was carried out.</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">1</extension>
+            <extension key="B">2</extension>
+            <extension key="C">2</extension>
+            <extension key="D">2</extension>
+            <extension key="E">6</extension>
+            <extension key="F">null</extension>
+            <extension key="G">GC 151</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="E2">from source</extension>
+            <extension key="[Optional]_Local_Identifier">XXXXXXX0320</extension>
+            <extension key="Notes_from_GD_JCIS">null</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="IMAGING" id="97@2">
+        <dataElement name="IMAGING CODE (NICIP)*" id="100@2">
+          <description>*IMAGING CODE (NICIP)
+and/or
+ (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
+is required.
 
-                        IMAGING CODE (NICIP) is the National Interim Clinical Imaging Procedure Code Set code which is used to identify both the test</description>
-                    <extensions>
-                        <extension key="Metadata">F: See also alternative  mandatory item for non-imported radiology activities
-                            Ie  (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
-                            G: GC 152
-                            H: NEO4J
-                            A: TBA
-                            Notes_from_GD_JCIS: orem ipsum dolor sit amet, consectetur adi</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="IMAGING" id="97@2">
-                <dataElement name="testcerImagingModality*" id="102@2">
-                    <description>*IMAGING CODE (NICIP)
-                        and/or
-                        (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
-                        is required.
+IMAGING CODE (NICIP) is the National Interim Clinical Imaging Procedure Code Set code which is used to identify both the test</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="A">TBA</extension>
+            <extension key="F">See also alternative  mandatory item for non-imported radiology activities</extension>
+            <extension key="G">GC 152</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adi</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="IMAGING" id="97@2">
+        <dataElement name="testcerImagingModality*" id="102@2">
+          <description>*IMAGING CODE (NICIP)
+and/or
+ (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
+is required.
 
-                        The type of imaging procedure used during an Imaging or Radiodiagnostic Event for a TESTcer Care Spell.
-                        NB: PET STEST also inc</description>
-                    <extensions>
-                        <extension key="Metadata">Notes_from_GD_JCIS: orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="IMAGING" id="97@2">
-                <dataElement name="IMAGING ANATOMICAL SITE*" id="103@2">
-                    <description>*IMAGING CODE (NICIP)
-                        and/or
-                        (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
-                        is required.
+The type of imaging procedure used during an Imaging or Radiodiagnostic Event for a TESTcer Care Spell.
+NB: PET STEST also inc</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="testcerImagingModality*" id="101@2">
+            <enumerations>
+              <enumeration value="C06X">Nuclear Med. imaging</enumeration>
+              <enumeration value="C02C">Virtual colonoscopy</enumeration>
+              <enumeration value="C09X">Intervention radiography.</enumeration>
+              <enumeration value="C08U">Urography (IV and retrograde)</enumeration>
+              <enumeration value="C01M">Mamm</enumeration>
+              <enumeration value="C08B">Barium</enumeration>
+              <enumeration value="C08A">Angiography</enumeration>
+              <enumeration value="CXXX">Other</enumeration>
+              <enumeration value="C01X">Standard Radiography</enumeration>
+              <enumeration value="C02X">CT STEST</enumeration>
+              <enumeration value="C04X">PET STEST</enumeration>
+              <enumeration value="C05X">Ultrasound STEST</enumeration>
+            </enumerations>
+          </dataType>
+          <extensions>
+            <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="IMAGING" id="97@2">
+        <dataElement name="IMAGING ANATOMICAL SITE*" id="103@2">
+          <description>*IMAGING CODE (NICIP)
+and/or
+ (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
+is required.
 
-                        A classification of the part of the body that is the subject of an Imaging Or Radiodiagnostic Event.</description>
-                    <extensions>
-                        <extension key="Metadata">F: Typically not recorded.  Unless the ATM makes it clear what the site is, the site of imaging is not recorded. Exceptions are mammogram (site recorded as breast);BRT ultrasound - user has to record site.
-                            [Usage for UGI CT sTEST (recorded 4 times on Live</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="IMAGING" id="97@2">
-                <dataElement name="anatomicalSide(imaging)*" id="105@2">
-                    <description>*IMAGING CODE (NICIP)
-                        and/or
-                        (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
-                        is required.
+A classification of the part of the body that is the subject of an Imaging Or Radiodiagnostic Event.</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="String" id="15@2" />
+          <extensions>
+            <extension key="F">Typically not recorded.  Unless the ATM makes it clear what the site is, the site of imaging is not recorded. Exceptions are mammogram (site recorded as breast);BRT ultrasound - user has to record site.</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="IMAGING" id="97@2">
+        <dataElement name="anatomicalSide(imaging)*" id="105@2">
+          <description>*IMAGING CODE (NICIP)
+and/or
+ (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
+is required.
 
-                        The side of the body that is the subject of an Imaging or Radiodiagnostic Event.</description>
-                    <extensions>
-                        <extension key="Metadata">Notes_from_GD_JCIS: orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-        <globalSearchFor>dataType</globalSearchFor>
-        <dataClass name="MAIN" id="13@2">
-            <dataClass name="IMAGING" id="97@2">
-                <dataElement name="gender2" id="107@2">
-                    <description>gender test stuff</description>
-                    <extensions>
-                        <extension key="Metadata">B: MAY BE REMOVED
-                            F: null
-                            G: null
-                            C: MAY BE REMOVED
-                            Link_to_existing definition:: GENDER2
-                            E2: null
-                            H: NEO4J
-                            NHIC_Identifier:: TEST_GENDER
-                            D: MAY BE REMOVED
-                            Notes_from_GD_JCIS: orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat i</extension>
-                    </extensions>
-                </dataElement>
-            </dataClass>
-        </dataClass>
-    </dataModel>
+The side of the body that is the subject of an Imaging or Radiodiagnostic Event.</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="anatomicalSide(imaging)*" id="104@2">
+            <enumerations>
+              <enumeration value="R">Right</enumeration>
+              <enumeration value="B">Bilateral</enumeration>
+              <enumeration value="8">Not applicable</enumeration>
+              <enumeration value="9">Not Known</enumeration>
+              <enumeration value="L">Left</enumeration>
+              <enumeration value="M">Midline</enumeration>
+            </enumerations>
+          </dataType>
+          <extensions>
+            <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+    <globalSearchFor>dataType</globalSearchFor>
+    <dataClass name="MAIN" id="13@2">
+      <dataClass name="IMAGING" id="97@2">
+        <dataElement name="gender2" id="107@2">
+          <description>gender test stuff</description>
+          <metadata>
+            <extension key="Min Occurs">0</extension>
+            <extension key="Max Occurs">*</extension>
+          </metadata>
+          <dataType name="gender2" id="106@2">
+            <enumerations>
+              <enumeration value="0">Not Known</enumeration>
+              <enumeration value="1">Male</enumeration>
+              <enumeration value="2">Female</enumeration>
+              <enumeration value="9">Not Specified</enumeration>
+            </enumerations>
+          </dataType>
+          <extensions>
+            <extension key="B">MAY BE REMOVED</extension>
+            <extension key="C">MAY BE REMOVED</extension>
+            <extension key="D">MAY BE REMOVED</extension>
+            <extension key="F">null</extension>
+            <extension key="G">null</extension>
+            <extension key="H">NEO4J</extension>
+            <extension key="E2">null</extension>
+            <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat i</extension>
+          </extensions>
+        </dataElement>
+      </dataClass>
+    </dataClass>
+  </dataModel>
 </catalogue>

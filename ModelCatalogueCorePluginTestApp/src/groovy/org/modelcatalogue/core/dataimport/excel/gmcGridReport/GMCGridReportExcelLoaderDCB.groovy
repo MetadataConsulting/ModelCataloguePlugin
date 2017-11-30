@@ -14,7 +14,6 @@ import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportHeaders as Headers
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter as Exporter
 
-
 /**
  *  Implementation using DefaultCatalogueBuilder. (Doesn't really work.)
  *
@@ -194,7 +193,6 @@ class GMCGridReportExcelLoaderDCB extends GMCGridReportExcelLoader {
                     originalElement.addToRelatedTo(placeholder)
                 }
             }
-
         }
     }
 }

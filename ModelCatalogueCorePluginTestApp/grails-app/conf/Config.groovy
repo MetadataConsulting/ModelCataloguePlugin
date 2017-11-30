@@ -345,6 +345,8 @@ log4j.main = {
 
     info 'org.modelcatalogue'
     info 'grails.app.domain.org.modelcatalogue'
+    warn 'org.modelcatalogue.core.persistence'
+    warn 'org.modelcatalogue.core.security'
 
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP
@@ -357,6 +359,8 @@ log4j.main = {
             'org.springframework',
             'org.hibernate',
             'net.sf.ehcache.hibernate'
+
+    info 'grails.app.conf.BootStrap'
 }
 grails.views.gsp.encoding = "UTF-8"
 

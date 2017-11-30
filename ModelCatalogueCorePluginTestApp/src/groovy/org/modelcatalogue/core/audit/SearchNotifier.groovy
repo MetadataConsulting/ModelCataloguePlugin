@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.audit
 
+import static org.modelcatalogue.core.util.HibernateHelper.*
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Mapping
@@ -10,10 +11,7 @@ import org.modelcatalogue.core.rx.ErrorSubscriber
 import rx.Observable
 import rx.subjects.PublishSubject
 import rx.subjects.Subject
-
 import java.util.concurrent.TimeUnit
-
-import static org.modelcatalogue.core.util.HibernateHelper.*
 
 class SearchNotifier extends AbstractAuditor {
 

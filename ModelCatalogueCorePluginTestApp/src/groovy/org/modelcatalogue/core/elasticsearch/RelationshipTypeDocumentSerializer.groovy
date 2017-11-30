@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.elasticsearch
 
 import static org.modelcatalogue.core.elasticsearch.CatalogueElementDocumentSerializer.safePut
-
 import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.RelationshipType
 

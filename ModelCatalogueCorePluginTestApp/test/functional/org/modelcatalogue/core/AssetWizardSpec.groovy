@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import static org.modelcatalogue.core.geb.Common.*
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.builder.api.CatalogueBuilder
@@ -11,9 +12,10 @@ import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Stepwise
+import spock.lang.IgnoreIf
 
-import static org.modelcatalogue.core.geb.Common.*
-
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
@@ -59,7 +61,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog gone
     }
 
-    def "Check the asset shows up with own detail page"(){
+    def "Check the asset shows up with own detail page"() {
         expect:
         check { infTableCell(1, 2, text: "Sample XSD") } displayed
 

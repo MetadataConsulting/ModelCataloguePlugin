@@ -1,8 +1,13 @@
 package org.modelcatalogue.core.security
 
-import com.google.common.io.BaseEncoding
+import grails.gorm.DetachedCriteria
+import grails.transaction.Transactional
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.util.FriendlyErrors
 
+@Slf4j
 class UserService {
 
     public static final String ACCESS_LEVEL_SUPERVISOR = 'supervisor'
@@ -78,15 +83,32 @@ class UserService {
         UserRole.remove(user, Role.findByAuthority(authority), true)
     }
 
-    String getApiKey(User user, Boolean regenerate) {
-        if (!user.apiKey || regenerate) {
-            user.apiKey = generateApiKey()
-            FriendlyErrors.failFriendlySave(user)
-        }
-        return user.apiKey
+    protected DetachedCriteria<User> findQueryByUsername(String usernameParam) {
+        DetachedCriteria<User> q = User.where { username == usernameParam }
     }
 
-    private static String generateApiKey() {
-        BaseEncoding.base64().encode(UUID.randomUUID().toString().bytes)
+    @CompileStatic
+    @Transactional
+    void resetApiKey(String username) {
+        User user = findQueryByUsername(username).get()
+        if ( !user ) {
+            log.error 'Unable to find User by username: {}', username
+            return
+        }
+        user.apiKey = ApiKeyUtils.apiKey()
+        FriendlyErrors.failFriendlySave(user)
+    }
+
+    @CompileDynamic
+    @Transactional
+    String findApiKeyByUsername(String username, boolean generateIfNonExisting = true) {
+        String apiKey = findQueryByUsername(username).projections {
+            property('apiKey')
+        }.get()
+        if ( !apiKey && generateIfNonExisting ) {
+            resetApiKey(username)
+            apiKey = findApiKeyByUsername(username, false)
+        }
+        apiKey
     }
 }
