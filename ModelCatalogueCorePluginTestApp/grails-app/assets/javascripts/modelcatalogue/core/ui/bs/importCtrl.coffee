@@ -1,7 +1,15 @@
-angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload']).controller 'importCtrl', ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', 'catalogue', 'args', ($scope, messages, names, modelCatalogueDataArchitect, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance, catalogue, args) ->
+angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload']).controller 'importCtrl', ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$uibModalInstance', 'Upload', 'rest', 'modelCatalogueApiRoot', 'enhance', 'catalogue', 'args', ($scope, messages, names, modelCatalogueDataArchitect, $uibModalInstance, Upload,rest, modelCatalogueApiRoot, enhance, catalogue, args) ->
     $scope.copy     = angular.copy(args.element ? {})
     $scope.original = args.element ? {}
     $scope.messages = messages.createNewMessages()
+
+    # get excel import types for user to select
+    rest(method: 'GET', url: "#{modelCatalogueApiRoot}/dataArchitect/imports/excelImportTypes").then ((resp) ->
+        $scope.excelImportTypes = resp.excelImportTypes
+      ),
+      ((failureReason) -> console.log("get excelImportTypes failed: #{failureReason}")),
+      (update) -> {}
+    # for Excel:
     # $scope.headersMap = {}
     # $scope.headersMapXMLString = ''
 
@@ -44,6 +52,7 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
           # headersMap: $scope.headersMap
           # headersMapXMLString: $scope.headersMapXMLString
           headersMapXMLFile: $scope.headersMapXMLFile # from ExcelImport
+          excelImportType: $scope.selectedExcelImportType
         }
       }).progress((evt) ->
         $scope.progress = parseInt(100.0 * evt.loaded / evt.total)

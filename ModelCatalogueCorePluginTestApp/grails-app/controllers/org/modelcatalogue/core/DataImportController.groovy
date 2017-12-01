@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
 import groovy.util.slurpersupport.GPathResult
 import org.apache.commons.lang3.tuple.Pair
@@ -7,6 +8,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataimport.excel.ExcelImportType
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 import org.modelcatalogue.core.security.MetadataRolesUtils
@@ -38,7 +40,7 @@ class DataImportController  {
 
     private static final List<String> CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
     static responseFormats = ['json']
-    static allowedMethods = [upload: "POST"]
+    static allowedMethods = [upload: "POST", excelImportTypesHumanReadable: 'GET']
 
     protected static List<String> getErrors(Map params, MultipartFile file) {
         def errors = []
@@ -53,7 +55,10 @@ class DataImportController  {
         }
         return errors
     }
-
+    def excelImportTypesHumanReadable() {
+        Map<String, List<String>> result = ['excelImportTypes': ExcelImportType.humanReadableNames]
+        render result as JSON
+    }
     def upload() {
 
 
@@ -64,6 +69,9 @@ class DataImportController  {
 
         MultipartFile file = request.getFile("file")
         MultipartFile headersMapXMLFile = request.getFile("headersMapXMLFile") // for "Generic Excel Import"
+        ExcelImportType excelImportType = ExcelImportType.fromHumanReadableName(request.getParameter('excelImportType'))
+
+        // having just one upload action (and on the front-end, one importCtrl) is going to get a bit hairy. Well, it already is hairy.
 
 
         List<String> errors = getErrors(params, file)
