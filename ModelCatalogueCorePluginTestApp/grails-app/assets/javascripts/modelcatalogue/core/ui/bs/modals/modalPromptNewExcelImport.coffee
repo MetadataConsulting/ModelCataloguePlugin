@@ -21,9 +21,17 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
               </div>
               <div class="form-group">
                 <label for="asset" class="">File</label>
-                <input ng-hide="uploading &amp;&amp; progress" type="file" accept=".xls,.xlsx" class="form-control" id="asset" placeholder="File" ngf-model="copy.asset" ngf-select="onFileSelect($files)">
+                <input ng-hide="uploading &amp;&amp; progress" type="file" accept=".xls,.xlsx" class="form-control" id="asset" ngf-model="copy.asset" ngf-select="onFileSelect($files)">
                 <uib-progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</uib-progressbar>
               </div>
+
+              <div class="form-group">
+                <label for="headersMapXMLFile">Headers Map XML File</label>
+                <input ng-hide="uploading &amp;&amp; progress" type="file" ngf-select ng-model="headersMapXMLFile" accept=".xml" class="form-control" id="headersMapXMLFile">
+                </input>
+              </div>
+
+<!-- no longer use this old way of collecting headers map:
               <div class="form-group">
                       <label ng-click="headersCollapsed = !headersCollapsed" ng-init="headersCollapsed = true">Customize Columns Headers</label>
               </div>
@@ -85,6 +93,7 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
                       <input type="text" class="form-control" id="metadata" placeholder="Metadata" ng-model="headersMap.metadata">
                     </div>
               </div>
+-->
               <fake-submit-button/>
             </form>
         </div>

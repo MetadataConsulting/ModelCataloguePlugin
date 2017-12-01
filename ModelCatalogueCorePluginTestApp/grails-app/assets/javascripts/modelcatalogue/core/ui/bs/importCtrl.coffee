@@ -2,6 +2,8 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
     $scope.copy     = angular.copy(args.element ? {})
     $scope.original = args.element ? {}
     $scope.messages = messages.createNewMessages()
+    # $scope.headersMap = {}
+    # $scope.headersMapXMLString = ''
 
     $scope.hasChanged   = ->
       $scope.copy.file or $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description
@@ -15,7 +17,7 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
 
     $scope.onFileSelect = ($files) ->
       $scope.copy.file = $files[0]
-      if $scope.copy.name == $scope.copy.originalFileName or $scope.nameFromFile
+      if (not $scope.copy.name) or $scope.nameFromFile
         $scope.nameFromFile = true
         $scope.copy.name = $scope.copy.file.name
 
@@ -39,7 +41,9 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
         }
         data: {
           file: $scope.copy.file
-          headersMap: $scope.headersMap
+          # headersMap: $scope.headersMap
+          # headersMapXMLString: $scope.headersMapXMLString
+          headersMapXMLFile: $scope.headersMapXMLFile # from ExcelImport
         }
       }).progress((evt) ->
         $scope.progress = parseInt(100.0 * evt.loaded / evt.total)

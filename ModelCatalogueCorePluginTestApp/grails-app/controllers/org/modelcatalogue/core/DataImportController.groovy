@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.plugin.springsecurity.SpringSecurityUtils
+import groovy.util.slurpersupport.GPathResult
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
@@ -62,6 +63,8 @@ class DataImportController  {
         }
 
         MultipartFile file = request.getFile("file")
+        MultipartFile headersMapXMLFile = request.getFile("headersMapXMLFile") // for "Generic Excel Import"
+
 
         List<String> errors = getErrors(params, file)
         if (errors) {
@@ -76,7 +79,27 @@ class DataImportController  {
 
         Long userId = modelCatalogueSecurityService.currentUser?.id
 
-        // "General Excel file"-- "THE MC Excel file" -- actually the format from ExcelExporter
+        // "Generic Excel Import"– really currently the same as LOINC Excel loader– using an XML file which describes headers
+        if (headersMapXMLFile) {
+            if (checkFileNameTypeAndContainsString(file,'.xls')) {
+                Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+                Long id = asset.id
+                InputStream inputStream = file.inputStream
+                String filename = file.originalFilename
+                Workbook wb = WorkbookFactory.create(inputStream)
+                defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+                GPathResult headersMapFromXML = (new XmlSlurper()).parse(headersMapXMLFile.inputStream)
+                executeInBackground(id, "Imported from Excel") {
+                    // TODO: Use the headersMapFromXML in a method similar to that below.
+                    throw new Error("Generic Excel Import using headersMapFromXML not implemented")
+                    // do something like e.g. loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
+                }
+                redirectToAsset(id)
+                return
+            }
+        }
+
+        // "General Excel file"-- "THE MC Excel file" -- actually the format produced by ExcelExporter that has parent data class etc.
         String suffix = "mc.xls"
         if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
@@ -124,7 +147,7 @@ class DataImportController  {
             return
         }
 
-        //Default excel import - which assumes data is in the 'Grid data' format
+        // openEHR
         suffix = "openEHR.xls"
         if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
@@ -141,7 +164,7 @@ class DataImportController  {
             return
         }
 
-        //Default excel import - which assumes data is in the 'Grid data' format
+        //Default excel import - "standardImport" – which assumes data is in the 'Grid data' format
         suffix = "xls"
         if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
