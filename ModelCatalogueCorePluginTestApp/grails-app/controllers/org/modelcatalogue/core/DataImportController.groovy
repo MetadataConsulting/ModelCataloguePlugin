@@ -96,7 +96,7 @@ class DataImportController  {
             return
         }
 
-        suffix = "loinc.xls"
+        suffix = "loinc.xlsx"
         if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             Long id = asset.id
