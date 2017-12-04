@@ -25,14 +25,11 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
 
     $scope.onFileSelect = ($files) ->
       $scope.copy.file = $files[0]
-      if (not $scope.copy.name) or $scope.nameFromFile
-        $scope.nameFromFile = true
-        $scope.copy.name = $scope.copy.file.name
 
     $scope.saveElement = ->
       $scope.messages.clearAllMessages()
-      if not $scope.copy.name and not $scope.copy.file
-        $scope.messages.error 'Empty Name', 'Please fill the name'
+      if not $scope.copy.modelName and not $scope.copy.file
+        $scope.messages.error 'No name and no file', 'Please give at least a file'
         return
 
 
@@ -42,7 +39,7 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
         url: "#{modelCatalogueApiRoot}/dataArchitect/imports/upload"
         params: {
           id: $scope.copy.id,
-          name: $scope.copy.name,
+          modelName: if $scope.copy.modelName then $scope.copy.modelName else $scope.copy.file.name
           conceptualDomain: $scope.copy.conceptualDomain,
           createModelsForElements: $scope.copy.createModelsForElements,
           idpattern: $scope.copy.idpattern
