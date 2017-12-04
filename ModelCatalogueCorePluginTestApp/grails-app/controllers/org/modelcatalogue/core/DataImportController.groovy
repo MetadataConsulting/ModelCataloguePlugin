@@ -60,6 +60,8 @@ class DataImportController  {
         render result as JSON
     }
     def upload() {
+        // called from importCtrl.coffee which is the AngularJS controller for ALL import dialogues.
+        // having just one upload action (and on the front-end, one importCtrl) is a bit hairy but there we go...
 
 
         if (!(request instanceof MultipartHttpServletRequest)) {
@@ -67,12 +69,17 @@ class DataImportController  {
             return
         }
 
-        MultipartFile file = request.getFile("file")
-        MultipartFile headersMapXMLFile = request.getFile("headersMapXMLFile") // for "Generic Excel Import"
+        //// get stuff from the request.
+
+
+        // XML headers map file for any "generic/customizable" excel importer. At some point, we might want to introduce some validation, either on front or back end or both. If both, the XSD file used to validate should be the same, and provided by the backend. You can access file.inputStream.
+        MultipartFile headersMapXMLFileMultipart = request.getFile("headersMapXMLFile")
+
         ExcelImportType excelImportType = ExcelImportType.fromHumanReadableName(request.getParameter('excelImportType'))
 
-        // having just one upload action (and on the front-end, one importCtrl) is going to get a bit hairy. Well, it already is hairy.
 
+        // the actual file to be imported.
+        MultipartFile file = request.getFile("file") // may be excel, Obo, etc. etc.
 
         List<String> errors = getErrors(params, file)
         if (errors) {
@@ -87,8 +94,9 @@ class DataImportController  {
 
         Long userId = modelCatalogueSecurityService.currentUser?.id
 
-        // "Generic Excel Import"– really currently the same as LOINC Excel loader– using an XML file which describes headers
-        if (headersMapXMLFile) {
+        // Customizable Excel Loader based on the LoincExcelLoader that can take a headersMap
+        if (excelImportType == ExcelImportType.LOINC ||
+            excelImportType == ExcelImportType.GOSH_LAB_TEST_CODES) {
             if (checkFileNameTypeAndContainsString(file,'.xls')) {
                 Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
                 Long id = asset.id
@@ -96,10 +104,9 @@ class DataImportController  {
                 String filename = file.originalFilename
                 Workbook wb = WorkbookFactory.create(inputStream)
                 defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-                GPathResult headersMapFromXML = (new XmlSlurper()).parse(headersMapXMLFile.inputStream)
                 executeInBackground(id, "Imported from Excel") {
-                    // TODO: Use the headersMapFromXML in a method similar to that below.
-                    throw new Error("Generic Excel Import using headersMapFromXML not implemented")
+                    // TODO: Use the headersMapXMLFile in a method similar to that below.
+                    throw new Error("Generic Excel Import (based on LOINC loader) using headersMapFromXML not implemented")
                     // do something like e.g. loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
                 }
                 redirectToAsset(id)
