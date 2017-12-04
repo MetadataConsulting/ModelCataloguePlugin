@@ -1,11 +1,14 @@
 package org.modelcatalogue.core
 
+import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
+import groovy.util.slurpersupport.GPathResult
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataimport.excel.ExcelImportType
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 import org.modelcatalogue.core.security.MetadataRolesUtils
@@ -37,7 +40,7 @@ class DataImportController  {
 
     private static final List<String> CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
     static responseFormats = ['json']
-    static allowedMethods = [upload: "POST"]
+    static allowedMethods = [upload: "POST", excelImportTypesHumanReadable: 'GET']
 
     protected static List<String> getErrors(Map params, MultipartFile file) {
         def errors = []
@@ -52,8 +55,13 @@ class DataImportController  {
         }
         return errors
     }
-
+    def excelImportTypesHumanReadable() {
+        Map<String, List<String>> result = ['excelImportTypes': ExcelImportType.humanReadableNames]
+        render result as JSON
+    }
     def upload() {
+        // called from importCtrl.coffee which is the AngularJS controller for ALL import dialogues.
+        // having just one upload action (and on the front-end, one importCtrl) is a bit hairy but there we go...
 
 
         if (!(request instanceof MultipartHttpServletRequest)) {
@@ -61,7 +69,20 @@ class DataImportController  {
             return
         }
 
-        MultipartFile file = request.getFile("file")
+        //// get stuff from the request.
+
+        // user-provided model name. It's the filename by default. In the past we have just gotten the filename directly anyways. But it's here.
+        String modelName = request.getParameter('name')
+
+
+        // XML config (including headers map) file for any "generic/customizable" excel importer. At some point, we might want to introduce some validation, either on front or back end or both. If both, the XSD file used to validate should be the same, and provided by the backend. You can access file.inputStream.
+        MultipartFile excelConfigXMLFileMultipart = request.getFile("excelConfigXMLFile")
+
+        ExcelImportType excelImportType = ExcelImportType.fromHumanReadableName(request.getParameter('excelImportType'))
+
+
+        // the actual file to be imported.
+        MultipartFile file = request.getFile("file") // may be excel, Obo, etc. etc.
 
         List<String> errors = getErrors(params, file)
         if (errors) {
@@ -76,7 +97,27 @@ class DataImportController  {
 
         Long userId = modelCatalogueSecurityService.currentUser?.id
 
-        // "General Excel file"-- "THE MC Excel file" -- actually the format from ExcelExporter
+        // Customizable Excel Loader based on the LoincExcelLoader that can take a headersMap
+        if (excelImportType == ExcelImportType.LOINC ||
+            excelImportType == ExcelImportType.GOSH_LAB_TEST_CODES) {
+            if (checkFileNameTypeAndContainsString(file,'.xls')) {
+                Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+                Long id = asset.id
+                InputStream inputStream = file.inputStream
+                String filename = file.originalFilename
+                Workbook wb = WorkbookFactory.create(inputStream)
+                defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+                executeInBackground(id, "Imported from Excel") {
+                    // TODO: Use the excelConfigXMLFile in a method similar to that below.
+                    throw new Error("Generic Excel Import (based on LOINC loader) using headersMapFromXML not implemented")
+                    // do something like e.g. loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
+                }
+                redirectToAsset(id)
+                return
+            }
+        }
+
+        // "General Excel file"-- "THE MC Excel file" -- actually the format produced by ExcelExporter that has parent data class etc.
         String suffix = "mc.xls"
         if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
@@ -124,7 +165,7 @@ class DataImportController  {
             return
         }
 
-        //Default excel import - which assumes data is in the 'Grid data' format
+        // openEHR
         suffix = "openEHR.xls"
         if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
@@ -141,7 +182,7 @@ class DataImportController  {
             return
         }
 
-        //Default excel import - which assumes data is in the 'Grid data' format
+        //Default excel import - "standardImport" – which assumes data is in the 'Grid data' format
         suffix = "xls"
         if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')

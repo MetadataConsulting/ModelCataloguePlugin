@@ -1,5 +1,8 @@
 package org.modelcatalogue.core
 
+import spock.lang.IgnoreIf
+
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class RelationshipControllerIntegrationSpec extends AbstractIntegrationSpec {
 
     def setup() {

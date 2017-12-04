@@ -7,6 +7,7 @@ import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
+import spock.lang.IgnoreIf
 import spock.util.concurrent.BlockingVariable
 import spock.util.concurrent.BlockingVariables
 
@@ -161,6 +162,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
 //        retry (10, 300) { elasticSearchService.search(DataModelPolicy, [search: 'test policy', max: '1']).total == 1L }
 //    }
 
+    @IgnoreIf( { System.getProperty('spock.ignore.slow') })
     def "index user"() {
         BlockingVariable<Boolean> userIndexed = new BlockingVariable<>(60, TimeUnit.SECONDS)
 
@@ -216,7 +218,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
         mapping.relationship.properties.destination
     }
 
-
+    @IgnoreIf( { System.getProperty('spock.ignore.slow') })
     def "test import MET-523"() {
         when:
         catalogueBuilder.build {

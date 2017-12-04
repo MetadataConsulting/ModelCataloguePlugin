@@ -1,5 +1,7 @@
 package org.modelcatalogue.gel.export
 
+import spock.lang.IgnoreIf
+
 import static junit.framework.Assert.assertEquals
 import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.modelcatalogue.core.DataClass
@@ -7,8 +9,8 @@ import org.modelcatalogue.core.DataClass
 /**
  * Test for RD eligibility criteria change log reports class using test model with similar format to expected data.
  */
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class RareDiseaseEligibilityChangeLogXlsExporterSpec extends AbstractRareDiseasesExporterSpec {
-
 
     def "Export rare disease eligibility change logs to xls"() {
         when:

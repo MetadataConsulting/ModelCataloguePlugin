@@ -7,9 +7,10 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.util.Metadata
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class ConventionCheckersSpec extends AbstractIntegrationSpec {
-
 
     DataModelService dataModelService
     ElementService elementService
