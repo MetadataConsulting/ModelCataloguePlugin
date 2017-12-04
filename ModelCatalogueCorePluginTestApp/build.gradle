@@ -125,6 +125,7 @@ task runDev(type: Exec, dependsOn: bowerInstall) {
     if (project.hasProperty('mc.debug')) {
         cmds << '--debug-fork'
     }
+    passProjectPropertyToJavaSystemPropertyIfExists('mc.client', cmds)
 
     cmds << '--non-interactive'
     cmds << '--stacktrace'
@@ -367,6 +368,13 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
 
     commandLine cmds
     mustRunAfter 'stop'
+}
+
+void passProjectPropertyToJavaSystemPropertyIfExists(String propertyName, List<String> cmds) {
+    if (project.hasProperty(propertyName)){
+        cmds << "-D${propertyName}=${project.getProperty(propertyName)}"
+    }
+
 }
 
 task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMySQLContainer]) {

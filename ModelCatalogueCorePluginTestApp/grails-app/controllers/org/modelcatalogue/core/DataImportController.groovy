@@ -2,12 +2,12 @@ package org.modelcatalogue.core
 
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
-import groovy.util.slurpersupport.GPathResult
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataarchitect.ExcelImportService
 import org.modelcatalogue.core.dataimport.excel.ExcelImportType
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
@@ -56,7 +56,8 @@ class DataImportController  {
         return errors
     }
     def excelImportTypesHumanReadable() {
-        Map<String, List<String>> result = ['excelImportTypes': ExcelImportType.humanReadableNames]
+        Map<String, List<String>> result =
+                ['excelImportTypes': ExcelImportService.excelImportTypesHumanReadable()]
         render result as JSON
     }
     def upload() {
