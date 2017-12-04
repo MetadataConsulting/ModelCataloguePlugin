@@ -34,8 +34,8 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
               </div>
 
               <div class="form-group">
-                <label for="headersMapXMLFile">Headers Map XML File</label>
-                <input ng-hide="uploading &amp;&amp; progress" type="file" ngf-select ng-model="headersMapXMLFile" accept=".xml" class="form-control" id="headersMapXMLFile">
+                <label for="excelConfigXMLFile">Excel Config XML File</label>
+                <input ng-hide="uploading &amp;&amp; progress" type="file" ngf-select ng-model="excelConfigXMLFile" accept=".xml" class="form-control" id="excelConfigXMLFile">
                 </input>
               </div>
 

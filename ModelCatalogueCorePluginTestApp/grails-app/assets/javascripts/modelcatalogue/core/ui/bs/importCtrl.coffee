@@ -48,8 +48,9 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
           file: $scope.copy.file
           # headersMap: $scope.headersMap
           # headersMapXMLString: $scope.headersMapXMLString
-          headersMapXMLFile: $scope.headersMapXMLFile # from ExcelImport
+          excelConfigXMLFile: $scope.excelConfigXMLFile # from ExcelImport
           excelImportType: $scope.selectedExcelImportType
+
         }
       }).progress((evt) ->
         $scope.progress = parseInt(100.0 * evt.loaded / evt.total)

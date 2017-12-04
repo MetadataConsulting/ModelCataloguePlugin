@@ -71,9 +71,12 @@ class DataImportController  {
 
         //// get stuff from the request.
 
+        // user-provided model name. It's the filename by default. In the past we have just gotten the filename directly anyways. But it's here.
+        String modelName = request.getParameter('name')
 
-        // XML headers map file for any "generic/customizable" excel importer. At some point, we might want to introduce some validation, either on front or back end or both. If both, the XSD file used to validate should be the same, and provided by the backend. You can access file.inputStream.
-        MultipartFile headersMapXMLFileMultipart = request.getFile("headersMapXMLFile")
+
+        // XML config (including headers map) file for any "generic/customizable" excel importer. At some point, we might want to introduce some validation, either on front or back end or both. If both, the XSD file used to validate should be the same, and provided by the backend. You can access file.inputStream.
+        MultipartFile excelConfigXMLFileMultipart = request.getFile("excelConfigXMLFile")
 
         ExcelImportType excelImportType = ExcelImportType.fromHumanReadableName(request.getParameter('excelImportType'))
 
@@ -105,7 +108,7 @@ class DataImportController  {
                 Workbook wb = WorkbookFactory.create(inputStream)
                 defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
                 executeInBackground(id, "Imported from Excel") {
-                    // TODO: Use the headersMapXMLFile in a method similar to that below.
+                    // TODO: Use the excelConfigXMLFile in a method similar to that below.
                     throw new Error("Generic Excel Import (based on LOINC loader) using headersMapFromXML not implemented")
                     // do something like e.g. loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
                 }
