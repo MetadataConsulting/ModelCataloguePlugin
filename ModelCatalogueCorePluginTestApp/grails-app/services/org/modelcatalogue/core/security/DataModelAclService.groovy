@@ -36,6 +36,17 @@ class DataModelAclService {
         hasPermission(dataModel, [BasePermission.READ, BasePermission.ADMINISTRATION] as Permission[])
     }
 
+    boolean isAdminOrHasReadPermission(Object instance) {
+        if ( SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('ADMIN')) ) {
+            return true
+        }
+        DataModel dataModel = dataModelFromInstance(instance)
+        if ( dataModel == null ) {
+            return true
+        }
+        hasReadPermission(dataModel)
+    }
+
     boolean hasAdministratorPermission(Object instance) {
         DataModel dataModel = dataModelFromInstance(instance)
         if ( dataModel == null ) {
