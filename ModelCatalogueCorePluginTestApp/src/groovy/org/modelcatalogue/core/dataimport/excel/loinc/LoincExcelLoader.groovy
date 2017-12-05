@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationContext
 @Log
 class LoincExcelLoader extends ExcelLoader {
 
-    static String dataModelName = "LOINC"
+    static String dataModelName = "GOSH"
 
     static protected Map<String, String> createRowMap(Row row, List<String> headers) {
         Map<String, String> rowMap = new LinkedHashMap<>()
@@ -164,7 +164,7 @@ class LoincExcelLoader extends ExcelLoader {
             if(loincModels) loincModel = loincModels.first()
 
             if(!loincModel){
-                loincModel = new DataModel(name: dataModelName).save()
+                loincModel = new DataModel(name: "GOSH").save()
             }else{
                 //if one exists, check to see if it's a draft
                 // but if it's finalised create a new version

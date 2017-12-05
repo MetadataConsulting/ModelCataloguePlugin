@@ -2,27 +2,27 @@ package org.modelcatalogue.core
 
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
-import groovy.util.slurpersupport.GPathResult
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.ExcelImportType
+import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
+import org.modelcatalogue.core.dataimport.excel.ConfigExcelLoader
+import org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
-import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader
 import org.modelcatalogue.integration.obo.OboLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.Async
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
+
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -70,9 +70,8 @@ class DataImportController  {
         }
 
         //// get stuff from the request.
-
         // user-provided model name. It's the filename by default. In the past we have just gotten the filename directly anyways. But it's here.
-        String modelName = request.getParameter('name')
+        String modelName = request.getParameter('modelName')
 
 
         // XML config (including headers map) file for any "generic/customizable" excel importer. At some point, we might want to introduce some validation, either on front or back end or both. If both, the XSD file used to validate should be the same, and provided by the backend. You can access file.inputStream.
@@ -104,13 +103,14 @@ class DataImportController  {
                 Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
                 Long id = asset.id
                 InputStream inputStream = file.inputStream
+                InputStream xmlConfigStream = excelConfigXMLFileMultipart.inputStream
                 String filename = file.originalFilename
                 Workbook wb = WorkbookFactory.create(inputStream)
                 defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
                 executeInBackground(id, "Imported from Excel") {
                     // TODO: Use the excelConfigXMLFile in a method similar to that below.
-                    throw new Error("Generic Excel Import (based on LOINC loader) using headersMapFromXML not implemented")
-                    // do something like e.g. loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
+                    loadConfigSpreadsheet(wb, modelName, xmlConfigStream, id, userId)
+
                 }
                 redirectToAsset(id)
                 return
@@ -397,6 +397,20 @@ class DataImportController  {
                 finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
 
             } catch (Exception e) {
+                logError(id, e)
+            }
+        }
+    }
+    // the generic loader based on the LOINC loader
+    @Async
+    protected void loadConfigSpreadsheet(Workbook wb, String modelName, InputStream xmlConfigStream, Long id, Long userId) {
+        auditService.mute {
+            try {
+                ConfigExcelLoader loader = new ConfigExcelLoader(modelName, xmlConfigStream)
+                loader.buildModel(wb)
+                finalizeAsset(id, (DataModel) (DataModel.findByName(modelName)), userId)
+            }
+            catch (Exception e) {
                 logError(id, e)
             }
         }
