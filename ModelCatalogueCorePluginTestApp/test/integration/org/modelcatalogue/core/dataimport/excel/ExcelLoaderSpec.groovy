@@ -23,7 +23,7 @@ import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Unroll
-
+@IgnoreIf( { System.getenv('jenkins.ignore') })
 class ExcelLoaderSpec extends AbstractIntegrationSpec {
     @Shared String resourcePath = (new File("test/integration/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
     StringWriter stringWriter
