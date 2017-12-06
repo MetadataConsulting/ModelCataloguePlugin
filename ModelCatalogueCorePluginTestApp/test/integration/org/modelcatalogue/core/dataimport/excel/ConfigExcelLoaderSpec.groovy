@@ -14,9 +14,9 @@ import spock.lang.Shared
 class ConfigExcelLoaderSpec extends AbstractIntegrationSpec {
     Boolean doGosh = false
 //    String dataModelName = 'LOINC_TEST7'
-    String dataModelName = doGosh ? 'GOSH_TEST1' : 'LOINC_TEST7'
+    String dataModelName = doGosh ? 'GOSH_TEST1' : 'LOINC_TEST21'
     String headersMapXml = doGosh ? 'gosh_headers_map.xml' : 'loinc_headers_map.xml'
-    String dataXlsx = doGosh ? 'GOSH_lab_test_codes100.xlsx' : 'loinc1000.xlsx'
+    String dataXlsx = doGosh ? 'GOSH_lab_test_codes100.xlsx' : 'loinc250.xlsx'
     @Shared String resourcePath = (new File("test/integration/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
     ConfigExcelLoader excelLoader
 //    CatalogueBuilder catalogueBuilder
@@ -41,6 +41,5 @@ class ConfigExcelLoaderSpec extends AbstractIntegrationSpec {
         then: "new model is created"
 
         DataModel.findByName(dataModelName)
-        return true
     }
 }
