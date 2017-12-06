@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import com.bertramlabs.plugins.karman.CloudFile
-import com.bertramlabs.plugins.karman.CloudFileACL
 import com.bertramlabs.plugins.karman.StorageProvider
 import com.bertramlabs.plugins.karman.local.LocalStorageProvider
 import org.codehaus.groovy.grails.commons.GrailsApplication

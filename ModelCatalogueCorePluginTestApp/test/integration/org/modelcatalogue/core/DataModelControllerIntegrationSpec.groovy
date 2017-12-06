@@ -7,17 +7,17 @@ import spock.lang.Ignore
 class DataModelControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "changedName", description: "edited description "]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
        [name:"new classification", description: "the classification of the university2"]
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300, description: "asdf"]
     }
 

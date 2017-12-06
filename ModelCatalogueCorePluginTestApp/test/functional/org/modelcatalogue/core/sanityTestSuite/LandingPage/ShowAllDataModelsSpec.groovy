@@ -1,12 +1,11 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import static org.modelcatalogue.core.geb.Common.curator
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.curator
-
-@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class ShowAllDataModelsSpec  extends AbstractModelCatalogueGebSpec {
 
@@ -15,24 +14,19 @@ class ShowAllDataModelsSpec  extends AbstractModelCatalogueGebSpec {
     private static final String  showAllModels="div.modal-body>div:nth-child(2)>div>a:nth-child(7)>h4"
 
     def "login to model catalogue"() {
-
+        when:
         login curator
 
-        expect:
+        then:
         check create displayed
     }
 
-    def "navigate to the top menu and select fast action"(){
-
+    def "navigate to the top menu and select fast action"() {
+        when:
         click fastActions
         click  showAllModels
 
-        expect:
+        then:
         check create displayed
-
-
     }
-
-
 }
-

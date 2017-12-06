@@ -1,5 +1,8 @@
 package org.modelcatalogue.core
 
+import spock.lang.IgnoreIf
+
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class RelationshipControllerIntegrationSpec extends AbstractIntegrationSpec {
 
     def setup() {
@@ -7,7 +10,7 @@ class RelationshipControllerIntegrationSpec extends AbstractIntegrationSpec {
         loadFixtures()
     }
 
-    def "restore relationship"(){
+    def "restore relationship"() {
         def controller = new RelationshipController()
 
         Relationship relationship = new Relationship(

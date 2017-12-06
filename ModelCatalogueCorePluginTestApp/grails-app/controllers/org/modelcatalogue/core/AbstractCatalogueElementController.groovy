@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import static org.springframework.http.HttpStatus.OK
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
@@ -37,11 +38,8 @@ import org.modelcatalogue.core.util.lists.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
 import org.modelcatalogue.core.events.MetadataResponseEvent
-
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
-
-import static org.springframework.http.HttpStatus.OK
 
 abstract class AbstractCatalogueElementController<T extends CatalogueElement> extends AbstractRestfulController<T> {
 
@@ -304,7 +302,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         handleParams(max)
 
         //before interceptor deals with this security - this is only applicable to data models and users
-        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())) {
+
+        boolean hasRoleViewer = modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())
+        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !hasRoleViewer) {
             unauthorized()
             return
         }

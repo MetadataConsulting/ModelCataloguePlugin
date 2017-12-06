@@ -1,10 +1,10 @@
 package org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
-import groovy.util.slurpersupport.GPathResult
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
+import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Unroll
 
@@ -19,7 +19,7 @@ class DeleteThingsSpec extends IntegrationSpec{
     String controllerName
     ResultRecorder recorder
 
-    def setup(){
+    def setup() {
         controller = new MeasurementUnitController()
         controllerName = "$controller.resourceName"
         recorder = DefaultResultRecorder.create(
@@ -29,9 +29,9 @@ class DeleteThingsSpec extends IntegrationSpec{
         )
     }
 
+    @IgnoreIf( { System.getProperty('spock.ignore.slow') })
     @Unroll
-    def "json bad delete i.e. MU used in another resource, returns errors"(){
-
+    def "json bad delete i.e. MU used in another resource, returns errors"() {
         def m, dm
 
         expect:

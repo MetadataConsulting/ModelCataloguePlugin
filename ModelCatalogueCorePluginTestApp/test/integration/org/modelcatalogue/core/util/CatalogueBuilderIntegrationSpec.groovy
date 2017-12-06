@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.util
 
+import static org.modelcatalogue.core.util.HibernateHelper.*
 import grails.util.Holders
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
@@ -9,8 +10,6 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import spock.lang.Issue
-
-import static org.modelcatalogue.core.util.HibernateHelper.*
 
 class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 

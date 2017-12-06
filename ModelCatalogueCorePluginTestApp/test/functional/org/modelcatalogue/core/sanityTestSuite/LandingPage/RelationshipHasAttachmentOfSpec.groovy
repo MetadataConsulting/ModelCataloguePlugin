@@ -1,11 +1,5 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.AssetWizardSpec
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
-import spock.lang.IgnoreIf
-import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.getCreate
 import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getModalDialog
@@ -16,6 +10,11 @@ import static org.modelcatalogue.core.geb.Common.getPick
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import static org.modelcatalogue.core.geb.Common.getSave
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
+import org.modelcatalogue.core.AssetWizardSpec
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
+import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore
@@ -34,7 +33,7 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
     public static final String  modelCatalogue = 'span.mc-name'
 
 
-    def "login to model catalogue and select a data model"(){
+    def "login to model catalogue and select a data model"() {
 
         when:
         loginAdmin()
@@ -62,9 +61,8 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         and:
         check modalDialog gone
     }
-    def"navigate back to data model"(){
 
-
+    def "navigate back to data model"() {
         when:
         click modelCatalogue
 
@@ -74,7 +72,8 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         then:
         check rightSideTitle contains 'Test 3'
     }
-    def"navigate to the top menu and select create relationship "(){
+
+    def "navigate to the top menu and select create relationship"() {
 
         when:'navigate to createRelationship page'
         click dataModel
@@ -84,8 +83,7 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         check destination displayed
 
     }
-    def"select based on,destination and create relationship"(){
-
+    def "select based on,destination and create relationship"() {
         when: 'select relation'
         click hasAttachmentOf
         and: ' select destination'

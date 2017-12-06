@@ -3,14 +3,12 @@ package org.modelcatalogue.core
 import spock.lang.Unroll
 
 class MappingISpec extends AbstractIntegrationSpec {
-
-
     DataType dt1
     DataType dt2
 
     MappingService mappingService
 
-    def setup(){
+    def setup() {
         initRelationshipTypes()
         dt1 = new DataType(name: 'test5').save(failOnError: true)
         dt2 = new DataType(name: 'test6').save(failOnError: true)
@@ -18,7 +16,7 @@ class MappingISpec extends AbstractIntegrationSpec {
 
 
     @Unroll
-    def "create a new mapping from #args validates to #validates" (){
+    def "create a new mapping from #args validates to #validates"() {
         int initialCount = Mapping.count()
 
         when:
@@ -55,15 +53,11 @@ class MappingISpec extends AbstractIntegrationSpec {
         false     | 0    | [name: "x" * 256]
         false     | 0    | [ name: "String", source: [name: 'test5a'], destination: [name: 'test5b'], mapping: "foo" ]
         true      | 1    | [ name: "String1", source: [name: 'test5c'], destination: [name: 'test5d'], mapping: "x * 2" ]
-
-
-
     }
 
-    def "map will fail if source and destination is the same"(){
+    def "map will fail if source and destination is the same"() {
 
         when:
-
         def dC = DataType.get(dt1.id)
 
         Mapping self = mappingService.map(dC, dC, "x")
@@ -72,13 +66,10 @@ class MappingISpec extends AbstractIntegrationSpec {
         self
         self.hasErrors()
         self.errors.getFieldError("destination")
-
     }
 
-    def "create mapping using map "(){
-
+    def "create mapping using map "() {
         when:
-
         def dC = DataType.get(dt1.id)
         def dF = DataType.get(dt2.id)
 

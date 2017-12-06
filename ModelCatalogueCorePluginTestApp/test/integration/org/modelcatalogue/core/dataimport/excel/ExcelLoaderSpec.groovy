@@ -20,6 +20,7 @@ import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
+import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Unroll
 
@@ -70,6 +71,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
                 (new FileInputStream(new File(resourcePath + '/test_expected_xml_from_load_spreadsheet_from_excel_exporter.xml'))).text
     }
 
+    @IgnoreIf( { System.getProperty('spock.ignore.slow')| System.getenv('jenkins.ignore') })
     def "test Exporter/Loader round trip: create model1 -> use ExcelExporter -> Load spreadsheet, creating model2 -> use Excel Exporter"() {
         setup: "Create model1"
         CatalogueXmlLoader loader = new CatalogueXmlLoader(catalogueBuilder)
@@ -112,13 +114,9 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
 
         then:
         noExceptionThrown()
-
-
-
     }
 
-    def "test default catalogue builder imports dataset"(){
-
+    def "test default catalogue builder imports dataset"() {
         when: "I load the Excel file"
 
         excelLoader.buildModelFromStandardWorkbookSheet(
@@ -130,11 +128,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         then: "new model is created"
 
         DataModel.findByName("MET-522")
-
-
     }
-
-
 
     String standardExcelLoaderXmlResult(String sampleFile, Map<String,String> headersMap, int index = 0) {
         return excelLoader.buildXmlFromStandardWorkbookSheet(headersMap,
@@ -143,7 +137,6 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
             //getClass().getResourceAsStream(sampleFile)),
             index)
     }
-
 
     Pair<String, List<String>> excelLoaderXmlResult(String sampleFile, int index=0) {
         excelLoader.buildXmlFromWorkbookSheet(

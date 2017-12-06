@@ -10,8 +10,8 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.core.util.test.TestData
 import org.modelcatalogue.core.util.test.TestDataHelper
+import org.modelcatalogue.core.util.test.TestDataService
 import org.springframework.web.context.support.WebApplicationContextUtils
 
 abstract class AbstractIntegrationSpec extends IntegrationSpec {
@@ -23,6 +23,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     def sessionFactory
     def cacheService
     def relationshipTypeService
+    TestDataService testDataService
 
     void loadMarshallers() {
         relationshipTypeService.clearCache()
@@ -30,8 +31,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         springContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
     }
 
-
-    void initRelationshipTypes(){
+    void initRelationshipTypes() {
         relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'reltypes.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
@@ -39,7 +39,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         cacheService.clearCache()
     }
 
-    void initCatalogue(){
+    void initCatalogue() {
         relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'initcatalogue.sql') {
             initCatalogueService.initCatalogue(true)
@@ -47,11 +47,11 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         cacheService.clearCache()
     }
 
-    void loadFixtures(){
+    void loadFixtures() {
         relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'testdata.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
-            TestData.createTestData()
+            testDataService.createTestData()
         }
         cacheService.clearCache()
         Role adminRole = Role.findOrCreateWhere(authority: 'ROLE_SUPERVISOR').save(failOnError: true)

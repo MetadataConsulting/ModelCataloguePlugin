@@ -12,8 +12,6 @@ class AssetDocumentSerializer extends CatalogueElementDocumentSerializer<Asset> 
         safePut(builder, 'content_type', element.contentType)
         safePut(builder, 'md5', element.md5)
         safePut(builder, 'original_file_name', element.originalFileName)
-
         return builder
     }
-
 }

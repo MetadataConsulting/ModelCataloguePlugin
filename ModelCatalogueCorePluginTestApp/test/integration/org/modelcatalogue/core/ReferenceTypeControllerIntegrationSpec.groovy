@@ -8,17 +8,17 @@ import spock.lang.Ignore
 class ReferenceTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "changedName", description: "edited description ",  dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
         [name: "etTest2123", dataModel: dataModelForSpec, dataClass: CatalogueElementMarshaller.minimalCatalogueElementJSON(DataClass.findByName("book"))]
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
 

@@ -2,7 +2,6 @@ package org.modelcatalogue.core.util.marshalling
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.DataModelPolicy
-import org.modelcatalogue.core.RelationshipType
 
 class DataModelPolicyMarshaller extends AbstractMarshaller {
 

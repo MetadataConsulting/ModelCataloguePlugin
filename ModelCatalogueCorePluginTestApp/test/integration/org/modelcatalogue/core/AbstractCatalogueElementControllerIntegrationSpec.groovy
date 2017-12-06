@@ -9,7 +9,6 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.ResultRecorder
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import spock.lang.Unroll
 
 import javax.servlet.http.HttpServletResponse
@@ -49,7 +48,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     @Unroll
-    def "Link existing elements using add to #direction endpoint with JSON result"(){
+    def "Link existing elements using add to #direction endpoint with JSON result"() {
 
         controller.response.format = 'json'
         controller.request.method       = 'POST'
@@ -102,7 +101,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     @Unroll
-    def "Unlink non existing elements using add to #direction endpoint with json result"(){
+    def "Unlink non existing elements using add to #direction endpoint with json result"() {
 
         controller.request.method       = 'DELETE'
         if (direction == "outgoing") {
@@ -128,7 +127,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     @Unroll
-    def "Unlink existing elements using add to #direction endpoint with json result"(){
+    def "Unlink existing elements using add to #direction endpoint with json result"() {
         controller.request.method       = 'DELETE'
         if (direction == "outgoing") {
             controller.relationshipService.link(loadItem, anotherLoadItem, relationshipType)
@@ -154,7 +153,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     @Unroll
-    def "Link existing elements using add to #direction endpoint with failing constraint as JSON result"(){
+    def "Link existing elements using add to #direction endpoint with failing constraint as JSON result"() {
         controller.request.method       = 'POST'
         RelationshipType relationshipType = RelationshipType.readByName("falseRuleReturn")
         controller.response.format = 'json'
@@ -176,7 +175,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     @Unroll
-    def "#action with non-existing one to #direction endpoint with json result"(){
+    def "#action with non-existing one to #direction endpoint with json result"() {
         controller.request.method       = method
         controller.response.format = 'json'
         def item = newResourceInstance()
@@ -208,7 +207,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     @Unroll
-    def "#action with not-existing type to #direction endpoint with json result"(){
+    def "#action with not-existing type to #direction endpoint with json result"() {
         controller.request.method = httpMethod
         controller.response.format = 'json'
         def input = anotherLoadItem.encodeAsJSON()
@@ -385,12 +384,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     abstract Object getAnotherLoadItem()
 
-
-    RelationshipType getRelationshipType(){
+    RelationshipType getRelationshipType() {
         RelationshipType.relatedToType
     }
-
-
 
     protected linkRelationshipsToDummyEntities(String incomingOrOutgoing) {
         def first = loadItem.save(flush: true)
@@ -573,7 +569,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     @Unroll
-    def "Map existing domains with failing constraint json"(){
+    def "Map existing domains with failing constraint json"() {
         controller.response.format = 'json'
         controller.request.json = payload
         controller.request.method = "POST"
@@ -593,7 +589,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     @Unroll
-    def "unmap non existing mapping will return 404 for json request"(){
+    def "unmap non existing mapping will return 404 for json request"() {
         controller.response.format = 'json'
         controller.request.method = "DELETE"
         controller.mappingService.unmap(loadItem, anotherLoadItem)
@@ -607,7 +603,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     @Unroll
-    def "unmap existing mapping will return 204 for json request"(){
+    def "unmap existing mapping will return 204 for json request"() {
         controller.response.format = 'json'
         controller.request.method = "DELETE"
         controller.mappingService.map(loadItem, anotherLoadItem, [one: "one"])

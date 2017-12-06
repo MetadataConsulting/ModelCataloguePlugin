@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.actions
 
-import grails.plugin.springsecurity.annotation.Secured
 import org.modelcatalogue.core.AbstractRestfulController
 import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.util.lists.Lists

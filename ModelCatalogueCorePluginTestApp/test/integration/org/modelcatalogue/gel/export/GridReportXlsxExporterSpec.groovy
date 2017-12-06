@@ -11,7 +11,9 @@ import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
 
     public static final String ROOT_DATA_MODEL_NAME = 'Grid Report Data Model'

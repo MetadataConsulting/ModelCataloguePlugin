@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
 import com.google.common.collect.ImmutableSet
 import grails.transaction.Transactional
 import grails.util.GrailsNameUtils
@@ -11,7 +13,6 @@ import org.modelcatalogue.core.dataimport.excel.ExcelExporter
 import org.modelcatalogue.core.events.DataModelFinalizedEvent
 import org.modelcatalogue.core.events.DataModelWithErrorsEvent
 import org.modelcatalogue.core.events.MetadataResponseEvent
-import org.modelcatalogue.core.events.SourceDestinationEvent
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.persistence.DataModelGormService
@@ -29,13 +30,7 @@ import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import grails.plugin.springsecurity.acl.AclUtilService
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.springframework.http.HttpStatus
-import org.springframework.security.acls.domain.BasePermission
-import org.springframework.security.acls.model.ObjectIdentity
-import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
-import grails.plugin.springsecurity.acl.AclService
 import org.springframework.validation.Errors
-import static org.springframework.http.HttpStatus.CREATED
-import static org.springframework.http.HttpStatus.OK
 import grails.plugin.springsecurity.SpringSecurityService
 
 class DataModelController<T extends CatalogueElement> extends AbstractCatalogueElementController<DataModel> {
@@ -171,7 +166,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
         if ( responseEvent instanceof DataModelWithErrorsEvent) {
-            respond instance.errors, view: 'edit' // STATUS CODE 422
+            DataModel dataModel = (responseEvent as DataModelWithErrorsEvent).dataModel
+            respond dataModel.errors, view: 'edit' // STATUS CODE 422
             return
         }
         if ( !(responseEvent instanceof DataModelFinalizedEvent) ) {
@@ -425,8 +421,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
         Long dataModelId = dataModel.id
 
-
-        def assetId = assetService.storeReportAsAsset(
+        Long assetId = assetService.storeReportAsAsset(
                 dataModel,
                 name: name ? name : "${dataModel.name} report as MS Excel Document",
                 originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
@@ -436,7 +431,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             CatalogueElementToXlsxExporter.forDataModel(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
-        response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
         return
     }

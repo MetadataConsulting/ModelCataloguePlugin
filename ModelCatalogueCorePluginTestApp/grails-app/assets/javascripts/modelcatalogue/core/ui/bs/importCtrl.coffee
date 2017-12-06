@@ -1,7 +1,17 @@
-angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload']).controller 'importCtrl', ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', 'catalogue', 'args', ($scope, messages, names, modelCatalogueDataArchitect, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance, catalogue, args) ->
+angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload']).controller 'importCtrl', ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$uibModalInstance', 'Upload', 'rest', 'modelCatalogueApiRoot', 'enhance', 'catalogue', 'args', ($scope, messages, names, modelCatalogueDataArchitect, $uibModalInstance, Upload,rest, modelCatalogueApiRoot, enhance, catalogue, args) ->
     $scope.copy     = angular.copy(args.element ? {})
     $scope.original = args.element ? {}
     $scope.messages = messages.createNewMessages()
+
+    # get excel import types for user to select
+    rest(method: 'GET', url: "#{modelCatalogueApiRoot}/dataArchitect/imports/excelImportTypes").then ((resp) ->
+        $scope.excelImportTypes = resp.excelImportTypes
+      ),
+      ((failureReason) -> console.log("get excelImportTypes failed: #{failureReason}")),
+      (update) -> {}
+    # for Excel:
+    # $scope.headersMap = {}
+    # $scope.headersMapXMLString = ''
 
     $scope.hasChanged   = ->
       $scope.copy.file or $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description
@@ -15,14 +25,11 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
 
     $scope.onFileSelect = ($files) ->
       $scope.copy.file = $files[0]
-      if $scope.copy.name == $scope.copy.originalFileName or $scope.nameFromFile
-        $scope.nameFromFile = true
-        $scope.copy.name = $scope.copy.file.name
 
     $scope.saveElement = ->
       $scope.messages.clearAllMessages()
-      if not $scope.copy.name and not $scope.copy.file
-        $scope.messages.error 'Empty Name', 'Please fill the name'
+      if not $scope.copy.modelName and not $scope.copy.file
+        $scope.messages.error 'No name and no file', 'Please give at least a file'
         return
 
 
@@ -32,14 +39,18 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
         url: "#{modelCatalogueApiRoot}/dataArchitect/imports/upload"
         params: {
           id: $scope.copy.id,
-          name: $scope.copy.name,
+          modelName: if $scope.copy.modelName then $scope.copy.modelName else $scope.copy.file.name
           conceptualDomain: $scope.copy.conceptualDomain,
           createModelsForElements: $scope.copy.createModelsForElements,
           idpattern: $scope.copy.idpattern
         }
         data: {
           file: $scope.copy.file
-          headersMap: $scope.headersMap
+          # headersMap: $scope.headersMap
+          # headersMapXMLString: $scope.headersMapXMLString
+          excelConfigXMLFile: $scope.excelConfigXMLFile # from ExcelImport
+          excelImportType: $scope.selectedExcelImportType
+
         }
       }).progress((evt) ->
         $scope.progress = parseInt(100.0 * evt.loaded / evt.total)

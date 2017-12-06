@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.security
 
 import org.apache.commons.lang.builder.HashCodeBuilder
-import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.util.FriendlyErrors
 
 class UserRole implements Serializable {

@@ -16,7 +16,6 @@ import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxE
 @Log4j
 class GMCGridReportExcelLoaderDirect extends GMCGridReportExcelLoader {
 
-
     GMCGridReportExcelLoaderDirect() {
     }
 
@@ -29,7 +28,7 @@ class GMCGridReportExcelLoaderDirect extends GMCGridReportExcelLoader {
 
         // move data elements from old systems
         log.info("Moving data elements between data sources")
-        List<Move> moves = movesFromRowMaps(rowMaps)
+        def moves = movesFromRowMaps(rowMaps)
         moves.each {it.justMove()}
 
         // update metadata for already existing data elements

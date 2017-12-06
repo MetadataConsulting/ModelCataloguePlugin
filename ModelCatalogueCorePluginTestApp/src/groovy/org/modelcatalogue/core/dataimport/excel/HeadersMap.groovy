@@ -27,7 +27,6 @@ class HeadersMap {
     static String dataModel = 'dataModel'
 
     // for spreadsheet produced by ExcelExporter (10 Oct 2017):
-
     static String multiplicity = 'multiplicity'
     static String dataTypeEnumerations = 'dataTypeEnumerations'
     static String dataTypeRule = 'dataTypeRule'
@@ -75,13 +74,10 @@ class HeadersMap {
         headersMap.put(metadata, params.get(metadata) ?: 'Metadata')
 
         // for spreadsheet produced by ExcelExporter (10 Oct 2017):
-
         headersMap.put(multiplicity, params.get(multiplicity) ?: 'Multiplicity')
         headersMap.put(dataTypeEnumerations, params.get(dataTypeEnumerations) ?: 'Data Type Enumerations')
         headersMap.put(dataTypeRule, params.get(dataTypeRule) ?: 'Data Type Rule')
         headersMap.put(measurementUnitCode, params.get(measurementUnitCode) ?: 'Measurement Unit ID')
-
         return headersMap
     }
-
 }

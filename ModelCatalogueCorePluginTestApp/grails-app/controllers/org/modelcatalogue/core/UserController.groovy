@@ -97,7 +97,8 @@ class UserController extends AbstractCatalogueElementController<User> {
             return
         }
         Long dataModelId = request.JSON.id as Long
-        favouriteService.favouriteModelById(dataModelId)
+        String elementType = request.JSON.elementType as String
+        favouriteService.favouriteElementTypeById(elementType, dataModelId)
         render status: 200
     }
 
@@ -107,7 +108,8 @@ class UserController extends AbstractCatalogueElementController<User> {
             return
         }
         Long dataModelId = request.JSON.id as Long
-        favouriteService.unfavouriteModelById(dataModelId)
+        String elementType = request.JSON.elementType as String
+        favouriteService.unfavouriteElementTypeById(elementType, dataModelId)
         render status: 200
     }
 

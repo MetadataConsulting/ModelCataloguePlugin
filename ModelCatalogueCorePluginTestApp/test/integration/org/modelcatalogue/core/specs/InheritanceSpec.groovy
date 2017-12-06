@@ -132,7 +132,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
         assertNothingInherited()
     }
 
-    def "with children works"(){
+    def "with children works"() {
         addBasedOn()
 
         List<CatalogueElement> children = []
@@ -144,7 +144,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
         children == [childClass]
     }
 
-    def "with children works with relationship as well"(){
+    def "with children works with relationship as well"() {
         addBasedOn()
 
         List<CatalogueElement> children = []
@@ -159,7 +159,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
         relationships == [baseClass]
     }
 
-    def "with all children works"(){
+    def "with all children works"() {
         addBasedOn()
 
         List<CatalogueElement> children = []
@@ -171,7 +171,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
         children == [childClass]
     }
 
-    def "with all children works with relationship as well"(){
+    def "with all children works with relationship as well"() {
         addBasedOn()
 
         List<CatalogueElement> children = []
@@ -186,7 +186,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
         relationships == [baseClass]
     }
 
-    def "with parents works"(){
+    def "with parents works"() {
         addBasedOn()
 
         List<CatalogueElement> parents = []
@@ -198,7 +198,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
         parents == [parentClass]
     }
 
-    def "with parents works with relationship as well"(){
+    def "with parents works with relationship as well"() {
         addBasedOn()
 
         List<CatalogueElement> parents = []
@@ -214,7 +214,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
 
     }
 
-    def "with all parents works"(){
+    def "with all parents works"() {
         addBasedOn()
 
         List<CatalogueElement> parents = []
@@ -226,7 +226,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
         parents == [parentClass]
     }
 
-    def "with all parents works with relationship as well"(){
+    def "with all parents works with relationship as well"() {
         addBasedOn()
 
         List<CatalogueElement> parents = []

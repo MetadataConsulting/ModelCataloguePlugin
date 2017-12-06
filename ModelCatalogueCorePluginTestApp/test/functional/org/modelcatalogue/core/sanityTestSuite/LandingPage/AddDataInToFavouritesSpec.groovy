@@ -1,19 +1,17 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
-import spock.lang.IgnoreIf
-import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.admin
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
+import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
     private static final String  creates  = "a#role_data-models_create-data-modelBtn"
@@ -26,17 +24,15 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
     private static final String   favouriteModel ="tr.inf-table-item-row>td:nth-child(2)>a"
     public static final String  greenButton ="#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > ui-view > div > div > div > div.inf-table-body > table > tfoot > tr > td > table > tfoot > tr > td.text-center > span"
 
-
-    def " login to model catalogue "(){
+    def "login to model catalogue"() {
         when:
         login admin
 
         then:
         check creates displayed
-
-
     }
-    def "navigate to favourites"(){
+
+    def "navigate to favourites"() {
         when:
         click user
         click favouriteButton
@@ -44,31 +40,31 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
         then:
         check catalogueID contains "Model Catalogue ID"
     }
-     def" add data to favourite"(){
+
+     def "add data to favourite"() {
          when:
          click greenButton
 
          then:
          check modalHeader is "Add to Favourites"
 
-
          when:
          fill searchField with 'Ovarian Cancer (NHIC 0.0.1)' and pick first item
          click modalPrimaryButton
 
+         refresh(browser) // TODO: It should not be necessary to refresh the page
+
          then:
          check firstRow displayed
-
      }
 
-    def" remove favourite data model"(){
-
+    @Ignore
+    def "remove favourite data model"() {
         when:
         click favouriteModel
 
         then:
         check rightSideTitle contains 'Cancer'
-
 
         when:
         click removeFavourite
@@ -80,7 +76,4 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
         then:
         check firstRow isGone()
     }
-
-  }
-
-
+}

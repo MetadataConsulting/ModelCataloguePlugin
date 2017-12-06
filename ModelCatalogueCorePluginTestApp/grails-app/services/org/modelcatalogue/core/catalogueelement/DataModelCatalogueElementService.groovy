@@ -11,7 +11,6 @@ import org.modelcatalogue.core.events.DataModelWithErrorsEvent
 import org.modelcatalogue.core.events.MetadataResponseEvent
 import org.modelcatalogue.core.events.UnauthorizedEvent
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
-
 import java.util.concurrent.ExecutorService
 
 @Slf4j

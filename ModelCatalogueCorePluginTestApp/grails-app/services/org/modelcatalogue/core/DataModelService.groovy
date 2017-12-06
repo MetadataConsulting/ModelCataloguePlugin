@@ -17,7 +17,6 @@ import org.modelcatalogue.core.util.lists.DetachedListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
 import org.modelcatalogue.core.util.lists.ListWrapper
-
 import javax.annotation.PostConstruct
 
 class DataModelService {

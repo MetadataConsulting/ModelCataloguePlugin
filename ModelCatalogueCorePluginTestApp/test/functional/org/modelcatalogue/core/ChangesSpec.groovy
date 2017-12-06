@@ -1,13 +1,13 @@
 package org.modelcatalogue.core
 
+import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
-
-import static org.modelcatalogue.core.geb.Common.*
 import spock.lang.IgnoreIf
-@IgnoreIf({ !System.getProperty('geb.env') })
+
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
 @Stepwise
 class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
@@ -36,7 +36,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         check 'h3' is 'Changes'
     }
 
-    def "check the unit shows up with own detail page"(){
+    def "check the unit shows up with own detail page"() {
         when:
 
         click FIRST_NEW_ELEMENT_CREATED_CHANGE

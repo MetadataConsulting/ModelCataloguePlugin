@@ -5,7 +5,9 @@ import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import spock.lang.Specification
 import spock.lang.Unroll
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class DataArchitectUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {

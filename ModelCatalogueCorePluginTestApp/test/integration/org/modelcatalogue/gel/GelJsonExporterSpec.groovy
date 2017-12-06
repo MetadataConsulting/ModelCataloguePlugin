@@ -7,8 +7,9 @@ import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import spock.lang.IgnoreIf
 
-
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class GelJsonExporterSpec extends IntegrationSpec {
 
     public static final String DATA_MODEL_NAME = 'testDataModel1'
@@ -57,11 +58,9 @@ class GelJsonExporterSpec extends IntegrationSpec {
                 }
             }
         }
-
     }
 
-
-    def "export model to json"(){
+    def "export model to json"() {
         OutputStream out = new ByteArrayOutputStream()
         when:
         DataClass model = DataClass.findByName(ROOT_DATA_CLASS_NAME)

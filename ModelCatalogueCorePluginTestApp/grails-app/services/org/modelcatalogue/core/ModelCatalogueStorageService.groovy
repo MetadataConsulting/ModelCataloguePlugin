@@ -4,7 +4,6 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.runtime.IOGroovyMethods
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.util.FriendlyErrors
-
 import javax.annotation.PostConstruct
 
 class ModelCatalogueStorageService implements StorageService {

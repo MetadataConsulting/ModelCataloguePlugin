@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.util
 
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataType
 

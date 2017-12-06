@@ -15,12 +15,12 @@ angular.module('mc.core.ui.bs.modalPromptNewXsdImport', ['mc.util.messages', 'mc
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
               <div class="form-group">
-                <label for="name" class="">Conceptual Domain</label>
+                <label for="conceptualDomain" class="">Conceptual Domain</label>
                 <input type="text" class="form-control" id="conceptualDomain" ng-model="copy.conceptualDomain">
               </div>
               <div class="form-group">
-                <label for="name" class="">Name</label>
-                <input type="text" class="form-control" id="name" placeholder="Name (leave blank to use filename)" ng-model="copy.name">
+                <label for="modelName" class="">Model Name</label>
+                <input type="text" class="form-control" id="modelName" placeholder="Model Name (leave blank to use filename)" ng-model="copy.modelName">
               </div>
               <div class="form-group">
                 <label for="asset" class="">File</label>

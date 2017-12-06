@@ -12,7 +12,9 @@ import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow')| System.getenv('jenkins.ignore') })
 class GMCGridReportXlsxExporterSpec extends AbstractIntegrationSpec {
 
     public static final String ROOT_DATA_MODEL_NAME = 'Grid Report Data Model'
@@ -288,7 +290,7 @@ class GMCGridReportXlsxExporterSpec extends AbstractIntegrationSpec {
 
 
     }
-
+    @IgnoreIf( { System.getenv('jenkins.ignore') })
     def "export model to excel"() {
         setup:
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")

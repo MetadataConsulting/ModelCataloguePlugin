@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-
 class MappingService {
 
     def auditService

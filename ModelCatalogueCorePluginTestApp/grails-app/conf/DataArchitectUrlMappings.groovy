@@ -11,5 +11,6 @@ class DataArchitectUrlMappings {
         "/api/modelCatalogue/core/dataArchitect/deleteSuggestions"(controller: "dataArchitect", action: "deleteSuggestions", method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataArchitect/suggestionsNames"(controller: "dataArchitect", action: "suggestionsNames", method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataArchitect/imports/upload"(controller: "dataImport", action: 'upload', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/dataArchitect/imports/excelImportTypes"(controller: "dataImport", action: "excelImportTypesHumanReadable", method: HttpMethod.GET)
     }
 }

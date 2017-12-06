@@ -35,10 +35,9 @@ class DataModelServiceSpec extends AbstractIntegrationSpec {
         class2 = new DataClass(dataModel: model2, name: "Classified 2 ", status: ElementStatus.FINALIZED).save(failOnError: true)
         class3 = new DataClass(dataModel: model3, name: "Classified 3 ", status: ElementStatus.FINALIZED).save(failOnError: true)
         model2.addToImports(model3)
-
     }
 
-    def "all the models are returned if no classification is selected"(){
+    def "all the models are returned if no classification is selected"() {
         DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass)
 
         expect:

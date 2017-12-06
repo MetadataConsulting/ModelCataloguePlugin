@@ -344,6 +344,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataArchitect/deleteSuggestions", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataArchitect/suggestionsNames", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataArchitect/imports/upload", 'ROLE_SUPERVISOR', HttpMethod.POST],
+            ["/api/modelCatalogue/core/dataArchitect/imports/excelImportTypes", 'ROLE_SUPERVISOR', HttpMethod.GET],
     ]
 
     public static final List<List> DATA_MODEL_POLICY_MAPPINGS = [

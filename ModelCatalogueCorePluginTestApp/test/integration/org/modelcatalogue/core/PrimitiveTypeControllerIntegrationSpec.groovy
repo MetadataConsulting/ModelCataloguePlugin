@@ -8,17 +8,17 @@ import spock.lang.Ignore
 class PrimitiveTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "changedName", description: "edited description ",  dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
         [name: "ptTest2123", dataModel: dataModelForSpec, measurementUnit: CatalogueElementMarshaller.minimalCatalogueElementJSON(notNull(MeasurementUnit.findByName("Degrees Celsius")))]
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
 

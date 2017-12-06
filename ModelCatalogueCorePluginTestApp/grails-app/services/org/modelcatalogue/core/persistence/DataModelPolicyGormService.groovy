@@ -3,10 +3,14 @@ package org.modelcatalogue.core.persistence
 import grails.transaction.Transactional
 import org.modelcatalogue.core.DataModelPolicy
 import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.WarnGormErrors
+import org.springframework.context.MessageSource
 
-class DataModelPolicyGormService {
+class DataModelPolicyGormService implements WarnGormErrors {
 
-    @Transactional
+    MessageSource messageSource
+
+    @Transactional(readOnly = true)
     DataModelPolicy findById(long id) {
         DataModelPolicy.get(id)
     }
@@ -18,5 +22,19 @@ class DataModelPolicyGormService {
 
     protected DetachedCriteria<DataModelPolicy> findQueryByName(String nameParam) {
         DataModelPolicy.where { name == nameParam }
+    }
+
+    @Transactional
+    DataModelPolicy saveWithNameAndPolicyText(String name, String policyText) {
+        save(new DataModelPolicy(name: name, policyText: policyText))
+    }
+
+    @Transactional
+    DataModelPolicy save(DataModelPolicy dataModelPolicyInstance) {
+        if ( !dataModelPolicyInstance.save() ) {
+            warnErrors(dataModelPolicyInstance, messageSource)
+            transactionStatus.setRollbackOnly()
+        }
+        dataModelPolicyInstance
     }
 }

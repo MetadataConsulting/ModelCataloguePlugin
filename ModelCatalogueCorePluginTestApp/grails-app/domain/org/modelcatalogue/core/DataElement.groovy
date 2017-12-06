@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Iterables
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
-import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors

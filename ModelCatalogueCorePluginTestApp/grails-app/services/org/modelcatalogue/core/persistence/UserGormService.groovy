@@ -3,6 +3,7 @@ package org.modelcatalogue.core.persistence
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.WarnGormErrors
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserService
 import org.springframework.context.MessageSource
@@ -66,6 +67,12 @@ class UserGormService implements WarnGormErrors {
             transactionStatus.setRollbackOnly()
         }
         user
+    }
+
+    @Transactional
+    User saveWithNameAndUsernameAndPasswordAndStatus(String name, String username, String password, ElementStatus status) {
+        User userInstance = new User(name: name, username: username, password: password, status: status)
+        save(userInstance)
     }
 
     protected DetachedCriteria<User> findQueryByNameOrUsername(String nameParam, String usernameParam) {

@@ -1,10 +1,5 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
-import spock.lang.IgnoreIf
-import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.delete
 import static org.modelcatalogue.core.geb.Common.description
@@ -16,6 +11,10 @@ import static org.modelcatalogue.core.geb.Common.modelCatalogueId
 import static org.modelcatalogue.core.geb.Common.nameLabel
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import static org.modelcatalogue.core.geb.Common.modalSuccessButton
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
+import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore
@@ -53,13 +52,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     private static final String   search='input#element'
     private static final String  closeButton='div.modal-footer>button:nth-child(2)'
 
-
-
-
-
-
     def "login and navigate to the model "() {
-
         when:
         loginAdmin()
         select 'Test 3'
@@ -72,13 +65,13 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     def "navigate to create data classes page"() {
         when:
         click create
+
         then:
         check modalHeader contains "Data Class Wizard"
     }
 
     def "create data class"() {
         when: ' fill data class step'
-
         fill nameLabel with "NEW_TESTING_MODEL "
         fill modelCatalogueId with "${UUID.randomUUID()}"
         fill description with 'THIS IS MY DATA CLASS'
@@ -108,11 +101,13 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check finishButton displayed
+
         when:
         fillMetadata 'Min Occurs': '1', 'Max Occurs': '10'
         // click on appearance
         click appearance
         fill name with ' this is my name'
+
         then:
         check elementStep displayed
 
@@ -133,18 +128,13 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         then:
-
         check wizardSummary contains "NEW_TESTING_MODEL"
 
         cleanup:
         click exitButton
-
-
     }
 
-    def" create a data class and create a relationship is based on"(){
-
-
+    def "create a data class and create a relationship is based on"() {
         when:
         selectInTree 'Data Classes'
 
@@ -198,11 +188,9 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         and:
         check type is 'Data Class'
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-
     }
 
     def "delete the created data class"() {
-
         when:
         click modelCatalogue
 
@@ -228,7 +216,5 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check wizardSummary gone
-
     }
-
 }

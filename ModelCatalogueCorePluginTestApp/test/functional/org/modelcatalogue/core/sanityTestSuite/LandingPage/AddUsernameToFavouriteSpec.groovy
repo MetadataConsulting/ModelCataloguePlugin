@@ -1,14 +1,13 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import org.apache.tomcat.jni.Thread
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
-import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
 
@@ -21,9 +20,7 @@ class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
     private static final String  tableFirstROW ="tr.inf-table-item-row>td:nth-child(1)"
     private static final String   plusButton ="span.fa-plus-square-o"
 
-
-    def "login to model catalogue"(){
-
+    def "login to model catalogue"() {
         when:
         loginAdmin()
 
@@ -31,27 +28,26 @@ class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
         check adminTag displayed
     }
 
-    def"select a data model and navigate to the user profile"(){
+    def "select a data model and navigate to the user profile"() {
 
     select('Test 3')
 
     expect:
     check rightSideTitle contains 'Test 3'
+    }
 
-
-}
-
-    def"navigate to the author tag and select a username"(){
+    @Ignore
+    def "navigate to the author tag and select a username"() {
 
          when:
          click userName
 
          then:
          check favourite displayed
-
     }
-    def " click on the favourite button and verify favourite tag"(){
 
+    @Ignore
+    def "click on the favourite button and verify favourite tag"() {
          when:
          click favourite
 
@@ -64,7 +60,8 @@ class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
          check tableFirstROW displayed
     }
 
-    def"remove the favourite username"(){
+    @Ignore
+    def "remove the favourite username"() {
 
         when:
         click plusButton

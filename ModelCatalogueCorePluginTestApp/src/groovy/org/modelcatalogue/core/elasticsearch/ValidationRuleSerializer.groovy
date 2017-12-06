@@ -21,5 +21,4 @@ class ValidationRuleSerializer extends CatalogueElementDocumentSerializer<Valida
 
         return builder
     }
-
 }

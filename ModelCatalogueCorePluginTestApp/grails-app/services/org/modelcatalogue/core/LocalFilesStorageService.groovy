@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
-
 import javax.annotation.PostConstruct
 
 class LocalFilesStorageService implements StorageService {

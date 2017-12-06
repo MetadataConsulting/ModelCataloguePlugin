@@ -1,13 +1,12 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import static org.modelcatalogue.core.geb.Common.*
 import geb.module.Select
 import groovy.transform.NotYetImplemented
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
-
-import static org.modelcatalogue.core.geb.Common.*
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore
@@ -24,7 +23,6 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
     private static String text="NHIC"
     private static final String cancel="div.messages-modal-confirm>div>div>div:nth-child(3)>form>button:nth-child(3)"
     private static final String plusButton="tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>a>span"
-
 
     def "login to model catalogue and navigate to data model"() {
         when:
@@ -45,8 +43,8 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
         check createRelationship displayed
     }
 
+    @Ignore
     def "create relationship"() {
-
         when:'select relation'
 
         def select = $(selectRelation).module(Select)
@@ -62,7 +60,6 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
         fill search with text and pick first item
         Thread.sleep(2000l)
 
-
         and:
         click cancel
 
@@ -73,9 +70,9 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
         noExceptionThrown()
         //check table contains 'is based on'
     }
-     @Ignore
-    def" remove the created relationship "(){
 
+    @Ignore
+    def "remove the created relationship"() {
         when:
         click plusButton
         and:
@@ -87,8 +84,5 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         noExceptionThrown()
-
-
-
     }
 }

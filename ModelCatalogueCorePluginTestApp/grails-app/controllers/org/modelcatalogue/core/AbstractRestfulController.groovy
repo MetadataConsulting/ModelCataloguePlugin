@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import static org.springframework.http.HttpStatus.*
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.acl.AclUtilService
@@ -21,8 +22,6 @@ import org.springframework.dao.ConcurrencyFailureException
 import org.springframework.security.acls.domain.BasePermission
 import org.springframework.security.core.Authentication
 import org.springframework.validation.Errors
-
-import static org.springframework.http.HttpStatus.*
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
@@ -326,6 +325,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             paramArgs.order = params.order
         }
 
+        paramArgs.offset = params.int('offset') ?: 0
+
         paramArgs
     }
 
@@ -496,7 +497,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     protected DataModel getDataModel() {
         if ( resource!=DataModel && resource!=RelationshipType && resource && params?.id ){
-            return (findById(params.long('id'))?.dataModel)
+            def instance = findById(params.long('id'))
+            if ( instance?.respondsTo('dataModel') ) {
+                return instance.dataModel
+            }
         } else {
             Long dataModelId = findDataModelId()
             if (dataModelId) {

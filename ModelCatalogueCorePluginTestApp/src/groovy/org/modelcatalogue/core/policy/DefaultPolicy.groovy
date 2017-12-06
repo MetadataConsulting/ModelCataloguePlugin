@@ -1,12 +1,11 @@
 package org.modelcatalogue.core.policy
 
+import static org.modelcatalogue.core.policy.VerificationPhase.FINALIZATION_CHECK
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables
 import groovy.transform.PackageScope
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
-
-import static org.modelcatalogue.core.policy.VerificationPhase.FINALIZATION_CHECK
 
 @PackageScope class DefaultPolicy implements Policy {
 

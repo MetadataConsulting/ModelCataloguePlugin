@@ -1,5 +1,10 @@
 package org.modelcatalogue.gel.export
 
+import static java.lang.Boolean.FALSE
+import static java.lang.Boolean.TRUE
+import static java.util.Map.Entry
+import static org.modelcatalogue.core.audit.ChangeType.*
+import static RareDiseaseChangeLogXlsExporter.RareDiseaseChangeType.*
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.ListMultimap
 import groovy.json.JsonSlurper
@@ -18,12 +23,6 @@ import org.modelcatalogue.core.audit.ChangeType
 import org.modelcatalogue.core.publishing.changelog.AbstractChangeLogGenerator
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.OrderedMap
-
-import static java.lang.Boolean.FALSE
-import static java.lang.Boolean.TRUE
-import static java.util.Map.Entry
-import static org.modelcatalogue.core.audit.ChangeType.*
-import static RareDiseaseChangeLogXlsExporter.RareDiseaseChangeType.*
 
 /**
  * Created by rickrees on 18/04/2016.

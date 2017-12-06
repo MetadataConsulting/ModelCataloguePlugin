@@ -1,10 +1,5 @@
 package org.modelcatalogue.core.security
 
-import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.plugin.springsecurity.authentication.dao.NullSaltSource
-import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.DataModel
-
 class UserAdminController extends grails.plugin.springsecurity.ui.UserController {
 
     /**

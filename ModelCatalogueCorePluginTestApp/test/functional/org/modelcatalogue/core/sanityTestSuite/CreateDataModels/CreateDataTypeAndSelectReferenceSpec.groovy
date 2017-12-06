@@ -1,10 +1,5 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
-import spock.lang.IgnoreIf
-import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.getCreate
 import static org.modelcatalogue.core.geb.Common.getDescription
 import static org.modelcatalogue.core.geb.Common.getItem
@@ -16,9 +11,12 @@ import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import static org.modelcatalogue.core.geb.Common.getSave
 import static org.modelcatalogue.core.geb.Common.messages
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
+import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec {
     private static final String reference= "input#pickReferenceType"
@@ -32,9 +30,7 @@ class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec
     private static final String deleteButton="a#delete-menu-item-link>span:nth-child(3)"
     private static final String dataType="tr.inf-table-item-row>td:nth-child(1)>span>span>a"
 
-
-
-    def"login to Model Catalogue and select Model"(){
+    def "login to Model Catalogue and select Model"() {
         when:
                loginCurator()
               select 'Test 3'
@@ -43,13 +39,15 @@ class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec
         then:
         check rightSideTitle contains 'Active Data Types'
     }
-    def"Navigate to data type page"() {
+
+    def "Navigate to data type page"() {
         when:
              click create
         then:
              check modalHeader contains 'Create Data Type'
     }
-    def " fill the create data type form"(){
+
+    def "fill the create data type form"() {
         when:
         fill nameLabel with "TESTING_DATA_TYPE"
 
@@ -75,10 +73,9 @@ class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec
 
         then:
         check table contains 'TESTING_DATA_TYPE'
-
     }
-    def"delete the created data type"(){
 
+    def "delete the created data type"() {
         when:'click on the created data type'
         click dataType
 

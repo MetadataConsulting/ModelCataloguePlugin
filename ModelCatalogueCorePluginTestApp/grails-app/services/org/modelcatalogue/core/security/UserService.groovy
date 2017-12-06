@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.security
 
-import com.google.common.io.BaseEncoding
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
@@ -90,11 +89,11 @@ class UserService {
 
     @CompileStatic
     @Transactional
-    void resetApiKey(String username) {
+    User resetApiKey(String username) {
         User user = findQueryByUsername(username).get()
         if ( !user ) {
             log.error 'Unable to find User by username: {}', username
-            return
+            return null
         }
         user.apiKey = ApiKeyUtils.apiKey()
         FriendlyErrors.failFriendlySave(user)
@@ -102,13 +101,12 @@ class UserService {
 
     @CompileDynamic
     @Transactional
-    String findApiKeyByUsername(String username, boolean generateIfNonExisting = true) {
+    String findApiKeyByUsername(String username, boolean regenerate = true) {
         String apiKey = findQueryByUsername(username).projections {
             property('apiKey')
         }.get()
-        if ( !apiKey && generateIfNonExisting ) {
-            resetApiKey(username)
-            apiKey = findApiKeyByUsername(username, false)
+        if ( !apiKey || regenerate ) {
+            return resetApiKey(username)?.apiKey
         }
         apiKey
     }

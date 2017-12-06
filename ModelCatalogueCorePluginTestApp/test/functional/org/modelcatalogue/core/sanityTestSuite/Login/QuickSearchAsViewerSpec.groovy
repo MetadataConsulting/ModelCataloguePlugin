@@ -1,15 +1,13 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
+import static org.modelcatalogue.core.geb.Common.item
+import static org.modelcatalogue.core.geb.Common.pick
+import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-
-import static org.modelcatalogue.core.geb.Common.item
-import static org.modelcatalogue.core.geb.Common.pick
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
-
-@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
 
@@ -17,8 +15,7 @@ class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
      private static final String  quickSearch='a#role_navigation-right_search-menu-menu-item-link>span:nth-child(1)'
      private static final String   search  ='input#value'
 
-
-    def"login to model catalogue"(){
+    def "login to model catalogue"() {
 
         loginCurator()
 
@@ -26,7 +23,7 @@ class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
         check catalogueModels contains 'Catalogue Models'
     }
 
-    def"navigate to the top menu and select quick search"(){
+    def "navigate to the top menu and select quick search"() {
 
         when:
         click quickSearch

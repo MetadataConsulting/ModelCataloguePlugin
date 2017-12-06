@@ -8,7 +8,6 @@ import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.acls.domain.BasePermission
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import org.springframework.security.acls.model.Permission
@@ -34,7 +33,18 @@ class DataModelAclService {
     }
 
     boolean hasReadPermission(DataModel dataModel) {
-        hasPermission(dataModel, BasePermission.READ)
+        hasPermission(dataModel, [BasePermission.READ, BasePermission.ADMINISTRATION] as Permission[])
+    }
+
+    boolean isAdminOrHasReadPermission(Object instance) {
+        if ( SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('ADMIN')) ) {
+            return true
+        }
+        DataModel dataModel = dataModelFromInstance(instance)
+        if ( dataModel == null ) {
+            return true
+        }
+        hasReadPermission(dataModel)
     }
 
     boolean hasAdministratorPermission(Object instance) {
@@ -49,7 +59,7 @@ class DataModelAclService {
         hasPermission(dataModel, BasePermission.ADMINISTRATION)
     }
 
-    boolean hasPermission(DataModel dataModel, Permission permission) {
+    boolean hasPermission(DataModel dataModel, Permission... permissions) {
         if ( dataModel == null) {
             return true
         }
@@ -57,7 +67,7 @@ class DataModelAclService {
         if ( authentication == null ) {
             return false
         }
-        aclUtilService.hasPermission(authentication, dataModel, permission)
+        aclUtilService.hasPermission(authentication, dataModel, permissions)
     }
 
     boolean isAdminOrHasAdministratorPermission(DataModel dataModel) {

@@ -4,7 +4,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.WebDriver
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB') })
 class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String cancel = "button.btn-warning"
@@ -13,11 +13,8 @@ class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
     private static final String login = "button.btn"
     private static final String primaryBtn = "button.btn"
 
-
     void clickOnCancel() {
-
         when:
-        WebDriver driver = browser.driver
         go(baseUrl)
         click login
         then:

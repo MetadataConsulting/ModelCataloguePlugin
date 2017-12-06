@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-
 class RelationshipTypeService {
 
     static transactional = false

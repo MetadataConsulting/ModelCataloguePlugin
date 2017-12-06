@@ -6,7 +6,6 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DataModelFilter
-
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 

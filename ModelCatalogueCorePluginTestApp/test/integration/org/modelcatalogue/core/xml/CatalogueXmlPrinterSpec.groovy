@@ -8,7 +8,9 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
     CatalogueXmlPrinter printer

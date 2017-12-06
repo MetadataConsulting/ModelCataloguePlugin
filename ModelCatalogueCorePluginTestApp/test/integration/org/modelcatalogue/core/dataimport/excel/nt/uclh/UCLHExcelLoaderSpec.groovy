@@ -44,7 +44,7 @@ class UCLHExcelLoaderSpec extends AbstractIntegrationSpec {
     @Shared DataModel sourceDataModel
 
 
-//    def setupSpec(){
+//    def setupSpec() {
 //        initRelationshipTypes()
 //        defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
 //        catalogueXmlLoader = new CatalogueXmlLoader(defaultCatalogueBuilder)

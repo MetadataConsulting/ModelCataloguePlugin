@@ -1,10 +1,10 @@
 package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
+import grails.transaction.Transactional
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
-import org.springframework.transaction.annotation.Transactional
 
 class RelationshipGormService {
 

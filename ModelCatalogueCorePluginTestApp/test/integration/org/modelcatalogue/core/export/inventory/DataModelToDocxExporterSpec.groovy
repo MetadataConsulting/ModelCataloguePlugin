@@ -1,10 +1,8 @@
 package org.modelcatalogue.core.export.inventory
 
+import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import spock.lang.Ignore
-
-import static org.modelcatalogue.core.util.test.FileOpener.open
-
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.junit.Rule

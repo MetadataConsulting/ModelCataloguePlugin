@@ -5,7 +5,6 @@ import org.hibernate.SessionFactory
 import org.hibernate.engine.spi.SessionFactoryImplementor
 import org.hibernate.persister.entity.EntityPersister
 import org.hibernate.persister.entity.JoinedSubclassEntityPersister
-import org.hibernate.persister.entity.SingleTableEntityPersister
 import org.hibernate.proxy.HibernateProxy
 
 class HibernateHelper {

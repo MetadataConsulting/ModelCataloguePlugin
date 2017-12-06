@@ -1,8 +1,11 @@
 package org.modelcatalogue.core
 
+import spock.lang.IgnoreIf
+
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class InitCatalogueServiceSpec extends AbstractIntegrationSpec {
 
     def setup() {
@@ -36,7 +39,7 @@ class InitCatalogueServiceSpec extends AbstractIntegrationSpec {
         dt4
     }
 
-    def "The containment is present withing default relations types"(){
+    def "The containment is present withing default relations types"() {
         when:
         RelationshipType loaded = RelationshipType.containmentType
 
@@ -50,7 +53,7 @@ class InitCatalogueServiceSpec extends AbstractIntegrationSpec {
 
     }
 
-    def "The hierarchy is present withing default relations types"(){
+    def "The hierarchy is present withing default relations types"() {
         when:
         RelationshipType loaded = RelationshipType.hierarchyType
 
@@ -64,7 +67,7 @@ class InitCatalogueServiceSpec extends AbstractIntegrationSpec {
 
     }
 
-    def "The supersession is present withing default relations types"(){
+    def "The supersession is present withing default relations types"() {
         when:
         RelationshipType loaded = RelationshipType.supersessionType
 

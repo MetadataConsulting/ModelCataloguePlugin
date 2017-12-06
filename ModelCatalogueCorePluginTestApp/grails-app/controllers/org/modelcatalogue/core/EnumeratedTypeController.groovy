@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import static org.springframework.http.HttpStatus.OK
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.enumeration.Enumeration
@@ -7,8 +8,6 @@ import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.persistence.EnumeratedTypeGormService
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
-
-import static org.springframework.http.HttpStatus.OK
 
 class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
 

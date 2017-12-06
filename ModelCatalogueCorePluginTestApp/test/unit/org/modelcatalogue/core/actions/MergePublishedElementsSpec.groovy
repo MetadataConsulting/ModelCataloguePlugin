@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.actions
 
+import static org.modelcatalogue.core.actions.AbstractActionRunner.encodeEntity
+import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDescription
 import grails.test.mixin.Mock
 import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.DataClass
@@ -9,9 +11,6 @@ import org.modelcatalogue.core.RelationshipService
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import spock.lang.Ignore
 import spock.lang.Specification
-
-import static org.modelcatalogue.core.actions.AbstractActionRunner.encodeEntity
-import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDescription
 
 @Mock([DataClass, ExtensionValue])
 class MergePublishedElementsSpec extends Specification {

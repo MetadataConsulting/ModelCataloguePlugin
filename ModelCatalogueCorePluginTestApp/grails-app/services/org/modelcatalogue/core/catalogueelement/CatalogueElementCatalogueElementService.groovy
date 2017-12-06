@@ -5,8 +5,6 @@ import org.modelcatalogue.core.persistence.CatalogueElementGormService
 
 class CatalogueElementCatalogueElementService extends AbstractCatalogueElementService {
 
-    CatalogueElementGormService catalogueElementGormService
-
     @Override
     protected String resourceName() {
         'catalogueElement'

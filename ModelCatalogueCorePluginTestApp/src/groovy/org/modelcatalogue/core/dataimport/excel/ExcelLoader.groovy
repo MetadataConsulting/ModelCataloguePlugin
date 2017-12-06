@@ -16,9 +16,7 @@ import org.modelcatalogue.core.DataModel
 @Log
 class ExcelLoader {
 
-
     def dataModelService, elementService
-
 
     static String getOwnerAndGelModelFromFileName(String sampleFile, String bitInBetween) {
         sampleFile.find(/(.*)$bitInBetween.*/){ match, firstcapture ->

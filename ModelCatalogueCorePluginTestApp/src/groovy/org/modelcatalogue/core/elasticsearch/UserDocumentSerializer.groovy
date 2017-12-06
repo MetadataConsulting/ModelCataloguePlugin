@@ -5,7 +5,6 @@ import org.modelcatalogue.core.security.User
 
 class UserDocumentSerializer extends CatalogueElementDocumentSerializer<User> {
 
-
     @Override
     ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, User user, ImmutableMap.Builder<String, Object> builder) {
         super.buildDocument(session, user, builder)
@@ -15,5 +14,4 @@ class UserDocumentSerializer extends CatalogueElementDocumentSerializer<User> {
         
         return builder
     }
-
 }
