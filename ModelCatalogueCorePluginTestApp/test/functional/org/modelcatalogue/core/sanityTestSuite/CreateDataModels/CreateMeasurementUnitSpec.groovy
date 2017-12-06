@@ -6,7 +6,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
     private static final String name="input#name"

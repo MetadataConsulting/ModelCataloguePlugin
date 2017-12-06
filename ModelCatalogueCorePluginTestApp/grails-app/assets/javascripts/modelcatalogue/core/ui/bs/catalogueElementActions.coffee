@@ -463,7 +463,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
     {
       position:   -50
-      label:      ''
+      label:      'Download Asset'
       icon:       'fa fa-fw fa-download'
       type:       'primary'
       action:     ->

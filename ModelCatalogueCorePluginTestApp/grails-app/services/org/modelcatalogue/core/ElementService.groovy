@@ -733,6 +733,11 @@ class ElementService implements Publisher<CatalogueElement> {
         if (element.dataModel) {
             element.status = element.dataModel.status
         } else {
+            if ( element instanceof CatalogueElement ) {
+                Closure<CatalogueElement> cls = { -> } as Closure<CatalogueElement>
+                auditService.logElementFinalized((CatalogueElement)element, cls)
+            }
+
             element.status = ElementStatus.FINALIZED
         }
         element.save(flush: true)
