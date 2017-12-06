@@ -102,7 +102,7 @@ class GMCGridReportExcelLoaderSpec extends AbstractIntegrationSpec {
         } as Closure
     }
 
-
+    @IgnoreIf( { System.getenv('jenkins.ignore') })
     def "test update"() {
         log.info("Using ${gmcGridReportExcelLoader.getClass().name}")
         when: "initial models in"
