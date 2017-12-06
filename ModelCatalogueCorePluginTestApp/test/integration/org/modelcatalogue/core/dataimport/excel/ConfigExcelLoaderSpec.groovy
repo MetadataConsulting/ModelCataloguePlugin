@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.dataimport.excel.nt
+package org.modelcatalogue.core.dataimport.excel
 
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -31,7 +31,7 @@ class ConfigExcelLoaderSpec extends AbstractIntegrationSpec {
 //        XMLUnit.ignoreComments = true
 //        XMLUnit.ignoreAttributeOrder = true
 //        catalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
-        excelLoader = new ConfigExcelLoader(dataModelName, auditService, new FileReader(resourcePath + '/' + headersMapXml))
+        excelLoader = new ConfigExcelLoader(dataModelName, new FileInputStream(resourcePath + '/' + headersMapXml))
     }
 
     def "test default catalogue builder imports generic nt dataset"(){
@@ -41,5 +41,6 @@ class ConfigExcelLoaderSpec extends AbstractIntegrationSpec {
         then: "new model is created"
 
         DataModel.findByName(dataModelName)
+        return true
     }
 }
