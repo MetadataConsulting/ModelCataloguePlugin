@@ -16,14 +16,30 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
               <div class="form-group">
-                <label for="name" class="">Name</label>
-                <input type="text" class="form-control" id="name" placeholder="Name (leave blank to use filename)" ng-model="copy.name">
+                <label for="modelName" class="">Model Name</label>
+                <input type="text" class="form-control" id="modelName" placeholder="Model Name (leave blank to use filename)" ng-model="copy.modelName">
               </div>
               <div class="form-group">
-                <label for="asset" class="">File</label>
-                <input ng-hide="uploading &amp;&amp; progress" type="file" accept=".xls,.xlsx" class="form-control" id="asset" placeholder="File" ngf-model="copy.asset" ngf-select="onFileSelect($files)">
+                <label for="excelImportTypeSelect">Select Excel Import Type</label>
+                <select name="excelImportTypeSelect"
+                        id="excelImportTypeSelect"
+                        ng-model="selectedExcelImportType">
+                  <option ng-repeat="excelImportType in excelImportTypes" value="{{excelImportType}}">{{excelImportType}}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="asset" class="">Excel File</label>
+                <input ng-hide="uploading &amp;&amp; progress" type="file" accept=".xls,.xlsx" class="form-control" id="asset" ngf-model="copy.asset" ngf-select="onFileSelect($files)">
                 <uib-progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</uib-progressbar>
               </div>
+
+              <div class="form-group">
+                <label for="excelConfigXMLFile">Excel Config XML File</label>
+                <input ng-hide="uploading &amp;&amp; progress" type="file" ngf-select ng-model="excelConfigXMLFile" accept=".xml" class="form-control" id="excelConfigXMLFile">
+                </input>
+              </div>
+
+<!-- no longer use this old way of collecting headers map:
               <div class="form-group">
                       <label ng-click="headersCollapsed = !headersCollapsed" ng-init="headersCollapsed = true">Customize Columns Headers</label>
               </div>
@@ -85,6 +101,7 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
                       <input type="text" class="form-control" id="metadata" placeholder="Metadata" ng-model="headersMap.metadata">
                     </div>
               </div>
+-->
               <fake-submit-button/>
             </form>
         </div>
