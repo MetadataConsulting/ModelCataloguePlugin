@@ -37,7 +37,7 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
             if (item) {
 
                 CatalogueElement relation = relationsList.direction.getRelation(relationsList.owner, item)
-                boolean hasReadPermission = dataModelAclService.hasReadPermission(relation)
+                boolean hasReadPermission = dataModelAclService.isAdminOrHasReadPermission(relation)
                 if ( hasReadPermission ) {
                     list.add([id            : item.id,
                               type          : item.relationshipType,
