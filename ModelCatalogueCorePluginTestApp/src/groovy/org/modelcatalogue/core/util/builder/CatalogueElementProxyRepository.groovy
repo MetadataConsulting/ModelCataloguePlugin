@@ -2,8 +2,11 @@ package org.modelcatalogue.core.util.builder
 
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
+import grails.util.Holders
 import groovy.transform.CompileDynamic
 import groovy.util.logging.Log4j
+import org.hibernate.Session
+import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.api.ElementStatus
@@ -11,6 +14,8 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.springframework.context.ApplicationContext
+import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.util.StopWatch
 
 @Log4j @GrailsCompileStatic
@@ -42,6 +47,8 @@ class CatalogueElementProxyRepository {
     private final Map<String, Relationship> createdRelationships = [:]
 
     ProgressMonitor monitor = ProgressMonitor.NOOP
+
+    ApplicationContext applicationContext = Holders.getApplicationContext()
 
 
     CatalogueElementProxyRepository(DataModelService dataModelService, ElementService elementService) {
@@ -97,12 +104,50 @@ class CatalogueElementProxyRepository {
 
         return equals(a.classification, b.classification) && a.name == b.name
     }
+    public void reconnectAfterClear(CatalogueElement catalogueElement, String failureMessage) {
+        if (!catalogueElement.readyForQueries) {
+            catalogueElement = catalogueElement.merge()
+            catalogueElement.refresh()
+            try {
+                catalogueElement = catalogueElement.merge()
+            }
+            catch (OptimisticLockingFailureException olfe) {
+                catalogueElement = CatalogueElement.get(catalogueElement.id)
+            }
+            if (!catalogueElement.readyForQueries) {
+                throw new IllegalStateException(failureMessage)
+            }
+        }
 
+    }
+    public void periodicFlushClear (int count, int batchSize, Session session) {
+        if (++count % batchSize == 0) {
+            try{
+                session.flush()
+                session.clear() // aggressive, but needed for bulk loading.
+            }
+            catch(Exception e) {
+                log.error(session)
+                log.error(" error: ${e.message}")
+                throw e
+            }
+        }
+    }
     public Set<CatalogueElement> resolveAllProxies(boolean skipDirtyChecking) {
+        SessionFactory sessionFactory = (SessionFactory) applicationContext.getBean('sessionFactory')
+        Session session = sessionFactory.getCurrentSession()
+        log.info(session.properties)
+
         StopWatch watch =  new StopWatch('catalogue proxy repository')
 
         // FIXME: keeping all the created elements eats lot of memory
         Set<CatalogueElement> created = []
+
+        int count = 0
+        int batchSize = 20
+
+
+
 
         List<CatalogueElement> lastElement = CatalogueElement.list(max: 1, sort: 'id', order: 'desc')
         maxCatalogueElementIdAtStart = lastElement ? lastElement.first().getId() : Long.MAX_VALUE
@@ -155,7 +200,7 @@ class CatalogueElementProxyRepository {
         watch.stop()
 
         if (!skipDirtyChecking) {
-            // Step 1:check something changed this must run before any other resolution happens
+            // Step 2:check something changed this must run before any other resolution happens
             watch.start('dirty checking')
             logInfo "(2/6) dirty checking"
 
@@ -189,7 +234,7 @@ class CatalogueElementProxyRepository {
             }
             watch.stop()
 
-            // Step 2: if something changed, create new versions. if run in one step, it generates false changes
+            // Step 3: if something changed, create new versions. if run in one step, it generates false changes
             watch.start('creating drafts')
             logInfo "(3/6) creating drafts"
 
@@ -206,14 +251,17 @@ class CatalogueElementProxyRepository {
 
         Set<RelationshipProxy> relationshipProxiesToBeResolved = []
 
-        // Step 3: resolve elements (set properties, update metadata)
+        // Step 4: resolve elements (set properties, update metadata)
         watch.start('resolving elements')
         logInfo "(4/6) resolving elements"
         int elNumberOfPositions = Math.floor(Math.log10(elementProxiesToBeResolved.size())).intValue() + 2
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
             logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
             try {
+                periodicFlushClear(count, batchSize, session)
+
                 CatalogueElement resolved = element.resolve() as CatalogueElement
+                reconnectAfterClear(resolved, "Catalogue element $resolved is not ready to be queried")
                 created.add(resolved)
                 relationshipProxiesToBeResolved.addAll element.pendingRelationships
                 if (element.pendingPolicies) {
@@ -243,6 +291,7 @@ class CatalogueElementProxyRepository {
         relationshipProxiesToBeResolved.eachWithIndex { RelationshipProxy relationshipProxy, i ->
             logDebug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
             try {
+                periodicFlushClear(count, batchSize, session)
                 if (relationshipProxy.source.resolve() == relationshipProxy.destination.resolve()) {
                     logWarn "Ignoring self reference: $relationshipProxy"
                     return
@@ -269,7 +318,10 @@ class CatalogueElementProxyRepository {
                 if (!element.underControl) {
                     return
                 }
+                periodicFlushClear(count, batchSize, session)
+
                 CatalogueElement catalogueElement = element.resolve() as CatalogueElement
+                reconnectAfterClear(catalogueElement, "Catalogue element $catalogueElement is not ready to be queried")
                 Set<Long> relations = []
                 relations.addAll catalogueElement.incomingRelationships*.getId()
                 relations.addAll catalogueElement.outgoingRelationships*.getId()
@@ -293,7 +345,9 @@ class CatalogueElementProxyRepository {
             ElementStatus status = element.getParameter('status') as ElementStatus
 
             try {
+                periodicFlushClear(count, batchSize, session)
                 CatalogueElement catalogueElement = element.resolve() as CatalogueElement
+                reconnectAfterClear(catalogueElement, "Catalogue element $catalogueElement is not ready to be queried")
 
                 if (status && catalogueElement.status != status) {
                     if (status == ElementStatus.FINALIZED) {
@@ -529,7 +583,7 @@ class CatalogueElementProxyRepository {
     }
 
     @CompileDynamic
-    private static <T> DetachedCriteria<T> getNameCriteria(Class<T> type, name) {
+    static <T> DetachedCriteria<T> getNameCriteria(Class<T> type, name) {
         DetachedCriteria<T> criteria = new DetachedCriteria<T>(type).build {
             eq 'name', name.toString()
         }
@@ -540,7 +594,7 @@ class CatalogueElementProxyRepository {
         elementService.findByModelCatalogueId(type, id?.toString(), maxCatalogueElementIdAtStart)?.asType(type) as T
     }
 
-    private static <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {
+    static <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {
         Map<String, Object> params = unclassifiedOnly ? LATEST - [max: 1] : LATEST
         List<T> elements = criteria.list(params)
         if (elements) {
@@ -571,16 +625,13 @@ class CatalogueElementProxyRepository {
             throw new IllegalStateException(FriendlyErrors.printErrors("Source element $sourceElement contains errors and is not ready to be part of the relationship ${proxy.toString()}", sourceElement.errors))
         }
 
-        if (!sourceElement.readyForQueries) {
-            throw new IllegalStateException("Source element $sourceElement is not ready to be part of the relationship ${proxy.toString()}")
-        }
+        reconnectAfterClear(sourceElement, "Source element $sourceElement is not ready to be part of the relationship ${proxy.toString()}")
+
         if (destinationElement.hasErrors()) {
             throw new IllegalStateException(FriendlyErrors.printErrors("Destination element $destinationElement contains errors and is not ready to be part of the relationship ${proxy.toString()}", destinationElement.errors))
         }
 
-        if (!destinationElement.readyForQueries) {
-            throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${proxy.toString()}")
-        }
+        reconnectAfterClear(destinationElement, "Destination element $destinationElement is not ready to be part of the relationship ${proxy.toString()}")
 
         String hash = PublishingContext.hashForRelationship(sourceElement, destinationElement, type)
 

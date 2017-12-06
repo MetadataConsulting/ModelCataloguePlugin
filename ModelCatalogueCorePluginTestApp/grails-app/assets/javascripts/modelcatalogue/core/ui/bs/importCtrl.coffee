@@ -55,8 +55,9 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
           if catalogue.isInstanceOf result.elementType, 'asset'
             result.show()
       ).error((data) ->
-        for err in data.errors
-          $scope.messages.error err.message
+        if (data?.errors)
+          for err in data?.errors
+            $scope.messages.error err.message
         $scope.uploading = false
         $scope.progress  = 0
         $uibModalInstance.close()

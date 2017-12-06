@@ -12,6 +12,7 @@ import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
+import org.modelcatalogue.core.util.builder.CatalogueElementProxyRepository
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader
 import org.modelcatalogue.integration.obo.OboLoader
@@ -363,23 +364,37 @@ class DataImportController  {
 
     @Async
     protected void loadMCSpreadsheet(Workbook wb, String filename, DefaultCatalogueBuilder defaultCatalogueBuilder, Long id, Long userId) {
-        auditService.mute {
+
             try {
                 ExcelLoader loader = new ExcelLoader()
-                loader.buildModelFromSpreadsheetFromExcelExporter(
-                        HeadersMap.createForSpreadsheetFromExcelExporter(),
-                        wb,
-                        0,
-                        defaultCatalogueBuilder,
-                        filename.split(/\.mc\.xls/)[0]
-                )
+                String modelName = filename.split(/\.mc\.xls/)[0]
+                String oldModelVersion = CatalogueElementProxyRepository.getLatestFromCriteria(CatalogueElementProxyRepository.getNameCriteria(DataModel, modelName), true).semanticVersion
+                // do load muted...
+                auditService.mute {
+                    loader.buildModelFromSpreadsheetFromExcelExporter(
+                            HeadersMap.createForSpreadsheetFromExcelExporter(),
+                            wb,
+                            0,
+                            defaultCatalogueBuilder,
+                            filename.split(/\.mc\.xls/)[0]
+                    )
+                }
+                // ...and some logging after the fact:
+                DataModel newModel = CatalogueElementProxyRepository.getLatestFromCriteria(CatalogueElementProxyRepository.getNameCriteria(DataModel, modelName), true)
+                String newModelVersion = newModel.semanticVersion
+                if (oldModelVersion == newModelVersion) {
+                    auditService.logElementUpdated(newModel)
+                }
+                else {
+                    auditService.logNewVersionCreated(newModel, {newModel})
+                }
                 finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
 
             }
             catch (Exception e) {
                 logError(id, e)
             }
-        }
+
     }
 
 

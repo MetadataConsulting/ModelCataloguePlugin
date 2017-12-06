@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.publishing
 
 import groovy.util.logging.Log4j
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
@@ -38,6 +39,7 @@ class FinalizationChain extends PublishingChain {
         }
 
         published.status = ElementStatus.PENDING
+        published.merge()
         published.save()
 
         for (CatalogueElement element in publishedDataModel.declares) {
@@ -72,7 +74,7 @@ class FinalizationChain extends PublishingChain {
     }
 
     private static CatalogueElement doPublish(CatalogueElement published, Publisher<CatalogueElement> archiver, Observer<String> monitor, boolean flush = false) {
-        published = HibernateHelper.ensureNoProxy(published)
+        published = (CatalogueElement) GrailsHibernateUtil.unwrapIfProxy(published) //HibernateHelper.ensureNoProxy(published)
         monitor.onNext("Finalizing $published ...")
 
         published.status = ElementStatus.FINALIZED

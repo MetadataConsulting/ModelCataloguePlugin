@@ -6,6 +6,7 @@ import groovy.transform.CompileDynamic
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.RelationshipType
@@ -47,6 +48,7 @@ class CloningChain extends PublishingChain {
 
         for (Collection<CatalogueElement> elements in queue) {
             for (CatalogueElement element in elements) {
+                element = (CatalogueElement) GrailsHibernateUtil.unwrapIfProxy(element)
                 if (context.destination && context.destination != element.dataModel && context.destination != element) {
                     if (element.instanceOf(DataModel)) {
                         context.addImport(element as DataModel)

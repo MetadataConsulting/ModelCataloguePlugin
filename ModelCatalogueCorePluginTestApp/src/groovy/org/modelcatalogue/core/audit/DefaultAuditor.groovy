@@ -20,9 +20,9 @@ class DefaultAuditor extends LoggingAuditor {
     }
 
     Observable<Long> logChange(Map <String, Object> changeProps, CatalogueElement element, boolean async) {
-        AsyncSubject<Long> subject = AsyncSubject.create()
-        if (!getSystem()) {
 
+        if (!getSystem()) {
+            AsyncSubject<Long> subject = AsyncSubject.create()
             boolean currentSystem = system
 
             Closure code = {
@@ -55,9 +55,11 @@ class DefaultAuditor extends LoggingAuditor {
             } else {
                 code()
             }
-
+            return subject
         }
-        return subject
+        else {
+            return Observable.empty()
+        }
     }
 
 }
