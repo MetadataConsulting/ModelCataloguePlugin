@@ -35,7 +35,7 @@ class ExcelExporterSpec extends AbstractIntegrationSpec {
 
     }
 
-    @IgnoreIf( { System.getProperty('spock.ignore.slow')|| System.getenv('jenkins.ignore') })
+    @IgnoreIf( { System.getProperty('spock.ignore.slow')|| System.getenv('JENKINS_IGNORE') })
     def "export model to excel"() {
         setup:
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
