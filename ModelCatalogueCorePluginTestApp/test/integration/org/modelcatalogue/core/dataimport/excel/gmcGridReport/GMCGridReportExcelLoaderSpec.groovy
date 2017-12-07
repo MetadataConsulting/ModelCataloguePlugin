@@ -30,7 +30,7 @@ import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportHeade
  * Created by james on 17/08/2017.
  */
 @Log4j
-@IgnoreIf( { System.getProperty('spock.ignore.slow') })
+@IgnoreIf( { System.getProperty('spock.ignore.slow') ||  System.getenv('JENKINS_IGNORE' )})
 class GMCGridReportExcelLoaderSpec extends AbstractIntegrationSpec {
     @Shared DataModelService dataModelService
     @Shared ElementService elementService
@@ -102,7 +102,7 @@ class GMCGridReportExcelLoaderSpec extends AbstractIntegrationSpec {
         } as Closure
     }
 
-    @IgnoreIf( { System.getenv('jenkins.ignore') })
+    @IgnoreIf( { System.getenv('JENKINS_IGNORE') })
     def "test update"() {
         log.info("Using ${gmcGridReportExcelLoader.getClass().name}")
         when: "initial models in"

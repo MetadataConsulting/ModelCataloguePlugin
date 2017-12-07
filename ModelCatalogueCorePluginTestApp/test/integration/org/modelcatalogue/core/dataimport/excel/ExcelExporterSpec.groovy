@@ -11,6 +11,7 @@ import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.IgnoreIf
 
+
 class ExcelExporterSpec extends AbstractIntegrationSpec {
 
     public static final String ROOT_DATA_MODEL_NAME = 'Grid Report Data Model'
@@ -34,7 +35,7 @@ class ExcelExporterSpec extends AbstractIntegrationSpec {
 
     }
 
-    @IgnoreIf( { System.getProperty('spock.ignore.slow')| System.getenv('jenkins.ignore') })
+    @IgnoreIf( { System.getProperty('spock.ignore.slow')|| System.getenv('JENKINS_IGNORE') })
     def "export model to excel"() {
         setup:
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
