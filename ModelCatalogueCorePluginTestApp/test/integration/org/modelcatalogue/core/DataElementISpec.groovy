@@ -1,13 +1,16 @@
 package org.modelcatalogue.core
 
+import spock.lang.IgnoreIf
+
 class DataElementISpec extends AbstractIntegrationSpec{
 
     def auth1, auth3, auth2
 
-    def setup(){
+    def setup() {
         loadFixtures()
     }
 
+    @IgnoreIf( { System.getProperty('spock.ignore.slow') })
     def "get all relations"() {
 
         initCatalogueService.initDefaultRelationshipTypes()

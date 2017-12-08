@@ -1,12 +1,10 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
-
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import spock.lang.Ignore
-
 
 class ValidateRegistrationSpec extends  AbstractModelCatalogueGebSpec {
     private static final String newUsername="input#username-new"

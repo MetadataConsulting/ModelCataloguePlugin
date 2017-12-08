@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.security
 
-import com.google.common.io.BaseEncoding
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic

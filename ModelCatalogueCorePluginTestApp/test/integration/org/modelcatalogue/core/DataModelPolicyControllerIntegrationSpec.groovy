@@ -13,17 +13,17 @@ class DataModelPolicyControllerIntegrationSpec extends AbstractControllerIntegra
 
 
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "Changed Policy", policyText: 'check dataType property "name" is unique']
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
         [name:"New Policy", policyText: 'check dataType property "name" is unique']
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300]
     }
 

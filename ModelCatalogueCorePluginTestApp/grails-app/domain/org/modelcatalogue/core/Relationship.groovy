@@ -20,7 +20,6 @@ import org.modelcatalogue.core.util.*
 * New types can be created using the ontology type class
 *
 */
-
 class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalogue.core.api.Relationship, DataModelAware {
 
     // when the relationship class is first loaded set the next index to current time in milliseconds

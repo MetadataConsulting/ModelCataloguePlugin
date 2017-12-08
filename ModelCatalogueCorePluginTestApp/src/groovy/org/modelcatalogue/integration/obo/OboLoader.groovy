@@ -1,10 +1,7 @@
 package org.modelcatalogue.integration.obo
 
-import groovy.text.SimpleTemplateEngine
-import groovy.text.Template
 import groovy.util.logging.Log4j
 import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.api.ElementStatus
 import org.obolibrary.oboformat.model.Clause
 import org.obolibrary.oboformat.model.Frame

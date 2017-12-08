@@ -1,11 +1,5 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-
-import org.modelcatalogue.core.AssetWizardSpec
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-
-import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.description
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
@@ -13,7 +7,14 @@ import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.nameLabel
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import static org.modelcatalogue.core.geb.Common.save
+import org.modelcatalogue.core.AssetWizardSpec
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
+import spock.lang.Stepwise
 
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
     private static final String asset ="input#asset"
@@ -27,7 +28,7 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
     private static final String  importedDataModel= "td.col-md-5"
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
 
-    def"login and navigate to the model"(){
+    def "login and navigate to the model"() {
         when:
         loginCurator()
         select 'Test 3'
@@ -36,13 +37,15 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
         then:
         check rightSideTitle contains 'Active Assets'
     }
-    def"navigate to create asset page"(){
+
+    def "navigate to create asset page"() {
         when:
         click create
         then:
         check modalHeader contains 'Create Asset'
     }
-    def"create a new asset"(){
+
+    def "create a new asset"() {
         when:
         fill nameLabel with " Sample excel${System.currentTimeMillis()}"
         fill asset with file ('example.xml')
@@ -52,8 +55,8 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
         then:
         check table displayed
     }
-    def"delete the created asset"(){
 
+    def "delete the created asset"() {
         when: 'click on the model catalogue to return home'
         click modelCatalogue
 
@@ -79,9 +82,9 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
         then:
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         check table gone
-
     }
-    def"login and navigate to model"(){
+
+    def "login and navigate to model"() {
         when:
         loginCurator()
         select 'Test 3'
@@ -90,20 +93,22 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
         check rightSideTitle contains 'Imports'
     }
 
-    def" import model "(){
+    def "import model "() {
         when:
         addDataModelImport 'Clinical Tags'
+
         then:
         check importedDataModel contains 'Clinical Tags'
     }
-    def"remove the imported data model "(){
 
+    def "remove the imported data model"() {
         when:
         click modelCatalogue
 
         and: ' select test3 and navigate to import tag'
         select 'Test 3'
         selectInTree 'Imported Data Models'
+
         then:
         check rightSideTitle contains 'Imports'
 
@@ -120,10 +125,9 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
         then:
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         check importedDataModel gone
-
     }
+
     String file(String name) {
         new File(AssetWizardSpec.getResource(name).toURI()).absolutePath
     }
-
 }

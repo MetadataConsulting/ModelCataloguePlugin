@@ -3,7 +3,6 @@ package org.modelcatalogue.core.util
 import grails.util.GrailsNameUtils
 import grails.util.Holders
 import grails.validation.ValidationException
-import org.modelcatalogue.core.CatalogueElement
 import org.springframework.context.MessageSource
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError

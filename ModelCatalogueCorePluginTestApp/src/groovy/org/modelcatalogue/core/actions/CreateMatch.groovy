@@ -1,4 +1,5 @@
 package org.modelcatalogue.core.actions
+
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship

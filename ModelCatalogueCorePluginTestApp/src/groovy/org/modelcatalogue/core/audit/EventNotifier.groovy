@@ -11,14 +11,10 @@ import org.springframework.messaging.core.MessageSendingOperations
 import rx.Observable
 import rx.subjects.PublishSubject
 import rx.subjects.Subject
-
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 
-
 class EventNotifier extends LoggingAuditor {
-
-
     final ExecutorService executorService
     final MessageSendingOperations brokerMessagingTemplate
 

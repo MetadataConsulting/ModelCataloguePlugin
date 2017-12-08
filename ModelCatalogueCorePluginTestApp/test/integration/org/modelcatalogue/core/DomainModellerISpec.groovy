@@ -11,7 +11,7 @@ class DomainModellerISpec extends IntegrationSpec{
     @Shared
     def domainModellerService
 
-    def "marshall domain models"(){
+    def "marshall domain models"() {
         expect:
         //domainModellerService.modelDomains()
         true

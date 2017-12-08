@@ -8,22 +8,22 @@ class DataClassControllerIntegrationSpec extends AbstractCatalogueElementControl
         true
     }
 
-    def setupSpec(){
+    def setupSpec() {
         totalCount = 12
     }
 
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "changedName", description: "edited description ", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
        [name:"new model", description: "the model of the book", dataModel: dataModelForSpec]
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
 

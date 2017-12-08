@@ -1,19 +1,20 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import groovy.transform.NotYetImplemented
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.getDescription
-import static org.modelcatalogue.core.geb.Common.getModalCloseButton
 import static org.modelcatalogue.core.geb.Common.getModelCatalogueId
 import static org.modelcatalogue.core.geb.Common.getNameLabel
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.save
+import groovy.transform.NotYetImplemented
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
+import spock.lang.Stepwise
 
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpec{
 
@@ -38,12 +39,12 @@ class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpe
     def "navigate to data type creation page "() {
         when:
         click create
+
         then:
         check modalHeader contains 'Create Data Type'
     }
 
-    def " fill the create data type form"() {
-
+    def "fill the create data type form"() {
         when:
         fill nameLabel with "TESTING_DATA_TYPE "
 
@@ -54,6 +55,7 @@ class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpe
         and: 'click on enumerated type'
         click enumerated
         fillMetadata '01': 'one', '02': 'two', '03': 'three', '04': 'four', '05': 'five'
+
         and:
         click paste
 
@@ -67,8 +69,7 @@ class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpe
         check first_row contains 'TESTING_DATA_TYPE'
     }
 
-    def" remove the created data type "(){
-
+    def "remove the created data type "() {
         when:
         click dataType
 

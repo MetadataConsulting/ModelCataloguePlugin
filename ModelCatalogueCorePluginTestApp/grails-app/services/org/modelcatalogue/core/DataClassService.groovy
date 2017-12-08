@@ -1,9 +1,11 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableSet
 import grails.transaction.Transactional
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DataModelFilter
-
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
@@ -14,12 +16,25 @@ class DataClassService {
     SecurityService modelCatalogueSecurityService
     DataModelService dataModelService
     PerformanceUtilService performanceUtilService
+    DataModelGormService dataModelGormService
+    DataModelAclService dataModelAclService
 
     ListWithTotalAndType<DataClass> getTopLevelDataClasses(Map params = [:]) {
         getTopLevelDataClasses(dataModelService.dataModelFilter, params)
     }
 
-    ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter, Map params = [:], boolean canViewDrafts = modelCatalogueSecurityService.isSubscribed(dataModelFilter.includes)) {
+    ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter,
+                                                           Map params = [:],
+                                                            Boolean canViewDraftsParam = null) {
+        boolean canViewDrafts
+        if ( canViewDraftsParam == null ) {
+            ImmutableSet<Long> dataModelIds = dataModelFilter.includes
+            List<Long> dataModelIdList = dataModelIds.toList()
+            canViewDrafts  = dataModelIdList.size() == dataModelGormService.findAllInIdList(dataModelIdList).size()
+        } else {
+            canViewDrafts = canViewDraftsParam
+        }
+
         RelationshipType hierarchy = RelationshipType.hierarchyType
         List<ElementStatus> status = ElementService.getStatusFromParams(params, canViewDrafts)
 

@@ -1,13 +1,14 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.admin
 import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
+import spock.lang.Stepwise
 
-
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class FastActionsActivitySpec extends AbstractModelCatalogueGebSpec{
 
@@ -16,15 +17,14 @@ class FastActionsActivitySpec extends AbstractModelCatalogueGebSpec{
     private static final String  activity ="div.modal-body>div:nth-child(2)>div>a:nth-child(2)"
     private static final String  user = "td.col-md-8"
 
-
-    def "login to model catalogue "(){
+    def "login to model catalogue "() {
         login admin
 
         expect:
         check create displayed
     }
 
-    def " select fast actions and click on the activity "(){
+    def "select fast actions and click on the activity"() {
         Thread.sleep(2000L)
         click fastActions
         click activity
@@ -33,7 +33,9 @@ class FastActionsActivitySpec extends AbstractModelCatalogueGebSpec{
         check modalHeader contains "Recent Activity"
 
     }
-    def "verify the most recent active users"(){
+
+    @Ignore // TODO: Discuss last seen feature
+    def "verify the most recent active users"() {
 
        expect:
        Thread.sleep(3000L)

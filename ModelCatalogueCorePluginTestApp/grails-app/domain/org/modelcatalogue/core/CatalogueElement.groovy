@@ -1,8 +1,10 @@
 package org.modelcatalogue.core
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import com.google.common.base.Function
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
+import grails.plugin.springsecurity.acl.AclEntry
 import grails.util.GrailsNameUtils
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.proxy.HibernateProxyHelper
@@ -13,8 +15,7 @@ import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import rx.Observer
-
-import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
+import java.security.acl.Acl
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
@@ -30,6 +31,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     transient mappingService
     transient elementService
     transient modelCatalogueSecurityService
+
+    transient dataModelAclService
 
     DataModel dataModel
 
@@ -84,8 +87,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     ]
 
     static constraints = {
-        name size: 1..255
-        description nullable: true, maxSize: 20000
+        name nullable: false, blank: false, size: 1..255
+        description nullable: true, blank: true, maxSize: 20000
 		modelCatalogueId nullable: true, size: 1..255
         dateCreated bindable: false
         lastUpdated bindable: false
@@ -229,12 +232,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         }
     }
 
-    def beforeDelete(){
-        User currentUser = modelCatalogueSecurityService.getCurrentUser()
-        //if this is a data model add this data model, otherwise add the data model of the class.
-        if(this.instanceOf(DataModel) && currentUser) {
-            modelCatalogueSecurityService.removeAllUserRoleModel(currentUser, this)
-        }
+    def beforeDelete() {
         auditService.logElementDeleted(this)
     }
 
@@ -456,14 +454,13 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     void afterMerge(CatalogueElement destination) {}
 
     void afterInsert() {
-        auditService.logElementCreated(this)
-        User currentUser = modelCatalogueSecurityService.getCurrentUser()
-        //if this is a data model add this data model, otherwise add the data model of the class.
-        if(this.instanceOf(DataModel) && currentUser) {
-            modelCatalogueSecurityService.addUserRoleModel(currentUser, Role.findByAuthority('ROLE_SUPERVISOR'), this)
-            //modelCatalogueSecurityService.addUserRoleModel(currentUser, Role.findByAuthority('ROLE_METADATA_CURATOR'), this)
+        if ( this instanceof DataModel ) {
+            final Long dataModelId = this.id
+            AclEntry.withNewSession {
+                dataModelAclService.addAdministrationPermission(dataModelId)
+            }
         }
-
+        auditService.logElementCreated(this)
     }
 
     void beforeInsert() {

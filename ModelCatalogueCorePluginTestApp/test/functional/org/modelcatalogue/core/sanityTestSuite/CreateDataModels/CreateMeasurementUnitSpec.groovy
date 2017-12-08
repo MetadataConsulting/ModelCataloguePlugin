@@ -1,10 +1,12 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.*
-
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
     private static final String name="input#name"
@@ -14,10 +16,7 @@ class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
     private static final String  measurementUnit="td.col-md-4>a"
     private static final String  measurementUnitButton="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
 
-
-
-
-    def"login to model catalogue and navigate to the model"(){
+    def "login to model catalogue and navigate to the model"() {
         when:
               loginCurator()
               select'Test 3'
@@ -25,7 +24,7 @@ class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
         then:
               check rightSideTitle contains 'Active Measurement Units'
     }
-    def" Navigate to measure unit page"(){
+    def "Navigate to measure unit page"() {
 
         when:
               click create
@@ -33,7 +32,7 @@ class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
         then:
              check modalHeader  contains "Create Measurement Unit"
     }
-    def" create Measurement unit"(){
+    def "create Measurement unit"() {
         when:
              fill name with("TESTING_KILOGRAM")
              fill symbol with("kilogram")
@@ -43,11 +42,9 @@ class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
 
         then:
             check table contains 'kilogram'
-
     }
 
-    def" remove the created measurement"(){
-
+    def "remove the created measurement"() {
         when:'click on the created  measurement unit'
         click measurementUnit
 
@@ -62,8 +59,5 @@ class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check table gone
-
     }
-
-
 }

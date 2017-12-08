@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.diff
 
+import static com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableMultimap
@@ -16,8 +17,6 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.HibernateHelper
-
-import static com.google.common.base.Preconditions.checkNotNull
 
 class CatalogueElementDiffs {
 
@@ -105,7 +104,6 @@ class CatalogueElementDiffs {
 
             }
         }
-
 //if the class is enumerated then do a diff on the specific enumerations the specific
 
         if (selfClass.fullName == EnumeratedType.name) {
@@ -143,11 +141,7 @@ class CatalogueElementDiffs {
         for(String key in missingExtensions) {
             builder.put(Diff.keyForExtension(key), Diff.createExtensionChange(key, self, null, other.ext[key], parentClass, parentElement))
         }
-
-
         //do a diff on the relationships
-
-
         //get the relationships for self and other
 
         ImmutableMap<String, Relationship> selfRelationships = collectRelationships(self)
@@ -194,7 +188,6 @@ class CatalogueElementDiffs {
         return builder.build()
     }
 
-
     ImmutableMultimap<String, Diff> differentiateTopLevelClasses(CatalogueElement self, CatalogueElement other) {
 
         //if there isn't another catalogue element or isn't a self of they are the same - return
@@ -208,13 +201,11 @@ class CatalogueElementDiffs {
         //check self and other aren't null
         GrailsDomainClass selfClass = checkNotNull(grailsApplication.getDomainClass(HibernateHelper.getEntityClass(self).name), "No such domain class ${HibernateHelper.getEntityClass(self).name}") as GrailsDomainClass
         GrailsDomainClass otherClass = checkNotNull(grailsApplication.getDomainClass(HibernateHelper.getEntityClass(other).name), "No such domain class ${HibernateHelper.getEntityClass(other).name}") as GrailsDomainClass
-
-
+        
         //get the parentOf relationships for self and other
 
         ImmutableMap<String, Relationship> selfRelationships = collectParentOfRelationships(self)
         ImmutableMap<String, Relationship> otherRelationships = collectParentOfRelationships(other)
-
 
         for(Map.Entry<String, Relationship> rel in selfRelationships) {
             Relationship selfRelationship = rel.value
@@ -241,8 +232,6 @@ class CatalogueElementDiffs {
         }
 
         return builder.build()
-
-
     }
 
     private static ImmutableMap<String, Relationship> collectRelationships(CatalogueElement self) {
@@ -265,11 +254,6 @@ class CatalogueElementDiffs {
                 selfRelationshipsBuilder.put(Diff.keyForRelationship(relationship), relationship)
             }
         }
-
         ImmutableMap.copyOf(selfRelationshipsBuilder)
     }
-
-
-
-
 }

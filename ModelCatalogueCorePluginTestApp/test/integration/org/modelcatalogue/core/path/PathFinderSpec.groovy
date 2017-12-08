@@ -6,8 +6,10 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
+import spock.lang.IgnoreIf
 import spock.lang.Requires
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class PathFinderSpec extends AbstractIntegrationSpec {
 
     DataModelService dataModelService

@@ -4,7 +4,6 @@ import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.marshalling.JsonMarshallingCustomizer
 import org.springframework.beans.factory.annotation.Autowired
 

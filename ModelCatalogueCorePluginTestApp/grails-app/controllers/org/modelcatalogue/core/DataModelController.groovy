@@ -1,13 +1,21 @@
 package org.modelcatalogue.core
 
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
 import com.google.common.collect.ImmutableSet
 import grails.transaction.Transactional
 import grails.util.GrailsNameUtils
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.catalogueelement.DataModelCatalogueElementService
+import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.dataimport.excel.ExcelExporter
+import org.modelcatalogue.core.events.DataModelFinalizedEvent
+import org.modelcatalogue.core.events.DataModelWithErrorsEvent
+import org.modelcatalogue.core.events.MetadataResponseEvent
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.DataModelFilter
@@ -19,21 +27,29 @@ import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
-import org.modelcatalogue.gel.export.GridReportXlsxExporter
+import grails.plugin.springsecurity.acl.AclUtilService
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.springframework.http.HttpStatus
 import org.springframework.validation.Errors
-
-import static org.springframework.http.HttpStatus.CREATED
-import static org.springframework.http.HttpStatus.OK
+import grails.plugin.springsecurity.SpringSecurityService
 
 class DataModelController<T extends CatalogueElement> extends AbstractCatalogueElementController<DataModel> {
 
     SessionFactory sessionFactory
 
-	DataModelController() {
-		super(DataModel, false)
-	}
+    SpringSecurityService springSecurityService
+
+    DataModelGormService dataModelGormService
+
+    AclUtilService aclUtilService
+
+    FavouriteService favouriteService
+
+    DataModelCatalogueElementService dataModelCatalogueElementService
+
+    DataModelController() {
+        super(DataModel, false)
+    }
 
     //can be used in the future
     static final String DOC_IMAGE_PATH = ""
@@ -55,7 +71,9 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         'paragraph.headerImage' height: 1.366.inches, width: 2.646.inches
     }
 
-
+    protected DataModel findById(long id) {
+        dataModelGormService.findById(id)
+    }
 
     /**
      * Saves a resource
@@ -63,14 +81,10 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      */
     @Transactional
     def save() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            unauthorized()
-            return
-        }
         if (handleReadOnly()) {
             return
         }
-        def instance = createResource()
+        DataModel instance = createResource()
 
         instance.validate()
 
@@ -109,13 +123,15 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         instance.save flush: true
 
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
+        
+
         bindRelations(instance, false)
 
         instance.save flush: true
-
-        if (!params.skipPolicies) {
-            validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, objectToBind)
-        }
 
         if (instance.hasErrors()) {
             respond instance.errors
@@ -123,80 +139,46 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
 
         if (favoriteAfterUpdate && modelCatalogueSecurityService.userLoggedIn && instance) {
-            modelCatalogueSecurityService.currentUser?.createLinkTo(instance, RelationshipType.favouriteType)
+            favouriteService.favouriteModel(instance)
         }
-
 
         respond instance, [status: CREATED]
     }
-
-
-
 
     /**
      * Finalize a model
      * @param id cloned element id
      * @param destinationDataModelId destination data model id
      */
+    @Transactional
     def finalizeElement() {
-
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
-            unauthorized()
-            return
-        }
-
         if (handleReadOnly()) {
             return
         }
 
-        T instance = queryForResource(params.id)
-        if (instance == null) {
+        Long dataModelId = params.long('id')
+        String semanticVersion = params.semanticVersion
+        String revisionNotes = params.revisionNotes
+
+        MetadataResponseEvent responseEvent = dataModelCatalogueElementService.finalize(dataModelId, semanticVersion, revisionNotes)
+        boolean handled = handleMetadataResponseEvent(responseEvent)
+        if ( handled ) {
+            return
+        }
+        if ( responseEvent instanceof DataModelWithErrorsEvent) {
+            DataModel dataModel = (responseEvent as DataModelWithErrorsEvent).dataModel
+            respond dataModel.errors, view: 'edit' // STATUS CODE 422
+            return
+        }
+        if ( !(responseEvent instanceof DataModelFinalizedEvent) ) {
+            log.warn("Got an unexpected event ${responseEvent.class.name}")
             notFound()
             return
         }
 
-        if (!instance.instanceOf(DataModel) && !instance.dataModel) {
-            instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model"
-            respond instance.errors
-            return
-        }
-
-
-        String semanticVersion = params.semanticVersion
-        String revisionNotes = params.revisionNotes
-
-        if (instance.instanceOf(DataModel)) {
-            instance.checkFinalizeEligibility(semanticVersion, revisionNotes)
-        }
-
-        if (instance.hasErrors()) {
-            respond instance.errors, view: 'edit' // STATUS CODE 422
-            return
-        }
-
-        Long id = instance.getId()
-
-        executorService.submit {
-            try {
-                CatalogueElement element = resource.get(id)
-                if (element.instanceOf(DataModel)) {
-                    elementService.finalizeDataModel(element as DataModel, semanticVersion, revisionNotes, BuildProgressMonitor.create("Finalizing $element", id))
-                } else {
-                    elementService.finalizeElement(element, BuildProgressMonitor.create("Finalizing $element", id))
-                }
-            } catch (e) {
-                log.error "Exception finalizing element on the background", e
-                CatalogueElement element = resource.get(id)
-                element.status = ElementStatus.DRAFT
-                element.save(flush: true)
-            }
-
-        }
-
+        DataModel instance = (responseEvent as DataModelFinalizedEvent).dataModel
         respond instance, [status: OK]
     }
-
-
 
     /**
      * Create a new version of a data model
@@ -204,16 +186,11 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      */
     @Transactional
     def newVersion() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
-            unauthorized()
+        if (handleReadOnly()) {
             return
         }
 
-        if(handleReadOnly()) {
-            return
-        }
-
-        T instance = queryForResource(params.id)
+        T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
             return
@@ -248,21 +225,13 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         respond instance, [status: OK]
     }
 
-
-
-/**
- * Check if a data model contains or imports another catalogue element
- * @param id of data model, other id of item to be checked
- */
-
+    /**
+     * Check if a data model contains or imports another catalogue element
+     * @param id of data model, other id of item to be checked
+     */
     def containsOrImports() {
 
-        if(!modelCatalogueSecurityService.isSubscribed(getDataModel())){
-            unauthorized()
-            return
-        }
-
-        DataModel dataModel = DataModel.get(params.id)
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
         if (!dataModel) {
             notFound()
             return
@@ -284,7 +253,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        DataModelFilter filter = DataModelFilter.includes(dataModel).withImports(modelCatalogueSecurityService.getSubscribed())
+        DataModelFilter filter = DataModelFilter.includes(dataModel).withImports(dataModelGormService.findAll())
 
 
         if (filter.isIncluding(other.dataModel)) {
@@ -294,22 +263,16 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         respond(success: false, contains: false, imports: false)
     }
 
-/**
- * Redindex a data model using the elasticsearch service.
- * @param id of data model
- */
-
+    /**
+     * Redindex a data model using the elasticsearch service.
+     * @param id of data model
+     */
     def reindex() {
-
-        if (!allowSaveAndEdit()) {
-            unauthorized()
-            return
-        }
         if (handleReadOnly()) {
             return
         }
 
-        DataModel dataModel = DataModel.get(params.id)
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
         if (!dataModel) {
             notFound()
             return
@@ -318,7 +281,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         Long id = dataModel.id
 
         executorService.submit {
-            DataModel model = DataModel.get(id)
+            DataModel model = dataModelGormService.findById(id)
             modelCatalogueSearchService.index(model.declares).subscribe {
                 log.info "${model} reindexed"
             }
@@ -326,7 +289,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         respond(success: true)
     }
-
 
     /**
      * Get the content of a data model
@@ -337,16 +299,17 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     //TODO: needs work, counts etc are confusing and have been removed from the ui but they should at some point be update properly
 
     def content() {
-        DataModel dataModel = DataModel.get(params.id)
+        long dataModelId = params.long('id')
+        DataModel dataModel = dataModelGormService.findById(dataModelId)
         if (!dataModel) {
             notFound()
             return
         }
 
-        DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel>of(dataModel), ImmutableSet.<DataModel>of())
+        DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
         Map<String, Integer> stats = dataModelService.getStatistics(filter)
 
-        ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : '' ])
+        ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''])
 
         ListWithTotalAndType<Map> list = Lists.lazy(params, Map) {
             List<Map> contentDescriptors = []
@@ -368,7 +331,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
                 contentDescriptors << deprecatedItems
             }
 
-            contentDescriptors << createContentDescriptorForRelationship('Imported Data Models', 'imports',  dataModel, RelationshipType.importType, RelationshipDirection.OUTGOING)
+            contentDescriptors << createContentDescriptorForRelationship('Imported Data Models', 'imports', dataModel, RelationshipType.importType, RelationshipDirection.OUTGOING)
 
             if (params.boolean('root')) {
                 contentDescriptors << createVersionsDescriptor(dataModel)
@@ -377,9 +340,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             contentDescriptors
         }
 
-        respond Lists.wrap(params, "/${resourceName}/${params.id}/content", list)
+        respond Lists.wrap(params, "/${resourceName}/${dataModelId}/content", list)
     }
-
 
     /**
      * Get all the data models the import this data model
@@ -387,7 +349,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      */
 
     def dependents() {
-        DataModel dataModel = DataModel.get(params.id)
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
         if (!dataModel) {
             notFound()
             return
@@ -396,7 +358,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         respond dataModelService.findDependents(dataModel)
     }
 
-
     /**
      * Get the history or changes for a data model
      * @param id of data model
@@ -404,12 +365,18 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
     //TODO: this needs some work
 
+    @Override
+    protected ManageCatalogueElementService getManageCatalogueElementService() {
+        dataModelCatalogueElementService
+    }
+
     def history(Integer max) {
         String name = getResourceName()
         Class type = resource
 
         params.max = Math.min(max ?: 10, 100)
-        CatalogueElement element = queryForResource(params.id)
+        long catalogueElementId = params.long('id')
+        CatalogueElement element = findById(catalogueElementId)
         if (!element) {
             notFound()
             return
@@ -418,7 +385,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         Long id = element.id
 
         if (!element.latestVersionId) {
-            respond Lists.wrap(params, "/${name}/${params.id}/history", Lists.lazy(params, type, {
+            respond Lists.wrap(params, "/${name}/${catalogueElementId}/history", Lists.lazy(params, type, {
                 [type.get(id)]
             }, { 1 }))
             return
@@ -432,48 +399,38 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         customParams.sort = 'versionNumber'
         customParams.order = 'desc'
 
-        respond Lists.fromCriteria(customParams, type, "/${name}/${params.id}/history") {
+        respond Lists.fromCriteria(customParams, type, "/${name}/${catalogueElementId}/history") {
             eq 'latestVersionId', latestVersionId
         }
     }
 
-
-    /**
-     * Spreadsheet report
-     * @param id of data model
-     */
-
-
-
+/**
+ * Spreadsheet report
+ * @param id of data model
+ */
     def inventorySpreadsheet(String name, Integer depth) {
 
-        if (!allowSaveAndEdit()) {
-            unauthorized()
-            return
-        }
         if (handleReadOnly()) {
             return
         }
 
-        DataModel dataModel = DataModel.get(params.id)
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
         if (!dataModel) {
             respond status: HttpStatus.NOT_FOUND
             return
         }
-        def dataModelId = dataModel.id
+        Long dataModelId = dataModel.id
 
-
-        def assetId = assetService.storeReportAsAsset(
+        Long assetId = assetService.storeReportAsAsset(
                 dataModel,
                 name: name ? name : "${dataModel.name} report as MS Excel Document",
                 originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            CatalogueElementToXlsxExporter.forDataModel(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            CatalogueElementToXlsxExporter.forDataModel(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
-        response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
         return
     }
@@ -482,20 +439,14 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      * Grid Spreadsheet report
      * @param id of data model
      */
-
     def gridSpreadsheet(String name, Integer depth) {
-
-        if (!allowSaveAndEdit()) {
-            unauthorized()
-            return
-        }
         if (handleReadOnly()) {
             return
         }
 
-        DataModel dataModel = DataModel.get(params.id)
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
 
-        def dataModelId = dataModel.id
+        Long dataModelId = dataModel.id
 
         if (!dataModel) {
             respond status: HttpStatus.NOT_FOUND
@@ -509,8 +460,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-           // GridReportXlsxExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
-            GMCGridReportXlsxExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            // GridReportXlsxExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            GMCGridReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
 
         }
 
@@ -527,17 +478,13 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      */
     def excelExporterSpreadsheet(String name, Integer depth) {
 
-        if (!allowSaveAndEdit()) {
-            unauthorized()
-            return
-        }
         if (handleReadOnly()) {
             return
         }
 
-        DataModel dataModel = DataModel.get(params.id)
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
 
-        def dataModelId = dataModel.id
+        Long dataModelId = dataModel.id
 
         if (!dataModel) {
             respond status: HttpStatus.NOT_FOUND
@@ -551,53 +498,43 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            ExcelExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            ExcelExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
         return
     }
-
 
     /**
      * Word Document Report
      * @param id of data model
      */
-
     def inventoryDoc(String name, Integer depth) {
-
-        if (!allowSaveAndEdit()) {
-            unauthorized()
-            return
-        }
         if (handleReadOnly()) {
             return
         }
 
-        DataModel dataModel = DataModel.get(params.id)
+        DataModel dataModel = dataModelGormService.findById(params.long('id'))
         if (!dataModel) {
             respond status: HttpStatus.NOT_FOUND
             return
         }
-        def modelId = dataModel.id
+        Long modelId = dataModel.id
 
-
-        def assetId =  assetService.storeReportAsAsset(
+        def assetId = assetService.storeReportAsAsset(
                 dataModel,
                 name: name ? name : "${dataModel.name} report as MS Excel Document",
                 originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream outputStream ->
-            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, elementService, customTemplate, DOC_IMAGE_PATH, depth).export(outputStream)
+            new DataModelToDocxExporter(dataModelGormService.findById(modelId), dataClassService, elementService, customTemplate, DOC_IMAGE_PATH, depth).export(outputStream)
         }
-
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
         return
     }
-
 
 //TODO: DOCUMENT
     /**
@@ -618,7 +555,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         ret
     }
 
-
     //TODO: DOCUMENT
     /**
      * not sure what this does
@@ -634,10 +570,9 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         ret.content = [count: count, itemType: clazz.name, link: link]
         ret.link = link
         ret.resource = GrailsNameUtils.getPropertyName(clazz)
-		ret.status = dataModel.status.toString()
+        ret.status = dataModel.status.toString()
         ret
     }
-
 
     //TODO: DOCUMENT
     /**
@@ -653,7 +588,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         ret.name = 'Versions'
         ret.content = [count: dataModel.countVersions(), itemType: DataModel.name, link: link]
         ret.link = link
-		ret.status = dataModel.status.toString()
+        ret.status = dataModel.status.toString()
         ret
     }
 
@@ -662,34 +597,34 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      * not sure what this does
      * @param id of data model
      */
-	private static Map createContentDescriptorForRelationship(String name, String property, DataModel dataModel, RelationshipType relationshipType, RelationshipDirection direction) {
-		String link = "/dataModel/${dataModel.getId()}/${direction.actionName}/${relationshipType.name}"
-		Map ret = [:]
-		ret.id = link
-		ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
-		ret.elementType = Relationships.name
-		ret.name = name
-		ret.content = [count: dataModel.countRelationshipsByDirectionAndType(direction, relationshipType), itemType: Relationship.name, link: link]
-		ret.link = link
+    private
+    static Map createContentDescriptorForRelationship(String name, String property, DataModel dataModel, RelationshipType relationshipType, RelationshipDirection direction) {
+        String link = "/dataModel/${dataModel.getId()}/${direction.actionName}/${relationshipType.name}"
+        Map ret = [:]
+        ret.id = link
+        ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
+        ret.elementType = Relationships.name
+        ret.name = name
+        ret.content = [count: dataModel.countRelationshipsByDirectionAndType(direction, relationshipType), itemType: Relationship.name, link: link]
+        ret.link = link
         ret.relationshipType = relationshipType
         ret.direction = direction.actionName
-		ret.status = dataModel.status.toString()
+        ret.status = dataModel.status.toString()
         ret.element = dataModel
         ret.property = property
 
-		ret
-	}
-
+        ret
+    }
 
     //TODO: why is this here?
     /**
      * not sure what this does
      * @param id of data model
      */
-	@Override
-	protected boolean hasUniqueName() {
-		true
-	}
+    @Override
+    protected boolean hasUniqueName() {
+        true
+    }
 
     //TODO: why is this here?
     /**
@@ -717,20 +652,22 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-		if (objectToBind.declares != null) {
-			for (domain in instance.declares.findAll { !(it.id in objectToBind.declares*.id) }) {
-				domain.dataModel = null
+        if (objectToBind.declares != null) {
+            for (domain in instance.declares.findAll { !(it.id in objectToBind.declares*.id) }) {
+                domain.dataModel = null
                 FriendlyErrors.failFriendlySave(domain)
-			}
-			for (domain in objectToBind.declares) {
-				CatalogueElement catalogueElement = CatalogueElement.get(domain.id as Long)
+            }
+            for (domain in objectToBind.declares) {
+                CatalogueElement catalogueElement = CatalogueElement.get(domain.id as Long)
                 catalogueElement.dataModel = instance
                 FriendlyErrors.failFriendlySave(catalogueElement)
-			}
-		}
+            }
+        }
 
         if (objectToBind.policies != null) {
-            Set<DataModelPolicy> policies = objectToBind.policies.collect { DataModelPolicy.get(it.id) } as Set<DataModelPolicy>
+            Set<DataModelPolicy> policies = objectToBind.policies.collect {
+                DataModelPolicy.get(it.id)
+            } as Set<DataModelPolicy>
             Set<DataModelPolicy> existing = instance.policies ?: Collections.emptySet()
             (policies - existing).each {
                 instance.addToPolicies(it)
@@ -748,12 +685,12 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      * @param id of data model
      */
 
-	@Override
-	protected getIncludeFields() {
-		def fields = super.includeFields
-		fields.removeAll(['declares'])
-		fields
-	}
+    @Override
+    protected getIncludeFields() {
+        def fields = super.includeFields
+        fields.removeAll(['declares'])
+        fields
+    }
 
     //TODO: why is this here?
     /**
@@ -761,12 +698,12 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      * @param id of data model
      */
 
-	@Override
-	protected DataModel createResource() {
-		DataModel instance = resource.newInstance()
-		bindData instance, getObjectToBind(), [include: includeFields]
-		instance
-	}
+    @Override
+    protected DataModel createResource() {
+        DataModel instance = resource.newInstance()
+        bindData instance, getObjectToBind(), [include: includeFields]
+        instance
+    }
 
     //TODO: why is this here?
     /**
@@ -786,7 +723,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         'semanticVersion'
     }
 
-
     /**
      * override the abstract controller method so all effective items for a user is a list of data models based on the general role - rather than a specific data model role
      * i.e. we can view the basic info of data models that we aren't subscribed to
@@ -798,7 +734,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         //if you only want the active data models (draft and finalised)
         if (params.status?.toLowerCase() == 'active') {
             //if you have the role viewer you can see drafts
-            if (modelCatalogueSecurityService.hasRole('VIEWER')){
+            if (modelCatalogueSecurityService.hasRole('VIEWER')) {
                 return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                     'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
                 }), overridableDataModelFilter)
@@ -820,5 +756,4 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
     }
-
 }

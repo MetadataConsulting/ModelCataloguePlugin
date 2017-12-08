@@ -4,7 +4,10 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     CatalogueBuilder catalogueBuilder
@@ -19,7 +22,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
     DataElement de2
     DataElement de3
 
-    def setup(){
+    def setup() {
         loadFixtures()
         parent1 = new DataClass(name: 'book').save(failOnError: true)
         parent2 = new DataClass(name: 'chapter1').save(failOnError: true)
@@ -74,7 +77,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         dataElements.items.contains(de3)
     }
 
-    def "test infinite recursion"(){
+    def "test infinite recursion"() {
         when:
         ListWithTotal subModels = dataClassService.getInnerClasses(parent1)
 
@@ -82,7 +85,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         subModels.total == 3L
     }
 
-
+    @Ignore
     def "data model filter where data classes has parents from other data models"() {
         catalogueBuilder.build {
             skip draft

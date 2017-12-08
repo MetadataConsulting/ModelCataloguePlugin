@@ -5,7 +5,9 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.util.test.FileOpener
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class RareDiseasesWebsiteExporterSpec extends AbstractRareDiseasesExporterSpec {
 
     @Rule TemporaryFolder folder = new TemporaryFolder()

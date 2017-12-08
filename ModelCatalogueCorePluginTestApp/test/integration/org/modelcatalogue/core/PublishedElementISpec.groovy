@@ -8,12 +8,11 @@ import org.modelcatalogue.core.api.ElementStatus
 
 class PublishedElementISpec extends AbstractIntegrationSpec{
 
-    def setupSpec(){
+    def setupSpec() {
         loadFixtures()
     }
 
-
-    def "finalize model with with finalized child models"(){
+    def "finalize model with with finalized child models"() {
 
         setup:
         CatalogueElement el1 = new DataClass(name: "parent1").save()
@@ -32,11 +31,9 @@ class PublishedElementISpec extends AbstractIntegrationSpec{
         cleanup:
         el1.delete()
         el2.delete()
-
     }
 
-    def "finalize model with with finalized data elements"(){
-
+    def "finalize model with with finalized data elements"() {
         setup:
         CatalogueElement el1 = new DataClass(name: "parent1").save()
         CatalogueElement el2 = new DataElement(name: "dataElement").save()

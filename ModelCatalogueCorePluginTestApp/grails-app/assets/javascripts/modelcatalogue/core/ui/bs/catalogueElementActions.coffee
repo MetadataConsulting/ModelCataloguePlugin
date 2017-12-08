@@ -62,10 +62,14 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
           action.label = 'Restore'
           action.icon = 'fa fa-fw fa-repeat'
           action.type = 'primary'
+          if $scope.element.status != 'DEPRECATED'
+            action.disabled = true
       else
         action.label = 'Deprecate'
         action.icon = 'fa fa-fw fa-ban'
         action.type = 'danger'
+        if $scope.element.status != 'FINALIZED'
+          action.disabled = true
 
       action
 
@@ -96,11 +100,11 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
               $scope.element.delete()
               .then ->
                 messages.success "#{$scope.element.getElementTypeName()} #{$scope.element.name} deleted."
-                $rootScope.$broadcast 'catalogueElementDeleted', $scope.element
                 resource = names.getPropertyNameFromType($scope.element.elementType)
                 if resource == 'dataModel'
                   $state.go('dataModels')
                 else if $state.current.name.indexOf('mc.resource.show') >= 0
+                  $rootScope.$broadcast 'catalogueElementDeleted', $scope.element
                   $state.go('mc.resource.list', {resource: resource}, {reload: true})
               .catch showErrorsUsingMessages(messages)
         }
@@ -218,7 +222,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       type:       'primary'
       watches:    ['element.enabled']
       action:     ->
-        title = if $scope.element.enabled then "Disable User" else "Disable User"
+        title = if $scope.element.enabled then "Disable User" else "Enable User"
         desc = if $scope.element.enabled then "Do you want to disable user?" else "Do you want to enable user?"
         messages.confirm(title, desc).then ->
           if $scope.element.enabled

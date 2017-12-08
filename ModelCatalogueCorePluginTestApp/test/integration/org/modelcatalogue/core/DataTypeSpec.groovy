@@ -7,19 +7,15 @@ import spock.lang.Unroll
  */
 class DataTypeSpec extends IntegrationSpec {
 
-
     @Unroll
-    def "create a new data type from #args validates to #validates" (){
+    def "create a new data type from #args validates to #validates"() {
         int initialSize = DataType.count()
 
         when:
-
         DataType type = new DataType(args)
         type.save()
 
-
         then:
-
         !type.hasErrors() == validates
         DataType.list().size() == size + initialSize
 
@@ -28,9 +24,7 @@ class DataTypeSpec extends IntegrationSpec {
         false     | [:]              | 0
         false     | [name: "x" *256] | 0
         true      | [name: "String"] | 1
-
     }
-
 
     @Unroll
     def "pick the suggestion #expected from #suggestions"() {
@@ -44,5 +38,4 @@ class DataTypeSpec extends IntegrationSpec {
         "bla"           | ["bla"]
         "Allred Score"  | ["EstrogenAllredScore", "ProgesteroneAllredScore"]
     }
-
 }

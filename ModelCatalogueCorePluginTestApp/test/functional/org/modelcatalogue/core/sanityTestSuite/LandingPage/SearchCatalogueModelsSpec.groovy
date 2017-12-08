@@ -1,10 +1,12 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.*
-
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
     private static final String searchInput2 ="#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > div:nth-child(1) > div > div:nth-child(1) > div > div > div > div > input"
@@ -15,7 +17,7 @@ class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
     private static final String  catalogueModels ='ul.nav-tabs>li:nth-child(2)>a'
     private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
 
-    def " login to model catalogue"() {
+    def "login to model catalogue"() {
         when:
         loginCurator()
         and:'click on the catalogue model'
@@ -25,10 +27,12 @@ class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
         then:
         check catalogueModels isDisplayed()
     }
-    def"search for a draft model"() {
+
+    @Ignore
+    def "search for a draft model"() {
 
         when: 'type in the search box'
-        fill searchInput2 with "cancel"
+        fill searchInput2 with "cancer"
 
         and: 'click on button next to search catalogue'
         click defaultButton
@@ -37,8 +41,9 @@ class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
         then: 'verify that draft is displayed'
         check defaultButton contains  "Draft"
     }
-     def "search for finalized model"(){
 
+    @Ignore
+    def "search for finalized model"() {
          when: 'click on button next to search catalogue'
          click defaultButton
          Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
@@ -46,8 +51,5 @@ class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
 
          then:
          check defaultButton is "Finalized"
-
-     }
-
-
+    }
 }

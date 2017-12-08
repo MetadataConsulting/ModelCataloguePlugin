@@ -1,9 +1,8 @@
 package org.modelcatalogue.core.export.inventory
 
-import org.modelcatalogue.core.AbstractIntegrationSpec
-
 import static org.modelcatalogue.core.util.test.FileOpener.open
-
+import org.modelcatalogue.core.AbstractIntegrationSpec
+import spock.lang.Ignore
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.junit.Rule
@@ -11,6 +10,7 @@ import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 
+@Ignore
 class DataModelToDocxExporterSpec extends AbstractIntegrationSpec {
 
     ElementService elementService

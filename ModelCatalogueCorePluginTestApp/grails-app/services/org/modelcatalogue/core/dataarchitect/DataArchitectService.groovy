@@ -2,16 +2,17 @@ package org.modelcatalogue.core.dataarchitect
 
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
-import org.hibernate.Criteria;
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.MatchResult
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.util.ParamArgs
+import org.modelcatalogue.core.util.SearchParams
 
 class DataArchitectService {
 
@@ -24,7 +25,7 @@ class DataArchitectService {
     def actionService
     def dataModelService
     def sessionFactory
-
+    DataModelGormService dataModelGormService
 
     //commented out the functions that are no longer relevant or don't work
     //TODO: finish these functions
@@ -140,7 +141,11 @@ class DataArchitectService {
             if (element) {
                 elements << element
             } else {
-                def searchResult = modelCatalogueSearchService.search(resource, [search: header, max: 1])
+                SearchParams searchParams = new SearchParams()
+                searchParams.search = header
+                searchParams.paramArgs = new ParamArgs()
+                searchParams.paramArgs.max = 1
+                def searchResult = modelCatalogueSearchService.search(resource, searchParams)
                 // expect that the first hit is the best hit
                 if (searchResult.total >= 1L) {
                     elements << searchResult.items[0]
@@ -361,8 +366,8 @@ class DataArchitectService {
     }
 
     private void generatePossibleEnumDuplicatesAndSynonyms(String dataModelAID, String dataModelBID){
-        DataModel dataModelA = DataModel.get(dataModelAID)
-        DataModel dataModelB = DataModel.get(dataModelBID)
+        DataModel dataModelA = dataModelGormService.findById(dataModelAID as Long)
+        DataModel dataModelB = dataModelGormService.findById(dataModelBID as Long)
         Batch.findAllByNameIlike("Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
         Batch batch = Batch.findOrSaveByName("Generating Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
         def matchingDataElements = elementService.findDuplicateEnumerationsSuggestions(dataModelA.id, dataModelB.id)
@@ -396,8 +401,8 @@ class DataArchitectService {
      *
      */
     private void generateDataElementSuggestionsExact(String dataModelAID, String dataModelBID){
-        DataModel dataModelA = DataModel.get(dataModelAID)
-        DataModel dataModelB = DataModel.get(dataModelBID)
+        DataModel dataModelA = dataModelGormService.findById(dataModelAID as Long)
+        DataModel dataModelB = dataModelGormService.findById(dataModelBID as Long)
         Batch.findAllByNameIlike("Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
         Batch batch = Batch.findOrSaveByName("Generating Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
         def matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
@@ -435,8 +440,8 @@ class DataArchitectService {
      */
 
     private void generateDataElementSuggestionsFuzzy(String dataModelAID, String dataModelBID, String minScore){
-        DataModel dataModelA = DataModel.get(dataModelAID)
-        DataModel dataModelB = DataModel.get(dataModelBID)
+        DataModel dataModelA = dataModelGormService.findById(dataModelAID as Long)
+        DataModel dataModelB = dataModelGormService.findById(dataModelBID as Long)
         Batch.findAllByNameIlike("Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
         Batch batch = Batch.findOrSaveByName("Generating suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
         def score

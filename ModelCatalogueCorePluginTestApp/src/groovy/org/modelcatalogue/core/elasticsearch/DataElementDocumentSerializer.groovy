@@ -11,9 +11,10 @@ class DataElementDocumentSerializer extends CatalogueElementDocumentSerializer<D
         super.buildDocument(session, element, builder)
 
         if (element.getDataTypeId()) {
-            safePut(builder, 'data_type', session.getDocument(DataType.get(element.getDataTypeId())).payload)
+            DataType.withNewSession {
+                safePut(builder, 'data_type', session.getDocument(DataType.get(element.getDataTypeId())).payload)
+            }
         }
-
         return builder
     }
 }

@@ -1,18 +1,19 @@
 package org.modelcatalogue.core.sanityTestSuite.HomePage
 
-
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 
-
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 class ClickOnModelCatalogueDevSupportedLinkSpec extends AbstractModelCatalogueGebSpec  {
 
     public static final String model ="div.panel-body>div"
      static WebDriver driver
-    void modelDevelopmentLinks(){
+    void modelDevelopmentLinks() {
         when:
         driver = browser.driver
         driver.manage().deleteAllCookies()

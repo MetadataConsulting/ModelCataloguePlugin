@@ -8,7 +8,9 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import spock.lang.Ignore
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
     CatalogueXmlPrinter printer
@@ -84,6 +86,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         similar locomotive, 'locomotive.catalogue.xml'
     }
 
+    @Ignore
     def "write simple classification"() {
         expect:
         similar transportation, 'transportation.catalogue.xml'

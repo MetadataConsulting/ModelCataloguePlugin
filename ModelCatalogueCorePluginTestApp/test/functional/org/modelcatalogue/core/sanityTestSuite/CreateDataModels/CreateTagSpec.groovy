@@ -1,10 +1,14 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.Keys
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
+import spock.lang.IgnoreRest
 import spock.lang.Stepwise
-import static org.modelcatalogue.core.geb.Common.*
 
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class CreateTagSpec extends AbstractModelCatalogueGebSpec {
 
@@ -13,6 +17,7 @@ class CreateTagSpec extends AbstractModelCatalogueGebSpec {
     private static final String  deleteButton = 'a#delete-menu-item-link>span:nth-child(3)'
     private static final String   dataElementButton = 'a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
 
+    @IgnoreRest
     def "login to model catalogue and select element"() {
 
         when:
@@ -29,7 +34,7 @@ class CreateTagSpec extends AbstractModelCatalogueGebSpec {
         check modalHeader is "Create Data Element"
     }
 
-    def " create a tag"() {
+    def "create a tag"() {
         when:
         fill nameLabel with("TESTING_TAG")
         fill modelCatalogueId with "M-234"
@@ -40,7 +45,7 @@ class CreateTagSpec extends AbstractModelCatalogueGebSpec {
         check table contains 'TESTING_TAG'
     }
 
-    def"delete the created tag"(){
+    def "delete the created tag"() {
 
         when:
         click tagCreated

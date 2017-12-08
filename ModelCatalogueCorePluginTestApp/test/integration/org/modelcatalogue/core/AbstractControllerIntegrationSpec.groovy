@@ -27,7 +27,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         false
     }
 
-    def setupSpec(){
+    def setupSpec() {
         loadMarshallers()
         loadFixtures()
         if (record) {

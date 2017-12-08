@@ -1,11 +1,12 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.rx.LoggingSubscriber
-import org.modelcatalogue.core.util.lists.Lists
-
-import java.util.concurrent.ExecutorService
-
 import static org.springframework.http.HttpStatus.OK
+import org.modelcatalogue.core.persistence.CatalogueElementGormService
+import org.modelcatalogue.core.rx.LoggingSubscriber
+import org.modelcatalogue.core.util.ParamArgs
+import org.modelcatalogue.core.util.SearchParams
+import org.modelcatalogue.core.util.lists.Lists
+import java.util.concurrent.ExecutorService
 
 class SearchController extends AbstractRestfulController<CatalogueElement> {
 
@@ -13,19 +14,25 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
 
     ExecutorService executorService
 
+    CatalogueElementGormService catalogueElementGormService
+
     SearchController() {
         super(CatalogueElement, true)
     }
 
-    def index(Integer max) {
-        setSafeMax(max)
+    protected CatalogueElement findById(long id) {
+        catalogueElementGormService.findById(id)
+    }
 
-        if (!params.search) {
+    def index(Integer max) {
+        String search = params.search
+        if ( !search ) {
             respond errors: "No query string to search on"
             return
         }
-
-        respond Lists.wrap(params, "/search/?search=${params.search.encodeAsURL()}", modelCatalogueSearchService.search(params))
+        ParamArgs paramArgs = instantiateParamArgs(max)
+        SearchParams searchParams = SearchParams.of(params, paramArgs)
+        respond Lists.wrap(params, "/search/?search=${params.search.encodeAsURL()}", modelCatalogueSearchService.search(searchParams))
 
     }
 
@@ -52,8 +59,12 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
     protected setSafeMax(Integer max) {
         withFormat {
             json {
-                params.max = Math.min(max ?: 10, 100)
+                params.max = safeMax(max)
             }
         }
+    }
+
+    protected int safeMax(Integer max) {
+        Math.min(max ?: 10, 100)
     }
 }

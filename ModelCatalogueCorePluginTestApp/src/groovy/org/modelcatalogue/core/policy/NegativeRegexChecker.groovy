@@ -1,14 +1,11 @@
 package org.modelcatalogue.core.policy
 
-import groovy.transform.CompileStatic
+import static com.google.common.base.Preconditions.checkNotNull
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
-
 import java.util.regex.Pattern
 
-import static com.google.common.base.Preconditions.checkNotNull
-
-@CompileStatic class NegativeRegexChecker implements ConventionChecker {
+class NegativeRegexChecker implements ConventionChecker {
 
     @Override
     def <T extends CatalogueElement & GroovyObject> void check(VerificationPhase phase, DataModel model, Class<T> ignored, T item, String property, String configuration, String messageOverride, boolean errorsToItem) {

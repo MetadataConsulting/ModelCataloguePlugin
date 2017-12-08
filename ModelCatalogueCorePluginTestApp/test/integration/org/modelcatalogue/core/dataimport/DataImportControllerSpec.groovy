@@ -5,7 +5,9 @@ import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder {
 
     def fileName, recorder, filenameXsd, filenameXsd2, fileNameStarUML
@@ -23,7 +25,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         )
     }
 
-    def testHeaderSetup(){
+    def testHeaderSetup() {
         Map<String,String> headersMap = HeadersMap.createForStandardExcelLoader()
         expect:
         headersMap.dataElementCode == "Data Item Unique Code"
@@ -40,10 +42,9 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         headersMap.measurementSymbol == "Measurement Unit Symbol"
         headersMap.classification == "Classification"
         headersMap.metadata == "Metadata"
-
     }
 
-    def testCustomHeaderSetup(){
+    def testCustomHeaderSetup() {
 
         Map<String,Object> params = [:]
 

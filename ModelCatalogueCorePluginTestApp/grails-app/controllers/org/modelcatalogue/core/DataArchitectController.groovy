@@ -1,10 +1,10 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.dataarchitect.CSVService
+import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
 
@@ -15,7 +15,8 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
     def dataArchitectService
     def executorService
     def dataClassService
-    @Autowired CSVService csvService
+    CSVService csvService
+    CatalogueElementGormService catalogueElementGormService
 
     DataArchitectController() {
         super(CatalogueElement, false)
@@ -148,4 +149,7 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     }
 
+    protected CatalogueElement findById(long id) {
+        catalogueElementGormService.findById(id)
+    }
 }

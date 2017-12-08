@@ -1,31 +1,35 @@
 /*
- This is the Geb configuration file.
- See: http://www.gebish.org/manual/current/configuration.html
- */
+	This is the Geb configuration file.
 
-
-import io.github.bonigarcia.wdm.ChromeDriverManager
+	See: http://www.gebish.org/manual/current/#configuration
+*/
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 
-ChromeOptions options = new ChromeOptions()
-options.addArguments("test-type")
-options.addArguments("--disable-extensions")
-
-reportsDir = new File("target/geb-reports")
-reportOnTestFailureOnly = false
-baseUrl = 'http://localhost:8080/'
-//baseUrl = 'https://gel-mc-test.metadata.org.uk/'
-
-ChromeDriverManager.getInstance().setup()
-
-driver = {
-    new ChromeDriver(options)
-}
-
 waiting {
-    timeout = 15
-    retryInterval = 0.6
+    timeout = 2
 }
 
+environments {
+
+    // run via “./gradlew chromeTest”
+    // See: http://code.google.com/p/selenium/wiki/ChromeDriver
+    chrome {
+        driver = { new ChromeDriver() }
+    }
+
+    // run via “./gradlew chromeHeadlessTest”
+    // See: http://code.google.com/p/selenium/wiki/ChromeDriver
+    chromeHeadless {
+        driver = {
+            ChromeOptions o = new ChromeOptions()
+            o.addArguments('headless')
+            new ChromeDriver(o)
+        }
+    }
+
+}
+
+baseNavigatorWaiting = true
 atCheckWaiting = true
+

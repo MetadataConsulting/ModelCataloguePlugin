@@ -14,7 +14,7 @@ class CsvTransformationControllerIntegrationSpec extends AbstractControllerInteg
     }
 
     @Override
-    Map getPropertiesToEdit(){
+    Map getPropertiesToEdit() {
         [name: "Changed Transformation", columns: [
                 [source: DataElement.findByName("patient temperature uk"), destination: DataElement.findByName("patient temperature us")],
                 [source: DataElement.findByName("speed of Opel"), destination: DataElement.findByName("speed of Vauxhall"), header: "speed"],
@@ -22,7 +22,7 @@ class CsvTransformationControllerIntegrationSpec extends AbstractControllerInteg
     }
 
     @Override
-    Map getNewInstance(){
+    Map getNewInstance() {
         [name:"New Transformation",
             columns: [
             [source: DataElement.findByName("speed of Opel"), destination: DataElement.findByName("speed of Vauxhall"), header: "speed"],
@@ -32,7 +32,7 @@ class CsvTransformationControllerIntegrationSpec extends AbstractControllerInteg
     }
 
     @Override
-    Map getBadInstance(){
+    Map getBadInstance() {
         [name: "t"*300]
     }
 

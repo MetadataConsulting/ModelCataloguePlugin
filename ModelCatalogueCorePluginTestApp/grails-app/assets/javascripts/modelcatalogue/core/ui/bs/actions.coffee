@@ -632,7 +632,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
         watches: ['batch', 'element']
         action: ->
           batch = $scope.batch ? $scope.element
-          messages.confirm('Run All Actions', "Do you really wan to run all actions from '#{batch.name}' batch").then ->
+          messages.confirm('Run All Actions', "Do you really want to run all actions from '#{batch.name}' batch").then ->
             enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}#{batch.link}/run")).then (updated) ->
               batch.updateFrom(updated)
             $timeout($scope.reload, 1000) if angular.isFunction($scope.reload)

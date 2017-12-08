@@ -21,7 +21,7 @@ class User extends CatalogueElement {
     static constraints = {
         username blank: false, unique: true, maxSize: 255
         password blank: false, maxSize: 255
-        email    nullable: true, email: true, maxSize: 255
+        email    nullable: true, email: true, unique: true, maxSize: 255
         apiKey   nullable: true, maxSize: 255
         enabled validator: { val, obj, errors ->
             GrailsApplication grailsApplication = Holders.grailsApplication

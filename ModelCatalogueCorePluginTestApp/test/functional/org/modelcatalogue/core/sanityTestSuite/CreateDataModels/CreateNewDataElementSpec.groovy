@@ -1,8 +1,5 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.description
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
@@ -14,7 +11,12 @@ import static org.modelcatalogue.core.geb.Common.modelCatalogueId
 import static org.modelcatalogue.core.geb.Common.nameLabel
 import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.save
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
+import spock.lang.Stepwise
 
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
 
@@ -40,14 +42,15 @@ class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle is 'Active Data Elements'
     }
 
-    def " navigate to data element creation page"() {
+    def "navigate to data element creation page"() {
         when:
         click create
         then:
         check modalHeader contains 'Create Data Element'
     }
 
-    def " fill the create data element form"() {
+    @Ignore
+    def "fill the create data element form"() {
         when:
         fill nameLabel with myName
 
@@ -66,9 +69,9 @@ class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
 
         then: 'verify that data is created'
         check table contains 'testing data element'
-
     }
 
+    @Ignore
     def "delete the created data model"() {
 
         when: 'click on the model catalogue'
@@ -87,6 +90,5 @@ class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check table gone
-
     }
 }

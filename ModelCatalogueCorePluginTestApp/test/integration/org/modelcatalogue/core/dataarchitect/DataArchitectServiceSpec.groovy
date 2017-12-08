@@ -9,7 +9,10 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.actions.CreateMatch
 import org.modelcatalogue.core.util.lists.ListWithTotal
+import spock.lang.Ignore
+import spock.lang.IgnoreIf
 
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class DataArchitectServiceSpec extends AbstractIntegrationSpec {
 
     def dataArchitectService, relationshipService, de1, de2, de3, de4, de5, md, dm1, dm2, actionService
@@ -103,6 +106,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         firstDataRow[newHeaders.indexOf("co-author")] == "ABC"
     }
 
+    @Ignore
     def "can add suggestion"() {
         boolean test = false
         dataArchitectService.addSuggestion('TEST') {

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.publishing.changelog
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import grails.util.GrailsNameUtils
 import grails.util.Holders
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -14,8 +15,6 @@ import org.modelcatalogue.core.comments.Comment
 import org.modelcatalogue.core.comments.CommentsService
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.HibernateHelper
-
-import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 abstract class AbstractChangeLogGenerator {
     protected final AuditService auditService

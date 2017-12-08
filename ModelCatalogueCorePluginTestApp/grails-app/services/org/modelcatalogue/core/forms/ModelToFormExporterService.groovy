@@ -24,7 +24,6 @@ import org.modelcatalogue.crf.model.Section
 import org.springframework.validation.DataBinder
 import org.springframework.validation.Errors
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter
-
 import javax.validation.Validation
 import javax.validation.Validator
 

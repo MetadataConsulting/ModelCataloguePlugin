@@ -1,22 +1,27 @@
 package org.modelcatalogue.core
 
-import grails.converters.JSON
+import static org.springframework.http.HttpStatus.*
+import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.acl.AclUtilService
 import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.hibernate.StaleStateException
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserRole
+import org.modelcatalogue.core.security.DataModelAclService
+import org.modelcatalogue.core.security.MetadataRolesUtils
+import org.modelcatalogue.core.util.ParamArgs
+import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.dao.ConcurrencyFailureException
+import org.springframework.security.acls.domain.BasePermission
+import org.springframework.security.core.Authentication
 import org.springframework.validation.Errors
-
-import static org.springframework.http.HttpStatus.*
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
@@ -27,6 +32,12 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     SecurityService modelCatalogueSecurityService
     CatalogueElementService catalogueElementService
     ElementService elementService
+    DataModelGormService dataModelGormService
+    DataModelAclService dataModelAclService
+    AclUtilService aclUtilService
+    SpringSecurityService springSecurityService
+
+    protected abstract T findById(long id)
 
     private Random random = new Random()
 
@@ -39,16 +50,15 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
     def search(Integer max) {
-        handleParams(max)
-
-        if (!params.search) {
+        String search = params.search
+        if ( !search ) {
             respond errors: "No query string to search on"
             return
         }
-
-        ListWithTotalAndType<T> results = modelCatalogueSearchService.search(resource, params)
-
-        respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(params.search, 'UTF-8')}", results)
+        ParamArgs paramArgs = instantiateParamArgs(max)
+        SearchParams searchParams = SearchParams.of(params, paramArgs)
+        ListWithTotalAndType<T> results = modelCatalogueSearchService.search(resource, searchParams)
+        respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(search, 'UTF-8')}", results)
     }
 
     @Override
@@ -87,9 +97,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         def instance = createResource()
 
         instance.validate()
+        Object objectToBindParam = this.getObjectToBind()
 
         if (!params.skipPolicies) {
-            validatePolicies(VerificationPhase.PROPERTY_CHECK, instance, objectToBind)
+            validatePolicies(VerificationPhase.PROPERTY_CHECK, instance, objectToBindParam)
         }
 
         if (instance.hasErrors()) {
@@ -158,7 +169,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        T instance = queryForResource(params.id)
+        T instance = findById(params.long('id'))
         if (instance == null) {
             notFound()
             return
@@ -203,17 +214,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     @Override
     def delete() {
-        if (!allowDelete()) {
-            response.status = FORBIDDEN.value()
-            respond errors: "Delete is not allowed for you, you probably need higher user role."
-            return
-        }
-
         if (handleReadOnly()) {
             return
         }
 
-        def instance = queryForResource(params.id)
+        def instance = findById(params.long('id'))
         if (!instance) {
             notFound()
             return
@@ -226,7 +231,15 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR', getDataModel())) {
+
+        DataModel dataModel
+        if ( instance instanceof DataModel ) {
+            dataModel = instance as DataModel
+        } else if ( CatalogueElement.class.isAssignableFrom(instance.class) ) {
+            dataModel = instance.dataModel
+        }
+
+        if ( dataModel && ( dataModelAclService.isAdminOrHasAdministratorPermission(dataModel)) ) {
             // only drafts can be deleted
             def error = "Only elements with status of DRAFT can be deleted."
             if (instance instanceof DataModel) {
@@ -275,12 +288,46 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         try {
             catalogueElementService.delete(instance)
+            if ( instance instanceof DataModel ) {
+                dataModelAclService.removePermissions(instance as DataModel)
+            }
+
             noContent()
         } catch (e) {
             response.status = INTERNAL_SERVER_ERROR.value()
             respond errors: "Unexpected error while deleting $instance ${e.message}"
             log.error("unexpected error while deleting $instance", e)
         }
+    }
+
+    protected ParamArgs instantiateParamArgs(Integer max) {
+
+        ParamArgs paramArgs = new ParamArgs()
+
+        withFormat {
+            json {
+                paramArgs.max = Math.min(max ?: 25, 100)
+            }
+            xml {
+                paramArgs.max = Math.min(max ?: 10000, 10000)
+            }
+        }
+
+        if ( defaultSort && !params.sort) {
+            paramArgs.sort = defaultSort
+        } else {
+            paramArgs.sort = params.sort
+        }
+
+        if ( defaultOrder && !params.order) {
+            paramArgs.order = defaultOrder
+        } else {
+            paramArgs.order = params.order
+        }
+
+        paramArgs.offset = params.int('offset') ?: 0
+
+        paramArgs
     }
 
     protected handleParams(Integer max) {
@@ -306,21 +353,19 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     /**
      * Specify if save and edit are allowed.
-     * @return Returns true if user role is CURATOR, false otherwise.
+     * if the user is a "general" curator they can create data models
+     * but if they are trying to create something within the context of a data model they must have ADMINISTRATION access to the specific model (not just general curator access)
      */
     protected boolean allowSaveAndEdit() {
-        //if the user is a "general" curator they can create data models
-//        if(resource == DataModel) return modelCatalogueSecurityService.hasRole('CURATOR')
-        //but if they are trying to create something within the context of a data model they must have curator access to the specific model (not just general curator access)
-        modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())
-    }
 
-    /**
-     * Specify if delete is allowed.
-     * @return Returns true if user role is ADMIN, false otherwise.
-     */
-    protected boolean allowDelete() {
-        modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())
+        DataModel dataModel = getDataModel()
+        boolean isCurator = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('CURATOR').join(','))
+        if ( !dataModel ) {
+            return isCurator
+        }
+        boolean isAdmin = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('ADMIN').join(','))
+        Authentication authentication = springSecurityService.authentication
+        isAdmin || (isCurator && aclUtilService.hasPermission(authentication, dataModel, BasePermission.ADMINISTRATION))
     }
 
     protected boolean isFavoriteAfterUpdate() {
@@ -437,20 +482,31 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     protected void notAcceptable() { render status: NOT_ACCEPTABLE }
 
-//TODO: REMOVE PUT INTO SERVICE AND CLASSES
-    protected DataModel getDataModel(){
-        DataModel dataModel
-        if(resource!=DataModel && resource!=RelationshipType && resource!=CsvTransformation && resource!=DataModelPolicy && resource && params?.id){
-            dataModel = (resource.get(params.id)?.dataModel)
-        }else if(resource == DataModel && params?.id){
-            dataModel = (resource.get(params.id))
-        }else if(getObjectToBind()?.dataModels){
-            dataModel = DataModel.get(getObjectToBind().dataModels.first()?.id)
-        }else if(params?.dataModel){
-            dataModel = DataModel.get(params.dataModel)
+    Long findDataModelId() {
+        if ( resource == DataModel && params?.id ){
+            return params.long('id')
+
+        } else if ( getObjectToBind()?.dataModels ) {
+            return getObjectToBind().dataModels.first()?.id as Long
+
+        } else if ( params?.dataModel ) {
+            return params.long('dataModel')
         }
-        dataModel
+        null
     }
 
-
+    protected DataModel getDataModel() {
+        if ( resource!=DataModel && resource!=RelationshipType && resource && params?.id ){
+            def instance = findById(params.long('id'))
+            if ( instance?.respondsTo('dataModel') ) {
+                return instance.dataModel
+            }
+        } else {
+            Long dataModelId = findDataModelId()
+            if (dataModelId) {
+                return dataModelGormService?.findById(dataModelId)
+            }
+        }
+        null
+    }
 }

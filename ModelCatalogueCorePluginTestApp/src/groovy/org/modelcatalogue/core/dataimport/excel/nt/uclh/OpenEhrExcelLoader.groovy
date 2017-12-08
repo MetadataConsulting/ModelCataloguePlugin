@@ -150,8 +150,4 @@ class OpenEhrExcelLoader extends ExcelLoader {
         }
         return rowMapList
     }
-
-
-
-
 }

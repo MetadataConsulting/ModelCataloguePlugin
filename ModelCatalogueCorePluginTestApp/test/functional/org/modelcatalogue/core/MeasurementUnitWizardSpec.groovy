@@ -1,10 +1,11 @@
 package org.modelcatalogue.core
 
 import static org.modelcatalogue.core.geb.Common.*
-
+import spock.lang.IgnoreIf
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
 
@@ -35,7 +36,7 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 2, text: 'Foos') } displayed
     }
 
-    def "check the unit shows up with own detail page"(){
+    def "check the unit shows up with own detail page"() {
         remove messages
         click { infTableCell(1, 2).find('a') }
 

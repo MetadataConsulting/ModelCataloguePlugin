@@ -10,7 +10,6 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.RelationshipsCounts
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import rx.subjects.Subject
-
 import java.util.concurrent.TimeUnit
 
 /**
