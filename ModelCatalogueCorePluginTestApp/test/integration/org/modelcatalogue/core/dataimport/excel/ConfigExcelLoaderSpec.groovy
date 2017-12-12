@@ -14,9 +14,9 @@ import spock.lang.Shared
 class ConfigExcelLoaderSpec extends AbstractIntegrationSpec {
     Boolean doGosh = false
 //    String dataModelName = 'LOINC_TEST7'
-    String dataModelName = doGosh ? 'GOSH_TEST1' : 'LOINC_TEST21'
+    String dataModelName = doGosh ? 'GOSH_TEST1' : 'LOINC_TEST01'
     String headersMapXml = doGosh ? 'gosh_headers_map.xml' : 'loinc_headers_map.xml'
-    String dataXlsx = doGosh ? 'GOSH_lab_test_codes100.xlsx' : 'loinc250.xlsx'
+    String dataXlsx = doGosh ? 'GOSH_lab_test_codes100.xlsx' : 'loinc.xlsx' // 'loinc_edit.xlsx'
     @Shared String resourcePath = (new File("test/integration/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
     ConfigExcelLoader excelLoader
 //    CatalogueBuilder catalogueBuilder
@@ -37,7 +37,10 @@ class ConfigExcelLoaderSpec extends AbstractIntegrationSpec {
     def "test default catalogue builder imports generic nt dataset"(){
 
         when: "I load the Excel file"
-            excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(resourcePath + '/' + dataXlsx)))
+        excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(resourcePath + '/' + dataXlsx)))
+//            auditService.mute {
+//                excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(resourcePath + '/' + dataXlsx)))
+//            }
         then: "new model is created"
 
         DataModel.findByName(dataModelName)
