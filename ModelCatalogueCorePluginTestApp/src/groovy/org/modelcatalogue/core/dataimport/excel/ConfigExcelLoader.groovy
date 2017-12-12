@@ -559,7 +559,7 @@ class ConfigExcelLoader extends ExcelLoader {
      */
     def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName){
         int count = 0
-        int batchSize = 1
+        int batchSize = 50
         DataModel dataModel = processDataModel(dataModelName)
         for (Map<String, String> rowMap in rowMaps) {
             println("creating row" + count)
