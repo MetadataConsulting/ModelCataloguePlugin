@@ -50,7 +50,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if ( !SpringSecurityUtils.ifAnyGranted(roles.join(',')) ) {
             return false
         }
-        dataModelAclService.hasReadPermission(dataModel)
+        dataModelAclService.isAdminOrHasReadPermission(dataModel)
     }
 
     //check if a user a general role
