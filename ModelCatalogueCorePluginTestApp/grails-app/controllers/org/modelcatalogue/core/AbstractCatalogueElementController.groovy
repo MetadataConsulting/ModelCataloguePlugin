@@ -480,7 +480,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        T destination = findById(params.destination)
+        Long destinationId = params.long('destination')
+        T destination = findById(destinationId)
         if (destination == null) {
             notFound()
             return

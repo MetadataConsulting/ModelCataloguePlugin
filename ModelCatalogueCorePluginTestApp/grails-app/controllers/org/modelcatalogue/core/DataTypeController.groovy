@@ -49,7 +49,8 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
             return
         }
 
-        DataType other = findById(params.destination)
+        Long destinationId = params.long('destination')
+        DataType other = findById(destinationId)
         if (!other) {
             notFound()
             return
