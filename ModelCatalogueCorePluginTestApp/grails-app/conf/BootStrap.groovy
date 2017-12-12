@@ -63,7 +63,7 @@ class BootStrap {
         } else if ( isTest() ) {
             initTest()
 
-        }  else if ( isProd() ) {
+        }  else if ( isProduction() ) {
             initProd()
         }
     }
