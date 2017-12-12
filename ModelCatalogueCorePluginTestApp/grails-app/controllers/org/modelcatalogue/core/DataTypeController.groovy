@@ -62,19 +62,21 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
             return
         }
 
-        if (!params.value) {
+        Object value = params.value
+
+        if (!value) {
             respond result: "Please, enter value."
             return
         }
 
-        def valid = dataType.validateRule(params.value)
+        boolean valid = dataType.validateRule(value)
 
-        if (!(valid instanceof Boolean && valid)) {
+        if ( !valid ) {
             respond result: "INVALID: Please, enter valid value"
             return
         }
 
-        def result = mapping.map(params.value)
+        def result = mapping.map(value)
 
         if (result instanceof Exception) {
             respond result: "ERROR: ${result.class.simpleName}: $result.message"
