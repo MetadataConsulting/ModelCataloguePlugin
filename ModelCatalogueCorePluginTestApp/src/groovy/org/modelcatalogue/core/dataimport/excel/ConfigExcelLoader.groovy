@@ -5,10 +5,8 @@ import groovy.util.logging.Log
 import org.apache.poi.ss.usermodel.*
 import org.hibernate.Session
 import org.hibernate.SessionFactory
-import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.springframework.context.ApplicationContext
@@ -20,6 +18,8 @@ import org.springframework.context.ApplicationContext
  */
 @Log
 class ConfigExcelLoader extends ExcelLoader {
+    final String DEFAULT_MU_NAME = null
+    final Integer MAX_METADATA_LEN = 2000
 //    AuditService auditService
     String dataModelName
     Map<String, String> headersMap
@@ -54,7 +54,7 @@ class ConfigExcelLoader extends ExcelLoader {
         if (xml.name() == 'headersMap') {
             Map<String, String> hdrMap = [:]
             List<String> metadataKeys = []
-            for (groovy.util.slurpersupport.Node n : xml.childNodes()) {
+            for (groovy.util.slurpersupport.Node n in xml.childNodes()) {
 //            System.out.println(n.name() + ": '" + n.text() + "',")
                 if (n.name == 'metadata') {
                     metadataKeys += n.text()
@@ -159,16 +159,16 @@ class ConfigExcelLoader extends ExcelLoader {
     static String valueHelper(Cell cell){
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_STRING:
-                return cell.getRichStringCellValue().getString().trim();
+                return cell.getRichStringCellValue().getString().trim()
             case Cell.CELL_TYPE_NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getDateCellValue();
+                    return cell.getDateCellValue()
                 }
-                return cell.getNumericCellValue();
+                return cell.getNumericCellValue()
             case Cell.CELL_TYPE_BOOLEAN:
-                return cell.getBooleanCellValue();
+                return cell.getBooleanCellValue()
             case Cell.CELL_TYPE_FORMULA:
-                return cell.getCellFormula();
+                return cell.getCellFormula()
         }
         return ""
     }
@@ -198,8 +198,10 @@ class ConfigExcelLoader extends ExcelLoader {
     String buildModelFromStandardWorkbookSheet(Workbook workbook, int index=0) {
         buildModelFromWorkbookSheet(null, workbook, index)
     }
+    /**
+     * flushes a batch of updates and releases memory
+     */
     void cleanGORM() {
-        //flush a batch of updates and release memory:
         try{
             session.flush()
         }catch(Exception e){
@@ -209,127 +211,364 @@ class ConfigExcelLoader extends ExcelLoader {
         }
         session.clear()
         propertyInstanceMap.get().clear()
-        println("cleaning up GORM")
+        log.info("cleaned up GORM")
     }
-    def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName){
-        List<String> metadataKeys = headersMap['metadata']
+    /**
+     *
+     * @param params
+     * @param code
+     * @param name
+     * @param symbol
+     * @return
+     */
+    Map<String, Object> paramsAddCodeNameDesc(Map<String, Object> params, String code, String name, String desc = null) {
+        if (code)
+            params['modelCatalogueId'] = code
+        if (name)
+            params['name'] = name
+        if (desc)
+            params['description'] = desc
+        return params
+    }
+    /**
+     *
+     * @param key
+     * @param oldValue
+     * @param newValue
+     * @param params
+     * @return
+     */
+    Map<String, String> update(String key, String oldValue, String newValue, Map<String, String> params = null) {
+        if (oldValue != newValue) {
+            if (params == null)
+                params = [key: newValue]
+            else
+                params[key] = newValue
+        }
+        return params
+    }
+
+    void addAsChildTo(CatalogueElement child, CatalogueElement parent) {
+        Set<Relationship> incoming = child.getIncomingRelationships()
+        for (Relationship rel in incoming) {
+            if (rel.getSource() == parent && rel.getDestination() == child && rel.getRelationshipType().getId() == RelationshipType.hierarchyType.getId()) {
+                return // is already a child - will usually be the case
+            }
+        }
+        child.addToChildOf(parent)
+    }
+    /**
+     *
+     * @param dataModelName
+     * @return
+     */
+    DataModel processDataModel(String dataModelName) {
+        //see if an open EHR model already exists, if not create one
+        //could consider changing this - if there are multiple versions - should make sure we use the latest one.
+        DataModel dataModel
+        List<DataModel> dataModels =  DataModel.findAllByName(dataModelName, [sort: 'versionNumber', order: 'desc'])
+        if(dataModels) dataModel = dataModels.first()
+
+        if (!dataModel){
+            log.info("Creating new DataModel: ${dataModelName}")
+            dataModel = new DataModel(name: dataModelName).save()
+        } else {
+            log.info("Found Data Model: ${dataModelName}")
+            //if one exists, check to see if it's a draft
+            // but if it's finalised create a new version
+            if(dataModel.status != ElementStatus.DRAFT){
+                DraftContext context = DraftContext.userFriendly()
+                dataModel = elementService.createDraftVersion(dataModel, PublishingContext.nextPatchVersion(dataModel.semanticVersion), context)
+            }
+        }
+        return dataModel
+    }
+    /**
+     *
+     * @param dataModel
+     * @param headersMap
+     * @param rowMap
+     * @return
+     */
+    DataClass processDataClass(DataModel dataModel, Map<String, Object> headersMap, Map<String, String> rowMap) {
         String regEx = headersMap['classSeparator'] ?: "\\."
-        int count = 0
-        int batchSize = 50
+        //take the class name and split to see if there is a hierarchy
+        String dcCode = tryHeader(ConfigHeadersMap.containingDataClassCode, headersMap, rowMap)
+        String dcNames = tryHeader(ConfigHeadersMap.containingDataClassName, headersMap, rowMap)
+        String dcDescription = tryHeader(ConfigHeadersMap.containingDataClassDescription, headersMap, rowMap)
+        String[] dcNameList = dcNames.split(regEx)
+        Integer maxDcNameIx = dcNameList.length - 1
+        Integer dcNameIx = 0
+        DataClass dc, parentDC
+        String className = dcNameList[dcNameIx]
 
-        rowMaps.each { Map<String, String> rowMap  ->
-            println("creating row" + count)
+        //if "class" separated by . (regEx) create class hierarchy if applicable,
+        //if not then populate the parent data class with the appropriate data element
+        while (dcNameIx < maxDcNameIx) { // we are just checking names at this point (above the leaf)
+            if (!(dc = DataClass.findByNameAndDataModel(className, dataModel))) {
+                dc = new DataClass(name: className, dataModel: dataModel).save() // any cat id or description will not apply here
+            }
+            // maybe check if the parent link is already in the incomingRelationships before calling addToChildOf?
+            if (parentDC)
+                addAsChildTo(dc, parentDC)
 
-            //take the class name and split to see if there is a hierarchy
-            //TODO: (this can be done further up)
-            String dataClassNames = tryHeader(ConfigHeadersMap.containingDataClassName, headersMap, rowMap)
-            String[] classNames = dataClassNames.split(regEx)
+            //last one will be the one that contains the data element
+            parentDC = dc
+            className = dcNameList[++dcNameIx]
+        }
+        // now we are processing the actual (leaf) class, so need to check if there is a model catalogue id (dcCode)
+        if (dcCode && (dc = DataClass.findByModelCatalogueIdAndDataModel(className, dataModel))) {
+            if (className != dc.getName()) { // yes, check if the name has changed
+                dc.setName(className)
+                dc.save()
+            }
+        } else {
+            // see if there is a data class with this name - if so make sure you get the right version i.e. highest version number
+            // it will be the latest one - only one of the same name per class and the data model is version specific
+            dc = DataClass.findByNameAndDataModel(className, dataModel)
+        }
+        if (dc) { // we found a DC, just need to check the description
+            if (dcDescription != dc.getDescription()) {
+                dc.setDescription(dcDescription)
+                dc.save()
+            }
+        } else { // need to create one - this time with all the parameters
+            // the data class doesn't already exist in the model so create it
+            def params = paramsAddCodeNameDesc([dataModel: dataModel], dcCode, className, dcDescription)
+            dc = new DataClass(params).save()
+        }
+        // maybe check if the parent link is already in the incomingRelationships before calling addToChildOf?
+        if (parentDC)
+            addAsChildTo(dc, parentDC)
 
-            //see if an open EHR model already exists, if not create one
-            //could consider changing this - if there are multiple versions - should make sure we use the latest one.
-            DataModel dataModel
-            List<DataModel> dataModels =  DataModel.findAllByName(dataModelName, [sort: 'versionNumber', order: 'desc'])
-            if(dataModels) dataModel = dataModels.first()
+        return dc
+    }
+    /**
+     *
+     * @param dataModel
+     * @param headersMap
+     * @param rowMap
+     * @return
+     */
+    MeasurementUnit processMeasurementUnit(DataModel dataModel, Map<String, Object> headersMap, Map<String, String> rowMap) {
+        //import the measurement unit for the data type (to be used in the creation of data type if applicable)
+        String muCatId = tryHeader(ConfigHeadersMap.measurementUnitCode, headersMap, rowMap)
+        String muSymbol = tryHeader(ConfigHeadersMap.measurementUnitSymbol, headersMap, rowMap)
+        String muName = tryHeader(ConfigHeadersMap.measurementUnitName, headersMap, rowMap) ?: (muSymbol ?: (muCatId ?: DEFAULT_MU_NAME))
 
-            if (!dataModel){
-                log.info("Creating new DataModel: ${dataModelName}")
-                dataModel = new DataModel(name: dataModelName).save()
+        MeasurementUnit mu
+
+        if (muName == DEFAULT_MU_NAME) { // there is no measurement unit
+            return null
+        }
+
+        if (muCatId){
+            mu = MeasurementUnit.findByModelCatalogueIdAndDataModel(muCatId, dataModel)
+        } else if (muName) { //see if a datatype with this name already exists in this model
+            mu = MeasurementUnit.findByNameAndDataModel(muName, dataModel)
+        } else if (muSymbol) {
+            mu = MeasurementUnit.findBySymbolAndDataModel(muSymbol, dataModel)
+        }
+        // all this to test
+        //if no mu then create one
+        if(!mu) {
+            mu  = new MeasurementUnit()
+            mu.setDataModel(dataModel)
+            mu.setName(muName)
+            if (muCatId)
+                mu.setModelCatalogueId(muCatId)
+            if (muSymbol)
+                mu.setSymbol(muSymbol)
+            mu.save()
+//            mu  = new MeasurementUnit(params).save()
+        } else {
+            Map<String, String> params = update('modelCatalogueId', mu.getModelCatalogueId(), muCatId)
+            params = update('name', mu.getName(), muName, params)
+            params = update('symbol', mu.getSymbol(), muSymbol, params)
+            if (params) // will be null if no updates
+                mu.save(params)
+        }
+        return mu
+    }
+    /**
+     *
+     * @param dataModel
+     * @param headersMap
+     * @param rowMap
+     * @param mu
+     * @return
+     */
+    DataType processDataType(DataModel dataModel, Map<String, Object> headersMap, Map<String, String> rowMap, MeasurementUnit mu) {
+        Boolean updated = false
+        String dtCode = tryHeader(ConfigHeadersMap.dataTypeCode, headersMap, rowMap)
+        String dtName = tryHeader(ConfigHeadersMap.dataTypeName, headersMap, rowMap)
+        DataType dt
+
+        //see if a datatype with the model catalogue id already exists in this model
+        if (dtCode && (dt = DataType.findByModelCatalogueIdAndDataModel(dtCode, dataModel))){
+            if ((dtName ?: '') != dt.getName()) {
+                dt.setName(dtName)
+                updated = true
+            }
+        } else if (dtName && (dt = DataType.findByNameAndDataModel(dtName, dataModel))) { //see if a datatype with this name already exists in this model
+            if (dtCode != dt.getModelCatalogueId()) {
+                dt = null // create a new datatype further on - it is unlikely to have datatypes with the same name but different catalogue ids
+//                dt.setModelCatalogueId(dtCode)
+//                updated = true
+            }
+        }
+        //if no dt then create one
+        if (!dt) {
+            if (mu) {
+                def params = paramsAddCodeNameDesc([dataModel: dataModel, measurementUnit: mu], dtCode, dtName)
+                dt  = new PrimitiveType(params)
             } else {
-                log.info("Found Data Model: ${dataModelName}")
-                //if one exists, check to see if it's a draft
-                // but if it's finalised create a new version
-                if(dataModel.status != ElementStatus.DRAFT){
-                    DraftContext context = DraftContext.userFriendly()
-                    dataModel = elementService.createDraftVersion(dataModel, PublishingContext.nextPatchVersion(dataModel.semanticVersion), context)
+                def params = paramsAddCodeNameDesc([dataModel: dataModel], dtCode, dtName)
+                dt = new DataType(params)
+            }
+            updated = true
+        }
+        if (updated)
+            dt.save()
+        return dt
+    }
+    /**
+     *
+     * @param de
+     * @param rowMap
+     * @param metadataKeys
+     * @return
+     */
+    Boolean addMetadata(DataElement de, Map<String, String> rowMap, List<String> metadataKeys) {
+        Boolean updated = false
+        for (String key in metadataKeys) {
+            String keyValue =  rowMap.get(key)
+            if (keyValue) {
+                de.ext.put(key, keyValue.take(MAX_METADATA_LEN).toString())
+                updated = true
+            }
+        }
+        return updated
+    }
+    /**
+     *
+     * @param de
+     * @param headersMap
+     * @param rowMap
+     * @param metadataKeys
+     * @return
+     */
+    Boolean updateMetadata(DataElement de, Map<String, Object> headersMap, Map<String, String> rowMap, List<String> metadataKeys) {
+        Boolean updated = false
+        if (de.ext.isEmpty()) { // no existing metadata, so just insert the new metadata
+            updated = addMetadata(de, rowMap, metadataKeys)
+        } else { // we need to update it (possible inserts, edits & deletes)
+            for (String newKey in metadataKeys) { // first go through the new row
+                String newValue =  rowMap.get(newKey)?.take(MAX_METADATA_LEN)
+                String oldValue = de.ext.get(newKey)
+                if (oldValue != newValue) {
+                    de.ext.put(newKey, newValue) // inserts or updates
+                    updated = true
                 }
             }
-
-            //if "class" separated by . (regEx)
-            //create class hierarchy if applicable,
-            //if not then populate the parent data class with the appropriate data element
-
-            DataClass parentDataClass
-
-            classNames.each{ String className ->
-
-                //TODO:
-                //see if a model catalogue id exists for the class in case name changed / description changed etc.
-                //then update it
-
-                //see if there is a data class with this name - if so make sure you get the right version i.e. highest version number
-                // it will be the latest one - only one of the same name per class and the data model is version specific
-                 DataClass dataClass = DataClass.findByNameAndDataModel(className, dataModel)
-
-                //if the data class doesn't already exist in the model then create it
-                if(!dataClass) dataClass = new DataClass(name: className, dataModel: dataModel).save()
-                if(parentDataClass) dataClass.addToChildOf(parentDataClass)
-
-                //last one will be the one that contains the data element
-                parentDataClass = dataClass
-            }
-            String deCode = tryHeader(ConfigHeadersMap.dataElementCode, headersMap, rowMap)
-            String deName = tryHeader(ConfigHeadersMap.dataElementName, headersMap, rowMap)
-            //see if a data element exists with this model catalogue id
-            DataElement de = DataElement.findByModelCatalogueIdAndDataModel(deCode, dataModel)
-            //if not see if a data element exists in this model with the same name
-            if(!de) de = DataElement.findByNameAndDataModel(deName, dataModel)
-
-            //TODO:
-            //then update the data element
-            // with params of data type info etc.
-
-            //import the measurement unit for the data type (to be used in the creation of data type if applicable)
-            String muCode = tryHeader(ConfigHeadersMap.measurementUnitCode, headersMap, rowMap)
-            MeasurementUnit mu
-
-            if (muCode){
-                mu = MeasurementUnit.findByModelCatalogueIdAndDataModel(muCode, dataModel)
-
-                //TODO:
-                //then update it if it's different
-            }else{
-                //see if a datatype with this name already exists in this model
-                String muName = tryHeader(ConfigHeadersMap.measurementUnitName, headersMap, rowMap)
-                mu = MeasurementUnit.findByNameAndDataModel(muName, dataModel)
-
-                //if no mu then create one
-                if(!mu) mu  = new MeasurementUnit(dataModel: dataModel, name: muName).save()
-            }
-
-            String dtCode = tryHeader(ConfigHeadersMap.dataTypeCode, headersMap, rowMap)
-            DataType dt
-
-            //see if a datatype with the model catalogue id already exists in this model
-            if(dtCode){
-                dt = DataType.findByModelCatalogueIdAndDataModel(dtCode, dataModel)
-
-                //TODO:
-                //then update it
-
-            }else{
-                String dtName = tryHeader(ConfigHeadersMap.dataTypeName, headersMap, rowMap)
-                //see if a datatype with this name already exists in this model
-                dt = DataType.findByNameAndDataModel(dtName, dataModel)
-
-                //if no dt then create one
-                if(!dt) dt  = new PrimitiveType(dataModel: dataModel, name: dtName, measurementUnit: mu).save()
-            }
-
-            //if no de then create a new one
-            if(!de) de = new DataElement(name: deName, dataModel: dataModel, dataType: dt).save()
-
-            //add metadata to data element
-            for (String key: metadataKeys) {
-                def keyValue =  rowMap.get(key)
-                if (keyValue) {
-                    de.ext.put(key, keyValue.take(2000).toString())
+            for (oldKey in de.ext.keySet()) {
+                if (!rowMap.get(oldKey)) {
+                    de.ext.remove(oldKey)
+                    updated = true
                 }
             }
+        }
+        return  updated
+    }
+    /**
+     *
+     * @param dataModel
+     * @param dt
+     * @param rowMap
+     * @param metadataKeys
+     * @param deCode
+     * @param deName
+     * @param deDescription
+     * @return
+     */
+    DataElement newDataElement(DataModel dataModel, DataType dt, Map<String, String> rowMap, List<String> metadataKeys, String deCode, String deName, String deDescription) {
+        def params = paramsAddCodeNameDesc([dataModel: dataModel, dataType: dt], deCode, deName, deDescription)
+        DataElement de = new DataElement(params).save()
+        addMetadata(de, rowMap, metadataKeys)
+        return de
+    }
+    /**
+     *
+     * @param dataModel
+     * @param headersMap
+     * @param rowMap
+     * @param dt
+     * @return
+     */
+    DataElement processDataElement(DataModel dataModel, Map<String, Object> headersMap, Map<String, String> rowMap, DataType dt) {
+        Boolean updated = false
+        List<String> metadataKeys = headersMap['metadata']
+        String deCode = tryHeader(ConfigHeadersMap.dataElementCode, headersMap, rowMap)
+        String deName = tryHeader(ConfigHeadersMap.dataElementName, headersMap, rowMap)
+        String deDescription = tryHeader(ConfigHeadersMap.dataElementDescription, headersMap, rowMap)
+        //see if a data element exists with this model catalogue id
+        DataElement de
 
-            //the last parent data class i.e. the bottom of the hierarchy will be the container for the data element
-            de.addToContainedIn(parentDataClass)
+        if (deCode && (de = DataElement.findByModelCatalogueIdAndDataModel(deCode, dataModel))) {
+            String oldDeName = de.getName()
+            if (deName != oldDeName) {
+                de.setName(deName)
+                updated = true
+            }
 
-            if ( ++count % batchSize == 0 ) {
+        } else if (deName && (de = DataElement.findByNameAndDataModel(deName, dataModel))) { //if not see if a data element exists in this model with the same name
+            String oldDeCatId = de.getModelCatalogueId()
+            if (deCode != oldDeCatId) { // have a new DE - will not happen if no code (cat id)
+                de = newDataElement(dataModel, dt, rowMap, metadataKeys, deCode, deName, deDescription)
+                updated = true
+            }
+        }
+        if (de) {
+            DataType oldDeDataType = de.getDataType()
+            String oldDeDescription = de.getDescription()
+            if (deDescription != oldDeDescription) {
+                de.setDescription(deDescription)
+                updated = true
+            }
+            if (dt != oldDeDataType) {
+                de.setDataType(dt)
+                updated = true
+            }
+            if (updateMetadata(de, headersMap, rowMap, metadataKeys)) {
+                updated = true
+            }
+        } else { //if no de then create one
+            de = newDataElement(dataModel, dt, rowMap, metadataKeys, deCode, deName, deDescription)
+            updated = true
+        }
+        if (updated)
+            de.save()
+        return de
+    }
+    /**
+     *
+     * @param rowMaps
+     * @param headersMap
+     * @param dataModelName
+     * @return
+     */
+    def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName){
+        int count = 0
+        int batchSize = 1
+        DataModel dataModel = processDataModel(dataModelName)
+        for (Map<String, String> rowMap in rowMaps) {
+            println("creating row" + count)
+            DataClass dc = processDataClass(dataModel, headersMap, rowMap)
+            MeasurementUnit mu = processMeasurementUnit(dataModel, headersMap, rowMap)
+            DataType dt = processDataType(dataModel, headersMap, rowMap, mu)
+            DataElement de = processDataElement(dataModel, headersMap, rowMap, dt)
+            de.addToContainedIn(dc)
+            if (++count % batchSize == 0) {
                 cleanGORM()
             }
         }
@@ -363,7 +602,7 @@ class ConfigExcelLoader extends ExcelLoader {
 //                processRowMaps(rowMaps, headersMap)
 //            }
 //        } else {
-            Sheet sheet = workbook.getSheetAt(index);
+            Sheet sheet = workbook.getSheetAt(index)
             List<Map<String,String>> rowMaps = getRowMaps(sheet, headersMap)
             //Iterate through the modelMaps to build new DataModel
             processRowMaps(rowMaps, headersMap)
@@ -397,7 +636,7 @@ class ConfigExcelLoader extends ExcelLoader {
 //                processRowMaps(rowMaps, headersMap)
 //            }
 //        } else {
-        Sheet sheet = workbook.getSheetAt(0);
+        Sheet sheet = workbook.getSheetAt(0)
         List<Map<String,String>> rowMaps = getRowMaps(sheet, headersMap)
         //Iterate through the modelMaps to build new DataModel
         processRowMaps(rowMaps, headersMap)
@@ -421,92 +660,5 @@ class ConfigExcelLoader extends ExcelLoader {
                 "header ${headersMap.get(internalHeaderName)}, from rowMap ${rowMap as String}, nothing found.")*/
             return null
         }
-    }
-
-    static void importDataTypesFromExcelExporterFormat(CatalogueBuilder catalogueBuilder,
-                                                       String dataTypeName, String dataTypeCode, String dataTypeEnumerations, String dataTypeRule, String measurementUnitName, String measurementUnitCode){
-        String[] lines = dataTypeEnumerations?.split("\\r?\\n");
-        Map<String,String> enumerations = dataTypeEnumerations ? parseMapStringLines(lines) : [:]
-        if (enumerations) {
-            catalogueBuilder.dataType(name: dataTypeName, enumerations: enumerations, rule: dataTypeRule, id: dataTypeCode) //TODO: get dataModel, which used to be dataTypeClassification, from data type code.
-        } else if (measurementUnitName) {
-            catalogueBuilder.dataType(name: dataTypeName, rule: dataTypeRule, id: dataTypeCode) {
-                measurementUnit(name: measurementUnitName, id: measurementUnitCode)
-            }
-        } else {
-            catalogueBuilder.dataType(name: dataTypeName, rule: dataTypeRule, id: dataTypeCode)
-        }
-    }
-
-    /**
-     *
-     * @param dataElementName data element/item name
-     * @param dataTypeNameOrEnum - Column F - content of - either blank or an enumeration or a named datatype.
-     * @return
-     */
-    static importDataTypes(CatalogueBuilder catalogueBuilder, String dataElementName, dataTypeNameOrEnum, String dataTypeCode, String dataTypeClassification, String measurementUnitName, String measurementUnitSymbol) {
-        if (!dataTypeNameOrEnum) {
-            if (measurementUnitName) {
-                return catalogueBuilder.dataType(id: dataTypeCode, dataModel: dataTypeClassification, name: 'String') {
-                    measurementUnit name: measurementUnitName, symbol: measurementUnitSymbol
-                }
-            }
-            return catalogueBuilder.dataType(id: dataTypeCode, dataModel: dataTypeClassification, name: 'String')
-        }
-        //default data type to return is the string data type
-        String[] lines = dataTypeNameOrEnum.split("\\r?\\n");
-        if (!(lines.size() > 0 && lines != null)) {
-            if (measurementUnitName) {
-                return catalogueBuilder.dataType(name: "String", dataModel: dataTypeClassification, id: dataTypeCode) {
-                    measurementUnit name: measurementUnitName, symbol: measurementUnitSymbol
-                }
-            }
-            return catalogueBuilder.dataType(name: "String", dataModel: dataTypeClassification, id: dataTypeCode)
-        }
-
-        def enumerations = lines.size() == 1 ? [:] : parseMapStringLines(lines)
-
-        if(!enumerations){
-            if (measurementUnitName) {
-                return catalogueBuilder.dataType(name: dataTypeNameOrEnum, dataModel: dataTypeClassification, id: dataTypeCode) {
-                    measurementUnit name: measurementUnitName, symbol: measurementUnitSymbol
-                }
-            }
-            return catalogueBuilder.dataType(name: dataTypeNameOrEnum, dataModel: dataTypeClassification, id: dataTypeCode)
-        }
-
-        return catalogueBuilder.dataType(name: dataElementName, enumerations: enumerations, dataModel: dataTypeClassification, id: dataTypeCode)
-    }
-
-    static Map<String,String> parseMapString(String mapString) {
-        return parseMapStringLines(mapString.split(/\r?\n/))
-    }
-
-    /**
-     For colon-separated key-value lines which are usually enumerations or metadata.
-     */
-    static Map<String,String> parseMapStringLines(String[] lines){
-        Map map = new HashMap()
-
-        lines.each { enumeratedValues ->
-
-            String[] EV = enumeratedValues.split(":")
-
-            if (EV?.size() == 2) {
-                String key = EV[0]
-                String value = EV[1]
-
-                if (value.size() > 244) {
-                    value = value[0..244]
-                }
-
-                key = key.trim()
-                value = value.trim()
-
-
-                map.put(key, value)
-            }
-        }
-        return map
     }
 }
