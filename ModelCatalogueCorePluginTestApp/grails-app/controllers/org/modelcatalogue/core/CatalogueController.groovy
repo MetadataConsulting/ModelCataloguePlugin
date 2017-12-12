@@ -35,7 +35,7 @@ class CatalogueController {
             return
         }
 
-        if ( !dataModelAclService.hasReadPermission((element)) ) {
+        if ( !dataModelAclService.isAdminOrHasReadPermission((element)) ) {
             response.sendError HttpServletResponse.SC_UNAUTHORIZED
             return false
         }

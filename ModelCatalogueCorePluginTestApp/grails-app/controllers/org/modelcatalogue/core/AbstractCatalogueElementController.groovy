@@ -519,7 +519,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
         if ( CatalogueElement.class.isAssignableFrom(instance.class) )  {
             DataModel dataModel = instance.dataModel
-            if ( !dataModelAclService.hasReadPermission(dataModel) ) {
+            if ( !dataModelAclService.isAdminOrHasReadPermission(dataModel) ) {
                 unauthorized()
                 return
             }
