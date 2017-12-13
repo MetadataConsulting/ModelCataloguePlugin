@@ -130,10 +130,13 @@ class BootStrap {
             initEmptyDataBase()
             log.info 'init register reports'
             userService.inviteAdmins()
-        }
+        } else {
+            log.info 'init request maps'
+            metadataSecurityService.secureUrlMappings()
 
-        loginAs('supervisor')
-        configureAcl()
+            loginAs('supervisor')
+            configureAcl()
+        }
     }
 
     void initDev() {
