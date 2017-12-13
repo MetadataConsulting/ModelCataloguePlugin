@@ -47,20 +47,20 @@ class InitSecurityService {
     }
 
     void initUserRoles() {
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('supervisor', MetadataRoles.ROLE_USER)
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('supervisor', MetadataRoles.ROLE_CURATOR)
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('supervisor', MetadataRoles.ROLE_STACKTRACE)
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('supervisor', MetadataRoles.ROLE_ADMIN)
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('supervisor', MetadataRoles.ROLE_SUPERVISOR)
-
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('admin', MetadataRoles.ROLE_USER)
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('admin', MetadataRoles.ROLE_CURATOR)
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('admin', MetadataRoles.ROLE_STACKTRACE)
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('admin', MetadataRoles.ROLE_ADMIN)
-
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('curator', MetadataRoles.ROLE_USER)
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('curator', MetadataRoles.ROLE_CURATOR)
-
-        userRoleGormService.saveUserRoleByUsernameAndAuthority('viewer', MetadataRoles.ROLE_USER)
+        for ( Map m : [
+                [username: 'supervisor', authority: MetadataRoles.ROLE_USER],
+                [username: 'supervisor', authority: MetadataRoles.ROLE_CURATOR],
+                [username: 'supervisor', authority: MetadataRoles.ROLE_STACKTRACE],
+                [username: 'supervisor', authority: MetadataRoles.ROLE_ADMIN],
+                [username: 'supervisor', authority: MetadataRoles.ROLE_SUPERVISOR],
+                [username: 'admin', authority: MetadataRoles.ROLE_USER],
+                [username: 'admin', authority: MetadataRoles.ROLE_CURATOR],
+                [username: 'admin', authority: MetadataRoles.ROLE_STACKTRACE],
+                [username: 'admin', authority: MetadataRoles.ROLE_ADMIN],
+                [username: 'curator', authority: MetadataRoles.ROLE_USER],
+                [username: 'curator', authority: MetadataRoles.ROLE_CURATOR],
+                [username: 'viewer', authority: MetadataRoles.ROLE_USER],]) {
+            userRoleGormService.saveUserRoleByUsernameAndAuthority(m.username, m.authority)
+        }
     }
 }
