@@ -373,7 +373,7 @@ class DataImportController  {
 
     @Async
     protected void loadNTSpreadsheet(Workbook wb){
-        auditService.mute {
+        auditService.betterMute {
             try {
                 ExcelLoader loader = new ExcelLoader()
                 loader.updateFromWorkbookSheet(wb, 0)
@@ -387,7 +387,7 @@ class DataImportController  {
     @Async
     protected void loadNTSpreadsheet(Workbook wb, String filename, DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
         Pair<String,String> modelDetails = getModelDetails(suffix)
-        auditService.mute {
+        auditService.betterMute {
             try{
                 UCLHExcelLoader loader = new UCLHExcelLoader(false)
                 String dataOwnerAndGelModel = ExcelLoader.getOwnerAndGelModelFromFileName(filename, '_nt_rawimport')
@@ -404,7 +404,7 @@ class DataImportController  {
     // the generic loader based on the LOINC loader
     @Async
     protected void loadConfigSpreadsheet(Workbook wb, String modelName, InputStream xmlConfigStream, Long id, Long userId) {
-        auditService.mute {
+        auditService.betterMute {
             try {
                 ConfigExcelLoader loader = new ConfigExcelLoader(modelName, xmlConfigStream)
                 loader.buildModel(wb)
@@ -418,7 +418,7 @@ class DataImportController  {
 
     @Async
     protected void loadMCSpreadsheet(Workbook wb, String filename, DefaultCatalogueBuilder defaultCatalogueBuilder, Long id, Long userId) {
-        auditService.mute {
+        auditService.betterMute {
             try {
                 ExcelLoader loader = new ExcelLoader()
                 loader.buildModelFromSpreadsheetFromExcelExporter(
@@ -442,7 +442,7 @@ class DataImportController  {
     protected void loadOpenEhrSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
         Pair<String,String> modelDetails = getModelDetails(suffix)
         executorService.submit {
-            auditService.mute {
+            auditService.betterMute {
                 try {
                     OpenEhrExcelLoader loader = new OpenEhrExcelLoader(false)
                     String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_openEHR')
