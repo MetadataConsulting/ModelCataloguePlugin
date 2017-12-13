@@ -1,6 +1,10 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.persistence.RelationshipTypeGormService
+
 class RelationshipTypeService {
+
+    RelationshipTypeGormService relationshipTypeGormService
 
     static transactional = false
 
@@ -11,8 +15,8 @@ class RelationshipTypeService {
         if (relationshipTypesCache) {
             return relationshipTypesCache
         }
-
-        relationshipTypesCache = RelationshipType.list().collectEntries { [it.name, it]}
+        List<RelationshipType> relationshipTypeList = relationshipTypeGormService.findRelationshipTypes()
+        relationshipTypesCache = relationshipTypeList.collectEntries { [it.name, it] }
     }
 
     Map<String, RelationshipType> getRelationshipTypesFor(Class cls) {
