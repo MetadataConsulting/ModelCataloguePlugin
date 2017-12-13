@@ -22,6 +22,12 @@ class RelationshipTypeGormService implements WarnGormErrors {
     }
 
     @Transactional
+    RelationshipType save(Map m) {
+        RelationshipType relationshipTypeInstance = new RelationshipType(m)
+        save(relationshipTypeInstance)
+    }
+
+    @Transactional
     RelationshipType save(RelationshipType relationshipTypeInstance) {
         if ( !relationshipTypeInstance.save() ) {
             warnErrors(relationshipTypeInstance, messageSource)

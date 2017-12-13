@@ -4,6 +4,7 @@ import org.codehaus.groovy.grails.io.support.PathMatchingResourcePatternResolver
 import org.codehaus.groovy.grails.io.support.Resource
 import org.grails.datastore.gorm.GormStaticApi
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.persistence.RelationshipTypeGormService
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.builder.ProgressMonitor
@@ -23,6 +24,7 @@ class InitCatalogueService {
     def elementService
     def sessionFactory
     def cacheService
+    RelationshipTypeGormService relationshipTypeGormService
 
     def initCatalogue(boolean test = false){
         Closure init = {
@@ -151,8 +153,8 @@ class InitCatalogueService {
         for (Map definition in defaultDataTypes) {
             RelationshipType existing = RelationshipType.readByName(definition.name)
             if (!existing) {
-                RelationshipType type = new RelationshipType(definition)
-                type.save(failOnError: true, flush: true)
+
+                RelationshipType type = relationshipTypeGormService.save(definition)
 
                 if (type.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Cannot create relationship type $definition.name", type.errors))
