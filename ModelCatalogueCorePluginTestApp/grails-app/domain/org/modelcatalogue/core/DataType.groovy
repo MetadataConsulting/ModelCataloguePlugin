@@ -75,7 +75,7 @@ class DataType extends CatalogueElement implements Validating {
      * @param x
      * @return
      */
-    def validateRule(Object x) {
+    boolean validateRule(Object x) {
         ValueValidator.validateRule(this, x)
     }
 

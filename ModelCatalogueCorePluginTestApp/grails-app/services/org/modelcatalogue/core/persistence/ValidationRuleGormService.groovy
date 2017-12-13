@@ -1,14 +1,27 @@
 package org.modelcatalogue.core.persistence
 
 import grails.transaction.Transactional
-import groovy.transform.CompileStatic
 import org.modelcatalogue.core.ValidationRule
+import org.modelcatalogue.core.WarnGormErrors
+import org.modelcatalogue.core.api.ElementStatus
+import org.springframework.context.MessageSource
 
-@CompileStatic
-class ValidationRuleGormService {
+class ValidationRuleGormService implements WarnGormErrors {
 
-    @Transactional
+    MessageSource messageSource
+
+    @Transactional(readOnly = true)
     ValidationRule findById(long id) {
         ValidationRule.get(id)
+    }
+
+    @Transactional
+    ValidationRule saveWithNameAndDescriptionAndStatus(String name, String description, ElementStatus status) {
+        ValidationRule validationRuleInstance = new ValidationRule(name: name, description: description, status: status)
+        if ( !validationRuleInstance.save() ) {
+            warnErrors(validationRuleInstance, messageSource)
+            transactionStatus.setRollbackOnly()
+        }
+        validationRuleInstance
     }
 }

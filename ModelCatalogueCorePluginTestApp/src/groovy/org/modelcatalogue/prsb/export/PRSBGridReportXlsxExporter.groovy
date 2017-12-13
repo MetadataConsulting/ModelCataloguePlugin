@@ -81,7 +81,7 @@ class PRSBGridReportXlsxExporter {
 
                 }
 
-                dataClasses.each{ dataClass->
+                dataClasses.each { dataClass->
                     buildRows(sheetDefinition, dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), 1, 2)
                 }
 

@@ -1,5 +1,7 @@
 package org.modelcatalogue.gel.export
 
+import spock.lang.IgnoreIf
+
 import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -12,6 +14,7 @@ import org.modelcatalogue.gel.GenomicsService
 /**
  * Created by amilward on 11/07/2017.
  */
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class RareDiseaseMaintenanceSplitDocsExporterSpec extends AbstractIntegrationSpec {
 
     ElementService elementService

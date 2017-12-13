@@ -302,7 +302,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         handleParams(max)
 
         //before interceptor deals with this security - this is only applicable to data models and users
-        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())) {
+
+        boolean hasRoleViewer = modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())
+        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !hasRoleViewer) {
             unauthorized()
             return
         }
@@ -478,7 +480,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        T destination = findById(params.destination)
+        Long destinationId = params.long('destination')
+        T destination = findById(destinationId)
         if (destination == null) {
             notFound()
             return
@@ -517,7 +520,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
         if ( CatalogueElement.class.isAssignableFrom(instance.class) )  {
             DataModel dataModel = instance.dataModel
-            if ( !dataModelAclService.hasReadPermission(dataModel) ) {
+            if ( !dataModelAclService.isAdminOrHasReadPermission(dataModel) ) {
                 unauthorized()
                 return
             }

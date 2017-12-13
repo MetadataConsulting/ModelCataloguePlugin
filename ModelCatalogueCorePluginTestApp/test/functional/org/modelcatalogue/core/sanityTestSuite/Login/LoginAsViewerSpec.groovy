@@ -5,7 +5,7 @@ import org.openqa.selenium.WebDriver
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
 @Stepwise
 class LoginAsViewerSpec extends AbstractModelCatalogueGebSpec {
 

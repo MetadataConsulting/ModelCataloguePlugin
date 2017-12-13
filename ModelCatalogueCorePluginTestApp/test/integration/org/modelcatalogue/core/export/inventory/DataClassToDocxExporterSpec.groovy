@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.export.inventory
 
+import spock.lang.IgnoreIf
+
 import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataClass
@@ -24,6 +26,7 @@ class DataClassToDocxExporterSpec extends AbstractIntegrationSpec {
 
     @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
 
+    @IgnoreIf( { System.getProperty('spock.ignore.slow') })
     def "export model to docx"() {
         when:
         File file = temporaryFolder.newFile("${System.currentTimeMillis()}.docx")

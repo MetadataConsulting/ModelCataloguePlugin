@@ -63,7 +63,7 @@ class BootStrap {
         } else if ( isTest() ) {
             initTest()
 
-        }  else if ( isProd() ) {
+        }  else if ( isProduction() ) {
             initProd()
         }
     }
@@ -130,6 +130,12 @@ class BootStrap {
             initEmptyDataBase()
             log.info 'init register reports'
             userService.inviteAdmins()
+        } else {
+            log.info 'init request maps'
+            metadataSecurityService.secureUrlMappings()
+
+            loginAs('supervisor')
+            configureAcl()
         }
     }
 

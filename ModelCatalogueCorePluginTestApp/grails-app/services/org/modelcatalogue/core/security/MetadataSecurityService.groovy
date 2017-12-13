@@ -11,11 +11,11 @@ class MetadataSecurityService {
 
     RequestmapGormService requestmapGormService
 
-    public static final List<List> MODEL_CATALOGUE_NORTH_THAMES_URL_MAPPINGS = [
-            ["/api/modelCatalogue/core/northThames/northThamesSummaryReport/*", 'isAuthenticated()', HttpMethod.GET]
+    public static final List MODEL_CATALOGUE_NORTH_THAMES_URL_MAPPINGS = [
+            ['/api/modelCatalogue/core/northThames/northThamesSummaryReport/*', 'isAuthenticated()', HttpMethod.GET]
     ]
 
-    public static final List<List> MODEL_CATALOGUE_GENOMICS_URL_MAPPINGS = [
+    public static final List MODEL_CATALOGUE_GENOMICS_URL_MAPPINGS = [
             ["/api/modelCatalogue/core/genomics/imports/upload", MetadataRolesUtils.roles('CURATOR') ,HttpMethod.POST],
             ["/api/modelCatalogue/core/genomics/exportGelSpecification/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/genomics/exportRareDiseaseHPOAndClinicalTestsAsJson/*", 'isAuthenticated()', HttpMethod.GET],
@@ -39,12 +39,12 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/genomics/exportRareDiseaseSplitDocs/*", 'isAuthenticated()', HttpMethod.GET],
     ]
 
-    public static final List<List> MODEL_CATALOGUE_FORM_URL_MAPPINGS = [
+    public static final List MODEL_CATALOGUE_FORM_URL_MAPPINGS = [
             ["/api/modelCatalogue/core/forms/generate/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/forms/preview/*", 'isAuthenticated()', HttpMethod.GET],
     ]
 
-    public static final List<List> MODEL_CATALOGUE_AUDIT_PLUGIN_MAPPINGS = [
+    public static final List MODEL_CATALOGUE_AUDIT_PLUGIN_MAPPINGS = [
             ["/api/modelCatalogue/core/change/", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/change/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/change/*/changes", 'isAuthenticated()', HttpMethod.GET],
@@ -65,7 +65,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/validationRule/*/changes", 'isAuthenticated()', HttpMethod.GET],
     ]
 
-    public static final List<List> ASSET_MAPPINGS = [
+    public static final List ASSET_MAPPINGS = [
             ["/api/modelCatalogue/core/asset", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/asset", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/asset/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -105,7 +105,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/asset/*/validateXml", 'isAuthenticated()', HttpMethod.POST],
     ]
 
-    public static final List<List> DATA_ELEMENTS_MAPPINGS = [
+    public static final List DATA_ELEMENTS_MAPPINGS = [
             ["/api/modelCatalogue/core/dataElement", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataElement", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataElement/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -141,7 +141,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataElement/*/content", 'isAuthenticated()', HttpMethod.GET],
     ]
 
-    public static final List<List> DATA_CLASS_MAPPINGS = [
+    public static final List DATA_CLASS_MAPPINGS = [
             ["/api/modelCatalogue/core/dataClass", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataClass", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataClass/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -181,7 +181,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataClass/*/content", 'isAuthenticated()', HttpMethod.GET],
     ]
 
-    public static final List<List> CATALOGUE_ELEMENT_MAPPINGS = [
+    public static final List CATALOGUE_ELEMENT_MAPPINGS = [
             ["/api/modelCatalogue/core/catalogueElement", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/catalogueElement", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/catalogueElement/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -216,7 +216,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/catalogueElement/*/merge/*",'isAuthenticated()',         HttpMethod.POST],
     ]
 
-    public static final List<List> DATA_TYPE_MAPPINGS = [
+    public static final List DATA_TYPE_MAPPINGS = [
             ["/api/modelCatalogue/core/dataType", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataType", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataType/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -254,7 +254,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataType/*/validateValue",'isAuthenticated()',HttpMethod.GET],
     ]
 
-    public static final List<List> ENUMERATED_TYPE_MAPPINGS = [
+    public static final List ENUMERATED_TYPE_MAPPINGS = [
             ["/api/modelCatalogue/core/enumeratedType", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/enumeratedType", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/enumeratedType/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -294,7 +294,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/enumeratedType/*/content",'isAuthenticated()',HttpMethod.GET],
     ]
 
-    public static final List<List> REFERENCE_TYPE_MAPPINGS = [
+    public static final List REFERENCE_TYPE_MAPPINGS = [
             ["/api/modelCatalogue/core/referenceType", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/referenceType", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/referenceType/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -333,7 +333,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/referenceType/*/content",'isAuthenticated()',HttpMethod.GET],
     ]
 
-    public static final List<List> DATA_ARCHITECT_MAPPINGS = [
+    public static final List DATA_ARCHITECT_MAPPINGS = [
             ["/api/modelCatalogue/core/dataArchitect/metadataKeyCheck/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataArchitect/getSubModelElements/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataArchitect/getSubModelElements/", 'isAuthenticated()', HttpMethod.GET],
@@ -343,10 +343,11 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataArchitect/generateSuggestions", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataArchitect/deleteSuggestions", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataArchitect/suggestionsNames", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/dataArchitect/imports/upload", 'ROLE_SUPERVISOR', HttpMethod.POST],
+            ["/api/modelCatalogue/core/dataArchitect/imports/upload", MetadataRolesUtils.roles('ADMIN'), HttpMethod.POST],
+            ["/api/modelCatalogue/core/dataArchitect/imports/excelImportTypes", MetadataRolesUtils.roles('ADMIN'), HttpMethod.GET],
     ]
 
-    public static final List<List> DATA_MODEL_POLICY_MAPPINGS = [
+    public static final List DATA_MODEL_POLICY_MAPPINGS = [
             ["/api/modelCatalogue/core/dataModelPolicy", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/dataModelPolicy", MetadataRolesUtils.roles('ADMIN'), HttpMethod.POST],
             ["/api/modelCatalogue/core/dataModelPolicy/search", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
@@ -358,7 +359,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataModelPolicy/*", MetadataRolesUtils.roles('ADMIN'), HttpMethod.DELETE],
     ]
 
-    public static final List<List> PRIMITIVE_TYPE_MAPPINGS = [
+    public static final List PRIMITIVE_TYPE_MAPPINGS = [
             ["/api/modelCatalogue/core/primitiveType", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/primitiveType", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/primitiveType/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -397,7 +398,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/primitiveType/*/content",'isAuthenticated()',HttpMethod.GET],
     ]
 
-    public static final List<List> CSV_TRANSFORMATION_MAPPINGS = [
+    public static final List CSV_TRANSFORMATION_MAPPINGS = [
             ["/api/modelCatalogue/core/csvTransformation", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/csvTransformation", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/csvTransformation/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -409,7 +410,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/csvTransformation/*/transform", MetadataRolesUtils.roles('VIEWER'), HttpMethod.POST],
     ]
 
-    public static final List<List> RELATIONSHIP_TYPE_MAPPINGS = [
+    public static final List RELATIONSHIP_TYPE_MAPPINGS = [
             ["/api/modelCatalogue/core/relationshipType", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/relationshipType", MetadataRolesUtils.roles('SUPERVISOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/relationshipType/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -421,7 +422,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/relationshipType/elementClasses", 'isAuthenticated()', HttpMethod.GET],
     ]
 
-    public static final List<List> TAG_MAPPINGS = [
+    public static final List TAG_MAPPINGS = [
             ["/api/modelCatalogue/core/tag/forDataModel/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/tag", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/tag", 'isAuthenticated()', HttpMethod.POST],
@@ -457,7 +458,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/tag/*/merge/*", 'isAuthenticated()', HttpMethod.POST],
     ]
 
-    public static final List<List> VALIDATION_RULE_MAPPINGS = [
+    public static final List VALIDATION_RULE_MAPPINGS = [
             ["/api/modelCatalogue/core/validationRule", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/validationRule", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/validationRule/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -493,7 +494,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/validationRule/*/content", 'isAuthenticated()', HttpMethod.GET],
     ]
 
-    public static final List<List> BATCH_MAPPINGS = [
+    public static final List BATCH_MAPPINGS = [
             ["/api/modelCatalogue/core/batch", MetadataRolesUtils.roles('ADMIN'), HttpMethod.GET],
             ["/api/modelCatalogue/core/batch", MetadataRolesUtils.roles('ADMIN'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/search/*",  MetadataRolesUtils.roles('ADMIN'), HttpMethod.GET],
@@ -514,7 +515,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/batch/*/actions/*/dependsOn", MetadataRolesUtils.roles('ADMIN'), HttpMethod.POST],
     ]
 
-    public static final List<List> MODEL_MAPPINGS = [
+    public static final List MODEL_MAPPINGS = [
             ["/api/modelCatalogue/core/model", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/model", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/model/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -555,7 +556,7 @@ class MetadataSecurityService {
     ]
 
 
-    public static final List<List> CLASSIFICATION_MAPPINGS = [
+    public static final List CLASSIFICATION_MAPPINGS = [
             ["/api/modelCatalogue/core/classification", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/classification", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/classification/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -602,7 +603,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/classification/*/reindex",'isAuthenticated()',HttpMethod.POST],
     ]
 
-    public static final List<List> DATA_MODEL_MAPPINGS = [
+    public static final List DATA_MODEL_MAPPINGS = [
             ["/api/modelCatalogue/core/dataModel", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataModel", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/dataModel/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -650,7 +651,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataModel/*/reindex",'isAuthenticated()',HttpMethod.POST],
     ]
 
-    public static final List<List> USER_MAPPINGS = [
+    public static final List USER_MAPPINGS = [
             ["/api/modelCatalogue/core/user", MetadataRolesUtils.roles('ADMIN'), HttpMethod.GET],
             ["/api/modelCatalogue/core/user", MetadataRolesUtils.roles('SUPERVISOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/user/search/*", 'isAuthenticated()', HttpMethod.GET],
@@ -696,7 +697,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/user/*/role/*", MetadataRolesUtils.roles('ADMIN'), HttpMethod.POST],
     ]
 
-    public static final List<List> MEASUREMENT_MAPPINGS = [
+    public static final List MEASUREMENT_MAPPINGS = [
             ["/api/modelCatalogue/core/measurementUnit", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/measurementUnit", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/measurementUnit/search/*", 'isAuthenticated()', HttpMethod.GET],

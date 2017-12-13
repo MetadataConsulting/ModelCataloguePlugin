@@ -436,7 +436,7 @@ class DocxSpecificationDataHelper {
                     row {
                         cell "Classes Applied Within"
                         cell(TITLE_COLUMN_CELL){
-                            vr.appliedWithin.each{ DataClass cls ->
+                            vr.appliedWithin.each { DataClass cls ->
                                 text cls?.name
                                 lineBreak()
                             }
@@ -445,7 +445,7 @@ class DocxSpecificationDataHelper {
                     row {
                         cell "Data Elements Involved"
                         cell(TITLE_COLUMN_CELL){
-                            vr.involves.each{ DataElement de ->
+                            vr.involves.each { DataElement de ->
                                 text de?.name
                                 lineBreak()
                             }
@@ -505,7 +505,7 @@ class DocxSpecificationDataHelper {
     }
 
     private Set getBaseRules(DataType dataType, Set basedOn = []){
-        elementService.getTypeHierarchy([:], dataType).items.each{ DataType type ->
+        elementService.getTypeHierarchy([:], dataType).items.each { DataType type ->
             basedOn.add(type)
             basedOn.addAll(getBaseRules(type, basedOn))
         }

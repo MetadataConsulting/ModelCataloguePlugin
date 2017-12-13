@@ -149,7 +149,7 @@ class DataClassService {
     ListWithTotalAndType<DataElement> getDataElementsFromClasses(List<DataClass> models){
         Lists.lazy([:], DataElement) {
             List<DataElement> results = []
-            models.each{ model ->
+            models.each { model ->
                 results.addAll(model.contains)
             }
             results

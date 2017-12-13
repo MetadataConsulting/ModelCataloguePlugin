@@ -5,7 +5,7 @@ import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
 class InvalidRegistrationSpec extends GebSpec {
 
     public static final String model = "div.panel-body>div"

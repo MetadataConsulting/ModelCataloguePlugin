@@ -1,5 +1,7 @@
 package org.modelcatalogue.gel.export
 
+import spock.lang.IgnoreIf
+
 import static junit.framework.Assert.assertEquals
 import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.modelcatalogue.core.DataClass
@@ -7,8 +9,8 @@ import org.modelcatalogue.core.DataClass
 /**
  * Test for RD eligibility criteria change log reports class using test model with similar format to expected data.
  */
+@IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class RareDiseaseEligibilityChangeLogXlsExporterSpec extends AbstractRareDiseasesExporterSpec {
-
 
     def "Export rare disease eligibility change logs to xls"() {
         when:
@@ -25,7 +27,7 @@ class RareDiseaseEligibilityChangeLogXlsExporterSpec extends AbstractRareDisease
         //need to prime with header as we're not running the excel part of the exporter here
         String allRows = 'Change reference,Level 2 Disease Group (ID),Level 3 Disease Subtype (ID),Level 4 Specific Disorder (ID),Affected Data Item,Change Type,Current version details,New version details\n'
 
-        rows.each{ row ->
+        rows.each { row ->
             allRows+= "${row.join(',')}\n"
         }
 

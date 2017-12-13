@@ -1,5 +1,7 @@
 package org.modelcatalogue.gel.export
 
+import spock.lang.IgnoreIf
+
 import static junit.framework.Assert.assertEquals
 import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.modelcatalogue.core.DataClass
@@ -14,6 +16,7 @@ class RareDiseasePhenotypeChangeLogXlsExporterSpec extends AbstractRareDiseasesE
     String new_guidance_id, new_dataElement_id1, new_dataElement_id2, nestedPheno_id1, nestedPheno_id2, nestedPheno_id3
 
     // content & file generation test combined as second one fails if run separately
+    @IgnoreIf( { System.getProperty('spock.ignore.slow') })
     def "Export rare disease phenotype changelogs to xls"() {
         when:
         buildTestModel(true)
@@ -33,7 +36,7 @@ class RareDiseasePhenotypeChangeLogXlsExporterSpec extends AbstractRareDiseasesE
         //need to prime with header as we're not running the excel part of the exporter here
         String allRows = 'Change reference,Level 2 Disease Group (ID),Level 3 Disease Subtype (ID),Level 4 Specific Disorder (ID),Element hierarchy,Phenotype /Clinical Tests/Guidance,Affected Data Item,Change Type,Current version details,New version details\n'
 
-        rows.each{ row ->
+        rows.each { row ->
             allRows+= "${row.join(',')}\n"
         }
 

@@ -10,7 +10,7 @@ import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
 @Ignore
-@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
 @Stepwise
 class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 

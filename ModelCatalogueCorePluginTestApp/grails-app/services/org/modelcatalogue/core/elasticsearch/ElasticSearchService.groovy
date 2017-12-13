@@ -829,7 +829,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     private void ensureIndexExists(IndexingSession session, ImmutableSet<String> indices, Iterable<Class> supportedTypes) {
 
-        indices.each{ index ->
+        indices.each { index ->
             SimpleIndicesExistsResponse response
 
             if (session.indexExist(index)) {
