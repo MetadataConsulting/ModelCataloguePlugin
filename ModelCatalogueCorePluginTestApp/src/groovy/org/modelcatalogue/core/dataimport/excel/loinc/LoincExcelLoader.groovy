@@ -180,7 +180,7 @@ class LoincExcelLoader extends ExcelLoader {
 
             DataClass parentDataClass
 
-            classNames.each{ String className ->
+            classNames.each { String className ->
 
 
                 //TODO:

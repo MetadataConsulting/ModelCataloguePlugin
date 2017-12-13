@@ -131,7 +131,7 @@ class OpenEhrExcelLoader extends UCLHExcelLoader {
             modelNames << name
 
             //Iterate through each row to build an new DataElement
-            rowMapsForModel.each{ Map<String, String> rowMap ->
+            rowMapsForModel.each { Map<String, String> rowMap ->
                 String ntname = getNTElementName(rowMap)
                 String ntdescription = 'OpenEhr Element Description'
                 DataElement newElement = new DataElement(name: ntname, description:  ntdescription , DataModel: newModel ).save(flush:true, failOnError: true)

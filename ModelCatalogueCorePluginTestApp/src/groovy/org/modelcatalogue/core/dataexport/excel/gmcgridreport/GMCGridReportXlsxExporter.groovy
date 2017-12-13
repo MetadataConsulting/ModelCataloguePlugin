@@ -85,7 +85,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
         rowDefinition.with {
 
-            outline.each{ // Class Hierarchy
+            outline.each { // Class Hierarchy
 
                 cell(it){
                     style {
@@ -147,7 +147,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
             cell sourceSystem // Previously In Source System -- same as Source System
 
-            GMCGridReportHeaders.ntElementMetadataKeys.each{ metadataKey ->
+            GMCGridReportHeaders.ntElementMetadataKeys.each { metadataKey ->
                 cell {
                     value "${printSystemMetadata(placeholders, metadataKey)}"
                     style standardCellStyle
@@ -178,7 +178,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
                 }
             }
 
-            systemsMap.get(system).each{ de ->
+            systemsMap.get(system).each { de ->
                 row() { RowDefinition rowDefinition ->
                     printSystemDataElement(rowDefinition, de)
                 }
@@ -228,7 +228,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
                         style standardCellStyle
                     }
             }
-            GMCGridReportHeaders.ntElementMetadataKeys.each{ metadataKey ->
+            GMCGridReportHeaders.ntElementMetadataKeys.each { metadataKey ->
                 cell {
                     value "${printSystemMetadata([dataElement], metadataKey)}"
                     style {
@@ -275,7 +275,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
                 }
             }
 
-            systemsMap.each{ k, v ->
+            systemsMap.each { k, v ->
                 row {
                     cell {
                         value "$k"
@@ -317,7 +317,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
                 }
             }
 
-            metadataCompletion.each{ k, v ->
+            metadataCompletion.each { k, v ->
 
                 row {
                     cell {
@@ -359,7 +359,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
             }
         }else if(relatedTo.size()>1){
 
-            relatedTo.each{ rel ->
+            relatedTo.each { rel ->
                 if(rel.ext.get("$metadata")){
                     score.put("completed", completed + 1)
                     score.put("total", total + 1)
@@ -379,7 +379,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     private void addToSystemsMap(List relatedTo, DataElement sourceElement){
 
         if(relatedTo.size()>0){
-            relatedTo.each{ de ->
+            relatedTo.each { de ->
                 String dmname = de.dataModel.name
                 List elements =  (systemsMap.get(dmname))?:[]
                 elements.add(de)

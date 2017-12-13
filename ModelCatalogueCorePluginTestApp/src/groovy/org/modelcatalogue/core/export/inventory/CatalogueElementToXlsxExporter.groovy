@@ -269,7 +269,7 @@ class CatalogueElementToXlsxExporter {
 
                 Map diffsByClass = getDiffsMapByClass(allDiffs)
 
-                diffsByClass.each{ key, val ->
+                diffsByClass.each { key, val ->
                     printClassDetails(key, val, sheet)
                 }
 
@@ -286,7 +286,7 @@ class CatalogueElementToXlsxExporter {
     protected Map getDiffsMapByClass(allDiffs){
         Map diffsByClass = [:]
 
-        allDiffs.each{ Diff diff ->
+        allDiffs.each { Diff diff ->
             if(diff!=null) {
                 Set classDiffs = []
                 classDiffs.add(diff)
@@ -1200,7 +1200,7 @@ class CatalogueElementToXlsxExporter {
         //check if the previous data model had additional top level classes so they can be included in the outline
         def previousVersionDataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(previousVersionElementForDiff as DataModel), [:], true).items
         def previousVersionDataClassesChanged = []
-        previousVersionDataClasses.each{ DataClass previousVersionDataClass->
+        previousVersionDataClasses.each { DataClass previousVersionDataClass ->
             //if the data class was in the previous version of the data model and isn't in the new one, then delete it
             if(!dataClasses.find{it.latestVersionId==previousVersionDataClass.latestVersionId}) previousVersionDataClassesChanged.add(previousVersionDataClass)
         }

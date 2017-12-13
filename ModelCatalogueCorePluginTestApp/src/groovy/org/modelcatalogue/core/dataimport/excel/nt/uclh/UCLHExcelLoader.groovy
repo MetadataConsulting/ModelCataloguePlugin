@@ -203,7 +203,7 @@ class UCLHExcelLoader extends ExcelLoader{
             Date startModelImport = new Date()
             log.info("Start import of model" + name )
             //Iterate through each row to build an new DataElement
-            rowMapsForModel.each{ Map<String, String> rowMap ->
+            rowMapsForModel.each { Map<String, String> rowMap ->
                 String ntname = getNTElementName(rowMap)
                 String ntdescription = rowMap['Description'] ?: rowMap['DE Description']
                 Date startElementInport = new Date()
