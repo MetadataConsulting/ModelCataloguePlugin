@@ -11,23 +11,12 @@ environments {
     // XXX: never commit your local configuration overrides for this file!!!
     development {
         dataSource {
-            driverClassName = "com.mysql.jdbc.Driver"
-            dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
-            url = "jdbc:mysql://localhost:3306/nhs_dd_rbma"
-            username = 'root'
-            password = ''
-            dbCreate = "update"
-            properties {
-                maxActive = -1
-                minEvictableIdleTimeMillis=1800000
-                timeBetweenEvictionRunsMillis=1800000
-                numTestsPerEvictionRun=3
-                testOnBorrow=true
-                testWhileIdle=true
-                testOnReturn=false
-                validationQuery="SELECT 1"
-                jdbcInterceptors="ConnectionState"
-            }
+            pooled = true
+            driverClassName = "org.h2.Driver"
+            username = "sa"
+            password = ""
+            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+            url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
     test {
