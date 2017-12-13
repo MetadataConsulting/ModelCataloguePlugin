@@ -51,6 +51,11 @@ class UserGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
+    boolean exists(Long userId) {
+        User.exists(userId)
+    }
+
+    @Transactional(readOnly = true)
     User findByUsername(String username) {
         findQueryByUsername(username).get()
     }
