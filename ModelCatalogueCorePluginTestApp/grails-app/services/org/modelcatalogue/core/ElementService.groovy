@@ -82,16 +82,19 @@ class ElementService implements Publisher<CatalogueElement> {
                 // TODO: better target the changes
                 CacheService.VERSION_COUNT_CACHE.invalidateAll()
 
-                dataModelAclService.copyPermissions(dataModel, draft)
-
                 return draft
             }
         }
+
+        DataModel draft
         if (context.importFriendly) {
-            return code()
+            draft = code()
         } else {
-            return (DataModel) CatalogueElement.withTransaction(code)
+            draft = (DataModel) CatalogueElement.withTransaction(code)
         }
+        dataModelAclService.copyPermissions(dataModel, draft)
+
+        draft
     }
 
     /**
