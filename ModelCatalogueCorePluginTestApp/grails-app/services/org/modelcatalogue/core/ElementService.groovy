@@ -158,14 +158,14 @@ class ElementService implements Publisher<CatalogueElement> {
 
         def matchNewScheme = theId.toString() =~ /\/(.\w+)\/(\d+)(@(.+))?$/
 
-        if (matchNewScheme) {
+        if (matchNewScheme.size()>0) {
             Long urlId = matchNewScheme[0][2] as Long
             String version = matchNewScheme[0][4] as String
             Long versionNumberFound = null
 
             def matchVersionNumber = version =~ /0\.0\.(\d+)/
 
-            if (matchVersionNumber) {
+            if (matchVersionNumber.size()>0) {
                 versionNumberFound = matchVersionNumber[0][1] as Long
             }
 
@@ -201,6 +201,7 @@ class ElementService implements Publisher<CatalogueElement> {
                     or {
                         eq 'latestVersionId', urlId
                         eq 'id', urlId
+                        eq 'modelCatalogueId', urlId
                     }
                     if (version) {
                         if (versionNumberFound) {
@@ -216,9 +217,37 @@ class ElementService implements Publisher<CatalogueElement> {
             }
 
 
+            //TODO: not sure why we have this line of code
+            // would like to get rid of it
+            // it's checking that the default model catalogue id id compatible with the 'fixed model catalogue id'
+            // but the default model catalogue id may not be the model catalogue id
+
             if (result && result.getDefaultModelCatalogueId(version == null).contains(Legacy.fixModelCatalogueId(theId).toString())) {
                 return result
             }
+
+
+            //added this in so that we can return element based on the model catalogue id
+            // i.e. if the model catalogue id has overriden the latest version id
+            if (resource == DataModel || resource == CatalogueElement && HibernateHelper.getEntityClass(CatalogueElement.findByLatestVersionId(urlId)) == DataModel) {
+                result = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
+                    or {
+                        eq 'modelCatalogueId', urlId
+                    }
+                    if (version) {
+                        if (versionNumberFound) {
+                            or {
+                                eq 'semanticVersion', version
+                                eq 'versionNumber', versionNumberFound
+                            }
+                        } else {
+                            eq 'semanticVersion', version
+                        }
+                    }
+                })
+            }
+
+            if(result) return result
 
             if (versionNumberFound) {
                 CatalogueElement byVersionNumber = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
@@ -846,7 +875,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 if(!de.relatedTo.contains(item)) {
                     score  = score*100
                     if(score>minimumScore) {
-                        elementSuggestions.add(new ElasticMatchResult(dataElementA: de, dataElementB: item , matchScore: score.round(2), message: message))
+                        elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
                     }
                 }
             }
@@ -855,11 +884,43 @@ class ElementService implements Publisher<CatalogueElement> {
         return elementSuggestions
     }
 
-    private String checkRelatedTo(DataElement de, DataModel proposedModel){
+
+    /**
+     * Return class ids which are very likely to be synonyms using elasticsearch fuzzy matching.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Set<MatchResult> findFuzzyDataClassDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
+        Set<MatchResult> elementSuggestions = []
+        Map searchParams = [:]
+        //iterate through the data model a
+        def elementsToMatch = DataClass.findAllByDataModel(dataModelA)
+        elementsToMatch.each{ DataClass de ->
+            //set params map
+            searchParams.dataModel = dataModelB.id
+            searchParams.search = de.name
+            searchParams.minScore = minimumScore/100
+            def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            String message = checkRelatedTo(de, dataModelB)
+            matches.getItemsWithScore().each{ item, score ->
+                if(!de.relatedTo.contains(item)) {
+                    score  = score*100
+                    if(score>minimumScore) {
+                        elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
+                    }
+                }
+            }
+        }
+
+        return elementSuggestions
+    }
+
+
+    private String checkRelatedTo(CatalogueElement ce, DataModel proposedModel){
         String modelRelatedItems = ""
-        de.relatedTo.each { ce ->
+
+        ce.relatedTo.each{ c ->
             if(ce.dataModel == proposedModel){
-                modelRelatedItems = modelRelatedItems + "Note: $de.name already related to: $ce.name \n "
+                modelRelatedItems = modelRelatedItems + "Note: $ce.name already related to: $c.name \n "
             }
         }
         modelRelatedItems
