@@ -7,6 +7,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataimport.excel.ConfigStatelessExcelLoader
 import org.modelcatalogue.core.dataimport.excel.ExcelImportType
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
@@ -406,7 +407,8 @@ class DataImportController  {
     protected void loadConfigSpreadsheet(Workbook wb, String modelName, InputStream xmlConfigStream, Long id, Long userId) {
         auditService.betterMute {
             try {
-                ConfigExcelLoader loader = new ConfigExcelLoader(modelName, xmlConfigStream)
+//                ConfigExcelLoader loader = new ConfigExcelLoader(modelName, xmlConfigStream)
+                ConfigStatelessExcelLoader loader = new ConfigStatelessExcelLoader(modelName, xmlConfigStream)
                 loader.buildModel(wb)
                 finalizeAsset(id, (DataModel) (DataModel.findByName(modelName)), userId)
             }
