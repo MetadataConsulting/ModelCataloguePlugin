@@ -127,9 +127,8 @@ environments {
         mc.allow.signup = true
 
         grails.plugin.console.enabled = true
-       mc.search.elasticsearch.host = "127.0.0.1"
-        // Elasticsearch bind port, defaults to 9300
-//        mc.search.elasticsearch.port = "9300"
+        mc.search.elasticsearch.host = System.getenv('MDX_ELASTIC_HOST') ?: '127.0.0.1'
+        mc.search.elasticsearch.port = System.getenv('MDX_ELASTIC_PORT') ?: '9300'
         mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
         mc.css.custom = """
           /* green for dev mode to show it's safe to do any changes */

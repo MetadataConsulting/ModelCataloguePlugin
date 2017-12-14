@@ -1,27 +1,28 @@
 package org.modelcatalogue.core
 
+import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataimport.excel.ExcelImportType
+import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
-import org.modelcatalogue.core.dataimport.excel.loinc.LoincExcelLoader
-import org.modelcatalogue.core.dataimport.excel.loinc.LoincHeadersMap
+import org.modelcatalogue.core.dataimport.excel.ConfigExcelLoader
+import org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
-import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader
 import org.modelcatalogue.integration.obo.OboLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.Async
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
+
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -39,7 +40,7 @@ class DataImportController  {
 
     private static final List<String> CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
     static responseFormats = ['json']
-    static allowedMethods = [upload: "POST"]
+    static allowedMethods = [upload: "POST", excelImportTypesHumanReadable: 'GET']
 
     protected static List<String> getErrors(Map params, MultipartFile file) {
         def errors = []
@@ -54,8 +55,13 @@ class DataImportController  {
         }
         return errors
     }
-
+    def excelImportTypesHumanReadable() {
+        Map<String, List<String>> result = ['excelImportTypes': ExcelImportType.humanReadableNames]
+        render result as JSON
+    }
     def upload() {
+        // called from importCtrl.coffee which is the AngularJS controller for ALL import dialogues.
+        // having just one upload action (and on the front-end, one importCtrl) is a bit hairy but there we go...
 
 
         if (!(request instanceof MultipartHttpServletRequest)) {
@@ -63,7 +69,19 @@ class DataImportController  {
             return
         }
 
-        MultipartFile file = request.getFile("file")
+        //// get stuff from the request.
+        // user-provided model name. It's the filename by default. In the past we have just gotten the filename directly anyways. But it's here.
+        String modelName = request.getParameter('modelName')
+
+
+        // XML config (including headers map) file for any "generic/customizable" excel importer. At some point, we might want to introduce some validation, either on front or back end or both. If both, the XSD file used to validate should be the same, and provided by the backend. You can access file.inputStream.
+        MultipartFile excelConfigXMLFileMultipart = request.getFile("excelConfigXMLFile")
+
+        ExcelImportType excelImportType = ExcelImportType.fromHumanReadableName(request.getParameter('excelImportType'))
+
+
+        // the actual file to be imported.
+        MultipartFile file = request.getFile("file") // may be excel, Obo, etc. etc.
 
         List<String> errors = getErrors(params, file)
         if (errors) {
@@ -78,7 +96,28 @@ class DataImportController  {
 
         Long userId = modelCatalogueSecurityService.currentUser?.id
 
-        // "General Excel file"-- "THE MC Excel file" -- actually the format from ExcelExporter
+        // Customizable Excel Loader based on the LoincExcelLoader that can take a headersMap
+        if (excelImportType == ExcelImportType.LOINC ||
+            excelImportType == ExcelImportType.GOSH_LAB_TEST_CODES) {
+            if (checkFileNameTypeAndContainsString(file,'.xls')) {
+                Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+                Long id = asset.id
+                InputStream inputStream = file.inputStream
+                InputStream xmlConfigStream = excelConfigXMLFileMultipart.inputStream
+                String filename = file.originalFilename
+                Workbook wb = WorkbookFactory.create(inputStream)
+                defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+                executeInBackground(id, "Imported from Excel") {
+                    // TODO: Use the excelConfigXMLFile in a method similar to that below.
+                    loadConfigSpreadsheet(wb, modelName, xmlConfigStream, id, userId)
+
+                }
+                redirectToAsset(id)
+                return
+            }
+        }
+
+        // "General Excel file"-- "THE MC Excel file" -- actually the format produced by ExcelExporter that has parent data class etc.
         String suffix = "mc.xls"
         if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
@@ -89,21 +128,6 @@ class DataImportController  {
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             executeInBackground(id, "Imported from Excel") {
                 loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
-            }
-            redirectToAsset(id)
-            return
-        }
-
-        suffix = "loinc.xlsx"
-        if (checkFileNameTypeAndContainsString(file,suffix)) {
-            Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
-            Long id = asset.id
-            InputStream inputStream = file.inputStream
-            String filename = file.originalFilename
-            Workbook wb = WorkbookFactory.create(inputStream)
-            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            executeInBackground(id, "Imported from Excel") {
-                loadLoincSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
             }
             redirectToAsset(id)
             return
@@ -141,7 +165,7 @@ class DataImportController  {
             return
         }
 
-        //Default excel import - which assumes data is in the 'Grid data' format
+        // openEHR
         suffix = "openEHR.xls"
         if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
@@ -158,7 +182,7 @@ class DataImportController  {
             return
         }
 
-        //Default excel import - which assumes data is in the 'Grid data' format
+        //Default excel import - "standardImport" – which assumes data is in the 'Grid data' format
         suffix = "xls"
         if (checkFileNameTypeAndContainsString(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
@@ -169,7 +193,7 @@ class DataImportController  {
             executeInBackground(id, "Imported from Excel") {
                 try {
                     ExcelLoader parser = new ExcelLoader()
-                    parser.buildModelFromStandardWorkbookSheet(HeadersMap.createForStandardExcelLoader(), inputStream, defaultCatalogueBuilder)
+                    parser.buildModelFromStandardWorkbookSheet(HeadersMap.createForStandardExcelLoader(), inputStream, )
                     finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)
@@ -377,6 +401,20 @@ class DataImportController  {
             }
         }
     }
+    // the generic loader based on the LOINC loader
+    @Async
+    protected void loadConfigSpreadsheet(Workbook wb, String modelName, InputStream xmlConfigStream, Long id, Long userId) {
+        auditService.mute {
+            try {
+                ConfigExcelLoader loader = new ConfigExcelLoader(modelName, xmlConfigStream)
+                loader.buildModel(wb)
+                finalizeAsset(id, (DataModel) (DataModel.findByName(modelName)), userId)
+            }
+            catch (Exception e) {
+                logError(id, e)
+            }
+        }
+    }
 
     @Async
     protected void loadMCSpreadsheet(Workbook wb, String filename, DefaultCatalogueBuilder defaultCatalogueBuilder, Long id, Long userId) {
@@ -401,35 +439,16 @@ class DataImportController  {
 
 
     @Async
-    protected void loadLoincSpreadsheet(Workbook wb, String filename, DefaultCatalogueBuilder defaultCatalogueBuilder, Long id, Long userId) {
-        auditService.mute {
-            try {
-                ExcelLoader loader = new LoincExcelLoader()
-                loader.buildModelFromStandardWorkbookSheet(
-                        LoincHeadersMap.createForLoincExcelLoader(),
-                        wb,
-                        defaultCatalogueBuilder,
-                        0
-                )
-                finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
-
-            }
-            catch (Exception e) {
-                logError(id, e)
-            }
-        }
-    }
-
-
-    @Async
     protected void loadOpenEhrSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
         Pair<String,String> modelDetails = getModelDetails(suffix)
         executorService.submit {
             auditService.mute {
                 try {
-                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader()
-                    String dataOwner = "Open EHR"
-                    loader.loadModel(wb, dataOwner)
+                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader(false)
+                    String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_openEHR')
+                    List<String> modelNames = loader.loadModel(wb, dataOwner)
+                    DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
+                    loader.addRelationshipsToModels(referenceModel, modelNames)
                     finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {
                         it.instanceOf(DataModel)
                     } ?: defaultCatalogueBuilder.created.find { it.dataModel }?.dataModel), userId)

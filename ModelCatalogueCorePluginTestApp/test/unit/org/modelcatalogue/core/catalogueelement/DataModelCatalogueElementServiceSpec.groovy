@@ -116,7 +116,7 @@ class DataModelCatalogueElementServiceSpec extends Specification {
         }
 
         when:
-        MetadataResponseEvent responseEvent = service.addRelation(1, 'classification', true, null, null)
+        MetadataResponseEvent responseEvent = service.addRelation(1, 'definition', true, null, null)
 
         then:
         responseEvent instanceof RelationshipTypeNotFoundEvent

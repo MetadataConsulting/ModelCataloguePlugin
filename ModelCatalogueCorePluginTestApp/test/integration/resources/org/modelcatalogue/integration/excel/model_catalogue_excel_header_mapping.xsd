@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+    targetNamespace="model_catalogue_excel_header_mapping"
+    xmlns="model_catalogue_excel_header_mapping">
+    <xs:element name="headersMap" type="headersMapFlatType"/>
+    <xs:complexType name="headersMapFlatType">
+        <xs:sequence>
+            <xs:element name="dataClassID" type="xs:string" minOccurs="0"/>
+            <xs:element name="dataClassName" type="xs:string" minOccurs="0"/>
+            <xs:element name="dataClassDescription" type="xs:string" minOccurs="0"/>
+            <xs:element name="dataElementID" type="xs:string" minOccurs="0"/>
+            <xs:element name="dataElementName" type="xs:string" minOccurs="1"/>
+            <xs:element name="dataElementDescription" type="xs:string" minOccurs="0"/>
+            <xs:element name="dataElementMultiplicity" type="xs:string" minOccurs="0"/>
+            <xs:element name="dataTypeID" type="xs:string" minOccurs="0"/>
+            <xs:element name="dataTypeName" type="xs:string" minOccurs="0"/>
+            <xs:element name="dataTypeDescription" type="xs:string" minOccurs="0"/>
+            <xs:element name="dataTypeRule" type="xs:string" minOccurs="0"/>
+            <xs:element name="dataTypeEnums" type="xs:string" minOccurs="0"/>
+            <xs:element name="measurementUnitID" type="xs:string" minOccurs="0"/>
+            <xs:element name="measurementUnitName" type="xs:string" minOccurs="0"/>
+            <xs:element name="measurementUnitSymbol" type="xs:string" minOccurs="0"/>
+            <xs:element name="metadata" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

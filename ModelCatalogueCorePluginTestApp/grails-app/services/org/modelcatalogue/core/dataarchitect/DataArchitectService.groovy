@@ -305,7 +305,7 @@ class DataArchitectService {
 
         Runnable runnable = new Runnable() {
             void run() {
-                batchList.each{ Batch btch ->
+                batchList.each { Batch btch ->
                     btch.delete()
                 }
             }

@@ -45,7 +45,69 @@ class LoincHeadersMap extends HeadersMap {
     static String VersionFirstReleased='VersionFirstReleased'
     static String ValidHL7AttachmentRequest='ValidHL7AttachmentRequest'
 
+    static Map<String,String> createForGoshExcelLoader(Map<String, Object> params = [:]){
+        Map<String,String> headersMap = new LinkedHashMap<String,String>()
+        headersMap.put(dataElementCode, params.get(dataElementCode) ?: 'Code')
+        headersMap.put(dataElementName, params.get(dataElementName) ?: 'Code name')
+//        headersMap.put(dataElementDescription, params.get(dataElementDescription) ?: 'LONG_COMMON_NAME')
+        headersMap.put(dataTypeName, params.get(dataTypeName) ?: 'Data Type')
+//        headersMap.put(parentDataClassName, params.get(parentDataClassName) ?: 'Parent Data Class')
+        headersMap.put(containingDataClassName, params.get(containingDataClassCode) ?: 'Set')
+        headersMap.put(containingDataClassName, params.get(containingDataClassName) ?: 'Set Name')
+//        headersMap.put(measurementUnitName, params.get(measurementUnitName) ?: 'EXAMPLE_UCUM_UNITS')
 
+        // for spreadsheet produced by ExcelExporter (10 Oct 2017):
+
+        headersMap.put(multiplicity, params.get(multiplicity) ?: 'Multiplicity')
+        headersMap.put(dataTypeEnumerations, params.get(dataTypeEnumerations) ?: 'Data Type Enumerations')
+        headersMap.put(dataTypeRule, params.get(dataTypeRule) ?: 'Data Type Rule')
+        headersMap.put(measurementUnitCode, params.get(measurementUnitCode) ?: 'Measurement Unit ID')
+
+
+
+//        headersMap.put(PROPERTY, params.get(PROPERTY) ?: 'PROPERTY')
+//        headersMap.put(TIME_ASPCT, params.get(TIME_ASPCT) ?: 'TIME_ASPCT')
+//        headersMap.put(SYSTEM, params.get(SYSTEM) ?: 'SYSTEM')
+//        headersMap.put(METHOD_TYP, params.get(METHOD_TYP) ?: 'METHOD_TYP')
+//        headersMap.put(VersionLastChanged, params.get(VersionLastChanged) ?: 'VersionLastChanged')
+//        headersMap.put(CHNG_TYPE, params.get(CHNG_TYPE) ?: 'CHNG_TYPE')
+//        headersMap.put(DefinitionDescription, params.get(DefinitionDescription) ?: 'DefinitionDescription')
+//        headersMap.put(STATUS, params.get(STATUS) ?: 'STATUS')
+//        headersMap.put(CONSUMER_NAME, params.get(CONSUMER_NAME) ?: 'CONSUMER_NAME')
+//        headersMap.put(CLASSTYPE, params.get(CLASSTYPE) ?: 'CLASSTYPE')
+//        headersMap.put(FORMULA, params.get(FORMULA) ?: 'FORMULA')
+//        headersMap.put(SPECIES, params.get(SPECIES) ?: 'SPECIES')
+//        headersMap.put(EXMPL_ANSWERS, params.get(EXMPL_ANSWERS) ?: 'EXMPL_ANSWERS')
+//        headersMap.put(SURVEY_QUEST_TEXT, params.get(SURVEY_QUEST_TEXT) ?: 'SURVEY_QUEST_TEXT')
+//        headersMap.put(SURVEY_QUEST_SRC, params.get(SURVEY_QUEST_SRC) ?: 'SURVEY_QUEST_SRC')
+//        headersMap.put(UNITSREQUIRED, params.get(UNITSREQUIRED) ?: 'UNITSREQUIRED')
+//        headersMap.put(SUBMITTED_UNITS, params.get(SUBMITTED_UNITS) ?: 'SUBMITTED_UNITS')
+//        headersMap.put(RELATEDNAMES2, params.get(RELATEDNAMES2) ?: 'RELATEDNAMES2')
+//        headersMap.put(SHORTNAME, params.get(SHORTNAME) ?: 'SHORTNAME')
+//        headersMap.put(ORDER_OBS, params.get(ORDER_OBS) ?: 'ORDER_OBS')
+//        headersMap.put(CDISC_COMMON_TESTS, params.get(CDISC_COMMON_TESTS) ?: 'CDISC_COMMON_TESTS')
+//        headersMap.put(HL7_FIELD_SUBFIELD_ID, params.get(HL7_FIELD_SUBFIELD_ID) ?: 'HL7_FIELD_SUBFIELD_ID')
+//        headersMap.put(EXTERNAL_COPYRIGHT_NOTICE, params.get(EXTERNAL_COPYRIGHT_NOTICE) ?: 'EXTERNAL_COPYRIGHT_NOTICE')
+//        headersMap.put(EXAMPLE_UNITS, params.get(EXAMPLE_UNITS) ?: 'EXAMPLE_UNITS')
+//        headersMap.put(UnitsAndRange, params.get(UnitsAndRange) ?: 'UnitsAndRange')
+//        headersMap.put(DOCUMENT_SECTION, params.get(DOCUMENT_SECTION) ?: 'DOCUMENT_SECTION')
+//        headersMap.put(EXAMPLE_SI_UCUM_UNITS, params.get(EXAMPLE_SI_UCUM_UNITS) ?: 'EXAMPLE_SI_UCUM_UNITS')
+//        headersMap.put(STATUS_REASON, params.get(STATUS_REASON) ?: 'STATUS_REASON')
+//        headersMap.put(STATUS_TEXT, params.get(STATUS_TEXT) ?: 'STATUS_TEXT')
+//        headersMap.put(CHANGE_REASON_PUBLIC, params.get(CHANGE_REASON_PUBLIC) ?: 'CHANGE_REASON_PUBLIC')
+//        headersMap.put(COMMON_TEST_RANK, params.get(COMMON_TEST_RANK) ?: 'COMMON_TEST_RANK')
+//        headersMap.put(COMMON_ORDER_RANK, params.get(COMMON_ORDER_RANK) ?: 'COMMON_ORDER_RANK')
+//        headersMap.put(COMMON_SI_TEST_RANK, params.get(COMMON_SI_TEST_RANK) ?: 'COMMON_SI_TEST_RANK')
+//        headersMap.put(HL7_ATTACHMENT_STRUCTURE, params.get(HL7_ATTACHMENT_STRUCTURE) ?: 'HL7_ATTACHMENT_STRUCTURE')
+//        headersMap.put(EXTERNAL_COPYRIGHT_LINK, params.get(EXTERNAL_COPYRIGHT_LINK) ?: 'EXTERNAL_COPYRIGHT_LINK')
+//        headersMap.put(PanelType, params.get(PanelType) ?: 'PanelType')
+//        headersMap.put(AskAtOrderEntry, params.get(AskAtOrderEntry) ?: 'AskAtOrderEntry')
+//        headersMap.put(AssociatedObservations, params.get(AssociatedObservations) ?: 'AssociatedObservations')
+//        headersMap.put(VersionFirstReleased, params.get(VersionFirstReleased) ?: 'VersionFirstReleased')
+//        headersMap.put(ValidHL7AttachmentRequest, params.get(ValidHL7AttachmentRequest) ?: 'ValidHL7AttachmentRequest')
+
+        return headersMap
+    }
 
     static Map<String,String> createForLoincExcelLoader(Map<String, Object> params = [:]){
         Map<String,String> headersMap = new LinkedHashMap<String,String>()

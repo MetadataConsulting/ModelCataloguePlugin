@@ -78,7 +78,7 @@ class GridReportXlsxExporter  {
                         style H1
                     }
 
-                    excelHeaders.each{ header ->
+                    excelHeaders.each { header ->
                         cell {
                             value header
                             width auto
@@ -86,7 +86,7 @@ class GridReportXlsxExporter  {
                         }
                     }
                 }
-                dataClasses.each{ dataClass->
+                dataClasses.each { dataClass->
                     buildRows(sheetDefinition, dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), 1, 2)
                 }
 

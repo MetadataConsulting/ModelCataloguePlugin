@@ -46,19 +46,21 @@ class LoincExcelLoaderSpec extends AbstractIntegrationSpec {
     }
 
 
-    def "test default catalogue builder imports loinc dataset"(){
+    def "test default catalogue builder imports gosh dataset"(){
 
         when: "I load the Excel file"
 
         excelLoader.buildModelFromStandardWorkbookSheet(
-                LoincHeadersMap.createForLoincExcelLoader(),
-                WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'loinc.xlsx'))),
-                catalogueBuilder,
-                0)
+            LoincHeadersMap.createForGoshExcelLoader(),
+//            LoincHeadersMap.createForLoincExcelLoader(),
+//            WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'loinc.xlsx'))),
+            WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'GOSH_lab_test_codes100.xlsx'))),
+            catalogueBuilder,
+            0)
 
         then: "new model is created"
 
-        DataModel.findByName("LOINC")
+        DataModel.findByName("GOSH")
 
 
     }

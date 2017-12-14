@@ -74,7 +74,7 @@ class ExcelExporter {
             apply ModelCatalogueStyles
             sheet("$element.name $element.dataModelSemanticVersion" ) { SheetDefinition sheetDefinition ->
                 row {
-                    excelHeaders.each{ header ->
+                    excelHeaders.each { header ->
                         cell {
                             value header
                             width auto

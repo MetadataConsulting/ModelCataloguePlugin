@@ -714,7 +714,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         Map<Long, Set<Long>>  matches = [:]
 
-        enums.each{ String key, Set<Long> values ->
+        enums.each { String key, Set<Long> values ->
             def found = enums2.get(key)
             if(found) {
                 //as this is a data type only match,
@@ -762,6 +762,11 @@ class ElementService implements Publisher<CatalogueElement> {
         if (element.dataModel) {
             element.status = element.dataModel.status
         } else {
+            if ( element instanceof CatalogueElement ) {
+                Closure<CatalogueElement> cls = { -> } as Closure<CatalogueElement>
+                auditService.logElementFinalized((CatalogueElement)element, cls)
+            }
+
             element.status = ElementStatus.FINALIZED
         }
         element.save(flush: true)
@@ -859,14 +864,14 @@ class ElementService implements Publisher<CatalogueElement> {
         Map searchParams = [:]
         //iterate through the data model a
         def elementsToMatch = DataElement.findAllByDataModel(dataModelA)
-        elementsToMatch.each{ DataElement de ->
+        elementsToMatch.each { DataElement de ->
             //set params map
             searchParams.dataModel = dataModelB.id
             searchParams.search = de.name
             searchParams.minScore = minimumScore/100
             def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
             String message = checkRelatedTo(de, dataModelB)
-            matches.getItemsWithScore().each{ item, score ->
+            matches.getItemsWithScore().each { item, score ->
                 if(!de.relatedTo.contains(item)) {
                     score  = score*100
                     if(score>minimumScore) {
@@ -912,6 +917,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
     private String checkRelatedTo(CatalogueElement ce, DataModel proposedModel){
         String modelRelatedItems = ""
+
         ce.relatedTo.each{ c ->
             if(ce.dataModel == proposedModel){
                 modelRelatedItems = modelRelatedItems + "Note: $ce.name already related to: $c.name \n "

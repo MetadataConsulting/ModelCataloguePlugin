@@ -23,7 +23,7 @@ import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Unroll
-
+@IgnoreIf( { System.getenv('JENKINS_IGNORE') })
 class ExcelLoaderSpec extends AbstractIntegrationSpec {
     @Shared String resourcePath = (new File("test/integration/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
     StringWriter stringWriter
@@ -70,7 +70,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
                 (new FileInputStream(new File(resourcePath + '/test_expected_xml_from_load_spreadsheet_from_excel_exporter.xml'))).text
     }
 
-    @IgnoreIf( { System.getProperty('spock.ignore.slow') })
+    @IgnoreIf( { System.getProperty('spock.ignore.slow')|| System.getenv('JENKINS_IGNORE') })
     def "test Exporter/Loader round trip: create model1 -> use ExcelExporter -> Load spreadsheet, creating model2 -> use Excel Exporter"() {
         setup: "Create model1"
         CatalogueXmlLoader loader = new CatalogueXmlLoader(catalogueBuilder)
