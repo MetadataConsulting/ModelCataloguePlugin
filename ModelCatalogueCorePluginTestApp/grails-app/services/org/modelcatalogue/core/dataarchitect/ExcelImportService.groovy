@@ -7,7 +7,7 @@ import org.modelcatalogue.Client
 @Transactional
 class ExcelImportService {
     static List<String> excelImportTypesHumanReadable() {
-        return Client.fromString(System.properties['mc.client']).excelImportTypes.collect {
+        return Client.clientFromSystemProperty().excelImportTypes.collect {
             it.humanReadableName
         }
 

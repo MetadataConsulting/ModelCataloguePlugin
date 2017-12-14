@@ -16,7 +16,9 @@ enum Client {
     Client(List<ExcelImportType> excelImportTypes) {
         this.excelImportTypes = excelImportTypes
     }
-
+    Client clientFromSystemProperty() {
+        return Client.fromString(System.properties['mc.client'])
+    }
     List<ExcelImportType> getExcelImportTypes() {
         return excelImportTypes + [ExcelImportType.REIMPORT_FROM_EXCEL_EXPORTER, ExcelImportType.STANDARD]
     }
