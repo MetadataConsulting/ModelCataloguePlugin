@@ -9,6 +9,7 @@ import groovy.transform.CompileDynamic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.springframework.security.acls.domain.BasePermission
+import org.springframework.security.acls.model.NotFoundException
 import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import org.springframework.security.acls.model.Permission
 import org.springframework.security.core.Authentication
@@ -130,7 +131,11 @@ class DataModelAclService {
             log.warn 'username is not set, cannot add permission'
             return
         }
-        aclUtilService.addPermission(dataModel, username, permission)
+        try {
+            aclUtilService.addPermission(dataModel, username, permission)
+        } catch ( NotFoundException e ) {
+            log.warn 'NotFoundException captured while trying to add permission for data model: ' + (dataModel?.name ?: '') + " username: " + username
+        }
     }
 
     void copyPermissions(DataModel sourceModel, DataModel destinationModel){
