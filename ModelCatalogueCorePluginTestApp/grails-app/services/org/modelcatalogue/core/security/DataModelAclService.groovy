@@ -18,10 +18,6 @@ class DataModelAclService {
 
     AclUtilService aclUtilService
 
-    ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy
-
-    AclService aclService
-
     SpringSecurityService springSecurityService
 
     boolean hasReadPermission(Object instance) {
@@ -81,13 +77,12 @@ class DataModelAclService {
     }
 
     protected DataModel dataModelFromInstance(Object instance) {
-        DataModel dataModel
         if ( instance instanceof DataModel ) {
-            return instance as DataModel
-        } else if ( dataModel instanceof CatalogueElement ) {
+            return instance
+        } else if ( instance instanceof CatalogueElement ) {
             return instance.dataModel
         }
-        dataModel
+        null
     }
 
     boolean isAdminOrHasAdministratorPermission(Object instance) {

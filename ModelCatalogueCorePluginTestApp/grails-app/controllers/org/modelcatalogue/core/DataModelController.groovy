@@ -1,5 +1,9 @@
 package org.modelcatalogue.core
 
+import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
+import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
+
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import com.google.common.collect.ImmutableSet
@@ -730,7 +734,12 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      */
 
     @Override
-    protected ListWrapper<T> getAllEffectiveItems(Integer max) {
+    protected ListWrapper<DataModel> getAllEffectiveItems(Integer max) {
+        ListWrapper<DataModel> items = findUnfilteredEffectiveItems(max)
+        filterUnauthorized(items)
+    }
+
+    protected ListWrapper<DataModel> findUnfilteredEffectiveItems(Integer max) {
         //if you only want the active data models (draft and finalised)
         if (params.status?.toLowerCase() == 'active') {
             //if you have the role viewer you can see drafts
@@ -755,5 +764,23 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
 
         return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
+    }
+
+
+    protected ListWrapper<DataModel> filterUnauthorized(ListWrapper<DataModel> items) {
+        if ( items instanceof ListWithTotalAndTypeWrapper ) {
+            ListWithTotalAndTypeWrapper listWithTotalAndTypeWrapperInstance = (ListWithTotalAndTypeWrapper) items
+            DetachedCriteria<DataModel> criteria = listWithTotalAndTypeWrapperInstance.list.criteria
+            Map<String, Object> params = listWithTotalAndTypeWrapperInstance.list.params
+            ListWithTotalAndType<DataModel> listWithTotalAndType = instantiateListWithTotalAndTypeWithCriteria(criteria, params)
+            return ListWithTotalAndTypeWrapper.create(listWithTotalAndTypeWrapperInstance.params, listWithTotalAndTypeWrapperInstance.base, listWithTotalAndType)
+        }
+        items
+    }
+
+    protected ListWithTotalAndType<DataModel> instantiateListWithTotalAndTypeWithCriteria(DetachedCriteria<DataModel> criteria, Map<String, Object> params) {
+        List<DataModel> dataModelList = dataModelGormService.findAllByCriteriaAndParams(criteria, params)
+        int total = dataModelGormService.findAllByCriteria(criteria).size()
+        new ListWithTotalAndTypeImpl<DataModel>(DataModel, dataModelList, total as Long)
     }
 }

@@ -917,10 +917,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
     }
 
-
-
     //TODO: not sure what this does
-    private <T> ListWrapper<T> withAdditionalIndexCriteria(ListWrapper<T> list) {
+    protected <T> ListWrapper<T> withAdditionalIndexCriteria(ListWrapper<T> list) {
         if (!hasAdditionalIndexCriteria()) {
             return list
         }
