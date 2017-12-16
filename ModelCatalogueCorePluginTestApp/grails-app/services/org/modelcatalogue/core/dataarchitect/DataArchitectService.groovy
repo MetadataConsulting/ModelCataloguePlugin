@@ -447,13 +447,31 @@ class DataArchitectService {
         def score
         try{ score  = Long.parseLong( minScore ) }catch(Exception e){ score  = 10}
         def matchingDataElements = elementService.findFuzzyDataElementSuggestions(dataModelA,dataModelB, score)
+        def matchingDataClasses = elementService.findFuzzyDataClassDataElementSuggestions(dataModelA,dataModelB, score)
         batch.name = "Processing suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
         batch.save()
+        matchingDataClasses.each { ElasticMatchResult match ->
+            RelationshipType type = RelationshipType.readByName("relatedTo")
+            Map<String, String> params = new HashMap<String, String>()
+            params.put("""source""", """gorm://org.modelcatalogue.core.DataClass:$match.catalogueElementA.id""")
+            params.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:$match.catalogueElementB.id""")
+            params.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+            params.put("""matchScore""", """${(match.matchScore) ? match.matchScore : 0}""")
+            params.put("""matchOn""", """ElementName""")
+            params.put("""message""", """$match.message""")
+            Action action
+            action = actionService.create(params, batch, CreateMatch)
+            if (action.hasErrors()) {
+                log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+            }
+            batch.archived = false
+            batch.save()
+        }
         matchingDataElements.each { ElasticMatchResult match ->
             RelationshipType type = RelationshipType.readByName("relatedTo")
             Map<String, String> params = new HashMap<String, String>()
-            params.put("""source""", """gorm://org.modelcatalogue.core.DataElement:$match.dataElementA.id""")
-            params.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:$match.dataElementB.id""")
+            params.put("""source""", """gorm://org.modelcatalogue.core.DataElement:$match.catalogueElementA.id""")
+            params.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:$match.catalogueElementB.id""")
             params.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
             params.put("""matchScore""", """${(match.matchScore) ? match.matchScore : 0}""")
             params.put("""matchOn""", """ElementName""")

@@ -71,7 +71,11 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     def "reuse existing classification by id"() {
         DataModel c = new DataModel(name: 'SchemaWithId', modelCatalogueId: 'http://www.example.com/SWI').save(failOnError: true)
 
+        //weird error - works without copy relationships if step through the breakpoints
+        // fails if you run without debug
+        // so added copyrelationships
         build {
+            copy relationships
             dataModel(name: 'NotUniqueName', id: 'http://www.example.com/SWI') {
                 description '''
                     This is a test schema which is just for test purposes!

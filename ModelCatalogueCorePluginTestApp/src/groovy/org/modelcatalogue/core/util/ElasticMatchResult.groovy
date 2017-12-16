@@ -1,13 +1,13 @@
 package org.modelcatalogue.core.util
 
-import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.CatalogueElement
 
 /**
  * Created by adam on 29/05/2017.
  */
 class ElasticMatchResult {
-    DataElement dataElementA
-    DataElement dataElementB
+    CatalogueElement catalogueElementA
+    CatalogueElement catalogueElementB
     Float matchScore
     String message
 }
