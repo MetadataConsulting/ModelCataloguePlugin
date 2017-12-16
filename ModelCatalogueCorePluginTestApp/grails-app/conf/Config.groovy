@@ -227,7 +227,7 @@ environments {
         //println "ServerURL" + grails.serverURL
 
         mc.search.elasticsearch.host=System.getenv('MDX_ELASTIC_HOST')
-        mc.ssearch.elasticsearch.port=System.getenv('MDX_ELASTIC_PORT')
+        mc.search.elasticsearch.port=System.getenv('MDX_ELASTIC_PORT')
 
         grails.plugin.console.enabled=true
         mc.legacy.dataModels=true
