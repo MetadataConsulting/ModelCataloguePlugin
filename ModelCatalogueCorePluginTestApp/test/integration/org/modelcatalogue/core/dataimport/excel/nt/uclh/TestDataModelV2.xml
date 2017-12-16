@@ -1,5 +1,5 @@
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
-    <dataModel name="TestDataModel" status="FINALIZED" semanticVersion="2">
+    <dataModel name="TestDataModel" status="FINALIZED" semanticVersion="2" id="37459">
     <description>NHIC conceptual domain i.e. value domains used the NHIC project</description>
     <extensions>
       <extension key="http://www.modelcatalogue.org/metadata/#authors">Matous Kucera</extension>
@@ -65,7 +65,7 @@ The NHS NUMBER, the primary identifier of a PERSON, is a unique identifier for a
                   </extensions>
                   <dataType name="Number" />
                 </dataElement>
-                <dataElement name="LOCAL PATIENT IDENTIFIER*">
+                <dataElement name="LOCAL PATIENT IDENTIFIER*" id="12502">
                   <description>*For linkage purposes NHS NUMBER
 and/or
  LOCAL PATIENT IDENTIFIER

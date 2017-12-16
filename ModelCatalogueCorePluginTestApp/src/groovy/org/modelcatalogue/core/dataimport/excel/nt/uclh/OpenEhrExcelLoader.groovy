@@ -1,153 +1,129 @@
 package org.modelcatalogue.core.dataimport.excel.nt.uclh
 
+import grails.util.Holders
 import org.apache.commons.lang.WordUtils
-import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
-import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.ElementService
+import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataimport.excel.ExcelLoader
+import org.modelcatalogue.core.elasticsearch.ElasticSearchService
+import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.publishing.PublishingContext
 
 /**
- * Created by davidmilward on 31/08/2017.
+ * Created by adammilward on 31/08/2017.
  */
-class OpenEhrExcelLoader extends UCLHExcelLoader {
+class OpenEhrExcelLoader extends ExcelLoader {
 
-    OpenEhrExcelLoader(boolean test = false){
-        super(test)
-    }
+    String dataModelName = 'Open EHR Mapping Model'
+    def modelCatalogueSearchService = Holders.applicationContext.getBean("elasticSearchService")
+    def elementService = Holders.applicationContext.getBean("elementService")
 
-    @Override
-    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {
-
-        if (owner == '') {
-            ownerAndGELModelSuffix = ''
-        }
-        else {
-            ownerAndGELModelSuffix = '_' + owner
-        }
-
-
-        Writer stringWriter = new StringWriter()
-        CatalogueBuilder catalogueBuilder = new XmlCatalogueBuilder(stringWriter, true)
-
-        if (!workbook) {
-            throw new IllegalArgumentException("Excel file contains no worksheet!")
-        }
-        Sheet sheet = workbook.getSheetAt(index);
-
-        List<Map<String, String>> rowMaps = getRowMaps(sheet)
-        String suffix = getOwnerSuffixWithRandom()
-        if(bTest){
-            suffix = getOwnerSuffix()
-        }
-
-        String modelName = rowMaps[0]['Current Paper Document  or system name']+  suffix // at the moment we are dealing with just one            UCLH data source, so there will be just one model
-
-        List<String> modelNames = [modelName]
-
-        catalogueBuilder.build {
-            dataModel('name': modelName) {
-                ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL'
-                rowMaps.each { Map<String, String> rowMap ->
-                    dataElement(name: getNTElementName(rowMap)) {
-                        openEhrHeaders.each {k, v ->
-                            ext v, (rowMap[k] ?: 'unavailable')
-                        }
-                        //ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
-                    }
-                }
-            }
-        }
-        return Pair.of(stringWriter.toString(), modelNames)
-    }
-
-
-    @Override
-    String getNTElementName(Map<String,String> rowMap){
-        String alias = getElementFromGelName(rowMap) + "_ph"
-        String name = alias?:rowMap['GEL Dataset Identifier']
-        return name
-    }
-
-    @Override
-    String getElementFromGelName(Map<String,String> rowMap){
-
-        String sName = rowMap['GEL Dataset Name']?:"Name not provided" //we need to put this into a form to use on the db
-        List<String> tokens = sName.tokenize('(') //grab bit before the bracket - Event Reference (14858.3)
-        return tokens[0].trim()
-
-    }
-
-    @Override
-    Long getMCIdFromSpreadSheet(Map<String,String> rowMap) {
-        Long id = 0
-        try{
-            String sId = rowMap['GEL Dataset Identifier']?:'unavailable'
-            if(sId){
-                def identity = sId.split("\\.")
-                id = identity[0] as Long
-            }
-        }catch(NumberFormatException ne){//
-            //exception catches the case where the row has been
-            //filled with data that is not in the expected format
-            // - so return id = 0
-        }
-        return id
-    }
-
-    static Map<String, String> openEhrHeaders = ['Archetype Path Query Statement',	'GEL Dataset Identifier'].collectEntries {
+    static Map<String, String> openEhrHeaders = ['Archetype Path Query Statement', 'GEL Dataset Name',	'GEL Dataset Identifier',  'Description'].collectEntries {
         header -> [(header), WordUtils.capitalizeFully(header).replaceAll(/\?/,'')]
     }  // map from header keys to their capitalized forms used as metadata keys
 
-    List<String>  loadModel(Workbook workbook,  String owner='') {
-        List<String> modelNames = []
-        if (owner == '') {
-            ownerAndGELModelSuffix = ''
-        }
-        else {
-            ownerAndGELModelSuffix = '_openEHR_' + owner
-        }
+    void loadModel(Workbook workbook,  String dataModelName='Open EHR') {
 
         if (!workbook) {
             throw new IllegalArgumentException("Excel file contains no worksheet!")
         }
-        //We convert the data in the spreadsheet to the workLists format
-        Map<String,List<Map<String, String>>> workbookMap = [:]
-        int sheetno = workbook.size()
-        for (int i = 1; i < sheetno ; i++){
-            Sheet sheet = workbook.getSheetAt(i)
-            String sheetName = sheet.getSheetName()
-            List<Map<String, String>> rowMapList =importSheet(sheet)
-            workbookMap[sheetName] = rowMapList
-        }
 
-        //Iterate through the modelMaps to build new DataModel
-        workbookMap.each { String name, List<Map<String, String>> rowMapsForModel ->
+        //see if an open EHR model already exists, if not create one
+        DataModel openEHRModel =  DataModel.findByName(dataModelName)
+        DataModel targetDataModel
 
-            DataModel newModel = getDataModel(name + ownerAndGELModelSuffix)
-            modelNames << name
-
-            //Iterate through each row to build an new DataElement
-            rowMapsForModel.each { Map<String, String> rowMap ->
-                String ntname = getNTElementName(rowMap)
-                String ntdescription = 'OpenEhr Element Description'
-                DataElement newElement = new DataElement(name: ntname, description:  ntdescription , DataModel: newModel ).save(flush:true, failOnError: true)
-                newElement.setDataModel(newModel)
-                //Add in metadata
-                openEhrHeaders.each { k, v ->
-                    newElement.addExtension(v, rowMap[k])
-                }
-                Long ref = getMCIdFromSpreadSheet(rowMap)
-                //Add metadata for adding in relationship to reference model
-                newElement.addExtension("represents", ref as String)
+        if(!openEHRModel){
+            openEHRModel = new DataModel(name: dataModelName).save()
+        }else{
+            //if one exists, check to see if it's a draft
+            // but if it's finalised create a new version
+            if(openEHRModel.status == ElementStatus.FINALIZED){
+                DraftContext context = DraftContext.userFriendly()
+                openEHRModel = elementService.createDraftVersion(openEHRModel, PublishingContext.nextPatchVersion(openEHRModel.semanticVersion), context)
             }
         }
 
-        return modelNames
+
+
+        //we convert the data in the spreadsheet to the workLists format
+        Map<String, List<Map<String, String>>> workbookMap = [:]
+        int sheetno = workbook.size()
+        for (int i = 0; i < sheetno ; i++){
+            Sheet sheet = workbook.getSheetAt(i)
+            String sheetName = sheet.getSheetName()
+            //if this is the first sheet get the data model info
+            if(sheetName=="Version Control"){
+                Iterator<Row> rowIt = sheet.rowIterator()
+                Row row = rowIt.next()
+                List<String> dataModelInfo = getRowData(row)
+                targetDataModel = elementService.findByModelCatalogueId(DataModel, dataModelInfo[2])
+            }else {
+                List<Map<String, String>> rowMapList = importSheet(sheet)
+                workbookMap[sheetName] = rowMapList
+            }
+        }
+
+        //Iterate through the modelMaps to build new DataModel
+        workbookMap.each { String sectionName, List<Map<String, String>> rowMapsForModel ->
+
+            //see which section / class within the open ehr dataset the element can be found
+            DataClass section = DataClass.findByNameAndDataModel(sectionName, openEHRModel)
+
+            if(!section){
+                //create new section
+                section = new DataClass(name: sectionName, dataModel: openEHRModel).save()
+            }
+
+            //Iterate through each row to build a new DataElement or find an existing one
+            rowMapsForModel.each{ Map<String, String> rowMap ->
+
+                String dataElementName = sectionName + "." + rowMap.get("GEL Dataset Name")
+
+                //see if the element exists in the current open ehr model
+                DataElement openEHRDataElement = DataElement.findByNameAndDataModel(dataElementName, openEHRModel)
+
+                if(!openEHRDataElement){
+                    //create a new data element if it doesn't already exist
+                    openEHRDataElement = new DataElement(name: dataElementName, description: rowMap.get('Description'), dataModel: openEHRModel).save()
+                }
+
+                //add archetype path query statement metadata to the data element
+                openEHRDataElement.ext.put("Archetype Path Query Statement", rowMap.get("Archetype Path Query Statement"))
+                openEHRDataElement.save()
+
+                //add the data element to the normalised class i.e. ehr class / table / template
+                section.addToContains(openEHRDataElement)
+
+
+                //split the GEL ID in the spreadsheet
+                if(rowMap.get("GEL Dataset Identifier") && targetDataModel) {
+                    def splitID = rowMap.get("GEL Dataset Identifier").split("\\.")
+                    def dataElementToLinkTo
+                    //find data element based on model catalogue id from spreadsheet
+                    if (splitID.size() > 0) {
+                        //FIXME: don't hard code in the data model ID i.e. gel rare disease model - this should be passed in as a parameter
+                        dataElementToLinkTo = modelCatalogueSearchService.search(DataElement, [search: splitID[0], dataModel: targetDataModel.id])?.items[0]
+                    }
+
+                    //create a relationship between the open ehr model and the
+                    if (dataElementToLinkTo) {
+                        openEHRDataElement.addToRelatedTo(dataElementToLinkTo)
+                    }
+                }
+
+            }
+        }
+
     }
+
+
+
     /**
      * importSheet
      * For each sheet we iterate through the rows one at a time
@@ -174,4 +150,8 @@ class OpenEhrExcelLoader extends UCLHExcelLoader {
         }
         return rowMapList
     }
+
+
+
+
 }
