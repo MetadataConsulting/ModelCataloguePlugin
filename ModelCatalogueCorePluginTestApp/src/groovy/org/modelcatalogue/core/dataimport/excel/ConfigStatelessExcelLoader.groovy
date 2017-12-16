@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationContext
  */
 @Log
 class ConfigStatelessExcelLoader extends ExcelLoader {
+    int count = 0
     final String DEFAULT_MU_NAME = null
     final Integer MAX_METADATA_LEN = 2000
 //    AuditService auditService
@@ -214,8 +215,13 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
 //        propertyInstanceMap.get().clear()
 //        log.info("cleaned up GORM")
     }
-    void pr(String msg, Object obj) {
-        println(msg + obj.toString())
+    void pr(String msg, Object obj = null) {
+        if (obj) {
+            println(msg + obj.toString())
+        } else {
+            println(msg)
+        }
+        println(msg + obj?.toString() ?: '')
     }
     Boolean equalsIgnoreCase(String s1, String s2) {
         return s1 ? s1.equalsIgnoreCase(s2) : s1 == s2
@@ -257,19 +263,23 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
 
     void addAsChildTo(DataModel dm, CatalogueElement child, CatalogueElement parent) {
 //        child.
-        Set<Relationship> incoming = child.getIncomingRelationships()
-        for (Relationship rel in incoming) {
-            if (rel.getSource() == parent && rel.getDestination() == child && rel.getRelationshipType().getId() == RelationshipType.hierarchyType.getId()) {
-                return // is already a child - will usually be the case
-            }
+//        Set<Relationship> incoming = child.getIncomingRelationships()
+//        for (Relationship rel in incoming) {
+//            if (rel.getSource() == parent && rel.getDestination() == child && rel.getRelationshipType().getId() == RelationshipType.hierarchyType.getId()) {
+//                return // is already a child - will usually be the case
+//            }
+//        }
+        if (Relationship.findBySourceAndDestinationAndRelationshipType(parent, child, RelationshipType.hierarchyType)) {
+            pr("#${child.getId()} ${child.getName()} already child to #${parent.getId()} ${parent.getName()}")
+        } else {
+            Relationship rel = new Relationship()
+            rel.setDataModel(dm)
+            rel.setSource(parent)
+            rel.setDestination(child)
+            rel.setRelationshipType(RelationshipType.hierarchyType)
+            session.insert(rel)
+            pr("added as child to rel: ", rel)
         }
-        Relationship rel = new Relationship()
-        rel.setDataModel(dm)
-        rel.setSource(parent)
-        rel.setDestination(child)
-        rel.setRelationshipType(RelationshipType.hierarchyType)
-        session.insert(rel)
-        pr("added as child to rel: ", rel)
     }
     void addToContainedIn(DataModel dm, DataElement de, DataClass dc) {
         Relationship rel = new Relationship()
@@ -291,12 +301,12 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
         ev.setVersion(0)
 //        ev.setOrderIndex(System.currentTimeMillis())
         session.insert(ev)
-        pr("inserted ev: ", ev)
+//        pr("inserted ev: ", ev)
     }
     void updateCatalogueElement(CatalogueElement ce) {
         ce.setLastUpdated(new Date())
         session.update(ce)
-        pr("updating ce: ", ce)
+//        pr("updating ce: ", ce)
     }
     void updateExtensionValue(ExtensionValue ev) {
         session.update(ev)
@@ -460,6 +470,10 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
         String dtName = tryHeader(ConfigHeadersMap.dataTypeName, headersMap, rowMap)
         DataType dt
 
+        if (!dtName) {
+            dtName = 'NoDataType'
+        }
+
         //see if a datatype with the model catalogue id already exists in this model
         if (dtCode && (dt = DataType.findByModelCatalogueIdAndDataModel(dtCode, dataModel))){
             if ((dtName ?: '') != dt.getName()) {
@@ -607,6 +621,9 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
             updateCatalogueElement(de)
         return de
     }
+    Boolean rowIsValid(Map<String, Object> headersMap, Map<String, String> rowMap) {
+        return tryHeader(ConfigHeadersMap.containingDataClassName, headersMap, rowMap) && tryHeader(ConfigHeadersMap.dataElementName, headersMap, rowMap)
+    }
     /**
      *
      * @param rowMaps
@@ -615,17 +632,22 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
      * @return
      */
     def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName){
-        int count = 0
         int batchSize = 50
         Transaction tx = session.beginTransaction()
         DataModel dataModel = processDataModel(dataModelName)
         for (Map<String, String> rowMap in rowMaps) {
-            println("creating row " + count++)
-            DataClass dc = processDataClass(dataModel, headersMap, rowMap)
-            MeasurementUnit mu = processMeasurementUnit(dataModel, headersMap, rowMap)
-            DataType dt = processDataType(dataModel, headersMap, rowMap, mu)
-            DataElement de = processDataElement(dataModel, headersMap, rowMap, dt)
-            addToContainedIn(dataModel, de, dc)
+            if (rowIsValid(headersMap, rowMap)) {
+                println("creating row " + count++)
+                DataClass dc = processDataClass(dataModel, headersMap, rowMap)
+                MeasurementUnit mu = processMeasurementUnit(dataModel, headersMap, rowMap)
+                DataType dt = processDataType(dataModel, headersMap, rowMap, mu)
+                DataElement de = processDataElement(dataModel, headersMap, rowMap, dt)
+                addToContainedIn(dataModel, de, dc)
+            } else {
+                println("ignoring row " + count++)
+            }
+
+
         }
         tx.commit()
     }

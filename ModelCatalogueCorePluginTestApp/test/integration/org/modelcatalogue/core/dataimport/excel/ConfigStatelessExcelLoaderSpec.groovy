@@ -11,12 +11,19 @@ import org.modelcatalogue.core.audit.AuditService
 import spock.lang.Shared
 
 class ConfigStatelessExcelLoaderSpec extends AbstractIntegrationSpec {
-    Boolean doGosh = false
 //    String dataModelName = 'LOINC_TEST7'
-    String dataModelName = doGosh ? 'GOSH_TEST1' : 'LOINC250_IDE_01'
-    String headersMapXml = doGosh ? 'gosh_headers_map.xml' : 'loinc_headers_map.xml'
-    String dataXlsx = doGosh ? 'GOSH_lab_test_codes100.xlsx' : 'loinc250.xlsx' // 'loinc_edit.xlsx'
-    @Shared String resourcePath = (new File("test/integration/resources/org/modelcatalogue/integration/excel/${doGosh ? 'goshTestCodes' : 'loinc'}")).getAbsolutePath()
+    String loincDataModelName = 'LOINC'
+    String goshDataModelName = 'GOSH'
+    String lpdcDataModelName = 'WinPath'
+    String loincHeadersMapXml = 'loinc_headers_map.xml'
+    String goshHeadersMapXml = 'gosh_headers_map.xml'
+    String lpdcHeadersMapXml = 'lpdc_headers_map.xml'
+    String lpdcDataFile = 'TFC-TLC_LPDC_With Dups.xlsx'
+    String[] loincDataFiles = ['1loinc.xlsx', '2loinc.xlsx', '3loinc.xlsx', '4loinc.xlsx', '5loinc.xlsx', '6loinc.xlsx', '7loinc.xlsx', '8loinc.xlsx']
+    String[] goshDataFiles = ['GOSH lab test codes 1.xlsx', 'GOSH lab test codes 2.xlsx', 'GOSH lab test codes 3.xlsx', 'GOSH lab test codes 4.xlsx', 'GOSH lab test codes 5.xlsx']
+    @Shared String lpdcResourcePath = (new File('test/integration/resources/org/modelcatalogue/integration/excel/')).getAbsolutePath()
+    @Shared String loincResourcePath = (new File('test/integration/resources/org/modelcatalogue/integration/excel/loinc/')).getAbsolutePath()
+    @Shared String goshResourcePath = (new File('test/integration/resources/org/modelcatalogue/integration/excel/goshTestCodes/')).getAbsolutePath()
     ConfigStatelessExcelLoader excelLoader
 //    CatalogueBuilder catalogueBuilder
     def dataModelService, elementService
@@ -30,7 +37,7 @@ class ConfigStatelessExcelLoaderSpec extends AbstractIntegrationSpec {
 //        XMLUnit.ignoreComments = true
 //        XMLUnit.ignoreAttributeOrder = true
 //        catalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
-        excelLoader = new ConfigStatelessExcelLoader(dataModelName, new FileInputStream(resourcePath + '/' + headersMapXml))
+//        excelLoader = new ConfigStatelessExcelLoader(dataModelName, new FileInputStream(resourcePath + '/' + headersMapXml))
     }
 
     def "test default catalogue builder imports generic nt dataset"(){
@@ -38,10 +45,25 @@ class ConfigStatelessExcelLoaderSpec extends AbstractIntegrationSpec {
         when: "I load the Excel file"
 //        excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(resourcePath + '/' + dataXlsx)))
         auditService.betterMute {
-            excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(resourcePath + '/' + dataXlsx)))
+            for (String loincDataXlsx in loincDataFiles) {
+                excelLoader = new ConfigStatelessExcelLoader(loincDataModelName, new FileInputStream(loincResourcePath + '/' + loincHeadersMapXml))
+                excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(loincResourcePath + '/' + loincDataXlsx)))
+                excelLoader = null
+            }
+            for (String goshDataXlsx in goshDataFiles) {
+                excelLoader = new ConfigStatelessExcelLoader(goshDataModelName, new FileInputStream(goshResourcePath + '/' + goshHeadersMapXml))
+                excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(goshResourcePath + '/' + goshDataXlsx)))
+                excelLoader = null
+            }
+            excelLoader = new ConfigStatelessExcelLoader(lpdcDataModelName, new FileInputStream(lpdcResourcePath + '/' + lpdcHeadersMapXml))
+            excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(lpdcResourcePath + '/' + lpdcDataFile)))
+            excelLoader = null
+//            excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(resourcePath + '/' + dataXlsx)))
         }
         then: "new model is created"
 
-        DataModel.findByName(dataModelName)
+//        DataModel.findByName(lpdcDataModelName)
+//        DataModel.findByName(loincDataModelName)
+        DataModel.findByName(goshDataModelName)
     }
 }

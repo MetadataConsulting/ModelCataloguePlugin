@@ -16,7 +16,7 @@ class ConfigExcelLoaderSpec extends AbstractIntegrationSpec {
     String dataModelName = doGosh ? 'GOSH_TEST1' : 'LOINC_TEST03'
     String headersMapXml = doGosh ? 'gosh_headers_map.xml' : 'loinc_headers_map.xml'
     String dataXlsx = doGosh ? 'GOSH_lab_test_codes100.xlsx' : 'loinc1000.xlsx' // 'loinc_edit.xlsx'
-    @Shared String resourcePath = (new File("test/integration/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
+    @Shared String resourcePath = (new File("test/integration/resources/org/modelcatalogue/integration/excel/${doGosh ? 'goshTestCodes' : 'loinc'}")).getAbsolutePath()
     ConfigExcelLoader excelLoader
 //    CatalogueBuilder catalogueBuilder
     def dataModelService, elementService
