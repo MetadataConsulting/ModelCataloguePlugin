@@ -460,7 +460,9 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
                 dataModelAclService.addAdministrationPermission(dataModelId)
             }
         }
-        auditService.logElementCreated(this)
+        if ( !(this instanceof User) ) {
+            auditService.logElementCreated(this)
+        }
     }
 
     void beforeInsert() {
@@ -469,8 +471,9 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     void beforeUpdate() {
         removeModelCatalogueIdIfDefault()
-        auditService.logElementUpdated(this)
-
+        if ( !(this instanceof User) ) {
+            auditService.logElementUpdated(this)
+        }
         CatalogueElement self = this
 
 

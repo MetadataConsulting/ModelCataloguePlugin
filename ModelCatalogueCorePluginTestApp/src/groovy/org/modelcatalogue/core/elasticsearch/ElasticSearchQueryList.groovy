@@ -14,6 +14,7 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.lists.JsonAwareListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -26,16 +27,22 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
     final Class<T> type
     final SearchRequestBuilder searchRequest
 
-    SearchResponse response
+    DataModelAclService dataModelAclService
 
-    static <T> ListWithTotalAndType<T> search(SearchParams params, Class<T> type, SearchRequestBuilder searchRequest) {
-        return new ElasticSearchQueryList<T>(params, type, searchRequest)
+    SearchResponse response
+    List<T> items
+    Long total
+
+    static <T> ListWithTotalAndType<T> search(SearchParams params, Class<T> type, SearchRequestBuilder searchRequest, DataModelAclService dataModelAclService) {
+        return new ElasticSearchQueryList<T>(params, type, searchRequest, dataModelAclService)
+
     }
 
-    private ElasticSearchQueryList(SearchParams params, Class<T> type, SearchRequestBuilder searchRequest) {
+    private ElasticSearchQueryList(SearchParams params, Class<T> type, SearchRequestBuilder searchRequest, DataModelAclService dataModelAclService) {
         this.params = params
         this.type = type
         this.searchRequest = searchRequest
+        this.dataModelAclService = dataModelAclService
     }
 
     @Override
@@ -45,28 +52,112 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
 
     @Override
     Long getTotal() {
-        try {
-            if (!response) {
-                response = initializeResponse()
-            }
-            return response.hits.totalHits
-        } catch (Exception ignored) {
-            return 0L
+        if (!response) {
+            setResponse(initializeResponse())
+        }
+        this.total
+    }
+
+    void setResponse(SearchResponse searchResponse) {
+        this.response = searchResponse
+
+        items = calculateItems()
+        if ( shouldUseMaxAndOffsetParamInSearchRequest() ) {
+            total = response.hits.totalHits
+        } else {
+            total = items.size()
+            items = subListItemsWithMaxAndOffset(items)
+        }
+    }
+
+    List<T> subListItemsWithMaxAndOffset(List<T> items) {
+        int fromIndex = subListItemsFromIndex()
+        int toIndex = subListItemsToIndex(items)
+        items.subList(fromIndex, toIndex)
+    }
+
+    int subListItemsToIndex(List<T> items) {
+        if (isOffsetPresent() && isMaxPresent() ) {
+            int offset = offset()
+            int max = max()
+            return Math.min( (offset + max), items.size())
+
+        } else if ( isMaxPresent() ) {
+            int max = max()
+            return Math.min( max, items.size())
+        }
+        return items.size()
+    }
+
+    int subListItemsFromIndex() {
+        return isOffsetPresent() ? offset() : 0
+    }
+
+    boolean isOffsetPresent() {
+        params.paramArgs?.offset
+    }
+
+    boolean isMaxPresent() {
+        params.paramArgs?.max
+    }
+
+    List<T> calculateItems() {
+        List<Long> hitsIds = collectHitIds()
+        collectAuthorizedObjects(hitsIds).findAll { AuthorizedObject authorizedObject ->
+            authorizedObject.authorized
+        }.collect { AuthorizedObject authorizedObject ->
+            authorizedObject.instance
+        }
+    }
+
+    List<Long> collectHitIds() {
+        SearchHit[] hits = response.hits.hits
+        hits.collect { SearchHit hit ->
+            hit.field('entity_id')?.toLong() ?: hit.id().toLong()
+        }
+    }
+
+    List<AuthorizedObject> collectAuthorizedObjects(List<Long> hitsIds) {
+        hitsIds.collect { Long hitId ->
+            def instance = type.get(hitId)
+            boolean authorized = dataModelAclService.isAdminOrHasReadPermission(instance)
+            new AuthorizedObject(instance: instance, authorized: authorized)
+        }
+    }
+
+    boolean shouldUseMaxAndOffsetParamInSearchRequest() {
+        // maybe we can allow for those types which
+        // don't extend from CatalalogueModel. types where we don't need to check
+        // if the user has ACL permissions to the dataModel
+        false
+    }
+
+    void setSearchRequestForm() {
+        if (shouldUseMaxAndOffsetParamInSearchRequest() && isOffsetPresent()) {
+            int offset = offset()
+            searchRequest.setFrom(offset)
+        }
+    }
+
+    int max() {
+        isMaxPresent() ? params.paramArgs?.max : 10
+    }
+
+    int offset() {
+        isOffsetPresent() ? params.paramArgs?.offset : 0
+    }
+
+    void setSearchRequestMax() {
+        if (shouldUseMaxAndOffsetParamInSearchRequest() && isMaxPresent()) {
+            int max = max()
+            searchRequest.setSize(max)
         }
     }
 
     private SearchResponse initializeResponse() {
         try {
-
-
-            if (params.paramArgs?.offset) {
-                int offset = params.paramArgs?.offset
-                searchRequest.setFrom(offset)
-            }
-            if (params.paramArgs?.max) {
-                int max = params.paramArgs?.max
-                searchRequest.setSize(max)
-            }
+            setSearchRequestForm()
+            setSearchRequestMax()
             if (params.explain) {
                 log.info searchRequest.toString()
             }
@@ -84,15 +175,9 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
     @Override
     List<T> getItems() {
         if (!response) {
-            try {
-                response = initializeResponse()
-            } catch (Exception ignored) {
-                return []
-            }
+            setResponse(initializeResponse())
         }
-        return response.hits.hits.collect { SearchHit hit ->
-            type.get(hit.field('entity_id')?.toLong() ?: hit.id().toLong())
-        }
+        this.items
     }
 
     Map getItemsWithScore() {
@@ -182,4 +267,10 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
 
         return ret
     }
+}
+
+class AuthorizedObject {
+    def instance
+    boolean authorized
+
 }
