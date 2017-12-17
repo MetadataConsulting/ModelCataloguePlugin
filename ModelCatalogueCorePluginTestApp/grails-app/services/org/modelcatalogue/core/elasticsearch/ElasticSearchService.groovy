@@ -83,7 +83,8 @@ class ElasticSearchService implements SearchCatalogue {
             full_version: 90,
             latest_id: 80,
             entity_id : 70,
-            description: 1
+            description: 1,
+            model_catalogue_id: 80
     ]
 
     GrailsApplication grailsApplication
@@ -933,7 +934,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     private DataModelFilter getOverridableDataModelFilter(SearchParams params, List<DataModel> subscribedModels) {
         if (params.dataModelId) {
-            Long dataModelId = params.dataModelId
+                Long dataModelId
                 //check that there is a data model is
                 // and check that you should include the results for the imports as well in search results
                 if (dataModelId) {

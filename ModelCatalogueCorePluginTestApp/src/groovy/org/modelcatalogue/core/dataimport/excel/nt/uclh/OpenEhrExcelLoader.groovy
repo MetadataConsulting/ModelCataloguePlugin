@@ -14,6 +14,8 @@ import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.elasticsearch.ElasticSearchService
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.PublishingContext
+import org.modelcatalogue.core.util.ParamArgs
+import org.modelcatalogue.core.util.SearchParams
 
 /**
  * Created by adammilward on 31/08/2017.
@@ -21,6 +23,7 @@ import org.modelcatalogue.core.publishing.PublishingContext
 class OpenEhrExcelLoader extends ExcelLoader {
 
     String dataModelName = 'Open EHR Mapping Model'
+    DataModel openEHRModel
     def modelCatalogueSearchService = Holders.applicationContext.getBean("elasticSearchService")
     def elementService = Holders.applicationContext.getBean("elementService")
 
@@ -28,14 +31,16 @@ class OpenEhrExcelLoader extends ExcelLoader {
         header -> [(header), WordUtils.capitalizeFully(header).replaceAll(/\?/,'')]
     }  // map from header keys to their capitalized forms used as metadata keys
 
-    void loadModel(Workbook workbook,  String dataModelName='Open EHR') {
+
+
+    DataModel loadModel(Workbook workbook,  String dataModelName='Open EHR') {
 
         if (!workbook) {
             throw new IllegalArgumentException("Excel file contains no worksheet!")
         }
 
         //see if an open EHR model already exists, if not create one
-        DataModel openEHRModel =  DataModel.findByName(dataModelName)
+        openEHRModel =  DataModel.findByName(dataModelName)
         DataModel targetDataModel
 
         if(!openEHRModel){
@@ -105,10 +110,16 @@ class OpenEhrExcelLoader extends ExcelLoader {
                 if(rowMap.get("GEL Dataset Identifier") && targetDataModel) {
                     def splitID = rowMap.get("GEL Dataset Identifier").split("\\.")
                     def dataElementToLinkTo
+
+                    SearchParams searchParams = new SearchParams()
+                    searchParams.search = splitID[0]
+                    searchParams.paramArgs = new ParamArgs()
+                    searchParams.paramArgs.max = 1
+                    searchParams.dataModelId = targetDataModel.id
                     //find data element based on model catalogue id from spreadsheet
                     if (splitID.size() > 0) {
                         //FIXME: don't hard code in the data model ID i.e. gel rare disease model - this should be passed in as a parameter
-                        dataElementToLinkTo = modelCatalogueSearchService.search(DataElement, [search: splitID[0], dataModel: targetDataModel.id])?.items[0]
+                        dataElementToLinkTo = modelCatalogueSearchService.search(DataElement, searchParams)?.items[0]
                     }
 
                     //create a relationship between the open ehr model and the
@@ -119,6 +130,8 @@ class OpenEhrExcelLoader extends ExcelLoader {
 
             }
         }
+
+         return openEHRModel
 
     }
 

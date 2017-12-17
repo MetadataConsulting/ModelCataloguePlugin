@@ -410,18 +410,12 @@ class DataImportController  {
 
     @Async
     protected void loadOpenEhrSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
-        Pair<String,String> modelDetails = getModelDetails(suffix)
         executorService.submit {
             auditService.betterMute {
                 try {
-                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader(false)
-                    String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_openEHR')
-                    List<String> modelNames = loader.loadModel(wb, dataOwner)
-                    DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
-                    loader.addRelationshipsToModels(referenceModel, modelNames)
-                    finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {
-                        it.instanceOf(DataModel)
-                    } ?: defaultCatalogueBuilder.created.find { it.dataModel }?.dataModel), userId)
+                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader()
+                    DataModel dm = loader.loadModel(wb)
+                    finalizeAsset(id, dm, userId)
 
                 } catch (Exception e) {
                     logError(id, e)
