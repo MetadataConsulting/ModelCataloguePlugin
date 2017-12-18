@@ -25,7 +25,7 @@ angular.module('modelcatalogue.core.ui.exports.actionsConf', ['mc.util.ui.action
   actionsProvider.registerChildAction 'export', 'export-cart', ['security', '$state', '$window',
     'modelCatalogueApiRoot', (security, $state, $window, modelCatalogueApiRoot) ->
       return undefined unless security.isUserLoggedIn()
-      return undefined unless $state.current.name == 'mc.favourites'
+      return undefined unless $state.current.name == 'catalogue.favourites'
 
       console.log $state.current.name
 
