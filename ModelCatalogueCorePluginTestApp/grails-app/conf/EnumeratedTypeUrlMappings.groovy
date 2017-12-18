@@ -10,6 +10,7 @@ class EnumeratedTypeUrlMappings {
         "/api/modelCatalogue/core/enumeratedType/$id/setDeprecated"(controller: 'enumeratedType', action: 'setDeprecated', method: HttpMethod.POST)
         "/api/modelCatalogue/core/enumeratedType/validate"(controller: 'enumeratedType', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/enumeratedType/$id"(controller: 'enumeratedType', action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/enumeratedType/$id/availableReports"(controller: 'enumeratedType', action: 'availableReports', method: HttpMethod.GET)
         "/api/modelCatalogue/core/enumeratedType/$id"(controller: 'enumeratedType', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/enumeratedType/$id"(controller: 'enumeratedType', action: 'delete', method: HttpMethod.DELETE)
         "/api/modelCatalogue/core/enumeratedType/$id/outgoing/search"(controller: 'enumeratedType', action: 'searchOutgoing', method: HttpMethod.GET)

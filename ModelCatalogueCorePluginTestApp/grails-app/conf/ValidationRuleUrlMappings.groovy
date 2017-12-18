@@ -10,6 +10,7 @@ class ValidationRuleUrlMappings {
         "/api/modelCatalogue/core/validationRule/$id/validate"(controller: 'validationRule', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/validationRule/validate"(controller: 'validationRule', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/validationRule/$id"(controller: 'validationRule', action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/validationRule/$id/availableReports"(controller: 'validationRule', action: 'availableReports', method: HttpMethod.GET)
         "/api/modelCatalogue/core/validationRule/$id"(controller: 'validationRule', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/validationRule/$id"(controller: 'validationRule', action: 'delete', method: HttpMethod.DELETE)
         "/api/modelCatalogue/core/validationRule/$id/outgoing/search"(controller: 'validationRule', action: 'searchOutgoing', method: HttpMethod.GET)
