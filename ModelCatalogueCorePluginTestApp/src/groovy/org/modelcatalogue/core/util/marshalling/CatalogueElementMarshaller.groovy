@@ -27,8 +27,8 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 dataModel: minimalCatalogueElementJSON(el.dataModel),
                 id: el.id,
                 latestVersionId: el.latestVersionId ?: el.id,
-				modelCatalogueId: el.modelCatalogueId ?: el.defaultModelCatalogueId,
-				internalModelCatalogueId: el.defaultModelCatalogueId,
+                modelCatalogueId: el.modelCatalogueId ?: el.defaultModelCatalogueId,
+                internalModelCatalogueId: el.defaultModelCatalogueId,
                 archived: el.archived,
                 name: el.name,
                 description: el.description,
@@ -161,7 +161,24 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         }
     }
 
-
+    static Map<String, Object> minimalCatalogueElementJSONSkeleton(CatalogueElement element) {
+        return [dateCreated: element.dateCreated,
+                versionCreated: element.versionCreated,
+                lastUpdated: element.lastUpdated, /*ext: OrderedMap.toJsonMap(element.ext),*/
+                internalModelCatalogueId: element.defaultModelCatalogueId,
+                modelCatalogueId: element.modelCatalogueId,
+                minimal: true,
+                name: element.name,
+                classifiedName: getClassifiedName(element),
+                id: element.id,
+                description: element.description,
+                elementType: element.getClass().name,
+                link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(),
+                status: "${element.status}".toString(),
+                versionNumber: element.versionNumber,
+                latestVersionId: element.latestVersionId ?: element.id,
+                dataModel: minimalCatalogueElementJSON(element.dataModel)]
+    }
     static Map<String, Object> minimalCatalogueElementJSON(CatalogueElement element) {
         Class entityClass = HibernateHelper.getEntityClass(element)
 
@@ -173,39 +190,58 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
             return minimalCatalogueElementJSON(element as DataElement)
         } else if (DataType.isAssignableFrom(entityClass)) {
             return minimalCatalogueElementJSON(element as DataType)
+        } else if (!element) {
+            return null
+        } else {
+            return minimalCatalogueElementJSONSkeleton(element)
         }
-        if (!element) return null
-        [dateCreated: element.dateCreated, versionCreated: element.versionCreated, lastUpdated: element.lastUpdated, /*ext: OrderedMap.toJsonMap(element.ext),*/ internalModelCatalogueId: element.defaultModelCatalogueId, modelCatalogueId: element.modelCatalogueId,minimal: true, name: element.name, classifiedName: getClassifiedName(element), id: element.id, description: element.description, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(), status: "${element.status}".toString(), versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel)]
     }
 
     static Map<String, Object> minimalCatalogueElementJSON(DataModel element) {
         if (!element) return null
-        [dateCreated: element.dateCreated, versionCreated: element.versionCreated, lastUpdated: element.lastUpdated, /*ext: OrderedMap.toJsonMap(element.ext),*/ internalModelCatalogueId: element.defaultModelCatalogueId, modelCatalogueId: element.modelCatalogueId,minimal: true, name: element.name, classifiedName: getClassifiedName(element), id: element.id, description: element.description, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(), status: "${element.status}".toString(), versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id, semanticVersion: element.semanticVersion]
+        def minimalJSON = minimalCatalogueElementJSONSkeleton(element)
+        minimalJSON.remove('dataModel')
+        return minimalJSON
     }
 
     static Map<String, Object> minimalCatalogueElementJSON(MeasurementUnit element) {
         if (!element) return null
-        [dateCreated: element.dateCreated, versionCreated: element.versionCreated, lastUpdated: element.lastUpdated, /*ext: OrderedMap.toJsonMap(element.ext),*/ internalModelCatalogueId: element.defaultModelCatalogueId, modelCatalogueId: element.modelCatalogueId,minimal: true, name: element.name, classifiedName: getClassifiedName(element), id: element.id, description: element.description, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(), status: "${element.status}".toString(), versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id, symbol: element.symbol]
+        def minimalJSON = minimalCatalogueElementJSONSkeleton(element)
+        minimalJSON.remove('dataModel')
+        minimalJSON.put('symbol', element.symbol)
+        return minimalJSON
     }
 
     static Map<String, Object> minimalCatalogueElementJSON(DataElement element) {
         if (!element) return null
-        [dateCreated: element.dateCreated, versionCreated: element.versionCreated, lastUpdated: element.lastUpdated, /*ext: OrderedMap.toJsonMap(element.ext),*/ internalModelCatalogueId: element.defaultModelCatalogueId, modelCatalogueId: element.modelCatalogueId,minimal: true, name: element.name, classifiedName: getClassifiedName(element), id: element.id, description: element.description, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(), status: "${element.status}".toString(), versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id, dataType: minimalCatalogueElementJSON(element.dataType)]
+        def minimalJSON = minimalCatalogueElementJSONSkeleton(element)
+        minimalJSON.put('dataType', minimalCatalogueElementJSON(element.dataType))
+        return minimalJSON
     }
 
     static Map<String, Object> minimalCatalogueElementJSON(DataType element) {
         if (!element) return null
+        def minimalJSON = minimalCatalogueElementJSONSkeleton(element)
+
         Class cls = HibernateHelper.getEntityClass(element)
+
+        minimalJSON = minimalJSON + [link: "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(cls))}/$element.id".toString(), 'elementType': cls.name]
+
         if (cls == EnumeratedType) {
-            return [dateCreated: element.dateCreated, versionCreated: element.versionCreated, lastUpdated: element.lastUpdated, /*ext: OrderedMap.toJsonMap(element.ext),*/ internalModelCatalogueId: element.defaultModelCatalogueId, modelCatalogueId: element.modelCatalogueId, minimal: true, name: element.name, classifiedName: getClassifiedName(element), id: element.id, description: element.description, enumerations: element.enumerationsObject.toJsonMap(),  elementType: cls.name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(cls))}/$element.id".toString(), status: "${element.status}".toString(), latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
+
+            return minimalJSON + [enumerations: ((EnumeratedType) element).enumerationsObject.toJsonMap()]
+
+        } else if (cls == ReferenceType) {
+
+            return minimalJSON + [dataClass: minimalCatalogueElementJSON(((ReferenceType) element).dataClass)]
+
+        } else if (cls == PrimitiveType) {
+
+            return minimalJSON + [measurementUnit: minimalCatalogueElementJSON(((PrimitiveType) element).measurementUnit)]
+
         }
-        if (cls == ReferenceType) {
-            return [dateCreated: element.dateCreated, versionCreated: element.versionCreated, lastUpdated: element.lastUpdated, /*ext: OrderedMap.toJsonMap(element.ext),*/ internalModelCatalogueId: element.defaultModelCatalogueId, modelCatalogueId: element.modelCatalogueId, minimal: true, name: element.name, classifiedName: getClassifiedName(element), id: element.id, description: element.description, dataClass: minimalCatalogueElementJSON(element.dataClass),  elementType: cls.name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(cls))}/$element.id".toString(), status: "${element.status}".toString(), latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
-        }
-        if (cls == PrimitiveType) {
-            return [dateCreated: element.dateCreated, versionCreated: element.versionCreated, lastUpdated: element.lastUpdated, /*ext: OrderedMap.toJsonMap(element.ext),*/ internalModelCatalogueId: element.defaultModelCatalogueId, modelCatalogueId: element.modelCatalogueId, minimal: true, name: element.name, classifiedName: getClassifiedName(element), id: element.id, description: element.description, measurementUnit: minimalCatalogueElementJSON(element.measurementUnit),  elementType: cls.name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(cls))}/$element.id".toString(), status: "${element.status}".toString(), latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
-        }
-        return [dateCreated: element.dateCreated, versionCreated: element.versionCreated, lastUpdated: element.lastUpdated, /*ext: OrderedMap.toJsonMap(element.ext),*/ internalModelCatalogueId: element.defaultModelCatalogueId, modelCatalogueId: element.modelCatalogueId, minimal: true, name: element.name, classifiedName: getClassifiedName(element), id: element.id, description: element.description, elementType: cls.name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(cls))}/$element.id".toString(), status: "${element.status}".toString(), latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
+
+        return minimalJSON
     }
 
 
