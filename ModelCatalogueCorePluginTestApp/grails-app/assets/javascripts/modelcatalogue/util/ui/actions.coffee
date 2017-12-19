@@ -99,7 +99,8 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
             action.children.push childAction
             continue
 
-          action.createActionsFrom = (watchExpression, createActionsFunction) ->
+          # getExpression to get the reports JSON, which should return the reports and also assign them to the object specified by the watchExpression
+          action.createActionsFrom = (getExpression, watchExpression, createActionsFunction) ->
             generatorAction = childAction
             updateChildActions = (input)->
               ret = $filter('filter')(action.children, (cha) -> cha.generatedBy != generatorAction.id and cha.id != generatorAction.id)
@@ -120,7 +121,10 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
               action.sortChildren()
               action.watches = watchExpression
 
-            updateChildActions($scope.$eval(watchExpression))
+            # resolve: if it's a promise, keep it a promise, otherwise wrap data into a promise.
+            $q.resolve($scope.$eval(getExpression)).then (reportData) ->
+              updateChildActions(reportData)
+
 
           childAction.heading = true
 

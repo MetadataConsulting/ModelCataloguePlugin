@@ -396,7 +396,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
           disabled: not $scope.element?.availableReports?.length
           watches: 'element.availableReports'
           generator: (action) ->
-            action.createActionsFrom 'element.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
+            action.createActionsFrom 'element.getAvailableReports()', 'element.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
         }
     ])
 
@@ -409,7 +409,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
           disabled: not $scope.reports?.length
           watches: 'reports'
           generator: (action) ->
-            action.createActionsFrom 'reports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
+            action.createActionsFrom 'reports', 'reports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
         }
     ])
 
@@ -424,7 +424,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
           disabled: not $scope.list.availableReports?.length
           watches: 'list.availableReports'
           generator: (action) ->
-            action.createActionsFrom 'list.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
+            action.createActionsFrom 'list.availableReports', 'list.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
         }
     ])
 
