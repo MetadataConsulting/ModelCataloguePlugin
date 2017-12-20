@@ -14,7 +14,7 @@ import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import java.util.concurrent.ExecutorService
 
 @Slf4j
-class DataModelCatalogueElementService extends AbstractCatalogueElementService {
+class DataModelCatalogueElementService<T extends CatalogueElement> extends AbstractCatalogueElementService<DataModel> {
 
     ExecutorService executorService
 

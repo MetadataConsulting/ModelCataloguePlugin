@@ -10,6 +10,7 @@ class AssetUrlMappings {
         "/api/modelCatalogue/core/asset/$id/validate" (controller: 'asset', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/asset/validate" (controller: 'asset', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/asset/$id" (controller: 'asset', action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/asset/$id/availableReports" (controller: 'asset', action: 'availableReports', method: HttpMethod.GET)
         "/api/modelCatalogue/core/asset/$id" (controller: 'asset', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/asset/$id" (controller: 'asset', action: 'delete', method: HttpMethod.DELETE)
         "/api/modelCatalogue/core/asset/$id/outgoing/search" (controller: 'asset', action: 'searchOutgoing', method: HttpMethod.GET)

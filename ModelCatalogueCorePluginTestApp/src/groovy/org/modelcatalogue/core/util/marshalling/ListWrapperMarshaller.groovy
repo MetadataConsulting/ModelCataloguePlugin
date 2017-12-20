@@ -24,7 +24,6 @@ abstract class ListWrapperMarshaller extends AbstractMarshaller {
                 list: getList(elements),
                 previous: elements.previous,
                 next: elements.next,
-                availableReports: getAvailableReports(elements),
                 sort: elements.sort,
                 order: elements.order
         ]

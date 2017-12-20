@@ -88,7 +88,13 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
             params.data = data if data
 
-            enhance rest params
+            restCallPromise = rest params
+            enhance restCallPromise
+
+          self.getAvailableReports = () ->
+            self.execute('availableReports').then (jsonData) ->
+              self.availableReports = jsonData.availableReports
+              return self.availableReports
 
           self.refresh        = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{self.link}"
           self.validate       = () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{self.link}/validate", data: self.getUpdatePayload()

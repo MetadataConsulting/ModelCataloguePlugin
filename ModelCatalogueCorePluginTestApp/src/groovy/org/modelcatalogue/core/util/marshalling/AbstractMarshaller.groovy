@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired
  */
 abstract class AbstractMarshaller {
 
-    @Autowired ReportsRegistry reportsRegistry
-    @Autowired SecurityService modelCatalogueSecurityService
     @Autowired DataModelAclService dataModelAclService
     @Autowired JsonMarshallingCustomizerRegistry jsonMarshallingCustomizerRegistry
 
@@ -33,25 +31,4 @@ abstract class AbstractMarshaller {
     }
 
     abstract protected Map<String, Object> prepareJsonMap(element)
-
-    protected getAvailableReports(el) {
-        // TODO: this should be moved to the frontend
-        def reports = []
-
-        for (ReportDescriptor descriptor in reportsRegistry.getAvailableReports(el)) {
-            if (modelCatalogueSecurityService.userLoggedIn) {
-                // for users logged in render all links
-                reports << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
-                            depth: descriptor.depth(el), includeMetadata: descriptor.getIncludeMetadata(el),
-                            url: descriptor.getLink(el), type: descriptor.renderType.toString()]
-            } else if (descriptor.renderType != ReportDescriptor.RenderType.ASSET) {
-                // for users not logged in only let non-asset reports to render
-                reports << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
-                            depth: descriptor.depth(el), includeMetadata: descriptor.includeMetadata(el),
-                            url: descriptor.getLink(el), type: descriptor.renderType.toString()]
-            }
-        }
-
-        reports
-    }
 }

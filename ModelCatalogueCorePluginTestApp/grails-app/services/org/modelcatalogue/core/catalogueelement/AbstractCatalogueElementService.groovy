@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.catalogueelement
 
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
@@ -31,6 +32,8 @@ import org.modelcatalogue.core.events.UnauthorizedEvent
 import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.persistence.RelationshipGormService
+import org.modelcatalogue.core.reports.ReportDescriptor
+import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.DestinationClass
@@ -41,7 +44,7 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 
-abstract class AbstractCatalogueElementService implements ManageCatalogueElementService {
+abstract class AbstractCatalogueElementService<T extends CatalogueElement> implements ManageCatalogueElementService {
 
     DataModelAclService dataModelAclService
 
@@ -55,11 +58,42 @@ abstract class AbstractCatalogueElementService implements ManageCatalogueElement
 
     CatalogueElementGormService catalogueElementGormService
 
+    ReportsRegistry reportsRegistry
+
+    SpringSecurityService springSecurityService
+
     def modelCatalogueSearchService
 
     abstract CatalogueElement findById(Long id)
 
     abstract protected String resourceName()
+
+    List<Map> availableReports(Long catalogueElementId) {
+
+        CatalogueElement el = findById(catalogueElementId)
+
+        List<Map> reports = []
+
+
+        List<ReportDescriptor> reportDescriptorList = reportsRegistry.getAvailableReports(el)
+
+        for (ReportDescriptor descriptor in reportDescriptorList ) {
+
+            if ( springSecurityService.isLoggedIn() ) {
+                // for users logged in render all links
+                reports << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
+                            depth: descriptor.depth(el), includeMetadata: descriptor.getIncludeMetadata(el),
+                            url: descriptor.getLink(el), type: descriptor.renderType.toString()]
+            } else if (descriptor.renderType != ReportDescriptor.RenderType.ASSET) {
+                // for users not logged in only let non-asset reports to render
+                reports << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
+                            depth: descriptor.depth(el), includeMetadata: descriptor.includeMetadata(el),
+                            url: descriptor.getLink(el), type: descriptor.renderType.toString()]
+            }
+        }
+
+        reports
+    }
 
     @Override
     MetadataResponseEvent searchWithinRelationships(Long catalogueElementId,
