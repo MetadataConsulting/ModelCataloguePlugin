@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<headersMap xmlns="model_catalogue_excel_header_mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="model_catalogue_excel_header_mapping model_catalogue_excel_header_mapping.xsd">
+
+    <!-- How to use this configuration file: Put the header name e.g. LOINC_NUM in the tag dataElementID.
+  This will use the entry under LOINC_NUM as the Data Element ID.
+  <dataElementID>LOINC_NUM</dataElementID> -->
+
+    <dataClassName>CLASS</dataClassName>
+    <dataElementID>LOINC_NUM</dataElementID>
+    <dataElementName>COMPONENT</dataElementName> <!-- must occur-->
+    <dataElementDescription>LONG_COMMON_NAME</dataElementDescription>
+    <dataTypeName>SCALE_TYP</dataTypeName>
+    <measurementUnitSymbol>EXAMPLE_UCUM_UNITS</measurementUnitSymbol>
+    <metadata>PROPERTY</metadata> <!-- can have multiple -->
+    <metadata>TIME_ASPCT</metadata>
+    <metadata>SYSTEM</metadata>
+    <metadata>METHOD_TYP</metadata>
+    <metadata>VersionLastChanged</metadata>
+    <metadata>CHNG_TYPE</metadata>
+    <metadata>DefinitionDescription</metadata>
+    <metadata>STATUS</metadata>
+    <metadata>CONSUMER_NAME</metadata>
+    <metadata>CLASSTYPE</metadata>
+    <metadata>FORMULA</metadata>
+    <metadata>SPECIES</metadata>
+    <metadata>EXMPL_ANSWERS</metadata>
+    <metadata>SURVEY_QUEST_TEXT</metadata>
+    <metadata>SURVEY_QUEST_SRC</metadata>
+    <metadata>UNITSREQUIRED</metadata>
+    <metadata>SUBMITTED_UNITS</metadata>
+    <metadata>RELATEDNAMES2</metadata>
+    <metadata>SHORTNAME</metadata>
+    <metadata>ORDER_OBS</metadata>
+    <metadata>CDISC_COMMON_TESTS</metadata>
+    <metadata>HL7_FIELD_SUBFIELD_ID</metadata>
+    <metadata>EXTERNAL_COPYRIGHT_NOTICE</metadata>
+    <metadata>EXAMPLE_UNITS</metadata>
+    <metadata>UnitsAndRange</metadata>
+    <metadata>DOCUMENT_SECTION</metadata>
+    <metadata>EXAMPLE_SI_UCUM_UNITS</metadata>
+    <metadata>STATUS_REASON</metadata>
+    <metadata>STATUS_TEXT</metadata>
+    <metadata>CHANGE_REASON_PUBLIC</metadata>
+    <metadata>COMMON_TEST_RANK</metadata>
+    <metadata>COMMON_ORDER_RANK</metadata>
+    <metadata>COMMON_SI_TEST_RANK</metadata>
+    <metadata>HL7_ATTACHMENT_STRUCTURE</metadata>
+    <metadata>EXTERNAL_COPYRIGHT_LINK</metadata>
+    <metadata>PanelType</metadata>
+    <metadata>AskAtOrderEntry</metadata>
+    <metadata>AssociatedObservations</metadata>
+    <metadata>VersionFirstReleased</metadata>
+    <metadata>ValidHL7AttachmentRequest</metadata>
+</headersMap>

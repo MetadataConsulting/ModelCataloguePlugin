@@ -103,27 +103,37 @@ class NorthThamesMappingReportXlsxExporter {
 
 
 
-    List<DataElement> getMappedDataElements(){
+    void getMappedDataElements(){
         //get all the data elements from the model
 
         if(mySQL) {
             //populate the mapped elements list with the ones that have relationships
             // and the unmapped element list for the ones that don't have any
+            Integer i = 0
             dataElementService.findAllDataElementsInModel([:], sourceModel).getItems().each{ de ->
+                i = i+1
+                println(i)
                 if(de.relatedTo.size()>0){
+                    println("mapping" + de.name)
                     mappedSourceElements.add(de)
                 }else{
-                    unmappedSourceElements.add(de)
+//                    unmappedSourceElements.add(de)
                 }
             }
         }else{
             //populate the mapped elements list with the ones that have relationships
             // and the unmapped element list for the ones that don't have any
-            DataElement.findAllByDataModel(sourceModel).each{ de ->
+            print("get mapped elements")
+            Integer i = 0
+            def dataElements = DataElement.findAllByDataModel(sourceModel)
+            dataElements.each{ de ->
+                i = i+1
+                println(i)
                 if(de.relatedTo.size()>0){
+                    println("mapping" + de.name)
                     mappedSourceElements.add(de)
                 }else{
-                    unmappedSourceElements.add(de)
+//                    unmappedSourceElements.add(de)
                 }
             }
         }
@@ -146,6 +156,7 @@ class NorthThamesMappingReportXlsxExporter {
         CatalogueElement openEHR
 
         mappedElements.each { CatalogueElement ce ->
+            print("printin-" + ce.name)
 
             String modelName = ce.dataModel.name
 
@@ -255,7 +266,7 @@ class NorthThamesMappingReportXlsxExporter {
                     //mapped items loinc
 
                     cell {
-                        value "${(loinc)?loinc.ext.get("LOINC_NUM"):''}"
+                        value  "${(loinc)? (loinc.modelCatalogueId)?: (loinc.latestVersionId)?:loinc.id : ''}"
                         width auto
                         style {
                             wrap text
@@ -345,10 +356,5 @@ class NorthThamesMappingReportXlsxExporter {
         return openQuery
 
     }
-
-
-
-
-
 
 }

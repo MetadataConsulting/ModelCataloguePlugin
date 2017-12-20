@@ -55,6 +55,10 @@ class AuditService {
      * Allows to run block of code without logging any activity. This is supposed to be used when setting and resetting
      * the UPDATED state and creating drafts.
      *
+     * Mutes by setting system true for the auditor. Which is usually a complex CompoundAuditor. Then system will be set to true in all leaves of the CompoundAuditor tree.
+     * But each log call will still go through the entire tree, only it does nothing.
+     * A better way is to temporarily set the auditor to be an empty auditor.
+     *
      * @param noAuditBlock code to be executed without logging the changes
      * @return the value returned from the noAuditBlock
      */
@@ -67,6 +71,39 @@ class AuditService {
         R result = noAuditBlock()
         sessionFactory.currentSession?.flush()
         auditor.system = currentSystem
+        return result
+    }
+
+    public <R> R betterMute(Closure<R> noAuditBlock) {
+        SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
+
+        Auditor oldAuditor = auditor.get()
+        auditor.set(CompoundAuditor.from()) // empty auditor?
+        sessionFactory.currentSession?.flush()
+
+        R result = noAuditBlock()
+
+        sessionFactory.currentSession?.flush()
+        auditor.set(oldAuditor)
+
+        return result
+    }
+
+    public <R> R onlyDefaultAuditor(Closure<R> onlyDefaultBlock) {
+        SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
+
+        // before execution
+        Auditor oldAuditor = auditor.get()
+        auditor.set(new DefaultAuditor(executorService))
+        sessionFactory.currentSession?.flush()
+
+        // execution
+        R result = onlyDefaultBlock()
+
+        // after execution
+        sessionFactory.currentSession?.flush()
+        auditor.set(oldAuditor)
+
         return result
     }
 
