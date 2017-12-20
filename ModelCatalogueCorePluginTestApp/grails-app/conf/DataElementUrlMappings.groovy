@@ -9,6 +9,7 @@ class DataElementUrlMappings {
         "/api/modelCatalogue/core/dataElement/$id/validate" (controller: 'dataElement', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataElement/validate" (controller: 'dataElement', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataElement/$id" (controller: 'dataElement', action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataElement/$id/availableReports"(controller: 'dataElement', action: 'availableReports', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataElement/$id" (controller: 'dataElement', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/dataElement/$id" (controller: 'dataElement', action: 'delete', method: HttpMethod.DELETE)
         "/api/modelCatalogue/core/dataElement/$id/outgoing/search" (controller: 'dataElement', action: 'searchOutgoing', method: HttpMethod.GET)

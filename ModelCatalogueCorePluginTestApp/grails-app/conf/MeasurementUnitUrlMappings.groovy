@@ -9,6 +9,7 @@ class MeasurementUnitUrlMappings {
         "/api/modelCatalogue/core/measurementUnit/$id/validate"(controller: 'measurementUnit', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/measurementUnit/validate"(controller: 'measurementUnit', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/measurementUnit/$id"(controller: 'measurementUnit', action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/measurementUnit/$id/availableReports"(controller: 'measurementUnit', action: 'availableReports', method: HttpMethod.GET)
         "/api/modelCatalogue/core/measurementUnit/$id"(controller: 'measurementUnit', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/measurementUnit/$id"(controller: 'measurementUnit', action: 'delete', method: HttpMethod.DELETE)
         "/api/modelCatalogue/core/measurementUnit/$id/outgoing/search"(controller: 'measurementUnit', action: 'searchOutgoing', method: HttpMethod.GET)

@@ -7,7 +7,7 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.persistence.DataTypeGormService
 
 @CompileStatic
-class DataTypeCatalogueElementService extends AbstractCatalogueElementService {
+class DataTypeCatalogueElementService<T extends CatalogueElement> extends AbstractCatalogueElementService<DataType> {
 
     DataTypeGormService dataTypeGormService
 
