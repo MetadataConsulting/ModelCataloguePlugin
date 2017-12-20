@@ -7,6 +7,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataimport.excel.ConfigStatelessExcelLoader
 import org.modelcatalogue.core.dataimport.excel.ExcelImportType
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
@@ -341,7 +342,7 @@ class DataImportController  {
 
     @Async
     protected void loadNTSpreadsheet(Workbook wb){
-        auditService.mute {
+        auditService.betterMute {
             try {
                 ExcelLoader loader = new ExcelLoader()
                 loader.updateFromWorkbookSheet(wb, 0)
@@ -355,7 +356,7 @@ class DataImportController  {
     @Async
     protected void loadNTSpreadsheet(Workbook wb, String filename, DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
         Pair<String,String> modelDetails = getModelDetails(suffix)
-        auditService.mute {
+        auditService.betterMute {
             try{
                 UCLHExcelLoader loader = new UCLHExcelLoader(false)
                 String dataOwnerAndGelModel = ExcelLoader.getOwnerAndGelModelFromFileName(filename, '_nt_rawimport')
@@ -372,9 +373,10 @@ class DataImportController  {
     // the generic loader based on the LOINC loader
     @Async
     protected void loadConfigSpreadsheet(Workbook wb, String modelName, InputStream xmlConfigStream, Long id, Long userId) {
-        auditService.mute {
+        auditService.betterMute {
             try {
-                ConfigExcelLoader loader = new ConfigExcelLoader(modelName, xmlConfigStream)
+//                ConfigExcelLoader loader = new ConfigExcelLoader(modelName, xmlConfigStream)
+                ConfigStatelessExcelLoader loader = new ConfigStatelessExcelLoader(modelName, xmlConfigStream)
                 loader.buildModel(wb)
                 finalizeAsset(id, (DataModel) (DataModel.findByName(modelName)), userId)
             }
@@ -386,7 +388,7 @@ class DataImportController  {
 
     @Async
     protected void loadMCSpreadsheet(Workbook wb, String filename, DefaultCatalogueBuilder defaultCatalogueBuilder, Long id, Long userId) {
-        auditService.mute {
+        auditService.betterMute {
             try {
                 ExcelLoader loader = new ExcelLoader()
                 loader.buildModelFromSpreadsheetFromExcelExporter(
@@ -408,18 +410,12 @@ class DataImportController  {
 
     @Async
     protected void loadOpenEhrSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
-        Pair<String,String> modelDetails = getModelDetails(suffix)
         executorService.submit {
-            auditService.mute {
+            auditService.betterMute {
                 try {
-                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader(false)
-                    String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_openEHR')
-                    List<String> modelNames = loader.loadModel(wb, dataOwner)
-                    DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
-                    loader.addRelationshipsToModels(referenceModel, modelNames)
-                    finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {
-                        it.instanceOf(DataModel)
-                    } ?: defaultCatalogueBuilder.created.find { it.dataModel }?.dataModel), userId)
+                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader()
+                    DataModel dm = loader.loadModel(wb)
+                    finalizeAsset(id, dm, userId)
 
                 } catch (Exception e) {
                     logError(id, e)

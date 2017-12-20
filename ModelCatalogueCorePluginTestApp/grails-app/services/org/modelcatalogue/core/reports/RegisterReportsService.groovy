@@ -84,7 +84,7 @@ class RegisterReportsService {
             depth 3
             type DataModel
             when { DataModel dataModel ->
-                dataModel.name == "GEL LDPC Codes"
+                dataModel.name == "LONDONPATHOLOGYCODES"
             }
             link controller: 'northThames', action: 'northThamesMappingReport', id: true
         }
