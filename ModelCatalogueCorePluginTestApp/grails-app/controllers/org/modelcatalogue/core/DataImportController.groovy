@@ -407,8 +407,8 @@ class DataImportController  {
     protected void loadConfigSpreadsheet(Workbook wb, String modelName, InputStream xmlConfigStream, Long id, Long userId) {
         auditService.betterMute {
             try {
-//                ConfigExcelLoader loader = new ConfigExcelLoader(modelName, xmlConfigStream)
-                ConfigStatelessExcelLoader loader = new ConfigStatelessExcelLoader(modelName, xmlConfigStream)
+                ConfigExcelLoader loader = new ConfigExcelLoader(modelName, xmlConfigStream)
+//                ConfigStatelessExcelLoader loader = new ConfigStatelessExcelLoader(modelName, xmlConfigStream)
                 loader.buildModel(wb)
                 finalizeAsset(id, (DataModel) (DataModel.findByName(modelName)), userId)
             }

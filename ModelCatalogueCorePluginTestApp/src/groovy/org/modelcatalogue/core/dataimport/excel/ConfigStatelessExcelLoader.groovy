@@ -221,7 +221,6 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
         } else {
             println(msg)
         }
-        println(msg + obj?.toString() ?: '')
     }
     Boolean equalsIgnoreCase(String s1, String s2) {
         return s1 ? s1.equalsIgnoreCase(s2) : s1 == s2

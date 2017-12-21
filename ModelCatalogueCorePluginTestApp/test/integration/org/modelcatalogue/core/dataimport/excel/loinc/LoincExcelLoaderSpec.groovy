@@ -53,8 +53,8 @@ class LoincExcelLoaderSpec extends AbstractIntegrationSpec {
         excelLoader.buildModelFromStandardWorkbookSheet(
             LoincHeadersMap.createForGoshExcelLoader(),
 //            LoincHeadersMap.createForLoincExcelLoader(),
-//            WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'loinc.xlsx'))),
-            WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'GOSH_lab_test_codes100.xlsx'))),
+//            WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'loinc/loinc.xlsx'))),
+            WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'goshTestCodes/GOSH_lab_test_codes100.xlsx'))),
             catalogueBuilder,
             0)
 
