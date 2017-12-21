@@ -145,8 +145,9 @@ class ConfigExcelLoader extends ExcelLoader {
     static boolean isRowEmpty(Row row) {
         for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
             Cell cell = row.getCell(c)
-            if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK)
+            if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK) {
                 return false
+            }
         }
         return true
     }
@@ -222,12 +223,15 @@ class ConfigExcelLoader extends ExcelLoader {
      * @return
      */
     Map<String, Object> paramsAddCodeNameDesc(Map<String, Object> params, String code, String name, String desc = null) {
-        if (code)
+        if (code) {
             params['modelCatalogueId'] = code
-        if (name)
+        }
+        if (name) {
             params['name'] = name
-        if (desc)
+        }
+        if (desc) {
             params['description'] = desc
+        }
         return params
     }
     /**
@@ -240,10 +244,11 @@ class ConfigExcelLoader extends ExcelLoader {
      */
     Map<String, String> update(String key, String oldValue, String newValue, Map<String, String> params = null) {
         if (oldValue != newValue) {
-            if (params == null)
+            if (params == null) {
                 params = [key: newValue]
-            else
+            } else {
                 params[key] = newValue
+            }
         }
         return params
     }
@@ -267,7 +272,9 @@ class ConfigExcelLoader extends ExcelLoader {
         //could consider changing this - if there are multiple versions - should make sure we use the latest one.
         DataModel dataModel
         List<DataModel> dataModels =  DataModel.findAllByName(dataModelName, [sort: 'versionNumber', order: 'desc'])
-        if(dataModels) dataModel = dataModels.first()
+        if(dataModels) {
+            dataModel = dataModels.first()
+        }
 
         if (!dataModel){
             log.info("Creating new DataModel: ${dataModelName}")
@@ -338,8 +345,9 @@ class ConfigExcelLoader extends ExcelLoader {
             dc = new DataClass(params).save()
         }
         // maybe check if the parent link is already in the incomingRelationships before calling addToChildOf?
-        if (parentDC)
+        if (parentDC) {
             addAsChildTo(dc, parentDC)
+        }
 
         return dc
     }
@@ -385,8 +393,10 @@ class ConfigExcelLoader extends ExcelLoader {
             Map<String, String> params = update('modelCatalogueId', mu.getModelCatalogueId(), muCatId)
             params = update('name', mu.getName(), muName, params)
             params = update('symbol', mu.getSymbol(), muSymbol, params)
-            if (params) // will be null if no updates
+            if (params ) { // will be null if no updates
                 mu.save(params)
+            }
+
         }
         return mu
     }
@@ -428,8 +438,9 @@ class ConfigExcelLoader extends ExcelLoader {
             }
             updated = true
         }
-        if (updated)
+        if (updated) {
             dt.save()
+        }
         return dt
     }
     /**
@@ -546,8 +557,9 @@ class ConfigExcelLoader extends ExcelLoader {
             de = newDataElement(dataModel, dt, rowMap, metadataKeys, deCode, deName, deDescription)
             updated = true
         }
-        if (updated)
+        if (updated) {
             de.save()
+        }
         return de
     }
     /**
