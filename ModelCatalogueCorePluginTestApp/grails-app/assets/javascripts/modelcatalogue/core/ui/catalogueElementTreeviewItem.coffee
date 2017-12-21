@@ -182,8 +182,13 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
           # first load
           $scope.node.loadingChildren = true
-          $scope.descendFun(null, onlyImportant($scope.extraParameters)).then(loadNewChildren).finally ->
-            $scope.node.loadingChildren = false
+
+          # It's hard to tell by tracing the code, but descendFun will be a listReference which is a query function... Minimal:true for minimal JSON
+          $scope.descendFun(null, angular.extend({minimal:true},
+                                  onlyImportant($scope.extraParameters)))
+            .then(loadNewChildren)
+            .finally ->
+              $scope.node.loadingChildren = false
 
         if $scope.extraParameters?.prefetch or startsWithSegment($scope.element, $scope.extraParameters?.path?.segments)
           $scope.node.loadChildren()
@@ -208,9 +213,17 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
       onElementUpdate($scope.element)
 
       # event broadcasters and listeners
-      $scope.select = (element) ->
-        $scope.collapseOrExpand()
-        $scope.treeview.select(element, $scope.extraParameters?.descendPath)
+      $scope.select = (node) ->
+        # Hack: Don't expand for a node which is DataElements/Tag resource
+        if (!node.item.resource || (node.item.resource != 'tag'
+            # && node.item.resource != 'dataElement'
+        ))
+        # if true
+        # Triggers loading of node's children
+          $scope.collapseOrExpand()
+
+        # In mc/dataModel state, trigger state change to look at list/element on the right hand side:
+        $scope.treeview.select(node, $scope.extraParameters?.descendPath)
 
       reloadChildrenOnChange = (_, result, url) ->
         if result.link == $scope.element.link
