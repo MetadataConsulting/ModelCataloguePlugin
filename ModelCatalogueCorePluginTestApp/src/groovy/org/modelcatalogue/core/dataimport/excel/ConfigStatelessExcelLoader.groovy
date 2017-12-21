@@ -133,7 +133,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
         int batchSize = 1000
         while (rowIt.hasNext()) {
             println("processing row" + counter)
-            if(++counter % batchSize == 0 ){
+            if(++counter % batchSize == 0 ) {
                 processRowMaps(rowMaps, headersMap)
                 rowMaps.clear()
             }
@@ -147,8 +147,9 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
     static boolean isRowEmpty(Row row) {
         for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
             Cell cell = row.getCell(c)
-            if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK)
+            if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK) {
                 return false
+            }
         }
         return true
     }
@@ -158,7 +159,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
         data[colIndex] = valueHelper(cell)
     }
 
-    static String valueHelper(Cell cell){
+    static String valueHelper(Cell cell) {
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_STRING:
                 return cell.getRichStringCellValue().getString().trim()
@@ -206,7 +207,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
     void cleanGORM() {
 //        try{
 //            session.flush()
-//        }catch(Exception e){
+//        }catch(Exception e) {
 //            log.error(session)
 //            log.error(" error: " + e.message)
 //            throw e
@@ -235,12 +236,15 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
      * @return
      */
     Map<String, Object> paramsAddCodeNameDesc(Map<String, Object> params, String code, String name, String desc = null) {
-        if (code)
+        if (code) {
             params['modelCatalogueId'] = code
-        if (name)
+        }
+        if (name) {
             params['name'] = name
-        if (desc)
+        }
+        if (desc) {
             params['description'] = desc
+        }
         return params
     }
     /**
@@ -253,10 +257,11 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
      */
     Map<String, String> update(String key, String oldValue, String newValue, Map<String, String> params = null) {
         if (oldValue != newValue) {
-            if (params == null)
+            if (params == null) {
                 params = [key: newValue]
-            else
+            } else {
                 params[key] = newValue
+            }
         }
         return params
     }
@@ -281,6 +286,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
             pr("added as child to rel: ", rel)
         }
     }
+
     void addToContainedIn(DataModel dm, DataElement de, DataClass dc) {
         Relationship rel = new Relationship()
         rel.setDataModel(dm)
@@ -290,6 +296,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
         session.insert(rel)
         pr("added to contained in: ", rel)
     }
+
     void insertCatalogueElement(CatalogueElement ce) {
         Date now = new Date()
         ce.setDateCreated(now)
@@ -297,17 +304,20 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
         session.insert(ce)
         pr("inserted ce: ", ce)
     }
+
     void insertExtensionValue(ExtensionValue ev) {
         ev.setVersion(0)
 //        ev.setOrderIndex(System.currentTimeMillis())
         session.insert(ev)
 //        pr("inserted ev: ", ev)
     }
+
     void updateCatalogueElement(CatalogueElement ce) {
         ce.setLastUpdated(new Date())
         session.update(ce)
 //        pr("updating ce: ", ce)
     }
+
     void updateExtensionValue(ExtensionValue ev) {
         session.update(ev)
         pr("updated ev: ", ev)
@@ -322,9 +332,11 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
         //could consider changing this - if there are multiple versions - should make sure we use the latest one.
         DataModel dataModel
         List<DataModel> dataModels =  DataModel.findAllByName(dataModelName, [sort: 'versionNumber', order: 'desc'])
-        if(dataModels) dataModel = dataModels.first()
+        if(dataModels) {
+            dataModel = dataModels.first()
+        }
 
-        if (!dataModel){
+        if (!dataModel) {
             log.info("Creating new DataModel: ${dataModelName}")
             dataModel = new DataModel(name: dataModelName)
             insertCatalogueElement(dataModel)
@@ -332,7 +344,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
             log.info("Found Data Model: ${dataModelName}")
             //if one exists, check to see if it's a draft
             // but if it's finalised create a new version
-            if(dataModel.status != ElementStatus.DRAFT){
+            if(dataModel.status != ElementStatus.DRAFT) {
                 DraftContext context = DraftContext.userFriendly()
                 dataModel = elementService.createDraftVersion(dataModel, PublishingContext.nextPatchVersion(dataModel.semanticVersion), context)
             }
@@ -366,8 +378,9 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
                 insertCatalogueElement(dc)
             }
             // maybe check if the parent link is already in the incomingRelationships before calling addToChildOf?
-            if (parentDC)
+            if (parentDC) {
                 addAsChildTo(dataModel, dc, parentDC)
+            }
 
             //last one will be the one that contains the data element
             parentDC = dc
@@ -396,8 +409,9 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
             insertCatalogueElement(dc)
         }
         // maybe check if the parent link is already in the incomingRelationships before calling addToChildOf?
-        if (parentDC)
+        if (parentDC) {
             addAsChildTo(dataModel, dc, parentDC)
+        }
 
         return dc
     }
@@ -420,7 +434,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
             return null
         }
 
-        if (muCatId){
+        if (muCatId) {
             mu = MeasurementUnit.findByModelCatalogueIdAndDataModel(muCatId, dataModel)
         } else if (muName) { //see if a datatype with this name already exists in this model
             mu = MeasurementUnit.findByNameAndDataModel(muName, dataModel)
@@ -433,10 +447,12 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
             mu  = new MeasurementUnit()
             mu.setDataModel(dataModel)
             mu.setName(muName)
-            if (muCatId)
+            if (muCatId) {
                 mu.setModelCatalogueId(muCatId)
-            if (muSymbol)
+            }
+            if (muSymbol) {
                 mu.setSymbol(muSymbol)
+            }
             insertCatalogueElement(mu)
         } else {
             Boolean updated = false
@@ -452,8 +468,9 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
                 mu.setSymbol(muSymbol)
                 updated = true
             }
-            if (updated) // will be false if no updates
+            if (updated) {// will be false if no updates
                 updateCatalogueElement(mu)
+            }
         }
         return mu
     }
@@ -475,7 +492,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
         }
 
         //see if a datatype with the model catalogue id already exists in this model
-        if (dtCode && (dt = DataType.findByModelCatalogueIdAndDataModel(dtCode, dataModel))){
+        if (dtCode && (dt = DataType.findByModelCatalogueIdAndDataModel(dtCode, dataModel))) {
             if ((dtName ?: '') != dt.getName()) {
                 dt.setName(dtName)
                 updateCatalogueElement(dt)
@@ -631,7 +648,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
      * @param dataModelName
      * @return
      */
-    def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName){
+    def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName) {
         int batchSize = 50
         Transaction tx = session.beginTransaction()
         DataModel dataModel = processDataModel(dataModelName)
@@ -661,7 +678,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
      * @param workbook
      * @param index
      */
-    String buildModelFromWorkbookSheet(Map<String, String> headersMap, Workbook workbook, int index = 0){
+    String buildModelFromWorkbookSheet(Map<String, String> headersMap, Workbook workbook, int index = 0) {
         // use default headersMap if headersMap is null
         // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
         if (headersMap == null) {
@@ -697,7 +714,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
      * @param workbook
      * @param index
      */
-    String buildModel(Workbook workbook){
+    String buildModel(Workbook workbook) {
         // use default headersMap if headersMap is null
         // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
         if (headersMap == null) {
