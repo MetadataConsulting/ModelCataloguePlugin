@@ -23,6 +23,8 @@ import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Legacy
+import org.modelcatalogue.core.util.ParamArgs
+import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
@@ -865,14 +867,15 @@ class ElementService implements Publisher<CatalogueElement> {
      */
     Set<MatchResult> findFuzzyDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
         Set<MatchResult> elementSuggestions = []
-        Map searchParams = [:]
         //iterate through the data model a
         def elementsToMatch = DataElement.findAllByDataModel(dataModelA)
         elementsToMatch.each { DataElement de ->
-            //set params map
-            searchParams.dataModel = dataModelB.id
-            searchParams.search = de.name
-            searchParams.minScore = minimumScore/100
+            SearchParams searchParams = new SearchParams()
+            searchParams.with {
+                search = de.name
+                dataModelId = dataModelB.id
+                minScore = minimumScore/100
+            }
             def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
             String message = checkRelatedTo(de, dataModelB)
             matches.getItemsWithScore().each { item, score ->
@@ -895,14 +898,15 @@ class ElementService implements Publisher<CatalogueElement> {
      */
     Set<MatchResult> findFuzzyDataClassDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
         Set<MatchResult> elementSuggestions = []
-        Map searchParams = [:]
         //iterate through the data model a
         def elementsToMatch = DataClass.findAllByDataModel(dataModelA)
         elementsToMatch.each{ DataClass de ->
-            //set params map
-            searchParams.dataModel = dataModelB.id
-            searchParams.search = de.name
-            searchParams.minScore = minimumScore/100
+            SearchParams searchParams = new SearchParams()
+            searchParams.with {
+                search = de.name
+                dataModelId = dataModelB.id
+                minScore = minimumScore/100
+            }
             def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
             String message = checkRelatedTo(de, dataModelB)
             matches.getItemsWithScore().each{ item, score ->
