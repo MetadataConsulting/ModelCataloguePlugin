@@ -286,6 +286,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
             pr("added as child to rel: ", rel)
         }
     }
+
     void addToContainedIn(DataModel dm, DataElement de, DataClass dc) {
         Relationship rel = new Relationship()
         rel.setDataModel(dm)
@@ -295,6 +296,7 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
         session.insert(rel)
         pr("added to contained in: ", rel)
     }
+
     void insertCatalogueElement(CatalogueElement ce) {
         Date now = new Date()
         ce.setDateCreated(now)
@@ -302,17 +304,20 @@ class ConfigStatelessExcelLoader extends ExcelLoader {
         session.insert(ce)
         pr("inserted ce: ", ce)
     }
+
     void insertExtensionValue(ExtensionValue ev) {
         ev.setVersion(0)
 //        ev.setOrderIndex(System.currentTimeMillis())
         session.insert(ev)
 //        pr("inserted ev: ", ev)
     }
+
     void updateCatalogueElement(CatalogueElement ce) {
         ce.setLastUpdated(new Date())
         session.update(ce)
 //        pr("updating ce: ", ce)
     }
+
     void updateExtensionValue(ExtensionValue ev) {
         session.update(ev)
         pr("updated ev: ", ev)
