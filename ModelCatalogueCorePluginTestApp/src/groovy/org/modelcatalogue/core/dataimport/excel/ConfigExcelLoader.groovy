@@ -131,7 +131,7 @@ class ConfigExcelLoader extends ExcelLoader {
         int batchSize = 1000
         while (rowIt.hasNext()) {
             println("processing row" + counter)
-            if(++counter % batchSize == 0 ){
+            if(++counter % batchSize == 0 ) {
                 processRowMaps(rowMaps, headersMap)
                 rowMaps.clear()
             }
@@ -156,7 +156,7 @@ class ConfigExcelLoader extends ExcelLoader {
         data[colIndex] = valueHelper(cell)
     }
 
-    static String valueHelper(Cell cell){
+    static String valueHelper(Cell cell) {
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_STRING:
                 return cell.getRichStringCellValue().getString().trim()
@@ -204,7 +204,7 @@ class ConfigExcelLoader extends ExcelLoader {
     void cleanGORM() {
         try{
             session.flush()
-        }catch(Exception e){
+        }catch(Exception e) {
             log.error(session)
             log.error(" error: " + e.message)
             throw e
@@ -269,14 +269,14 @@ class ConfigExcelLoader extends ExcelLoader {
         List<DataModel> dataModels =  DataModel.findAllByName(dataModelName, [sort: 'versionNumber', order: 'desc'])
         if(dataModels) dataModel = dataModels.first()
 
-        if (!dataModel){
+        if (!dataModel) {
             log.info("Creating new DataModel: ${dataModelName}")
             dataModel = new DataModel(name: dataModelName).save()
         } else {
             log.info("Found Data Model: ${dataModelName}")
             //if one exists, check to see if it's a draft
             // but if it's finalised create a new version
-            if(dataModel.status != ElementStatus.DRAFT){
+            if(dataModel.status != ElementStatus.DRAFT) {
                 DraftContext context = DraftContext.userFriendly()
                 dataModel = elementService.createDraftVersion(dataModel, PublishingContext.nextPatchVersion(dataModel.semanticVersion), context)
             }
@@ -362,7 +362,7 @@ class ConfigExcelLoader extends ExcelLoader {
             return null
         }
 
-        if (muCatId){
+        if (muCatId) {
             mu = MeasurementUnit.findByModelCatalogueIdAndDataModel(muCatId, dataModel)
         } else if (muName) { //see if a datatype with this name already exists in this model
             mu = MeasurementUnit.findByNameAndDataModel(muName, dataModel)
@@ -405,7 +405,7 @@ class ConfigExcelLoader extends ExcelLoader {
         DataType dt
 
         //see if a datatype with the model catalogue id already exists in this model
-        if (dtCode && (dt = DataType.findByModelCatalogueIdAndDataModel(dtCode, dataModel))){
+        if (dtCode && (dt = DataType.findByModelCatalogueIdAndDataModel(dtCode, dataModel))) {
             if ((dtName ?: '') != dt.getName()) {
                 dt.setName(dtName)
                 updated = true
@@ -557,7 +557,7 @@ class ConfigExcelLoader extends ExcelLoader {
      * @param dataModelName
      * @return
      */
-    def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName){
+    def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName) {
         int count = 0
         int batchSize = 50
         DataModel dataModel = processDataModel(dataModelName)
@@ -584,7 +584,7 @@ class ConfigExcelLoader extends ExcelLoader {
      * @param workbook
      * @param index
      */
-    String buildModelFromWorkbookSheet(Map<String, String> headersMap, Workbook workbook, int index = 0){
+    String buildModelFromWorkbookSheet(Map<String, String> headersMap, Workbook workbook, int index = 0) {
         // use default headersMap if headersMap is null
         // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
         if (headersMap == null) {
@@ -618,7 +618,7 @@ class ConfigExcelLoader extends ExcelLoader {
      * @param workbook
      * @param index
      */
-    String buildModel(Workbook workbook){
+    String buildModel(Workbook workbook) {
         // use default headersMap if headersMap is null
         // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
         if (headersMap == null) {
