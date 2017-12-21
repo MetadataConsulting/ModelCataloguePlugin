@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.WarnGormErrors
@@ -12,6 +13,12 @@ import org.springframework.security.access.prepost.PreAuthorize
 class DataModelGormService implements WarnGormErrors {
 
     MessageSource messageSource
+
+    @Transactional(readOnly = true)
+    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    List<DataModel> findAllByCriteria(DetachedCriteria<DataModel> criteria) {
+        criteria.list()
+    }
 
     @Transactional(readOnly = true)
     @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")

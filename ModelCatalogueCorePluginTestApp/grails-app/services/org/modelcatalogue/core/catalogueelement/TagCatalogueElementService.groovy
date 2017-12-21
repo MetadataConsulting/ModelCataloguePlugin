@@ -7,7 +7,7 @@ import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.persistence.TagGormService
 
 @CompileStatic
-class TagCatalogueElementService extends AbstractCatalogueElementService {
+class TagCatalogueElementService<T extends CatalogueElement> extends AbstractCatalogueElementService<Tag> {
 
     TagGormService tagGormService
 

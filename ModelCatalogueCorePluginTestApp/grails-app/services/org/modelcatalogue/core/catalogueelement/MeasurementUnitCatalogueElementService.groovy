@@ -7,7 +7,7 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.persistence.MeasurementUnitGormService
 
 @CompileStatic
-class MeasurementUnitCatalogueElementService extends AbstractCatalogueElementService {
+class MeasurementUnitCatalogueElementService<T extends CatalogueElement> extends AbstractCatalogueElementService<MeasurementUnit> {
 
     MeasurementUnitGormService measurementUnitGormService
 

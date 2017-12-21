@@ -7,7 +7,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.persistence.AssetGormService
 
 @CompileStatic
-class AssetCatalogueElementService extends AbstractCatalogueElementService {
+class AssetCatalogueElementService<T extends CatalogueElement> extends AbstractCatalogueElementService<Asset> {
 
     AssetGormService assetGormService
 

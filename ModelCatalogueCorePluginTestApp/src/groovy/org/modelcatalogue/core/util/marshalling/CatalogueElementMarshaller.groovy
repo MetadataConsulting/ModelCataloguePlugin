@@ -60,8 +60,6 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         relationships.outgoing?.each        addRelationsJson(RelationshipDirection.OUTGOING, el, ret, types)
         relationships.bidirectional?.each   addRelationsJson(RelationshipDirection.OUTGOING, el, ret, types)
 
-        ret.availableReports = getAvailableReports(el)
-
         // TODO: remove soon
         ret.dataModels = [ret.dataModel]
 

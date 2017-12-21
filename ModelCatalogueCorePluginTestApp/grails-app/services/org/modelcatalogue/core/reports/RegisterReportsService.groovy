@@ -36,17 +36,17 @@ class RegisterReportsService {
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
 
-//        reportsRegistry.register {
-//            creates asset
-//            title { "Grid Report Spreadsheet" }
-//            defaultName { "${it.name} report as MS Excel Document Grid" }
-//            depth 3
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.countDeclares() > 0
-//            }
-//            link controller: 'dataModel', action: 'gridSpreadsheet', id: true
-//        }
+        reportsRegistry.register {
+            creates asset
+            title { "Grid Report Spreadsheet" }
+            defaultName { "${it.name} report as MS Excel Document Grid" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.countDeclares() > 0
+            }
+            link controller: 'dataModel', action: 'gridSpreadsheet', id: true
+        }
 
         reportsRegistry.register {
             creates asset
@@ -75,6 +75,22 @@ class RegisterReportsService {
                 link controller: 'northThames', action: 'northThamesSummaryReport', id: true, params: [organization: name]
             }
         }
+
+
+        reportsRegistry.register {
+            creates asset
+            title { "North Thames Mapping Report Document" }
+            defaultName { "North Thames Mapping Report Document" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.name == "LONDONPATHOLOGYCODES"
+            }
+            link controller: 'northThames', action: 'northThamesMappingReport', id: true
+        }
+
+
+
 
 
         reportsRegistry.register {

@@ -131,7 +131,7 @@ class ConfigExcelLoader extends ExcelLoader {
         int batchSize = 1000
         while (rowIt.hasNext()) {
             println("processing row" + counter)
-            if(++counter % batchSize == 0 ){
+            if(++counter % batchSize == 0 ) {
                 processRowMaps(rowMaps, headersMap)
                 rowMaps.clear()
             }
@@ -145,8 +145,9 @@ class ConfigExcelLoader extends ExcelLoader {
     static boolean isRowEmpty(Row row) {
         for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
             Cell cell = row.getCell(c)
-            if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK)
+            if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK) {
                 return false
+            }
         }
         return true
     }
@@ -156,7 +157,7 @@ class ConfigExcelLoader extends ExcelLoader {
         data[colIndex] = valueHelper(cell)
     }
 
-    static String valueHelper(Cell cell){
+    static String valueHelper(Cell cell) {
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_STRING:
                 return cell.getRichStringCellValue().getString().trim()
@@ -204,7 +205,7 @@ class ConfigExcelLoader extends ExcelLoader {
     void cleanGORM() {
         try{
             session.flush()
-        }catch(Exception e){
+        }catch(Exception e) {
             log.error(session)
             log.error(" error: " + e.message)
             throw e
@@ -222,12 +223,15 @@ class ConfigExcelLoader extends ExcelLoader {
      * @return
      */
     Map<String, Object> paramsAddCodeNameDesc(Map<String, Object> params, String code, String name, String desc = null) {
-        if (code)
+        if (code) {
             params['modelCatalogueId'] = code
-        if (name)
+        }
+        if (name) {
             params['name'] = name
-        if (desc)
+        }
+        if (desc) {
             params['description'] = desc
+        }
         return params
     }
     /**
@@ -240,10 +244,11 @@ class ConfigExcelLoader extends ExcelLoader {
      */
     Map<String, String> update(String key, String oldValue, String newValue, Map<String, String> params = null) {
         if (oldValue != newValue) {
-            if (params == null)
+            if (params == null) {
                 params = [key: newValue]
-            else
+            } else {
                 params[key] = newValue
+            }
         }
         return params
     }
@@ -267,16 +272,18 @@ class ConfigExcelLoader extends ExcelLoader {
         //could consider changing this - if there are multiple versions - should make sure we use the latest one.
         DataModel dataModel
         List<DataModel> dataModels =  DataModel.findAllByName(dataModelName, [sort: 'versionNumber', order: 'desc'])
-        if(dataModels) dataModel = dataModels.first()
+        if(dataModels) {
+            dataModel = dataModels.first()
+        }
 
-        if (!dataModel){
+        if (!dataModel) {
             log.info("Creating new DataModel: ${dataModelName}")
             dataModel = new DataModel(name: dataModelName).save()
         } else {
             log.info("Found Data Model: ${dataModelName}")
             //if one exists, check to see if it's a draft
             // but if it's finalised create a new version
-            if(dataModel.status != ElementStatus.DRAFT){
+            if(dataModel.status != ElementStatus.DRAFT) {
                 DraftContext context = DraftContext.userFriendly()
                 dataModel = elementService.createDraftVersion(dataModel, PublishingContext.nextPatchVersion(dataModel.semanticVersion), context)
             }
@@ -338,8 +345,9 @@ class ConfigExcelLoader extends ExcelLoader {
             dc = new DataClass(params).save()
         }
         // maybe check if the parent link is already in the incomingRelationships before calling addToChildOf?
-        if (parentDC)
+        if (parentDC) {
             addAsChildTo(dc, parentDC)
+        }
 
         return dc
     }
@@ -362,7 +370,7 @@ class ConfigExcelLoader extends ExcelLoader {
             return null
         }
 
-        if (muCatId){
+        if (muCatId) {
             mu = MeasurementUnit.findByModelCatalogueIdAndDataModel(muCatId, dataModel)
         } else if (muName) { //see if a datatype with this name already exists in this model
             mu = MeasurementUnit.findByNameAndDataModel(muName, dataModel)
@@ -385,8 +393,10 @@ class ConfigExcelLoader extends ExcelLoader {
             Map<String, String> params = update('modelCatalogueId', mu.getModelCatalogueId(), muCatId)
             params = update('name', mu.getName(), muName, params)
             params = update('symbol', mu.getSymbol(), muSymbol, params)
-            if (params) // will be null if no updates
+            if (params ) { // will be null if no updates
                 mu.save(params)
+            }
+
         }
         return mu
     }
@@ -405,7 +415,7 @@ class ConfigExcelLoader extends ExcelLoader {
         DataType dt
 
         //see if a datatype with the model catalogue id already exists in this model
-        if (dtCode && (dt = DataType.findByModelCatalogueIdAndDataModel(dtCode, dataModel))){
+        if (dtCode && (dt = DataType.findByModelCatalogueIdAndDataModel(dtCode, dataModel))) {
             if ((dtName ?: '') != dt.getName()) {
                 dt.setName(dtName)
                 updated = true
@@ -428,8 +438,9 @@ class ConfigExcelLoader extends ExcelLoader {
             }
             updated = true
         }
-        if (updated)
+        if (updated) {
             dt.save()
+        }
         return dt
     }
     /**
@@ -546,8 +557,9 @@ class ConfigExcelLoader extends ExcelLoader {
             de = newDataElement(dataModel, dt, rowMap, metadataKeys, deCode, deName, deDescription)
             updated = true
         }
-        if (updated)
+        if (updated) {
             de.save()
+        }
         return de
     }
     /**
@@ -557,7 +569,7 @@ class ConfigExcelLoader extends ExcelLoader {
      * @param dataModelName
      * @return
      */
-    def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName){
+    def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName) {
         int count = 0
         int batchSize = 50
         DataModel dataModel = processDataModel(dataModelName)
@@ -584,7 +596,7 @@ class ConfigExcelLoader extends ExcelLoader {
      * @param workbook
      * @param index
      */
-    String buildModelFromWorkbookSheet(Map<String, String> headersMap, Workbook workbook, int index = 0){
+    String buildModelFromWorkbookSheet(Map<String, String> headersMap, Workbook workbook, int index = 0) {
         // use default headersMap if headersMap is null
         // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
         if (headersMap == null) {
@@ -618,7 +630,7 @@ class ConfigExcelLoader extends ExcelLoader {
      * @param workbook
      * @param index
      */
-    String buildModel(Workbook workbook){
+    String buildModel(Workbook workbook) {
         // use default headersMap if headersMap is null
         // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
         if (headersMap == null) {

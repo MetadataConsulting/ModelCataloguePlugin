@@ -45,6 +45,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     static responseFormats = ['json', 'xml']
     static allowedMethods = [
+            availableReports: "GET",
             outgoing: "GET",
             incoming: "GET",
             addIncoming: "POST",
@@ -287,6 +288,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         MappingSavedEvent mappingSavedEvent = responseEvent as MappingSavedEvent
         response.status = HttpServletResponse.SC_CREATED
         respond mappingSavedEvent.mapping
+    }
+
+    def availableReports(Long id) {
+        List<Map> reports = manageCatalogueElementService.availableReports(id)
+        render(contentType: 'text/json') {[
+                'availableReports': reports
+        ]}
     }
 
 
@@ -917,10 +925,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
     }
 
-
-
     //TODO: not sure what this does
-    private <T> ListWrapper<T> withAdditionalIndexCriteria(ListWrapper<T> list) {
+    protected <T> ListWrapper<T> withAdditionalIndexCriteria(ListWrapper<T> list) {
         if (!hasAdditionalIndexCriteria()) {
             return list
         }

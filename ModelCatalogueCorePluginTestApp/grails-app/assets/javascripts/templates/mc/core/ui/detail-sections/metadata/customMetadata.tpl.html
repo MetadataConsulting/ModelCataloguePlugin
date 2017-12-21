@@ -3,7 +3,7 @@
          ng-if="!editableForm.$visible">
     <tbody>
       <tr ng-repeat="value in customMetadata.values">
-        <td class="text-wrap" ng-switch on="value.key">
+        <th class="col-md-3" ng-switch on="value.key">
           <strong class="small" ng-switch-when="http://www.modelcatalogue.org/metadata/genomics/#rare-disease-reports">
             Rare Disease Report Available
           </strong>
@@ -17,8 +17,8 @@
             All Cancer Model Reports
           </strong>
           <strong class="small" ng-switch-default>{{value.key}}</strong>
-        </td>
-        <td>
+        </th>
+        <td class="full-width-editable">
           <small>{{value.value}}</small>
         </td>
       </tr>

@@ -65,6 +65,8 @@ class BootStrap {
 
         }  else if ( isProduction() ) {
             initProd()
+            log.info 'init register reports'
+            registerReportsService.register()
         }
     }
 

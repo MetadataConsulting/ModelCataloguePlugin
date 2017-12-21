@@ -14,6 +14,8 @@ import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.dataimport.excel.ConfigExcelLoader
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
+import org.modelcatalogue.core.persistence.AssetGormService
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
@@ -37,7 +39,10 @@ class DataImportController  {
     def assetService
     def auditService
     def dataClassService
-
+    DataImportXmlService dataImportXmlService
+    DataImportOboService dataImportOboService
+    AssetGormService assetGormService
+    UserGormService userGormService
 
     private static final List<String> CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
     static responseFormats = ['json']
@@ -233,43 +238,16 @@ class DataImportController  {
         }
 
         if (checkFileNameTypeAndContainsString(file, '.xml')) {
-            Asset asset = assetService.storeAsset(params, file, 'application/xml')
-            Long id = asset.id
-            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            InputStream inputStream = file.inputStream
-            executeInBackground(id, "Imported from XML") {
-                try {
-                    CatalogueXmlLoader loader = new CatalogueXmlLoader(defaultCatalogueBuilder)
-                    loader.load(inputStream)
-                    finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
-                } catch (Exception e) {
-                    logError(id, e)
-                }
-            }
-            redirectToAsset(id)
+            Long assetId = dataImportXmlService.importFile(params, file)
+            redirectToAsset(assetId)
             return
         }
 
         if (checkFileNameEndsWith(file, '.obo')) {
-            Asset asset = assetService.storeAsset(params, file, 'text/obo')
-            Long id = asset.id
-            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            InputStream inputStream = file.inputStream
-            String name = params?.name
-            executeInBackground(id, "Imported from OBO") {
-                try {
-                    OboLoader loader = new OboLoader(defaultCatalogueBuilder)
-                    loader.load(inputStream, name)
-                    finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
-                } catch (Exception e) {
-                    logError(id, e)
-                }
-            }
-            redirectToAsset(id)
-
+            Long assetId = dataImportOboService.importFile(params, file)
+            redirectToAsset(assetId)
             return
         }
-
 
         if (checkFileNameEndsWith(file, '.csv')) {
             Asset asset = assetService.storeAsset(params, file, 'application/model-catalogue')
@@ -322,25 +300,20 @@ class DataImportController  {
             file.size > 0 &&
             file.originalFilename.contains(suffix)
     }
-    protected static Asset finalizeAsset(Long id, DataModel dataModel, Long userId){
+
+    protected Asset finalizeAsset(Long id, DataModel dataModel, Long userId){
         BuildProgressMonitor.get(id)?.onCompleted()
 
-        Asset updated = Asset.get(id)
+        Asset assetInstance = assetGormService.finalizeAsset(id, dataModel, userId)
 
-        if (!dataModel) {
-            return updated
-        }
-        updated.dataModel = dataModel
-        updated.status = ElementStatus.FINALIZED
-        updated.description = "Your import has finished."
-        updated.save(flush: true, failOnError: true)
-
-        if (userId && User.exists(userId)) {
-            User.get(userId).createLinkTo(dataModel, RelationshipType.favouriteType)
+        if ( userId && userGormService.exists(userId) ) {
+            User userInstance = userGormService.findById(userId)
+            userInstance.createLinkTo(dataModel, RelationshipType.favouriteType)
         }
 
-        updated
+        assetInstance
     }
+
     protected redirectToAsset(Long id){
         response.setHeader("X-Asset-ID",  id.toString())
         redirect url: grailsApplication.config.grails.serverURL +  "/api/modelCatalogue/core/asset/" + id
@@ -349,12 +322,7 @@ class DataImportController  {
     protected logError(Long id,Exception e){
         BuildProgressMonitor.get(id)?.onError(e)
         log.error "Error importing Asset[$id]", e
-        Asset updated = Asset.get(id)
-        updated.refresh()
-        updated.status = ElementStatus.FINALIZED
-        updated.name = updated.name + " - Error during upload"
-        updated.description = "Error importing file: ${e}"
-        updated.save(flush: true, failOnError: true)
+        assetGormService.finalizeAssetWithError(e)
     }
 
     //simply halts if the closure includes a file stream object
@@ -442,18 +410,12 @@ class DataImportController  {
 
     @Async
     protected void loadOpenEhrSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
-        Pair<String,String> modelDetails = getModelDetails(suffix)
         executorService.submit {
             auditService.betterMute {
                 try {
-                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader(false)
-                    String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_openEHR')
-                    List<String> modelNames = loader.loadModel(wb, dataOwner)
-                    DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
-                    loader.addRelationshipsToModels(referenceModel, modelNames)
-                    finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {
-                        it.instanceOf(DataModel)
-                    } ?: defaultCatalogueBuilder.created.find { it.dataModel }?.dataModel), userId)
+                    OpenEhrExcelLoader loader = new OpenEhrExcelLoader()
+                    DataModel dm = loader.loadModel(wb)
+                    finalizeAsset(id, dm, userId)
 
                 } catch (Exception e) {
                     logError(id, e)

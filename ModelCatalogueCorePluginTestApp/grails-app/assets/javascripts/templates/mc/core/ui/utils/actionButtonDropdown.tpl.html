@@ -34,7 +34,7 @@
   </button>
 
   <ul id="{{::action.id}}BtnItems" class="dropdown-menu" role="menu">
-    <li ng-repeat="childAction in ::action.children track by childAction.id"
+    <li ng-repeat="childAction in action.children track by childAction.id"
         ng-class="::({'dropdown-header': childAction.heading, 'active': childAction.active, 'disabled': childAction.disabled})">
       <a id="{{::childAction.id}}Btn" ng-hide="::childAction.heading" ng-click="childAction.run()"
          ng-class="::({'disabled': childAction.disabled})">
