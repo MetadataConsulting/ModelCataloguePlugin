@@ -65,4 +65,22 @@ class DataElementGormService implements WarnGormErrors {
     protected DetachedCriteria<DataElement> findQueryByName(String nameParam) {
         DataElement.where { name == nameParam }
     }
+
+    @Transactional(readOnly = true)
+    DataElement findByModelCatalogueIdAndDataModel(String modelCatalogueId, DataModel dataModel) {
+        findQueryByModelCatalogueIdAndDataModel(modelCatalogueId, dataModel).get()
+    }
+
+    protected DetachedCriteria<DataElement> findQueryByModelCatalogueIdAndDataModel(String modelCatalogueIdParam, DataModel dataModelParam) {
+        DataElement.where { modelCatalogueId == modelCatalogueIdParam && dataModel == dataModelParam }
+    }
+
+    @Transactional(readOnly = true)
+    DataElement findDataElementByNameAndDataModel(String name, DataModel dataModel) {
+        findQueryByNameAndDataModel(name, dataModel).get()
+    }
+
+    protected DetachedCriteria<DataElement> findQueryByNameAndDataModel(String nameParam, DataModel dataModelParam) {
+        DataElement.where { name == nameParam && dataModel == dataModelParam }
+    }
 }

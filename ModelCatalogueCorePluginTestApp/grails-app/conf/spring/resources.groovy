@@ -48,6 +48,7 @@ import org.modelcatalogue.core.xml.render.RelationshipsXmlRenderer
 import org.modelcatalogue.core.errors.MetadataExceptionResolver
 import java.util.concurrent.Executors
 import  grails.plugin.executor.PersistenceContextExecutorWrapper
+import org.modelcatalogue.core.dataimport.ProcessDataRowsDaoService
 
 // Place your Spring DSL code here
 beans = {

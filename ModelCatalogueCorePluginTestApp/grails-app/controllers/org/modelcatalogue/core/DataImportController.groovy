@@ -7,11 +7,14 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataimport.ExcelParserService
+import org.modelcatalogue.core.dataimport.HeadersMapService
+import org.modelcatalogue.core.dataimport.ProcessDataRowsDaoService
+import org.modelcatalogue.core.dataimport.ProcessRowMapsService
 import org.modelcatalogue.core.dataimport.excel.ConfigStatelessExcelLoader
 import org.modelcatalogue.core.dataimport.excel.ExcelImportType
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
-import org.modelcatalogue.core.dataimport.excel.ConfigExcelLoader
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 import org.modelcatalogue.core.persistence.AssetGormService
@@ -20,7 +23,6 @@ import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.integration.obo.OboLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.springframework.scheduling.annotation.Async
 import org.springframework.web.multipart.MultipartFile
@@ -43,6 +45,9 @@ class DataImportController  {
     DataImportOboService dataImportOboService
     AssetGormService assetGormService
     UserGormService userGormService
+    ExcelParserService excelParserService
+    HeadersMapService headersMapService
+    ProcessRowMapsService processRowMapsService
 
     private static final List<String> CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
     static responseFormats = ['json']
@@ -370,15 +375,16 @@ class DataImportController  {
             }
         }
     }
+
     // the generic loader based on the LOINC loader
     @Async
     protected void loadConfigSpreadsheet(Workbook wb, String modelName, InputStream xmlConfigStream, Long id, Long userId) {
         auditService.betterMute {
             try {
-//                ConfigExcelLoader loader = new ConfigExcelLoader(modelName, xmlConfigStream)
-                ConfigStatelessExcelLoader loader = new ConfigStatelessExcelLoader(modelName, xmlConfigStream)
-                loader.buildModel(wb)
-                finalizeAsset(id, (DataModel) (DataModel.findByName(modelName)), userId)
+                Map<String, String> headersMap = headersMapService.headersMap(xmlConfigStream)
+                List<Map<String, String>> rowMaps = excelParserService.getRowMaps(wb)
+                DataModel dataModelInstance = processRowMapsService.processRowMaps(rowMaps, headersMap, modelName)
+                finalizeAsset(id, dataModelInstance, userId)
             }
             catch (Exception e) {
                 logError(id, e)

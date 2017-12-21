@@ -16,6 +16,12 @@ class DataModelGormService implements WarnGormErrors {
 
     @Transactional(readOnly = true)
     @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    DataModel findByName(String nameParam, String sort = 'versionNumber', String orderDirection = 'desc') {
+        DataModel.where { name == nameParam }.order(sort, orderDirection).get()
+    }
+
+    @Transactional(readOnly = true)
+    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
     List<DataModel> findAllByCriteria(DetachedCriteria<DataModel> criteria) {
         criteria.list()
     }

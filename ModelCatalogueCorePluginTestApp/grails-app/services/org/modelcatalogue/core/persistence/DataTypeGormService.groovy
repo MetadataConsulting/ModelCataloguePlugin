@@ -3,6 +3,7 @@ package org.modelcatalogue.core.persistence
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
@@ -39,5 +40,23 @@ class DataTypeGormService implements WarnGormErrors {
     @Transactional
     DataType saveWithStatusAndNameAndDescription(ElementStatus status, String name, String description) {
         save(new DataType(name: name, description: description, status: status))
+    }
+
+    @Transactional(readOnly = true)
+    DataType findByModelCatalogueIdAndDataModel(String modelCatalogueId, DataModel dataModel) {
+        findQueryByModelCatalogueIdAndDataModel(modelCatalogueId, dataModel).get()
+    }
+
+    protected DetachedCriteria<DataType> findQueryByModelCatalogueIdAndDataModel(String modelCatalogueIdParam, DataModel dataModelParam) {
+        DataType.where { modelCatalogueId == modelCatalogueIdParam && dataModel == dataModelParam }
+    }
+
+    @Transactional(readOnly = true)
+    DataType findByNameAndDataModel(String name, DataModel dataModel) {
+        findQueryByNameAndDataModel(name, dataModel).get()
+    }
+
+    protected DetachedCriteria<DataType> findQueryByNameAndDataModel(String nameParam, DataModel dataModelParam) {
+        DataType.where { name == nameParam && dataModel == dataModelParam }
     }
 }
