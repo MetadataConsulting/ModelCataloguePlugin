@@ -17,6 +17,14 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
 
   getRoleAwareId = (role, id) -> "role_#{role}_#{id}"
 
+  # moved from contextualMenu
+  makeCSSClassesForchild = (child) ->
+    childClasses = []
+    childClasses.push 'text-muted navbar-dropdown-heading' if child.heading
+    childClasses.push 'active' if child.active
+    childClasses.push 'disabled' if child.disabled
+
+    child.$$class = childClasses.join ' '
 
   registerActionInternal = (parentId, id, actionFactory, roles) ->
     throw {message: "Missing action id"} if not id
@@ -129,6 +137,8 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
           childAction.heading = true
 
           childAction.generator(action, childAction)
+          makeCSSClassesForchild(childAction)
+
 
 
         action.sortChildren = ->

@@ -36,6 +36,16 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
 
       watches
 
+#    moved to actionsProvider code
+
+#    makeCSSClassesForchild = (child) ->
+#      childClasses = []
+#      childClasses.push 'text-muted navbar-dropdown-heading' if child.heading
+#      childClasses.push 'active' if child.active
+#      childClasses.push 'disabled' if child.disabled
+#
+#      child.$$class = childClasses.join ' '
+#
     updateActions = ->
       removeWatchers($scope)
       scope.$destroy() for scope in scopes
@@ -44,14 +54,9 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
       $element.empty()
       for role in ($scope.role ? actions.ROLE_NAVIGATION).split(',')
         for action in actions.getActions($scope.scope ? $scope.$parent, role)
-          if action.children
-            for child in action.children
-              childClasses = []
-              childClasses.push 'text-muted navbar-dropdown-heading' if child.heading
-              childClasses.push 'active' if child.active
-              childClasses.push 'disabled' if child.disabled
-
-              child.$$class = childClasses.join ' '
+#          if action.children
+#            for child in action.children
+#             makeCSSClassesForchild(child)
 
           classes = []
           classes.push('active') if action.active
