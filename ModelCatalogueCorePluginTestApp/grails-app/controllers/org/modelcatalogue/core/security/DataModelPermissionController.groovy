@@ -2,6 +2,7 @@ package org.modelcatalogue.core.security
 
 import groovy.transform.CompileStatic
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.events.MetadataResponseEvent
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.persistence.UserGormService
 import org.springframework.security.acls.model.Permission
@@ -59,7 +60,11 @@ class DataModelPermissionController {
             return
         }
         Permission permissionInstance = cmd.aclPermission()
-        dataModelPermissionService.addPermission(cmd.username, cmd.id, permissionInstance)
+        MetadataResponseEvent responseEvent = dataModelPermissionService.addPermission(cmd.username, cmd.id, permissionInstance)
+        String errorMessage = dataModelPermissionService.addPermissionErrorMessage(responseEvent, permissionInstance, request.locale)
+        if ( errorMessage ) {
+            flash.error = errorMessage
+        }
         redirect(action: 'show', id: cmd.id)
         return
     }

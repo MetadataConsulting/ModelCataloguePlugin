@@ -33,5 +33,10 @@
     <g:hiddenField name="id" value="${dataModel.id}" />
     <g:actionSubmit name="grant" value="${message(code: 'grant', default: 'Grant')}"/>
 </g:form>
+
+<g:if test="${flash.error}">
+    <b>${flash.error}</b>
+</g:if>
+
 </body>
 </html>
