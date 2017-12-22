@@ -30,12 +30,9 @@ class DataElementService {
                     LEFT JOIN catalogue_element dm on ce.data_model_id = dm.id
                     WHERE
                     ce.data_model_id = :modelId
-                    or find_in_set(de.id, GetAllDestinations(GetTopLevelDataClasses(:modelId, :hierarchytypeId), :hierarchytypeId, :containmentTypeId))
                     ORDER BY ce.name
                 """) {
                         setLong('modelId', modelId)
-                        setLong('hierarchytypeId', hierarchyType)
-                        setLong('containmentTypeId', containmentType)
                     }
         }
 
