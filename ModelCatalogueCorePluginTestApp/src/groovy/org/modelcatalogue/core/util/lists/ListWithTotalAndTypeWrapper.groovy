@@ -16,6 +16,14 @@ class ListWithTotalAndTypeWrapper<T> implements ListWrapper<T> {
 
     @Delegate ListWithTotalAndType<T> list = null
 
+    /**
+     * Shouldn't have to do this because there's @Delegate but...
+     * @param total
+     */
+    void totalKnownAlready(Long total) {
+        list.totalKnownAlready(total)
+    }
+
     public static <T> ListWrapper<T> create(Map params, String base, ListWithTotalAndType<T> list){
         new ListWithTotalAndTypeWrapper<T>(list, base, params)
     }

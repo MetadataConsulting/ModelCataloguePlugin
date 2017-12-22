@@ -56,6 +56,12 @@ class QueryListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndType<
     }
 
     @Override
+    void totalKnownAlready(Long total) {
+        this.total = total
+        // if this is set, then getTotal() will just return it directly
+    }
+
+    @Override
     Long getTotal() {
         if (total == null) {
             return total = type.executeQuery(countQuery, arguments)[0]

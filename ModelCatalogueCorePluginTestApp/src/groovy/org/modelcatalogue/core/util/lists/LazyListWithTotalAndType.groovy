@@ -12,6 +12,7 @@ class LazyListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndType<T
     private List<T> items = null
 
     public static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, Class<T> type, Closure itemsClosure){
+
         new LazyListWithTotalAndType<T>(params, type, itemsClosure, null)
     }
 
@@ -28,10 +29,18 @@ class LazyListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndType<T
         this.totalClosure = totalClosure
     }
 
+
+    @Override
+    void totalKnownAlready(Long total) {
+        this.total = total
+        // if this is set, then getTotal() will just return it directly
+    }
+
     @Override
     Long getTotal() {
         if (total == null) {
             return total = totalClosure ? totalClosure() : getItems().size()
+            // this could query EVERY DATA ELEMENT IN A MODEL because no params with max are passed in.
         }
         return total
     }

@@ -26,6 +26,11 @@ class DetachedListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndTy
     }
 
     @Override
+    void totalKnownAlready(Long total) {
+        this.total = total
+        // if this is set, then getTotal() will just return it directly
+    }
+    @Override
     Long getTotal() {
         if (total == null) {
             return total = criteria.count()

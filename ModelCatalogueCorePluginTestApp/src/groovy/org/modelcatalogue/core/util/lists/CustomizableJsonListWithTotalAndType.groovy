@@ -3,6 +3,10 @@ package org.modelcatalogue.core.util.lists
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 
+/**
+ * ListWithTotalAndTypeWrapperMarshaller will ask for jsonItems instead of items for this class, which uses customizer on its own items method.
+ * @param <T>
+ */
 abstract class CustomizableJsonListWithTotalAndType<T> implements JsonAwareListWithTotalAndType<T> {
 
     private Closure<List<Object>> customizer
