@@ -35,7 +35,7 @@ class DataElementService {
                   JOIN data_element de on ce.id = de.id
             """
 
-        boolean findInGetAllDestinations = true
+        boolean findInGetAllDestinations = false
         String findInGetAllDestinationsCondition = findInGetAllDestinations ? "OR find_in_set(de.id, GetAllDestinations(GetTopLevelDataClasses(:modelId, :hierarchytypeId), :hierarchytypeId, :containmentTypeId))" : ""
 
         String whereBasic = "WHERE (ce.data_model_id = :modelId $findInGetAllDestinationsCondition)"
