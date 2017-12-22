@@ -2,7 +2,6 @@ package org.modelcatalogue.core.security
 
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.plugin.springsecurity.acl.AclService
 import grails.plugin.springsecurity.acl.AclUtilService
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
@@ -10,9 +9,11 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.springframework.security.acls.domain.BasePermission
 import org.springframework.security.acls.model.NotFoundException
-import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
 import org.springframework.security.acls.model.Permission
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.transaction.annotation.Propagation
 
 class DataModelAclService {
@@ -21,12 +22,22 @@ class DataModelAclService {
 
     SpringSecurityService springSecurityService
 
+    UserDetailsService userDetailsService
+
     boolean hasReadPermission(Object instance) {
         DataModel dataModel = dataModelFromInstance(instance)
         if ( dataModel == null ) {
             return true
         }
         hasReadPermission(dataModel)
+    }
+
+    boolean hasReadPermission(DataModel dataModel, String username) {
+        hasPermission(dataModel, username, [BasePermission.READ, BasePermission.ADMINISTRATION] as Permission[])
+    }
+
+    boolean hasAdministrationPermission(DataModel dataModel, String username) {
+        hasPermission(dataModel, username, [BasePermission.ADMINISTRATION] as Permission[])
     }
 
     boolean hasReadPermission(DataModel dataModel) {
@@ -60,14 +71,29 @@ class DataModelAclService {
     }
 
     boolean hasPermission(DataModel dataModel, Permission... permissions) {
-        if ( dataModel == null) {
-            return true
-        }
         Authentication authentication = springSecurityService.authentication
         if ( authentication == null ) {
             return false
         }
+        hasPermission(dataModel, authentication, permissions)
+    }
+
+    boolean hasPermission(DataModel dataModel, Authentication authentication, Permission... permissions) {
+        if ( dataModel == null) {
+            return true
+        }
+
         aclUtilService.hasPermission(authentication, dataModel, permissions)
+    }
+
+    boolean hasPermission(DataModel dataModel, String username, Permission... permissions) {
+        Authentication authentication = authenticationByUsername(username)
+        hasPermission(dataModel, authentication, permissions)
+    }
+
+    Authentication authenticationByUsername(String username) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username)
+        new UsernamePasswordAuthenticationToken(userDetails, userDetails.password, userDetails.authorities)
     }
 
     boolean isAdminOrHasAdministratorPermission(DataModel dataModel) {
