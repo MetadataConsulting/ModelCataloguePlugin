@@ -146,6 +146,20 @@ class Lists {
     }
 
     /**
+     * Creates new ListWithTotalAndType whose items will initialized by listMethods.
+     * @param params            url parameters used to determine pagination and sort settings
+     * @param type              type to be used as wrapper's itemType
+     * @param itemsClosure      closure returning the items of the list
+     * @param totalClosure      closure returning the total count of the items
+     * @return new ListWithTotalAndType which items will initialized by itemsClosure closure
+     */
+    static <T> CustomizableJsonListWithTotalAndType<T> methodNotClosureLazy(Map params, Class<T> type, MethodNotClosureLazyListWithTotalAndType.ListMethods<T> listMethods){
+        MethodNotClosureLazyListWithTotalAndType.create(params, type, listMethods)
+    }
+
+
+
+    /**
      * Creates new ListWrapper for lazily evaluated list.
      * @param params            url parameters used to determine pagination and sort settings
      * @param type              type to be used as wrapper's itemType
