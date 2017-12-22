@@ -30,6 +30,7 @@ class DataElementService {
                     LEFT JOIN catalogue_element dm on ce.data_model_id = dm.id
                     WHERE
                     ce.data_model_id = :modelId
+                    ORDER BY ce.name
                 """) {
                         setLong('modelId', modelId)
                     }
