@@ -6,8 +6,10 @@ import grails.transaction.Transactional
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.events.MetadataResponseEvent
 import org.modelcatalogue.core.events.PermissionGrantedEvent
+import org.modelcatalogue.core.events.AlreadyHasAclPermissionEvent
 import org.modelcatalogue.core.events.UserMissingAnyGranted
 import org.modelcatalogue.core.events.UserNotFoundEvent
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.persistence.UserRoleGormService
 import org.springframework.security.access.prepost.PreAuthorize
@@ -29,6 +31,10 @@ class DataModelPermissionService {
     ] as Set<String>
 
     DefaultPermissionFactory aclPermissionFactory
+
+    DataModelGormService dataModelGormService
+
+    DataModelAclService dataModelAclService
 
     AclUtilService aclUtilService
 
@@ -60,10 +66,26 @@ class DataModelPermissionService {
         if ( !user ) {
             return new UserNotFoundEvent(username: username)
         }
-        Set<Role> roles = userRoleGormService.findRolesByUser(user)
-        if ( BasePermission.ADMINISTRATION == permission && !aclAdminGrantAllowed(roles, AUTHORITIES_ALLOWED_TO_HAVE_ACL_ADMIN) ) {
-            return new UserMissingAnyGranted(anyGranted: AUTHORITIES_ALLOWED_TO_HAVE_ACL_ADMIN)
+
+        DataModel dataModel = dataModelGormService.findById(dataModelId)
+
+        if ( BasePermission.ADMINISTRATION == permission ) {
+
+            if ( dataModelAclService.hasAdministrationPermission(dataModel, username) ) {
+                return new AlreadyHasAclPermissionEvent()
+            }
+
+            Set<Role> roles = userRoleGormService.findRolesByUser(user)
+            if ( !aclAdminGrantAllowed(roles, AUTHORITIES_ALLOWED_TO_HAVE_ACL_ADMIN) ) {
+                return new UserMissingAnyGranted(anyGranted: AUTHORITIES_ALLOWED_TO_HAVE_ACL_ADMIN)
+            }
+
+        } else if ( BasePermission.READ == permission ) {
+            if (dataModelAclService.hasReadPermission(dataModel, username)) {
+                return new AlreadyHasAclPermissionEvent()
+            }
         }
+
 
         aclUtilService.addPermission(DataModel, dataModelId, username, permission)
 
