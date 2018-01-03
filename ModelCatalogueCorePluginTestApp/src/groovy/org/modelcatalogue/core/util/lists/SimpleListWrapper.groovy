@@ -16,7 +16,7 @@ class SimpleListWrapper<T> implements ListWrapper<T>{
     List<T> items
 
 
-    @Override
+
     void totalKnownAlready(Long total) {
         this.total = total
         // if this is set, then getTotal() will just return it directly
