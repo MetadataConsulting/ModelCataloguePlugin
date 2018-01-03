@@ -25,7 +25,7 @@ class DetachedListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndTy
         this.params     = Collections.unmodifiableMap(theParams)
     }
 
-    @Override
+
     void totalKnownAlready(Long total) {
         this.total = total
         // if this is set, then getTotal() will just return it directly

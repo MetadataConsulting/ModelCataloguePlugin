@@ -31,7 +31,7 @@ class MethodNotClosureLazyListWithTotalAndType<T> extends CustomizableJsonListWi
         this.listMethods = listMethods
     }
 
-    @Override
+
     void totalKnownAlready(Long total) {
         this.total = total
         // if this is set, then getTotal() will just return it directly

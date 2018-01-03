@@ -51,6 +51,11 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
     }
 
     @Override
+    void totalKnownAlready(Long number){
+        //Do nothing?
+    }
+
+    @Override
     Long getTotal() {
         if (!response) {
             setResponse(initializeResponse())
