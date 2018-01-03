@@ -6,6 +6,7 @@ import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import spock.lang.Ignore
+import spock.lang.Shared
 
 /**
  * Testing data element queries with LOINC
@@ -13,7 +14,7 @@ import spock.lang.Ignore
  */
 class DataElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
-    Long loincModelId = 76530
+    @Shared Long loincModelId = 76530
     Closure setModelIdClosure(Long modelId) {
         return {
             setLong('modelId', modelId)
@@ -58,6 +59,7 @@ class DataElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     @Ignore
     def "Test HQL"() {
+        //Long loincModelId = 76530
         List results = DataElement.executeQuery("""
             select count(*) from DataElement de
             where de.dataModel=:dataModel
