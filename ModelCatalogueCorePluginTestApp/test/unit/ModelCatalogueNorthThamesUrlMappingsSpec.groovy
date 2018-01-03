@@ -9,6 +9,6 @@ class ModelCatalogueNorthThamesUrlMappingsSpec extends Specification {
 
     void "test UserUrlMappings GET Request mappings"() {
         expect:
-        assertForwardUrlMapping('/api/modelCatalogue/core/northThames/northThamesSummaryReport/$id', controller: 'northThames', action: 'northThamesSummaryReport')
+        assertForwardUrlMapping('/api/modelCatalogue/core/northThames/northThamesSummaryReport/$id', controller: 'northThames', action: 'northThamesMappingReport')
     }
 }
