@@ -79,12 +79,90 @@ class RegisterReportsService {
 
         reportsRegistry.register {
             creates asset
-            title { "North Thames Mapping Report Document" }
-            defaultName { "North Thames Mapping Report Document" }
+            title { "Royal Free Mapping Report" }
+            defaultName { "RFH Mapping Report Document" }
             depth 3
             type DataModel
             when { DataModel dataModel ->
-                dataModel.name == "LONDONPATHOLOGYCODES"
+                dataModel.name.matches("RFH(.*)")
+            }
+            link controller: 'northThames', action: 'northThamesMappingReport', id: true
+        }
+        reportsRegistry.register {
+            creates asset
+            title { "University College Mapping Report" }
+            defaultName { "UCLH Mapping Report Document" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.name.matches("UCLH(.*)")
+            }
+            link controller: 'northThames', action: 'northThamesMappingReport', id: true
+        }
+        reportsRegistry.register {
+            creates asset
+            title { "Great Ormond Street Mapping Report" }
+            defaultName { "GOSH Mapping Report Document" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.name.matches("GOSH(.*)")
+            }
+            link controller: 'northThames', action: 'northThamesMappingReport', id: true
+        }
+        reportsRegistry.register {
+            creates asset
+            title { "St. Bartholomews Mapping Report" }
+            defaultName { "BARTS Mapping Report Document" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.name.matches("BARTS(.*)")
+            }
+            link controller: 'northThames', action: 'northThamesMappingReport', id: true
+        }
+        reportsRegistry.register {
+            creates asset
+            title { "Royal National Orthopaedic Mapping Report" }
+            defaultName { "RNOH Mapping Report Document" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.name.matches("RNOH(.*)")
+            }
+            link controller: 'northThames', action: 'northThamesMappingReport', id: true
+        }
+        reportsRegistry.register {
+            creates asset
+            title { "London North West Street Mapping Report" }
+            defaultName { "LNW Mapping Report Document" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.name.matches("LNW(.*)")
+            }
+            link controller: 'northThames', action: 'northThamesMappingReport', id: true
+        }
+        reportsRegistry.register {
+            creates asset
+            title { "Moorfields Eye Hospital Mapping Report" }
+            defaultName { "MEH Mapping Report Document" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.name.matches("MEH(.*)")
+            }
+            link controller: 'northThames', action: 'northThamesMappingReport', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "North Thames Genomic Centres Mapping Report" }
+            defaultName { "NT Mapping Report Document" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.name.matches("LONDONPATHOLOGYCODES(.*)")
             }
             link controller: 'northThames', action: 'northThamesMappingReport', id: true
         }
