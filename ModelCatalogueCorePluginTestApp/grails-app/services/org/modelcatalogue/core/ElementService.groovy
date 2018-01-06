@@ -861,6 +861,25 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
     /**
+     * Return dataElement ids which are very likely to be duplicates.
+     * Enums are very likely duplicates if they have similar enum values.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Map<Long, Set<Long>> findDuplicateDataElementSuggestionsFullText(DataModel dataModelA, DataModel dataModelB) {
+        Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
+        def results = getDataElementsInCommon(dataModelA.id,dataModelB.id)
+        if(results.size() > 0){
+            results.each{
+                def dataElementName = it as String
+                Long ida =getDataElementId(dataElementName,dataModelA.id)
+                Long idb =getDataElementId(dataElementName,dataModelB.id)
+                elementSuggestions.put(ida,idb)
+            }
+        }
+        return elementSuggestions
+    }
+
+    /**
      * Return dataElement ids which are very likely to be synonyms using elasticsearch fuzzy matching.
      * @return map with the enum id as key and set of ids of duplicate enums as value
      */
@@ -1023,6 +1042,34 @@ class ElementService implements Publisher<CatalogueElement> {
      * @return List
      */
     private List getDataElementsInCommon(Long dmAId, Long dmBId){
+
+
+        String query = """  SELECT  catalogue_element.name 
+              FROM catalogue_element, data_element 
+              WHERE (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmA) 
+              AND catalogue_element.name IN 
+              (select  catalogue_element.name 
+              from catalogue_element, data_element 
+              where (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmB))"""
+
+        final session = sessionFactory.currentSession
+        final sqlQuery = session.createSQLQuery(query)
+        final results = sqlQuery.with {
+            setLong('dmA', dmAId)
+            setLong('dmB', dmBId)
+            list()
+        }
+
+        return results
+    }
+
+    /**
+     * getDataElementsInCommon
+     * @param Long
+     * @param Long
+     * @return List
+     */
+    private List getDataElementsInFullTextSearch(Long dmAId, Long dmBId){
 
 
         String query = """  SELECT  catalogue_element.name 
