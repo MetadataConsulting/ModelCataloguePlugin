@@ -35,6 +35,7 @@ class DataArchitectService {
         'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
         'Data Element Exact Match':this.&generateDataElementSuggestionsExact,
         'Data Element Fuzzy Match':this.&generateDataElementSuggestionsFuzzy,
+        'Data Element Full Text Match':this.&generateDataElementSuggestionsFullText,
 //        'Data Element and Type Exact Match':this.&generateDataElementAndTypeSuggestionsExact,
 //        'Data Element and Type Fuzzy Match':this.&generateDataElementAndTypeSuggestionsFuzzy
 
@@ -274,6 +275,9 @@ class DataArchitectService {
                     case 'Data Element Fuzzy Match':
                         generateDataElementSuggestionsFuzzy(dataModel1ID, dataModel2ID, minScore)
                         break
+                    case 'Data Element Full Text Match':
+                        generateDataElementSuggestionsFullText(dataModel1ID, dataModel2ID)
+                        break
                     case 'Data Element Exact Match':
                         generateDataElementSuggestionsExact(dataModel1ID, dataModel2ID)
                         break
@@ -406,6 +410,38 @@ class DataArchitectService {
         Batch.findAllByNameIlike("Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
         Batch batch = Batch.findOrSaveByName("Generating Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
         def matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
+        batch.name = "Processing DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
+        def matchScore = 100
+        matchingDataElements.each { first, other ->
+            RelationshipType type = RelationshipType.readByName("relatedTo")
+            other.each { otherId ->
+                Map<String, String> params = new HashMap<String,String>()
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$otherId""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$first""")
+                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                params.put("""matchScore""","""$matchScore""")
+                params.put("""matchOn""","""ElementName""")
+                Action action
+                action = actionService.create(params, batch, CreateMatch)
+                if (action.hasErrors()) {
+                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+                }
+            }
+            batch.archived = false
+            batch.save()
+        }
+        batch.name = "Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
+
+    }
+
+    private void generateDataElementSuggestionsFullText(String dataModelAID, String dataModelBID){
+        DataModel dataModelA = dataModelGormService.findById(dataModelAID as Long)
+        DataModel dataModelB = dataModelGormService.findById(dataModelBID as Long)
+        Batch.findAllByNameIlike("Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
+        Batch batch = Batch.findOrSaveByName("Generating Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
+        def matchingDataElements = elementService.findFullTextDataElementSuggestions(dataModelA,dataModelB, 10)
         batch.name = "Processing DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
         batch.save()
         def matchScore = 100
