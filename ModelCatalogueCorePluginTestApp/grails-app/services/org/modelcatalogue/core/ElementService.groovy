@@ -924,7 +924,7 @@ class ElementService implements Publisher<CatalogueElement> {
             String message = checkRelatedTo(de, dataModelB)
             matches.getItemsWithScore().each { item, score ->
                 if(!de.relatedTo.contains(item)) {
-                    score  = score*100
+                    score  = score
                     if(score>minimumScore) {
                         elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
                     }
@@ -954,7 +954,7 @@ class ElementService implements Publisher<CatalogueElement> {
             String message = checkRelatedTo(de, dataModelB)
             matches.getItemsWithScore().each{ item, score ->
                 if(!de.relatedTo.contains(item)) {
-                    score  = score*100
+                    score  = score
                     if(score>minimumScore) {
                         elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
                     }

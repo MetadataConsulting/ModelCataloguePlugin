@@ -166,7 +166,11 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
             if (params.explain) {
                 log.info searchRequest.toString()
             }
-            searchRequest.execute().get()
+            log.info "REQUEST=" + searchRequest.toString()
+            def sr = searchRequest.execute()
+            SearchResponse response = searchRequest.execute().get()
+            log.info "RESPONSE=" + response.toString()
+            return response
         } catch (Exception e) {
             if (e.cause instanceof IndexNotFoundException) {
                 log.error("Search index not found: ${e.cause.index}")
@@ -194,8 +198,9 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
                 return []
             }
         }
+        def maxScore = response.hits.maxScore()
         response.hits.hits.each { SearchHit hit ->
-            results.put(type.get(hit.field('entity_id')?.toLong() ?: hit.id().toLong()), hit.score)
+            results.put(type.get(hit.field('entity_id')?.toLong() ?: hit.id().toLong()), (hit.score/maxScore * 100))
         }
         return results
     }
