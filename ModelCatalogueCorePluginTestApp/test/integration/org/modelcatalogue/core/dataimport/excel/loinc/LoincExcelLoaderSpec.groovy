@@ -24,6 +24,7 @@ import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.Shared
 import spock.lang.Unroll
+import spock.lang.Ignore
 
 class LoincExcelLoaderSpec extends AbstractIntegrationSpec {
     @Shared String resourcePath = (new File("test/integration/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
@@ -45,7 +46,7 @@ class LoincExcelLoaderSpec extends AbstractIntegrationSpec {
         excelLoader = new LoincExcelLoader()
     }
 
-
+    @Ignore
     def "test default catalogue builder imports gosh dataset"(){
 
         when: "I load the Excel file"
