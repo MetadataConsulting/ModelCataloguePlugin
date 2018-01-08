@@ -35,7 +35,7 @@ class DataArchitectService {
         'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
         'Data Element Exact Match':this.&generateDataElementSuggestionsExact,
         'Data Element Fuzzy Match':this.&generateDataElementSuggestionsFuzzy,
-        'Data Element Full Text Match':this.&generateDataElementSuggestionsFullText,
+        //'Data Element Full Text Match':this.&generateDataElementSuggestionsFullText,
 //        'Data Element and Type Exact Match':this.&generateDataElementAndTypeSuggestionsExact,
 //        'Data Element and Type Fuzzy Match':this.&generateDataElementAndTypeSuggestionsFuzzy
 
