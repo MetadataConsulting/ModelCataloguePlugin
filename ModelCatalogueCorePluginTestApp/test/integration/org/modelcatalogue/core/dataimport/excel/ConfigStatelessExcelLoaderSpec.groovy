@@ -9,6 +9,7 @@ import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.audit.AuditService
 import spock.lang.Shared
+import spock.lang.Ignore
 
 class ConfigStatelessExcelLoaderSpec extends AbstractIntegrationSpec {
 //    String dataModelName = 'LOINC_TEST7'
@@ -40,6 +41,7 @@ class ConfigStatelessExcelLoaderSpec extends AbstractIntegrationSpec {
 //        excelLoader = new ConfigStatelessExcelLoader(dataModelName, new FileInputStream(resourcePath + '/' + headersMapXml))
     }
 
+    @Ignore
     def "test default catalogue builder imports generic nt dataset"(){
 
         when: "I load the Excel file"
