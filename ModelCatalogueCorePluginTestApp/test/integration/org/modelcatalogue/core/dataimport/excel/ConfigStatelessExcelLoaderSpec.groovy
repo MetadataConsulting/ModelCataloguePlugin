@@ -16,17 +16,22 @@ class ConfigStatelessExcelLoaderSpec extends AbstractIntegrationSpec {
     String loincDataModelName = 'LOINC'
     String goshDataModelName = 'GOSH'
     String lpdcDataModelName = 'WinPath'
+    String lpdcRareDataModelName = 'RareDisease'
     String loincHeadersMapXml = 'loinc_headers_map.xml'
     String goshHeadersMapXml = 'gosh_headers_map.xml'
     String lpdcHeadersMapXml = 'lpdc_headers_map.xml'
+    String RareDiseaseldpcXml = 'RareDiseaseldpc.xml'
     String lpdcDataFile = 'TFC-TLC_LPDC_With Dups.xlsx'
+    String RareDiseaseldpc = 'RareDiseaseldpc.xlsx'
+    String testDataModelName = 'TEST_MODEL'
+    String testLoincData = 'loinc.xlsx'
+    String testGoshData = 'GOSH_lab_test_codes100.xlsx'
     String[] loincDataFiles = ['1loinc.xlsx', '2loinc.xlsx', '3loinc.xlsx', '4loinc.xlsx', '5loinc.xlsx', '6loinc.xlsx', '7loinc.xlsx', '8loinc.xlsx']
     String[] goshDataFiles = ['GOSH lab test codes 1.xlsx', 'GOSH lab test codes 2.xlsx', 'GOSH lab test codes 3.xlsx', 'GOSH lab test codes 4.xlsx', 'GOSH lab test codes 5.xlsx']
     @Shared String lpdcResourcePath = (new File('test/integration/resources/org/modelcatalogue/integration/excel/')).getAbsolutePath()
     @Shared String loincResourcePath = (new File('test/integration/resources/org/modelcatalogue/integration/excel/loinc/')).getAbsolutePath()
     @Shared String goshResourcePath = (new File('test/integration/resources/org/modelcatalogue/integration/excel/goshTestCodes/')).getAbsolutePath()
     ConfigStatelessExcelLoader excelLoader
-//    CatalogueBuilder catalogueBuilder
     def dataModelService, elementService
     AuditService auditService
     DataClassService dataClassService
@@ -52,20 +57,39 @@ class ConfigStatelessExcelLoaderSpec extends AbstractIntegrationSpec {
                 excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(loincResourcePath + '/' + loincDataXlsx)))
                 excelLoader = null
             }
+    }
+    def goshData() {
             for (String goshDataXlsx in goshDataFiles) {
                 excelLoader = new ConfigStatelessExcelLoader(goshDataModelName, new FileInputStream(goshResourcePath + '/' + goshHeadersMapXml))
                 excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(goshResourcePath + '/' + goshDataXlsx)))
                 excelLoader = null
             }
+    }
+    def lpdcData() {
             excelLoader = new ConfigStatelessExcelLoader(lpdcDataModelName, new FileInputStream(lpdcResourcePath + '/' + lpdcHeadersMapXml))
             excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(lpdcResourcePath + '/' + lpdcDataFile)))
             excelLoader = null
+    }
+    def rareDisease() {
+        excelLoader = new ConfigStatelessExcelLoader(lpdcRareDataModelName, new FileInputStream(lpdcResourcePath + '/' + RareDiseaseldpcXml))
+        excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(lpdcResourcePath + '/' + RareDiseaseldpc)))
+        excelLoader = null
+    }
+    def testData() {
+        excelLoader = new ConfigStatelessExcelLoader(testDataModelName, new FileInputStream(loincResourcePath + '/' + loincHeadersMapXml))
+        excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(loincResourcePath + '/' + testLoincData)))
+    }
+    def setup() {
+//        excelLoader = new ConfigStatelessExcelLoader(dataModelName, new FileInputStream(resourcePath + '/' + headersMapXml))
+    }
 //            excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(resourcePath + '/' + dataXlsx)))
         }
         then: "new model is created"
 
 //        DataModel.findByName(lpdcDataModelName)
 //        DataModel.findByName(loincDataModelName)
+//        DataModel.findByName(goshDataModelName)
         DataModel.findByName(goshDataModelName)
+        DataModel.findByName(testDataModelName)
     }
 }

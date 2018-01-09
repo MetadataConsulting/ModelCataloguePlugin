@@ -23,6 +23,7 @@ import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Legacy
+import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
