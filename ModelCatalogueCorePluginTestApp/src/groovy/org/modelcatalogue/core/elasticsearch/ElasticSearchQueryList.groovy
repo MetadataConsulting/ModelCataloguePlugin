@@ -166,10 +166,10 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
             if (params.explain) {
                 log.info searchRequest.toString()
             }
-            log.info "REQUEST" + searchRequest.toString()
+            //log.info "REQUEST" + searchRequest.toString()
             def rep1 = searchRequest.execute()
             SearchResponse rep = rep1.get()
-            log.info "Search Result" + rep.toString()
+            //log.info "Search Result" + rep.toString()
             return rep
         } catch (Exception e) {
             if (e.cause instanceof IndexNotFoundException) {

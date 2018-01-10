@@ -936,6 +936,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     private DataModelFilter getOverridableDataModelFilter(SearchParams params, List<DataModel> subscribedModels) {
         if (params.dataModelId) {
+            //Included again after
             Long dataModelId = params.dataModelId
                 //check that there is a data model is
                 // and check that you should include the results for the imports as well in search results

@@ -262,7 +262,13 @@ class DataArchitectService {
 
         def execute = { String label, Runnable cl ->
             log.info "Creating suggestions '$label'"
-            cl.run()
+            try{
+                cl.run()
+            }
+            catch(Exception ex){
+                log.info "Suggestions '$label' FAILED - Check data"
+            }
+
             log.info "Suggestions '$label' created"
         }
 
@@ -477,7 +483,9 @@ class DataArchitectService {
 
     private void generateDataElementSuggestionsFuzzy(String dataModelAID, String dataModelBID, String minScore){
         DataModel dataModelA = dataModelGormService.findById(dataModelAID as Long)
+
         DataModel dataModelB = dataModelGormService.findById(dataModelBID as Long)
+
         Batch.findAllByNameIlike("Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
         Batch batch = Batch.findOrSaveByName("Generating suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
         def score

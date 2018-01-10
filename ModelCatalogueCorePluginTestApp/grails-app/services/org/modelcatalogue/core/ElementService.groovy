@@ -918,20 +918,23 @@ class ElementService implements Publisher<CatalogueElement> {
         def elementsToMatch = DataElement.findAllByDataModel(dataModelA)
         elementsToMatch.each { DataElement de ->
             //set params map
+            log.info "findFuzzyDataElement:start matching de:" + de.name
             searchParams.dataModelId   = dataModelB.id
             searchParams.search = de.name
             searchParams.minScore = minimumScore/100
             def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            log.info "matching :" + matches.total + " elements"
             String message = checkRelatedTo(de, dataModelB)
             matches.getItemsWithScore().each { item, score ->
                 if(!de.relatedTo.contains(item)) {
-                    if(score>minimumScore) {
+                    //if(score>minimumScore) {
                         elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
-                    }
+                   // }
                 }
             }
+            log.info "completed matching de:" + de.name
         }
-
+        log.info "completed findFuzzyDataClassDataElement"
         return elementSuggestions
     }
 
@@ -950,18 +953,21 @@ class ElementService implements Publisher<CatalogueElement> {
             searchParams.dataModelId= dataModelB.id
             searchParams.search = de.name
             searchParams.minScore = minimumScore/100
+            log.info "findFuzzyDataClassDataElement: start matching de:" + de.name + " from " + dataModelA.name
             def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            log.info "matching :" + matches.total + " elements"
             String message = checkRelatedTo(de, dataModelB)
             matches.getItemsWithScore().each{ item, score ->
                 if(!de.relatedTo.contains(item)) {
                     //if(!de.relatedTo.contains(item)&&(dataModelB.contains(item))) {
-                    if(score>minimumScore) {
+                    //if(score>minimumScore) {
                         elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
-                    }
+                    //}
                 }
             }
+            log.info "completed matching de:" + de.name
         }
-
+        log.info "completed findFuzzyDataClassDataElement"
         return elementSuggestions
     }
 

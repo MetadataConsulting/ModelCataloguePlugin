@@ -798,7 +798,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
         ParamArgs paramArgs = instantiateParamArgs(max)
         SearchParams searchParams = SearchParams.of(params, paramArgs)
-        ListWithTotalAndType<T> results = modelCatalogueSearchService.search(resource, searchParams)
+        ListWithTotalAndType<T> results = modelCatalogueSearchService.search(searchParams)
        // ListWithTotalAndType<T> results = getAllEffectiveItems(max)
 
         respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(search, 'UTF-8')}", results)
