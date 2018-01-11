@@ -52,6 +52,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
           angular.extend(@, element)
 
           @defaultExcludes = ['id','elementTypeName', 'classifiedName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link', 'mappings']
+          # Why are these methods being defined on each object itself? They should be defined in the class so that we take advantage of prototypal inheritance... But it seems like this causes problems. Such functions are not found for some reason...
           @getUpdatePayload = () ->
             payload = {}
             for name in @updatableProperties
@@ -95,6 +96,12 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             self.execute('availableReports').then (jsonData) ->
               self.availableReports = jsonData.availableReports
               return self.availableReports
+
+          self.refreshIfMinimal = () ->
+            if self.minimal
+              return self.refresh()
+            else
+              return self
 
           self.refresh        = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{self.link}"
           self.validate       = () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{self.link}/validate", data: self.getUpdatePayload()
@@ -255,7 +262,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
       cached = cache.get(element.link)
 
       if cached
-        delete element.minimal
+        delete element.minimal # why delete element.minimal? Can you be sure that the newly loaded element is not minimal just because there is already a cached version? Is this not assuming that the second loading of anything will always be a full load?
         updateFrom(cached, element, true)
         return cached
 

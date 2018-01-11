@@ -324,6 +324,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         items = getAllEffectiveItems(max)
 
+        if (params.total) {
+            items.totalKnownAlready(params.total as Long) // should set the total.
+        }
+
 
         if (params.boolean('minimal') && items instanceof ListWithTotalAndTypeWrapper) {
             ListWithTotalAndTypeWrapper<T> listWrapper = items as ListWithTotalAndTypeWrapper<T>
@@ -791,7 +795,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected def addRelation(Long catalogueElementId, String type, boolean outgoing) {
 
         try {
-            def otherSide = parseOtherSide()
+            // def otherSide = parseOtherSide()
             DestinationClass destinationClass = destinationClassFromJsonPayload()
             def objectToBindParam = getObjectToBind()
             MetadataResponseEvent metadataResponse = manageCatalogueElementService.addRelation(catalogueElementId,
@@ -826,7 +830,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
     }
 
-    //TODO: not sure what this does
+    /**
+     * Turn the JSON payload of the request into an Object
+     * @return
+     */
     protected Object parseOtherSide() {
         request.getJSON()
     }

@@ -1,34 +1,35 @@
 package org.modelcatalogue.core.util.lists
 
-class LazyListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndType<T> {
+/**
+ * Based on LazyListWithTotalAndType but using an inner class rather than closures. Classic Java
+ * @param <T>
+ */
+class MethodNotClosureLazyListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndType<T> {
 
     final Class<T> itemType
     final Map<String, Object> params
+    interface ListMethods<T> {
+        List<T> getItems(Map params)
+        Long getTotal()
 
-    final Closure<List<T>> itemsClosure
-    final Closure<Long> totalClosure
+    }
+    final ListMethods<T> listMethods
 
     private Long total = null
     private List<T> items = null
 
-    public static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, Class<T> type, Closure itemsClosure){
 
-        new LazyListWithTotalAndType<T>(params, type, itemsClosure, null)
+    static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, Class<T> type, ListMethods listMethods){
+        new MethodNotClosureLazyListWithTotalAndType<T>(params, type, listMethods)
     }
 
-    public static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, Class<T> type, Closure<List<T>> itemsClosure, Closure<Long> totalClosure){
-        new LazyListWithTotalAndType<T>(params, type, itemsClosure, totalClosure)
-    }
-
-    private LazyListWithTotalAndType(Map<String, Object> params, Class<T> type, Closure<List<T>> itemsClosure, Closure<Long> totalClosure) {
+    private MethodNotClosureLazyListWithTotalAndType(Map<String, Object> params, Class<T> type, ListMethods listMethods) {
         Map<String, Object> theParams = new HashMap(params)
 
         this.params = Collections.unmodifiableMap(theParams)
         this.itemType = type
-        this.itemsClosure = itemsClosure
-        this.totalClosure = totalClosure
+        this.listMethods = listMethods
     }
-
 
 
     void totalKnownAlready(Long total) {
@@ -39,7 +40,7 @@ class LazyListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndType<T
     @Override
     Long getTotal() {
         if (total == null) {
-            return total = totalClosure ? totalClosure() : getItems().size()
+            return total = listMethods.getTotal()
             // this could query EVERY DATA ELEMENT IN A MODEL because no params with max are passed in.
         }
         return total
@@ -56,7 +57,7 @@ class LazyListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndType<T
     @Override
     List<T> getItems() {
         if (items == null)  {
-            return (items = Collections.unmodifiableList(itemsClosure(params)))
+            return (items = Collections.unmodifiableList(listMethods.getItems(params)))
         }
         return items
     }

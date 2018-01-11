@@ -9,6 +9,7 @@ import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.audit.AuditService
 import spock.lang.Shared
+import spock.lang.Ignore
 
 class ConfigStatelessExcelLoaderSpec extends AbstractIntegrationSpec {
 //    String dataModelName = 'LOINC_TEST7'
@@ -37,24 +38,37 @@ class ConfigStatelessExcelLoaderSpec extends AbstractIntegrationSpec {
     GrailsApplication grailsApplication
     @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
 
-    def loincData() {
-        for (String loincDataXlsx in loincDataFiles) {
-            excelLoader = new ConfigStatelessExcelLoader(loincDataModelName, new FileInputStream(loincResourcePath + '/' + loincHeadersMapXml))
-            excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(loincResourcePath + '/' + loincDataXlsx)))
-            excelLoader = null
-        }
+    def setup() {
+//        XMLUnit.ignoreWhitespace = true
+//        XMLUnit.ignoreComments = true
+//        XMLUnit.ignoreAttributeOrder = true
+//        catalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
+//        excelLoader = new ConfigStatelessExcelLoader(dataModelName, new FileInputStream(resourcePath + '/' + headersMapXml))
+    }
+
+    @Ignore
+    def "test default catalogue builder imports generic nt dataset"(){
+
+        when: "I load the Excel file"
+//        excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(resourcePath + '/' + dataXlsx)))
+        auditService.betterMute {
+            for (String loincDataXlsx in loincDataFiles) {
+                excelLoader = new ConfigStatelessExcelLoader(loincDataModelName, new FileInputStream(loincResourcePath + '/' + loincHeadersMapXml))
+                excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(loincResourcePath + '/' + loincDataXlsx)))
+                excelLoader = null
+            }
     }
     def goshData() {
-        for (String goshDataXlsx in goshDataFiles) {
-            excelLoader = new ConfigStatelessExcelLoader(goshDataModelName, new FileInputStream(goshResourcePath + '/' + goshHeadersMapXml))
-            excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(goshResourcePath + '/' + goshDataXlsx)))
-            excelLoader = null
-        }
+            for (String goshDataXlsx in goshDataFiles) {
+                excelLoader = new ConfigStatelessExcelLoader(goshDataModelName, new FileInputStream(goshResourcePath + '/' + goshHeadersMapXml))
+                excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(goshResourcePath + '/' + goshDataXlsx)))
+                excelLoader = null
+            }
     }
     def lpdcData() {
-        excelLoader = new ConfigStatelessExcelLoader(lpdcDataModelName, new FileInputStream(lpdcResourcePath + '/' + lpdcHeadersMapXml))
-        excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(lpdcResourcePath + '/' + lpdcDataFile)))
-        excelLoader = null
+            excelLoader = new ConfigStatelessExcelLoader(lpdcDataModelName, new FileInputStream(lpdcResourcePath + '/' + lpdcHeadersMapXml))
+            excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(lpdcResourcePath + '/' + lpdcDataFile)))
+            excelLoader = null
     }
     def rareDisease() {
         excelLoader = new ConfigStatelessExcelLoader(lpdcRareDataModelName, new FileInputStream(lpdcResourcePath + '/' + RareDiseaseldpcXml))
@@ -68,23 +82,14 @@ class ConfigStatelessExcelLoaderSpec extends AbstractIntegrationSpec {
     def setup() {
 //        excelLoader = new ConfigStatelessExcelLoader(dataModelName, new FileInputStream(resourcePath + '/' + headersMapXml))
     }
-    def "test default catalogue builder imports generic nt dataset"(){
-
-        when: "I load the Excel file"
-//        testData()
-        auditService.betterMute {
-//            loincData()
-//            goshData()
-//            lpdcData()
-//            rareDisease()
-            testData()
+//            excelLoader.buildModelFromStandardWorkbookSheet(null, WorkbookFactory.create(new FileInputStream(resourcePath + '/' + dataXlsx)))
         }
         then: "new model is created"
 
 //        DataModel.findByName(lpdcDataModelName)
 //        DataModel.findByName(loincDataModelName)
 //        DataModel.findByName(goshDataModelName)
-//        DataModel.findByName(lpdcRareDataModelName)
+        DataModel.findByName(goshDataModelName)
         DataModel.findByName(testDataModelName)
     }
 }

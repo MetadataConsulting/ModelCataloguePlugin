@@ -14,7 +14,8 @@ angular.module('mc.core.ui.bs.watchAndAskForImportOrCloneCtrl', []).controller '
         element.execute("clone/#{currentDataModel.id}", 'POST').then (clone)->
           deferred.resolve(clone)
       if result == 'import'
-        currentDataModel.imports.add(element.dataModel).then ->
+        dataModelToImport = element.dataModel || element # element.dataModel, or else if it's null, element itself is a data model.
+        currentDataModel.imports.add("", dataModelToImport).then ->
           deferred.resolve(element)
       return deferred.promise
 

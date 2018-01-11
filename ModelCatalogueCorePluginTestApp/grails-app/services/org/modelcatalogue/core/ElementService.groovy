@@ -862,32 +862,79 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
     /**
+     * Return dataElement ids which are very likely to be duplicates.
+     * Enums are very likely duplicates if they have similar enum values.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Map<Long, Set<Long>> findDuplicateDataElementSuggestionsFullText(DataModel dataModelA, DataModel dataModelB) {
+        Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
+        def results = getDataElementsInFullTextSearch(dataModelA.id,dataModelB.id)
+        if(results.size() > 0){
+            results.each{
+                def dataElementName = it as String
+                Long ida =getDataElementId(dataElementName,dataModelA.id)
+                Long idb =getDataElementId(dataElementName,dataModelB.id)
+                elementSuggestions.put(ida,idb)
+            }
+        }
+        return elementSuggestions
+    }
+
+    /**
+     * Return dataElement ids which are very likely to be synonyms using elasticsearch fuzzy matching.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Set<MatchResult> findFullTextDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
+        Set<MatchResult> elementSuggestions = []
+        SearchParams searchParams = new SearchParams()
+        //iterate through the data model a
+        def elementsToMatch = DataElement.findAllByDataModel(dataModelA)
+        elementsToMatch.each { DataElement de ->
+            //set params map
+            searchParams.dataModelId   = dataModelB.id
+            searchParams.search = de.name
+            searchParams.minScore = minimumScore/100
+            def matches = getDataElementsInFullTextSearch(de.name, dataModelB.id)
+            String message = checkRelatedTo(de, dataModelB)
+            matches.each { item ->
+                if(!de.contains(item)) {
+                        elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: 60, message: message))
+                }
+            }
+        }
+
+        return elementSuggestions
+    }
+
+
+    /**
      * Return dataElement ids which are very likely to be synonyms using elasticsearch fuzzy matching.
      * @return map with the enum id as key and set of ids of duplicate enums as value
      */
     Set<MatchResult> findFuzzyDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
         Set<MatchResult> elementSuggestions = []
+        SearchParams searchParams = new SearchParams()
         //iterate through the data model a
         def elementsToMatch = DataElement.findAllByDataModel(dataModelA)
         elementsToMatch.each { DataElement de ->
-            SearchParams searchParams = new SearchParams()
-            searchParams.with {
-                search = de.name
-                dataModelId = dataModelB.id
-                minScore = minimumScore/100
-            }
+            //set params map
+            log.info "findFuzzyDataElement:start matching de:" + de.name
+            searchParams.dataModelId   = dataModelB.id
+            searchParams.search = de.name
+            searchParams.minScore = minimumScore/100
             def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            log.info "matching :" + matches.total + " elements"
             String message = checkRelatedTo(de, dataModelB)
             matches.getItemsWithScore().each { item, score ->
                 if(!de.relatedTo.contains(item)) {
-                    score  = score*100
-                    if(score>minimumScore) {
+                    //if(score>minimumScore) {
                         elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
-                    }
+                   // }
                 }
             }
+            log.info "completed matching de:" + de.name
         }
-
+        log.info "completed findFuzzyDataClassDataElement"
         return elementSuggestions
     }
 
@@ -898,27 +945,29 @@ class ElementService implements Publisher<CatalogueElement> {
      */
     Set<MatchResult> findFuzzyDataClassDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
         Set<MatchResult> elementSuggestions = []
+        SearchParams searchParams = new SearchParams()
         //iterate through the data model a
         def elementsToMatch = DataClass.findAllByDataModel(dataModelA)
         elementsToMatch.each{ DataClass de ->
-            SearchParams searchParams = new SearchParams()
-            searchParams.with {
-                search = de.name
-                dataModelId = dataModelB.id
-                minScore = minimumScore/100
-            }
+            //set params map
+            searchParams.dataModelId= dataModelB.id
+            searchParams.search = de.name
+            searchParams.minScore = minimumScore/100
+            log.info "findFuzzyDataClassDataElement: start matching de:" + de.name + " from " + dataModelA.name
             def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            log.info "matching :" + matches.total + " elements"
             String message = checkRelatedTo(de, dataModelB)
             matches.getItemsWithScore().each{ item, score ->
                 if(!de.relatedTo.contains(item)) {
-                    score  = score*100
-                    if(score>minimumScore) {
+                    //if(!de.relatedTo.contains(item)&&(dataModelB.contains(item))) {
+                    //if(score>minimumScore) {
                         elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
-                    }
+                    //}
                 }
             }
+            log.info "completed matching de:" + de.name
         }
-
+        log.info "completed findFuzzyDataClassDataElement"
         return elementSuggestions
     }
 
@@ -1043,6 +1092,38 @@ class ElementService implements Publisher<CatalogueElement> {
             setLong('dmB', dmBId)
             list()
         }
+
+        return results
+    }
+
+    /**
+     * getDataElementsInCommon
+     * @param Long
+     * @param Long
+     * @return List
+     */
+    private List<MatchResult> getDataElementsInFullTextSearch(String dataElementAName, Long dmBId){
+
+        Map<String, String> paramMap = [:]
+        paramMap.put('dataElementAName', dataElementAName)
+        paramMap.put('dmBId', dmBId)
+        String queryFT = """SELECT  catalogue_element.name, catalogue_element.id
+                FROM catalogue_element, data_element
+                WHERE (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =:dmBId)
+                AND MATCH(catalogue_element.name) AGAINST(\'"""
+        queryFT = queryFT + dataElementAName + """\');"""
+
+        final session = sessionFactory.currentSession
+        final sqlQuery = session.createQuery(queryFT)
+        final results = sqlQuery.with {
+            addEntity(org.modelcatalogue.core.DataElement)
+            // Set value for parameter startId.
+            setLong('dmBId', dmBId)
+            //setString('dataElementAName',dataElementAName)
+            // Get all results.
+            list()
+        }
+
 
         return results
     }
