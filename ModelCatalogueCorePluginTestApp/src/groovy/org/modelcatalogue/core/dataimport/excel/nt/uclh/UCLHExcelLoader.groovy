@@ -15,6 +15,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
@@ -201,6 +202,7 @@ class UCLHExcelLoader extends ExcelLoader{
         modelMaps.each { String name, List<Map<String, String>> rowMapsForModel ->
 
             DataModel newModel = getDataModel(name)
+            newModel.ext.put(GMCGridReportXlsxExporter.organizationMetadataKey, organization.toUpperCase())
             Date startModelImport = new Date()
             log.info("Start import of model" + name )
             //Iterate through each row to build an new DataElement
