@@ -7,11 +7,12 @@
 #= require angular-loading-bar/build/loading-bar
 #= require angular-ui-router/release/angular-ui-router
 #= require ngInfiniteScroll/build/ng-infinite-scroll
-#= require angular-ui-router/release/angular-ui-router
 #= require angular-diff-match-patch.js
 #= require angular-xeditable/dist/js/xeditable
 #= require angular-ui-ace/ui-ace
 #= require angular-file-saver/dist/angular-file-saver
+#= require jquery/dist/jquery.min.js
+#= require remarkable-bootstrap-notify/dist/bootstrap-notify.min.js
 #= require sly-repeat/scalyr.js
 #= require_self
 #= require_full_tree .
