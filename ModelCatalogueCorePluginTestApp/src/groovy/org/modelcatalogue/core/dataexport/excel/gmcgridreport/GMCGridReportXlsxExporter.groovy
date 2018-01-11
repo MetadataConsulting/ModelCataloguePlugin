@@ -2,7 +2,6 @@ package org.modelcatalogue.core.dataexport.excel.gmcgridreport
 
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.modelcatalogue.core.*
 import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
@@ -28,6 +27,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     String organization = ''
     static String defaultOrganization = 'UCLH'
     static String organizationMetadataKey = 'http://www.modelcatalogue.org/metadata/#organization'
+    static String dataSourceNameMetadataKey = "http://www.modelcatalogue.org/metadata/#dataSourceName"
     protected List<String> excelHeaders = GMCGridReportHeaders.excelHeaders
 
     /**
@@ -139,7 +139,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
             }
 
             Closure sourceSystem = {
-                value "${getRelatedToModel(placeholders)}"
+                value "${getRelatedToDataSourceName(placeholders)}"
                 style standardCellStyle
             } as Closure
 
@@ -393,9 +393,14 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
     }
 
-    String getRelatedToModel(List relatedTo){
+    /**
+     * Not the same as the Data Model name! Data Model name has organization and GEL model added on.
+     * @param relatedTo
+     * @return
+     */
+    String getRelatedToDataSourceName(List relatedTo){
         if(relatedTo.size()==1){
-            "${relatedTo[0].dataModel.name}"
+            "${relatedTo[0].dataModel.ext.get(dataSourceNameMetadataKey)}"
         }else if(relatedTo.size()>1){
             multipleSourcesMessage
         }else{
