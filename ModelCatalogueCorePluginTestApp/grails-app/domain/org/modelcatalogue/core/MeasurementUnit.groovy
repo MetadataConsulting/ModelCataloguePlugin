@@ -19,10 +19,11 @@ class MeasurementUnit extends CatalogueElement {
         primitiveTypes.collectEntries {
             if (toBeDeleted) {
                 // if DataModel is going to be deleted, then MeasurementUnit needs to be from same DataModel
-                if (it.dataModel != this.dataModel)
+                if (it.dataModel != this.dataModel) {
                     return [(it): it.dataModel]
-                else
+                } else {
                     return [:]
+                }
             } else {
                 // if deletes MeasurementUnit, it should not be used anywhere
                 return [(it): null]
