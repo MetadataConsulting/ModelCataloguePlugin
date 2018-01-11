@@ -40,10 +40,11 @@ class DataType extends CatalogueElement implements Validating {
         DataElement.findAllByDataType(this).collectEntries {
             if (toBeDeleted) {
                 // if DataModel is going to be deleted, then DataElement needs to be from same DataModel
-                if (it.dataModel != this.dataModel)
+                if (it.dataModel != this.dataModel) {
                     return [(it): it.dataModel]
-                else
-                    return [:]
+                } else {
+                    return [(it): null]
+                }
             } else {
                 // if deletes DataType, it should not be used anywhere
                 return [(it): null]
