@@ -22,7 +22,7 @@ class MeasurementUnit extends CatalogueElement {
                 if (it.dataModel != this.dataModel) {
                     return [(it): it.dataModel]
                 } else {
-                    return [:]
+                    return [(it): null]
                 }
             } else {
                 // if deletes MeasurementUnit, it should not be used anywhere
