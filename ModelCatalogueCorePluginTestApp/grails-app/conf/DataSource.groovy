@@ -13,9 +13,9 @@ environments {
         dataSource {
             driverClassName = "com.mysql.jdbc.Driver"
             dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
-            url = "jdbc:mysql://localhost:3306/ntgoshdb2?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
-            username = 'mdradmin'
-            password = 'mdradmin123'
+            url = "jdbc:mysql://localhost:3306/ntgoshdb?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
+            username = 'metadata'
+            password = 'metadata'
             dbCreate = "update"
             properties {
                 maxActive = -1

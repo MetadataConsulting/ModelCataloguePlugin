@@ -11,7 +11,7 @@ import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
-import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.reports.ReportDescriptorRegistry
 import org.modelcatalogue.core.security.ajax.AjaxAwareLoginUrlAuthenticationEntryPoint
 import org.modelcatalogue.core.security.ss2x.ApiKeyDaoAuthenticationProvider
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -84,7 +84,7 @@ beans = {
     mergeConfig(application)
 
     relationshipsXmlRenderer(RelationshipsXmlRenderer)
-    reportsRegistry(ReportsRegistry)
+    reportDescriptorRegistry(ReportDescriptorRegistry)
     jsonMarshallingCustomizerRegistry(JsonMarshallingCustomizerRegistry)
     frontendConfigurationProviderRegistry(FrontendConfigurationProviderRegistry)
 

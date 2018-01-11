@@ -8,12 +8,12 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.util.Metadata
 
-class RegisterReportsService {
+class RegisterReportDescriptorsService {
 
-    ReportsRegistry reportsRegistry
+    ReportDescriptorRegistry reportDescriptorRegistry
 
     void register() {
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
             defaultName { "Export All Elements of ${it.name} to Excel XSLX" }
@@ -24,7 +24,7 @@ class RegisterReportsService {
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report: 'NHIC'], id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Inventory Report Spreadsheet" }
             defaultName { "${it.name} report as MS Excel Document" }
@@ -36,7 +36,7 @@ class RegisterReportsService {
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Grid Report Spreadsheet" }
             defaultName { "${it.name} report as MS Excel Document Grid" }
@@ -48,7 +48,7 @@ class RegisterReportsService {
             link controller: 'dataModel', action: 'gridSpreadsheet', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "MC Excel Export" }
             defaultName { "${it.name} report as MS Excel Document Grid" }
@@ -63,7 +63,7 @@ class RegisterReportsService {
         List<String> northThamesHospitalNames = ['GOSH', 'LNWH', 'MEH', 'UCLH'] // not sure if this should be defined here. Maybe it would be better in a source file, or perhaps a config file.
         List<String> gelSourceModelNames = ['Cancer Model', 'Rare Diseases']
         northThamesHospitalNames.each { name ->
-            reportsRegistry.register {
+            reportDescriptorRegistry.register {
                 creates asset
                 title { "GMC Grid Report – North Thames – ${name}" }
                 defaultName { "${it.name} report as MS Excel Document Grid" }
@@ -77,7 +77,7 @@ class RegisterReportsService {
         }
 
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Royal Free Mapping Report" }
             defaultName { "RFH Mapping Report Document" }
@@ -88,7 +88,7 @@ class RegisterReportsService {
             }
             link controller: 'northThames', action: 'northThamesMappingReport', id: true
         }
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "University College Mapping Report" }
             defaultName { "UCLH Mapping Report Document" }
@@ -99,7 +99,7 @@ class RegisterReportsService {
             }
             link controller: 'northThames', action: 'northThamesMappingReport', id: true
         }
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Great Ormond Street Mapping Report" }
             defaultName { "GOSH Mapping Report Document" }
@@ -110,7 +110,7 @@ class RegisterReportsService {
             }
             link controller: 'northThames', action: 'northThamesMappingReport', id: true
         }
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "St. Bartholomews Mapping Report" }
             defaultName { "BARTS Mapping Report Document" }
@@ -121,7 +121,7 @@ class RegisterReportsService {
             }
             link controller: 'northThames', action: 'northThamesMappingReport', id: true
         }
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Royal National Orthopaedic Mapping Report" }
             defaultName { "RNOH Mapping Report Document" }
@@ -132,7 +132,7 @@ class RegisterReportsService {
             }
             link controller: 'northThames', action: 'northThamesMappingReport', id: true
         }
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "London North West Street Mapping Report" }
             defaultName { "LNW Mapping Report Document" }
@@ -143,7 +143,7 @@ class RegisterReportsService {
             }
             link controller: 'northThames', action: 'northThamesMappingReport', id: true
         }
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Moorfields Eye Hospital Mapping Report" }
             defaultName { "MEH Mapping Report Document" }
@@ -155,7 +155,7 @@ class RegisterReportsService {
             link controller: 'northThames', action: 'northThamesMappingReport', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "North Thames Genomic Centres Mapping Report" }
             defaultName { "NT Mapping Report Document" }
@@ -171,7 +171,7 @@ class RegisterReportsService {
 
 
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Inventory Report Document" }
             defaultName { "${it.name} report as MS Word Document" }
@@ -180,7 +180,7 @@ class RegisterReportsService {
             link controller: 'dataClass', action: 'inventoryDoc', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Inventory Report Document" }
             defaultName { "${it.name} report as MS Word Document" }
@@ -192,7 +192,7 @@ class RegisterReportsService {
             link controller: 'dataModel', action: 'inventoryDoc', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Inventory Report Spreadsheet" }
             defaultName { "${it.name} report as MS Excel Document" }
@@ -202,7 +202,7 @@ class RegisterReportsService {
         }
 
 //  needs more work
-//        reportsRegistry.register {
+//        reportDescriptorRegistry.register {
 //            creates asset
 //            title { "Changelog Document" }
 //            defaultName { "${it.name} changelog as MS Word Document" }
@@ -212,7 +212,7 @@ class RegisterReportsService {
 //            link controller: 'dataClass', action: 'changelogDoc', id: true
 //        }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             type DataModel, DataClass, DataElement, DataType, MeasurementUnit
             title { "Export to Catalogue XML" }
@@ -221,7 +221,7 @@ class RegisterReportsService {
             }
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Generate all ${it.name} files" }
             type DataModel
@@ -231,7 +231,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportAllCancerReports', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Generate all ${it.name} files" }
             type DataModel
@@ -242,7 +242,7 @@ class RegisterReportsService {
         }
 
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Disorder List (CSV)" }
             type DataModel
@@ -252,7 +252,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseDisorderListAsCsv', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Eligibility Criteria Report (Word Doc)" }
             type DataModel
@@ -262,7 +262,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Phenotypes and Clinical Tests Report (Word Doc)" }
             type DataModel
@@ -273,7 +273,7 @@ class RegisterReportsService {
         }
 
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Eligibility Phenotypes Split Docs" }
             type DataModel
@@ -283,7 +283,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseSplitDocs', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases HPO And Clinical Tests (JSON)" }
             defaultName { "${it.name} report as Json" }
@@ -294,7 +294,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsJson', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Disorder List Only (JSON)" }
             defaultName { "${it.name} report as Json" }
@@ -305,7 +305,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseListAsJson', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Eligibility Criteria (JSON)" }
             defaultName { "${it.name} report as Json" }
@@ -316,7 +316,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseHPOEligibilityCriteriaAsJson', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases HPO And Clinical Tests (CSV)" }
             type DataModel
@@ -326,7 +326,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Disease Eligibility Criteria Report (CSV)" }
             type DataModel
@@ -336,7 +336,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityCsv', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Static Website" }
             type DataModel
@@ -348,7 +348,7 @@ class RegisterReportsService {
 
 
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Static Website" }
             type DataModel

@@ -1,11 +1,11 @@
 package org.modelcatalogue.core.util.marshalling
 
-import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.reports.ReportDescriptorRegistry
 import org.springframework.beans.factory.annotation.Autowired
 
 abstract class ListWrapperMarshaller extends AbstractMarshaller {
 
-    @Autowired ReportsRegistry reportsRegistry
+    @Autowired ReportDescriptorRegistry reportDescriptorRegistry
 
     ListWrapperMarshaller(Class cls) {
         super(cls)

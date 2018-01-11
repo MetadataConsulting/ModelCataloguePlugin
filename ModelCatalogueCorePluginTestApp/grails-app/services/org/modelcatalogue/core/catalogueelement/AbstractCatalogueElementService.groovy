@@ -33,7 +33,7 @@ import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.persistence.RelationshipGormService
 import org.modelcatalogue.core.reports.ReportDescriptor
-import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.reports.ReportDescriptorRegistry
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.DestinationClass
@@ -58,7 +58,7 @@ abstract class AbstractCatalogueElementService<T extends CatalogueElement> imple
 
     CatalogueElementGormService catalogueElementGormService
 
-    ReportsRegistry reportsRegistry
+    ReportDescriptorRegistry reportDescriptorRegistry
 
     SpringSecurityService springSecurityService
 
@@ -68,31 +68,31 @@ abstract class AbstractCatalogueElementService<T extends CatalogueElement> imple
 
     abstract protected String resourceName()
 
-    List<Map> availableReports(Long catalogueElementId) {
+    List<Map> availableReportDescriptors(Long catalogueElementId) {
 
         CatalogueElement el = findById(catalogueElementId)
 
-        List<Map> reports = []
+        List<Map> reportDescriptorsJson = []
 
 
-        List<ReportDescriptor> reportDescriptorList = reportsRegistry.getAvailableReports(el)
+        List<ReportDescriptor> reportDescriptors = reportDescriptorRegistry.getAvailableReportDescriptors(el)
 
-        for (ReportDescriptor descriptor in reportDescriptorList ) {
+        for (ReportDescriptor descriptor in reportDescriptors ) {
 
             if ( springSecurityService.isLoggedIn() ) {
                 // for users logged in render all links
-                reports << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
+                reportDescriptorsJson << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
                             depth: descriptor.depth(el), includeMetadata: descriptor.getIncludeMetadata(el),
                             url: descriptor.getLink(el), type: descriptor.renderType.toString()]
             } else if (descriptor.renderType != ReportDescriptor.RenderType.ASSET) {
                 // for users not logged in only let non-asset reports to render
-                reports << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
+                reportDescriptorsJson << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
                             depth: descriptor.depth(el), includeMetadata: descriptor.includeMetadata(el),
                             url: descriptor.getLink(el), type: descriptor.renderType.toString()]
             }
         }
 
-        reports
+        reportDescriptorsJson
     }
 
     @Override

@@ -110,7 +110,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
           # getExpression to get the reports JSON, which should return the reports and also assign them to the object specified by the watchExpression
           action.createActionsFrom = (getExpression, watchExpression, createActionsFunction) ->
             generatorAction = childAction
-            updateChildActions = (input)->
+            updateChildActions = (input)-> # named input to be generic, but the only use case so far is report descriptor data.
               ret = $filter('filter')(action.children, (cha) -> cha.generatedBy != generatorAction.id and cha.id != generatorAction.id)
               createdActions = createActionsFunction(input) ? []
               for createdAction, i in createdActions
