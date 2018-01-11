@@ -12,7 +12,7 @@ class MetadataSecurityService {
     RequestmapGormService requestmapGormService
 
     public static final List MODEL_CATALOGUE_NORTH_THAMES_URL_MAPPINGS = [
-            ['/api/modelCatalogue/core/northThames/northThamesSummaryReport/*', 'isAuthenticated()', HttpMethod.GET]
+            ['/api/modelCatalogue/core/northThames/northThamesGridHierarchyMappingSummaryReport/*', 'isAuthenticated()', HttpMethod.GET]
     ]
 
     public static final List MODEL_CATALOGUE_GENOMICS_URL_MAPPINGS = [

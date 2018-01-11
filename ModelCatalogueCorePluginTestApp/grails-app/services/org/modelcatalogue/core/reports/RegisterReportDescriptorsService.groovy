@@ -9,7 +9,21 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.util.Metadata
 
 class RegisterReportDescriptorsService {
+    class OrganizationDescription {
+        String fullName
+        String abbreviatedName
+        String regexForDataModelName
 
+        OrganizationDescription(String fullName, String abbreviatedName, String regexForDataModelName) {
+            this.fullName = fullName
+            this.abbreviatedName = abbreviatedName
+            this.regexForDataModelName = regexForDataModelName
+        }
+
+        OrganizationDescription createWithAbbrevNamePrefixAsRegex(String fullName, String abbreviatedName) {
+            new OrganizationDescription(fullName, abbreviatedName, abbreviatedName + "(.*)")
+        }
+    }
     ReportDescriptorRegistry reportDescriptorRegistry
 
     void register() {
@@ -71,100 +85,50 @@ class RegisterReportDescriptorsService {
                 type DataModel
                 when { DataModel dataModel ->
                     (dataModel.countDeclares() > 0) && (gelSourceModelNames.contains(dataModel.name))
+                    // report only applies to Cancer Model and Rare Diseases!
                 }
-                link controller: 'northThames', action: 'northThamesSummaryReport', id: true, params: [organization: name]
+                link controller: 'northThames', action: 'northThamesGridHierarchyMappingSummaryReport', id: true, params: [organization: name]
             }
+
+            reportDescriptorRegistry.register {
+                creates asset
+                title { "GMC Mapping Report – North Thames – ${name}" }
+                defaultName { "${it.name} North Thames mapping report as MS Excel Document" }
+                depth 7 // for Rare Diseases
+                type DataModel
+                when { DataModel dataModel ->
+                    (dataModel.countDeclares() > 0) && (gelSourceModelNames.contains(dataModel.name))
+                }
+                link controller: 'northThames', action: 'northThamesMappingReport', id: true, params: [organization: name]
+            }
+
         }
 
 
-        reportDescriptorRegistry.register {
-            creates asset
-            title { "Royal Free Mapping Report" }
-            defaultName { "RFH Mapping Report Document" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.name.matches("RFH(.*)")
-            }
-            link controller: 'northThames', action: 'northThamesMappingReport', id: true
-        }
-        reportDescriptorRegistry.register {
-            creates asset
-            title { "University College Mapping Report" }
-            defaultName { "UCLH Mapping Report Document" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.name.matches("UCLH(.*)")
-            }
-            link controller: 'northThames', action: 'northThamesMappingReport', id: true
-        }
-        reportDescriptorRegistry.register {
-            creates asset
-            title { "Great Ormond Street Mapping Report" }
-            defaultName { "GOSH Mapping Report Document" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.name.matches("GOSH(.*)")
-            }
-            link controller: 'northThames', action: 'northThamesMappingReport', id: true
-        }
-        reportDescriptorRegistry.register {
-            creates asset
-            title { "St. Bartholomews Mapping Report" }
-            defaultName { "BARTS Mapping Report Document" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.name.matches("BARTS(.*)")
-            }
-            link controller: 'northThames', action: 'northThamesMappingReport', id: true
-        }
-        reportDescriptorRegistry.register {
-            creates asset
-            title { "Royal National Orthopaedic Mapping Report" }
-            defaultName { "RNOH Mapping Report Document" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.name.matches("RNOH(.*)")
-            }
-            link controller: 'northThames', action: 'northThamesMappingReport', id: true
-        }
-        reportDescriptorRegistry.register {
-            creates asset
-            title { "London North West Street Mapping Report" }
-            defaultName { "LNW Mapping Report Document" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.name.matches("LNW(.*)")
-            }
-            link controller: 'northThames', action: 'northThamesMappingReport', id: true
-        }
-        reportDescriptorRegistry.register {
-            creates asset
-            title { "Moorfields Eye Hospital Mapping Report" }
-            defaultName { "MEH Mapping Report Document" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.name.matches("MEH(.*)")
-            }
-            link controller: 'northThames', action: 'northThamesMappingReport', id: true
-        }
+        List<OrganizationDescription> organizationDescriptions = [
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("Royal Free Hospital", "RFH"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("University College London Hospital", "UCLH"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("Great Ormond Street Hospital", "GOSH"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("St. Bartholomews", "BARTS"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("Royal National Orthopaedic Hospital", "RNOH"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("London North West Hospital", "LNWH"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("Moorfields Eye Hospital", "MEH"),
+                new OrganizationDescription("North Thames Genomic Medical Centres", "NT", "LONDONPATHOLOGYCODES(.*)")
+        ]
 
-        reportDescriptorRegistry.register {
-            creates asset
-            title { "North Thames Genomic Centres Mapping Report" }
-            defaultName { "NT Mapping Report Document" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.name.matches("LONDONPATHOLOGYCODES(.*)")
+        for (OrganizationDescription organizationDescription : organizationDescriptions) {
+            reportDescriptorRegistry.register {
+                creates asset
+                title { "${organizationDescription.fullName} Mapping Report" }
+                defaultName { "${organizationDescription.abbreviatedName} Mapping Report Document" }
+                depth 3
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.name.matches(organizationDescription.regexForDataModelName)
+                }
+                link controller: 'northThames', action: 'northThamesMappingReport', id: true
             }
-            link controller: 'northThames', action: 'northThamesMappingReport', id: true
+
         }
 
 
@@ -221,9 +185,11 @@ class RegisterReportDescriptorsService {
             }
         }
 
+        ///// Genomics England Reports
+
         reportDescriptorRegistry.register {
             creates link
-            title { "Generate all ${it.name} files" }
+            title { "Generate all ${it.name} Cancer Report files" }
             type DataModel
             when { DataModel dataModel ->
                 dataModel.ext.get(Metadata.ALL_CANCER_REPORTS) == 'true'
@@ -233,7 +199,7 @@ class RegisterReportDescriptorsService {
 
         reportDescriptorRegistry.register {
             creates link
-            title { "Generate all ${it.name} files" }
+            title { "Generate all ${it.name} Rare Disease Report files" }
             type DataModel
             when { DataModel dataModel ->
                 dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true'
