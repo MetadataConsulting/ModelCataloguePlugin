@@ -43,7 +43,7 @@ class DataType extends CatalogueElement implements Validating {
                 if (it.dataModel != this.dataModel) {
                     return [(it): it.dataModel]
                 } else {
-                    return [:]
+                    return [(it): null]
                 }
             } else {
                 // if deletes DataType, it should not be used anywhere
