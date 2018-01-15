@@ -6,7 +6,6 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
         template: '''
          <div class="modal-header">
             <h4>Login</h4>
-            <span class="label label-warning"><b>You are not authorized to access this resource</b></span>
         </div>
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>

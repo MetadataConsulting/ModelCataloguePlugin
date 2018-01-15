@@ -47,10 +47,11 @@ class DataModel extends CatalogueElement {
         def manualDelete = declares.collectEntries {
             // check the element for the same - if manual delete is needed
             def relationshipManualDelete = it.manualDeleteRelationships(this)
-            if (relationshipManualDelete.size() > 0)
+            if (relationshipManualDelete.size() > 0) {
                 return [(it): relationshipManualDelete]
-            else
+            } else {
                 return [:]
+            }
         }
         // inspect relationships
         manualDelete << (outgoingRelationships + incomingRelationships).collectEntries {

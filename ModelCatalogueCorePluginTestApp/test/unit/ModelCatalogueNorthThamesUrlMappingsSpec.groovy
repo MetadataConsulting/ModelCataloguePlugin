@@ -7,8 +7,9 @@ import spock.lang.Specification
 @Mock(NorthThamesController)
 class ModelCatalogueNorthThamesUrlMappingsSpec extends Specification {
 
-    void "test UserUrlMappings GET Request mappings"() {
+    void "test ModelCatalogueNorthThamesUrlMappings GET Request mappings"() {
         expect:
-        assertForwardUrlMapping('/api/modelCatalogue/core/northThames/northThamesGridHierarchyMappingSummaryReport/$id', controller: 'northThames', action: 'northThamesMappingReport')
+        assertForwardUrlMapping('/api/modelCatalogue/core/northThames/northThamesGridHierarchyMappingSummaryReport/$id', controller: 'northThames', action: 'northThamesGridHierarchySummaryMappingReport')
+        assertForwardUrlMapping('/api/modelCatalogue/core/northThames/northThamesMappingReport/$id', controller: 'northThames', action: 'northThamesMappingReport')
     }
 }
