@@ -11,7 +11,7 @@ class PrimitiveTypeUrlMappings {
         "/api/modelCatalogue/core/primitiveType/$id/validate"(controller: 'primitiveType', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/primitiveType/validate"(controller: 'primitiveType', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/primitiveType/$id"(controller: 'primitiveType', action: 'show', method: HttpMethod.GET)
-        "/api/modelCatalogue/core/primitiveType/$id/availableReports"(controller: 'primitiveType', action: 'availableReports', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/primitiveType/$id/availableReportDescriptors"(controller: 'primitiveType', action: 'availableReportDescriptors', method: HttpMethod.GET)
         "/api/modelCatalogue/core/primitiveType/$id"(controller: 'primitiveType', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/primitiveType/$id"(controller: 'primitiveType', action: 'delete', method: HttpMethod.DELETE)
         "/api/modelCatalogue/core/primitiveType/$id/outgoing/search"(controller: 'primitiveType', action: 'searchOutgoing', method: HttpMethod.GET)

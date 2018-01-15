@@ -343,20 +343,21 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
-  generateReports = ($scope, $window, enhance, rest, $log, messages, $timeout) ->
-    (reports = []) ->
-      for report in reports
+  generateReportActionsFromDescriptors = ($scope, $window, enhance, rest, $log, messages, $timeout) -> # dependencies for contextual instantiation
+    # the actual generator:
+    (reportDescriptors = []) ->
+      for reportDescriptor in reportDescriptors
         {
-          label: report.title
-          defaultName: report.defaultName
-          depth: report.depth
-          includeMetadata: report.includeMetadata
-          url: report.url
-          type: report.type
+          label: reportDescriptor.title
+          defaultName: reportDescriptor.defaultName
+          depth: reportDescriptor.depth
+          includeMetadata: reportDescriptor.includeMetadata
+          url: reportDescriptor.url
+          type: reportDescriptor.type
           watches: 'element'
           action: ->
             url = @url
-            defaultValue = if @defaultName then @defaultName else ''
+            defaultValue = @defaultName || ''
             depth = @depth
             includeMetadata = @includeMetadata
             if @type == 'LINK'
@@ -393,10 +394,10 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
         {
           position: 1000
           label: "#{$scope.element.name} Reports"
-          disabled: not $scope.element?.availableReports?.length
-          watches: 'element.availableReports'
+          disabled: not $scope.element?.availableReportDescriptors?.length
+          watches: 'element.availableReportDescriptors'
           generator: (action) ->
-            action.createActionsFrom 'element.getAvailableReports()', 'element.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
+            action.createActionsFrom 'element.getAvailableReportDescriptors()', 'element.availableReportDescriptors', generateReportActionsFromDescriptors($scope, $window, enhance, rest, $log, messages, $timeout)
         }
     ])
 
@@ -409,7 +410,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
           disabled: not $scope.reports?.length
           watches: 'reports'
           generator: (action) ->
-            action.createActionsFrom 'reports', 'reports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
+            action.createActionsFrom 'reports', 'reports', generateReportActionsFromDescriptors($scope, $window, enhance, rest, $log, messages, $timeout)
         }
     ])
 
@@ -421,10 +422,10 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
         {
           position: 5000
           label: "Current Reports"
-          disabled: not $scope.list.availableReports?.length
-          watches: 'list.availableReports'
+          disabled: not $scope.list.availableReportDescriptors?.length
+          watches: 'list.availableReportDescriptors'
           generator: (action) ->
-            action.createActionsFrom 'list.availableReports', 'list.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
+            action.createActionsFrom 'list.availableReportDescriptors', 'list.availableReportDescriptors', generateReportActionsFromDescriptors($scope, $window, enhance, rest, $log, messages, $timeout)
         }
     ])
 

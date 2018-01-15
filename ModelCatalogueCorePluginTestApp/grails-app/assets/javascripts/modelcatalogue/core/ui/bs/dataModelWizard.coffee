@@ -66,14 +66,14 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
             unless name
               deferred.resolve false
               return deferred.promise
-
+            lName = name.toLowerCase()
             checkForUniqueness = (list) ->
               if list.total == 0
                 deferred.resolve true
                 return
 
               for classification in list.list
-                if classification.name == name
+                if classification.name.toLowerCase() == lName
                   deferred.resolve false
                   $scope.messages.error "Name is not unique"
                   return

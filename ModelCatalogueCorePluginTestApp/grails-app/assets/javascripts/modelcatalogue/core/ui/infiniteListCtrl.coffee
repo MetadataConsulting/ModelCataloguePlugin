@@ -121,7 +121,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       addElements(newList.list)
       $scope.next     = newList.next
       $scope.total    = newList.total
-      $scope.reports  = newList.availableReports
+      $scope.reports  = newList.availableReportDescriptors
     else
       $scope.rows     = []
       $scope.elements = []

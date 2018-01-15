@@ -19,7 +19,7 @@ class NorthThamesController {
 
     //produce a grid report spreadsheet where the whole data set is displayed as a grid with metadata and relationships (rather then tabs)
 
-    def northThamesSummaryReport(String name, Integer depth) {
+    def northThamesGridHierarchyMappingSummaryReport(String name, Integer depth) {
         DataModel dataModel = dataModelGormService.findById(params.long('id'))
         String organization = params.organization as String
         Long dataModelId = dataModel.id

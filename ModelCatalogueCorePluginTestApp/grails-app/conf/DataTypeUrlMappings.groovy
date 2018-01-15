@@ -10,7 +10,7 @@ class DataTypeUrlMappings {
         "/api/modelCatalogue/core/dataType/$id/validate"(controller: 'dataType', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataType/validate"(controller: 'dataType', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataType/$id"(controller: 'dataType', action: 'show', method: HttpMethod.GET)
-        "/api/modelCatalogue/core/dataType/$id/availableReports"(controller: 'dataType', action: 'availableReports', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataType/$id/availableReportDescriptors"(controller: 'dataType', action: 'availableReportDescriptors', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataType/$id"(controller: 'dataType', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/dataType/$id"(controller: 'dataType', action: 'delete', method: HttpMethod.DELETE)
         "/api/modelCatalogue/core/dataType/$id/outgoing/search"(controller: 'dataType', action: 'searchOutgoing', method: HttpMethod.GET)
