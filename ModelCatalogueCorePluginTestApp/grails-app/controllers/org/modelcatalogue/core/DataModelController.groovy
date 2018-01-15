@@ -77,6 +77,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         'paragraph.headerImage' height: 1.366.inches, width: 2.646.inches
     }
 
+    @Override
     protected DataModel findById(long id) {
         dataModelGormService.findById(id)
     }

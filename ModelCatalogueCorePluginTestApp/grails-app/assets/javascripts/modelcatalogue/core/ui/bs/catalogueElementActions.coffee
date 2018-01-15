@@ -81,11 +81,11 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         return undefined if not angular.isFunction($scope.element.delete)
         return undefined if not angular.isFunction($scope.element.isInstanceOf)
         return undefined if not security.hasRole('CURATOR')
+        return undefined if ($scope.element.isInstanceOf('dataModel') and $scope.element.status != 'DRAFT')
         return undefined if not ($scope.element.isInstanceOf('asset') or $scope.element.isInstanceOf('dataClass') or
           $scope.element.isInstanceOf('dataElement') or $scope.element.isInstanceOf('dataModel') or
           $scope.element.isInstanceOf('dataType') or $scope.element.isInstanceOf('measurementUnit') or
           $scope.element.isInstanceOf('validationRule'))
-
         {
           position: -1500
           label: 'Delete'

@@ -231,6 +231,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
+        if (instance instanceof DataModel && ((DataModel) instance).status != ElementStatus.DRAFT) {
+            response.status = FORBIDDEN.value()
+            respond errors: "Only Draft Data Models can be deleted"
+            return
+        }
 
         DataModel dataModel
         if ( instance instanceof DataModel ) {
