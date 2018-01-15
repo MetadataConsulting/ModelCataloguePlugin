@@ -122,53 +122,57 @@ class DataImportController  {
                 return
             }
         }
-
-        // "General Excel file"-- "THE MC Excel file" -- actually the format produced by ExcelExporter that has parent data class etc.
-        String suffix = "mc.xls"
-        if (checkFileNameTypeAndContainsString(file,suffix)) {
-            Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
-            Long id = asset.id
-            InputStream inputStream = file.inputStream
-            String filename = file.originalFilename
-            Workbook wb = WorkbookFactory.create(inputStream)
-            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            executeInBackground(id, "Imported from Excel") {
-                loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
+        if (excelImportType == ExcelImportType.REIMPORT_FROM_EXCEL_EXPORTER) {
+            // "General Excel file"-- "THE MC Excel file" -- actually the format produced by ExcelExporter that has parent data class etc.
+            String suffix = "mc.xls"
+            if (checkFileNameTypeAndContainsString(file,suffix)) {
+                Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+                Long id = asset.id
+                InputStream inputStream = file.inputStream
+                String filename = file.originalFilename
+                Workbook wb = WorkbookFactory.create(inputStream)
+                defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+                executeInBackground(id, "Imported from Excel") {
+                    loadMCSpreadsheet(wb, filename, defaultCatalogueBuilder, id, userId)
+                }
+                redirectToAsset(id)
+                return
             }
-            redirectToAsset(id)
-            return
         }
 
-        //North Thames GMC specific import type for cancer data
-        suffix = "ca_nt_rawimport.xls"
-        if (checkFileNameTypeAndContainsString(file,suffix)) {
-            Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
-            Long id = asset.id
-            InputStream inputStream = file.inputStream
-            String filename = file.originalFilename
-            Workbook wb = WorkbookFactory.create(inputStream)
-            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            executeInBackground(id, "Imported from Excel") {
-                loadNTSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
-            }
-            redirectToAsset(id)
-            return
-        }
+        if (excelImportType == ExcelImportType.NORTH_THAMES_DATA_SOURCE_MAPPING) {
 
-        //North Thames GMC specific import type for rare disease data
-        suffix = "rd_nt_rawimport.xls"
-        if (checkFileNameTypeAndContainsString(file,suffix)) {
-            Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
-            Long id = asset.id
-            InputStream inputStream = file.inputStream
-            String filename = file.originalFilename
-            Workbook wb = WorkbookFactory.create(inputStream)
-            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            executeInBackground(id, "Imported from Excel") {
-                loadNTSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+            //North Thames GMC specific import type for cancer data
+            suffix = "ca_nt_rawimport.xls"
+            if (checkFileNameTypeAndContainsString(file,suffix)) {
+                Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+                Long id = asset.id
+                InputStream inputStream = file.inputStream
+                String filename = file.originalFilename
+                Workbook wb = WorkbookFactory.create(inputStream)
+                defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+                executeInBackground(id, "Imported from Excel") {
+                    loadNTSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+                }
+                redirectToAsset(id)
+                return
             }
-            redirectToAsset(id)
-            return
+
+            //North Thames GMC specific import type for rare disease data
+            suffix = "rd_nt_rawimport.xls"
+            if (checkFileNameTypeAndContainsString(file,suffix)) {
+                Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+                Long id = asset.id
+                InputStream inputStream = file.inputStream
+                String filename = file.originalFilename
+                Workbook wb = WorkbookFactory.create(inputStream)
+                defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+                executeInBackground(id, "Imported from Excel") {
+                    loadNTSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+                }
+                redirectToAsset(id)
+                return
+            }
         }
 
         // openEHR
@@ -188,25 +192,27 @@ class DataImportController  {
             return
         }
 
-        //Default excel import - "standardImport" – which assumes data is in the 'Grid data' format
-        suffix = "xls"
-        if (checkFileNameTypeAndContainsString(file,suffix)) {
-            Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
-            Long id = asset.id
-            InputStream inputStream = file.inputStream
-            Workbook wb = WorkbookFactory.create(inputStream)
-            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            executeInBackground(id, "Imported from Excel") {
-                try {
-                    ExcelLoader parser = new ExcelLoader()
-                    parser.buildModelFromStandardWorkbookSheet(HeadersMap.createForStandardExcelLoader(), inputStream, )
-                    finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
-                } catch (Exception e) {
-                    logError(id, e)
+        if (excelImportType == ExcelImportType.STANDARD) {
+            //Default excel import - "standardImport" – which assumes data is in the 'Grid data' format
+            suffix = "xls"
+            if (checkFileNameTypeAndContainsString(file,suffix)) {
+                Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+                Long id = asset.id
+                InputStream inputStream = file.inputStream
+                Workbook wb = WorkbookFactory.create(inputStream)
+                defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+                executeInBackground(id, "Imported from Excel") {
+                    try {
+                        ExcelLoader parser = new ExcelLoader()
+                        parser.buildModelFromStandardWorkbookSheet(HeadersMap.createForStandardExcelLoader(), inputStream, )
+                        finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
+                    } catch (Exception e) {
+                        logError(id, e)
+                    }
                 }
+                redirectToAsset(id)
+                return
             }
-            redirectToAsset(id)
-            return
         }
 
 

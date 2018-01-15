@@ -45,7 +45,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     static responseFormats = ['json', 'xml']
     static allowedMethods = [
-            availableReports: "GET",
+            availableReportDescriptors: "GET",
             outgoing: "GET",
             incoming: "GET",
             addIncoming: "POST",
@@ -290,10 +290,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond mappingSavedEvent.mapping
     }
 
-    def availableReports(Long id) {
-        List<Map> reports = manageCatalogueElementService.availableReports(id)
+    def availableReportDescriptors(Long id) {
+        List<Map> reports = manageCatalogueElementService.availableReportDescriptors(id)
         render(contentType: 'text/json') {[
-                'availableReports': reports
+                'availableReportDescriptors': reports
         ]}
     }
 
