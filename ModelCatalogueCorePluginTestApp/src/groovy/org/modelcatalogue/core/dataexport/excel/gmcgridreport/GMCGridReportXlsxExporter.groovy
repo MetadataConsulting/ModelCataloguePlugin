@@ -1,5 +1,11 @@
 package org.modelcatalogue.core.dataexport.excel.gmcgridreport
 
+import org.modelcatalogue.core.DataClassService
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Relationship
+
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.gel.export.GridReportXlsxExporter
@@ -34,7 +40,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
      * The report is triggered from a DataModel (element), and is on the
      * location of data elements specified by that DataModel in the given 'organization'.
      * @param element
-     * @param dataClassService
+     * @param
      * @param grailsApplication
      * @param depth
      * @param organization
