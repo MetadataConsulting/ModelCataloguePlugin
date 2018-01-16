@@ -122,9 +122,10 @@ class DataImportController  {
                 return
             }
         }
+        String suffix = ""
         if (excelImportType == ExcelImportType.REIMPORT_FROM_EXCEL_EXPORTER) {
             // "General Excel file"-- "THE MC Excel file" -- actually the format produced by ExcelExporter that has parent data class etc.
-            String suffix = "mc.xls"
+            suffix = "mc.xls"
             if (checkFileNameTypeAndContainsString(file,suffix)) {
                 Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
                 Long id = asset.id
