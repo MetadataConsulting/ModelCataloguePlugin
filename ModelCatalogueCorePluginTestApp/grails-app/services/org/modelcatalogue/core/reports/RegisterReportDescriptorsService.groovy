@@ -7,23 +7,23 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.util.Metadata
+class OrganizationDescription {
+    String fullName
+    String abbreviatedName
+    String regexForDataModelName
 
-class RegisterReportDescriptorsService {
-    class OrganizationDescription {
-        String fullName
-        String abbreviatedName
-        String regexForDataModelName
-
-        OrganizationDescription(String fullName, String abbreviatedName, String regexForDataModelName) {
-            this.fullName = fullName
-            this.abbreviatedName = abbreviatedName
-            this.regexForDataModelName = regexForDataModelName
-        }
-
-        OrganizationDescription createWithAbbrevNamePrefixAsRegex(String fullName, String abbreviatedName) {
-            new OrganizationDescription(fullName, abbreviatedName, abbreviatedName + "(.*)")
-        }
+    OrganizationDescription(String fullName, String abbreviatedName, String regexForDataModelName) {
+        this.fullName = fullName
+        this.abbreviatedName = abbreviatedName
+        this.regexForDataModelName = regexForDataModelName
     }
+
+    static OrganizationDescription createWithAbbrevNamePrefixAsRegex(String fullName, String abbreviatedName) {
+        new OrganizationDescription(fullName, abbreviatedName, abbreviatedName + "(.*)")
+    }
+}
+class RegisterReportDescriptorsService {
+
     ReportDescriptorRegistry reportDescriptorRegistry
 
     void register() {
