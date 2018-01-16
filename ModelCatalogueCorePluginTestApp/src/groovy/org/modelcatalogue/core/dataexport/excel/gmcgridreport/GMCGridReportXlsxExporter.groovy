@@ -12,6 +12,8 @@ import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
 
+import org.modelcatalogue.core.util.builder.BuildProgressMonitor
+
 /**
  * GridReportXlsxExporter.groovy
  * Generates a report from a source data model which, as in GridReportXlsxExporter, shows its data classes in a hierarchy and
@@ -36,6 +38,8 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     static String dataSourceNameMetadataKey = "http://www.modelcatalogue.org/metadata/#dataSourceName"
     protected List<String> excelHeaders = GMCGridReportHeaders.excelHeaders
 
+    BuildProgressMonitor buildProgressMonitor = null // originally for CatalogueBuilder but using it for monitoring the progress of the export.
+
     /**
      * The report is triggered from a DataModel (element), and is on the
      * location of data elements specified by that DataModel in the given 'organization'.
@@ -48,6 +52,18 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
      */
     static GMCGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = defaultOrganization) {
         return new GMCGridReportXlsxExporter(element, dataClassService, grailsApplication, depth, organization)
+    }
+
+    static GMCGridReportXlsxExporter createWithBuildProgressMonitor(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth, String organization, BuildProgressMonitor buildProgressMonitor) {
+        GMCGridReportXlsxExporter gmcGridReportXlsxExporter = create(element, dataClassService, grailsApplication, depth, organization)
+        gmcGridReportXlsxExporter.buildProgressMonitor = buildProgressMonitor
+        return gmcGridReportXlsxExporter
+    }
+
+    void logToMonitorIfExists(String message) {
+        if (buildProgressMonitor) {
+            buildProgressMonitor.onNext(message)
+        }
     }
 
 
@@ -84,7 +100,11 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
     @Override
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
+
         DataElement dataElement = dataElementRelationship.destination
+
+        logToMonitorIfExists("Printing data element ${dataElement.name}")
+
         List placeholders  = []
         placeholders = dataElement.relatedTo.findAll{ it.dataModel.ext.get(organizationMetadataKey) == organization }
         addToSystemsMap(placeholders, dataElement)
