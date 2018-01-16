@@ -6,6 +6,7 @@ import org.modelcatalogue.core.dataexport.excel.norththamesreport.NorthThamesMap
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.springframework.http.HttpStatus
+import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 
 /**
  * Controller for GEL specific reports.
@@ -29,15 +30,19 @@ class NorthThamesController {
             return
         }
 
+        String assetName = name ?: "${dataModel.name} report as MS Excel Document-for-${organization}"
+
         def assetId = assetService.storeReportAsAsset(
                 dataModel,
-                name: name ? name : "${dataModel.name} report as MS Excel Document-for-${organization}",
+                name: assetName,
                 originalFileName: "${organization}-${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ) { OutputStream outputStream ->
+        ) { OutputStream outputStream, Long assetId ->
+            BuildProgressMonitor buildProgressMonitor = BuildProgressMonitor.create("Exporting asset $assetName", assetId)
             // reload domain class as this is called in separate thread
-            GMCGridReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth, organization).export(outputStream)
+            GMCGridReportXlsxExporter.createWithBuildProgressMonitor(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth, organization, buildProgressMonitor).export(outputStream)
         }
+
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
