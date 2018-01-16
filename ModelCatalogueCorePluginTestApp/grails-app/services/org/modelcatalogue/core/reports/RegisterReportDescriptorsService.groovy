@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.reports
 
+import groovy.transform.Immutable
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
@@ -7,16 +8,10 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.util.Metadata
-class OrganizationDescription {
-    String fullName
-    String abbreviatedName
-    String regexForDataModelName
 
-    OrganizationDescription(String fullName, String abbreviatedName, String regexForDataModelName) {
-        this.fullName = fullName
-        this.abbreviatedName = abbreviatedName
-        this.regexForDataModelName = regexForDataModelName
-    }
+@Immutable(copyWith=true)
+class OrganizationDescription {
+    String fullName, abbreviatedName, regexForDataModelName
 
     static OrganizationDescription createWithAbbrevNamePrefixAsRegex(String fullName, String abbreviatedName) {
         new OrganizationDescription(fullName, abbreviatedName, abbreviatedName + "(.*)")
@@ -117,14 +112,15 @@ class RegisterReportDescriptorsService {
         ]
 
         for (OrganizationDescription organizationDescription : organizationDescriptions) {
+            OrganizationDescription copiedOrganizationDescription = organizationDescription.copyWith() // copy so that each reportDescriptor has a different variable
             reportDescriptorRegistry.register {
                 creates asset
-                title { "${organizationDescription.fullName} Mapping Report" }
-                defaultName { "${organizationDescription.abbreviatedName} Mapping Report Document" }
+                title { "${copiedOrganizationDescription.fullName} Mapping Report" }
+                defaultName { "${copiedOrganizationDescription.abbreviatedName} Mapping Report Document" }
                 depth 3
                 type DataModel
                 when { DataModel dataModel ->
-                    dataModel.name.matches(organizationDescription.regexForDataModelName)
+                    dataModel.name.matches(copiedOrganizationDescription.regexForDataModelName)
                 }
                 link controller: 'northThames', action: 'northThamesMappingReport', id: true
             }
