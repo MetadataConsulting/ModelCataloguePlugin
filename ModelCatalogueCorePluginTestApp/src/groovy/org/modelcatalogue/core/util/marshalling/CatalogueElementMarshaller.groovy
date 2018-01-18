@@ -150,10 +150,10 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
             }
             switch (direction) {
                 case RelationshipDirection.INCOMING:
-                    relation.count = RelationshipType.withNewSession { el.countIncomingRelationshipsByType(type) }
+                    relation.count = el.countIncomingRelationshipsByType(type)
                     break
                 default:
-                    relation.count = RelationshipType.withNewSession { el.countOutgoingRelationshipsByType(type) }
+                    relation.count = el.countOutgoingRelationshipsByType(type)
                     break
             }
 
