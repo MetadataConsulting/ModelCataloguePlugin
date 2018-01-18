@@ -191,6 +191,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               ret = @name
               semver = @semanticVersion
               versionNumber = @versionNumber
+            else if @classifiedName
+              return @classifiedName.replace(@name+' (', "").replace(")", "")
             else
               return null
 
