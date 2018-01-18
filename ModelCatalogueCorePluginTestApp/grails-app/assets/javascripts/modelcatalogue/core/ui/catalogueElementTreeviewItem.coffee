@@ -153,7 +153,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
         $scope.node.metadataOccurrencesToAsterisk = metadataOccurrencesToAsterisk(element)
 
         $scope.node.reset = ->
-          if $scope.node.item[$scope.treeview.getDescend()]
+          if $scope.node.item[$scope.treeview.getDescend()] # descend is "content"– this is asking for a "content" field/function.
             $scope.node.numberOfChildren = $scope.element[$scope.treeview.getDescend()].total
             $scope.node.loadingChildren = false
           else
@@ -184,8 +184,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           $scope.node.loadingChildren = true
 
           # It's hard to tell by tracing the code, but descendFun will be a listReference which is a query function... Minimal:true for minimal JSON
-          $scope.descendFun(null, angular.extend({minimal:true},
-                                  onlyImportant($scope.extraParameters)))
+          $scope.descendFun(null, angular.extend({minimal:true},onlyImportant($scope.extraParameters)))
+#          $scope.descendFun(null, onlyImportant($scope.extraParameters))
             .then(loadNewChildren)
             .finally ->
               $scope.node.loadingChildren = false
