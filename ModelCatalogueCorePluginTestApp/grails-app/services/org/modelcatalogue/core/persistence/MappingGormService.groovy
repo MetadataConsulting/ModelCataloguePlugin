@@ -24,4 +24,9 @@ class MappingGormService implements WarnGormErrors {
         }
         mapping
     }
+
+    @Transactional(readOnly = true)
+    Mapping findById(Long id) {
+        Mapping.get(id)
+    }
 }
