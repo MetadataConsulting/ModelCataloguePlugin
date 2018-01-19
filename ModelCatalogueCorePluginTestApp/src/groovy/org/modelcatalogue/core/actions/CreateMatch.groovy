@@ -140,7 +140,9 @@ class CreateMatch extends AbstractActionRunner {
             String matchOn = parameters?.matchOn
             if(match){
                 relationship.addExtension("match", "$match")
-                if(matchOn) relationship.addExtension("matchOn", "$matchOn")
+                if(matchOn) {
+                    relationship.addExtension("matchOn", "$matchOn")
+                }
                 relationship.save()
             }
 
