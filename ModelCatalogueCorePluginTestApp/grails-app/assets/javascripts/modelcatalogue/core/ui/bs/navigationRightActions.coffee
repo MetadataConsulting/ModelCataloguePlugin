@@ -172,7 +172,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     {
       position:   1000
       icon:       'fa fa-flash fa-fw'
-      label:      'Action Batches'
+      label:      'Mapping Utility'
       action: ->
         $window.open("#{security.contextPath}/batch/all")
     }
