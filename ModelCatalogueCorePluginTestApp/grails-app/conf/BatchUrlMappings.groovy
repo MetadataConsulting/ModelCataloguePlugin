@@ -4,6 +4,10 @@ class BatchUrlMappings {
 
     static mappings = {
         // Batch
+        "/batch/all"(controller: 'batch', action: 'all', method: HttpMethod.GET)
+        "/batch/create"(controller: 'batch', action: 'create', method: HttpMethod.GET)
+        "/batch/generateSuggestions"(controller: 'batch', action: 'generateSuggestions', method: HttpMethod.POST)
+        "/batch/archive"(controller: 'batch', action: 'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/batch" (controller: 'batch', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/batch" (controller: 'batch', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/batch/search/$search?" (controller: 'batch', action: 'search', method: HttpMethod.GET)
@@ -12,7 +16,6 @@ class BatchUrlMappings {
         "/api/modelCatalogue/core/batch/$id" (controller: 'batch', action: 'show', method: HttpMethod.GET)
         "/api/modelCatalogue/core/batch/$id" (controller: 'batch', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/batch/$id" (controller: 'batch', action: 'delete', method: HttpMethod.DELETE)
-        "/api/modelCatalogue/core/batch/$id/archive"(controller: 'batch', action:  'archive', method: HttpMethod.POST)
         "/api/modelCatalogue/core/batch/$id/run"(controller: 'batch', action: 'runAll', method: HttpMethod.POST)
         "/api/modelCatalogue/core/batch/$id/actions/$state?"(controller: 'batch', action: 'listActions', method: HttpMethod.GET)
         "/api/modelCatalogue/core/batch/$id/actions/$actionId/dismiss"(controller: 'batch', action: 'dismiss', method: HttpMethod.POST)

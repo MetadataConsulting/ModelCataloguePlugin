@@ -59,4 +59,13 @@ class GenerateSuggestionsCommandSpec extends Specification {
         then:
         !cmd.validate(['minScore'])
     }
+
+    void 'dataModel2ID and dataModel1ID cannot be the same'() {
+        when:
+        cmd.dataModel2ID = 2
+        cmd.dataModel1ID = 2
+
+        then:
+        !cmd.validate(['dataModel1ID'])
+    }
 }
