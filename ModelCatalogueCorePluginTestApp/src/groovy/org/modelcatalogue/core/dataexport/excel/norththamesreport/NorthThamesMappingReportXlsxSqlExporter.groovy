@@ -29,8 +29,8 @@ class NorthThamesMappingReportXlsxSqlExporter {
     final GrailsApplication grailsApplication
     ApplicationContext context = Holders.getApplicationContext()
     SessionFactory sessionFactory = (SessionFactory) context.getBean('sessionFactory')
-    String lpcModelName = 'LONDONPATHOLOGYCODES'
-    String localModelName = 'WinPath'
+    String lpcModelName = 'RFH_LONDONPATHOLOGYCODES'
+    String localModelName = 'RFH_WinPath'
     String loincModelName = 'LOINC'
     String gelModelName = 'Rare Diseases'
     protected List<String> excelHeaders = ['LOCAL SITE', 'LOCAL CODESET 1', 'LOCAL CODE 1', 'LOCAL CODE 1 NAME', "LOCAL CODESET 2",	"LOCAL CODE 2",	"LOCAL CODE 2 DESCRIPTION",	"LOINC CODE",	"LOINC CODE DESCRIPTION",	"LOINC SYSTEM(SPECIMEN)",	"GEL CODE",	"GEL CODE DESCRIPTION",	"OPENEHR QUERY", "REF RANGE"]
