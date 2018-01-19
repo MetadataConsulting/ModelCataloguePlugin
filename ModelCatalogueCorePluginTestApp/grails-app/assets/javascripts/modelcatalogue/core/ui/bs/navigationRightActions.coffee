@@ -115,7 +115,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
 
   actionsProvider.registerActionInRole 'admin-menu', actionsProvider.ROLE_NAVIGATION_RIGHT, ['security', (security) ->
-    return undefined unless security.hasRole('ADMIN')
+    return undefined unless security.hasRole('CURATOR')
     {
       position:   5000
       icon:       'fa fa-cog fa-fw fa-2x-if-wide'
