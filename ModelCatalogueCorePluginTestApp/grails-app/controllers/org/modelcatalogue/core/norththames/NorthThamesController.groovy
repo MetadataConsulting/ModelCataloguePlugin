@@ -3,6 +3,7 @@ package org.modelcatalogue.core.norththames
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.dataexport.excel.norththamesreport.NorthThamesMappingReportXlsxExporter
+import org.modelcatalogue.core.dataexport.excel.norththamesreport.NorthThamesMappingReportXlsxSqlExporter
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.springframework.http.HttpStatus
@@ -62,7 +63,7 @@ class NorthThamesController {
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            NorthThamesMappingReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, dataElementService, grailsApplication, isDatabaseFallback()).export(outputStream)
+            NorthThamesMappingReportXlsxSqlExporter.create(dataModelGormService.findById(dataModelId), dataClassService, dataElementService, grailsApplication, isDatabaseFallback()).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
