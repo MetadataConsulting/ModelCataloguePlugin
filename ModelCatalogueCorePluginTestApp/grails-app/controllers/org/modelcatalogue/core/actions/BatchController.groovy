@@ -1,36 +1,106 @@
 package org.modelcatalogue.core.actions
 
+import grails.validation.ValidationErrors
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.AbstractRestfulController
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.dataarchitect.DataArchitectService
 import org.modelcatalogue.core.persistence.BatchGormService
+import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.util.BeanMessage
 import org.modelcatalogue.core.util.lists.Lists
+import org.springframework.context.MessageSource
+import org.springframework.validation.ObjectError
 
-class BatchController extends AbstractRestfulController<Batch> {
+@Slf4j
+class BatchController extends AbstractRestfulController<Batch> implements BeanMessage {
 
     def actionService
+    BatchService batchService
     BatchGormService batchGormService
-    static allowedMethods = [index: 'GET', actions: 'GET', run: 'POST', reactivate: 'POST', dismiss: 'POST', updateActionParameters: 'PUT', addDependency: 'POST', removeDependency: 'DELETE']
+    DataModelGormService dataModelGormService
+    DataArchitectService dataArchitectService
+    MessageSource messageSource
+    def executorService
+
+    static allowedMethods = [
+            all: 'GET',
+            create: 'GET',
+            generateSuggestions: 'POST',
+            archive: 'POST',
+            index: 'GET',
+            actions: 'GET',
+            run: 'POST',
+            reactivate: 'POST',
+            dismiss: 'POST',
+            updateActionParameters: 'PUT',
+            addDependency: 'POST',
+            removeDependency: 'DELETE'
+    ]
 
     BatchController() {
         super(Batch)
     }
 
-    def archive() {
+    def all() {
+        List<BatchViewModel> batchList = batchService.findAllActive()
+        Number total = batchGormService.countActive()
 
-        if (!params.id) {
-            notFound()
+        [batchList: batchList, total: total]
+    }
+
+    def create() {
+        List<IdName> dataModelList = dataModelGormService.findAll().collect { DataModel dataModel ->
+            new IdName(id: dataModel.id, name: "${dataModel.name} ${dataModel.semanticVersion}".toString())
+        }
+        if ( dataModelList && dataModelList.size() < 2 ) {
+            flash.error = messageSource.getMessage('batch.create.dataModel.min', [] as Object[], 'You need at least two Data Models', request.locale)
+            redirect(action: 'all', controller: 'batch')
+            return
+        }
+        Long dataModel1Id = params.long('dataModel1')
+        Long dataModel2Id = params.long('dataModel2')
+        Integer minScore = params.int('minScore') ?: 10
+        OptimizationType optimizationType = params.optimizationType as OptimizationType
+
+        BatchCreateViewModel batchCreateViewModel = batchService.instantiateBatchCreateViewModel(dataModelList, dataModel1Id, dataModel2Id, minScore, optimizationType)
+        [
+                batchCreateViewModel: batchCreateViewModel,
+                dataModelList: dataModelList,
+                optimizationTypeList: batchService.findAllActiveOptimizationType(),
+        ]
+    }
+
+    def generateSuggestions(GenerateSuggestionsCommand cmd) {
+        if (cmd.hasErrors()) {
+            flash.error = cmd.errors.allErrors.collect { ObjectError error ->
+                messageSource.getMessage(error, request.locale)
+            }.join(',')
+            redirect(action: 'create', controller: 'batch')
             return
         }
 
-        Batch batch = findById(params.long('id'))
+        executorService.execute {
+            dataArchitectService.generateSuggestions(cmd.optimizationType, cmd.dataModel1ID, cmd.dataModel2ID, cmd.minScore)
+        }
 
-        if (!batch) {
-            notFound()
+        flash.message = messageSource.getMessage('batch.generating', [] as Object[], 'Mappings being generated', request.locale)
+        redirect action: 'all', controller: 'batch'
+    }
+
+
+    def archive(ArchiveCommand cmd) {
+        if ( cmd.hasErrors() ) {
+            flash.error = messageSource.getMessage('batch.archived.min', [] as Object[], 'Select at least one', request.locale)
+            redirect action: 'all', controller: 'batch'
             return
         }
 
-        batch.archived = true
+        batchGormService.update(cmd.batchIds, Boolean.TRUE)
 
-        respond batch
+        flash.message = messageSource.getMessage('batch.archived', [] as Object[], 'Mappings archived', request.locale)
+
+        redirect action: 'all', controller: 'batch'
     }
 
     def runAll() {

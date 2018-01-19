@@ -166,15 +166,16 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
-  actionsProvider.registerChildAction 'admin-menu', 'action-batches', ['$state', ($state) ->
+  actionsProvider.registerChildAction 'admin-menu', 'action-batches', ($window, security) ->
+    "ngInject"
+    return undefined unless security.hasRole('CURATOR')
     {
       position:   1000
       icon:       'fa fa-flash fa-fw'
-      label:      'Action Batches'
+      label:      'Mapping Utility'
       action: ->
-        $state.go 'simple.resource.list', resource: 'batch'
+        $window.open("#{security.contextPath}/batch/all")
     }
-  ]
 
   userLastSeen = [
     '$scope', 'names','security', '$state', 'messages',

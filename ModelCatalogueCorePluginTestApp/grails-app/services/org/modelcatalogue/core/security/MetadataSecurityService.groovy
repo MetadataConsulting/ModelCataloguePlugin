@@ -15,6 +15,13 @@ class MetadataSecurityService {
             ['/api/modelCatalogue/core/northThames/northThamesGridHierarchyMappingSummaryReport/*', 'isAuthenticated()', HttpMethod.GET]
     ]
 
+    public static final List MAPPINGS_SUGGESTIONS_URL_MAPPINGS = [
+            ["/mappingsuggestions",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+            ["/mappingsuggestions",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
+            ["/mappingsuggestions/reject",  MetadataRolesUtils.roles('CURATOR') ,HttpMethod.POST],
+            ["/mappingsuggestions/approve",  MetadataRolesUtils.roles('CURATOR') ,HttpMethod.POST],
+    ]
+
     public static final List MODEL_CATALOGUE_GENOMICS_URL_MAPPINGS = [
             ["/api/modelCatalogue/core/genomics/imports/upload", MetadataRolesUtils.roles('CURATOR') ,HttpMethod.POST],
             ["/api/modelCatalogue/core/genomics/exportGelSpecification/*", 'isAuthenticated()', HttpMethod.GET],
@@ -503,15 +510,18 @@ class MetadataSecurityService {
     ]
 
     public static final List BATCH_MAPPINGS = [
+
             ["/api/modelCatalogue/core/batch", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/batch", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/search/*",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/batch/search/",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/batch/*/validate", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
+
             ["/api/modelCatalogue/core/batch/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/batch/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.PUT],
             ["/api/modelCatalogue/core/batch/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
+
             ["/api/modelCatalogue/core/batch/*/archive", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/run", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/actions/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
@@ -519,6 +529,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/batch/*/actions/*/reactivate", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/actions/*/run", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/actions/*/parameters", MetadataRolesUtils.roles('CURATOR'), HttpMethod.PUT],
+
             ["/api/modelCatalogue/core/batch/*/actions/*/dependsOn", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/batch/*/actions/*/dependsOn", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
     ]
@@ -808,6 +819,9 @@ class MetadataSecurityService {
         secureModelCatalogueCorePluginUrlMappings()
 
         secureDataModelPermissionEndpoints()
+
+        secureMappings(MAPPINGS_SUGGESTIONS_URL_MAPPINGS)
+
     }
 
     void secureDataModelPermissionEndpoints() {
