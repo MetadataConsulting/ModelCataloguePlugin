@@ -510,6 +510,10 @@ class MetadataSecurityService {
     ]
 
     public static final List BATCH_MAPPINGS = [
+            ["/batch/all", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+            ["/batch/create", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+            ["/batch/generateSuggestions", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
+            ["/batch/archive", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
 
             ["/api/modelCatalogue/core/batch", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/batch", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
