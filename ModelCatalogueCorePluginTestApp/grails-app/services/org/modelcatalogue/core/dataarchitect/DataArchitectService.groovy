@@ -342,7 +342,7 @@ class DataArchitectService {
             DataClass dataClass = DataClass.get(sourceId)
             Batch batch = Batch.findOrSaveByName("Inline Data Class '$dataClass.name'")
             batch.description = """Data Class '$dataClass.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
-            Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$sourceId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
+            Action action = actionService.create batch, MergePublishedElements, source: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, sourceId), destination: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, destId)
             if (action.hasErrors()) {
                 log.error(FriendlyErrors.printErrors("Error generating merge data class action", action.errors))
             }
@@ -363,7 +363,13 @@ class DataArchitectService {
             RelationshipType type = RelationshipType.readByName("relatedTo")
 
             sources.each { srcId ->
-                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+
+                Map params = [
+                        source: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, srcId),
+                        destination: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, destId),
+                        type: MetadataDomainEntity.stringRepresentation(MetadataDomain.RELATIONSHIP_TYPE, type.id)
+                ]
+                Action action = actionService.create(params, batch, CreateRelationship)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -377,7 +383,11 @@ class DataArchitectService {
             DataClass dataClass = DataClass.get(destId)
             Batch batch = Batch.findOrSaveByName("Merge Data Class '$dataClass.name'")
             sources.each { srcId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
+                Map params = [
+                        source: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, srcId),
+                        destination: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, destId),
+                ]
+                Action action = actionService.create(params, batch, MergePublishedElements)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
