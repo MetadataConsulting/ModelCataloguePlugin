@@ -83,14 +83,15 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
     }
 
     def getPaginationParameters(String baseLink) {
+        int total = RelationshipType.countBySystem(false)
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 10, 10, 0, RelationshipType.countBySystem(false), "${baseLink}?max=10&offset=10", ""],
-                [2, 5, 5, 0, RelationshipType.countBySystem(false), "${baseLink}?max=5&offset=5", ""],
-                [3, 5, 5, 5, RelationshipType.countBySystem(false), "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
-                [4, 4, 4, 8, RelationshipType.countBySystem(false), "${baseLink}?max=4&offset=12", "${baseLink}?max=4&offset=4"],
-                [5, RelationshipType.countBySystem(false) - 10, 10, 10, RelationshipType.countBySystem(false), "", "${baseLink}?max=10&offset=0"],
-                [6, 2, 2, 10, RelationshipType.countBySystem(false), "${baseLink}?max=2&offset=12", "${baseLink}?max=2&offset=8"]
+                [1, 10, 10, 0, total, "${baseLink}?max=10&total=${total}&offset=10", ""],
+                [2, 5, 5, 0, total, "${baseLink}?max=5&total=${total}&offset=5", ""],
+                [3, 5, 5, 5, total, "${baseLink}?max=5&total=${total}&offset=10", "${baseLink}?max=5&total=${total}&offset=0"],
+                [4, 4, 4, 8, total, "${baseLink}?max=4&total=${total}&offset=12", "${baseLink}?max=4&total=${total}&offset=4"],
+                [5, RelationshipType.countBySystem(false) - 10, 10, 10, total, "", "${baseLink}?max=10&total=${total}&offset=0"],
+                [6, 2, 2, 10, total, "${baseLink}?max=2&total=${total}&offset=12", "${baseLink}?max=2&total=${total}&offset=8"]
         ]
     }
 
