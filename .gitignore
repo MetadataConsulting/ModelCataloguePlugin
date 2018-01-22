@@ -1,6 +1,7 @@
 **.iml
 **/.idea/**/*
 **/atlassian-ide-plugin.xml
+ModelCatalogueCorePluginTestApp/null/ModelCatalogueCorePluginTestApp/*/*.sql
 ModelCatalogueCorePluginTestApp/elasticsearch/
 ModelCatalogueCorePluginTestApp/test/drivers/
 ModelCatalogueCorePluginTestApp/rickmc.log

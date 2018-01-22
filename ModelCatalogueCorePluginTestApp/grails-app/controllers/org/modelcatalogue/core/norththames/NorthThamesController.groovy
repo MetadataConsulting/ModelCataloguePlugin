@@ -3,9 +3,11 @@ package org.modelcatalogue.core.norththames
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.dataexport.excel.norththamesreport.NorthThamesMappingReportXlsxExporter
+import org.modelcatalogue.core.dataexport.excel.norththamesreport.NorthThamesMappingReportXlsxSqlExporter
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.springframework.http.HttpStatus
+import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 
 /**
  * Controller for GEL specific reports.
@@ -19,7 +21,7 @@ class NorthThamesController {
 
     //produce a grid report spreadsheet where the whole data set is displayed as a grid with metadata and relationships (rather then tabs)
 
-    def northThamesSummaryReport(String name, Integer depth) {
+    def northThamesGridHierarchyMappingSummaryReport(String name, Integer depth) {
         DataModel dataModel = dataModelGormService.findById(params.long('id'))
         String organization = params.organization as String
         Long dataModelId = dataModel.id
@@ -29,15 +31,19 @@ class NorthThamesController {
             return
         }
 
+        String assetName = name ?: "${dataModel.name} report as MS Excel Document-for-${organization}"
+
         def assetId = assetService.storeReportAsAsset(
                 dataModel,
-                name: name ? name : "${dataModel.name} report as MS Excel Document-for-${organization}",
+                name: assetName,
                 originalFileName: "${organization}-${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ) { OutputStream outputStream ->
+        ) { OutputStream outputStream, Long assetId ->
+            BuildProgressMonitor buildProgressMonitor = BuildProgressMonitor.create("Exporting asset $assetName", assetId)
             // reload domain class as this is called in separate thread
-            GMCGridReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth, organization).export(outputStream)
+            GMCGridReportXlsxExporter.createWithBuildProgressMonitor(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth, organization, buildProgressMonitor).export(outputStream)
         }
+
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
@@ -62,7 +68,7 @@ class NorthThamesController {
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            NorthThamesMappingReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, dataElementService, grailsApplication, isDatabaseFallback()).export(outputStream)
+            NorthThamesMappingReportXlsxSqlExporter.create(dataModelGormService.findById(dataModelId), dataClassService, dataElementService, grailsApplication, isDatabaseFallback()).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())

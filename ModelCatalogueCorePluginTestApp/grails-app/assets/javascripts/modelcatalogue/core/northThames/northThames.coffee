@@ -23,6 +23,7 @@ stewardship.config ['detailSectionsProvider', (detailSectionsProvider)->
     position: 50
     types: [
       'dataModel'
+      'dataElement'
       # may later extend to Data Types
     ]
     keys: [

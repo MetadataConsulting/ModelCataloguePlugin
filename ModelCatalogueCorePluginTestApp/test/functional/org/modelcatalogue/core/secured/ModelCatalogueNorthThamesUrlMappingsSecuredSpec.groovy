@@ -17,7 +17,7 @@ class ModelCatalogueNorthThamesUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-                '/api/modelCatalogue/core/northThames/northThamesSummaryReport/$id',
+                '/api/modelCatalogue/core/northThames/northThamesGridHierarchyMappingSummaryReport/$id',
         ]
     }
 }

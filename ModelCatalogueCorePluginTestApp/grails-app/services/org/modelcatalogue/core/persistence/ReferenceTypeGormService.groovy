@@ -25,4 +25,9 @@ class ReferenceTypeGormService implements WarnGormErrors {
         }
         referenceTypeInstance
     }
+
+    @Transactional(readOnly = true)
+    ReferenceType findById(Long id) {
+        ReferenceType.get(id)
+    }
 }

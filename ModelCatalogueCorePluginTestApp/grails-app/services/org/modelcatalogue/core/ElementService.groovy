@@ -911,7 +911,7 @@ class ElementService implements Publisher<CatalogueElement> {
      * Return dataElement ids which are very likely to be synonyms using elasticsearch fuzzy matching.
      * @return map with the enum id as key and set of ids of duplicate enums as value
      */
-    Set<MatchResult> findFuzzyDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
+    Set<MatchResult> findFuzzyDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Integer minimumScore = 1) {
         Set<MatchResult> elementSuggestions = []
         SearchParams searchParams = new SearchParams()
         //iterate through the data model a

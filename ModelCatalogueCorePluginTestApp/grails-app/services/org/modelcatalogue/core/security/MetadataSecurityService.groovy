@@ -12,7 +12,14 @@ class MetadataSecurityService {
     RequestmapGormService requestmapGormService
 
     public static final List MODEL_CATALOGUE_NORTH_THAMES_URL_MAPPINGS = [
-            ['/api/modelCatalogue/core/northThames/northThamesSummaryReport/*', 'isAuthenticated()', HttpMethod.GET]
+            ['/api/modelCatalogue/core/northThames/northThamesGridHierarchyMappingSummaryReport/*', 'isAuthenticated()', HttpMethod.GET]
+    ]
+
+    public static final List MAPPINGS_SUGGESTIONS_URL_MAPPINGS = [
+            ["/mappingsuggestions",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+            ["/mappingsuggestions",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
+            ["/mappingsuggestions/reject",  MetadataRolesUtils.roles('CURATOR') ,HttpMethod.POST],
+            ["/mappingsuggestions/approve",  MetadataRolesUtils.roles('CURATOR') ,HttpMethod.POST],
     ]
 
     public static final List MODEL_CATALOGUE_GENOMICS_URL_MAPPINGS = [
@@ -72,7 +79,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/asset/*/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/asset/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/asset/*", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/asset/*/availableReports", 'isAuthenticated()', HttpMethod.GET],
+            ["/api/modelCatalogue/core/asset/*/availableReportDescriptors", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/asset/*", 'isAuthenticated()', HttpMethod.PUT],
             ["/api/modelCatalogue/core/asset/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/asset/*/outgoing/search", 'isAuthenticated()', HttpMethod.GET],
@@ -113,7 +120,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataElement/*/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataElement/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataElement/*", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/dataElement/*/availableReports", 'isAuthenticated()', HttpMethod.GET],
+            ["/api/modelCatalogue/core/dataElement/*/availableReportDescriptors", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataElement/*", 'isAuthenticated()', HttpMethod.PUT],
             ["/api/modelCatalogue/core/dataElement/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/dataElement/*/outgoing/search", 'isAuthenticated()', HttpMethod.GET],
@@ -150,7 +157,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataClass/*/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataClass/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataClass/*", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/dataClass/*/availableReports", 'isAuthenticated()', HttpMethod.GET],
+            ["/api/modelCatalogue/core/dataClass/*/availableReportDescriptors", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataClass/*", 'isAuthenticated()', HttpMethod.PUT],
             ["/api/modelCatalogue/core/dataClass/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/dataClass/*/outgoing/search", 'isAuthenticated()', HttpMethod.GET],
@@ -226,7 +233,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataType/*/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataType/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataType/*", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/dataType/*/availableReports", 'isAuthenticated()', HttpMethod.GET],
+            ["/api/modelCatalogue/core/dataType/*/availableReportDescriptors", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataType/*", 'isAuthenticated()', HttpMethod.PUT],
             ["/api/modelCatalogue/core/dataType/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/dataType/*/outgoing/search", 'isAuthenticated()', HttpMethod.GET],
@@ -266,7 +273,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/enumeratedType/*/setDeprecated", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/enumeratedType/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/enumeratedType/*", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/enumeratedType/*/availableReports", 'isAuthenticated()', HttpMethod.GET],
+            ["/api/modelCatalogue/core/enumeratedType/*/availableReportDescriptors", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/enumeratedType/*", 'isAuthenticated()', HttpMethod.PUT],
             ["/api/modelCatalogue/core/enumeratedType/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/enumeratedType/*/outgoing/search", 'isAuthenticated()', HttpMethod.GET],
@@ -371,7 +378,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/primitiveType/*/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/primitiveType/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/primitiveType/*", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/primitiveType/*/availableReports", 'isAuthenticated()', HttpMethod.GET],
+            ["/api/modelCatalogue/core/primitiveType/*/availableReportDescriptors", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/primitiveType/*", 'isAuthenticated()', HttpMethod.PUT],
             ["/api/modelCatalogue/core/primitiveType/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/primitiveType/*/outgoing/search", 'isAuthenticated()', HttpMethod.GET],
@@ -436,7 +443,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/tag/*/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/tag/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/tag/*", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/tag/*/availableReports", 'isAuthenticated()', HttpMethod.GET],
+            ["/api/modelCatalogue/core/tag/*/availableReportDescriptors", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/tag/*", 'isAuthenticated()', HttpMethod.PUT],
             ["/api/modelCatalogue/core/tag/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/tag/*/outgoing/search", 'isAuthenticated()', HttpMethod.GET],
@@ -472,7 +479,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/validationRule/*/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/validationRule/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/validationRule/*", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/validationRule/*/availableReports", 'isAuthenticated()', HttpMethod.GET],
+            ["/api/modelCatalogue/core/validationRule/*/availableReportDescriptors", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/validationRule/*", 'isAuthenticated()', HttpMethod.PUT],
             ["/api/modelCatalogue/core/validationRule/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/validationRule/*/outgoing/search", 'isAuthenticated()', HttpMethod.GET],
@@ -503,15 +510,31 @@ class MetadataSecurityService {
     ]
 
     public static final List BATCH_MAPPINGS = [
+<<<<<<< HEAD
+=======
+            ["/batch/all", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+            ["/batch/create", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+            ["/batch/generateSuggestions", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
+            ["/batch/archive", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
+
+>>>>>>> origin/release/2.2.4
             ["/api/modelCatalogue/core/batch", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/batch", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/search/*",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/batch/search/",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/batch/*/validate", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/release/2.2.4
             ["/api/modelCatalogue/core/batch/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/batch/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.PUT],
             ["/api/modelCatalogue/core/batch/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/release/2.2.4
             ["/api/modelCatalogue/core/batch/*/archive", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/run", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/actions/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
@@ -519,6 +542,10 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/batch/*/actions/*/reactivate", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/actions/*/run", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/actions/*/parameters", MetadataRolesUtils.roles('CURATOR'), HttpMethod.PUT],
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/release/2.2.4
             ["/api/modelCatalogue/core/batch/*/actions/*/dependsOn", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/batch/*/actions/*/dependsOn", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
     ]
@@ -618,7 +645,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataModel/*/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataModel/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataModel/*", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/dataModel/*/availableReports", 'isAuthenticated()', HttpMethod.GET],
+            ["/api/modelCatalogue/core/dataModel/*/availableReportDescriptors", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataModel/*", 'isAuthenticated()', HttpMethod.PUT],
             ["/api/modelCatalogue/core/dataModel/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/dataModel/*/outgoing/search", 'isAuthenticated()', HttpMethod.GET],
@@ -668,7 +695,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/user/*/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/user/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/user/*", MetadataRolesUtils.roles('VIEWER'), HttpMethod.GET],
-            ["/api/modelCatalogue/core/user/*/availableReports", MetadataRolesUtils.roles('VIEWER'), HttpMethod.GET],
+            ["/api/modelCatalogue/core/user/*/availableReportDescriptors", MetadataRolesUtils.roles('VIEWER'), HttpMethod.GET],
             ["/api/modelCatalogue/core/user/*", MetadataRolesUtils.roles('SUPERVISOR'), HttpMethod.PUT],
             ["/api/modelCatalogue/core/user/*", MetadataRolesUtils.roles('SUPERVISOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/user/*/outgoing/search", 'isAuthenticated()', HttpMethod.GET],
@@ -714,7 +741,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/measurementUnit/*/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/measurementUnit/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/measurementUnit/*", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/measurementUnit/*/availableReports", 'isAuthenticated()', HttpMethod.GET],
+            ["/api/modelCatalogue/core/measurementUnit/*/availableReportDescriptors", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/measurementUnit/*", 'isAuthenticated()', HttpMethod.PUT],
             ["/api/modelCatalogue/core/measurementUnit/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
             ["/api/modelCatalogue/core/measurementUnit/*/outgoing/search", 'isAuthenticated()', HttpMethod.GET],
@@ -808,6 +835,9 @@ class MetadataSecurityService {
         secureModelCatalogueCorePluginUrlMappings()
 
         secureDataModelPermissionEndpoints()
+
+        secureMappings(MAPPINGS_SUGGESTIONS_URL_MAPPINGS)
+
     }
 
     void secureDataModelPermissionEndpoints() {

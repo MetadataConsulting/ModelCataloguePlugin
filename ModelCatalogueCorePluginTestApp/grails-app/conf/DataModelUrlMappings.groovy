@@ -9,7 +9,7 @@ class DataModelUrlMappings {
         "/api/modelCatalogue/core/dataModel/$id/validate"(controller: 'dataModel', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataModel/validate"(controller: 'dataModel', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataModel/$id"(controller: 'dataModel', action: 'show', method: HttpMethod.GET)
-        "/api/modelCatalogue/core/dataModel/$id/availableReports"(controller: 'dataModel', action: 'availableReports', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataModel/$id/availableReportDescriptors"(controller: 'dataModel', action: 'availableReportDescriptors', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataModel/$id"(controller: 'dataModel', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/dataModel/$id"(controller: 'dataModel', action: 'delete', method: HttpMethod.DELETE)
         "/api/modelCatalogue/core/dataModel/$id/outgoing/search"(controller: 'dataModel', action: 'searchOutgoing', method: HttpMethod.GET)

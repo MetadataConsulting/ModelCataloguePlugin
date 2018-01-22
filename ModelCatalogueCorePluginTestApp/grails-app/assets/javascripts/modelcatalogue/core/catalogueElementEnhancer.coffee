@@ -92,10 +92,10 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             restCallPromise = rest params
             enhance restCallPromise
 
-          self.getAvailableReports = () ->
-            self.execute('availableReports').then (jsonData) ->
-              self.availableReports = jsonData.availableReports
-              return self.availableReports
+          self.getAvailableReportDescriptors = () ->
+            self.execute('availableReportDescriptors').then (jsonData) ->
+              self.availableReportDescriptors = jsonData.availableReportDescriptors
+              return self.availableReportDescriptors
 
           self.refreshIfMinimal = () ->
             if self.minimal
@@ -191,6 +191,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               ret = @name
               semver = @semanticVersion
               versionNumber = @versionNumber
+            else if @classifiedName
+              return @classifiedName.replace(@name+' (', "").replace(")", "")
             else
               return null
 
