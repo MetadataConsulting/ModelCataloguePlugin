@@ -302,6 +302,9 @@ class ConfigExcelLoader extends ExcelLoader {
         //take the class name and split to see if there is a hierarchy
         String dcCode = tryHeader(ConfigHeadersMap.containingDataClassCode, headersMap, rowMap)
         String dcNames = tryHeader(ConfigHeadersMap.containingDataClassName, headersMap, rowMap)
+        if(dcNames == null){
+            return null  //Best go no further and return a null object
+        }
         String dcDescription = tryHeader(ConfigHeadersMap.containingDataClassDescription, headersMap, rowMap)
         String[] dcNameList = dcNames.split(regEx)
         Integer maxDcNameIx = dcNameList.length - 1
@@ -363,7 +366,9 @@ class ConfigExcelLoader extends ExcelLoader {
         String muCatId = tryHeader(ConfigHeadersMap.measurementUnitCode, headersMap, rowMap)
         String muSymbol = tryHeader(ConfigHeadersMap.measurementUnitSymbol, headersMap, rowMap)
         String muName = tryHeader(ConfigHeadersMap.measurementUnitName, headersMap, rowMap) ?: (muSymbol ?: (muCatId ?: DEFAULT_MU_NAME))
-
+        if(muName == null){
+            return null  //Best go no further and return a null object
+        }
         MeasurementUnit mu
 
         if (muName == DEFAULT_MU_NAME) { // there is no measurement unit
@@ -412,6 +417,9 @@ class ConfigExcelLoader extends ExcelLoader {
         Boolean updated = false
         String dtCode = tryHeader(ConfigHeadersMap.dataTypeCode, headersMap, rowMap)
         String dtName = tryHeader(ConfigHeadersMap.dataTypeName, headersMap, rowMap)
+        if(dtName == null){
+            return null  //Best go no further and return a null object
+        }
         DataType dt
 
         //see if a datatype with the model catalogue id already exists in this model
@@ -521,6 +529,9 @@ class ConfigExcelLoader extends ExcelLoader {
         List<String> metadataKeys = headersMap['metadata']
         String deCode = tryHeader(ConfigHeadersMap.dataElementCode, headersMap, rowMap)
         String deName = tryHeader(ConfigHeadersMap.dataElementName, headersMap, rowMap)
+        if(deName == null){
+            return null  //Best go no further and return a null object
+        }
         String deDescription = tryHeader(ConfigHeadersMap.dataElementDescription, headersMap, rowMap)
         //see if a data element exists with this model catalogue id
         DataElement de
@@ -579,7 +590,9 @@ class ConfigExcelLoader extends ExcelLoader {
             MeasurementUnit mu = processMeasurementUnit(dataModel, headersMap, rowMap)
             DataType dt = processDataType(dataModel, headersMap, rowMap, mu)
             DataElement de = processDataElement(dataModel, headersMap, rowMap, dt)
-            de.addToContainedIn(dc)
+            if(de!=null){
+                de.addToContainedIn(dc)
+            }
             if (++count % batchSize == 0) {
                 cleanGORM()
             }
