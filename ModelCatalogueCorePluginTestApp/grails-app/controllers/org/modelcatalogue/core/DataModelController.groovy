@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
@@ -52,6 +53,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     FavouriteService favouriteService
 
     DataModelCatalogueElementService dataModelCatalogueElementService
+
+    AssetGormService assetGormService
 
     DataModelController() {
         super(DataModel, false)
@@ -428,16 +431,23 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
         Long dataModelId = dataModel.id
 
-        Long assetId = assetService.storeReportAsAsset(
-                dataModel,
+        AssetMetadata assetMetadata = new AssetMetadata(
                 name: name ? name : "${dataModel.name} report as MS Excel Document",
                 originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ) { OutputStream outputStream ->
-            // reload domain class as this is called in separate thread
-            CatalogueElementToXlsxExporter.forDataModel(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+        )
+        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
+        asset.dataModel = dataModel
+        asset = assetGormService.save(asset)
+        Long assetId = asset.id
+
+        assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->
+            DataModel dataModelInstance = dataModelGormService.findById(dataModelId)
+            CatalogueElementToXlsxExporter exporter = CatalogueElementToXlsxExporter.forDataModel(dataModelInstance, dataClassService, grailsApplication, depth)
+            exporter.export(outputStream)
         }
 
+        response.setHeader("X-Asset-ID", asset.id.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
         return
     }
@@ -460,12 +470,17 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        def assetId = assetService.storeReportAsAsset(
-                dataModel,
+        AssetMetadata assetMetadata = new AssetMetadata(
                 name: name ? name : "${dataModel.name} report as MS Excel Document",
                 originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ) { OutputStream outputStream ->
+        )
+        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
+        asset.dataModel = dataModel
+        asset = assetGormService.save(asset)
+        Long assetId = asset.id
+
+        assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
             // GridReportXlsxExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
             GMCGridReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
@@ -474,7 +489,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
-        return
     }
 
     /**
@@ -498,19 +512,23 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        def assetId = assetService.storeReportAsAsset(
-                dataModel,
+        AssetMetadata assetMetadata = new AssetMetadata(
                 name: name ? name : "${dataModel.name} report as MS Excel Document",
                 originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.mc.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ) { OutputStream outputStream ->
+        )
+        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
+        asset.dataModel = dataModel
+        asset = assetGormService.save(asset)
+        Long assetId = asset.id
+
+        assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
             ExcelExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
-        return
     }
 
     /**
@@ -529,18 +547,22 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
         Long modelId = dataModel.id
 
-        def assetId = assetService.storeReportAsAsset(
-                dataModel,
+        AssetMetadata assetMetadata = new AssetMetadata(
                 name: name ? name : "${dataModel.name} report as MS Excel Document",
                 originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ) { OutputStream outputStream ->
+        )
+        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
+        asset.dataModel = dataModel
+        asset = assetGormService.save(asset)
+        Long assetId = asset.id
+
+        assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->
             new DataModelToDocxExporter(dataModelGormService.findById(modelId), dataClassService, elementService, customTemplate, DOC_IMAGE_PATH, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
-        return
     }
 
 //TODO: DOCUMENT
