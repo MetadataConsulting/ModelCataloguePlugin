@@ -20,9 +20,11 @@ import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.ElasticMatchResult
+import org.modelcatalogue.core.util.ElasticMatchResultAdapter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Legacy
+import org.modelcatalogue.core.util.MatchResultImpl
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.builder.ProgressMonitor
@@ -898,7 +900,7 @@ class ElementService implements Publisher<CatalogueElement> {
             String message = checkRelatedTo(de, dataModelB)
             matches.each { item ->
                 if(!de.contains(item)) {
-                        elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: 60, message: message))
+                        elementSuggestions.add(new ElasticMatchResultAdapter(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: 60, message: message)))
                 }
             }
         }
@@ -928,7 +930,7 @@ class ElementService implements Publisher<CatalogueElement> {
             matches.getItemsWithScore().each { item, score ->
                 if(!de.relatedTo.contains(item)) {
                     //if(score>minimumScore) {
-                        elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
+                        elementSuggestions.add(new ElasticMatchResultAdapter(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message)))
                    // }
                 }
             }
@@ -961,7 +963,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 if(!de.relatedTo.contains(item)) {
                     //if(!de.relatedTo.contains(item)&&(dataModelB.contains(item))) {
                     //if(score>minimumScore) {
-                        elementSuggestions.add(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message))
+                        elementSuggestions.add(new ElasticMatchResultAdapter(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message)))
                     //}
                 }
             }
@@ -1147,8 +1149,8 @@ class ElementService implements Publisher<CatalogueElement> {
             fuzzyElementList = null
         }else{
             aList.each{
-                def aListName = it.name
-                def aListId = it.id
+                String aListName = it.name
+                Long aListId = it.id
                 String query2getBList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id =  ${dmBId}"""
                 sqlQuery = session.createSQLQuery(query2getBList)
                 sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
@@ -1157,11 +1159,6 @@ class ElementService implements Publisher<CatalogueElement> {
                     fuzzyElementList = null
                 }else {
                     bList.each {
-                        MatchResult suggestedMatches = new MatchResult()
-                        suggestedMatches.setDataElementAName(aListName)
-                        suggestedMatches.setDataElementAId(aListId as Long)
-                        suggestedMatches.setDataElementBName(it.name)
-                        suggestedMatches.setDataElementBId(it.id as Long)
 
                             //we need not just the element match, but also the rating of the match
                             Long matchScore = getNameMetric(suggestedMatches.dataElementAName, suggestedMatches.dataElementBName)
@@ -1171,6 +1168,12 @@ class ElementService implements Publisher<CatalogueElement> {
                                 fuzzyElementList.add(suggestedMatches)
                                 println " Loading Match: ${suggestedMatches.dataElementAName} and ${suggestedMatches.dataElementBName} score is: ${matchScore}"
                             }
+                        MatchResult suggestedMatches = new MatchResultImpl(
+                                dataElementAName: aListName,
+                                dataElementAId: aListId,
+                                dataElementBName: it.name as String,
+                                dataElementBId: it.id as Long,
+                        )
                         }
                     }
                 }
