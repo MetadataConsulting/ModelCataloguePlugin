@@ -399,14 +399,8 @@ class DataArchitectService {
             RelationshipType type = RelationshipType.readByName("relatedTo")
             def matchScore = 100
             other.each { otherId ->
-                Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataType:$otherId""")
-                params.put("""destination""","""gorm://org.modelcatalogue.core.DataType:$first""")
-                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                params.put("""matchScore""","""$matchScore""")
-                params.put("""matchOn""","""TypeEnums""")
-                Action action
-                action = actionService.create(params, batch, CreateMatch)
+                Map<String, String> params = matchParams(otherId as Long, MetadataDomain.DATA_TYPE, first as Long, MetadataDomain.DATA_TYPE, type.id, matchScore, null, 'TypeEnums')
+                Action action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -431,17 +425,12 @@ class DataArchitectService {
         batch.name = "Processing DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
         batch.save()
         def matchScore = 100
-        matchingDataElements.each { first, other ->
-            RelationshipType type = RelationshipType.readByName("relatedTo")
-            other.each { otherId ->
-                Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$otherId""")
-                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$first""")
-                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                params.put("""matchScore""","""$matchScore""")
-                params.put("""matchOn""","""ElementName""")
-                Action action
-                action = actionService.create(params, batch, CreateMatch)
+        RelationshipType type = RelationshipType.readByName("relatedTo")
+        for ( Long first : matchingDataElements.keySet() ) {
+            Set<Long> others = matchingDataElements[first]
+            for ( Long otherId : others ) {
+                Map<String, String> params = matchParams(otherId as Long, MetadataDomain.DATA_ELEMENT, first as Long, MetadataDomain.DATA_ELEMENT, type.id, matchScore)
+                Action action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -462,18 +451,12 @@ class DataArchitectService {
         def matchingDataElements = elementService.findFullTextDataElementSuggestions(dataModelA,dataModelB, 10)
         batch.name = "Processing DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
         batch.save()
-        def matchScore = 100
+        Float matchScore = 100
         matchingDataElements.each { first, other ->
             RelationshipType type = RelationshipType.readByName("relatedTo")
             other.each { otherId ->
-                Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$otherId""")
-                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$first""")
-                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                params.put("""matchScore""","""$matchScore""")
-                params.put("""matchOn""","""ElementName""")
-                Action action
-                action = actionService.create(params, batch, CreateMatch)
+                Map<String, String> params = matchParams(otherId as Long, MetadataDomain.DATA_ELEMENT, first as Long, MetadataDomain.DATA_ELEMENT, type.id, matchScore)
+                Action action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -504,34 +487,20 @@ class DataArchitectService {
             def matchingDataClasses = elementService.findFuzzyDataClassDataElementSuggestions(dataModelA, dataModelB, score)
             batch.name = "Processing suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
             batch.save()
-            matchingDataClasses.each { ElasticMatchResult match ->
-                RelationshipType type = RelationshipType.readByName("relatedTo")
-                Map<String, String> params = new HashMap<String, String>()
-                params.put("""source""", """gorm://org.modelcatalogue.core.DataClass:$match.catalogueElementA.id""")
-                params.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:$match.catalogueElementB.id""")
-                params.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                params.put("""matchScore""", """${(match.matchScore) ? match.matchScore : 0}""")
-                params.put("""matchOn""", """ElementName""")
-                params.put("""message""", """$match.message""")
-                Action action
-                action = actionService.create(params, batch, CreateMatch)
+
+            RelationshipType type = RelationshipType.readByName("relatedTo")
+            for ( MatchResult match :  matchingDataClasses ) {
+                Map<String, String> matchParams = matchParams(match, MetadataDomain.DATA_CLASS, MetadataDomain.DATA_ELEMENT, type.id)
+                Action action = actionService.create(matchParams, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
                 batch.archived = false
                 batch.save()
             }
-            matchingDataElements.each { ElasticMatchResult match ->
-                RelationshipType type = RelationshipType.readByName("relatedTo")
-                Map<String, String> params = new HashMap<String, String>()
-                params.put("""source""", """gorm://org.modelcatalogue.core.DataElement:$match.catalogueElementA.id""")
-                params.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:$match.catalogueElementB.id""")
-                params.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                params.put("""matchScore""", """${(match.matchScore) ? match.matchScore : 0}""")
-                params.put("""matchOn""", """ElementName""")
-                params.put("""message""", """$match.message""")
-                Action action
-                action = actionService.create(params, batch, CreateMatch)
+            for ( MatchResult match :  matchingDataElements ) {
+                Map<String, String> matchParams = matchParams(match, MetadataDomain.DATA_ELEMENT, MetadataDomain.DATA_ELEMENT, type.id)
+                Action action = actionService.create(matchParams, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -544,8 +513,23 @@ class DataArchitectService {
             log.error(FriendlyErrors.printErrors("Error in generateDataElementSuggestionsFuzzy"))
         }
 
+    Map<String, String> matchParams(MatchResult match, MetadataDomain sourceDomain, MetadataDomain destinationDomain, Long relationshipTypeId) {
+        matchParams(match.dataElementAId, sourceDomain, match.dataElementBId, destinationDomain, relationshipTypeId, match.matchScore, match.message)
     }
 
+    Map<String, String> matchParams(Long sourceId, MetadataDomain sourceDomain, Long destinationId, MetadataDomain destinationDomain, Long relationshipTypeId, Float matchScore, String message = null, String matchOn = 'ElementName') {
+        Map<String, String> params = new HashMap<String, String>()
+        params.put("""source""", """${MetadataDomainEntity.stringRepresentation(sourceDomain, sourceId)}""")
+        params.put("""destination""", """${MetadataDomainEntity.stringRepresentation(destinationDomain, destinationId)}""")
+        params.put("""type""", """${MetadataDomainEntity.stringRepresentation(MetadataDomain.RELATIONSHIP_TYPE, relationshipTypeId)}""")
+        params.put("""matchScore""", """${(matchScore) ? matchScore : 0}""")
+        params.put("""matchOn""", """${matchOn}""")
+        if ( message ) {
+            params.put("""message""", """${message}""")
+        }
+        params
+    }
+    
     /**
      * generateDataElementAndTypeSuggestionsExact
      *
