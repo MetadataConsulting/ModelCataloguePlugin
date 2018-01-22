@@ -2,12 +2,16 @@ package org.modelcatalogue.core.dataarchitect
 
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
+import grails.transaction.Transactional
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.MatchResult
+import org.modelcatalogue.core.util.MetadataDomain
+import org.modelcatalogue.core.util.MetadataDomainEntity
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.SecuredRuleExecutor
@@ -26,6 +30,7 @@ class DataArchitectService {
     def dataModelService
     def sessionFactory
     DataModelGormService dataModelGormService
+    BatchGormService batchGormService
 
     //commented out the functions that are no longer relevant or don't work
     //TODO: finish these functions
@@ -239,20 +244,11 @@ class DataArchitectService {
         return null
     }
 
-    private static Closure getReset() {
-        return { Batch batch ->
-            for (Action action in new HashSet<Action>(batch.actions)) {
-                if (action.state in [ActionState.FAILED, ActionState.PENDING]) {
-                    batch.removeFromActions(action)
-                    action.batch = null
-                    action.delete(flush: true)
-                }
-            }
-            batch.archived =  true
-            batch.save(flush: true)
-        }
+    @Transactional
+    void resetBatch(Batch batch) {
+        batchGormService.removeActionsInStateFromBatch(batch, [ActionState.FAILED, ActionState.PENDING])
+        batchGormService.update([batch.id], Boolean.TRUE)
     }
-
 
     void addSuggestion(String label, Closure suggestionGenerator) {
         suggestions[label] = suggestionGenerator
@@ -277,7 +273,7 @@ class DataArchitectService {
                         break
                 }
             } catch ( Exception ex ) {
-                log.info "Suggestions '$optimizationType' FAILED - Check data ${ex.detailMessage}"
+                log.info "Suggestions '$optimizationType' FAILED - Check data ${ex.message}"
 
             }
 
@@ -400,10 +396,10 @@ class DataArchitectService {
     private void generatePossibleEnumDuplicatesAndSynonyms(Long dataModelAID, Long dataModelBID){
         DataModel dataModelA = dataModelGormService.findById(dataModelAID)
         DataModel dataModelB = dataModelGormService.findById(dataModelBID)
-        Batch.findAllByNameIlike("Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
-        Batch batch = Batch.findOrSaveByName("Generating Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
+        Batch.findAllByNameIlike("Suggested DataType Synonyms ${mappingsNameSuffix(dataModelA, dataModelB)}").each reset
+        Batch batch = Batch.findOrSaveByName("Generating Suggested DataType Synonyms ${mappingsNameSuffix(dataModelA, dataModelB)}")
         def matchingDataElements = elementService.findDuplicateEnumerationsSuggestions(dataModelA.id, dataModelB.id)
-        batch.name = "Processing Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.name = "Processing Suggested DataType Synonyms ${mappingsNameSuffix(dataModelA, dataModelB)}"
         batch.save()
         matchingDataElements.each { first, other ->
             RelationshipType type = RelationshipType.readByName("relatedTo")
@@ -418,7 +414,7 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
-        batch.name = "Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.name = "Suggested DataType Synonyms ${mappingsNameSuffix(dataModelA, dataModelB)}"
         batch.save()
 
     }
@@ -429,10 +425,17 @@ class DataArchitectService {
     private void generateDataElementSuggestionsExact(Long dataModelAID, Long dataModelBID){
         DataModel dataModelA = dataModelGormService.findById(dataModelAID)
         DataModel dataModelB = dataModelGormService.findById(dataModelBID)
-        Batch.findAllByNameIlike("Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
-        Batch batch = Batch.findOrSaveByName("Generating Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
+        String batchName = suggestedExactMatchesName(dataModelA, dataModelB)
+        for ( Batch batch : batchGormService.findAllByNameIlike(batchName) ) {
+            resetBatch(batch)
+        }
+        batchName = generatingExactMatchesName(dataModelA, dataModelB)
+        Batch batch = batchGormService.findByNameIlike(batchName)
+        if ( !batch ) {
+            batch = batchGormService.saveWithName(batchName)
+        }
         Map<Long, Set<Long>>  matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
-        batch.name = "Processing DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.name = processingExactMatchesName(dataModelA, dataModelB)
         batch.save()
         def matchScore = 100
         RelationshipType type = RelationshipType.readByName("relatedTo")
@@ -448,18 +451,53 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
-        batch.name = "Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
-        batch.save()
 
+        batch.name = suggestedExactMatchesName(dataModelA, dataModelB)
+        batch.save()
+    }
+
+    String mappingsNameSuffix(DataModel dataModelA, DataModel dataModelB) {
+        "for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+    }
+    
+    String suggestedExactMatchesName(DataModel dataModelA, DataModel dataModelB) {
+        "Suggested DataElement Exact Matches  ${mappingsNameSuffix(dataModelA, dataModelB)}"
+    }
+
+    String processingExactMatchesName(DataModel dataModelA, DataModel dataModelB) {
+        "Processing DataElement Exact Matches ${mappingsNameSuffix(dataModelA, dataModelB)}"
+    }
+
+    String generatingExactMatchesName(DataModel dataModelA, DataModel dataModelB) {
+        "Generating Suggested DataElement Exact Matches ${mappingsNameSuffix(dataModelA, dataModelB)}"
+    }
+
+    String suggestedFuzzyMappingsName(DataModel dataModelA, DataModel dataModelB) {
+        "Suggested Fuzzy DataElement Relations ${mappingsNameSuffix(dataModelA, dataModelB)}"
+    }
+
+    String processingFuzzyMappingsName(DataModel dataModelA, DataModel dataModelB) {
+        "Processing suggested Fuzzy DataElement Relations ${mappingsNameSuffix(dataModelA, dataModelB)}"
+    }
+
+    String generatingFuzzyMappingsName(DataModel dataModelA, DataModel dataModelB) {
+        "Generating suggested Fuzzy DataElement Relations ${mappingsNameSuffix(dataModelA, dataModelB)}"
     }
 
     private void generateDataElementSuggestionsFullText(Long dataModelAID, Long dataModelBID){
         DataModel dataModelA = dataModelGormService.findById(dataModelAID)
         DataModel dataModelB = dataModelGormService.findById(dataModelBID)
-        Batch.findAllByNameIlike("Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
-        Batch batch = Batch.findOrSaveByName("Generating Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
-        def matchingDataElements = elementService.findFullTextDataElementSuggestions(dataModelA,dataModelB, 10)
-        batch.name = "Processing DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        String batchName = suggestedExactMatchesName(dataModelA, dataModelB)
+        for ( Batch batch : batchGormService.findAllByNameIlike(batchName) ) {
+            resetBatch(batch)
+        }
+        batchName = generatingExactMatchesName(dataModelA, dataModelB)
+        Batch batch = batchGormService.findByNameIlike(batchName)
+        if ( !batch ) {
+            batch = batchGormService.saveWithName(batchName)
+        }
+        Set<MatchResult> matchingDataElements = elementService.findFullTextDataElementSuggestions(dataModelA,dataModelB, 10)
+        batch.name = processingExactMatchesName(dataModelA, dataModelB)
         batch.save()
         Float matchScore = 100
         matchingDataElements.each { first, other ->
@@ -474,28 +512,34 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
-        batch.name = "Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.name = suggestedExactMatchesName(dataModelA, dataModelB)
         batch.save()
 
     }
-
 
 
     /**
      * generateDataElementSuggestionsFuzzy
      *
      */
-
     private void generateDataElementSuggestionsFuzzy(Long dataModelAID, Long dataModelBID, Integer minScore) {
         try {
             DataModel dataModelA = dataModelGormService.findById(dataModelAID)
             DataModel dataModelB = dataModelGormService.findById(dataModelBID)
-            Batch.findAllByNameIlike("Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
-            Batch batch = Batch.findOrSaveByName("Generating suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
+            String batchName = suggestedFuzzyMappingsName(dataModelA, dataModelB)
+            List<Batch> batchList = batchGormService.findAllByNameIlike(batchName)
+            for ( Batch batch : batchList ) {
+                resetBatch(batch)
+            }
+            batchName = generatingFuzzyMappingsName(dataModelA, dataModelB)
+            Batch batch = batchGormService.findByNameIlike(batchName)
+            if ( !batch ) {
+                batch = batchGormService.saveWithName(batchName)
+            }
             Integer score = minScore ?: 10
-            def matchingDataElements = elementService.findFuzzyDataElementSuggestions(dataModelA, dataModelB, score)
-            def matchingDataClasses = elementService.findFuzzyDataClassDataElementSuggestions(dataModelA, dataModelB, score)
-            batch.name = "Processing suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+            Set<MatchResult> matchingDataElements = elementService.findFuzzyDataElementSuggestions(dataModelA, dataModelB, score)
+            Set<MatchResult> matchingDataClasses = elementService.findFuzzyDataClassDataElementSuggestions(dataModelA, dataModelB, score)
+            batch.name = processingFuzzyMappingsName(dataModelA, dataModelB)
             batch.save()
 
             RelationshipType type = RelationshipType.readByName("relatedTo")
@@ -517,11 +561,12 @@ class DataArchitectService {
                 batch.archived = false
                 batch.save()
             }
-            batch.name = "Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+            batch.name = suggestedFuzzyMappingsName(dataModelA, dataModelB)
             batch.save()
-        }catch(Exception ex){
-            log.error(FriendlyErrors.printErrors("Error in generateDataElementSuggestionsFuzzy"))
+        } catch(Exception ex){
+            log.error(ex.message)
         }
+    }
 
     Map<String, String> matchParams(MatchResult match, MetadataDomain sourceDomain, MetadataDomain destinationDomain, Long relationshipTypeId) {
         matchParams(match.dataElementAId, sourceDomain, match.dataElementBId, destinationDomain, relationshipTypeId, match.matchScore, match.message)
@@ -532,14 +577,14 @@ class DataArchitectService {
         params.put("""source""", """${MetadataDomainEntity.stringRepresentation(sourceDomain, sourceId)}""")
         params.put("""destination""", """${MetadataDomainEntity.stringRepresentation(destinationDomain, destinationId)}""")
         params.put("""type""", """${MetadataDomainEntity.stringRepresentation(MetadataDomain.RELATIONSHIP_TYPE, relationshipTypeId)}""")
-        params.put("""matchScore""", """${(matchScore) ? matchScore : 0}""")
+        params.put("""matchScore""", """${(matchScore) ? matchScore as Integer : 0}""")
         params.put("""matchOn""", """${matchOn}""")
         if ( message ) {
             params.put("""message""", """${message}""")
         }
         params
     }
-    
+
     /**
      * generateDataElementAndTypeSuggestionsExact
      *

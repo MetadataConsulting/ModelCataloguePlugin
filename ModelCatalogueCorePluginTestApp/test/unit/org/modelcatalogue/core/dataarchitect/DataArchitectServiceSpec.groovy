@@ -42,7 +42,7 @@ class DataArchitectServiceSpec extends Specification {
         expected.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:5""")
         expected.put("""matchScore""", """98""")
         expected.put("""matchOn""", """ElementName""")
-        
+
 
         when:
         MatchResult matchResult = new MatchResultImpl(dataElementAId: 2, dataElementBId: 4, matchScore: 98.0)

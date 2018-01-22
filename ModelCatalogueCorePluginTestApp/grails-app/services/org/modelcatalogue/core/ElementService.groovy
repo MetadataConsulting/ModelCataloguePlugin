@@ -12,6 +12,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftChain
 import org.modelcatalogue.core.publishing.DraftContext
@@ -47,6 +48,7 @@ class ElementService implements Publisher<CatalogueElement> {
     def elasticSearchService
 
     DataModelAclService dataModelAclService
+    DataElementGormService dataElementGormService
 
 //    NONE OF THESE ARE USED OR IMPLEMENTED - Commenting them out - will remove
 //    List<CatalogueElement> list(Map params = [:]) {
@@ -65,7 +67,7 @@ class ElementService implements Publisher<CatalogueElement> {
 //        resource.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
 //    }
 
-    public DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {
+    DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {
         dataModel.checkNewSemanticVersion(newSemanticVersion)
 
         if (dataModel.hasErrors()) {
@@ -917,8 +919,8 @@ class ElementService implements Publisher<CatalogueElement> {
         Set<MatchResult> elementSuggestions = []
         SearchParams searchParams = new SearchParams()
         //iterate through the data model a
-        def elementsToMatch = DataElement.findAllByDataModel(dataModelA)
-        elementsToMatch.each { DataElement de ->
+        List<DataElement> elementsToMatch = dataElementGormService.findAllByDataModel(dataModelA)
+        for ( DataElement de : elementsToMatch ) {
             //set params map
             log.info "findFuzzyDataElement:start matching de:" + de.name
             searchParams.dataModelId   = dataModelB.id
@@ -1147,7 +1149,7 @@ class ElementService implements Publisher<CatalogueElement> {
         List aList = sqlQuery.list()
         if(aList.size() == 0){
             fuzzyElementList = null
-        }else{
+        } else {
             aList.each{
                 String aListName = it.name
                 Long aListId = it.id
@@ -1155,29 +1157,29 @@ class ElementService implements Publisher<CatalogueElement> {
                 sqlQuery = session.createSQLQuery(query2getBList)
                 sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
                 List bList = sqlQuery.list()
-                if(bList.size() == 0){
+                if (bList.size() == 0){
                     fuzzyElementList = null
-                }else {
+                } else {
                     bList.each {
-
-                            //we need not just the element match, but also the rating of the match
-                            Long matchScore = getNameMetric(suggestedMatches.dataElementAName, suggestedMatches.dataElementBName)
-                            //Only accept matches above pre-defined limit
-                            if((matchScore > 80)&(matchScore <= 100)){
-                                suggestedMatches.setMatchScore(matchScore)
-                                fuzzyElementList.add(suggestedMatches)
-                                println " Loading Match: ${suggestedMatches.dataElementAName} and ${suggestedMatches.dataElementBName} score is: ${matchScore}"
-                            }
                         MatchResult suggestedMatches = new MatchResultImpl(
                                 dataElementAName: aListName,
                                 dataElementAId: aListId,
                                 dataElementBName: it.name as String,
                                 dataElementBId: it.id as Long,
                         )
+
+                        //we need not just the element match, but also the rating of the match
+                        Long matchScore = getNameMetric(suggestedMatches.dataElementAName, suggestedMatches.dataElementBName)
+                        //Only accept matches above pre-defined limit
+                        if((matchScore > 80)&(matchScore <= 100)) {
+                            suggestedMatches.setMatchScore(matchScore)
+                            fuzzyElementList.add(suggestedMatches)
+                            println " Loading Match: ${suggestedMatches.dataElementAName} and ${suggestedMatches.dataElementBName} score is: ${matchScore}"
                         }
                     }
                 }
             }
+        }
         return fuzzyElementList
     }
 
