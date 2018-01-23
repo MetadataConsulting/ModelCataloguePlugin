@@ -153,7 +153,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                     relation.count = el.countIncomingRelationshipsByType(type)
                     break
                 default:
-                    relation.count = el.countIncomingRelationshipsByType(type)
+                    relation.count = el.countOutgoingRelationshipsByType(type)
                     break
             }
 
