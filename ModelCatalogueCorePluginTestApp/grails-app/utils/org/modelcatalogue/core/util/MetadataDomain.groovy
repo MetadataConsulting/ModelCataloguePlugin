@@ -37,32 +37,118 @@ enum MetadataDomain {
     static MetadataDomain of(CatalogueElement catalogueElement) {
 
         if ( catalogueElement instanceof Asset ) {
-            return MetadataDomain.ASSET
+            return ASSET
 
         } else if ( catalogueElement instanceof DataClass ) {
-            return MetadataDomain.DATA_CLASS
+            return DATA_CLASS
 
         } else if ( catalogueElement instanceof DataElement ) {
-            return MetadataDomain.DATA_ELEMENT
+            return DATA_ELEMENT
 
         } else if ( catalogueElement instanceof DataModel ) {
-            return MetadataDomain.DATA_MODEL
+            return DATA_MODEL
 
         } else if ( catalogueElement instanceof EnumeratedType ) {
-            return MetadataDomain.ENUMERATED_TYPE
+            return ENUMERATED_TYPE
 
         } else if ( catalogueElement instanceof MeasurementUnit ) {
-            return MetadataDomain.MEASUREMENT_UNIT
+            return MEASUREMENT_UNIT
 
         } else if ( catalogueElement instanceof PrimitiveType ) {
-            return MetadataDomain.PRIMITIVE_TYPE
+            return PRIMITIVE_TYPE
 
         } else if ( catalogueElement instanceof ReferenceType ) {
-            return MetadataDomain.REFERENCE_TYPE
+            return REFERENCE_TYPE
 
         } else if ( catalogueElement instanceof DataType ) {
-            return MetadataDomain.DATA_TYPE
+            return DATA_TYPE
         }
-        MetadataDomain.CATALOGUE_ELEMENT
+        CATALOGUE_ELEMENT
+    }
+
+    static String lowerCamelCaseDomainName(MetadataDomain domain) {
+        switch (domain) {
+            case ASSET:
+                return 'asset'
+            case ASSET_FILE:
+                return 'assetFile'
+            case CATALOGUE_ELEMENT:
+                return 'catalogueElement'
+            case DATA_CLASS:
+                return 'dataClass'
+            case DATA_ELEMENT:
+                return 'dataElement'
+            case DATA_MODEL:
+                return 'dataModel'
+            case DATA_MODEL_POLICY:
+                return 'dataModelPolicy'
+            case DATA_TYPE:
+                return 'dataType'
+            case ENUMERATED_TYPE:
+                return 'enumeratedType'
+            case EXTENSION_VALUE:
+                return 'extensionValue'
+            case MAPPING:
+                return 'mapping'
+            case MEASUREMENT_UNIT:
+                return 'measurementUnit'
+            case PRIMITIVE_TYPE:
+                return 'primitiveType'
+            case REFERENCE_TYPE:
+                return 'referenceType'
+            case RELATIONSHIP:
+                return 'relationship'
+            case RELATIONSHIP_METADATA:
+                return 'relationshipMetadata'
+            case RELATIONSHIP_TYPE:
+                return 'relationshipType'
+            case RELATIONSHIP_TAG:
+                return 'relationshipTag'
+            default:
+                return null
+        }
+    }
+
+    static String camelCaseDomainName(MetadataDomain domain) {
+        switch (domain) {
+            case ASSET:
+                return 'Asset'
+            case ASSET_FILE:
+                return 'AssetFile'
+            case CATALOGUE_ELEMENT:
+                return 'CatalogueElement'
+            case DATA_CLASS:
+                return 'DataClass'
+            case DATA_ELEMENT:
+                return 'DataElement'
+            case DATA_MODEL:
+                return 'DataModel'
+            case DATA_MODEL_POLICY:
+                return 'DataModelPolicy'
+            case DATA_TYPE:
+                return 'DataType'
+            case ENUMERATED_TYPE:
+                return 'EnumeratedType'
+            case EXTENSION_VALUE:
+                return 'ExtensionValue'
+            case MAPPING:
+                return 'Mapping'
+            case MEASUREMENT_UNIT:
+                return 'MeasurementUnit'
+            case PRIMITIVE_TYPE:
+                return 'PrimitiveType'
+            case REFERENCE_TYPE:
+                return 'ReferenceType'
+            case RELATIONSHIP:
+                return 'Relationship'
+            case RELATIONSHIP_METADATA:
+                return 'RelationshipMetadata'
+            case RELATIONSHIP_TYPE:
+                return 'RelationshipType'
+            case RELATIONSHIP_TAG:
+                return 'RelationshipTag'
+            default:
+                return null
+        }
     }
 }

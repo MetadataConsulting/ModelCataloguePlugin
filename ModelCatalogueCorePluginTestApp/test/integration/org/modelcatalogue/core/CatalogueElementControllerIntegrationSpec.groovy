@@ -62,9 +62,9 @@ class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElement
     def getPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 10, 10, 0, totalCount, "${baseLink}?max=10&offset=10", ""],
-                [2, 5, 5, 0, totalCount, "${baseLink}?max=5&offset=5", ""],
-                [3, 5, 5, 5, totalCount, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"]
+                [1, 10, 10, 0, totalCount, "${baseLink}?max=10&total=${totalCount}&offset=10", ""],
+                [2, 5, 5, 0, totalCount, "${baseLink}?max=5&total=${totalCount}&offset=5", ""],
+                [3, 5, 5, 5, totalCount, "${baseLink}?max=5&total=${totalCount}&offset=10", "${baseLink}?max=5&total=${totalCount}&offset=0"]
         ]
     }
 

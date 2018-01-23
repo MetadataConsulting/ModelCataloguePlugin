@@ -13,18 +13,18 @@ abstract class ListWrapperMarshaller extends AbstractMarshaller {
 
     @Override
     protected Map<String, Object> prepareJsonMap(Object elements) {
-        def base =  elements.base;
-        def itemType =  elements.itemType?.name;
-        def success =  true;
-        def total =  elements.total;
-        def offset =  elements.offset;
-        def page =  elements.page;
-        def size =  getSize(elements);
-        def list =  getList(elements);
-        def previous =  elements.previous;
-        def next =  elements.next;
-        def sort =  elements.sort;
-        def order =  elements.order;
+        def base =  elements.base
+        def itemType =  elements.itemType?.name
+        def success =  true
+        def total =  elements.total
+        def offset =  elements.offset
+        def page =  elements.page
+        def size =  getSize(elements)
+        def list =  getList(elements)
+        def previous =  elements.previous
+        def next =  elements.next
+        def sort =  elements.sort
+        def order =  elements.order
         [
              base: base,
              itemType: itemType,

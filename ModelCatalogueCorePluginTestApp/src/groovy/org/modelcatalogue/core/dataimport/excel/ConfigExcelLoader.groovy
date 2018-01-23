@@ -360,6 +360,9 @@ class ConfigExcelLoader extends ExcelLoader {
         //take the class name and split to see if there is a hierarchy
         String dcCode = tryHeader(ConfigHeadersMap.containingDataClassCode, headersMap, rowMap)
         String dcNames = tryHeader(ConfigHeadersMap.containingDataClassName, headersMap, rowMap)
+        if(dcNames == null){
+            return null  //Best go no further and return a null object
+        }
         String dcDescription = tryHeader(ConfigHeadersMap.containingDataClassDescription, headersMap, rowMap)
 
         if (!dcNames) {
@@ -425,7 +428,9 @@ class ConfigExcelLoader extends ExcelLoader {
         String muCatId = tryHeader(ConfigHeadersMap.measurementUnitCode, headersMap, rowMap)
         String muSymbol = tryHeader(ConfigHeadersMap.measurementUnitSymbol, headersMap, rowMap)
         String muName = tryHeader(ConfigHeadersMap.measurementUnitName, headersMap, rowMap) ?: (muSymbol ?: (muCatId ?: DEFAULT_MU_NAME))
-
+        if(muName == null){
+            return null  //Best go no further and return a null object
+        }
         MeasurementUnit mu
 
         if (muName == DEFAULT_MU_NAME) { // there is no measurement unit
@@ -589,6 +594,9 @@ class ConfigExcelLoader extends ExcelLoader {
         List<String> metadataKeys = headersMap['metadata']
         String deCode = tryHeader(ConfigHeadersMap.dataElementCode, headersMap, rowMap)
         String deName = tryHeader(ConfigHeadersMap.dataElementName, headersMap, rowMap)
+        if(deName == null){
+            return null  //Best go no further and return a null object
+        }
         String deDescription = tryHeader(ConfigHeadersMap.dataElementDescription, headersMap, rowMap)
         //see if a data element exists with this model catalogue id
         DataElement de
