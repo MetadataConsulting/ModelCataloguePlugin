@@ -169,6 +169,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                     break
                 default:
                     directedRelationJSON.count = el.countOutgoingRelationshipsByType(relationshipType)
+
                     break
             }
 

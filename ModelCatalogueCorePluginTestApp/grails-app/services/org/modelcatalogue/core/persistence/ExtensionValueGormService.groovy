@@ -23,4 +23,9 @@ class ExtensionValueGormService implements WarnGormErrors {
     ExtensionValue saveWithNameAndExtensionValueAndDataElement(String name, String extensionValue, DataElement dataElement) {
         save(new ExtensionValue(name: name, extensionValue: extensionValue, element: dataElement))
     }
+
+    @Transactional(readOnly = true)
+    ExtensionValue findById(Long id) {
+        ExtensionValue.get(id)
+    }
 }

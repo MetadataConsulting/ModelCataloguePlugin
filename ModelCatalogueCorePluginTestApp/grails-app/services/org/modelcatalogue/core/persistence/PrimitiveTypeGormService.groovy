@@ -25,4 +25,9 @@ class PrimitiveTypeGormService implements WarnGormErrors {
         PrimitiveType primitiveTypeInstance = new PrimitiveType(status: status, name: name, measurementUnit: measurementUnit)
         save(primitiveTypeInstance)
     }
+
+    @Transactional(readOnly = true)
+    PrimitiveType findById(Long id) {
+        PrimitiveType.get(id)
+    }
 }
