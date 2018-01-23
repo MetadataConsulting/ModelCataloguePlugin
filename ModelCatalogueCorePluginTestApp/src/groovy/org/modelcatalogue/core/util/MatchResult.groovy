@@ -1,12 +1,14 @@
 package org.modelcatalogue.core.util
 
-/**
- * Created by david on 21/05/2017.
- */
-class MatchResult {
-    String dataElementAName
-    Long dataElementAId
-    String dataElementBName
-    Long dataElementBId
-    Long matchScore
+import groovy.transform.CompileStatic
+import org.modelcatalogue.core.CatalogueElement
+
+@CompileStatic
+interface MatchResult {
+    String getDataElementAName()
+    Long getDataElementAId()
+    String getDataElementBName()
+    Long getDataElementBId()
+    Float getMatchScore()
+    String getMessage()
 }
