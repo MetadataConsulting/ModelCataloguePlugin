@@ -426,7 +426,7 @@ class ElasticSearchService implements SearchCatalogue {
                 .setTypes(collectTypes(resource) as String[])
                 .setIndicesOptions(IndicesOptions.lenientExpandOpen())
                 .setQuery(qb)
-                .setMinScore(minScore.toFloat())
+                //.setMinScore(minScore.toFloat())
 
         ElasticSearchQueryList.search(params,resource, request, dataModelAclService)
     }
