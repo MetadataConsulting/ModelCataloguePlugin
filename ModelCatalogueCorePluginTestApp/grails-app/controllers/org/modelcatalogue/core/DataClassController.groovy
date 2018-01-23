@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
 import org.modelcatalogue.core.catalogueelement.DataClassCatalogueElementService
 import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
@@ -20,6 +21,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     DataClassGormService dataClassGormService
     DataClassCatalogueElementService dataClassCatalogueElementService
     AssetGormService assetGormService
+    AssetMetadataService assetMetadataService
 
     DataClassController() {
         super(DataClass, false)
@@ -95,15 +97,10 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
             return
         }
 
+
         DataClass dataClass = dataClassGormService.findById(params.long('id'))
-        AssetMetadata assetMetadata = new AssetMetadata(name: name ? name : "${dataClass.name} report as MS Excel Document",
-                originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}.docx",
-                contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
-        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
-        asset.dataModel = dataClass.dataModel
-        asset = assetGormService.save(asset)
-
+        Asset asset = saveAsset(assetMetadataService.assetReportForDataClass(dataClass, name, MicrosoftOfficeDocument.DOC), dataClass)
         Long assetId = asset.id
 
         assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->
@@ -123,15 +120,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         Long dataClassId = dataClass.id
 
-        AssetMetadata assetMetadata = new AssetMetadata(
-                name: name ? name : "${dataClass.name} report as MS Excel Document",
-                originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}.xlsx",
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
-        asset.dataModel = dataClass.dataModel
-        asset = assetGormService.save(asset)
-
+        Asset asset = saveAsset(assetMetadataService.assetReportForDataClass(dataClass, name, MicrosoftOfficeDocument.XLSX), dataClass)
         Long assetId = asset.id
 
         assetService.storeReportAsAsset(asset.id, asset.contentType)  { OutputStream out ->
@@ -150,25 +139,21 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         DataClass dataClass = dataClassGormService.findById(params.long('id'))
 
         Long dataClassId = dataClass.id
-
-
-        AssetMetadata assetMetadata = new AssetMetadata(
-                name: name ? name : "${dataClass.name} changelog as MS Word Document",
-                originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}-changelog.docx",
-                contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
-        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
-        asset.dataModel = dataClass.dataModel
-        asset = assetGormService.save(asset)
+        Asset asset = saveAsset(assetMetadataService.assetReportForDataClass(dataClass, name, MicrosoftOfficeDocument.DOC), dataClass)
         Long assetId = asset.id
 
         assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream out ->
-            new ChangeLogDocxGenerator(auditService, dataClassService, performanceUtilService , depth, includeMetadata)
+            new ChangeLogDocxGenerator(auditService, dataClassService, performanceUtilService, elementService, depth, includeMetadata)
                 .generateChangelog(DataClass.get(dataClassId), out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    protected Asset saveAsset(Asset asset, DataClass dataClass) {
+        asset.dataModel = dataClass.dataModel
+        assetGormService.save(asset)
     }
 
     @Override

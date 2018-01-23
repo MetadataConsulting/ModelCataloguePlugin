@@ -12,9 +12,9 @@ class MicrosoftOfficeDocumentSpec extends Specification {
         type == MicrosoftOfficeDocument.documentType(doc)
 
         where:
-        doc                           | type
-        MicrosoftOfficeDocument.DOC   | 'MS Doc'
-        MicrosoftOfficeDocument.EXCEL | 'MS Excel'
+        doc                          | type
+        MicrosoftOfficeDocument.DOC  | 'MS Doc'
+        MicrosoftOfficeDocument.XLSX | 'MS Excel'
     }
 
     @Unroll
@@ -24,9 +24,9 @@ class MicrosoftOfficeDocumentSpec extends Specification {
         suffix == MicrosoftOfficeDocument.suffix(doc)
 
         where:
-        doc                           | suffix
-        MicrosoftOfficeDocument.DOC   | 'docx'
-        MicrosoftOfficeDocument.EXCEL | 'xlsx'
+        doc                          | suffix
+        MicrosoftOfficeDocument.DOC  | 'docx'
+        MicrosoftOfficeDocument.XLSX | 'xlsx'
     }
 
     @Unroll
@@ -36,8 +36,8 @@ class MicrosoftOfficeDocumentSpec extends Specification {
         contentType == MicrosoftOfficeDocument.contentType(doc)
 
         where:
-        doc                           | contentType
-        MicrosoftOfficeDocument.DOC   | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        MicrosoftOfficeDocument.EXCEL | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        doc                          | contentType
+        MicrosoftOfficeDocument.DOC  | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        MicrosoftOfficeDocument.XLSX | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     }
 }

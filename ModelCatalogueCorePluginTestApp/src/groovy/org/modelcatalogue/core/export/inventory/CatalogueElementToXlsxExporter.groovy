@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.export.inventory
 
+import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
+
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_NEW
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_REMOVAL
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_UPDATE
@@ -56,8 +58,8 @@ class CatalogueElementToXlsxExporter {
     static final String CONTENT = 'Content'
     static final String DATA_CLASSES = 'DataClasses'
     public static final String DATA_TYPE_FIRST_COLUMN = 'F'
-    public static final MimeType XLSX                  = new MimeType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx')
-    public static final MimeType EXCEL                 = new MimeType('application/vnd.ms-excel', 'xlsx')
+    public static final MimeType XLSX                  = MicrosoftOfficeDocument.mimeType(MicrosoftOfficeDocument.XLSX)
+    public static final MimeType EXCEL                 = MicrosoftOfficeDocument.mimeType(MicrosoftOfficeDocument.EXCEL)
 
     final DataClassService dataClassService
     final GrailsApplication grailsApplication

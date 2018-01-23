@@ -209,19 +209,6 @@ class AssetService {
         asset
     }
 
-    Asset instantiateAssetWithMetadata(AssetMetadata assetMetadata) {
-        Asset asset = new Asset()
-        asset.with {
-            name = assetMetadata.name
-            originalFileName = assetMetadata.originalFileName
-            contentType = assetMetadata.contentType
-            size = 0
-            status = ElementStatus.PENDING
-            description = "Your report will be available in this asset soon. Use Refresh action to reload"
-        }
-        asset
-    }
-
     void storeReportAsAsset(Long assetId, String contentType, @ClosureParams(value = FromString, options= ["java.io.OutputStream", "java.io.OutputStream,java.lang.Long"]) Closure worker){
         Long authorId = modelCatalogueSecurityService.currentUser?.id
         executorService.submit {
@@ -233,8 +220,9 @@ class AssetService {
 
                     } catch (e) {
                         log.error "Exception of type ${e.class} with id=${assetId}", e
-                        updated.refresh()
-                        assetGormService.update(assetId, ElementStatus.FINALIZED, "${updated.name} - Error during generation", "Error generating report: $e")
+                        Asset asset = assetGormService.findById(assetId)
+                        asset.refresh()
+                        assetGormService.update(assetId, ElementStatus.FINALIZED, "${asset.name} - Error during generation", "Error generating report: $e")
                     }
                 }
         }

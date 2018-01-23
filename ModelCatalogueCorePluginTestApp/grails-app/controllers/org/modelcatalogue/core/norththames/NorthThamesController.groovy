@@ -3,8 +3,9 @@ package org.modelcatalogue.core.norththames
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.AssetMetadata
+import org.modelcatalogue.core.AssetMetadataService
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.dataexport.excel.norththamesreport.NorthThamesMappingReportXlsxExporter
+import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
 import org.modelcatalogue.core.dataexport.excel.norththamesreport.NorthThamesMappingReportXlsxSqlExporter
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
@@ -19,6 +20,7 @@ class NorthThamesController {
 
     DataModelGormService dataModelGormService
     AssetGormService assetGormService
+    AssetMetadataService assetMetadataService
     def dataClassService, assetService, dataElementService
     SessionFactory sessionFactory
 
@@ -36,19 +38,19 @@ class NorthThamesController {
 
         String assetName = name ?: "${dataModel.name} report as MS Excel Document-for-${organization}"
 
+        MicrosoftOfficeDocument doc = MicrosoftOfficeDocument.XLSX
         AssetMetadata assetMetadata = new AssetMetadata(
                 name: assetName,
-                originalFileName: "${organization}-${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                originalFileName: "${organization}-${dataModel.name}-${dataModel.status}-${dataModel.version}.${MicrosoftOfficeDocument.suffix(doc)}",
+                contentType: MicrosoftOfficeDocument.contentType(doc)
         )
-        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
+        Asset asset = assetMetadataService.instantiateAssetWithMetadata(assetMetadata)
         asset.dataModel = dataModel
         asset = assetGormService.save(asset)
         Long assetId = asset.id
 
         assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream, Long assetIdentifier ->
             BuildProgressMonitor buildProgressMonitor = BuildProgressMonitor.create("Exporting asset $assetName", assetId)
-            // reload domain class as this is called in separate thread
             GMCGridReportXlsxExporter.createWithBuildProgressMonitor(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth, organization, buildProgressMonitor).export(outputStream)
         }
 
@@ -74,13 +76,12 @@ class NorthThamesController {
                 originalFileName: "North Thames-${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
-        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
+        Asset asset = assetMetadataService.instantiateAssetWithMetadata(assetMetadata)
         asset.dataModel = dataModel
         asset = assetGormService.save(asset)
         Long assetId = asset.id
 
         assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->
-            // reload domain class as this is called in separate thread
             NorthThamesMappingReportXlsxSqlExporter.create(dataModelGormService.findById(dataModelId), dataClassService, dataElementService, grailsApplication, isDatabaseFallback()).export(outputStream)
         }
 

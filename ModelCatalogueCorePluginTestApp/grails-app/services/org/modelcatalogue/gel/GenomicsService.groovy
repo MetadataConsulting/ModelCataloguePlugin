@@ -2,11 +2,16 @@ package org.modelcatalogue.gel
 
 import grails.gsp.PageRenderer
 import grails.transaction.Transactional
+import org.modelcatalogue.core.Asset
+import org.modelcatalogue.core.AssetMetadata
+import org.modelcatalogue.core.AssetMetadataService
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -25,17 +30,12 @@ class GenomicsService {
 
     def auditService
     def assetService
+    AssetGormService assetGormService
+    GenomicsAssetMetadataService genomicsAssetMetadataService
     def dataClassService
-    def elementService
+    ElementService elementService
     PerformanceUtilService performanceUtilService
     PageRenderer groovyPageRenderer
-
-    static final String RD_ELIGIBILITY_CSV_FILENAME = "RD Eligibility Criteria.csv"
-    static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
-    static final String RD_ELIGIBILITY_CRITERIA_JSON = "RD Eligibility Criteria.json"
-    static final String RD_WEB = "website.zip"
-    static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS = "RD Change log for Phenotypes and clinical tests.xlsx"
-    static final String RD_ELIGIBILITY_CHANGELOG_XLS = "RD Change Log for Eligibility Criteria.xlsx"
 
     static final String DOC_IMAGE_PATH = GenomicsService.getResource('Genomics-England-logo-2015.png')?.toExternalForm()
 
@@ -55,138 +55,108 @@ class GenomicsService {
         'paragraph.headerImage' height: 1.366.inches, width: 2.646.inches
     }
 
-    long genRareDiseaseHPOAndClinicalTestsAsJson(DataClass dataClass){
+    Long genRareDiseaseHPOAndClinicalTestsAsJson(DataClass dataClass){
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dataClass.getDefaultModelCatalogueId(true))
-
-        return assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "${latestVersion.name} - HPO and Clinical Tests report (JSON)",
-            originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.json",
-            contentType: "application/json",
-        ) {
+        Asset asset = saveAsset(genomicsAssetMetadataService.genRareDiseaseHPOAndClinicalTestsAsJson(latestVersion), latestVersion.dataModel)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) {
             new GelJsonExporter(it).printDiseaseOntology(latestVersion)
         }
+
+        asset.id
     }
 
-    long genDiseaseListOnlyAsJson(DataClass dataClass){
+    Long genDiseaseListOnlyAsJson(DataClass dataClass){
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dataClass.getDefaultModelCatalogueId(true))
-
-        return assetService.storeReportAsAsset(latestVersion.dataModel,
-                name: "${latestVersion.name} - Disease List Only (JSON)",
-                originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.json",
-                contentType: "application/json",
-        ) {
+        Asset asset = saveAsset(genomicsAssetMetadataService.genDiseaseListOnlyAsJson(latestVersion), latestVersion.dataModel)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) {
             new RareDiseasesJsonExporter(it).exportDiseaseListOnly(latestVersion)
         }
+
+        asset.id
     }
 
-
-
-
-    long genRareDiseaseHPOEligibilityCriteriaAsJson(DataClass dataClass){
-        return assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} - Eligibility criteria report (JSON)",
-            originalFileName: "$RD_ELIGIBILITY_CRITERIA_JSON",
-            contentType: "application/json",
-        ) {
+    Long genRareDiseaseHPOEligibilityCriteriaAsJson(DataClass dataClass) {
+        Asset asset = saveAsset(genomicsAssetMetadataService.genRareDiseaseHPOEligibilityCriteriaAsJson(dataClass), dataClass.dataModel)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) {
             new RareDiseasesJsonExporter(it).exportEligibilityCriteriaAsJson(dataClass)
         }
+        asset.id
     }
 
-    long genRareDiseaseCsv(DataClass dClass, def docType){
+    Long genRareDiseaseCsv(DataClass dClass, def docType){
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
-
-        return assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "Eligibility Report: ${docType == RareDiseaseCsvExporter.HPO_AND_CLINICAL_TESTS ? RD_HPO_CSV_FILENAME : RD_ELIGIBILITY_CSV_FILENAME}",
-            originalFileName: "${docType == RareDiseaseCsvExporter.HPO_AND_CLINICAL_TESTS ? RD_HPO_CSV_FILENAME : RD_ELIGIBILITY_CSV_FILENAME}",
-            contentType: "text/csv",
-        ) {
+        Asset asset = saveAsset(genomicsAssetMetadataService.genRareDiseaseCsv(docType), latestVersion.dataModel)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) {
             new RareDiseaseCsvExporter(it, docType).printReport(latestVersion)
         }
+        asset.id
     }
 
-    long genRareDiseaseDisorderListAsCsv(DataClass dClass){
+    Long genRareDiseaseDisorderListAsCsv(DataClass dClass){
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
-        String name = "Rare Disease Disorder List"
-
-        return assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "${name} (CSV)",
-            originalFileName: "${name}-${latestVersion.status}-${latestVersion.version}.csv",
-            contentType: "text/csv",
-        ) {
+        Asset asset = saveAsset(genomicsAssetMetadataService.genRareDiseaseDisorderListAsCsv(latestVersion), latestVersion.dataModel)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) {
             new RareDiseaseDisorderListCsvExporter(it).export(latestVersion)
         }
+        asset.id
     }
 
-    long genEligibilityOrPhenotypesAndTests(DataClass dataClass, boolean eligibilityMode) {
-        String documentName = RareDiseasesDocExporter.documentName(eligibilityMode)
-
+    Long genEligibilityOrPhenotypesAndTests(DataClass dataClass, boolean eligibilityMode) {
         Long classId = dataClass.id
-        return assetService.storeReportAsAsset(
-            dataClass.dataModel,
-            name: "${documentName} report (MS Word Document)",
-            originalFileName: "${documentName}-${dataClass.status}-${dataClass.version}.docx",
-            contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ) { OutputStream out ->
-            new RareDiseasesDocExporter(DataClass.get(classId), org.modelcatalogue.gel.export.RareDiseasesDocExporter.standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(out)
+        Asset asset = saveAsset(genomicsAssetMetadataService.genEligibilityOrPhenotypesAndTests(dataClass, eligibilityMode), dataClass.dataModel)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) { OutputStream out ->
+            new RareDiseasesDocExporter(DataClass.get(classId), RareDiseasesDocExporter.standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(out)
         }
+        asset.id
     }
 
 
-    long genSplitDocAsset(DataClass dataClass){
-        String documentName = "Rare Disease Eligibility, Phenotypes and Clinical Tests for $dataClass.name"
+    Long genSplitDocAsset(DataClass dataClass) {
+        Asset asset = saveAsset(genomicsAssetMetadataService.genSplitDocAsset(dataClass), dataClass.dataModel)
         Long classId = dataClass.id
-        return assetService.storeReportAsAsset(
-                dataClass.dataModel,
-                name: "${documentName} report (MS Word Document)",
-                originalFileName: "${documentName}-${dataClass.status}-${dataClass.version}.docx",
-                contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ) { OutputStream out ->
-            new RareDiseaseMaintenanceSplitDocsExporter(DataClass.get(classId), org.modelcatalogue.gel.export.RareDiseaseMaintenanceSplitDocsExporter.standardTemplate, DOC_IMAGE_PATH, 2).export(out)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) { OutputStream out ->
+            new RareDiseaseMaintenanceSplitDocsExporter(DataClass.get(classId), RareDiseaseMaintenanceSplitDocsExporter.standardTemplate, DOC_IMAGE_PATH, 2).export(out)
         }
-
+        asset.id
     }
 
 
-    long genRareDiseaseHPOAndClinicalTestsAsXls(DataClass dataClass) {
-        assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} - HPO and Clinical Tests (MS Excel Spreadsheet)",
-            originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ) { OutputStream out ->
+    Long genRareDiseaseHPOAndClinicalTestsAsXls(DataClass dataClass) {
+
+        Asset asset = saveAsset(genomicsAssetMetadataService.genRareDiseaseHPOAndClinicalTestsAsXls(dataClass), dataClass.dataModel)
+
+        assetService.storeReportAsAsset(asset.id, asset.contentType) { OutputStream out ->
             new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 0, false).export(dataClass,out)
         }
+        asset.id
     }
 
-    long genRareDiseaseEligibilityChangeLogAsXls(DataClass dataClass){
-        return assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} - Eligibility change log (MS Excel Spreadsheet)",
-            originalFileName: "$RD_ELIGIBILITY_CHANGELOG_XLS",
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ) { OutputStream out ->
+    Long genRareDiseaseEligibilityChangeLogAsXls(DataClass dataClass) {
+        Asset asset = saveAsset(genomicsAssetMetadataService.genRareDiseaseEligibilityChangeLogAsXls(dataClass), dataClass.dataModel)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) { OutputStream out ->
             new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 0, false).export(dataClass, out)
         }
+        asset.id
     }
 
-    long genChangeLogDocument(DataClass dataClass, String name, Integer depth, Boolean includeMetadata){
+    Long genChangeLogDocument(DataClass dataClass, String name, Integer depth, Boolean includeMetadata){
+
+        Asset asset = saveAsset(genomicsAssetMetadataService.genChangeLogDocument(dataClass, name), dataClass.dataModel)
+
         Long classId = dataClass.id
-        return assetService.storeReportAsAsset(dataClass.dataModel,
-            name: name ? name : "${dataClass.name} - change log (MS Word Document)",
-            originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}-changelog.docx",
-            contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ) { OutputStream out ->
-            new ChangeLogDocxGenerator(auditService, dataClassService, performanceUtilService, depth, includeMetadata, customTemplate, DOC_IMAGE_PATH)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) { OutputStream out ->
+            new ChangeLogDocxGenerator(auditService, dataClassService, performanceUtilService, elementService, depth, includeMetadata, customTemplate, DOC_IMAGE_PATH)
                 .generateChangelog(DataClass.get(classId), out)
         }
+        asset.id
     }
 
-    long genDataSpecChangeLogAsXls(DataModel model) {
-        return assetService.storeReportAsAsset(model,
-            name: "${model.name}  - Specification change log (MS Excel Spreadsheet)",
-            originalFileName: "${model.name}-${model.status}-${model.version}-changelog.xlsx",
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ) { OutputStream out ->
+    Long genDataSpecChangeLogAsXls(DataModel model) {
+        Asset asset = saveAsset(genomicsAssetMetadataService.genDataSpecChangeLogAsXls(model), model)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) { OutputStream out ->
             new DataModelChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 0, false).export(model, out)
         }
+        asset.id
     }
 
     ListWithTotalAndType<DataClass> findRareDiseases(Map<String, Object> params = [:], DataModel dataModel) {
@@ -207,13 +177,16 @@ class GenomicsService {
         }
     }
 
-    long genRareDiseaseWebsite(DataModel dataModel) {
-        return assetService.storeReportAsAsset(dataModel,
-            name: "${dataModel.name} - Static Website",
-            originalFileName: "$RD_WEB",
-            contentType: "application/zip",
-        ) { OutputStream it, Long assetId ->
+    Long genRareDiseaseWebsite(DataModel dataModel) {
+        Asset asset = saveAsset(genomicsAssetMetadataService.genRareDiseaseWebsite(dataModel), dataModel)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) { OutputStream it, Long assetId ->
             new RareDiseasesWebsiteExporter(this, dataModel, groovyPageRenderer, BuildProgressMonitor.create("${dataModel.name} - Static Website", assetId)).export(it)
         }
+        asset.id
+    }
+
+    Asset saveAsset(Asset asset, DataModel dataModel) {
+        asset.dataModel = dataModel
+        assetGormService.save(asset)
     }
 }

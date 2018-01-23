@@ -1,6 +1,10 @@
 package org.modelcatalogue.core.logging
 
+import org.modelcatalogue.core.Asset
+import org.modelcatalogue.core.AssetMetadata
+import org.modelcatalogue.core.AssetMetadataService
 import org.modelcatalogue.core.AssetService
+import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import java.nio.file.Files
 import java.text.SimpleDateFormat
@@ -12,15 +16,19 @@ class LoggingService {
     private final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("ddMMyyyyHHmmss")
 
     AssetService assetService
+    AssetMetadataService assetMetadataService
+    AssetGormService assetGormService
 
     Long saveLogsToAsset() {
         String timestamp = TIMESTAMP_FORMAT.format(new Date())
-        assetService.storeReportAsAsset(
-            null,
-            name: "Logs from $timestamp",
-            originalFileName: "${timestamp}.zip",
-            contentType: "application/zip"
-        ) { OutputStream outputStream, Long assetId ->
+        AssetMetadata assetMetadata = new AssetMetadata(
+                name: "Logs from $timestamp",
+                originalFileName: "${timestamp}.zip",
+                contentType: "application/zip"
+        )
+        Asset asset = assetMetadataService.instantiateAssetWithMetadata(assetMetadata)
+        asset = assetGormService.save(asset)
+        assetService.storeReportAsAsset(asset.id, asset.contentType) { OutputStream outputStream, Long assetId ->
             BuildProgressMonitor monitor = BuildProgressMonitor.create("Export logs $timestamp", assetId)
 
             File logs = logsDirectory

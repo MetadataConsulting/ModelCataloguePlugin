@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
@@ -55,6 +56,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     DataModelCatalogueElementService dataModelCatalogueElementService
 
     AssetGormService assetGormService
+
+    AssetMetadataService assetMetadataService
 
     DataModelController() {
         super(DataModel, false)
@@ -431,14 +434,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
         Long dataModelId = dataModel.id
 
-        AssetMetadata assetMetadata = new AssetMetadata(
-                name: name ? name : "${dataModel.name} report as MS Excel Document",
-                originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
-        asset.dataModel = dataModel
-        asset = assetGormService.save(asset)
+        Asset asset = saveAsset(assetMetadataService.assetReportForDataModel(dataModel, name, MicrosoftOfficeDocument.XLSX), dataModel)
         Long assetId = asset.id
 
         assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->
@@ -450,6 +446,11 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         response.setHeader("X-Asset-ID", asset.id.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
         return
+    }
+
+    protected Asset saveAsset(Asset asset, DataModel dataModel) {
+        asset.dataModel = dataModel
+        assetGormService.save(asset)
     }
 
     /**
@@ -470,21 +471,11 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        AssetMetadata assetMetadata = new AssetMetadata(
-                name: name ? name : "${dataModel.name} report as MS Excel Document",
-                originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
-        asset.dataModel = dataModel
-        asset = assetGormService.save(asset)
+        Asset asset = saveAsset(assetMetadataService.assetReportForDataModel(dataModel, name, MicrosoftOfficeDocument.XLSX), dataModel)
         Long assetId = asset.id
 
         assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->
-            // reload domain class as this is called in separate thread
-            // GridReportXlsxExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
             GMCGridReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
-
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -512,18 +503,10 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        AssetMetadata assetMetadata = new AssetMetadata(
-                name: name ? name : "${dataModel.name} report as MS Excel Document",
-                originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.mc.xlsx",
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
-        asset.dataModel = dataModel
-        asset = assetGormService.save(asset)
+        Asset asset = saveAsset(assetMetadataService.assetReportForDataModel(dataModel, name, MicrosoftOfficeDocument.XLSX), dataModel)
         Long assetId = asset.id
 
         assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->
-            // reload domain class as this is called in separate thread
             ExcelExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
@@ -547,14 +530,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
         Long modelId = dataModel.id
 
-        AssetMetadata assetMetadata = new AssetMetadata(
-                name: name ? name : "${dataModel.name} report as MS Excel Document",
-                originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.docx",
-                contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
-        Asset asset = assetService.instantiateAssetWithMetadata(assetMetadata)
-        asset.dataModel = dataModel
-        asset = assetGormService.save(asset)
+        Asset asset = saveAsset(assetMetadataService.assetReportForDataModel(dataModel, name, MicrosoftOfficeDocument.DOC), dataModel)
         Long assetId = asset.id
 
         assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->

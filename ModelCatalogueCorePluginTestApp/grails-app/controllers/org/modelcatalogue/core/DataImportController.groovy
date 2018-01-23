@@ -7,6 +7,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
 import org.modelcatalogue.core.dataimport.excel.ConfigStatelessExcelLoader
 import org.modelcatalogue.core.dataimport.excel.ExcelImportType
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
@@ -44,7 +45,8 @@ class DataImportController  {
     AssetGormService assetGormService
     UserGormService userGormService
 
-    private static final List<String> CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
+
+    private static final List<String> CONTENT_TYPES = [MicrosoftOfficeDocument.contentType(MicrosoftOfficeDocument.EXCEL), MicrosoftOfficeDocument.contentType(MicrosoftOfficeDocument.XLSX), 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
     static responseFormats = ['json']
     static allowedMethods = [upload: "POST", excelImportTypesHumanReadable: 'GET']
 
