@@ -9,6 +9,7 @@ import org.apache.commons.io.output.CountingOutputStream
 import org.codehaus.groovy.runtime.InvokerInvocationException
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
+import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.publishing.CloningContext
 import org.springframework.util.DigestUtils
@@ -27,6 +28,7 @@ class AssetService {
     SecurityService modelCatalogueSecurityService
     AuditService auditService
     DataModelGormService dataModelGormService
+    AssetGormService assetGormService
 
     private static final long GIGA = 1024 * 1024 * 1024
     private static final long MEGA = 1024 * 1024
@@ -90,7 +92,7 @@ class AssetService {
             asset = clone
         }
 
-        asset.save(flush: true)
+        assetGormService.save(asset)
 
         if (existing) {
             addToSupersedes(existing, asset)
@@ -104,7 +106,7 @@ class AssetService {
             asset.errors.rejectValue('md5', 'asset.uploadfailed', "There were problems uploading file $filename")
         }
 
-        return asset
+        asset
     }
 
     private static String getOverridableContentType(MultipartFile multipartFile) {
@@ -113,7 +115,7 @@ class AssetService {
                 return entry.value
             }
         }
-        return multipartFile.contentType
+        multipartFile.contentType
     }
 
     @CompileDynamic
@@ -130,7 +132,8 @@ class AssetService {
             modelCatalogueStorageService.store('assets', "${asset.id}", file.contentType, { OutputStream it -> it << countingInputStream })
             asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
             asset.size = countingInputStream.byteCount
-            asset.save(flush: true)
+            assetGormService.save(asset)
+
         } catch (Exception e) {
             log.error("Exception storing asset from file", e)
             throw e
@@ -148,7 +151,7 @@ class AssetService {
             modelCatalogueStorageService.store('assets', "${asset.id}", contentType, { OutputStream it -> it << countingInputStream })
             asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
             asset.size = countingInputStream.byteCount
-            asset.save(flush: true)
+            assetGormService.save(asset)
         } catch (Exception e) {
             log.error("Exception storing asset from file", e)
             throw e
@@ -157,21 +160,24 @@ class AssetService {
         }
     }
 
-    void storeAssetWithStream(Asset asset, String contentType, Closure withOutputStream) {
-        if (!asset) throw new IllegalArgumentException("Please, provide valid asset.")
+    void storeAssetWithStream(Long assetId, String contentType, Closure withOutputStream) {
+        if ( !assetId ) {
+            throw new IllegalArgumentException("Please, provide valid asset.")
+        }
         MessageDigest md5 = MessageDigest.getInstance('MD5')
-        modelCatalogueStorageService.store('assets', "${asset.id}", contentType) { OutputStream it ->
+        modelCatalogueStorageService.store('assets', "${assetId}", contentType) { OutputStream it ->
             DigestOutputStream dos      = null
             CountingOutputStream cos    = null
+            long size = 0
             try {
                 dos = new DigestOutputStream(it, md5)
                 cos = new CountingOutputStream(dos)
                 if (withOutputStream.maximumNumberOfParameters == 1) {
                     withOutputStream(cos)
                 } else {
-                    withOutputStream(cos, asset.id)
+                    withOutputStream(cos, assetId)
                 }
-                asset.size = cos.byteCount
+                size = cos.byteCount
             } catch (InvokerInvocationException e) {
                 // sadly this sometimes happens
                 log.error("Exception storing asset with output stream", e.cause)
@@ -183,66 +189,42 @@ class AssetService {
                 dos?.close()
                 cos?.close()
             }
+            assetGormService.update(assetId, size, DigestUtils.md5DigestAsHex(md5.digest()))
         }
-        asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
-        asset.save(flush: true)
     }
 
     protected Asset storeAsset(Map param, MultipartFile file, String contentType = 'application/xslt'){
         String theName = (param.name ?: param.action)
 
         // data model unknown at the moment
-        Asset asset = new Asset(
+        Asset asset = assetGormService.save(new Asset(
                 name: "Import for " + theName,
                 originalFileName: file.originalFilename,
                 description: "Your import will be available in this asset soon. Use Refresh action to reload.",
                 status: ElementStatus.PENDING,
                 contentType: contentType,
                 size: 0
-        )
-        asset.save(flush: true, failOnError: true)
+        ))
         storeAssetFromFile(file, asset)
-        return asset
+        asset
     }
 
-    Long storeReportAsAsset(Map<String, Object> assetParams, DataModel dataModel, @ClosureParams(value = FromString, options= ["java.io.OutputStream", "java.io.OutputStream,java.lang.Long"]) Closure worker){
-        assert assetParams.name
-        assert assetParams.contentType
-        assert assetParams.originalFileName
-
-        assetParams.size = 0
-        assetParams.status = ElementStatus.PENDING
-        assetParams.description = assetParams.description ?: "Your report will be available in this asset soon. Use Refresh action to reload"
-
-        Asset asset = new Asset(assetParams)
-        asset.dataModel = dataModel
-        asset.save(flush: true, failOnError: true)
-
-        Long id = asset.id
+    void storeReportAsAsset(Long assetId, String contentType, @ClosureParams(value = FromString, options= ["java.io.OutputStream", "java.io.OutputStream,java.lang.Long"]) Closure worker){
         Long authorId = modelCatalogueSecurityService.currentUser?.id
-
         executorService.submit {
-            auditService.withDefaultAuthorId(authorId) {
-                Asset updated = Asset.getWithRetries(id)
-                try {
-                    //do the hard work
-                    storeAssetWithStream(updated, assetParams.contentType?.toString(), worker)
+                auditService.withDefaultAuthorId(authorId) {
+                    try {
+                        //do the hard work
+                        storeAssetWithStream(assetId, contentType?.toString(), worker)
+                        assetGormService.update(assetId, ElementStatus.FINALIZED, "Your report is ready. Use Download button to download it.")
 
-                    updated.status = ElementStatus.FINALIZED
-                    updated.description = "Your report is ready. Use Download button to download it."
-                    updated.save(flush: true, failOnError: true)
-                } catch (e) {
-                    log.error "Exception of type ${e.class} with id=${id}", e
-
-                    updated.refresh()
-                    updated.status = ElementStatus.FINALIZED
-                    updated.name = updated.name + " - Error during generation"
-                    updated.description = "Error generating report: $e"
-                    updated.save(flush: true, failOnError: true)
+                    } catch (e) {
+                        log.error "Exception of type ${e.class} with id=${assetId}", e
+                        Asset asset = assetGormService.findById(assetId)
+                        asset.refresh()
+                        assetGormService.update(assetId, ElementStatus.FINALIZED, "${asset.name} - Error during generation", "Error generating report: $e")
+                    }
                 }
-            }
         }
-        asset.id
     }
-
 }
