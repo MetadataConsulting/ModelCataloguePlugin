@@ -91,6 +91,21 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         relationshipTypeService.getRelationshipTypesFor(elementClass)
     }
 
+    /**
+     * e.g. relationships = {
+     *     "incoming": {
+     *         "hierarchy": "childOf"
+     *     }
+     *     "outgoing": {
+     *         "hierarchy": "parentOf"
+     *     }
+     *     "bidirectional": {
+     *         "relatedTo": "relatedTo"
+     *     }
+     *  }
+     * @param type
+     * @return
+     */
     Map<String, Map<String, String>> getRelationshipConfiguration(Class type) {
         Map<String, Map<String, String>> relationships  = [incoming: [:], outgoing: [:], bidirectional: [:]]
         if (type.superclass && CatalogueElement.isAssignableFrom(type.superclass)) {
@@ -141,23 +156,24 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         relationships
     }
 
-    private static Closure addRelationsJson(RelationshipDirection direction, CatalogueElement el, Map ret, Map<String, RelationshipType> types) {
-        { String relationshipType, String name ->
-            RelationshipType type = types[relationshipType]
-            def relation = [itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipType}".toString()]
-            if (type?.searchable) {
-                relation.search = "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipType}/search".toString()
+    private static Closure addRelationsJson(RelationshipDirection direction, CatalogueElement el, Map ret, Map<String, RelationshipType> relationshipTypeMap) {
+        { String relationshipTypeName, String relationshipTypeDirectionalName ->
+            RelationshipType relationshipType = relationshipTypeMap[relationshipTypeName]
+            def directedRelationJSON = [itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipTypeName}".toString()]
+            if (relationshipType?.searchable) {
+                directedRelationJSON.search = "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipTypeName}/search".toString()
             }
             switch (direction) {
                 case RelationshipDirection.INCOMING:
-                    relation.count = el.countIncomingRelationshipsByType(type)
+                    directedRelationJSON.count = el.countIncomingRelationshipsByType(relationshipType)
                     break
                 default:
-                    relation.count = el.countOutgoingRelationshipsByType(type)
+                    directedRelationJSON.count = el.countOutgoingRelationshipsByType(relationshipType)
+
                     break
             }
 
-            ret[name] = relation
+            ret[relationshipTypeDirectionalName] = directedRelationJSON
         }
     }
 
@@ -190,6 +206,8 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
             return minimalCatalogueElementJSON(element as DataElement)
         } else if (DataType.isAssignableFrom(entityClass)) {
             return minimalCatalogueElementJSON(element as DataType)
+        } else if (DataClass.isAssignableFrom(entityClass)) {
+            return minimalCatalogueElementJSON(element as DataClass)
         } else if (!element) {
             return null
         } else {
@@ -216,6 +234,14 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         if (!element) return null
         def minimalJSON = minimalCatalogueElementJSONSkeleton(element)
         minimalJSON.put('dataType', minimalCatalogueElementJSON(element.dataType))
+        return minimalJSON
+    }
+
+    static Map<String, Object> minimalCatalogueElementJSON(DataClass element) {
+        if (!element) return null
+        def minimalJSON = minimalCatalogueElementJSONSkeleton(element)
+        DataClassMarshaller.addDataClassFields(minimalJSON, element) // needed to display hierarchy properly in CatalogueElementTreeview, particularly the "content" field. It doesn't seem like the other CatalogueElements like DataElement and PrimitiveType need this "content" field to display their DataTypes and MeasurementUnits respectively...
+
         return minimalJSON
     }
 
