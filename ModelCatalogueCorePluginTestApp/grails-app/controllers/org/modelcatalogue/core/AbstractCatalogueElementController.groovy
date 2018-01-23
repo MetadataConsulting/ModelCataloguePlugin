@@ -797,7 +797,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         try {
             // def otherSide = parseOtherSide()
             DestinationClass destinationClass = destinationClassFromJsonPayload()
-            def objectToBindParam = getObjectToBind()
+            def objectToBindParam = getObjectToBind() // the JSON request payload
             MetadataResponseEvent metadataResponse = manageCatalogueElementService.addRelation(catalogueElementId,
                     type,
                     outgoing as Boolean,
