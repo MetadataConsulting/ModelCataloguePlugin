@@ -36,23 +36,6 @@ class DataType extends CatalogueElement implements Validating {
         tablePerHierarchy false
     }
 
-
-    @Override
-    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
-        DataElement.findAllByDataType(this).collectEntries {
-            if (toBeDeleted) {
-                // if DataModel is going to be deleted, then DataElement needs to be from same DataModel
-                if (it.dataModel != this.dataModel) {
-                    return [(it): it.dataModel]
-                } else {
-                    return [(it): null]
-                }
-            } else {
-                // if deletes DataType, it should not be used anywhere
-                return [(it): null]
-            }
-        }
-    }
     static transients = ['relatedDataElements', 'regexDef', 'dataElementGormService']
 
     void setRegexDef(String regex) {
@@ -170,12 +153,5 @@ class DataType extends CatalogueElement implements Validating {
     @Override
     protected String getModelCatalogueResourceName() {
         'dataType'
-    }
-
-    @Override
-    Long getFirstParentId() {
-        return getRelatedDataElements().find {
-            it.getDataModelId() == getDataModelId()
-        }?.getId() ?: super.getFirstParentId()
     }
 }

@@ -45,28 +45,6 @@ class DataModel extends CatalogueElement {
         super.preparePublishChain(chain).add(this.declares)
     }
 
-    @Override
-    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
-        // inspect declarations
-        def manualDelete = declares.collectEntries {
-            // check the element for the same - if manual delete is needed
-            def relationshipManualDelete = it.manualDeleteRelationships(this)
-            if (relationshipManualDelete.size() > 0) {
-                return [(it): relationshipManualDelete]
-            } else {
-                return [:]
-            }
-        }
-        // inspect relationships
-        manualDelete << (outgoingRelationships + incomingRelationships).collectEntries {
-            if (it.dataModel && it.dataModel != toBeDeleted)
-                return [(it.dataModel): it]
-            else
-                return [:]
-        }
-
-        return manualDelete
-    }
 
     /**
      * Deletes all {@link CatalogueElement}s assigned to this {@link DataModel} and then call super class method

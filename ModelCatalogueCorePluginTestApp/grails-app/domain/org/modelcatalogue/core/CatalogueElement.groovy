@@ -237,20 +237,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     /**
-     * List all relationships to this object which cannot be automatically deleted.
-     * @param toBeDeleted If deleting whole {@link DataModel}, this should be specifies. Null if item to be deleted is
-     * not {@link DataModel}.
-     * @return Map of object which needs to be manually delete. Key is {@link CatalogueElement} and value is either
-     * {@link Map} with same structure (nested relationships) or following objects:
-     * <ul>
-     *     <li>null: means the {@link CatalogueElement} is problem itself, it should be deleted manualy before deleting this</li>
-     *     <li>{@link DataModel}: means cannot delete elements which belongs to different {@link DataModel}</li>
-     *     <li>{@link Relationship}: means cannot delete relationship which belongs to different {@link DataModel}</li>
-     * </ul>
-     */
-    abstract Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted)
-
-    /**
      * This method deletes all related relationships which cannot be cleared automatically when object is deleted.
      * It should be overridden by implementors if needed. Deletes all catalogue relationships: {@link #outgoingMappings},
      * {@link #incomingRelationships}, {@link #outgoingMappings}, {@link #incomingMappings} and {@link #extensions}.

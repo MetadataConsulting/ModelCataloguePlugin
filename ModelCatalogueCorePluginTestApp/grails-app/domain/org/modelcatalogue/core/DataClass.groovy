@@ -25,21 +25,7 @@ class DataClass extends CatalogueElement {
         ret
     }
 
-    @Override
-    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
-        referringDataTypes.collectEntries {
-            if (toBeDeleted) {
-                // if DataModel is going to be deleted, then ReferenceType needs to be from same DataModel
-                if (it.dataModel != toBeDeleted)
-                    return [(it): it.dataModel]
-                else
-                    return [:]
-            } else {
-                // if deletes DataClass, it should not be used anywhere
-                return [(it): null]
-            }
-        }
-    }
+
 
     @Override
     void setModelCatalogueId(String mcID) {
