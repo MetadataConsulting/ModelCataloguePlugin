@@ -45,9 +45,7 @@ class DataElementService {
         if (!tagId) {
             return  buildDataElementsList(params,
                     selectDEs, selectCount,
-                            fromBasic +
-                            whereBasic
-                            + order
+                            "${fromBasic} ${whereBasic} ${order}".toString()
                     ) {
                         setLong('modelId', modelId)
                         if (findInGetAllDestinations) {
@@ -62,10 +60,7 @@ class DataElementService {
             String tagRelTagIdNullCondition = "AND rel.id is null"
 
             return buildDataElementsList(params,
-                    selectDEs, selectCount,
-                            fromBasic + joinTagRel +
-                            whereBasic + tagRelTagIdNullCondition +
-                            order
+                    selectDEs, selectCount, "${fromBasic} ${joinTagRel} ${whereBasic} ${tagRelTagIdNullCondition} ${order}".toString()
                     ) {
                     setLong('modelId', modelId)
                     if (findInGetAllDestinations) {
@@ -78,9 +73,7 @@ class DataElementService {
             String tagReltagIdNotNullCondition = "AND de.id in (select destination_id from relationship where relationship_type_id = :tagTypeId and source_id = :tagId)"
             buildDataElementsList(params,
                     selectDEs, selectCount,
-                    fromBasic +
-                            whereBasic + tagReltagIdNotNullCondition +
-                            order
+                    "${fromBasic} ${whereBasic} ${tagReltagIdNotNullCondition} ${order}".toString()
             ) {
                 setLong('modelId', modelId)
                 if (findInGetAllDestinations) {
