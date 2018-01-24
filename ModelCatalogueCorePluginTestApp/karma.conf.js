@@ -50,6 +50,7 @@ module.exports = function(config) {
             'test/js/**/*.fixture.coffee',
 
             // App under test
+            'grails-app/assets/javascripts/modelcatalogue/util/Stomp.js', // trying to do this before MessagingClient is called but the file is just not loading.
             'grails-app/assets/javascripts/modelcatalogue/modelcatalogue.coffee',
             'grails-app/assets/javascripts/**/*.es6',
             'grails-app/assets/javascripts/**/*.coffee',
