@@ -644,13 +644,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         "/${GrailsNameUtils.getPropertyName(getClass())}/${getId()}".toString()
     }
 
-    Long getFirstParentId() {
-        if (getDataModel()) {
-            return getDataModel().getId()
-        }
-        return null
-    }
-
     CatalogueElement findPreviousVersion() {
         if (countSupersedes()) {
             return supersedes.first()

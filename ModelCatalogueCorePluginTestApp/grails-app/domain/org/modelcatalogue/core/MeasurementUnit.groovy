@@ -31,10 +31,6 @@ class MeasurementUnit extends CatalogueElement {
         }
     }
 
-    @Override
-    Long getFirstParentId() {
-        return getPrimitiveTypes().find { it.getDataModelId() == getDataModelId() }?.getId() ?: super.getFirstParentId()
-    }
 
     List<PrimitiveType> getPrimitiveTypes() {
         if (!readyForQueries) {

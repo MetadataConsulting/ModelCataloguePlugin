@@ -72,10 +72,4 @@ class DataClass extends CatalogueElement {
         FriendlyErrors.failFriendlySave(domain)
         this
     }
-
-
-    @Override
-    Long getFirstParentId() {
-        return getChildOf().find { it.getDataModelId() == getDataModelId() }?.getId() ?: super.getFirstParentId()
-    }
 }

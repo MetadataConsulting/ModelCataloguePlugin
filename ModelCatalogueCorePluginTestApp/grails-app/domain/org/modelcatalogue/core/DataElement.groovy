@@ -70,9 +70,4 @@ class DataElement extends CatalogueElement {
     Iterable<String> getInheritedAssociationsNames() {
         Iterables.concat(super.inheritedAssociationsNames, ImmutableSet.of('dataType'))
     }
-
-    @Override
-    Long getFirstParentId() {
-        return getContainedIn().find { it.getDataModelId() == getDataModelId() }?.getId() ?: super.getFirstParentId()
-    }
 }
