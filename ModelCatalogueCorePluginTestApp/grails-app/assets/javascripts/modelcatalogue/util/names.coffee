@@ -1,4 +1,4 @@
-naturalNames = {}
+naturalNames = {'validationRule': 'Business Rule'} # hack: call validationRules Business Rules
 propertyNamesFromTypes = {}
 propertyNamesFromQualifiers = {}
 
