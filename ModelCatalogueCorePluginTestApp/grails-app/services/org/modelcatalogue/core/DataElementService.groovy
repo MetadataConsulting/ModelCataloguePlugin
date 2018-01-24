@@ -157,42 +157,5 @@ class DataElementService {
     private ListWithTotalAndType<DataElement>  buildDataElementsList(Map params, String selectElements, String selectCount, String fromQuery, @DelegatesTo(SQLQuery) Closure closure) {
         QuerySetupListMethods querySetupListMethods = new QuerySetupListMethods(selectElements, selectCount, fromQuery, closure)
         return Lists.methodNotClosureLazy(params, DataElement, querySetupListMethods)
-
-//        Closure queryClosure = {
-//            def max = it?.max
-//            def offset = it?.offset
-//
-//            final session = sessionFactory.currentSession
-//
-//            // Create native SQL query.
-//            final sqlQuery = session.createSQLQuery(query)
-//
-//            // Use Groovy with() method to invoke multiple methods
-//            // on the sqlQuery object.
-//            sqlQuery.addEntity(DataElement)
-//
-//            if (max) {
-//                sqlQuery.setMaxResults(max as Integer)
-//            }
-//
-//            if (offset) {
-//                sqlQuery.setFirstResult(offset as Integer)
-//            }
-//
-//            sqlQuery.with closure
-//
-//            // Get all results.
-//            if (it instanceof Map) {
-//                return sqlQuery.list()
-//            }
-//            return sqlQuery.list().size()
-//        }
-//
-//        Lists.lazy(params, DataElement, queryClosure, queryClosure)
-
-
-
     }
-
-
 }
