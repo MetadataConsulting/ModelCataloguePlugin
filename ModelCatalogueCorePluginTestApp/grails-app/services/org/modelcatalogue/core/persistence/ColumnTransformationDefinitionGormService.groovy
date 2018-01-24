@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.WarnGormErrors
@@ -23,7 +24,7 @@ class ColumnTransformationDefinitionGormService implements WarnGormErrors {
 
     @Transactional
     ColumnTransformationDefinition save(ColumnTransformationDefinition instance) {
-        if ( !instance.save() ) {
+        if (!instance.save()) {
             warnErrors(instance, messageSource)
             transactionStatus.setRollbackOnly()
         }
@@ -32,7 +33,16 @@ class ColumnTransformationDefinitionGormService implements WarnGormErrors {
 
     @Transactional
     ColumnTransformationDefinition saveByTransformationAndSourceAndHeader(CsvTransformation transformation, DataElement source, String header) {
-        ColumnTransformationDefinition instance  = new ColumnTransformationDefinition(source: source, transformation: transformation, header: header)
+        ColumnTransformationDefinition instance = new ColumnTransformationDefinition(source: source, transformation: transformation, header: header)
         save(instance)
+    }
+
+    @Transactional(readOnly = true)
+    List<ColumnTransformationDefinition> findAllBySourceOrDestination(DataElement source, DataElement destination) {
+        findQueryBySourceOrDestination(source, destination).list()
+    }
+
+    DetachedCriteria<ColumnTransformationDefinition> findQueryBySourceOrDestination(DataElement sourceParam, DataElement destinationParam) {
+        ColumnTransformationDefinition.where { source == sourceParam && destination == destinationParam }
     }
 }
