@@ -276,7 +276,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             }
         }
 
-        if (manualDeleteRelationships.size() > 0) {
+        if ( manualDeleteRelationships ) {
             log.debug("cannot delete object $instance as there are relationship objects which needs to be handled " +
                           "manually $manualDeleteRelationships")
 
