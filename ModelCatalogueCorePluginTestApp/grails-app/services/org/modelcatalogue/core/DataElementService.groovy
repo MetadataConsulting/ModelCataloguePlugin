@@ -42,46 +42,35 @@ class DataElementService {
 
         String order = "ORDER BY ce.name"
 
+        String fromQuery
+        Closure querySetupClosure
         if (!tagId) {
-            return  buildDataElementsList(params,
-                    selectDEs, selectCount,
-                            fromBasic +
-                            whereBasic
-                            + order
-                    ) {
-                        setLong('modelId', modelId)
-                        if (findInGetAllDestinations) {
-                            setLong('hierarchytypeId', hierarchyType)
-                            setLong('containmentTypeId', containmentType)
-                        }
-                    }
+            fromQuery = "${fromBasic} ${whereBasic} ${order}".toString()
+            querySetupClosure = {
+                setLong('modelId', modelId)
+                if (findInGetAllDestinations) {
+                    setLong('hierarchytypeId', hierarchyType)
+                    setLong('containmentTypeId', containmentType)
+                }
+            }
         } else if (tagId in ['none', 'null', 'undefined']) {
 
             // introduces variable rel
             String joinTagRel = "LEFT JOIN relationship rel on rel.destination_id = de.id and rel.relationship_type_id = :tagTypeId"
             String tagRelTagIdNullCondition = "AND rel.id is null"
-
-            return buildDataElementsList(params,
-                    selectDEs, selectCount,
-                            fromBasic + joinTagRel +
-                            whereBasic + tagRelTagIdNullCondition +
-                            order
-                    ) {
-                    setLong('modelId', modelId)
-                    if (findInGetAllDestinations) {
-                        setLong('hierarchytypeId', hierarchyType)
-                        setLong('containmentTypeId', containmentType)
-                    }
-                    setLong('tagTypeId', tagTypeId)
+            fromQuery = "${fromBasic} ${joinTagRel} ${whereBasic} ${tagRelTagIdNullCondition} ${order}".toString()
+            querySetupClosure = {
+                setLong('modelId', modelId)
+                if (findInGetAllDestinations) {
+                    setLong('hierarchytypeId', hierarchyType)
+                    setLong('containmentTypeId', containmentType)
                 }
+                setLong('tagTypeId', tagTypeId)
+            }
         } else {
             String tagReltagIdNotNullCondition = "AND de.id in (select destination_id from relationship where relationship_type_id = :tagTypeId and source_id = :tagId)"
-            buildDataElementsList(params,
-                    selectDEs, selectCount,
-                    fromBasic +
-                            whereBasic + tagReltagIdNotNullCondition +
-                            order
-            ) {
+            fromQuery = "${fromBasic} ${whereBasic} ${tagReltagIdNotNullCondition} ${order}".toString()
+            querySetupClosure = {
                 setLong('modelId', modelId)
                 if (findInGetAllDestinations) {
                     setLong('hierarchytypeId', hierarchyType)
@@ -91,6 +80,7 @@ class DataElementService {
                 setLong('tagId', tagId as Long)
             }
         }
+        buildDataElementsList(params, selectDEs, selectCount, fromQuery, querySetupClosure)
     }
 
     /**
