@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.scripting.Validating
 import org.modelcatalogue.core.scripting.ValueValidator
@@ -18,6 +19,8 @@ class DataType extends CatalogueElement implements Validating {
 
     String rule
 
+    DataElementGormService dataElementGormService
+
     static constraints = {
         name size: 1..255
         rule nullable: true, maxSize: 10000, validator: { val, obj ->
@@ -33,7 +36,6 @@ class DataType extends CatalogueElement implements Validating {
         tablePerHierarchy false
     }
 
-    static transients = ['relatedDataElements', 'regexDef']
 
     @Override
     Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
@@ -51,6 +53,7 @@ class DataType extends CatalogueElement implements Validating {
             }
         }
     }
+    static transients = ['relatedDataElements', 'regexDef', 'dataElementGormService']
 
     void setRegexDef(String regex) {
         if (!regex) {
@@ -119,9 +122,9 @@ class DataType extends CatalogueElement implements Validating {
             return []
         }
         if (archived) {
-            return DataElement.findAllByDataType(this)
+            return dataElementGormService.findAllByDataType(this)
         }
-        return DataElement.findAllByDataTypeAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
+        return dataElementGormService.findAllByDataTypeAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     Long countRelatedDataElements() {
@@ -129,9 +132,9 @@ class DataType extends CatalogueElement implements Validating {
             return 0
         }
         if (archived) {
-            return DataElement.countByDataType(this)
+            return dataElementGormService.countByDataType(this)
         }
-        return DataElement.countByDataTypeAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
+        return dataElementGormService.countByDataTypeAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     DataType removeFromRelatedDataElements(DataElement element) {

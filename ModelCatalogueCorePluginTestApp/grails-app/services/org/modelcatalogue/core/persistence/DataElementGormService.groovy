@@ -80,6 +80,11 @@ class DataElementGormService implements WarnGormErrors {
         findQueryByDataType(dataType).list()
     }
 
+    @Transactional(readOnly = true)
+    Number countByDataType(DataType dataType) {
+        findQueryByDataType(dataType).count()
+    }
+
     protected DetachedCriteria<DataElement> findQueryByDataType(DataType dataTypeParam) {
         DataElement.where {
             dataType == dataTypeParam
@@ -89,6 +94,11 @@ class DataElementGormService implements WarnGormErrors {
     @Transactional(readOnly = true)
     List<DataElement> findAllByDataTypeAndStatusInList(DataType dataType, List<ElementStatus> elementStatuses) {
         findQueryByDataTypeAndStatusInList(dataType, elementStatuses).list()
+    }
+
+    @Transactional(readOnly = true)
+    Number countByDataTypeAndStatusInList(DataType dataType, List<ElementStatus> elementStatuses) {
+        findQueryByDataTypeAndStatusInList(dataType, elementStatuses).count()
     }
 
     protected DetachedCriteria<DataElement> findQueryByDataTypeAndStatusInList(DataType dataTypeParam, List<ElementStatus> elementStatuses) {
