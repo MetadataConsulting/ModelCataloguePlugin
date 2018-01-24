@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
@@ -36,9 +37,25 @@ class CatalogueElementGormService {
 
     EnumeratedTypeGormService enumeratedTypeGormService
 
-    @Transactional
+    @Transactional(readOnly = true)
     CatalogueElement findById(long id) {
         CatalogueElement.get(id)
+    }
+
+    @Transactional(readOnly = true)
+    List<CatalogueElement> findAllByDataModel(DataModel dataModel) {
+        findQueryByDataModel(dataModel).list()
+    }
+
+    @Transactional(readOnly = true)
+    Number countByDataModel(DataModel dataModel) {
+        findQueryByDataModel(dataModel).count()
+    }
+
+    DetachedCriteria<CatalogueElement> findQueryByDataModel(DataModel dataModelParam) {
+        CatalogueElement.where {
+            dataModel == dataModelParam
+        }
     }
 
     @Transactional

@@ -26,26 +26,6 @@ class DataElement extends CatalogueElement {
     static fetchMode = [dataType: 'eager']
 
     @Override
-    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
-        // data elements might be in transformation definition
-        ColumnTransformationDefinition.findAllBySourceOrDestination(this, this).collectEntries {
-            if (toBeDeleted) {
-                // source is in different data model
-                if (it.source && it.source.dataModel != toBeDeleted) {
-                    return [(it): it.source.dataModel]
-                } else if (it.destination && it.destination.dataModel != toBeDeleted) {
-                    return [(it): it.destination.dataModel]
-                } else {
-                    // we cannot delete column transformation definition anyway due to session flush exception
-                    return [(it): null]
-                }
-            } else {
-                return [(it): null]
-            }
-        }
-    }
-
-    @Override
     protected PublishingChain preparePublishChain(PublishingChain chain) {
         super.preparePublishChain(chain).add(this.dataType)
     }
@@ -69,10 +49,5 @@ class DataElement extends CatalogueElement {
     @Override
     Iterable<String> getInheritedAssociationsNames() {
         Iterables.concat(super.inheritedAssociationsNames, ImmutableSet.of('dataType'))
-    }
-
-    @Override
-    Long getFirstParentId() {
-        return getContainedIn().find { it.getDataModelId() == getDataModelId() }?.getId() ?: super.getFirstParentId()
     }
 }

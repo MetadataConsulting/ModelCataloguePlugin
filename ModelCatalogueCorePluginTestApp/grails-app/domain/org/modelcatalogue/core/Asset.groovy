@@ -18,12 +18,6 @@ class Asset extends CatalogueElement {
             incoming: [attachment: 'isAttachedTo']
     ]
 
-    @Override
-    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
-        // Asset has no relationships
-        return [:]
-    }
-
     static Asset getWithRetries(Serializable id, int attempts = 10) {
         for (int i = 0; i < attempts ; i++) {
             Asset found = Asset.get(id)
