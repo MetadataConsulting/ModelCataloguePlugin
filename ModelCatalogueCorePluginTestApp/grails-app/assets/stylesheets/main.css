@@ -607,6 +607,9 @@ form ol li label {
 form ol.filter li label {
     display: inline;
 }
+form ol.filter li input[type='checkbox'] {
+    margin-right: 20px;
+}
 
 form ol.filter li {
     float: left;
