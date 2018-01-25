@@ -859,7 +859,10 @@ class ElementService implements Publisher<CatalogueElement> {
                 def dataElementName = it as String
                 Long ida =getDataElementId(dataElementName,dataModelA.id)
                 Long idb =getDataElementId(dataElementName,dataModelB.id)
-                elementSuggestions.put(ida,idb)
+                if ( !elementSuggestions.containsKey(ida) ) {
+                    elementSuggestions[ida] = new HashSet<Long>()
+                }
+                elementSuggestions[ida].add(idb)
             }
         }
         return elementSuggestions
