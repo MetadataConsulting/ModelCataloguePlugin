@@ -46,7 +46,7 @@ class MappingSuggestionsController {
                 max: cmd.max ?: defaultMax,
                 offset: cmd.offset ?: 0,
                 scorePercentage: cmd.score ?: defaultScore,
-                stateList: cmd.status ?: defaultActionStates(),
+                stateList: cmd.state ?: defaultActionStates(),
                 term: cmd.term
         )
         MappingSuggestionResponse rsp = mappingsSuggestionsGateway.findAll(mappingSuggestionRequest)
