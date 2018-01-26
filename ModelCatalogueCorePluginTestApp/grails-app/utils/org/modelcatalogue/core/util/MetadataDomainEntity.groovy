@@ -7,89 +7,89 @@ class MetadataDomainEntity {
     Long id
     MetadataDomain domain
 
+    public static final String GORM_PREFFIX = 'gorm'
+    public static final String DOMAIN_CLASS_PACKAGE = 'org.modelcatalogue.core'
+
     static MetadataDomainEntity of(String str) {
 
         if ( !str ) {
             return null
         }
 
-        final String gormPreffix = 'gorm'
-        final String domainClassesPackage = 'org.modelcatalogue.core'
-
         try {
 
             MetadataDomain metadataDomain
             String className
 
-            if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.Asset:")) {
+            if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.Asset:")) {
                 className = 'Asset'
                 metadataDomain =  MetadataDomain.ASSET
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.AssetFile:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.AssetFile:")) {
                 className = 'AssetFile'
                 metadataDomain =  MetadataDomain.ASSET_FILE
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.CatalogueElement:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.CatalogueElement:")) {
                 className = 'CatalogueElement'
                 metadataDomain =  MetadataDomain.CATALOGUE_ELEMENT
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.DataClass:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.DataClass:")) {
                 className = 'DataClass'
                 metadataDomain =  MetadataDomain.DATA_CLASS
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.DataElement:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.DataElement:")) {
                 className = 'DataElement'
                 metadataDomain =  MetadataDomain.DATA_ELEMENT
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.DataModel:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.DataModel:")) {
                 className = 'DataModel'
                 metadataDomain =  MetadataDomain.DATA_MODEL
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.DataModelPolicy:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.DataModelPolicy:")) {
                 className = 'DataModelPolicy'
                 metadataDomain =  MetadataDomain.DATA_MODEL_POLICY
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.DataType:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.DataType:")) {
                 className = 'DataType'
                 metadataDomain =  MetadataDomain.DATA_TYPE
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.EnumeratedType:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.EnumeratedType:")) {
                 className = 'EnumeratedType'
                 metadataDomain =  MetadataDomain.ENUMERATED_TYPE
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.ExtensionValue:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.ExtensionValue:")) {
                 className = 'ExtensionValue'
                 metadataDomain =  MetadataDomain.EXTENSION_VALUE
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.Mapping:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.Mapping:")) {
                 className = 'Mapping'
                 metadataDomain =  MetadataDomain.MAPPING
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.MeasurementUnit:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.MeasurementUnit:")) {
                 className = 'MeasurementUnit'
                 metadataDomain =  MetadataDomain.MEASUREMENT_UNIT
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.PrimitiveType:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.PrimitiveType:")) {
                 className = 'PrimitiveType'
                 metadataDomain =  MetadataDomain.PRIMITIVE_TYPE
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.ReferenceType:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.ReferenceType:")) {
                 className = 'ReferenceType'
                 metadataDomain =  MetadataDomain.REFERENCE_TYPE
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.Relationship:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.Relationship:")) {
                 className = 'Relationship'
                 metadataDomain =  MetadataDomain.RELATIONSHIP
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.RelationshipMetadata:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.RelationshipMetadata:")) {
                 className = 'RelationshipMetadata'
                 metadataDomain =  MetadataDomain.RELATIONSHIP_METADATA
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.RelationshipType:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.RelationshipType:")) {
                 className = 'RelationshipType'
                 metadataDomain =  MetadataDomain.RELATIONSHIP_TYPE
 
-            } else if ( str.startsWith("${gormPreffix}://${domainClassesPackage}.RelationshipTag:")) {
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.RelationshipTag:")) {
                 className = 'RelationshipTag'
                 metadataDomain =  MetadataDomain.RELATIONSHIP_TAG
 
@@ -97,7 +97,7 @@ class MetadataDomainEntity {
             if ( className == null ||metadataDomain == null ) {
                 return null
             }
-            final Long id = Long.valueOf(str.substring("${gormPreffix}://${domainClassesPackage}.${className}:".length(), str.size()))
+            final Long id = Long.valueOf(str.substring("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.${className}:".length(), str.size()))
             return new MetadataDomainEntity(domain: metadataDomain, id: id)
 
         } catch( NumberFormatException e ) {
@@ -105,66 +105,18 @@ class MetadataDomainEntity {
         }
     }
 
-    static String link(Long dataModelId, MetadataDomainEntity entity) {
-        String name = null
-        switch (entity.domain) {
-            case MetadataDomain.ASSET:
-                name = 'asset'
-                break
-            case MetadataDomain.ASSET_FILE:
-                name = 'assetFile'
-                break
-            case MetadataDomain.CATALOGUE_ELEMENT:
-                name = 'catalogueElement'
-                break
-            case MetadataDomain.DATA_CLASS:
-                name = 'dataClass'
-                break
-            case MetadataDomain.DATA_ELEMENT:
-                name = 'dataElement'
-                break
-            case MetadataDomain.DATA_MODEL:
-                name = 'dataModel'
-                break
-            case MetadataDomain.DATA_MODEL_POLICY:
-                name = 'dataPolicy'
-                break
-            case MetadataDomain.DATA_TYPE:
-                name = 'dataType'
-                break
-            case MetadataDomain.ENUMERATED_TYPE:
-                name = 'enumeratedType'
-                break
-            case MetadataDomain.EXTENSION_VALUE:
-                name = 'extensionValue'
-                break
-            case MetadataDomain.MAPPING:
-                name = 'mapping'
-                break
-            case MetadataDomain.MEASUREMENT_UNIT:
-                name = 'measurmentUnit'
-                break
-            case MetadataDomain.PRIMITIVE_TYPE:
-                name = 'primitiveType'
-                break
-            case MetadataDomain.REFERENCE_TYPE:
-                name = 'referenceType'
-                break
-            case MetadataDomain.RELATIONSHIP:
-                name = 'relationship'
-                break
-            case MetadataDomain.RELATIONSHIP_METADATA:
-                name = 'relationshipMetadata'
-                break
-            case MetadataDomain.RELATIONSHIP_TYPE:
-                name = 'relationshipType'
-                break
-            case MetadataDomain.RELATIONSHIP_TAG:
-                name = 'relationshipTag'
-                break
-            default:
-                return null
+    static String stringRepresentation(MetadataDomain domain, Long id) {
+        if ( domain == null || id == null ) {
+            return null
         }
+        String name = MetadataDomain.camelCaseDomainName(domain)
+        "${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.${name}:$id".toString()
+    }
+
+
+    static String link(Long dataModelId, MetadataDomainEntity entity) {
+        String name = MetadataDomain.lowerCamelCaseDomainName(entity.domain)
+
         if ( name ) {
             return link(dataModelId,name, entity.id)
         }

@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.persistence.CatalogueElementGormService
+
 import static org.modelcatalogue.core.policy.VerificationPhase.FINALIZATION_CHECK
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables
@@ -16,13 +18,15 @@ class DataModel extends CatalogueElement {
     String semanticVersion = '0.0.1'
     String revisionNotes
 
+    CatalogueElementGormService catalogueElementGormService
+
     static constraints = {
         name unique: 'semanticVersion'
         semanticVersion size: 1..20, nullable: true
         revisionNotes maxSize: 2000, nullable: true
     }
 
-    static transients = ['namespace', 'dataModelPolicies']
+    static transients = ['namespace', 'dataModelPolicies', 'catalogueElementGormService']
 
     static relationships = [
         outgoing: [classificationFilter: 'usedAsFilterBy', 'import': 'imports'],
@@ -41,28 +45,6 @@ class DataModel extends CatalogueElement {
         super.preparePublishChain(chain).add(this.declares)
     }
 
-    @Override
-    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
-        // inspect declarations
-        def manualDelete = declares.collectEntries {
-            // check the element for the same - if manual delete is needed
-            def relationshipManualDelete = it.manualDeleteRelationships(this)
-            if (relationshipManualDelete.size() > 0) {
-                return [(it): relationshipManualDelete]
-            } else {
-                return [:]
-            }
-        }
-        // inspect relationships
-        manualDelete << (outgoingRelationships + incomingRelationships).collectEntries {
-            if (it.dataModel && it.dataModel != toBeDeleted)
-                return [(it.dataModel): it]
-            else
-                return [:]
-        }
-
-        return manualDelete
-    }
 
     /**
      * Deletes all {@link CatalogueElement}s assigned to this {@link DataModel} and then call super class method
@@ -106,14 +88,14 @@ class DataModel extends CatalogueElement {
         if (!readyForQueries) {
             return Collections.emptyList()
         }
-        CatalogueElement.findAllByDataModel(this)
+        catalogueElementGormService.findAllByDataModel(this)
     }
 
     Number countDeclares() {
         if (!readyForQueries) {
             return 0
         }
-        CatalogueElement.countByDataModel(this)
+        catalogueElementGormService.countByDataModel(this)
     }
 
     List<DataElement> getDataElements() {

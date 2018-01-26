@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.export.inventory
 
+import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
+
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_NEW
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_REMOVAL
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_UPDATE
@@ -56,8 +58,8 @@ class CatalogueElementToXlsxExporter {
     static final String CONTENT = 'Content'
     static final String DATA_CLASSES = 'DataClasses'
     public static final String DATA_TYPE_FIRST_COLUMN = 'F'
-    public static final MimeType XLSX                  = new MimeType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx')
-    public static final MimeType EXCEL                 = new MimeType('application/vnd.ms-excel', 'xlsx')
+    public static final MimeType XLSX                  = MicrosoftOfficeDocument.mimeType(MicrosoftOfficeDocument.XLSX)
+    public static final MimeType EXCEL                 = MicrosoftOfficeDocument.mimeType(MicrosoftOfficeDocument.EXCEL)
 
     final DataClassService dataClassService
     final GrailsApplication grailsApplication
@@ -1198,28 +1200,28 @@ class CatalogueElementToXlsxExporter {
 
 
         //check if the previous data model had additional top level classes so they can be included in the outline
-        def previousVersionDataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(previousVersionElementForDiff as DataModel), [:], true).items
-        def previousVersionDataClassesChanged = []
-        previousVersionDataClasses.each { DataClass previousVersionDataClass ->
+        List<DataClass> previousVersionDataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(previousVersionElementForDiff as DataModel), [:], true).items
+        List<DataClass> previousVersionDataClassesChanged = []
+        for ( DataClass previousVersionDataClass : previousVersionDataClasses ) {
             //if the data class was in the previous version of the data model and isn't in the new one, then delete it
             if(!dataClasses.find{it.latestVersionId==previousVersionDataClass.latestVersionId}) previousVersionDataClassesChanged.add(previousVersionDataClass)
         }
 
 
         //iterate through the changes for the current version classes
-        dataClasses.each { DataClass dataClass ->
+        for ( DataClass dataClass : dataClasses ) {
             ImmutableMultimap<String, Diff> topLevelDiffs = ImmutableMultimap.builder().putAll(catalogueElementDiffs.differentiateTopLevelClasses(dataClass, findOther(dataClass, previousVersionElementForDiff))).build()
             buildChildOutline(sheet, dataClass, dataClass, null, previousVersionElementForDiff, 1, topLevelDiffs)
         }
 
         //iterate through any changes from the previous version
-        previousVersionDataClassesChanged.each { DataClass dataClass ->
+        for ( DataClass dataClass : previousVersionDataClassesChanged ) {
             //note findOther and data class have been switched - this is because we are doing the comparison the other way round i.e. what was in the previous and isn't in this one
             ImmutableMultimap<String, Diff> topLevelDiffs = ImmutableMultimap.builder().putAll(catalogueElementDiffs.differentiateTopLevelClasses(null, dataClass)).build()
 
             //add the top level "deleted diffs" to the set of computed diffs i.e. the changes that appear in the changes sheet
 
-            String key = "$dataClass.id=>$previousVersionElementForDiff.id"
+            String key = "$dataClass.id=>${previousVersionElementForDiff?.id ?: ''}"
 
             if (!computedDiffs.containsKey(key)) {
                 computedDiffs[key] = topLevelDiffs

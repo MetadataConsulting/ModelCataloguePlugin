@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.path.PathFinderService
+
 import static org.springframework.http.HttpStatus.OK
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
@@ -22,7 +24,6 @@ import org.modelcatalogue.core.events.RelationshipWithErrorsEvent
 import org.modelcatalogue.core.events.RelationshipsEvent
 import org.modelcatalogue.core.events.SourceDestinationEvent
 import org.modelcatalogue.core.events.UnauthorizedEvent
-import org.modelcatalogue.core.path.PathFinder
 import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.CloningContext
@@ -67,6 +68,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     AddMappingService addMappingService
     SourceDestinationService sourceDestinationService
     RemoveRelationService removeRelationService
+    PathFinderService pathFinderService
 
     abstract protected ManageCatalogueElementService getManageCatalogueElementService()
 
@@ -687,7 +689,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        respond new PathFinder().findPath(element)
+        respond pathFinderService.findPath(element)
     }
 
     /**
@@ -797,7 +799,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         try {
             // def otherSide = parseOtherSide()
             DestinationClass destinationClass = destinationClassFromJsonPayload()
-            def objectToBindParam = getObjectToBind()
+            def objectToBindParam = getObjectToBind() // the JSON request payload
             MetadataResponseEvent metadataResponse = manageCatalogueElementService.addRelation(catalogueElementId,
                     type,
                     outgoing as Boolean,

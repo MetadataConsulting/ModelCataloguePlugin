@@ -102,11 +102,6 @@ class User extends CatalogueElement {
     }
 
     @Override
-    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
-        return [:]
-    }
-
-    @Override
     void beforeDraftPersisted(PublishingContext context) {
         super.beforeDraftPersisted(context)
         String randomUsername = username

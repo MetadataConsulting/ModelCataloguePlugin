@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.DataModel
@@ -27,6 +28,24 @@ class AssetGormService implements WarnGormErrors {
     @Transactional
     Asset saveWithNameAndDescriptionAndStatus(String name, String description, ElementStatus status) {
         save(new Asset(name: name, description: description, status: status))
+    }
+
+    @Transactional
+    void update(Long assetId, ElementStatus status, String description) {
+        DetachedCriteria<Asset> query = Asset.where { id == assetId }
+        query.updateAll(status: status, description: description)
+    }
+
+    @Transactional
+    void update(Long assetId, ElementStatus status, String name, String description) {
+        DetachedCriteria<Asset> query = Asset.where { id == assetId }
+        query.updateAll(status: status, name: name, description: description)
+    }
+
+    @Transactional
+    void update(Long assetId, long size, String md5) {
+        DetachedCriteria<Asset> query = Asset.where { id == assetId }
+        query.updateAll(size: size, md5: md5)
     }
 
     @Transactional

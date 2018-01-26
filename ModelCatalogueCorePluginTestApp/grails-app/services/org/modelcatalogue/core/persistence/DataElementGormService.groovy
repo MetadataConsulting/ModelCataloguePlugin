@@ -65,4 +65,45 @@ class DataElementGormService implements WarnGormErrors {
     protected DetachedCriteria<DataElement> findQueryByName(String nameParam) {
         DataElement.where { name == nameParam }
     }
+
+    @Transactional(readOnly = true)
+    List<DataElement> findAllByDataModel(DataModel dataModel) {
+        findQueryByDataModel(dataModel).list()
+    }
+
+    protected DetachedCriteria<DataElement> findQueryByDataModel(DataModel dataModelParam) {
+        DataElement.where { dataModel == dataModelParam }
+    }
+
+    @Transactional(readOnly = true)
+    List<DataElement> findAllByDataType(DataType dataType) {
+        findQueryByDataType(dataType).list()
+    }
+
+    @Transactional(readOnly = true)
+    Number countByDataType(DataType dataType) {
+        findQueryByDataType(dataType).count()
+    }
+
+    protected DetachedCriteria<DataElement> findQueryByDataType(DataType dataTypeParam) {
+        DataElement.where {
+            dataType == dataTypeParam
+        }
+    }
+
+    @Transactional(readOnly = true)
+    List<DataElement> findAllByDataTypeAndStatusInList(DataType dataType, List<ElementStatus> elementStatuses) {
+        findQueryByDataTypeAndStatusInList(dataType, elementStatuses).list()
+    }
+
+    @Transactional(readOnly = true)
+    Number countByDataTypeAndStatusInList(DataType dataType, List<ElementStatus> elementStatuses) {
+        findQueryByDataTypeAndStatusInList(dataType, elementStatuses).count()
+    }
+
+    protected DetachedCriteria<DataElement> findQueryByDataTypeAndStatusInList(DataType dataTypeParam, List<ElementStatus> elementStatuses) {
+        DataElement.where {
+            dataType == dataTypeParam && status in elementStatuses
+        }
+    }
 }

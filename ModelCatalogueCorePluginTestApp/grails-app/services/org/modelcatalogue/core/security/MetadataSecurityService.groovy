@@ -515,22 +515,23 @@ class MetadataSecurityService {
             ]
 
     public static final List BATCH_MAPPINGS = [
+
             ["/batch/all", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/batch/create", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/batch/generateSuggestions", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/batch/archive", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
+
 
             ["/api/modelCatalogue/core/batch", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/batch", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/search/*",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/batch/search/",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/api/modelCatalogue/core/batch/*/validate", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
-
             ["/api/modelCatalogue/core/batch/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/batch/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.PUT],
             ["/api/modelCatalogue/core/batch/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
-
+        
             ["/api/modelCatalogue/core/batch/*/archive", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/run", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/actions/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],

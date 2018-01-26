@@ -10,7 +10,7 @@ class MappingSuggestionIndexCommand  {
     Long batchId
     Integer max
     Integer offset
-    List<ActionState> status
+    List<ActionState> state
     Integer score
     String term
 
@@ -20,7 +20,7 @@ class MappingSuggestionIndexCommand  {
         max nullable: true, min: 1
         score nullable: true, range: 0..100
         offset nullable: true, min: 0
-        status nullable: true, validator: { List<String> val, MappingSuggestionIndexCommand obj ->
+        state nullable: true, validator: { List<ActionState> val, MappingSuggestionIndexCommand obj ->
             ActionState[] validStatusList = ActionState.values()
             val == null || val.every { validStatusList.contains(it) }
         }

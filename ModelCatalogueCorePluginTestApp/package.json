@@ -28,5 +28,8 @@
   "homepage": "https://github.com/MetadataRegistry/ModelCataloguePlugin",
   "repository": {
     "url": "https://github.com/MetadataRegistry/ModelCataloguePlugin.git"
+  },
+  "scripts": {
+    "test-watch": "node node_modules/karma/bin/karma start --browsers=Chrome --single-run=false --auto-watch"
   }
 }
