@@ -509,6 +509,11 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/validationRule/*/content", 'isAuthenticated()', HttpMethod.GET],
     ]
 
+
+    public static final List DASHBOARD_MAPPINGS = [
+            ["/dashboard/index", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET]
+            ]
+
     public static final List BATCH_MAPPINGS = [
             ["/batch/all", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/batch/create", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
@@ -890,6 +895,7 @@ class MetadataSecurityService {
         secureMappings(VALIDATION_RULE_MAPPINGS)
         secureMappings(TAG_MAPPINGS)
         secureMappings(BATCH_MAPPINGS)
+        secureMappings(DASHBOARD_MAPPINGS)
         secureMappings(RELATIONSHIP_TYPE_MAPPINGS)
         secureMappings(CSV_TRANSFORMATION_MAPPINGS)
         secureMappings(DATA_MODEL_POLICY_MAPPINGS)

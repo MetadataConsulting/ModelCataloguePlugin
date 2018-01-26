@@ -130,6 +130,13 @@ class DataModel extends CatalogueElement {
         DataType.findAllByDataModel(this)
     }
 
+    List<Asset> getAssets() {
+        if (!readyForQueries) {
+            return Collections.emptyList()
+        }
+        Asset.findAllByDataModel(this)
+    }
+
     void checkNewSemanticVersion(String newSemanticVersion) {
         if (!newSemanticVersion) {
             errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.null', 'Semantic version must be specified!')

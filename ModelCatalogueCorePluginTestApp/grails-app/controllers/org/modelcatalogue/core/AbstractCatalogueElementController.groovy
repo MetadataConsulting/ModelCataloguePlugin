@@ -299,7 +299,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
 
     /**
-     * Get a list of catalouge elements
+     * Get a list of catalogue elements
      * @param max, maximum number of results
      * check if the the user has a role of viewer - otherwise they can't see draft elements
      * @param status, filter by status
