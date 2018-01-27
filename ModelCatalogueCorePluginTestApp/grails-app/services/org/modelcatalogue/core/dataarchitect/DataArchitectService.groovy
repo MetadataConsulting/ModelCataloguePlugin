@@ -3,10 +3,17 @@ package org.modelcatalogue.core.dataarchitect
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
 import grails.transaction.Transactional
+import groovy.transform.CompileDynamic
+import groovy.util.logging.Slf4j
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionsGeneratorService
+import org.modelcatalogue.core.mappingsuggestions.MatchAgainst
+import org.modelcatalogue.core.mappingsuggestions.MatchParamsService
 import org.modelcatalogue.core.persistence.BatchGormService
+import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.MatchResult
@@ -18,6 +25,9 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 
+import javax.annotation.PostConstruct
+
+@Slf4j
 class DataArchitectService {
 
     static transactional = false
@@ -29,8 +39,32 @@ class DataArchitectService {
     def actionService
     def dataModelService
     def sessionFactory
+    DataElementGormService dataElementGormService
     DataModelGormService dataModelGormService
     BatchGormService batchGormService
+    MatchParamsService matchParamsService
+    MappingSuggestionsGeneratorService mappingSuggestionsGeneratorService
+    MatchAgainst matchAgainst = MatchAgainst.CONTAINS_STEMMED_KEYWORDS
+
+    Integer minSizeMatchAgainstContainsStemmedKeywords
+    GrailsApplication grailsApplication
+
+    @CompileDynamic
+    @PostConstruct
+    private void init() {
+        minSizeMatchAgainstContainsStemmedKeywords = grailsApplication.config.mc.mappingsuggestions.minSizeMatchAgainstContainsStemmedKeywords ?: 1000
+
+        String matchAgainstConfigValue = grailsApplication.config.mc.mappingsuggestions.matchAgainst
+
+        if ( matchAgainstConfigValue != null ) {
+            try {
+                matchAgainst = matchAgainstConfigValue as MatchAgainst
+            } catch(java.lang.IllegalArgumentException e) {
+            }
+        }
+
+
+    }
 
     //commented out the functions that are no longer relevant or don't work
     //TODO: finish these functions
@@ -405,7 +439,7 @@ class DataArchitectService {
             RelationshipType type = RelationshipType.readByName("relatedTo")
             def matchScore = 100
             other.each { otherId ->
-                Map<String, String> params = matchParams(otherId as Long, MetadataDomain.DATA_TYPE, first as Long, MetadataDomain.DATA_TYPE, type.id, matchScore, null, 'TypeEnums')
+                Map<String, String> params = matchParamsService.matchParams(otherId as Long, MetadataDomain.DATA_TYPE, first as Long, MetadataDomain.DATA_TYPE, type.id, matchScore, null, 'TypeEnums')
                 Action action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
@@ -442,7 +476,7 @@ class DataArchitectService {
         for ( Long first : matchingDataElements.keySet() ) {
             Set<Long> others = matchingDataElements[first]
             for ( Long otherId : others ) {
-                Map<String, String> params = matchParams(otherId as Long, MetadataDomain.DATA_ELEMENT, first as Long, MetadataDomain.DATA_ELEMENT, type.id, matchScore)
+                Map<String, String> params = matchParamsService.matchParams(otherId as Long, MetadataDomain.DATA_ELEMENT, first as Long, MetadataDomain.DATA_ELEMENT, type.id, matchScore)
                 Action action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
@@ -503,7 +537,7 @@ class DataArchitectService {
         matchingDataElements.each { first, other ->
             RelationshipType type = RelationshipType.readByName("relatedTo")
             other.each { otherId ->
-                Map<String, String> params = matchParams(otherId as Long, MetadataDomain.DATA_ELEMENT, first as Long, MetadataDomain.DATA_ELEMENT, type.id, matchScore)
+                Map<String, String> params = matchParamsService.matchParams(otherId as Long, MetadataDomain.DATA_ELEMENT, first as Long, MetadataDomain.DATA_ELEMENT, type.id, matchScore)
                 Action action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
@@ -536,54 +570,46 @@ class DataArchitectService {
             if ( !batch ) {
                 batch = batchGormService.saveWithName(batchName)
             }
-            Integer score = minScore ?: 10
-            Set<MatchResult> matchingDataElements = elementService.findFuzzyDataElementSuggestions(dataModelA, dataModelB, score)
-            Set<MatchResult> matchingDataClasses = elementService.findFuzzyDataClassDataElementSuggestions(dataModelA, dataModelB, score)
-            batch.name = processingFuzzyMappingsName(dataModelA, dataModelB)
-            batch.save()
+            batchGormService.update([batch.id], Boolean.FALSE)
 
-            RelationshipType type = RelationshipType.readByName("relatedTo")
-            for ( MatchResult match :  matchingDataClasses ) {
-                Map<String, String> matchParams = matchParams(match, MetadataDomain.DATA_CLASS, MetadataDomain.DATA_ELEMENT, type.id)
-                Action action = actionService.create(matchParams, batch, CreateMatch)
-                if (action.hasErrors()) {
-                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
-                }
-                batch.archived = false
-                batch.save()
-            }
-            for ( MatchResult match :  matchingDataElements ) {
-                Map<String, String> matchParams = matchParams(match, MetadataDomain.DATA_ELEMENT, MetadataDomain.DATA_ELEMENT, type.id)
-                Action action = actionService.create(matchParams, batch, CreateMatch)
-                if (action.hasErrors()) {
-                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
-                }
-                batch.archived = false
-                batch.save()
-            }
+            Float score = minScore as Float ?: 10.0f
+            MatchAgainst matchAgainst = matchAgainstDependingOnDataModelSize(dataModelB)
+
+            log.info 'Using match against: {}', matchAgainst.name()
+            mappingSuggestionsGeneratorService.execute(batch.id, DataClass.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
+            mappingSuggestionsGeneratorService.execute(batch.id, DataElement.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
+
             batch.name = suggestedFuzzyMappingsName(dataModelA, dataModelB)
             batch.save()
+
         } catch(Exception ex){
             log.error(ex.message)
         }
     }
 
-    Map<String, String> matchParams(MatchResult match, MetadataDomain sourceDomain, MetadataDomain destinationDomain, Long relationshipTypeId) {
-        matchParams(match.dataElementAId, sourceDomain, match.dataElementBId, destinationDomain, relationshipTypeId, match.matchScore, match.message)
+    MatchAgainst matchAgainstDependingOnDataModelSize(DataModel dataModel) {
+        if ( matchAgainst == MatchAgainst.CONTAINS_STEMMED_KEYWORDS && dataElementGormService.countByDataModel(dataModel) < minSizeMatchAgainstContainsStemmedKeywords) {
+            return MatchAgainst.ALL
+        }
+        return matchAgainst
     }
 
-    Map<String, String> matchParams(Long sourceId, MetadataDomain sourceDomain, Long destinationId, MetadataDomain destinationDomain, Long relationshipTypeId, Float matchScore, String message = null, String matchOn = 'ElementName') {
-        Map<String, String> params = new HashMap<String, String>()
-        params.put("""source""", """${MetadataDomainEntity.stringRepresentation(sourceDomain, sourceId)}""")
-        params.put("""destination""", """${MetadataDomainEntity.stringRepresentation(destinationDomain, destinationId)}""")
-        params.put("""type""", """${MetadataDomainEntity.stringRepresentation(MetadataDomain.RELATIONSHIP_TYPE, relationshipTypeId)}""")
-        params.put("""matchScore""", """${(matchScore) ? matchScore as Integer : 0}""")
-        params.put("""matchOn""", """${matchOn}""")
-        if ( message ) {
-            params.put("""message""", """${message}""")
+    void saveMatchResultsAsActions(Set<MatchResult> matchingElements,
+                                   Batch batch,
+                                   RelationshipType type,
+                                   MetadataDomain sourceDomain,
+                                   MetadataDomain sourceDestination) {
+        for ( MatchResult match :  matchingElements ) {
+            Map<String, String> matchParams = matchParamsService.matchParams(match, sourceDomain, sourceDestination, type.id)
+            Action action = actionService.create(matchParams, batch, CreateMatch)
+            if (action.hasErrors()) {
+                log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+            }
+            batch.archived = false
+            batch.save()
         }
-        params
     }
+
 
     /**
      * generateDataElementAndTypeSuggestionsExact

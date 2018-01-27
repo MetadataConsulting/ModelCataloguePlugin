@@ -8,12 +8,28 @@ import org.modelcatalogue.core.RelationshipType
 
 class RelationshipGormService {
 
-    @Transactional
+    @Transactional(readOnly = true)
     Relationship findById(long id) {
         Relationship.get(id)
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
+    Number countByRelationshipTypeAndSourceAndDestination(RelationshipType relationshipType, CatalogueElement source, CatalogueElement destination) {
+        findQueryByRelationshipTypeAndSourceAndDestination(relationshipType, source, destination).count()
+    }
+
+    @Transactional(readOnly = true)
+    List<Relationship> findAllByRelationshipTypeAndSourceAndDestination(RelationshipType relationshipType, CatalogueElement source, CatalogueElement destination) {
+        findQueryByRelationshipTypeAndSourceAndDestination(relationshipType, source, destination).list()
+    }
+
+    protected DetachedCriteria<Relationship> findQueryByRelationshipTypeAndSourceAndDestination(RelationshipType relationshipTypeParam,
+                                                                                  CatalogueElement sourceParam,
+                                                                                  CatalogueElement destinationParam) {
+        Relationship.where { relationshipType == relationshipTypeParam && source == sourceParam && destination == destinationParam }
+    }
+
+    @Transactional(readOnly = true)
     List<Relationship> findAllByRelationshipTypeAndSource(RelationshipType relationshipType, CatalogueElement source) {
         findQueryByRelationshipTypeAndSource(relationshipType, source).list() as List<Relationship>
     }
