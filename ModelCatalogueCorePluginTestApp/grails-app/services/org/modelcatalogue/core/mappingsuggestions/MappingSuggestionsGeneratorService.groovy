@@ -179,21 +179,15 @@ class MappingSuggestionsGeneratorService implements MappingSuggestionsGenerator 
         suggestions
     }
 
+    @CompileDynamic
     List<SourceDestinationMappingSuggestion> addToSuggestions(List<SourceDestinationMappingSuggestion> suggestions, CatalogueElement source, CatalogueElement destination, float distance, int maxSuggestions) {
-        for (int i = 0; i < maxSuggestions; i++) {
-            SourceDestinationMappingSuggestion suggestion = suggestions[i]
-            if (suggestion == null) {
-                suggestions << new SourceDestinationMappingSuggestion(source: source, destination: destination, distance: distance)
-                break
-            } else if (suggestion.distance < distance) {
-                suggestions.add(0, new SourceDestinationMappingSuggestion(source: source, destination: destination, distance: distance))
-                break
-            }
+        SourceDestinationMappingSuggestion suggestion = new SourceDestinationMappingSuggestion(source: source, destination: destination, distance: distance as Float)
+        suggestions.add(suggestion)
+        suggestions = suggestions.sort()
+        if ( suggestions.size() > maxSuggestions) {
+            suggestions = suggestions.drop( (suggestions.size() - maxSuggestions) )
         }
-        if (suggestions.size() > maxSuggestions) {
-            suggestions = suggestions.subList(0, maxSuggestions)
-        }
-        suggestions
+        suggestions.reverse()
     }
 
     void generateMappings(Long batchId, Class sourceClazz, DataModel sourceDataModel, Class destinationClazz, DataModel destinationDataModel, MappingGenerationConfiguration config) {

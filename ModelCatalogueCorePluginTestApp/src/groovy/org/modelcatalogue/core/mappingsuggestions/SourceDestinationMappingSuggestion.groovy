@@ -1,12 +1,13 @@
 package org.modelcatalogue.core.mappingsuggestions
 
 import groovy.transform.CompileStatic
+import groovy.transform.Sortable
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.DataElement
 
+@Sortable(includes = 'distance')
 @CompileStatic
 class SourceDestinationMappingSuggestion {
     CatalogueElement source
     CatalogueElement destination
-    float distance
+    Float distance
 }
