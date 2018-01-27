@@ -13,11 +13,18 @@ import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionService
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.actions.CreateMatch
+import org.modelcatalogue.core.elasticsearch.ElasticSearchQueryList
+import org.modelcatalogue.core.elasticsearch.ElasticSearchService
 import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.persistence.DataClassGormService
 import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.persistence.RelationshipGormService
+import org.modelcatalogue.core.util.ElasticMatchResult
+import org.modelcatalogue.core.util.ElasticMatchResultAdapter
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.MatchResult
+import org.modelcatalogue.core.util.SearchParams
+
 import javax.annotation.PostConstruct
 
 @Slf4j
@@ -37,6 +44,8 @@ class MappingSuggestionsGeneratorService implements MappingSuggestionsGenerator 
     ActionService actionService
 
     RelationshipGormService relationshipGormService
+
+    ElasticSearchService elasticSearchService
 
     def sessionFactory
 
@@ -64,7 +73,13 @@ class MappingSuggestionsGeneratorService implements MappingSuggestionsGenerator 
     }
 
     @Override
-    void execute(Long batchId, Class sourceClazz, DataModel sourceDataModel, Class destionationClazz, DataModel destinationDataModel, Float minDistance, MatchAgainst matchAgainst) {
+    void execute(Long batchId,
+                 Class sourceClazz,
+                 DataModel sourceDataModel,
+                 Class destionationClazz,
+                 DataModel destinationDataModel,
+                 Float minDistance,
+                 MatchAgainst matchAgainst) {
         MappingGenerationConfiguration config = instantiateMappingGenerationConfiguration(minDistance, matchAgainst)
         generateMappings(batchId, sourceClazz, sourceDataModel, destionationClazz, destinationDataModel, config)
     }
@@ -158,8 +173,49 @@ class MappingSuggestionsGeneratorService implements MappingSuggestionsGenerator 
         []
     }
 
+    @CompileDynamic
+    List<SourceDestinationMappingSuggestion> elasticSearchSuggestionsForSource(CatalogueElement source,
+                                                                               Class destinationClazz,
+                                                                               DataModel destinationDataModel,
+                                                                               MappingGenerationConfiguration config) {
+        SearchParams searchParams = new SearchParams()
+        searchParams.dataModelId = destinationDataModel.id
+        searchParams.search = source.name
+        searchParams.minScore = config.minDistance / 100.0f
+        ElasticSearchQueryList<DataElement> matches = elasticSearchService.fuzzySearch(destinationClazz, searchParams)
+        String message = checkRelatedTo(source, destinationDataModel)
+        List<SourceDestinationMappingSuggestion> result = []
+        matches.getItemsWithScore().each { item, score ->
+            if(!source.relatedTo.contains(item)) {
+                //if(score>minimumScore) {
+                result << new SourceDestinationMappingSuggestion(source: source,
+                        destination: item,
+                        distance: score.round(2) as Float)
+                // }
+            }
+        }
+
+        result
+    }
+
+    @CompileDynamic
+    private String checkRelatedTo(CatalogueElement ce, DataModel proposedModel){
+        String modelRelatedItems = ""
+
+        ce.relatedTo.each{ c ->
+            if(ce.dataModel == proposedModel){
+                modelRelatedItems = modelRelatedItems + "Note: $ce.name already related to: $c.name \n "
+            }
+        }
+        modelRelatedItems
+    }
+
     List<SourceDestinationMappingSuggestion> suggestionsForSource(CatalogueElement source, List<String> sourceKeywords, Class destinationClazz, DataModel destinationDataModel, int totalDestination, MappingGenerationConfiguration config) {
         log.info('Generating suggestions for {}', source.name)
+
+        if ( config.matchAgainst == MatchAgainst.ELASTIC_SEARCH) {
+            return elasticSearchSuggestionsForSource(source, destinationClazz, destinationDataModel, config)
+        }
         List<SourceDestinationMappingSuggestion> suggestions = []
         for (int offsetDestination = 0; offsetDestination < totalDestination; offsetDestination = (offsetDestination + config.pageSizeDestination)) {
             List destinationList = findAllDependingOnMatchAgainst(sourceKeywords, destinationClazz, destinationDataModel, offsetDestination, config)

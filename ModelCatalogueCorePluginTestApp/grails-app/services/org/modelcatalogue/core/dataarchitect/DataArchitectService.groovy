@@ -4,6 +4,7 @@ import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
@@ -26,6 +27,7 @@ import org.modelcatalogue.core.util.SearchParams
 
 import javax.annotation.PostConstruct
 
+@Slf4j
 class DataArchitectService {
 
     static transactional = false
@@ -51,7 +53,7 @@ class DataArchitectService {
     @PostConstruct
     private void init() {
         minSizeMatchAgainstContainsStemmedKeywords = grailsApplication.config.mc.mappingsuggestions.minSizeMatchAgainstContainsStemmedKeywords ?: 1000
-        
+
         String matchAgainstConfigValue = grailsApplication.config.mc.mappingsuggestions.matchAgainst
 
         if ( matchAgainstConfigValue != null ) {
@@ -573,6 +575,7 @@ class DataArchitectService {
             Float score = minScore as Float ?: 10.0f
             MatchAgainst matchAgainst = matchAgainstDependingOnDataModelSize(dataModelB)
 
+            log.info 'Using match against: {}', matchAgainst.name()
             mappingSuggestionsGeneratorService.execute(batch.id, DataClass.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
             mappingSuggestionsGeneratorService.execute(batch.id, DataElement.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
 
