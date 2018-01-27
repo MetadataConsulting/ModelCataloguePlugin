@@ -27,7 +27,9 @@ class MatchParamsService {
                 suggestion.destination.id,
                 MetadataDomain.of(suggestion.destination),
                 relationshipTypeId,
-                suggestion.distance
+                suggestion.distance,
+                null,
+                'ElementName'
         )
     }
 

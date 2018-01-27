@@ -7,8 +7,8 @@ import org.simmetrics.metrics.StringMetrics
 @CompileStatic
 class CompareByNameService {
 
-    float distance(WithName source, WithName destination) {
+    Float distance(WithName source, WithName destination) {
         StringMetric metric = StringMetrics.levenshtein()
-        return metric.compare(source.name, destination.name)
+        new Float(metric.compare(source.name, destination.name))
     }
 }

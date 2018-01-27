@@ -181,7 +181,7 @@ class MappingSuggestionsGeneratorService implements MappingSuggestionsGenerator 
 
     @CompileDynamic
     List<SourceDestinationMappingSuggestion> addToSuggestions(List<SourceDestinationMappingSuggestion> suggestions, CatalogueElement source, CatalogueElement destination, float distance, int maxSuggestions) {
-        SourceDestinationMappingSuggestion suggestion = new SourceDestinationMappingSuggestion(source: source, destination: destination, distance: distance as Float)
+        SourceDestinationMappingSuggestion suggestion = new SourceDestinationMappingSuggestion(source: source, destination: destination, distance: distance)
         suggestions.add(suggestion)
         suggestions = suggestions.sort()
         if ( suggestions.size() > maxSuggestions) {
