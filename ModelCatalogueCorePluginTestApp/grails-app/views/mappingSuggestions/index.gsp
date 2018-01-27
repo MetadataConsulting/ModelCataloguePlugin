@@ -86,7 +86,7 @@
                     total="${pagination.total}"
                     offset="${pagination.offset}"
                     max="${pagination.max}"
-                    params="[batchId: $batchId]"
+                    params="[batchId: batchId]"
         />
         <g:message code="pagination.legend" args="[pagination.offset, Math.min(pagination.offset + pagination.max, pagination.total), pagination.total]" default="Displaying ${pagination.offset}-${Math.min(pagination.offset + pagination.max, pagination.total)} of ${pagination.total}"/>
     </div>
