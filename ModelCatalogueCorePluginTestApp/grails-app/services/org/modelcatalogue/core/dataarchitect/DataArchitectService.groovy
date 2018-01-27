@@ -51,6 +51,17 @@ class DataArchitectService {
     @PostConstruct
     private void init() {
         minSizeMatchAgainstContainsStemmedKeywords = grailsApplication.config.mc.mappingsuggestions.minSizeMatchAgainstContainsStemmedKeywords ?: 1000
+        
+        String matchAgainstConfigValue = grailsApplication.config.mc.mappingsuggestions.matchAgainst
+
+        if ( matchAgainstConfigValue != null ) {
+            try {
+                matchAgainst = matchAgainstConfigValue as MatchAgainst
+            } catch(java.lang.IllegalArgumentException e) {
+            }
+        }
+
+
     }
 
     //commented out the functions that are no longer relevant or don't work
