@@ -15,9 +15,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.util.concurrent.Callable
 
 abstract class AbstractDataImportService {
-    static transactional = false
 
-    AssetService assetService
     DataModelService dataModelService
     ElementService elementService
     SpringSecurityService springSecurityService
@@ -38,11 +36,9 @@ abstract class AbstractDataImportService {
      * @param file the actual file to be imported.
      * @return stored asset id
      */
-    Long importFile(GrailsParameterMap params, MultipartFile file) {
+    void importFile(Long assetId, GrailsParameterMap params, MultipartFile file) {
         boolean isAdmin = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('ADMIN').join(','))
         DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
-        Asset asset = assetService.storeAsset(params, file, contentType)
-        final Long assetId = asset.id
         defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", assetId)
         InputStream inputStream = file.inputStream
         String name = params.name
@@ -61,8 +57,6 @@ abstract class AbstractDataImportService {
                 }
             }
         }
-
-        assetId
     }
 
     DataModel findCreatedDataModel(Set<CatalogueElement> created) {

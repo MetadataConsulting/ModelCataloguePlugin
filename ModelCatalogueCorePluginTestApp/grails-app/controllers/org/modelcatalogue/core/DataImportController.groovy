@@ -247,14 +247,16 @@ class DataImportController  {
         }
 
         if (checkFileNameTypeAndContainsString(file, '.xml')) {
-            Long assetId = dataImportXmlService.importFile(params, file)
-            redirectToAsset(assetId)
+            Asset asset = assetService.storeAsset(params, file, dataImportXmlService.contentType)
+            dataImportXmlService.importFile(asset.id, params, file)
+            redirectToAsset(asset.id)
             return
         }
 
         if (checkFileNameEndsWith(file, '.obo')) {
-            Long assetId = dataImportOboService.importFile(params, file)
-            redirectToAsset(assetId)
+            Asset asset = assetService.storeAsset(params, file, dataImportOboService.contentType)
+            dataImportOboService.importFile(asset.id, params, file)
+            redirectToAsset(asset.id)
             return
         }
 
