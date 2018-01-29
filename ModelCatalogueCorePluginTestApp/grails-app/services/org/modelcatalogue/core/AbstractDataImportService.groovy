@@ -46,18 +46,21 @@ abstract class AbstractDataImportService {
         InputStream inputStream = file.inputStream
         String name = params.name
         Long userId = springSecurityService.principal?.id
-        executeInBackground(assetId, executeBackgroundMessage) {
-            try {
-                //DataModel.withTransaction {
-                loadInputStream(defaultCatalogueBuilder, inputStream, name)
-                DataModel dataModelInstance = findCreatedDataModel(defaultCatalogueBuilder.created)
-                finalizeAsset(assetId, dataModelInstance, userId)
-                //}
+        executorService.execute {
+            DataModel.withTransaction {
+                auditService.logExternalChange(assetGormService.findById(assetId), userId, executeBackgroundMessage) {
+                    try {
+                        loadInputStream(defaultCatalogueBuilder, inputStream, name)
+                        DataModel dataModelInstance = findCreatedDataModel(defaultCatalogueBuilder.created)
+                        finalizeAsset(assetId, dataModelInstance, userId)
 
-            } catch (Exception e) {
-                logError(assetId, e)
+                    } catch (Exception e) {
+                        logError(assetId, e)
+                    }
+                }
             }
         }
+
         assetId
     }
 
@@ -73,15 +76,6 @@ abstract class AbstractDataImportService {
         BuildProgressMonitor.get(id)?.onError(e)
         log.error "Error importing Asset[$id]", e
         assetGormService.finalizeAssetWithError(e)
-    }
-
-    protected executeInBackground(Long assetId, String message, Closure code) {
-        Long userId = springSecurityService.principal?.id
-        executorService.submit {
-            DataModel.withTransaction {
-                auditService.logExternalChange(assetGormService.findById(assetId), userId, message, code)
-            }
-        }
     }
 
     protected Asset finalizeAsset(Long id, DataModel dataModel, Long userId){
