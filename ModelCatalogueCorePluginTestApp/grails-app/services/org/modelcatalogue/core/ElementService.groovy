@@ -92,13 +92,22 @@ class ElementService implements Publisher<CatalogueElement> {
             }
         }
 
-        DataModel draft
-        if (context.importFriendly) {
-            draft = code()
-        } else {
-            draft = (DataModel) CatalogueElement.withTransaction(code)
+        DataModel draft = (DataModel) CatalogueElement.withTransaction(code)
+
+        Long dataModelId = dataModel.id
+        Long draftId = draft.id
+        DataModel.withNewTransaction {
+            DataModel.withNewSession {
+                DataModel sourceModel = DataModel.where {id == dataModelId }.get()
+                DataModel destinationModel = DataModel.where {id == draftId }.get()
+                if ( sourceModel != null && destinationModel != null ) {
+                    dataModelAclService.copyPermissions(sourceModel, destinationModel)
+                } else {
+                    log.warn 'Could not copy permissions'
+                }
+
+            }
         }
-        dataModelAclService.copyPermissions(dataModel, draft)
 
         draft
     }
