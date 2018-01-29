@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.util.concurrent.Callable
 
 abstract class AbstractDataImportService {
+    static transactional = false
 
     AssetService assetService
     DataModelService dataModelService
