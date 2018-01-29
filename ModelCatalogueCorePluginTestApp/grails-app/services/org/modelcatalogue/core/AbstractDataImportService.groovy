@@ -70,8 +70,9 @@ abstract class AbstractDataImportService {
     protected void logError(Long id,Exception e){
         BuildProgressMonitor.get(id)?.onError(e)
         log.error "Error importing Asset[$id]", e
-        assetGormService.finalizeAssetWithError(e)
+        assetGormService.finalizeAssetWithError(id, e)
     }
+
 
     protected Asset finalizeAsset(Long id, DataModel dataModel, Long userId){
         BuildProgressMonitor.get(id)?.onCompleted()

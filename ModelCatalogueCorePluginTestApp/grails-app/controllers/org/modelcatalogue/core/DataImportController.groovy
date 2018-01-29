@@ -333,7 +333,7 @@ class DataImportController  {
     protected logError(Long id,Exception e){
         BuildProgressMonitor.get(id)?.onError(e)
         log.error "Error importing Asset[$id]", e
-        assetGormService.finalizeAssetWithError(e)
+        assetGormService.finalizeAssetWithError(id, e)
     }
 
     //simply halts if the closure includes a file stream object
