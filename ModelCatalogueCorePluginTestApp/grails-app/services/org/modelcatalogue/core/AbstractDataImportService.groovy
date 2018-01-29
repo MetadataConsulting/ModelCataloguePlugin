@@ -79,7 +79,7 @@ abstract class AbstractDataImportService {
 
         Asset assetInstance = assetGormService.finalizeAsset(id, dataModel, userId)
 
-        if ( userId && userGormService.exists(userId) ) {
+        if ( userId && userGormService.exists(userId) && dataModel != null) {
             User userInstance = userGormService.findById(userId)
             userInstance.createLinkTo(dataModel, RelationshipType.favouriteType)
         }
