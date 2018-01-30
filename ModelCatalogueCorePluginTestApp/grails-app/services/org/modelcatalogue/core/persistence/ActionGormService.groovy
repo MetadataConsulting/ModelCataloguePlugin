@@ -40,13 +40,12 @@ class ActionGormService implements WarnGormErrors {
         DetachedCriteria<Action> query = Action.where {
             batch == batchParam && state in stateList
         }
-        if ( offset ) {
-            query.offset(offset)
-        }
-        if ( max ) {
-            query.max(max)
-        }
         query = query.sort('lastUpdated', 'asc')
+
+        if ( offset != null && max != null ) {
+            return query.list([max: max, offset: offset])
+
+        }
         query.list()
     }
 

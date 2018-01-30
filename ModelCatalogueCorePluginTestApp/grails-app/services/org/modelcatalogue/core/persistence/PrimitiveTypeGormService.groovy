@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.PrimitiveType
@@ -29,5 +30,21 @@ class PrimitiveTypeGormService implements WarnGormErrors {
     @Transactional(readOnly = true)
     PrimitiveType findById(Long id) {
         PrimitiveType.get(id)
+    }
+
+    @Transactional(readOnly = true)
+    List<PrimitiveType> findAllByMeasurementUnit(MeasurementUnit measurementUnitParam) {
+        findQueryByMeasurementUnit(measurementUnitParam).list()
+    }
+
+    @Transactional(readOnly = true)
+    Number countByMeasurementUnit(MeasurementUnit measurementUnitParam) {
+        findQueryByMeasurementUnit(measurementUnitParam).count()
+    }
+
+    DetachedCriteria<PrimitiveType> findQueryByMeasurementUnit(MeasurementUnit measurementUnitParam) {
+        PrimitiveType.where {
+            measurementUnit == measurementUnitParam
+        }
     }
 }

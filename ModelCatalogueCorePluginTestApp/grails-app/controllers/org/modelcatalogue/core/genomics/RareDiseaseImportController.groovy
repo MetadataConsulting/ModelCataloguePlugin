@@ -64,6 +64,7 @@ class RareDiseaseImportController {
             // redirect to asset
             response.setHeader("X-Asset-ID", asset.id.toString())
             redirect url: grailsApplication.config.grails.serverURL + "/api/modelCatalogue/core/asset/" + asset.id
+            return
         }
 
         respond("errors": ["usupported content type ${file.contentType}, use some of ${CONTENT_TYPES}"])

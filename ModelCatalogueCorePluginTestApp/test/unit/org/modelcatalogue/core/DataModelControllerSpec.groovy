@@ -33,6 +33,7 @@ class DataModelControllerSpec extends Specification {
 
     void "Attempt to delete a draft data model returns NO_CONTENT: 204 status"() {
         given:
+        controller.manualDeleteRelationshipsService = Mock(ManualDeleteRelationshipsService)
         controller.catalogueElementService = Mock(CatalogueElementService)
         controller.dataModelAclService = Stub(DataModelAclService) {
             isAdminOrHasAdministratorPermission(_) >> true

@@ -2,18 +2,32 @@ package org.modelcatalogue.core.dataarchitect
 
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
+import grails.transaction.Transactional
+import groovy.transform.CompileDynamic
+import groovy.util.logging.Slf4j
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionsGeneratorService
+import org.modelcatalogue.core.mappingsuggestions.MatchAgainst
+import org.modelcatalogue.core.mappingsuggestions.MatchParamsService
+import org.modelcatalogue.core.persistence.BatchGormService
+import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
-import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.MatchResult
+import org.modelcatalogue.core.util.MetadataDomain
+import org.modelcatalogue.core.util.MetadataDomainEntity
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 
+import javax.annotation.PostConstruct
+
+@Slf4j
 class DataArchitectService {
 
     static transactional = false
@@ -25,7 +39,32 @@ class DataArchitectService {
     def actionService
     def dataModelService
     def sessionFactory
+    DataElementGormService dataElementGormService
     DataModelGormService dataModelGormService
+    BatchGormService batchGormService
+    MatchParamsService matchParamsService
+    MappingSuggestionsGeneratorService mappingSuggestionsGeneratorService
+    MatchAgainst matchAgainst = MatchAgainst.CONTAINS_STEMMED_KEYWORDS
+
+    Integer minSizeMatchAgainstContainsStemmedKeywords
+    GrailsApplication grailsApplication
+
+    @CompileDynamic
+    @PostConstruct
+    private void init() {
+        minSizeMatchAgainstContainsStemmedKeywords = grailsApplication.config.mc.mappingsuggestions.minSizeMatchAgainstContainsStemmedKeywords ?: 1000
+
+        String matchAgainstConfigValue = grailsApplication.config.mc.mappingsuggestions.matchAgainst
+
+        if ( matchAgainstConfigValue != null ) {
+            try {
+                matchAgainst = matchAgainstConfigValue as MatchAgainst
+            } catch(java.lang.IllegalArgumentException e) {
+            }
+        }
+
+
+    }
 
     //commented out the functions that are no longer relevant or don't work
     //TODO: finish these functions
@@ -239,20 +278,11 @@ class DataArchitectService {
         return null
     }
 
-    private static Closure getReset() {
-        return { Batch batch ->
-            for (Action action in new HashSet<Action>(batch.actions)) {
-                if (action.state in [ActionState.FAILED, ActionState.PENDING]) {
-                    batch.removeFromActions(action)
-                    action.batch = null
-                    action.delete(flush: true)
-                }
-            }
-            batch.archived =  true
-            batch.save(flush: true)
-        }
+    @Transactional
+    void resetBatch(Batch batch) {
+        batchGormService.removeActionsInStateFromBatch(batch, [ActionState.FAILED, ActionState.PENDING])
+        batchGormService.update([batch.id], Boolean.TRUE)
     }
-
 
     void addSuggestion(String label, Closure suggestionGenerator) {
         suggestions[label] = suggestionGenerator
@@ -277,7 +307,7 @@ class DataArchitectService {
                         break
                 }
             } catch ( Exception ex ) {
-                log.info "Suggestions '$optimizationType' FAILED - Check data ${ex.detailMessage}"
+                log.info "Suggestions '$optimizationType' FAILED - Check data ${ex.message}"
 
             }
 
@@ -342,7 +372,7 @@ class DataArchitectService {
             DataClass dataClass = DataClass.get(sourceId)
             Batch batch = Batch.findOrSaveByName("Inline Data Class '$dataClass.name'")
             batch.description = """Data Class '$dataClass.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
-            Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$sourceId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
+            Action action = actionService.create batch, MergePublishedElements, source: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, sourceId), destination: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, destId)
             if (action.hasErrors()) {
                 log.error(FriendlyErrors.printErrors("Error generating merge data class action", action.errors))
             }
@@ -363,7 +393,13 @@ class DataArchitectService {
             RelationshipType type = RelationshipType.readByName("relatedTo")
 
             sources.each { srcId ->
-                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+
+                Map params = [
+                        source: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, srcId),
+                        destination: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, destId),
+                        type: MetadataDomainEntity.stringRepresentation(MetadataDomain.RELATIONSHIP_TYPE, type.id)
+                ]
+                Action action = actionService.create(params, batch, CreateRelationship)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -377,7 +413,11 @@ class DataArchitectService {
             DataClass dataClass = DataClass.get(destId)
             Batch batch = Batch.findOrSaveByName("Merge Data Class '$dataClass.name'")
             sources.each { srcId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
+                Map params = [
+                        source: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, srcId),
+                        destination: MetadataDomainEntity.stringRepresentation(MetadataDomain.DATA_CLASS, destId),
+                ]
+                Action action = actionService.create(params, batch, MergePublishedElements)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -390,23 +430,17 @@ class DataArchitectService {
     private void generatePossibleEnumDuplicatesAndSynonyms(Long dataModelAID, Long dataModelBID){
         DataModel dataModelA = dataModelGormService.findById(dataModelAID)
         DataModel dataModelB = dataModelGormService.findById(dataModelBID)
-        Batch.findAllByNameIlike("Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
-        Batch batch = Batch.findOrSaveByName("Generating Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
+        Batch.findAllByNameIlike("Suggested DataType Synonyms ${mappingsNameSuffix(dataModelA, dataModelB)}").each reset
+        Batch batch = Batch.findOrSaveByName("Generating Suggested DataType Synonyms ${mappingsNameSuffix(dataModelA, dataModelB)}")
         def matchingDataElements = elementService.findDuplicateEnumerationsSuggestions(dataModelA.id, dataModelB.id)
-        batch.name = "Processing Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.name = "Processing Suggested DataType Synonyms ${mappingsNameSuffix(dataModelA, dataModelB)}"
         batch.save()
         matchingDataElements.each { first, other ->
             RelationshipType type = RelationshipType.readByName("relatedTo")
             def matchScore = 100
             other.each { otherId ->
-                Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataType:$otherId""")
-                params.put("""destination""","""gorm://org.modelcatalogue.core.DataType:$first""")
-                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                params.put("""matchScore""","""$matchScore""")
-                params.put("""matchOn""","""TypeEnums""")
-                Action action
-                action = actionService.create(params, batch, CreateMatch)
+                Map<String, String> params = matchParamsService.matchParams(otherId as Long, MetadataDomain.DATA_TYPE, first as Long, MetadataDomain.DATA_TYPE, type.id, matchScore, null, 'TypeEnums')
+                Action action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -414,7 +448,7 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
-        batch.name = "Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.name = "Suggested DataType Synonyms ${mappingsNameSuffix(dataModelA, dataModelB)}"
         batch.save()
 
     }
@@ -425,23 +459,25 @@ class DataArchitectService {
     private void generateDataElementSuggestionsExact(Long dataModelAID, Long dataModelBID){
         DataModel dataModelA = dataModelGormService.findById(dataModelAID)
         DataModel dataModelB = dataModelGormService.findById(dataModelBID)
-        Batch.findAllByNameIlike("Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
-        Batch batch = Batch.findOrSaveByName("Generating Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
+        String batchName = suggestedExactMatchesName(dataModelA, dataModelB)
+        for ( Batch batch : batchGormService.findAllByNameIlike(batchName) ) {
+            resetBatch(batch)
+        }
+        batchName = generatingExactMatchesName(dataModelA, dataModelB)
+        Batch batch = batchGormService.findByNameIlike(batchName)
+        if ( !batch ) {
+            batch = batchGormService.saveWithName(batchName)
+        }
         Map<Long, Set<Long>>  matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
-        batch.name = "Processing DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.name = processingExactMatchesName(dataModelA, dataModelB)
         batch.save()
         def matchScore = 100
-        matchingDataElements.each { first, other ->
-            RelationshipType type = RelationshipType.readByName("relatedTo")
-            other.each { otherId ->
-                Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$otherId""")
-                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$first""")
-                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                params.put("""matchScore""","""$matchScore""")
-                params.put("""matchOn""","""ElementName""")
-                Action action
-                action = actionService.create(params, batch, CreateMatch)
+        RelationshipType type = RelationshipType.readByName("relatedTo")
+        for ( Long first : matchingDataElements.keySet() ) {
+            Set<Long> others = matchingDataElements[first]
+            for ( Long otherId : others ) {
+                Map<String, String> params = matchParamsService.matchParams(otherId as Long, MetadataDomain.DATA_ELEMENT, first as Long, MetadataDomain.DATA_ELEMENT, type.id, matchScore)
+                Action action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -449,31 +485,60 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
-        batch.name = "Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
-        batch.save()
 
+        batch.name = suggestedExactMatchesName(dataModelA, dataModelB)
+        batch.save()
+    }
+
+    String mappingsNameSuffix(DataModel dataModelA, DataModel dataModelB) {
+        "for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+    }
+    
+    String suggestedExactMatchesName(DataModel dataModelA, DataModel dataModelB) {
+        "Suggested DataElement Exact Matches  ${mappingsNameSuffix(dataModelA, dataModelB)}"
+    }
+
+    String processingExactMatchesName(DataModel dataModelA, DataModel dataModelB) {
+        "Processing DataElement Exact Matches ${mappingsNameSuffix(dataModelA, dataModelB)}"
+    }
+
+    String generatingExactMatchesName(DataModel dataModelA, DataModel dataModelB) {
+        "Generating Suggested DataElement Exact Matches ${mappingsNameSuffix(dataModelA, dataModelB)}"
+    }
+
+    String suggestedFuzzyMappingsName(DataModel dataModelA, DataModel dataModelB) {
+        "Suggested Fuzzy DataElement Relations ${mappingsNameSuffix(dataModelA, dataModelB)}"
+    }
+
+    String processingFuzzyMappingsName(DataModel dataModelA, DataModel dataModelB) {
+        "Processing suggested Fuzzy DataElement Relations ${mappingsNameSuffix(dataModelA, dataModelB)}"
+    }
+
+    String generatingFuzzyMappingsName(DataModel dataModelA, DataModel dataModelB) {
+        "Generating suggested Fuzzy DataElement Relations ${mappingsNameSuffix(dataModelA, dataModelB)}"
     }
 
     private void generateDataElementSuggestionsFullText(Long dataModelAID, Long dataModelBID){
         DataModel dataModelA = dataModelGormService.findById(dataModelAID)
         DataModel dataModelB = dataModelGormService.findById(dataModelBID)
-        Batch.findAllByNameIlike("Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
-        Batch batch = Batch.findOrSaveByName("Generating Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
-        def matchingDataElements = elementService.findFullTextDataElementSuggestions(dataModelA,dataModelB, 10)
-        batch.name = "Processing DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        String batchName = suggestedExactMatchesName(dataModelA, dataModelB)
+        for ( Batch batch : batchGormService.findAllByNameIlike(batchName) ) {
+            resetBatch(batch)
+        }
+        batchName = generatingExactMatchesName(dataModelA, dataModelB)
+        Batch batch = batchGormService.findByNameIlike(batchName)
+        if ( !batch ) {
+            batch = batchGormService.saveWithName(batchName)
+        }
+        Set<MatchResult> matchingDataElements = elementService.findFullTextDataElementSuggestions(dataModelA,dataModelB, 10)
+        batch.name = processingExactMatchesName(dataModelA, dataModelB)
         batch.save()
-        def matchScore = 100
+        Float matchScore = 100
         matchingDataElements.each { first, other ->
             RelationshipType type = RelationshipType.readByName("relatedTo")
             other.each { otherId ->
-                Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$otherId""")
-                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$first""")
-                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                params.put("""matchScore""","""$matchScore""")
-                params.put("""matchOn""","""ElementName""")
-                Action action
-                action = actionService.create(params, batch, CreateMatch)
+                Map<String, String> params = matchParamsService.matchParams(otherId as Long, MetadataDomain.DATA_ELEMENT, first as Long, MetadataDomain.DATA_ELEMENT, type.id, matchScore)
+                Action action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -481,70 +546,70 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
-        batch.name = "Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.name = suggestedExactMatchesName(dataModelA, dataModelB)
         batch.save()
 
     }
-
 
 
     /**
      * generateDataElementSuggestionsFuzzy
      *
      */
-
     private void generateDataElementSuggestionsFuzzy(Long dataModelAID, Long dataModelBID, Integer minScore) {
         try {
             DataModel dataModelA = dataModelGormService.findById(dataModelAID)
             DataModel dataModelB = dataModelGormService.findById(dataModelBID)
-            Batch.findAllByNameIlike("Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
-            Batch batch = Batch.findOrSaveByName("Generating suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
-            Integer score = minScore ?: 10
-            def matchingDataElements = elementService.findFuzzyDataElementSuggestions(dataModelA, dataModelB, score)
-            def matchingDataClasses = elementService.findFuzzyDataClassDataElementSuggestions(dataModelA, dataModelB, score)
-            batch.name = "Processing suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
-            batch.save()
-            matchingDataClasses.each { ElasticMatchResult match ->
-                RelationshipType type = RelationshipType.readByName("relatedTo")
-                Map<String, String> params = new HashMap<String, String>()
-                params.put("""source""", """gorm://org.modelcatalogue.core.DataClass:$match.catalogueElementA.id""")
-                params.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:$match.catalogueElementB.id""")
-                params.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                params.put("""matchScore""", """${(match.matchScore) ? match.matchScore : 0}""")
-                params.put("""matchOn""", """ElementName""")
-                params.put("""message""", """$match.message""")
-                Action action
-                action = actionService.create(params, batch, CreateMatch)
-                if (action.hasErrors()) {
-                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
-                }
-                batch.archived = false
-                batch.save()
+            String batchName = suggestedFuzzyMappingsName(dataModelA, dataModelB)
+            List<Batch> batchList = batchGormService.findAllByNameIlike(batchName)
+            for ( Batch batch : batchList ) {
+                resetBatch(batch)
             }
-            matchingDataElements.each { ElasticMatchResult match ->
-                RelationshipType type = RelationshipType.readByName("relatedTo")
-                Map<String, String> params = new HashMap<String, String>()
-                params.put("""source""", """gorm://org.modelcatalogue.core.DataElement:$match.catalogueElementA.id""")
-                params.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:$match.catalogueElementB.id""")
-                params.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                params.put("""matchScore""", """${(match.matchScore) ? match.matchScore : 0}""")
-                params.put("""matchOn""", """ElementName""")
-                params.put("""message""", """$match.message""")
-                Action action
-                action = actionService.create(params, batch, CreateMatch)
-                if (action.hasErrors()) {
-                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
-                }
-                batch.archived = false
-                batch.save()
+            batchName = generatingFuzzyMappingsName(dataModelA, dataModelB)
+            Batch batch = batchGormService.findByNameIlike(batchName)
+            if ( !batch ) {
+                batch = batchGormService.saveWithName(batchName)
             }
-            batch.name = "Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
-            batch.save()
-        }catch(Exception ex){
-            log.error(FriendlyErrors.printErrors("Error in generateDataElementSuggestionsFuzzy"))
-        }
+            batchGormService.update([batch.id], Boolean.FALSE)
 
+            Float score = minScore as Float ?: 10.0f
+            MatchAgainst matchAgainst = matchAgainstDependingOnDataModelSize(dataModelB)
+
+            log.info 'Using match against: {}', matchAgainst.name()
+            mappingSuggestionsGeneratorService.execute(batch.id, DataClass.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
+            mappingSuggestionsGeneratorService.execute(batch.id, DataElement.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
+
+            batch.name = suggestedFuzzyMappingsName(dataModelA, dataModelB)
+            batch.save()
+
+        } catch(Exception ex){
+            log.error(ex.message)
+        }
     }
+
+    MatchAgainst matchAgainstDependingOnDataModelSize(DataModel dataModel) {
+        if ( matchAgainst == MatchAgainst.CONTAINS_STEMMED_KEYWORDS && dataElementGormService.countByDataModel(dataModel) < minSizeMatchAgainstContainsStemmedKeywords) {
+            return MatchAgainst.ALL
+        }
+        return matchAgainst
+    }
+
+    void saveMatchResultsAsActions(Set<MatchResult> matchingElements,
+                                   Batch batch,
+                                   RelationshipType type,
+                                   MetadataDomain sourceDomain,
+                                   MetadataDomain sourceDestination) {
+        for ( MatchResult match :  matchingElements ) {
+            Map<String, String> matchParams = matchParamsService.matchParams(match, sourceDomain, sourceDestination, type.id)
+            Action action = actionService.create(matchParams, batch, CreateMatch)
+            if (action.hasErrors()) {
+                log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+            }
+            batch.archived = false
+            batch.save()
+        }
+    }
+
 
     /**
      * generateDataElementAndTypeSuggestionsExact

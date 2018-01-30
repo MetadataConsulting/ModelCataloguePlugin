@@ -10,10 +10,11 @@ import spock.lang.IgnoreIf
 import spock.lang.Requires
 
 @IgnoreIf( { System.getProperty('spock.ignore.slow') })
-class PathFinderSpec extends AbstractIntegrationSpec {
+class PathFinderServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     DataModelService dataModelService
     ElementService elementService
+    PathFinderService pathFinderService
 
     def setup() {
 
@@ -31,9 +32,7 @@ class PathFinderSpec extends AbstractIntegrationSpec {
         dataModel
 
         when:
-        PathFinder finder = new PathFinder()
-
-        List<String> path = finder.findPath(dataElement)
+        List<String> path = pathFinderService.findPath(dataElement)
 
         then:
         path.size() == 5

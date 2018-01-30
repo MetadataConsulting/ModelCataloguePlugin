@@ -388,6 +388,8 @@ class ElasticSearchService implements SearchCatalogue {
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
             boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
+            boolQuery.should(QueryBuilders.fuzzyQuery('name', search)).boost(200)
+
             qb = boolQuery
         } else if (RelationshipType.isAssignableFrom(resource)) {
             indicies = [getGlobalIndexName(resource)]
@@ -424,7 +426,7 @@ class ElasticSearchService implements SearchCatalogue {
                 .setTypes(collectTypes(resource) as String[])
                 .setIndicesOptions(IndicesOptions.lenientExpandOpen())
                 .setQuery(qb)
-                .setMinScore(minScore.toFloat())
+                //.setMinScore(minScore.toFloat())
 
         ElasticSearchQueryList.search(params,resource, request, dataModelAclService)
     }

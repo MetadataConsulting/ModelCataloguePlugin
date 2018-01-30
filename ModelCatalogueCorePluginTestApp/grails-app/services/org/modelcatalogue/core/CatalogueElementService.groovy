@@ -17,6 +17,8 @@ class CatalogueElementService {
 
     SearchCatalogue modelCatalogueSearchService
 
+    ManualDeleteRelationshipsService manualDeleteRelationshipsService
+
     def grailsApplication
     def cacheService
 
@@ -60,8 +62,17 @@ class CatalogueElementService {
 
         try {
             // control if manual delete of some relationships is needed
-            def manualDeleteRelationships = catalogueElement
-                .manualDeleteRelationships(catalogueElement instanceof DataModel ? catalogueElement : null)
+
+            List<CatalogueElementDeleteBlocker> manualDeleteRelationships = []
+            if ( catalogueElement instanceof DataModel ) {
+                manualDeleteRelationships = manualDeleteRelationshipsService.manualDeleteRelationships(catalogueElement as DataModel)
+            } else {
+                List<DeleteBlocker> deleteBlockerList = manualDeleteRelationshipsService.manualDeleteRelationshipsAtCatalogueElement(catalogueElement, null)
+                if ( deleteBlockerList ) {
+                    manualDeleteRelationships = [new CatalogueElementDeleteBlocker(elementTargetedToDeletion: catalogueElement, deleteBlockerList: deleteBlockerList)]
+                }
+            }
+
             if (manualDeleteRelationships.size()) {
                 throw new IllegalStateException("There are some relationships which needs to be deleted manually first " +
                                                     "${manualDeleteRelationships}")
@@ -74,7 +85,7 @@ class CatalogueElementService {
             catalogueElement.deleteRelationships()
 
             // delete the catalogue element
-            catalogueElement.delete(flush: true)
+            catalogueElement.delete()
 
             // invalidate cache
             cacheService.invalidate(id, latestVersionId)

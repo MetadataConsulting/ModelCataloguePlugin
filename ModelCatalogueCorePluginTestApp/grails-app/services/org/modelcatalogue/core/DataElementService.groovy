@@ -42,46 +42,35 @@ class DataElementService {
 
         String order = "ORDER BY ce.name"
 
+        String fromQuery
+        Closure querySetupClosure
         if (!tagId) {
-            return  buildDataElementsList(params,
-                    selectDEs, selectCount,
-                            fromBasic +
-                            whereBasic
-                            + order
-                    ) {
-                        setLong('modelId', modelId)
-                        if (findInGetAllDestinations) {
-                            setLong('hierarchytypeId', hierarchyType)
-                            setLong('containmentTypeId', containmentType)
-                        }
-                    }
+            fromQuery = "${fromBasic} ${whereBasic} ${order}".toString()
+            querySetupClosure = {
+                setLong('modelId', modelId)
+                if (findInGetAllDestinations) {
+                    setLong('hierarchytypeId', hierarchyType)
+                    setLong('containmentTypeId', containmentType)
+                }
+            }
         } else if (tagId in ['none', 'null', 'undefined']) {
 
             // introduces variable rel
             String joinTagRel = "LEFT JOIN relationship rel on rel.destination_id = de.id and rel.relationship_type_id = :tagTypeId"
             String tagRelTagIdNullCondition = "AND rel.id is null"
-
-            return buildDataElementsList(params,
-                    selectDEs, selectCount,
-                            fromBasic + joinTagRel +
-                            whereBasic + tagRelTagIdNullCondition +
-                            order
-                    ) {
-                    setLong('modelId', modelId)
-                    if (findInGetAllDestinations) {
-                        setLong('hierarchytypeId', hierarchyType)
-                        setLong('containmentTypeId', containmentType)
-                    }
-                    setLong('tagTypeId', tagTypeId)
+            fromQuery = "${fromBasic} ${joinTagRel} ${whereBasic} ${tagRelTagIdNullCondition} ${order}".toString()
+            querySetupClosure = {
+                setLong('modelId', modelId)
+                if (findInGetAllDestinations) {
+                    setLong('hierarchytypeId', hierarchyType)
+                    setLong('containmentTypeId', containmentType)
                 }
+                setLong('tagTypeId', tagTypeId)
+            }
         } else {
             String tagReltagIdNotNullCondition = "AND de.id in (select destination_id from relationship where relationship_type_id = :tagTypeId and source_id = :tagId)"
-            buildDataElementsList(params,
-                    selectDEs, selectCount,
-                    fromBasic +
-                            whereBasic + tagReltagIdNotNullCondition +
-                            order
-            ) {
+            fromQuery = "${fromBasic} ${whereBasic} ${tagReltagIdNotNullCondition} ${order}".toString()
+            querySetupClosure = {
                 setLong('modelId', modelId)
                 if (findInGetAllDestinations) {
                     setLong('hierarchytypeId', hierarchyType)
@@ -91,6 +80,7 @@ class DataElementService {
                 setLong('tagId', tagId as Long)
             }
         }
+        buildDataElementsList(params, selectDEs, selectCount, fromQuery, querySetupClosure)
     }
 
     /**
@@ -157,42 +147,5 @@ class DataElementService {
     private ListWithTotalAndType<DataElement>  buildDataElementsList(Map params, String selectElements, String selectCount, String fromQuery, @DelegatesTo(SQLQuery) Closure closure) {
         QuerySetupListMethods querySetupListMethods = new QuerySetupListMethods(selectElements, selectCount, fromQuery, closure)
         return Lists.methodNotClosureLazy(params, DataElement, querySetupListMethods)
-
-//        Closure queryClosure = {
-//            def max = it?.max
-//            def offset = it?.offset
-//
-//            final session = sessionFactory.currentSession
-//
-//            // Create native SQL query.
-//            final sqlQuery = session.createSQLQuery(query)
-//
-//            // Use Groovy with() method to invoke multiple methods
-//            // on the sqlQuery object.
-//            sqlQuery.addEntity(DataElement)
-//
-//            if (max) {
-//                sqlQuery.setMaxResults(max as Integer)
-//            }
-//
-//            if (offset) {
-//                sqlQuery.setFirstResult(offset as Integer)
-//            }
-//
-//            sqlQuery.with closure
-//
-//            // Get all results.
-//            if (it instanceof Map) {
-//                return sqlQuery.list()
-//            }
-//            return sqlQuery.list().size()
-//        }
-//
-//        Lists.lazy(params, DataElement, queryClosure, queryClosure)
-
-
-
     }
-
-
 }
