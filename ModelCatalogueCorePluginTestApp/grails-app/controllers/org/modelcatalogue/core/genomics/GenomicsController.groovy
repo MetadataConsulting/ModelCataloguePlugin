@@ -60,9 +60,6 @@ class GenomicsController {
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-
-
-
     def exportRareDiseaseEligibilityCsv() {
         exportRareDiseaseCsv(RareDiseaseCsvExporter.ELIGIBILITY)
     }

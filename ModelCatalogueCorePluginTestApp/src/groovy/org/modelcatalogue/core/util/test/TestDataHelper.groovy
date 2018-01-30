@@ -24,7 +24,7 @@ class TestDataHelper {
     }
 
     private static initDb(SessionFactory sessionFactory, boolean drop, String tempSqlFileName, Closure initCode) {
-        if (isH2(sessionFactory)) {
+        if (!isH2(sessionFactory)) {
             return initCode()
         }
 
@@ -58,6 +58,6 @@ class TestDataHelper {
     }
 
     static boolean isH2(SessionFactory sessionFactory) {
-        sessionFactory.currentSession.connection().metaData.databaseProductName != 'H2'
+        sessionFactory.currentSession.connection().metaData.databaseProductName == 'H2'
     }
 }

@@ -6,7 +6,7 @@ class ApiFilters {
 
 
     def filters = {
-        legacy(controller:'*', action:'*') {
+        legacy(controller:'*', action:'*', controllerExclude: 'genomics', actionExclude: 'changelogDoc|inventoryDoc|excelExporterSpreadsheet|gridSpreadsheet|inventorySpreadsheet') {
             before = {
                 if (Legacy.hasLegacyName(controllerName) && !request.forwardURI.contains(controllerName)) {
                     redirect url: Legacy.getRedirectUrl(controllerName, request), permanent: true

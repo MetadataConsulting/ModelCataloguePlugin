@@ -13,7 +13,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
 @IgnoreIf( { System.getProperty('spock.ignore.slow') })
-class DataArchitectServiceSpec extends AbstractIntegrationSpec {
+class DataArchitectServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def dataArchitectService, relationshipService, de1, de2, de3, de4, de5, md, dm1, dm2, actionService
 
