@@ -262,7 +262,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     final Integer countVersions() {
-        elementService.countVersions(this)
+        elementService?.countVersions(this) ?: 1
     }
 
 
