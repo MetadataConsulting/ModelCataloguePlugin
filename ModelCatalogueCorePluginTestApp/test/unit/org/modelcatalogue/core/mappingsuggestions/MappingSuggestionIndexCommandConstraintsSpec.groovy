@@ -29,26 +29,26 @@ class MappingSuggestionIndexCommandConstraintsSpec extends Specification {
         !cmd.validate(['batchId'])
     }
 
-    void 'status can be null'() {
+    void 'state can be null'() {
         when:
-        cmd.status = null
+        cmd.state = null
 
         then:
-        cmd.validate(['status'])
+        cmd.validate(['state'])
     }
 
-    void 'status can be a list of APPROVED, REJECTED or PENDING'() {
+    void 'state can be a list of APPROVED, REJECTED or PENDING'() {
         when:
-        cmd.status = status
+        cmd.state = state
         if ( !cmd.validate() ) {
             println cmd.errors
         }
 
         then:
-        cmd.validate(['status'])
+        cmd.validate(['state'])
 
         where:
-        status << [
+        state << [
                 [ActionState.PENDING, ActionState.PERFORMING, ActionState.PERFORMED, ActionState.DISMISSED, ActionState.FAILED],
                 [ActionState.PENDING,],
                 [ActionState.PERFORMING,],
