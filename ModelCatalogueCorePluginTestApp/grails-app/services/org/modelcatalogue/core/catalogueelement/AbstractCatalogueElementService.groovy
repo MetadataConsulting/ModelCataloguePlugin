@@ -4,6 +4,7 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.ElementService
@@ -33,7 +34,7 @@ import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.persistence.RelationshipGormService
 import org.modelcatalogue.core.reports.ReportDescriptor
-import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.reports.ReportDescriptorRegistry
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.DestinationClass
@@ -58,7 +59,7 @@ abstract class AbstractCatalogueElementService<T extends CatalogueElement> imple
 
     CatalogueElementGormService catalogueElementGormService
 
-    ReportsRegistry reportsRegistry
+    ReportDescriptorRegistry reportDescriptorRegistry
 
     SpringSecurityService springSecurityService
 
@@ -68,31 +69,31 @@ abstract class AbstractCatalogueElementService<T extends CatalogueElement> imple
 
     abstract protected String resourceName()
 
-    List<Map> availableReports(Long catalogueElementId) {
+    List<Map> availableReportDescriptors(Long catalogueElementId) {
 
         CatalogueElement el = findById(catalogueElementId)
 
-        List<Map> reports = []
+        List<Map> reportDescriptorsJson = []
 
 
-        List<ReportDescriptor> reportDescriptorList = reportsRegistry.getAvailableReports(el)
+        List<ReportDescriptor> reportDescriptors = reportDescriptorRegistry.getAvailableReportDescriptors(el)
 
-        for (ReportDescriptor descriptor in reportDescriptorList ) {
+        for (ReportDescriptor descriptor in reportDescriptors ) {
 
             if ( springSecurityService.isLoggedIn() ) {
                 // for users logged in render all links
-                reports << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
+                reportDescriptorsJson << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
                             depth: descriptor.depth(el), includeMetadata: descriptor.getIncludeMetadata(el),
                             url: descriptor.getLink(el), type: descriptor.renderType.toString()]
             } else if (descriptor.renderType != ReportDescriptor.RenderType.ASSET) {
                 // for users not logged in only let non-asset reports to render
-                reports << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
+                reportDescriptorsJson << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
                             depth: descriptor.depth(el), includeMetadata: descriptor.includeMetadata(el),
                             url: descriptor.getLink(el), type: descriptor.renderType.toString()]
             }
         }
 
-        reports
+        reportDescriptorsJson
     }
 
     @Override
@@ -214,6 +215,7 @@ abstract class AbstractCatalogueElementService<T extends CatalogueElement> imple
     }
 
     /**
+     * This method can be used to EDIT relationships. However, it does not use Relationship's addExtension method which is symmetric for bidirectional relationships. There is a code reuse problem here.
      * @param otherSide - request JSON as an JSONObject or an JSONArray
      */
     @Override
@@ -260,21 +262,42 @@ abstract class AbstractCatalogueElementService<T extends CatalogueElement> imple
         }
 
         if (oldDataModelInstance != dataModel) {
-            if (outgoing) {
+            if (relationshipType.bidirectional) {
                 relationshipService.unlink(source, destination, relationshipType, oldDataModelInstance)
-            } else {
                 relationshipService.unlink(destination, source, relationshipType, oldDataModelInstance)
+            }
+            else {
+                if (outgoing) {
+                    relationshipService.unlink(source, destination, relationshipType, oldDataModelInstance)
+                } else {
+                    relationshipService.unlink(destination, source, relationshipType, oldDataModelInstance)
+                }
             }
         }
 
-        RelationshipDefinitionBuilder definition = outgoing ? RelationshipDefinition.create(source, destination, relationshipType) : RelationshipDefinition.create(destination, source, relationshipType)
 
-        definition.withDataModel(dataModel).withMetadata(metadataFromObjectToBind(objectToBind))
+        RelationshipDefinitionBuilder definitionBuilder = outgoing ? RelationshipDefinition.create(source, destination, relationshipType) : RelationshipDefinition.create(destination, source, relationshipType)
+
+        RelationshipDefinitionBuilder otherWayDefinitionBuilder =
+            relationshipType.bidirectional ?
+                (outgoing ? RelationshipDefinition.create(destination, source, relationshipType) :
+                           RelationshipDefinition.create(source, destination, relationshipType))
+                : null
+
+        if (otherWayDefinitionBuilder) {
+            addRelationshipFromDefinitionBuilder(otherWayDefinitionBuilder, !outgoing, dataModel, objectToBind, source, destination)
+        }
+        addRelationshipFromDefinitionBuilder(definitionBuilder, outgoing, dataModel, objectToBind, source, destination)
+    }
+
+    private MetadataResponseEvent addRelationshipFromDefinitionBuilder(RelationshipDefinitionBuilder relationshipDefinitionBuilder, Boolean outgoing, DataModel dataModel, Object objectToBind, CatalogueElement source, CatalogueElement destination) {
+
+        relationshipDefinitionBuilder.withDataModel(dataModel).withMetadata(metadataFromObjectToBind(objectToBind))
 
         if ( isSupervisor() ) {
-            definition.withIgnoreRules(true)
+            relationshipDefinitionBuilder.withIgnoreRules(true)
         }
-        Relationship rel = relationshipService.link(definition.definition)
+        Relationship rel = relationshipService.link(relationshipDefinitionBuilder.definition)
 
         if (rel.hasErrors()) {
             return new RelationshipWithErrorsEvent(relationship: rel)
@@ -282,9 +305,11 @@ abstract class AbstractCatalogueElementService<T extends CatalogueElement> imple
 
         RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
 
+
         rel.save(flush: true, deepValidate: false, validate: false)
 
-        new RelationAddedEvent(rel: rel, source: source, direction: direction)
+        return new RelationAddedEvent(rel: rel, source: source, direction: direction)
+
     }
 
     private boolean isSupervisor() {

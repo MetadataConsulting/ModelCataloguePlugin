@@ -1,11 +1,11 @@
 package org.modelcatalogue.core.util.marshalling
 
-import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.reports.ReportDescriptorRegistry
 import org.springframework.beans.factory.annotation.Autowired
 
 abstract class ListWrapperMarshaller extends AbstractMarshaller {
 
-    @Autowired ReportsRegistry reportsRegistry
+    @Autowired ReportDescriptorRegistry reportDescriptorRegistry
 
     ListWrapperMarshaller(Class cls) {
         super(cls)
@@ -13,19 +13,31 @@ abstract class ListWrapperMarshaller extends AbstractMarshaller {
 
     @Override
     protected Map<String, Object> prepareJsonMap(Object elements) {
+        def base =  elements.base
+        def itemType =  elements.itemType?.name
+        def success =  true
+        def total =  elements.total
+        def offset =  elements.offset
+        def page =  elements.page
+        def size =  getSize(elements)
+        def list =  getList(elements)
+        def previous =  elements.previous
+        def next =  elements.next
+        def sort =  elements.sort
+        def order =  elements.order
         [
-                base: elements.base,
-                itemType: elements.itemType?.name,
-                success: true,
-                total: elements.total,
-                offset: elements.offset,
-                page: elements.page,
-                size: getSize(elements),
-                list: getList(elements),
-                previous: elements.previous,
-                next: elements.next,
-                sort: elements.sort,
-                order: elements.order
+             base: base,
+             itemType: itemType,
+             success: success,
+             total: total,
+             offset: offset,
+             page: page,
+             size: size,
+             list: list,
+             previous: previous,
+             next: next,
+             sort: sort,
+             order: order
         ]
     }
 

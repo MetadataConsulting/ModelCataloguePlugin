@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.reports
 
+import groovy.transform.Immutable
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
@@ -8,12 +9,20 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.util.Metadata
 
-class RegisterReportsService {
+@Immutable(copyWith=true)
+class OrganizationDescription {
+    String fullName, abbreviatedName, regexForDataModelName
 
-    ReportsRegistry reportsRegistry
+    static OrganizationDescription createWithAbbrevNamePrefixAsRegex(String fullName, String abbreviatedName) {
+        new OrganizationDescription(fullName, abbreviatedName, abbreviatedName + "(.*)")
+    }
+}
+class RegisterReportDescriptorsService {
+
+    ReportDescriptorRegistry reportDescriptorRegistry
 
     void register() {
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
             defaultName { "Export All Elements of ${it.name} to Excel XSLX" }
@@ -24,7 +33,7 @@ class RegisterReportsService {
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report: 'NHIC'], id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Inventory Report Spreadsheet" }
             defaultName { "${it.name} report as MS Excel Document" }
@@ -36,7 +45,7 @@ class RegisterReportsService {
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Grid Report Spreadsheet" }
             defaultName { "${it.name} report as MS Excel Document Grid" }
@@ -48,7 +57,7 @@ class RegisterReportsService {
             link controller: 'dataModel', action: 'gridSpreadsheet', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "MC Excel Export" }
             defaultName { "${it.name} report as MS Excel Document Grid" }
@@ -63,7 +72,7 @@ class RegisterReportsService {
         List<String> northThamesHospitalNames = ['GOSH', 'LNWH', 'MEH', 'UCLH'] // not sure if this should be defined here. Maybe it would be better in a source file, or perhaps a config file.
         List<String> gelSourceModelNames = ['Cancer Model', 'Rare Diseases']
         northThamesHospitalNames.each { name ->
-            reportsRegistry.register {
+            reportDescriptorRegistry.register {
                 creates asset
                 title { "GMC Grid Report – North Thames – ${name}" }
                 defaultName { "${it.name} report as MS Excel Document Grid" }
@@ -71,29 +80,58 @@ class RegisterReportsService {
                 type DataModel
                 when { DataModel dataModel ->
                     (dataModel.countDeclares() > 0) && (gelSourceModelNames.contains(dataModel.name))
+                    // report only applies to Cancer Model and Rare Diseases!
                 }
-                link controller: 'northThames', action: 'northThamesSummaryReport', id: true, params: [organization: name]
+                link controller: 'northThames', action: 'northThamesGridHierarchyMappingSummaryReport', id: true, params: [organization: name]
             }
+
+            reportDescriptorRegistry.register {
+                creates asset
+                title { "GMC Mapping Report – North Thames – ${name}" }
+                defaultName { "${it.name} North Thames mapping report as MS Excel Document" }
+                depth 7 // for Rare Diseases
+                type DataModel
+                when { DataModel dataModel ->
+                    (dataModel.countDeclares() > 0) && (gelSourceModelNames.contains(dataModel.name))
+                }
+                link controller: 'northThames', action: 'northThamesMappingReport', id: true, params: [organization: name]
+            }
+
         }
 
 
-        reportsRegistry.register {
-            creates asset
-            title { "North Thames Mapping Report Document" }
-            defaultName { "North Thames Mapping Report Document" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.name == "LONDONPATHOLOGYCODES"
+        List<OrganizationDescription> organizationDescriptions = [
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("Royal Free Hospital", "RFH"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("University College London Hospital", "UCLH"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("Great Ormond Street Hospital", "GOSH"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("St. Bartholomews", "BARTS"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("Royal National Orthopaedic Hospital", "RNOH"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("London North West Hospital", "LNWH"),
+                OrganizationDescription.createWithAbbrevNamePrefixAsRegex("Moorfields Eye Hospital", "MEH"),
+                new OrganizationDescription("North Thames Genomic Medical Centres", "NT", "LONDONPATHOLOGYCODES(.*)")
+        ]
+
+        for (OrganizationDescription organizationDescription : organizationDescriptions) {
+            OrganizationDescription copiedOrganizationDescription = organizationDescription.copyWith() // copy so that each reportDescriptor has a different variable
+            reportDescriptorRegistry.register {
+                creates asset
+                title { "${copiedOrganizationDescription.fullName} Mapping Report" }
+                defaultName { "${copiedOrganizationDescription.abbreviatedName} Mapping Report Document" }
+                depth 3
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.name.matches(copiedOrganizationDescription.regexForDataModelName)
+                }
+                link controller: 'northThames', action: 'northThamesMappingReport', id: true
             }
-            link controller: 'northThames', action: 'northThamesMappingReport', id: true
+
         }
 
 
 
 
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Inventory Report Document" }
             defaultName { "${it.name} report as MS Word Document" }
@@ -102,7 +140,7 @@ class RegisterReportsService {
             link controller: 'dataClass', action: 'inventoryDoc', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Inventory Report Document" }
             defaultName { "${it.name} report as MS Word Document" }
@@ -114,7 +152,7 @@ class RegisterReportsService {
             link controller: 'dataModel', action: 'inventoryDoc', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates asset
             title { "Inventory Report Spreadsheet" }
             defaultName { "${it.name} report as MS Excel Document" }
@@ -124,7 +162,7 @@ class RegisterReportsService {
         }
 
 //  needs more work
-//        reportsRegistry.register {
+//        reportDescriptorRegistry.register {
 //            creates asset
 //            title { "Changelog Document" }
 //            defaultName { "${it.name} changelog as MS Word Document" }
@@ -134,7 +172,7 @@ class RegisterReportsService {
 //            link controller: 'dataClass', action: 'changelogDoc', id: true
 //        }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             type DataModel, DataClass, DataElement, DataType, MeasurementUnit
             title { "Export to Catalogue XML" }
@@ -143,9 +181,11 @@ class RegisterReportsService {
             }
         }
 
-        reportsRegistry.register {
+        ///// Genomics England Reports
+
+        reportDescriptorRegistry.register {
             creates link
-            title { "Generate all ${it.name} files" }
+            title { "Generate all ${it.name} Cancer Report files" }
             type DataModel
             when { DataModel dataModel ->
                 dataModel.ext.get(Metadata.ALL_CANCER_REPORTS) == 'true'
@@ -153,9 +193,9 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportAllCancerReports', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
-            title { "Generate all ${it.name} files" }
+            title { "Generate all ${it.name} Rare Disease Report files" }
             type DataModel
             when { DataModel dataModel ->
                 dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true'
@@ -164,7 +204,7 @@ class RegisterReportsService {
         }
 
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Disorder List (CSV)" }
             type DataModel
@@ -174,7 +214,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseDisorderListAsCsv', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Eligibility Criteria Report (Word Doc)" }
             type DataModel
@@ -184,7 +224,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Phenotypes and Clinical Tests Report (Word Doc)" }
             type DataModel
@@ -195,7 +235,7 @@ class RegisterReportsService {
         }
 
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Eligibility Phenotypes Split Docs" }
             type DataModel
@@ -205,7 +245,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseSplitDocs', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases HPO And Clinical Tests (JSON)" }
             defaultName { "${it.name} report as Json" }
@@ -216,7 +256,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsJson', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Disorder List Only (JSON)" }
             defaultName { "${it.name} report as Json" }
@@ -227,7 +267,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseListAsJson', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Eligibility Criteria (JSON)" }
             defaultName { "${it.name} report as Json" }
@@ -238,7 +278,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseHPOEligibilityCriteriaAsJson', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases HPO And Clinical Tests (CSV)" }
             type DataModel
@@ -248,7 +288,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Disease Eligibility Criteria Report (CSV)" }
             type DataModel
@@ -258,7 +298,7 @@ class RegisterReportsService {
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityCsv', id: true
         }
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Static Website" }
             type DataModel
@@ -270,7 +310,7 @@ class RegisterReportsService {
 
 
 
-        reportsRegistry.register {
+        reportDescriptorRegistry.register {
             creates link
             title { "Rare Diseases Static Website" }
             type DataModel

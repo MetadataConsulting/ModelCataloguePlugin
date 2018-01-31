@@ -30,5 +30,5 @@ interface ManageCatalogueElementService {
                                                     RelationshipDirection direction,
                                                     SearchParams searchParams)
 
-    List<Map> availableReports(Long catalogueElementId)
+    List<Map> availableReportDescriptors(Long catalogueElementId)
 }

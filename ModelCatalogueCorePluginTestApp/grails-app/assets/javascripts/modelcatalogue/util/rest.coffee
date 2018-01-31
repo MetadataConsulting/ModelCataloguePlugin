@@ -20,7 +20,7 @@ angular.module('mc.util.rest', ['mc.util.messages', 'mc.util.objectVisitor']).fa
     if config.data
 
       config.data = objectVisitor.visit config.data, (value, name) ->
-        unless value? or name in ['__enhancedBy', 'defaultExcludes', 'updatableProperties', 'original', 'availableReports']
+        unless value? or name in ['__enhancedBy', 'defaultExcludes', 'updatableProperties', 'original', 'availableReportDescriptors']
           return undefined
         if value and name in ['ext']
           return value
@@ -37,7 +37,7 @@ angular.module('mc.util.rest', ['mc.util.messages', 'mc.util.objectVisitor']).fa
 #      objectVisitor.visit config.data, (value, name) ->
 #        if value and angular.isObject(value)
 #          return value if angular.isArray(value) and value.length == 0
-#          if value and name in ['__enhancedBy', 'defaultExcludes', 'updatableProperties', 'original', 'availableReports']
+#          if value and name in ['__enhancedBy', 'defaultExcludes', 'updatableProperties', 'original', 'availableReportDescriptors']
 #            return value
 #          if angular.isDate(value) or angular.isFunction(value)
 #            return value

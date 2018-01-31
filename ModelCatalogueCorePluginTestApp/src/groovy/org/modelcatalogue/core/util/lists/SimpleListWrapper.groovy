@@ -15,4 +15,11 @@ class SimpleListWrapper<T> implements ListWrapper<T>{
     int offset
     List<T> items
 
+
+
+    void totalKnownAlready(Long total) {
+        this.total = total
+        // if this is set, then getTotal() will just return it directly
+    }
+
 }

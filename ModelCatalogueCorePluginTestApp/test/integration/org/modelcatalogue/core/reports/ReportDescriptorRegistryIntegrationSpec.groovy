@@ -13,14 +13,14 @@ import org.modelcatalogue.core.util.lists.SimpleListWrapper
 import spock.lang.Stepwise
 
 @Stepwise
-class ReportsRegistryIntegrationSpec extends IntegrationSpec {
+class ReportDescriptorRegistryIntegrationSpec extends IntegrationSpec {
 
     def "returns reports for the given element"() {
         DataClass model                 = new DataClass(name: "Test")
         model.id                    = 1
 
         LinkGenerator linkGenerator = applicationContext.getBean(LinkGenerator)
-        ReportsRegistry registry    = new ReportsRegistry(linkGenerator: linkGenerator)
+        ReportDescriptorRegistry registry    = new ReportDescriptorRegistry(linkGenerator: linkGenerator)
 
         registry.register {
             title 'Export All to COSD'
@@ -43,7 +43,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
             link controller: 'foo', action: 'bar', params: [format: 'xml']
         }
 
-        def modelReports = registry.getAvailableReports(model)
+        def modelReports = registry.getAvailableReportDescriptors(model)
 
         expect:
         modelReports.size()                 >= 1
@@ -52,7 +52,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
 
         when:
         def models = new Elements(itemType: DataClass)
-        def wrapperReports = registry.getAvailableReports(models)
+        def wrapperReports = registry.getAvailableReportDescriptors(models)
 
         then:
         wrapperReports.size()               >= 1

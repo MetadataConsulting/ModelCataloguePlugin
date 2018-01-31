@@ -2,7 +2,6 @@ package org.modelcatalogue.core.persistence
 
 import grails.transaction.Transactional
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.WarnGormErrors
 import org.springframework.context.MessageSource
@@ -23,5 +22,10 @@ class MappingGormService implements WarnGormErrors {
             transactionStatus.setRollbackOnly()
         }
         mapping
+    }
+
+    @Transactional(readOnly = true)
+    Mapping findById(Long id) {
+        Mapping.get(id)
     }
 }

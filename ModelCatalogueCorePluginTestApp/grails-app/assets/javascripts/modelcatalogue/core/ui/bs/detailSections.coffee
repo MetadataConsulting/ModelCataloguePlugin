@@ -125,6 +125,7 @@ x in ['apple', 'banana', 'cherry']
     title: 'Metadata'
     position: 60
     types: [
+      'dataModel'
       'dataClass'
       'dataType'
       'dataElement'

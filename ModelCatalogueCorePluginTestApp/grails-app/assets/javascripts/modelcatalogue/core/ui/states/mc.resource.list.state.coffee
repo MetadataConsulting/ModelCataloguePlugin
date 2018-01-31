@@ -33,6 +33,9 @@ angular.module('mc.core.ui.states.mc.resource.list', ['mc.core.ui.states.control
           params.classification = $stateParams.classification ? undefined
           params.tag = $stateParams.tag ? undefined
 
+          # Minimal JSON for list within DataModel view
+          params.minimal = true
+
           if $stateParams.dataModelId and $stateParams.dataModelId != 'catalogue'
             params.dataModel = $stateParams.dataModelId
 

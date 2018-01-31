@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import groovy.transform.CompileDynamic
+
 import static org.springframework.http.HttpStatus.*
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
@@ -36,6 +38,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     DataModelAclService dataModelAclService
     AclUtilService aclUtilService
     SpringSecurityService springSecurityService
+    ManualDeleteRelationshipsService manualDeleteRelationshipsService
 
     protected abstract T findById(long id)
 
@@ -231,6 +234,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
+        if (instance instanceof DataModel && ((DataModel) instance).status != ElementStatus.DRAFT) {
+            response.status = FORBIDDEN.value()
+            respond errors: "Only Draft Data Models can be deleted"
+            return
+        }
 
         DataModel dataModel
         if ( instance instanceof DataModel ) {
@@ -257,32 +265,24 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             }
         }
 
-
         // find out if CatalogueElement can be deleted
-        def manualDeleteRelationships = instance.manualDeleteRelationships(instance instanceof DataModel ? instance : null)
-        if (manualDeleteRelationships.size() > 0) {
+        List<CatalogueElementDeleteBlocker> manualDeleteRelationships = []
+        if ( instance instanceof DataModel ) {
+            manualDeleteRelationships = manualDeleteRelationshipsService.manualDeleteRelationships(instance as DataModel)
+        } else if (instance instanceof CatalogueElement ) {
+            List<DeleteBlocker> deleteBlockerList = manualDeleteRelationshipsService.manualDeleteRelationshipsAtCatalogueElement(instance as CatalogueElement, null)
+            if ( deleteBlockerList ) {
+                manualDeleteRelationships = [new CatalogueElementDeleteBlocker(elementTargetedToDeletion: instance as CatalogueElement, deleteBlockerList: deleteBlockerList)]
+            }
+        }
+
+        if ( manualDeleteRelationships ) {
             log.debug("cannot delete object $instance as there are relationship objects which needs to be handled " +
                           "manually $manualDeleteRelationships")
 
-            def printError
-            printError = { Map<CatalogueElement, Object> map ->
-                map.collect { key, val ->
-                    if (val instanceof Map) {
-                        printError(val)
-                    } else if (val instanceof DataModel) {
-                        [message: "Cannot delete [$key] as it belongs to different data model [$val]. " +
-                            "Remove the relationship to this element first."]
-                    } else if (val instanceof Relationship) {
-                        [message: "Cannot delete [$key] as it is part of relationhip [${val.source}, " +
-                            "${val.destination}] which beongs to different data model [${val.dataModel}]"]
-                    } else {
-                        [message: "Cannot automatically delete [$key], delete it manually or remove the relationship to it."]
-                    }
-                }.flatten()
-            }
-
+            def deleteErrors = manualDeleteRelationships.collect { messageForCatalogueDeleteBlocker(it) }.flatten()
             response.status = CONFLICT.value()
-            respond errors: printError(manualDeleteRelationships)
+            respond errors: deleteErrors
             return
         }
 
@@ -298,6 +298,28 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             respond errors: "Unexpected error while deleting $instance ${e.message}"
             log.error("unexpected error while deleting $instance", e)
         }
+    }
+
+    @CompileDynamic
+    List messageForCatalogueDeleteBlocker(CatalogueElementDeleteBlocker catalogueElementDeleteBlocker) {
+        List<Map> mapList = catalogueElementDeleteBlocker.deleteBlockerList.collect { DeleteBlocker deleteBlocker ->
+            switch (deleteBlocker.reason) {
+                case DeleteBlockerReason.CATALOGUE_ELEMENT:
+                    return [message: "Cannot delete ${catalogueElementDeleteBlocker.elementTargetedToDeletion}. Cannot automatically delete [${deleteBlocker.elementPreventsDeletion}], delete it manually or remove the relationship to it."]
+
+                case DeleteBlockerReason.SOURCE_BELONGS_TO_DIFFERENT_DATAMODEL:
+                case DeleteBlockerReason.DESTINATION_BELONGS_TO_DIFFERENT_DATAMODEL:
+                    return [message: "Cannot delete ${catalogueElementDeleteBlocker.elementTargetedToDeletion}. Cannot delete [${deleteBlocker.elementPreventsDeletion}] as it belongs to different data model [${deleteBlocker.elementPreventsDeletion.dataModel}]. Remove the relationship to this element first."]
+                
+                case DeleteBlockerReason.BELONGS_TO_DIFFERENT_DATAMODEL:
+                    return [message: "Cannot delete ${catalogueElementDeleteBlocker.elementTargetedToDeletion}. Cannot delete [${deleteBlocker.elementPreventsDeletion}] as it belongs to different data model [${deleteBlocker.elementPreventsDeletion.dataModel}]. Remove the relationship to this element first."]
+
+                case DeleteBlockerReason.INCOMING_RELATION_AT_DIFFERENT_DATAMODEL:
+                case DeleteBlockerReason.OUTGOING_RELATION_AT_DIFFERENT_DATAMODEL:
+                    return [message: "Cannot delete ${catalogueElementDeleteBlocker.elementTargetedToDeletion}. Cannot delete [${deleteBlocker.elementPreventsDeletion}] as it is part of relationhip [${deleteBlocker.elementPreventsDeletion.source}, ${deleteBlocker.elementPreventsDeletion.destination}] which beongs to different data model [${deleteBlocker.elementPreventsDeletion.dataModel}]"]
+            }
+        }
+        mapList.flatten()
     }
 
     protected ParamArgs instantiateParamArgs(Integer max) {

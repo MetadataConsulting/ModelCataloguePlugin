@@ -11,4 +11,11 @@ class ListWithTotalAndTypeImpl<T> implements ListWithTotalAndType<T> {
         this.total = total
         this.items = items
     }
+
+
+
+    void totalKnownAlready(Long total) {
+        this.total = total
+        // if this is set, then getTotal() will just return it directly
+    }
 }

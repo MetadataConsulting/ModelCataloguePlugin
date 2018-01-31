@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.WarnGormErrors
@@ -9,11 +10,12 @@ import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.DataElement
 
+@Slf4j
 class DataElementGormService implements WarnGormErrors {
 
     MessageSource messageSource
 
-    @Transactional
+    @Transactional(readOnly = true)
     DataElement findById(long id) {
         DataElement.get(id)
     }
@@ -64,5 +66,76 @@ class DataElementGormService implements WarnGormErrors {
 
     protected DetachedCriteria<DataElement> findQueryByName(String nameParam) {
         DataElement.where { name == nameParam }
+    }
+
+    @Transactional(readOnly = true)
+    List<DataElement> findAllByDataModel(DataModel dataModel, Integer offset = null, Integer max = null) {
+        DetachedCriteria<DataElement> query = findQueryByDataModel(dataModel)
+
+        if ( offset != null && max != null) {
+            return  query.list(max: max, offset: offset)
+        }
+
+        findQueryByDataModel(dataModel).list()
+    }
+
+    @Transactional(readOnly = true)
+    Number countByDataModel(DataModel dataModel) {
+        findQueryByDataModel(dataModel).count()
+    }
+
+    protected DetachedCriteria<DataElement> findQueryByDataModel(DataModel dataModelParam) {
+        DataElement.where { dataModel == dataModelParam }
+    }
+
+    @Transactional(readOnly = true)
+    List<DataElement> findAllByDataType(DataType dataType) {
+        findQueryByDataType(dataType).list()
+    }
+
+    @Transactional(readOnly = true)
+    Number countByDataType(DataType dataType) {
+        findQueryByDataType(dataType).count()
+    }
+
+    protected DetachedCriteria<DataElement> findQueryByDataType(DataType dataTypeParam) {
+        DataElement.where {
+            dataType == dataTypeParam
+        }
+    }
+
+    @Transactional(readOnly = true)
+    List<DataElement> findAllByDataTypeAndStatusInList(DataType dataType, List<ElementStatus> elementStatuses) {
+        findQueryByDataTypeAndStatusInList(dataType, elementStatuses).list()
+    }
+
+    @Transactional(readOnly = true)
+    Number countByDataTypeAndStatusInList(DataType dataType, List<ElementStatus> elementStatuses) {
+        findQueryByDataTypeAndStatusInList(dataType, elementStatuses).count()
+    }
+
+    protected DetachedCriteria<DataElement> findQueryByDataTypeAndStatusInList(DataType dataTypeParam, List<ElementStatus> elementStatuses) {
+        DataElement.where {
+            dataType == dataTypeParam && status in elementStatuses
+        }
+    }
+
+    @Transactional(readOnly = true)
+    Number countByDataModelAndKeywordList(DataModel dataModel, List<String> keywords) {
+        HqlOperation hqlOperation = HqlOperationUtils.ofDataModelAndKeywordList(dataModel, keywords)
+        String hql = "select count(*) ${hqlOperation.hql}"
+        log.debug 'about to execute query: {} with params: {}', hql, hqlOperation.params
+        def result = DataElement.executeQuery(hql, hqlOperation.params)
+        result[0] as Number
+    }
+
+    @Transactional(readOnly = true)
+    List<DataElement> findAllByDataModelAndKeywordList(DataModel dataModel, List<String> keywords, Integer offset = null, Integer max = null) {
+        HqlOperation hqlOperation = HqlOperationUtils.ofDataModelAndKeywordList(dataModel, keywords)
+        log.debug 'about to execute query: {} with params: {}', hqlOperation.hql, hqlOperation.params
+        if ( offset != null && max != null ) {
+            return DataElement.findAll(hqlOperation.hql, hqlOperation.params, [offset: offset, max: max])
+        }
+        return DataElement.findAll(hqlOperation.hql, hqlOperation.params)
     }
 }

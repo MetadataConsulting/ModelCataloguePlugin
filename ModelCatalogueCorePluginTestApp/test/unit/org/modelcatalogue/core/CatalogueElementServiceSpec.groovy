@@ -16,6 +16,7 @@ class CatalogueElementServiceSpec extends Specification {
 
     def "test if modelCatalogueSearchService unindex method is called when deleting CatalogueElement"() {
         setup:
+            service.manualDeleteRelationshipsService = Mock(ManualDeleteRelationshipsService)
             def searchCatalogue = Mock(SearchCatalogue)
             def auditService = Mock(AuditService)
             def cacheService = Mock(CacheService)

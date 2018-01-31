@@ -57,7 +57,7 @@ class DeleteThingsSpec extends IntegrationSpec{
         json.errors
         json.errors instanceof List
         json.errors.size() == 1
-        json.errors[0].message?.startsWith "Cannot automatically delete"
+        json.errors[0].message?.contains "Cannot automatically delete"
 
     }
 

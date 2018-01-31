@@ -41,7 +41,7 @@ class NorthThamesMappingReportXlsxExporter {
     List<CatalogueElement> unmappedSourceElements = []
 
 
-    protected List<String> excelHeaders = ['LOCAL SITE', 'LOCAL CODESET 1', 'LOCAL CODE 1', 'LOCAL CODE 1 NAME', "LOCAL CODESET 2",	"LOCAL CODE 2",	"LOCAL CODE 2 DESCRIPTION",	"LOINC CODE",	"LOINC CODE DESCRIPTION",	"LOINC SYSTEM(SPECIMEN)",	"GEL CODE",	"GEL CODE DESCRIPTION",	"OPENEHR QUERY"]
+    protected List<String> excelHeaders = ['LOCAL SITE', 'LOCAL CODESET 1', 'LOCAL CODE 1', 'LOCAL CODE 1 NAME', "LOCAL CODESET 2",	"LOCAL CODE 2",	"LOCAL CODE 2 DESCRIPTION",	"LOINC CODE",	"LOINC CODE DESCRIPTION",	"LOINC SYSTEM(SPECIMEN)",	"GEL CODE",	"GEL CODE DESCRIPTION",	"OPENEHR QUERY", "REF RANGE"]
 
 
 
@@ -328,6 +328,18 @@ class NorthThamesMappingReportXlsxExporter {
 
                     cell {
                         value   "${(gel)?getOpenEHR(gel):''}"
+                        width auto
+                        style {
+                            wrap text
+                            border left, {
+                                color black
+                                style medium
+                            }
+                        }
+                    }
+
+                    cell {
+                        value   "${(sourceDE) ? sourceDE.ext.get("Ref Range"):''}"
                         width auto
                         style {
                             wrap text
