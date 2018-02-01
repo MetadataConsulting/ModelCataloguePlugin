@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.util
 
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -24,7 +25,7 @@ class SecuredRuleExecutorSpec extends Specification {
         "throw new RuntimeException()",
         "x.delete()",
         "package org.modelcatalogue.core.util",
-        "import org.modelcatalogue.core.util.SecuredRuleExecutor",
+        "import org.modelcatalogue.core.scripting.SecuredRuleExecutor",
         "y",
         "x.unitOfMeasure = null"
 

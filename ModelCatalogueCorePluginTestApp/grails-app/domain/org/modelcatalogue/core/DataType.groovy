@@ -6,9 +6,9 @@ import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.scripting.Validating
 import org.modelcatalogue.core.scripting.ValueValidator
-import org.modelcatalogue.core.util.DataTypeRuleScript
+import org.modelcatalogue.core.scripting.DataTypeRuleScript
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 
 /**
  * A Data Type is like a primitive type
