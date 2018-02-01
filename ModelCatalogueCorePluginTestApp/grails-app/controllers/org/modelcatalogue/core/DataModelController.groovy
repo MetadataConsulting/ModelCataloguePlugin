@@ -736,63 +736,13 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
     @Override
     protected ListWrapper<DataModel> getAllEffectiveItems(Integer max) {
-        ListWrapper<DataModel> items = findUnfilteredEffectiveItems(max)
-        filterUnauthorized(items)
+        dataModelService.getAllEffectiveItems(max, params)
     }
-
-    protected ListWrapper<DataModel> findUnfilteredEffectiveItems(Integer max) {
-        //if you only want the active data models (draft and finalised)
-        if (params.status?.toLowerCase() == 'active') {
-            //if you have the role viewer you can see drafts
-            if (modelCatalogueSecurityService.hasRole('VIEWER')) {
-                return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                    'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
-                }), overridableDataModelFilter)
-            }
-            //if not you can only see finalised models
-            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'eq' 'status', ElementStatus.FINALIZED
-            }), overridableDataModelFilter)
-        }
-
-        //if you want models with a specific status
-        //check that you can access drafts i.e. you have a viewer role
-        //then return the models by the status - providing you have the correct role
-        if (params.status) {
-            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))
-            }), overridableDataModelFilter)
-        }
-
-        return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
-    }
-
-
-    protected ListWrapper<DataModel> filterUnauthorized(ListWrapper<DataModel> items) {
-        if ( items instanceof ListWithTotalAndTypeWrapper ) {
-            ListWithTotalAndTypeWrapper listWithTotalAndTypeWrapperInstance = (ListWithTotalAndTypeWrapper) items
-            DetachedCriteria<DataModel> criteria = listWithTotalAndTypeWrapperInstance.list.criteria
-            Map<String, Object> params = listWithTotalAndTypeWrapperInstance.list.params
-            ListWithTotalAndType<DataModel> listWithTotalAndType = instantiateListWithTotalAndTypeWithCriteria(criteria, params)
-            return ListWithTotalAndTypeWrapper.create(listWithTotalAndTypeWrapperInstance.params, listWithTotalAndTypeWrapperInstance.base, listWithTotalAndType)
-        }
-        items
-    }
-
-    protected ListWithTotalAndType<DataModel> instantiateListWithTotalAndTypeWithCriteria(DetachedCriteria<DataModel> criteria, Map<String, Object> params) {
-        List<DataModel> dataModelList = dataModelGormService.findAllByCriteria(criteria)
-        if ( !dataModelList ) {
-            return new ListWithTotalAndTypeImpl<DataModel>(DataModel, [], 0L)
-        }
-        int total = dataModelList.size()
-        dataModelList = MaxOffsetSublistUtils.subList(SortParamsUtils.sort(dataModelList, params), params)
-        new ListWithTotalAndTypeImpl<DataModel>(DataModel, dataModelList, total as Long)
-    }
-
 
 
     @Override
     def search(Integer max) {
+        String search = params.search
         SearchParams searchParams = getSearchParams(max)
         ListWithTotalAndType<T> results = modelCatalogueSearchService.search(searchParams)
         respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(search, 'UTF-8')}", results)
