@@ -16,7 +16,6 @@ import java.util.concurrent.Callable
 
 abstract class AbstractDataImportService {
 
-    AssetService assetService
     DataModelService dataModelService
     ElementService elementService
     SpringSecurityService springSecurityService
@@ -37,28 +36,27 @@ abstract class AbstractDataImportService {
      * @param file the actual file to be imported.
      * @return stored asset id
      */
-    Long importFile(GrailsParameterMap params, MultipartFile file) {
+    void importFile(Long assetId, GrailsParameterMap params, MultipartFile file) {
         boolean isAdmin = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('ADMIN').join(','))
         DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
-        Asset asset = assetService.storeAsset(params, file, contentType)
-        final Long assetId = asset.id
         defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", assetId)
         InputStream inputStream = file.inputStream
         String name = params.name
         Long userId = springSecurityService.principal?.id
-        executeInBackground(assetId, executeBackgroundMessage) {
-            try {
-                //DataModel.withTransaction {
-                loadInputStream(defaultCatalogueBuilder, inputStream, name)
-                DataModel dataModelInstance = findCreatedDataModel(defaultCatalogueBuilder.created)
-                finalizeAsset(assetId, dataModelInstance, userId)
-                //}
+        executorService.execute {
+            DataModel.withTransaction {
+                auditService.logExternalChange(assetGormService.findById(assetId), userId, executeBackgroundMessage) {
+                    try {
+                        loadInputStream(defaultCatalogueBuilder, inputStream, name)
+                        DataModel dataModelInstance = findCreatedDataModel(defaultCatalogueBuilder.created)
+                        finalizeAsset(assetId, dataModelInstance, userId)
 
-            } catch (Exception e) {
-                logError(assetId, e)
+                    } catch (Exception e) {
+                        logError(assetId, e)
+                    }
+                }
             }
         }
-        assetId
     }
 
     DataModel findCreatedDataModel(Set<CatalogueElement> created) {
@@ -72,24 +70,16 @@ abstract class AbstractDataImportService {
     protected void logError(Long id,Exception e){
         BuildProgressMonitor.get(id)?.onError(e)
         log.error "Error importing Asset[$id]", e
-        assetGormService.finalizeAssetWithError(e)
+        assetGormService.finalizeAssetWithError(id, e)
     }
 
-    protected executeInBackground(Long assetId, String message, Closure code) {
-        Long userId = springSecurityService.principal?.id
-        executorService.submit {
-            DataModel.withTransaction {
-                auditService.logExternalChange(assetGormService.findById(assetId), userId, message, code)
-            }
-        }
-    }
 
     protected Asset finalizeAsset(Long id, DataModel dataModel, Long userId){
         BuildProgressMonitor.get(id)?.onCompleted()
 
         Asset assetInstance = assetGormService.finalizeAsset(id, dataModel, userId)
 
-        if ( userId && userGormService.exists(userId) ) {
+        if ( userId && userGormService.exists(userId) && dataModel != null) {
             User userInstance = userGormService.findById(userId)
             userInstance.createLinkTo(dataModel, RelationshipType.favouriteType)
         }

@@ -41,8 +41,10 @@ class ActionGormService implements WarnGormErrors {
             batch == batchParam && state in stateList
         }
         query = query.sort('lastUpdated', 'asc')
-        if ( max != null && offset != null ) {
-            return query.list(max: max, offset: offset)
+
+        if ( offset != null && max != null ) {
+            return query.list([max: max, offset: offset])
+
         }
         query.list()
     }

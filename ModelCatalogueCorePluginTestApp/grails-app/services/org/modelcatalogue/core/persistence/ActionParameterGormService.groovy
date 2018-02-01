@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.actions.Action
@@ -18,6 +19,11 @@ class ActionParameterGormService implements WarnGormErrors {
             transactionStatus.setRollbackOnly()
         }
         actionParameterInstance
+    }
+
+
+    protected DetachedCriteria<ActionParameter> findQueryByNameAndExtensionValueAndBatch(String name, String extensionValue) {
+
     }
 }
 

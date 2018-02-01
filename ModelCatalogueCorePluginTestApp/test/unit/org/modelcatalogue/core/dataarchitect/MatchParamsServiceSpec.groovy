@@ -1,18 +1,19 @@
 package org.modelcatalogue.core.dataarchitect
 
 import grails.test.mixin.TestFor
+import org.modelcatalogue.core.mappingsuggestions.MatchParamsService
 import org.modelcatalogue.core.util.MatchResult
 import org.modelcatalogue.core.util.MatchResultImpl
 import org.modelcatalogue.core.util.MetadataDomain
 import spock.lang.Specification
 
-@TestFor(DataArchitectService)
-class DataArchitectServiceSpec extends Specification {
+@TestFor(MatchParamsService)
+class MatchParamsServiceSpec extends Specification {
 
     void "matchParams method results expected map"() {
         given:
 
-        Map<String, String> expected = [:]
+        Map<String, Object> expected = [:]
         expected.put("""source""", """gorm://org.modelcatalogue.core.DataElement:2""")
         expected.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:4""")
         expected.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:5""")
@@ -21,7 +22,7 @@ class DataArchitectServiceSpec extends Specification {
         expected.put("""message""", """test match""")
 
         when:
-        Map<String, String> result = service.matchParams(2, MetadataDomain.DATA_ELEMENT, 4, MetadataDomain.DATA_ELEMENT, 5, 98, 'test match')
+        Map<String, Object> result = service.matchParams(2, MetadataDomain.DATA_ELEMENT, 4, MetadataDomain.DATA_ELEMENT, 5, 98, 'test match')
 
         then:
         expected.keySet() == result.keySet()
@@ -36,17 +37,16 @@ class DataArchitectServiceSpec extends Specification {
     void "matchParams with MatchResult parameter results expected map"() {
         given:
 
-        Map<String, String> expected = [:]
+        Map<String, Object> expected = [:]
         expected.put("""source""", """gorm://org.modelcatalogue.core.DataElement:2""")
         expected.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:4""")
         expected.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:5""")
         expected.put("""matchScore""", """98""")
         expected.put("""matchOn""", """ElementName""")
 
-
         when:
         MatchResult matchResult = new MatchResultImpl(dataElementAId: 2, dataElementBId: 4, matchScore: 98.0)
-        Map<String, String> result = service.matchParams(matchResult, MetadataDomain.DATA_ELEMENT, MetadataDomain.DATA_ELEMENT, 5)
+        Map<String, Object> result = service.matchParams(matchResult, MetadataDomain.DATA_ELEMENT, MetadataDomain.DATA_ELEMENT, 5)
 
         then:
         expected.keySet() == result.keySet()
@@ -56,8 +56,5 @@ class DataArchitectServiceSpec extends Specification {
         expected.matchScore == result.matchScore
         expected.matchOn == result.matchOn
         expected.message == result.message
-
-
-
     }
 }
