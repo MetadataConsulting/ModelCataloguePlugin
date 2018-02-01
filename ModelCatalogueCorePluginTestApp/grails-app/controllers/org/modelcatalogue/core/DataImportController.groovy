@@ -103,7 +103,7 @@ class DataImportController  {
         Long userId = modelCatalogueSecurityService.currentUser?.id
 
         // Customizable Excel Loader based on the LoincExcelLoader that can take a headersMap
-        if (excelImportType == ExcelImportType.LOINC ||
+        if (excelImportType == ExcelImportType.CONFIG ||
             excelImportType == ExcelImportType.GOSH_LAB_TEST_CODES) {
             if (checkFileNameTypeAndContainsString(file,'.xls')) {
                 Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
