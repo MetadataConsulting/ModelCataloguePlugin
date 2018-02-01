@@ -25,7 +25,7 @@ class ValueValidator {
     }
 
     static boolean evaluateRule(String rule, Object x) {
-        def result = new SecuredRuleExecutor(ValidatingRuleScript, new Binding(x: x)).execute(rule)
+        def result = new SecuredRuleExecutor(DataTypeRuleScript, new Binding(x: x)).execute(rule)
         if (result != null && (!(result instanceof Boolean) || result.is(false))) {
             return result
         }
