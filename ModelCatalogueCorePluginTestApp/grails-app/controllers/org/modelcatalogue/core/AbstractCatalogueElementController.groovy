@@ -1081,4 +1081,17 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         false
     }
+
+
+    SearchParams getSearchParams(Integer max){
+        String search = params.search
+        if ( !search ) {
+            respond errors: "No query string to search on"
+            return
+        }
+        ParamArgs paramArgs = instantiateParamArgs(max)
+        SearchParams searchParams = SearchParams.of(params, paramArgs)
+
+        return searchParams
+    }
 }

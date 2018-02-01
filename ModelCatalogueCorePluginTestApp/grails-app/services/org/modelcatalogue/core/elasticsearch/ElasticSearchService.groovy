@@ -487,6 +487,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     ListWithTotalAndType<CatalogueElement> search(SearchParams params) {
+
         search CatalogueElement, params
     }
 

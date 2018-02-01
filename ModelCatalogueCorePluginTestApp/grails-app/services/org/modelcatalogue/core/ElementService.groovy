@@ -427,7 +427,7 @@ class ElementService implements Publisher<CatalogueElement> {
         if (!status) {
             return ImmutableList.copyOf(ElementStatus.values().toList())
         }
-        if (status == 'active') {
+        if (status.toLowerCase() == 'active') {
             if (canViewDrafts) {
                 return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
             }

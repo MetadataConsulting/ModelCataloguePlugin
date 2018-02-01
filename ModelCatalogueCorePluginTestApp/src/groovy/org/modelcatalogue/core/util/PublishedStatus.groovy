@@ -6,7 +6,9 @@ package org.modelcatalogue.core.util
     public enum PublishedStatus {
         UNPUBLISHED,
         CANDIDATE,
+        APPROVED,
         PUBLISHED,
+        RETIRED,
 
         private PublishedStatus() {
         }

@@ -788,18 +788,13 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         dataModelList = MaxOffsetSublistUtils.subList(SortParamsUtils.sort(dataModelList, params), params)
         new ListWithTotalAndTypeImpl<DataModel>(DataModel, dataModelList, total as Long)
     }
+
+
+
     @Override
     def search(Integer max) {
-        String search = params.search
-        if ( !search ) {
-            respond errors: "No query string to search on"
-            return
-        }
-        ParamArgs paramArgs = instantiateParamArgs(max)
-        SearchParams searchParams = SearchParams.of(params, paramArgs)
+        SearchParams searchParams = getSearchParams(max)
         ListWithTotalAndType<T> results = modelCatalogueSearchService.search(searchParams)
-       // ListWithTotalAndType<T> results = getAllEffectiveItems(max)
-
         respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(search, 'UTF-8')}", results)
     }
 }
