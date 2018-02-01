@@ -17,9 +17,12 @@ abstract class DataTypeRuleScript extends Script {
      * Validates that the 'x' variable can be converted to given type and if it is possible
      * it casts the variable to given type and store back to the binding.
      *
+     * Deprecated because this method is too confusing, changing state when its name only indicates testing.
+     *
      * @param type tested type
      * @return true if the variable 'x' can be (and has been) converted to given type
      */
+    @Deprecated
     boolean is(Class type) {
         if (!type) return false
         if (type == String) return x = string(x)
@@ -31,6 +34,31 @@ abstract class DataTypeRuleScript extends Script {
         }
         try {
             x = type.newInstance([x] as Object[])
+            return true
+        } catch (Exception e) {
+            exception = e
+        }
+        return false
+    }
+
+    /**
+     * Better version of is() method
+     * @param type
+     * @return
+     */
+    boolean canConvertTo(Class type) {
+        if (!type) return false
+        //if (type == String) return x = string(x)
+        try {
+            //x =
+            x.asType(type)
+            return true
+        } catch (Exception e) {
+            exception = e
+        }
+        try {
+            //x =
+            type.newInstance([x] as Object[])
             return true
         } catch (Exception e) {
             exception = e
@@ -115,7 +143,7 @@ abstract class DataTypeRuleScript extends Script {
      * @return true if the numeric representation of the 'x' variable is greater or the same as the limit
      */
     boolean minInclusive(Number limit) {
-        is(number) && number(x) >= limit
+        canConvertTo(number) && number(x) >= limit
     }
 
     /**
@@ -124,7 +152,7 @@ abstract class DataTypeRuleScript extends Script {
      * @return true if the numeric representation of the 'x' variable is greater or the same as the limit
      */
     boolean maxInclusive(Number limit) {
-        is(number) && number(x) <= limit
+        canConvertTo(number) && number(x) <= limit
     }
 
     /**
@@ -133,7 +161,7 @@ abstract class DataTypeRuleScript extends Script {
      * @return true if the numeric representation of the 'x' variable is greater or the same as the limit
      */
     boolean minExclusive(Number limit) {
-        is(number) && number(x) > limit
+        canConvertTo(number) && number(x) > limit
     }
 
     /**
@@ -142,7 +170,38 @@ abstract class DataTypeRuleScript extends Script {
      * @return true if the numeric representation of the 'x' variable is greater or the same as the limit
      */
     boolean maxExclusive(Number limit) {
-        is(number) && number(x) < limit
+        canConvertTo(number) && number(x) < limit
+    }
+
+    /**
+     * From XML Schema: that x is expressible as i × 10^-power where i and power are integers such that |i| < 10^n and 0 <= power <= n.
+     * @param n
+     * @return
+     */
+    boolean totalDigits(Integer n) {
+        // TODO: implement
+        /*
+        doesn't work
+        if (n <= 0) throw new Exception("totalDigits only accepts positive integer, $n is less than 0")
+        BigDecimal x2 = x as BigDecimal
+        if (x2 >= 10**n) return false
+        if (x2.abs() < 1) return x2.abs().round(new MathContext(n, RoundingMode.DOWN)) == x2.abs()
+
+        return x2.stripTrailingZeros().precision() <= n
+        // note the precision of 0 is 1 which is fine because x=0 will always pass, which is what we want for totalDigits.
+        // precision doesn't work for 1000 because precision of 1000 is 1 for some reason... not 4 which is the totalDigits we want
+        // Also 0.0999 precision is 3 but the totalDigits is 4.
+        */
+    }
+
+    /**
+     * From XML Schema: that x is expressible as i × 10^-power where i and power are integers such that 0 <= power <= n.
+     * @param n
+     * @return
+     */
+    boolean fractionDigits(Integer n) {
+        // TODO: implement
+        return true
     }
 
     Date date(String pattern) {
@@ -179,17 +238,5 @@ abstract class DataTypeRuleScript extends Script {
 
     void setException(Exception e) {
         binding.setVariable('exception', e)
-    }
-
-
-    DataType getDataType() {
-        if (!binding.hasVariable('dataType')) {
-            return null
-        }
-        (DataType)binding.getVariable('dataType')
-    }
-
-    void setDataType(DataType dataType) {
-        binding.setVariable('dataType', dataType)
     }
 }
