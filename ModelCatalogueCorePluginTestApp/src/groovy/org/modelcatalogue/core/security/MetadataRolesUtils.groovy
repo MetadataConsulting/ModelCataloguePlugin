@@ -1,22 +1,18 @@
 package org.modelcatalogue.core.security
 
 import groovy.transform.CompileStatic
+import static org.modelcatalogue.core.security.MetadataRoles.*
 
 @CompileStatic
 class MetadataRolesUtils {
 
-    public static final String ROLE_USER= 'ROLE_USER'
-    public static final String ROLE_ADMIN = 'ROLE_ADMIN'
-    public static final String ROLE_SUPERVISOR = 'ROLE_SUPERVISOR'
-    public static final String ROLE_METADATA_CURATOR = 'ROLE_METADATA_CURATOR'
-
     static List<String> getRolesFromAuthority(String authority){
         if (authority == 'VIEWER') {
-            return [ROLE_USER, ROLE_METADATA_CURATOR, ROLE_ADMIN, ROLE_SUPERVISOR]
+            return [ROLE_USER, ROLE_CURATOR, ROLE_ADMIN, ROLE_SUPERVISOR]
 
         }  else if (authority == 'CURATOR') {
 
-            return [ROLE_METADATA_CURATOR, ROLE_ADMIN, ROLE_SUPERVISOR]
+            return [ROLE_CURATOR, ROLE_ADMIN, ROLE_SUPERVISOR]
 
         } else if (authority == "ADMIN") {
             return [ROLE_ADMIN, ROLE_SUPERVISOR]
@@ -35,7 +31,7 @@ class MetadataRolesUtils {
     }
 
     static List<String> getRolesForDataModelAdministrationPermission() {
-        [ROLE_USER, ROLE_METADATA_CURATOR]
+        [ROLE_USER, ROLE_CURATOR]
     }
 
     static List<String> getRolesForDataModelReadPermission() {
