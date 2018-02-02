@@ -62,7 +62,11 @@ class DataType extends CatalogueElement implements Validating {
      * @param x
      * @return
      */
+//    boolean validateRule(Object x) {
+//        ValueValidator.validateRule(this, x)
+//    }
     boolean validateRule(Object x) {
+        rule = processRule(rule)
         ValueValidator.validateRule(this, x)
     }
 
@@ -148,6 +152,12 @@ class DataType extends CatalogueElement implements Validating {
                 }
             }
         }
+    }
+
+
+
+    String processRule(String rule) {
+        return rule.replaceAll(/&amp;/, '&')
     }
 
     @Override

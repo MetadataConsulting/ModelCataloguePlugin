@@ -29,8 +29,8 @@ class NorthThamesMappingReportXlsxSqlExporter {
 //    final GrailsApplication grailsApplication
     ApplicationContext context = Holders.getApplicationContext()
     SessionFactory sessionFactory = (SessionFactory) context.getBean('sessionFactory')
-    String lpcModelName = 'LONDONPATHOLOGYCODES'
-    String localModelName = 'WinPath'
+    String lpcModelName = 'RFH_LONDONPATHOLOGYCODES'
+    String localModelName = 'RFH_WinPath'
     String loincModelName = 'LOINC'
     String gelModelName = 'Rare Diseases'
     protected List<String> excelHeaders = ['LOCAL SITE', 'LOCAL CODESET 1', 'LOCAL CODE 1', 'LOCAL CODE 1 NAME', "LOCAL CODESET 2",	"LOCAL CODE 2",	"LOCAL CODE 2 DESCRIPTION",	"LOINC CODE",	"LOINC CODE DESCRIPTION",	"LOINC SYSTEM(SPECIMEN)",	"GEL CODE",	"GEL CODE DESCRIPTION",	"OPENEHR QUERY", "REF RANGE"]
@@ -76,11 +76,9 @@ FROM
 	(catalogue_element AS lpc_dm, catalogue_element AS wpath_dm, catalogue_element AS loinc_dm, catalogue_element AS gel_dm)
 	JOIN (
 		SELECT 
-			ce.id, r.source_id, ev.extension_value AS `code`, ce.`name`, ce.data_model_id, ev2.extension_value AS ref_range
-		FROM
-			catalogue_element AS ce
+			ce.id, r.source_id, ce.model_catalogue_id AS `code`, ce.`name`, ce.data_model_id, ev2.extension_value AS ref_range
+		FROM catalogue_element AS ce
 			JOIN data_element AS de USING (id)
-			JOIN extension_value AS ev ON ev.element_id = ce.id AND ev.`name` = 'Index'
 			LEFT JOIN extension_value AS ev2 ON ev2.element_id = ce.id AND ev2.`name`  = 'Ref Range'
 			JOIN relationship AS r ON r.source_id = ce.id AND r.relationship_type_id = 7
 	) AS lpc ON lpc.data_model_id = lpc_dm.id

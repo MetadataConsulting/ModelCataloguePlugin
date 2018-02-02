@@ -63,7 +63,7 @@ class DataArchitectService {
             }
         }
 
-
+        log.info("matchAgainst=" + matchAgainst)
     }
 
     //commented out the functions that are no longer relevant or don't work
@@ -493,7 +493,7 @@ class DataArchitectService {
     String mappingsNameSuffix(DataModel dataModelA, DataModel dataModelB) {
         "for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
     }
-    
+
     String suggestedExactMatchesName(DataModel dataModelA, DataModel dataModelB) {
         "Suggested DataElement Exact Matches  ${mappingsNameSuffix(dataModelA, dataModelB)}"
     }

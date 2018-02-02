@@ -12,7 +12,7 @@ class ExcelImportTypeSpec extends Specification {
         String goshLabTestCodesHumanReadableName = "GOSH Lab Test Codes"
         expect:
 
-        assert ExcelImportType.humanReadableNames.toSet().containsAll(["LOINC", goshLabTestCodesHumanReadableName])
+        assert ExcelImportType.humanReadableNames.toSet().containsAll(["Configurable (XML Map)", goshLabTestCodesHumanReadableName])
         assert ExcelImportType.fromHumanReadableName(goshLabTestCodesHumanReadableName) == ExcelImportType.GOSH_LAB_TEST_CODES
     }
 }
