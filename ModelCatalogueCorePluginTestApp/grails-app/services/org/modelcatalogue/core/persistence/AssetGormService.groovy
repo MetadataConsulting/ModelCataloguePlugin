@@ -77,8 +77,8 @@ class AssetGormService implements WarnGormErrors {
     }
 
     @Transactional
-    Asset finalizeAssetWithError(Exception e) {
-        Asset assetInstance = Asset.get(id)
+    Asset finalizeAssetWithError(Long assetId, Exception e) {
+        Asset assetInstance = Asset.get(assetId)
         assetInstance.refresh()
         assetInstance.status = ElementStatus.FINALIZED
         assetInstance.name = assetInstance.name + " - Error during upload"

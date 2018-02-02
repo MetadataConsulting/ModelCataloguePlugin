@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.util
+package org.modelcatalogue.core.scripting
 
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.Expression
