@@ -145,39 +145,39 @@ class DataTypeRuleScriptSpec extends Specification {
         "!length(1)" | 'aa'
     }
 
-    def "test 'totalDigits' method"() {
+//    def "test 'totalDigits' method"() {
+//
+//        when:
+//        ValueValidator.evaluateRule("totalDigits(0)" | 0) // totalDigits does not accept 0
+//        then:
+//        thrown(Exception)
+//
+//        expect:
+//        ValueValidator.evaluateRule(rule, x)
+//
+//        where:
+//        rule | x
+//        'totalDigits(3)' | 999
+//        'totalDigits(3)' | 0.999
+//        'totalDigits(3)' | 9.99
+//
+//        '!totalDigits(3)' | 1000
+//        '!totalDigits(3)' | 0.0999
+//        '!totalDigits(3)' | 99.99
+//
+//    }
 
-        when:
-        ValueValidator.evaluateRule("totalDigits(0)" | 0) // totalDigits does not accept 0
-        then:
-        thrown(Exception)
-
-        expect:
-        ValueValidator.evaluateRule(rule, x)
-
-        where:
-        rule | x
-        'totalDigits(3)' | 999
-        'totalDigits(3)' | 0.999
-        'totalDigits(3)' | 9.99
-
-        '!totalDigits(3)' | 1000
-        '!totalDigits(3)' | 0.0999
-        '!totalDigits(3)' | 99.99
-
-    }
-
-    def "test 'fractionDigits' method"() {
-        expect:
-        ValueValidator.evaluateRule(rule, x)
-
-        where:
-        rule | x
-        'fractionDigits(3)' | 99999999.999
-        '!fractionDigits(3)' | 0.9999
-        'fractionDigits(0)' | 1
-        'fractionDigits(0)' | 01.0
-    }
+//    def "test 'fractionDigits' method"() {
+//        expect:
+//        ValueValidator.evaluateRule(rule, x)
+//
+//        where:
+//        rule | x
+//        'fractionDigits(3)' | 99999999.999
+//        '!fractionDigits(3)' | 0.9999
+//        'fractionDigits(0)' | 1
+//        'fractionDigits(0)' | 01.0
+//    }
 
     def "test regular expression"() {
         expect:
@@ -198,15 +198,15 @@ class DataTypeRuleScriptSpec extends Specification {
         "!(x in ['apple', 'banana', 'cherry'])" | 'appl'
     }
 
-    def "test 'allTrue' method"() {
-        expect:
-        ValueValidator.evaluateRule(rule, x)
-
-        where:
-        rule | x
-        //"allTrue[minLength(1), maxLength(1)]" | 'a'
-        "minLength(1)\n && maxLength(1)" | 'a'
-    }
+//    def "test 'allTrue' method"() {
+//        expect:
+//        ValueValidator.evaluateRule(rule, x)
+//
+//        where:
+//        rule | x
+//        //"allTrue[minLength(1), maxLength(1)]" | 'a'
+//        "minLength(1)\n && maxLength(1)" | 'a'
+//    }
 
     def "test date"() {
         // TODO
