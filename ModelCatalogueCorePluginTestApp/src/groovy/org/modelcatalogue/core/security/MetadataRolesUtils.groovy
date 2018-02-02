@@ -23,7 +23,7 @@ class MetadataRolesUtils {
         } else if (!authority.startsWith('ROLE_')) {
             return ["ROLE_${authority}" as String]
         }
-        return [authority]
+        [authority]
     }
 
     static String roles(String authority) {
