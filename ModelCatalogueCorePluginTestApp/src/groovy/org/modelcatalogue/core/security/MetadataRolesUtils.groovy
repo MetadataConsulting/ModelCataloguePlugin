@@ -26,6 +26,10 @@ class MetadataRolesUtils {
         [authority]
     }
 
+    static boolean isRoleDeprecated(String role) {
+        [ROLE_ADMIN, ROLE_REGISTERED, ROLE_STACKTRACE].contains(role)
+    }
+
     static String roles(String authority) {
         getRolesFromAuthority(authority).join(',')
     }
