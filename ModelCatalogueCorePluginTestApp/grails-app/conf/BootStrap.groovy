@@ -57,6 +57,12 @@ class BootStrap {
         grailsApplication.mainContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
         log.info 'completed:registerMarshallers'
 
+        log.info 'init roles'
+        initSecurityService.initRoles()
+
+        log.info 'init role hierarchy'
+        initSecurityService.initRoles()
+
         if ( isDev() ) {
             initDev()
 
@@ -79,9 +85,6 @@ class BootStrap {
 
         log.info 'init policies and tags'
         initPoliciesAndTagsService.initPoliciesAndTags()
-
-        log.info 'init roles'
-        initSecurityService.initRoles()
 
         log.info 'init users'
         initSecurityService.initUsers()
