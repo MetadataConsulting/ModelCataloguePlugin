@@ -225,7 +225,7 @@ environments {
         grails.plugin.springsecurity.logout.afterLogoutUrl = grails.serverURL
         grails.plugin.springsecurity.successHandler.defaultTargetUrl = grails.serverURL
         //println "ServerURL" + grails.serverURL
-
+        mc.mappingsuggestions.matchAgainst = System.getenv('MATCH_AGAINST') ?: 'ELASTIC_SEARCH'
         mc.search.elasticsearch.host=System.getenv('MDX_ELASTIC_HOST')
         mc.search.elasticsearch.port=System.getenv('MDX_ELASTIC_PORT')
 
