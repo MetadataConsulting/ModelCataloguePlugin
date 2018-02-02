@@ -88,4 +88,12 @@ class UserGormService implements WarnGormErrors {
         User.where { username == usernameParam }
     }
 
+    @Transactional(readOnly = true)
+    User findByEmail(String email) {
+        findQueryByEmail(email).get()
+    }
+
+    DetachedCriteria<User> findQueryByEmail(String emailParam) {
+        User.where { email == emailParam }
+    }
 }

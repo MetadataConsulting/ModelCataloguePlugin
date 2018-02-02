@@ -5,10 +5,13 @@ import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.util.FriendlyErrors
 
 @Slf4j
 class UserService {
+
+    UserGormService userGormService
 
     public static final String ACCESS_LEVEL_SUPERVISOR = 'supervisor'
     public static final String ACCESS_LEVEL_ADMIN = 'admin'
@@ -54,7 +57,7 @@ class UserService {
             return
         }
 
-        User admin = User.findByEmail(adminEmail)
+        User admin = userGormService.findByEmail(adminEmail)
 
         if (admin) {
             return
