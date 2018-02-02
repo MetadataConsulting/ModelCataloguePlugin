@@ -62,7 +62,7 @@ class DataArchitectService {
             } catch(java.lang.IllegalArgumentException e) {
             }
         }
-
+        log.info("matchAgainst =" + matchAgainst )
 
     }
 
