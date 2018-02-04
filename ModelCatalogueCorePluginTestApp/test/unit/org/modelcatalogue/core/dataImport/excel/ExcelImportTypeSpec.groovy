@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.dataImport.excel
+package org.modelcatalogue.core.dataimport.excel
 
 import org.modelcatalogue.core.dataimport.excel.ExcelImportType
 import spock.lang.Specification
