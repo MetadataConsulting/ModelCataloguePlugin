@@ -168,6 +168,7 @@ environments {
         mc.allow.signup = true
 
         grails.plugin.console.enabled = true
+        mc.mappingsuggestions.matchAgainst = System.getenv('MATCH_AGAINST') ?: 'ELASTIC_SEARCH'
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}"
         if (System.getenv('DOCKERIZED_TESTS') && System.properties["grails.test.phase"] == 'functional') {
             mc.search.elasticsearch.host="localhost"
@@ -226,7 +227,7 @@ environments {
         grails.plugin.springsecurity.logout.afterLogoutUrl = grails.serverURL
         grails.plugin.springsecurity.successHandler.defaultTargetUrl = grails.serverURL
         //println "ServerURL" + grails.serverURL
-
+        mc.mappingsuggestions.matchAgainst = System.getenv('MATCH_AGAINST') ?: 'ELASTIC_SEARCH'
         mc.search.elasticsearch.host=System.getenv('MDX_ELASTIC_HOST')
         mc.search.elasticsearch.port=System.getenv('MDX_ELASTIC_PORT')
 
