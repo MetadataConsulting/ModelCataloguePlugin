@@ -645,7 +645,10 @@ class ConfigExcelLoader extends ExcelLoader {
         List<Relationship> containers = de.getIncomingRelationshipsByType(RelationshipType.containmentType)
         Relationship container = findSource(containers, dc)
         if (container == null) {
-            container = createRelationship(dm, de, dc, RelationshipType.containmentType)
+            de.addToContainedIn(dc)
+            containers = de.getIncomingRelationshipsByType(RelationshipType.containmentType)
+            container = findSource(containers, dc)
+//            container = createRelationship(dm, de, dc, RelationshipType.containmentType) // this did not update the UI properly
 //            log.info("added to contained in: ", container)
         }
         if (mandatory != null) { // only update if supplied
@@ -773,7 +776,6 @@ class ConfigExcelLoader extends ExcelLoader {
             }
         } else { // do nothing at the moment  - should we delete existing rules??
         }
-
     }
     /**
      *
@@ -832,10 +834,10 @@ class ConfigExcelLoader extends ExcelLoader {
 //                processRowMaps(rowMaps, headersMap)
 //            }
 //        } else {
-            Sheet sheet = workbook.getSheetAt(index)
-            List<Map<String,String>> rowMaps = getRowMaps(sheet, headersMap)
-            //Iterate through the modelMaps to build new DataModel
-            processRowMaps(rowMaps, headersMap)
+        Sheet sheet = workbook.getSheetAt(index)
+        List<Map<String,String>> rowMaps = getRowMaps(sheet, headersMap)
+        //Iterate through the modelMaps to build new DataModel
+        processRowMaps(rowMaps, headersMap)
 //        }
 
     }
