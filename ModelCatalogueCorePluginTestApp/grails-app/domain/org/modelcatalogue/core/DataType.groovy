@@ -66,11 +66,11 @@ class DataType extends CatalogueElement implements Validating {
 //        ValueValidator.validateRule(this, x)
 //    }
     boolean validateRule(Object x) {
-        rule = processRule(rule)
+        rule = processDtRule(rule)
         ValueValidator.validateRule(this, x)
     }
 
-    String processRule(String rule) {
+    String processDtRule(String rule) {
         return rule.replaceAll(/&amp;/, '&')
     }
 
