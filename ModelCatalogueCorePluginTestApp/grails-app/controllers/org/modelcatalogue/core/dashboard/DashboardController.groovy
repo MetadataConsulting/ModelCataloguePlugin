@@ -1,39 +1,51 @@
 package org.modelcatalogue.core.dashboard
 
 import groovy.transform.CompileStatic
-import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.persistence.AssetGormService
+import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.PaginationQuery
+import org.modelcatalogue.core.util.PublishedStatus
 import org.modelcatalogue.core.util.SortQuery
+import org.modelcatalogue.core.view.AssetViewModel
+import org.modelcatalogue.core.view.DataModelViewModel
+import org.springframework.context.MessageSource
 
 @CompileStatic
 class DashboardController {
 
-    DataModelGormService dataModelGormService
+    DashboardService dashboardService
+    MessageSource messageSource
 
     static allowedMethods = [
             index: 'GET'
     ]
 
     def index(DashboardIndexCommand cmd) {
+
         if  ( cmd.hasErrors() ) {
-            render status: 404
+            flash.error = messageSource.getMessage('dashboard.params.notvalid', [] as Object[], 'Invalid Parameters', request.locale)
             return
         }
 
         SearchStatusQuery searchStatusQuery = cmd.toSearchStatusQuery()
         SortQuery sortQuery = cmd.toSortQuery()
         PaginationQuery paginationQuery = cmd.toPaginationQuery()
-        List<DataModel> dataModelList = dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, sortQuery, paginationQuery) ?: [] as List<DataModel>
-        Number count = dataModelGormService.countAllBySearchStatusQuery(searchStatusQuery)
-        int total =  count != null ? (count as int) : 0
+
+        List catalogueElementList = dashboardService.findAllBySearchStatusQuery(cmd.metadataDomain,
+                searchStatusQuery,
+                sortQuery,
+                paginationQuery) ?: [] as List<DataModelViewModel>
+        int total = dashboardService.countAllBySearchStatusQuery(cmd.metadataDomain, searchStatusQuery)
         [
+                metadataDomain: cmd.metadataDomain,
+                metadataDomainList: [MetadataDomain.DATA_MODEL, MetadataDomain.DATA_ELEMENT],
                 sortQuery: sortQuery,
                 paginationQuery: paginationQuery,
                 search: cmd.search,
                 status: cmd.status,
-                models: dataModelList,
-                total: total
+                catalogueElementList: catalogueElementList,
+                total: total,
         ]
     }
+
 }

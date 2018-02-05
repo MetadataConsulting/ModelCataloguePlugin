@@ -10,6 +10,7 @@ import org.modelcatalogue.core.dashboard.SearchStatusQuery
 import org.modelcatalogue.core.datamodel.DataModelRow
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.SortQuery
+import org.modelcatalogue.core.view.DataModelViewModel
 import org.springframework.context.MessageSource
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
@@ -31,25 +32,21 @@ class DataModelGormService implements WarnGormErrors {
         query
     }
 
-    @Transactional(readOnly = true)
-    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
-    List<DataModel> findAllBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    @CompileStatic
+    DetachedCriteria<DataModel> findQueryBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery) {
         DetachedCriteria<DataModel> query = findQueryBySearchStatusQuery(searchStatusQuery)
-        if ( sortQuery.sort != null && sortQuery.order != null) {
+        if ( sortQuery?.sort != null && sortQuery?.order != null) {
             query = query.sort(sortQuery.sort, sortQuery.order)
         }
-        if ( paginationQuery.max && paginationQuery.offset ) {
-            return query.list(max: paginationQuery.max, offset: paginationQuery.offset)
-        }
-        query.list()
+        query
     }
 
     @Transactional(readOnly = true)
-    Number countAllBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
-        DetachedCriteria<DataModel> query = findQueryBySearchStatusQuery(searchStatusQuery)
-        query.projections {
-            property('id')
-        }.count()
+    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    List<DataModel> findAllBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+        DetachedCriteria<DataModel> query = findQueryBySearchStatusQuery(searchStatusQuery, sortQuery)
+        Map m = paginationQuery?.toMap() ?: Collections.emptyMap()
+        query.list(m)
     }
 
     @Transactional(readOnly = true)

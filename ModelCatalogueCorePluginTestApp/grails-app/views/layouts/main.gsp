@@ -16,7 +16,6 @@
     <g:layoutHead/>
 </head>
 <body>
-
 <div class="navbar navbar-default navbar-static-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
@@ -39,6 +38,7 @@
 </div>
 
 <g:layoutBody/>
+
 
 <div class="footer" role="contentinfo">
     <g:render template="/templates/sponsorsfooter"/>

@@ -1,8 +1,6 @@
 package org.modelcatalogue.core.dashboard
 
 import grails.test.mixin.TestFor
-import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.persistence.DataModelGormService
 import spock.lang.Specification
 
 @TestFor(DashboardController)
@@ -10,7 +8,7 @@ class DashboardControllerSpec extends Specification {
 
     def "dashboard.index model contains sortQuery"() {
         given:
-        controller.dataModelGormService = Mock(DataModelGormService)
+        controller.dashboardService = Mock(DashboardService)
 
         when:
         Map model = controller.index()
@@ -23,7 +21,7 @@ class DashboardControllerSpec extends Specification {
 
     def "dashboard.index model contains paginationQuery"() {
         given:
-        controller.dataModelGormService = Mock(DataModelGormService)
+        controller.dashboardService = Mock(DashboardService)
 
         when:
         Map model = controller.index()
@@ -36,7 +34,7 @@ class DashboardControllerSpec extends Specification {
 
     def "dashboard.index model contains search"() {
         given:
-        controller.dataModelGormService = Mock(DataModelGormService)
+        controller.dashboardService = Mock(DashboardService)
 
         when:
         params.search = 'Cancer'
@@ -49,7 +47,7 @@ class DashboardControllerSpec extends Specification {
 
     def "dashboard.index model contains status"() {
         given:
-        controller.dataModelGormService = Mock(DataModelGormService)
+        controller.dashboardService = Mock(DashboardService)
 
         when:
         Map model = controller.index()
@@ -61,7 +59,7 @@ class DashboardControllerSpec extends Specification {
 
     def "dashboard.index model contains models"() {
         given:
-        controller.dataModelGormService = Mock(DataModelGormService)
+        controller.dashboardService = Mock(DashboardService)
 
         when:
         Map model = controller.index()
@@ -73,7 +71,7 @@ class DashboardControllerSpec extends Specification {
 
     def "dashboard.index model contains total"() {
         given:
-        controller.dataModelGormService = Mock(DataModelGormService)
+        controller.dashboardService = Mock(DashboardService)
 
         when:
         Map model = controller.index()
@@ -85,13 +83,13 @@ class DashboardControllerSpec extends Specification {
 
     def "findAllBySearchStatusQuery and count are invoked once"() {
         given:
-        controller.dataModelGormService = Mock(DataModelGormService)
+        controller.dashboardService = Mock(DashboardService)
 
         when:
         controller.index()
 
         then:
-        1 * controller.dataModelGormService.findAllBySearchStatusQuery(_, _, _)
-        1 * controller.dataModelGormService.countAllBySearchStatusQuery(_)
+        1 * controller.dashboardService.findAllBySearchStatusQuery(_, _, _)
+        1 * controller.dashboardService.countAllBySearchStatusQuery(_)
     }
 }

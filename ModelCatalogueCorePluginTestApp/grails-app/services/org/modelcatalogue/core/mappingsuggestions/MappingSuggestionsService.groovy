@@ -8,7 +8,7 @@ import org.modelcatalogue.core.actions.ActionParameter
 import org.modelcatalogue.core.actions.ActionService
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
-import org.modelcatalogue.core.actions.IdName
+import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.persistence.ActionGormService
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.persistence.BatchGormService

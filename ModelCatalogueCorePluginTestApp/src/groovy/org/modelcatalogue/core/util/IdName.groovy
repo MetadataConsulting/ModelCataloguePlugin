@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.actions
+package org.modelcatalogue.core.util
 
 import groovy.transform.CompileStatic
 

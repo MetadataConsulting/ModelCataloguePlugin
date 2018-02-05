@@ -2,6 +2,7 @@ package org.modelcatalogue.core.dashboard
 
 import grails.validation.Validateable
 import org.modelcatalogue.core.api.ElementStatusUtils
+import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.SortQuery
 
@@ -9,6 +10,7 @@ import org.modelcatalogue.core.util.SortQuery
 class DashboardIndexCommand {
 
     Integer max = 25
+    MetadataDomain metadataDomain = MetadataDomain.DATA_MODEL
     DashboardDropdown status = DashboardDropdown.ACTIVE
     String order = 'asc'
     String sort = 'name'
@@ -16,6 +18,8 @@ class DashboardIndexCommand {
     Integer offset = 0
 
     static constraints = {
+        metadataDomain nullable: false
+        status nullable: false
         search nullable: true, blank: true
         offset nullable: false, min: 0
         sort nullable: false, inList: ['name', 'status', 'semanticVersion', 'lastUpdated']

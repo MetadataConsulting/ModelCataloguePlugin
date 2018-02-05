@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.persistence.CatalogueElementGormService
 
 import static org.modelcatalogue.core.policy.VerificationPhase.FINALIZATION_CHECK
@@ -19,6 +20,7 @@ class DataModel extends CatalogueElement {
     String revisionNotes
 
     CatalogueElementGormService catalogueElementGormService
+    AssetGormService assetGormService
 
     static constraints = {
         name unique: 'semanticVersion'
@@ -26,7 +28,7 @@ class DataModel extends CatalogueElement {
         revisionNotes maxSize: 2000, nullable: true
     }
 
-    static transients = ['namespace', 'dataModelPolicies', 'catalogueElementGormService']
+    static transients = ['namespace', 'dataModelPolicies', 'catalogueElementGormService', 'assetGormService']
 
     static relationships = [
         outgoing: [classificationFilter: 'usedAsFilterBy', 'import': 'imports'],
@@ -116,7 +118,7 @@ class DataModel extends CatalogueElement {
         if (!readyForQueries) {
             return Collections.emptyList()
         }
-        Asset.findAllByDataModel(this)
+        assetGormService.findAllByDataModel(this)
     }
 
     void checkNewSemanticVersion(String newSemanticVersion) {

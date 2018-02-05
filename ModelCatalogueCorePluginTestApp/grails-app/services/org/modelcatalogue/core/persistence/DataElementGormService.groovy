@@ -1,10 +1,13 @@
 package org.modelcatalogue.core.persistence
 
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dashboard.SearchStatusQuery
+import org.modelcatalogue.core.util.SortQuery
 import org.springframework.context.MessageSource
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
@@ -137,5 +140,32 @@ class DataElementGormService implements WarnGormErrors {
             return DataElement.findAll(hqlOperation.hql, hqlOperation.params, [offset: offset, max: max])
         }
         return DataElement.findAll(hqlOperation.hql, hqlOperation.params)
+    }
+
+    @CompileStatic
+    DetachedCriteria<DataElement> findQueryBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
+        DetachedCriteria<DataElement> query = DataElement.where {}
+        if ( searchStatusQuery.statusList ) {
+            query = query.where { status in searchStatusQuery.statusList }
+        }
+        if ( searchStatusQuery.search ) {
+            String term = "%${searchStatusQuery.search}%".toString()
+            query = query.where { name =~ term }
+        }
+        query
+    }
+
+    @CompileStatic
+    DetachedCriteria<DataElement> findQueryBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery) {
+        DetachedCriteria<DataElement> query = findQueryBySearchStatusQuery(searchStatusQuery)
+        if ( sortQuery?.sort != null && sortQuery?.order != null) {
+            query = query.sort(sortQuery.sort, sortQuery.order)
+        }
+        query
+    }
+
+    @Transactional(readOnly = true)
+    Number countBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
+        findQueryBySearchStatusQuery(searchStatusQuery).count()
     }
 }
