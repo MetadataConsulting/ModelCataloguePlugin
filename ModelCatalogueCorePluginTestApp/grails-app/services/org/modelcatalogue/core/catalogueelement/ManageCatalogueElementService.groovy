@@ -29,4 +29,6 @@ interface ManageCatalogueElementService {
                                                     String type,
                                                     RelationshipDirection direction,
                                                     SearchParams searchParams)
+
+    List<Map> availableReportDescriptors(Long catalogueElementId)
 }

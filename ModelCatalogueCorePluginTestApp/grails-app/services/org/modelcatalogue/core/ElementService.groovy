@@ -12,6 +12,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftChain
 import org.modelcatalogue.core.publishing.DraftContext
@@ -20,9 +21,13 @@ import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.ElasticMatchResult
+import org.modelcatalogue.core.util.ElasticMatchResultAdapter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Legacy
+import org.modelcatalogue.core.util.MatchResultImpl
+import org.modelcatalogue.core.util.ParamArgs
+import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
@@ -43,6 +48,7 @@ class ElementService implements Publisher<CatalogueElement> {
     def elasticSearchService
 
     DataModelAclService dataModelAclService
+    DataElementGormService dataElementGormService
 
 //    NONE OF THESE ARE USED OR IMPLEMENTED - Commenting them out - will remove
 //    List<CatalogueElement> list(Map params = [:]) {
@@ -61,7 +67,7 @@ class ElementService implements Publisher<CatalogueElement> {
 //        resource.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
 //    }
 
-    public DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {
+    DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {
         dataModel.checkNewSemanticVersion(newSemanticVersion)
 
         if (dataModel.hasErrors()) {
@@ -82,16 +88,28 @@ class ElementService implements Publisher<CatalogueElement> {
                 // TODO: better target the changes
                 CacheService.VERSION_COUNT_CACHE.invalidateAll()
 
-                dataModelAclService.copyPermissions(dataModel, draft)
-
                 return draft
             }
         }
-        if (context.importFriendly) {
-            return code()
-        } else {
-            return (DataModel) CatalogueElement.withTransaction(code)
+
+        DataModel draft = (DataModel) CatalogueElement.withTransaction(code)
+
+        Long dataModelId = dataModel.id
+        Long draftId = draft.id
+        DataModel.withNewTransaction {
+            DataModel.withNewSession {
+                DataModel sourceModel = DataModel.where {id == dataModelId }.get()
+                DataModel destinationModel = DataModel.where {id == draftId }.get()
+                if ( sourceModel != null && destinationModel != null ) {
+                    dataModelAclService.copyPermissions(sourceModel, destinationModel)
+                } else {
+                    log.warn 'Could not copy permissions'
+                }
+
+            }
         }
+
+        draft
     }
 
     /**
@@ -158,14 +176,14 @@ class ElementService implements Publisher<CatalogueElement> {
 
         def matchNewScheme = theId.toString() =~ /\/(.\w+)\/(\d+)(@(.+))?$/
 
-        if (matchNewScheme) {
+        if (matchNewScheme.size()>0) {
             Long urlId = matchNewScheme[0][2] as Long
             String version = matchNewScheme[0][4] as String
             Long versionNumberFound = null
 
             def matchVersionNumber = version =~ /0\.0\.(\d+)/
 
-            if (matchVersionNumber) {
+            if (matchVersionNumber.size()>0) {
                 versionNumberFound = matchVersionNumber[0][1] as Long
             }
 
@@ -201,6 +219,7 @@ class ElementService implements Publisher<CatalogueElement> {
                     or {
                         eq 'latestVersionId', urlId
                         eq 'id', urlId
+                        eq 'modelCatalogueId', urlId
                     }
                     if (version) {
                         if (versionNumberFound) {
@@ -216,9 +235,37 @@ class ElementService implements Publisher<CatalogueElement> {
             }
 
 
+            //TODO: not sure why we have this line of code
+            // would like to get rid of it
+            // it's checking that the default model catalogue id id compatible with the 'fixed model catalogue id'
+            // but the default model catalogue id may not be the model catalogue id
+
             if (result && result.getDefaultModelCatalogueId(version == null).contains(Legacy.fixModelCatalogueId(theId).toString())) {
                 return result
             }
+
+
+            //added this in so that we can return element based on the model catalogue id
+            // i.e. if the model catalogue id has overriden the latest version id
+            if (resource == DataModel || resource == CatalogueElement && HibernateHelper.getEntityClass(CatalogueElement.findByLatestVersionId(urlId)) == DataModel) {
+                result = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
+                    or {
+                        eq 'modelCatalogueId', urlId
+                    }
+                    if (version) {
+                        if (versionNumberFound) {
+                            or {
+                                eq 'semanticVersion', version
+                                eq 'versionNumber', versionNumberFound
+                            }
+                        } else {
+                            eq 'semanticVersion', version
+                        }
+                    }
+                })
+            }
+
+            if(result) return result
 
             if (versionNumberFound) {
                 CatalogueElement byVersionNumber = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
@@ -272,6 +319,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         return null
     }
+
 
     static CatalogueElement getLatestFromCriteria(DetachedCriteria<? extends CatalogueElement> criteria) {
         List<CatalogueElement> elements = criteria.list(sort: 'versionNumber', order: 'desc', max: 1)
@@ -820,6 +868,28 @@ class ElementService implements Publisher<CatalogueElement> {
                 def dataElementName = it as String
                 Long ida =getDataElementId(dataElementName,dataModelA.id)
                 Long idb =getDataElementId(dataElementName,dataModelB.id)
+                if ( !elementSuggestions.containsKey(ida) ) {
+                    elementSuggestions[ida] = new HashSet<Long>()
+                }
+                elementSuggestions[ida].add(idb)
+            }
+        }
+        return elementSuggestions
+    }
+
+    /**
+     * Return dataElement ids which are very likely to be duplicates.
+     * Enums are very likely duplicates if they have similar enum values.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Map<Long, Set<Long>> findDuplicateDataElementSuggestionsFullText(DataModel dataModelA, DataModel dataModelB) {
+        Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
+        def results = getDataElementsInFullTextSearch(dataModelA.id,dataModelB.id)
+        if(results.size() > 0){
+            results.each{
+                def dataElementName = it as String
+                Long ida =getDataElementId(dataElementName,dataModelA.id)
+                Long idb =getDataElementId(dataElementName,dataModelB.id)
                 elementSuggestions.put(ida,idb)
             }
         }
@@ -830,24 +900,21 @@ class ElementService implements Publisher<CatalogueElement> {
      * Return dataElement ids which are very likely to be synonyms using elasticsearch fuzzy matching.
      * @return map with the enum id as key and set of ids of duplicate enums as value
      */
-    Set<MatchResult> findFuzzyDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
+    Set<MatchResult> findFullTextDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
         Set<MatchResult> elementSuggestions = []
-        Map searchParams = [:]
+        SearchParams searchParams = new SearchParams()
         //iterate through the data model a
         def elementsToMatch = DataElement.findAllByDataModel(dataModelA)
         elementsToMatch.each { DataElement de ->
             //set params map
-            searchParams.dataModel = dataModelB.id
+            searchParams.dataModelId   = dataModelB.id
             searchParams.search = de.name
             searchParams.minScore = minimumScore/100
-            def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            def matches = getDataElementsInFullTextSearch(de.name, dataModelB.id)
             String message = checkRelatedTo(de, dataModelB)
-            matches.getItemsWithScore().each { item, score ->
-                if(!de.relatedTo.contains(item)) {
-                    score  = score*100
-                    if(score>minimumScore) {
-                        elementSuggestions.add(new ElasticMatchResult(dataElementA: de, dataElementB: item , matchScore: score.round(2), message: message))
-                    }
+            matches.each { item ->
+                if(!de.contains(item)) {
+                        elementSuggestions.add(new ElasticMatchResultAdapter(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: 60, message: message)))
                 }
             }
         }
@@ -855,11 +922,78 @@ class ElementService implements Publisher<CatalogueElement> {
         return elementSuggestions
     }
 
-    private String checkRelatedTo(DataElement de, DataModel proposedModel){
+
+    /**
+     * Return dataElement ids which are very likely to be synonyms using elasticsearch fuzzy matching.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Set<MatchResult> findFuzzyDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Integer minimumScore = 1) {
+        Set<MatchResult> elementSuggestions = []
+        SearchParams searchParams = new SearchParams()
+        //iterate through the data model a
+        List<DataElement> elementsToMatch = dataElementGormService.findAllByDataModel(dataModelA)
+        for ( DataElement de : elementsToMatch ) {
+            //set params map
+            log.info "findFuzzyDataElement:start matching de:" + de.name
+            searchParams.dataModelId   = dataModelB.id
+            searchParams.search = de.name
+            searchParams.minScore = minimumScore/100
+            def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            log.info "matching :" + matches.total + " elements"
+            String message = checkRelatedTo(de, dataModelB)
+            matches.getItemsWithScore().each { item, score ->
+                if(!de.relatedTo.contains(item)) {
+                    //if(score>minimumScore) {
+                        elementSuggestions.add(new ElasticMatchResultAdapter(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message)))
+                   // }
+                }
+            }
+            log.info "completed matching de:" + de.name
+        }
+        log.info "completed findFuzzyDataClassDataElement"
+        return elementSuggestions
+    }
+
+
+    /**
+     * Return class ids which are very likely to be synonyms using elasticsearch fuzzy matching.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Set<MatchResult> findFuzzyDataClassDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
+        Set<MatchResult> elementSuggestions = []
+        SearchParams searchParams = new SearchParams()
+        //iterate through the data model a
+        def elementsToMatch = DataClass.findAllByDataModel(dataModelA)
+        elementsToMatch.each{ DataClass de ->
+            //set params map
+            searchParams.dataModelId= dataModelB.id
+            searchParams.search = de.name
+            searchParams.minScore = minimumScore/100
+            log.info "findFuzzyDataClassDataElement: start matching de:" + de.name + " from " + dataModelA.name
+            def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            log.info "matching :" + matches.total + " elements"
+            String message = checkRelatedTo(de, dataModelB)
+            matches.getItemsWithScore().each{ item, score ->
+                if(!de.relatedTo.contains(item)) {
+                    //if(!de.relatedTo.contains(item)&&(dataModelB.contains(item))) {
+                    //if(score>minimumScore) {
+                        elementSuggestions.add(new ElasticMatchResultAdapter(new ElasticMatchResult(catalogueElementA: de, catalogueElementB: item , matchScore: score.round(2), message: message)))
+                    //}
+                }
+            }
+            log.info "completed matching de:" + de.name
+        }
+        log.info "completed findFuzzyDataClassDataElement"
+        return elementSuggestions
+    }
+
+
+    private String checkRelatedTo(CatalogueElement ce, DataModel proposedModel){
         String modelRelatedItems = ""
-        de.relatedTo.each { ce ->
+
+        ce.relatedTo.each{ c ->
             if(ce.dataModel == proposedModel){
-                modelRelatedItems = modelRelatedItems + "Note: $de.name already related to: $ce.name \n "
+                modelRelatedItems = modelRelatedItems + "Note: $ce.name already related to: $c.name \n "
             }
         }
         modelRelatedItems
@@ -979,6 +1113,38 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
     /**
+     * getDataElementsInCommon
+     * @param Long
+     * @param Long
+     * @return List
+     */
+    private List<MatchResult> getDataElementsInFullTextSearch(String dataElementAName, Long dmBId){
+
+        Map<String, String> paramMap = [:]
+        paramMap.put('dataElementAName', dataElementAName)
+        paramMap.put('dmBId', dmBId)
+        String queryFT = """SELECT  catalogue_element.name, catalogue_element.id
+                FROM catalogue_element, data_element
+                WHERE (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =:dmBId)
+                AND MATCH(catalogue_element.name) AGAINST(\'"""
+        queryFT = queryFT + dataElementAName + """\');"""
+
+        final session = sessionFactory.currentSession
+        final sqlQuery = session.createQuery(queryFT)
+        final results = sqlQuery.with {
+            addEntity(org.modelcatalogue.core.DataElement)
+            // Set value for parameter startId.
+            setLong('dmBId', dmBId)
+            //setString('dataElementAName',dataElementAName)
+            // Get all results.
+            list()
+        }
+
+
+        return results
+    }
+
+    /**
      * getDataElementsWithFuzzyMatches
      * This will need to be streamed for large datasets
      * @param Long
@@ -995,36 +1161,37 @@ class ElementService implements Publisher<CatalogueElement> {
         List aList = sqlQuery.list()
         if(aList.size() == 0){
             fuzzyElementList = null
-        }else{
+        } else {
             aList.each{
-                def aListName = it.name
-                def aListId = it.id
+                String aListName = it.name
+                Long aListId = it.id
                 String query2getBList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id =  ${dmBId}"""
                 sqlQuery = session.createSQLQuery(query2getBList)
                 sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
                 List bList = sqlQuery.list()
-                if(bList.size() == 0){
+                if (bList.size() == 0){
                     fuzzyElementList = null
-                }else {
+                } else {
                     bList.each {
-                        MatchResult suggestedMatches = new MatchResult()
-                        suggestedMatches.setDataElementAName(aListName)
-                        suggestedMatches.setDataElementAId(aListId as Long)
-                        suggestedMatches.setDataElementBName(it.name)
-                        suggestedMatches.setDataElementBId(it.id as Long)
+                        MatchResult suggestedMatches = new MatchResultImpl(
+                                dataElementAName: aListName,
+                                dataElementAId: aListId,
+                                dataElementBName: it.name as String,
+                                dataElementBId: it.id as Long,
+                        )
 
-                            //we need not just the element match, but also the rating of the match
-                            Long matchScore = getNameMetric(suggestedMatches.dataElementAName, suggestedMatches.dataElementBName)
-                            //Only accept matches above pre-defined limit
-                            if((matchScore > 80)&(matchScore <= 100)){
-                                suggestedMatches.setMatchScore(matchScore)
-                                fuzzyElementList.add(suggestedMatches)
-                                println " Loading Match: ${suggestedMatches.dataElementAName} and ${suggestedMatches.dataElementBName} score is: ${matchScore}"
-                            }
+                        //we need not just the element match, but also the rating of the match
+                        Long matchScore = getNameMetric(suggestedMatches.dataElementAName, suggestedMatches.dataElementBName)
+                        //Only accept matches above pre-defined limit
+                        if((matchScore > 80)&(matchScore <= 100)) {
+                            suggestedMatches.setMatchScore(matchScore)
+                            fuzzyElementList.add(suggestedMatches)
+                            println " Loading Match: ${suggestedMatches.dataElementAName} and ${suggestedMatches.dataElementBName} score is: ${matchScore}"
                         }
                     }
                 }
             }
+        }
         return fuzzyElementList
     }
 

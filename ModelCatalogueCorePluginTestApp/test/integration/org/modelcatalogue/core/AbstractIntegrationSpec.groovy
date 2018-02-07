@@ -5,6 +5,7 @@ import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.custommonkey.xmlunit.DetailedDiff
 import org.custommonkey.xmlunit.Diff
+import org.hibernate.SessionFactory
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
@@ -20,7 +21,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     protected static final String COMPLEX_MODEL_NAME = 'C4CTDE'
 
     def initCatalogueService
-    def sessionFactory
+    SessionFactory sessionFactory
     def cacheService
     def relationshipTypeService
     TestDataService testDataService

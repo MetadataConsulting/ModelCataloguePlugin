@@ -15,6 +15,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
@@ -30,6 +31,7 @@ class UCLHExcelLoader extends ExcelLoader{
 
     String ownerAndGELModelSuffix = ''
     String randomSuffix = ''
+
     UCLHExcelLoader(boolean test = false) {
         bTest = test
         if (test) {
@@ -148,7 +150,9 @@ class UCLHExcelLoader extends ExcelLoader{
 //        return Pair.of(resultClosure, modelNames)
 //    }
 
-
+    String modelNameFromDataSourceName(String dataSourceName) {
+        return dataSourceName + getOwnerSuffixWithRandom()
+    }
     List<String>  loadModel(Workbook workbook, String sheetName, String ownerAndGELModel ='') {
         String organization = ''
         if (ownerAndGELModel == '') {
@@ -177,14 +181,13 @@ class UCLHExcelLoader extends ExcelLoader{
             }
         }
         //Set up a Map of new Models in the spreadsheet
-        Map<String, List<Map<String, String>>> modelMaps = rowMaps.groupBy{
-            String modelName = it.get('Collected from') ?: it.get('Primary source') ?: it.get('Secondary source')
-            if(modelName){
-                modelName+getOwnerSuffixWithRandom()
-            }
+        Map<String, List<Map<String, String>>> dataSourceRowMaps = rowMaps.groupBy{
+            it.get('Collected from') ?: it.get('Primary source') ?: it.get('Secondary source')
         }
         //Store the list of model names for future usage
-        List<String> modelNames = modelMaps.keySet() as List<String>
+        List<String> modelNames = (dataSourceRowMaps.keySet() as List<String>).collect { dataSourceName ->
+            modelNameFromDataSourceName(dataSourceName)
+        }
         Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',
                                                'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',
                                                'Related To',	'Part of standard data set',
@@ -197,17 +200,22 @@ class UCLHExcelLoader extends ExcelLoader{
         Date start = new Date()
         log.info("Start import to mc" + ownerSuffix )
         //Iterate through the modelMaps to build new DataModel
-        modelMaps.each { String name, List<Map<String, String>> rowMapsForModel ->
+        dataSourceRowMaps.each { String dataSourceName, List<Map<String, String>> rowMapsForModel ->
+            String modelName = modelNameFromDataSourceName(dataSourceName)
 
-            DataModel newModel = getDataModel(name)
+            DataModel newModel = getDataModel(modelName)
+            // add metadata:
+            newModel.ext.put(GMCGridReportXlsxExporter.organizationMetadataKey, organization.toUpperCase())
+            newModel.ext.put(GMCGridReportXlsxExporter.dataSourceNameMetadataKey, dataSourceName)
+
             Date startModelImport = new Date()
-            log.info("Start import of model" + name )
+            log.info("Start import of model" + modelName )
             //Iterate through each row to build an new DataElement
             rowMapsForModel.each { Map<String, String> rowMap ->
                 String ntname = getNTElementName(rowMap)
                 String ntdescription = rowMap['Description'] ?: rowMap['DE Description']
                 Date startElementInport = new Date()
-                log.info("Start import of model" + name )
+                log.info("Start import of model" + modelName )
                 DataElement newElement = new DataElement(name: ntname, description:  ntdescription , DataModel: newModel ).save(flush:true, failOnError: true)
                 Date stage1ElementImport = new Date()
                 TimeDuration tdElementImport1 = TimeCategory.minus( stage1ElementImport, startElementInport )

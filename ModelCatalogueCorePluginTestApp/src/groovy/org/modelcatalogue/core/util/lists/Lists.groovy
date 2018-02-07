@@ -146,6 +146,20 @@ class Lists {
     }
 
     /**
+     * Creates new ListWithTotalAndType whose items will initialized by listMethods.
+     * @param params            url parameters used to determine pagination and sort settings
+     * @param type              type to be used as wrapper's itemType
+     * @param itemsClosure      closure returning the items of the list
+     * @param totalClosure      closure returning the total count of the items
+     * @return new ListWithTotalAndType which items will initialized by itemsClosure closure
+     */
+    static <T> CustomizableJsonListWithTotalAndType<T> methodNotClosureLazy(Map params, Class<T> type, MethodNotClosureLazyListWithTotalAndType.ListMethods<T> listMethods){
+        MethodNotClosureLazyListWithTotalAndType.create(params, type, listMethods)
+    }
+
+
+
+    /**
      * Creates new ListWrapper for lazily evaluated list.
      * @param params            url parameters used to determine pagination and sort settings
      * @param type              type to be used as wrapper's itemType
@@ -199,7 +213,9 @@ class Lists {
     static <T> ListWithTotalAndType<T> emptyListWithTotalAndType(Class<T> type) {
         new EmptyListWithTotalAndType<T>(itemType: type)
     }
-
+    static boolean keyNotPresentInLink(String link, String key) {
+        !(link =~ /[\?&]${key}=/)
+    }
     static Map<String, String> nextAndPreviousLinks(Map<String, Object> params, String baseLink, Long total) {
         def link = baseLink.contains('?') ? "${baseLink}&" : "${baseLink}?"
         if (params.max) {
@@ -209,9 +225,15 @@ class Lists {
             if (k == 'sort' && RelationshipDirection.values()*.sortProperty.contains(v)) {
                 return
             }
-            if (v && !(k in ['offset', 'max', 'type', 'action', 'controller', 'id']) && !(baseLink =~ /[\?&]${k}=/)) {
+            if (v &&
+                    !(k in ['offset', 'max', 'type', 'action', 'controller', 'id']) // don't want these keys
+                    && keyNotPresentInLink(baseLink, k)) {// if baseLink doesn't already have this key
                 link += "&$k=$v"
             }
+        }
+
+        if (total && keyNotPresentInLink(link, "total") ) {
+            link += "&total=${total as String}" // give total as params so that in the next request, total does not have to be calculated.
         }
 
         def nextLink = ""

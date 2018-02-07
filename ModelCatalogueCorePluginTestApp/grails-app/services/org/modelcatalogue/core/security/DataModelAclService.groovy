@@ -2,27 +2,27 @@ package org.modelcatalogue.core.security
 
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.plugin.springsecurity.acl.AclService
 import grails.plugin.springsecurity.acl.AclUtilService
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.springframework.security.acls.domain.BasePermission
-import org.springframework.security.acls.model.ObjectIdentityRetrievalStrategy
+import org.springframework.security.acls.model.NotFoundException
 import org.springframework.security.acls.model.Permission
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.transaction.annotation.Propagation
 
 class DataModelAclService {
 
     AclUtilService aclUtilService
 
-    ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy
-
-    AclService aclService
-
     SpringSecurityService springSecurityService
+
+    UserDetailsService userDetailsService
 
     boolean hasReadPermission(Object instance) {
         DataModel dataModel = dataModelFromInstance(instance)
@@ -32,19 +32,30 @@ class DataModelAclService {
         hasReadPermission(dataModel)
     }
 
+    boolean hasReadPermission(DataModel dataModel, String username) {
+        hasPermission(dataModel, username, [BasePermission.READ, BasePermission.ADMINISTRATION] as Permission[])
+    }
+
+    boolean hasAdministrationPermission(DataModel dataModel, String username) {
+        hasPermission(dataModel, username, [BasePermission.ADMINISTRATION] as Permission[])
+    }
+
     boolean hasReadPermission(DataModel dataModel) {
         hasPermission(dataModel, [BasePermission.READ, BasePermission.ADMINISTRATION] as Permission[])
+    }
+
+    boolean isAdminOrHasAdministrationPermission(Object instance) {
+        if ( SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('ADMIN')) ) {
+            return true
+        }
+        hasAdministratorPermission(instance)
     }
 
     boolean isAdminOrHasReadPermission(Object instance) {
         if ( SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('ADMIN')) ) {
             return true
         }
-        DataModel dataModel = dataModelFromInstance(instance)
-        if ( dataModel == null ) {
-            return true
-        }
-        hasReadPermission(dataModel)
+        hasReadPermission(instance)
     }
 
     boolean hasAdministratorPermission(Object instance) {
@@ -60,14 +71,29 @@ class DataModelAclService {
     }
 
     boolean hasPermission(DataModel dataModel, Permission... permissions) {
-        if ( dataModel == null) {
-            return true
-        }
         Authentication authentication = springSecurityService.authentication
         if ( authentication == null ) {
             return false
         }
+        hasPermission(dataModel, authentication, permissions)
+    }
+
+    boolean hasPermission(DataModel dataModel, Authentication authentication, Permission... permissions) {
+        if ( dataModel == null) {
+            return true
+        }
+
         aclUtilService.hasPermission(authentication, dataModel, permissions)
+    }
+
+    boolean hasPermission(DataModel dataModel, String username, Permission... permissions) {
+        Authentication authentication = authenticationByUsername(username)
+        hasPermission(dataModel, authentication, permissions)
+    }
+
+    Authentication authenticationByUsername(String username) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username)
+        new UsernamePasswordAuthenticationToken(userDetails, userDetails.password, userDetails.authorities)
     }
 
     boolean isAdminOrHasAdministratorPermission(DataModel dataModel) {
@@ -78,13 +104,12 @@ class DataModelAclService {
     }
 
     protected DataModel dataModelFromInstance(Object instance) {
-        DataModel dataModel
         if ( instance instanceof DataModel ) {
-            return instance as DataModel
-        } else if ( dataModel instanceof CatalogueElement ) {
+            return instance
+        } else if ( instance instanceof CatalogueElement ) {
             return instance.dataModel
         }
-        dataModel
+        null
     }
 
     boolean isAdminOrHasAdministratorPermission(Object instance) {
@@ -132,7 +157,11 @@ class DataModelAclService {
             log.warn 'username is not set, cannot add permission'
             return
         }
-        aclUtilService.addPermission(dataModel, username, permission)
+        try {
+            aclUtilService.addPermission(dataModel, username, permission)
+        } catch ( NotFoundException e ) {
+            log.warn 'NotFoundException captured while trying to add permission for data model: ' + (dataModel?.name ?: '') + " username: " + username
+        }
     }
 
     void copyPermissions(DataModel sourceModel, DataModel destinationModel){

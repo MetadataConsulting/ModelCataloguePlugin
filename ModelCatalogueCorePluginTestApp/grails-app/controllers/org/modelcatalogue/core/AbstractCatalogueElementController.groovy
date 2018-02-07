@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.path.PathFinderService
+
 import static org.springframework.http.HttpStatus.OK
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.transaction.Transactional
@@ -22,7 +24,6 @@ import org.modelcatalogue.core.events.RelationshipWithErrorsEvent
 import org.modelcatalogue.core.events.RelationshipsEvent
 import org.modelcatalogue.core.events.SourceDestinationEvent
 import org.modelcatalogue.core.events.UnauthorizedEvent
-import org.modelcatalogue.core.path.PathFinder
 import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.CloningContext
@@ -45,6 +46,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     static responseFormats = ['json', 'xml']
     static allowedMethods = [
+            availableReportDescriptors: "GET",
             outgoing: "GET",
             incoming: "GET",
             addIncoming: "POST",
@@ -66,6 +68,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     AddMappingService addMappingService
     SourceDestinationService sourceDestinationService
     RemoveRelationService removeRelationService
+    PathFinderService pathFinderService
 
     abstract protected ManageCatalogueElementService getManageCatalogueElementService()
 
@@ -289,6 +292,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond mappingSavedEvent.mapping
     }
 
+    def availableReportDescriptors(Long id) {
+        List<Map> reports = manageCatalogueElementService.availableReportDescriptors(id)
+        render(contentType: 'text/json') {[
+                'availableReportDescriptors': reports
+        ]}
+    }
+
 
     /**
      * Get a list of catalouge elements
@@ -315,6 +325,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         // allows you to filter imports etc quickly and easilt
 
         items = getAllEffectiveItems(max)
+
+        if (params.total) {
+            items.totalKnownAlready(params.total as Long) // should set the total.
+        }
 
 
         if (params.boolean('minimal') && items instanceof ListWithTotalAndTypeWrapper) {
@@ -675,7 +689,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        respond new PathFinder().findPath(element)
+        respond pathFinderService.findPath(element)
     }
 
     /**
@@ -783,9 +797,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected def addRelation(Long catalogueElementId, String type, boolean outgoing) {
 
         try {
-            def otherSide = parseOtherSide()
+            // def otherSide = parseOtherSide()
             DestinationClass destinationClass = destinationClassFromJsonPayload()
-            def objectToBindParam = getObjectToBind()
+            def objectToBindParam = getObjectToBind() // the JSON request payload
             MetadataResponseEvent metadataResponse = manageCatalogueElementService.addRelation(catalogueElementId,
                     type,
                     outgoing as Boolean,
@@ -818,7 +832,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
     }
 
-    //TODO: not sure what this does
+    /**
+     * Turn the JSON payload of the request into an Object
+     * @return
+     */
     protected Object parseOtherSide() {
         request.getJSON()
     }
@@ -917,10 +934,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
     }
 
-
-
     //TODO: not sure what this does
-    private <T> ListWrapper<T> withAdditionalIndexCriteria(ListWrapper<T> list) {
+    protected <T> ListWrapper<T> withAdditionalIndexCriteria(ListWrapper<T> list) {
         if (!hasAdditionalIndexCriteria()) {
             return list
         }

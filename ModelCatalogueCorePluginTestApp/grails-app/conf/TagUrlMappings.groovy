@@ -11,6 +11,7 @@ class TagUrlMappings {
         "/api/modelCatalogue/core/tag/$id/validate" (controller: 'tag', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/tag/validate" (controller: 'tag', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/tag/$id" (controller: 'tag', action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/tag/$id/availableReportDescriptors"(controller: 'tag', action: 'availableReportDescriptors', method: HttpMethod.GET)
         "/api/modelCatalogue/core/tag/$id" (controller: 'tag', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/tag/$id" (controller: 'tag', action: 'delete', method: HttpMethod.DELETE)
         "/api/modelCatalogue/core/tag/$id/outgoing/search" (controller: 'tag', action: 'searchOutgoing', method: HttpMethod.GET)

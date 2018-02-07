@@ -7,7 +7,7 @@ import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.security.User
 
 @CompileStatic
-class UserCatalogueElementService extends AbstractCatalogueElementService {
+class UserCatalogueElementService<T extends User> extends AbstractCatalogueElementService<User> {
 
     UserGormService userGormService
 

@@ -401,7 +401,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'incomingRelationships', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'outgoingRelationships', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'relationships', hidden: true
-  catalogueElementPropertiesProvider.configureProperty 'availableReports', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'availableReportDescriptors', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'downloadUrl', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'archived', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'status', hidden: true

@@ -2,12 +2,13 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.scripting.Validating
 import org.modelcatalogue.core.scripting.ValueValidator
-import org.modelcatalogue.core.util.DataTypeRuleScript
+import org.modelcatalogue.core.scripting.DataTypeRuleScript
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 
 /**
  * A Data Type is like a primitive type
@@ -17,6 +18,8 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 class DataType extends CatalogueElement implements Validating {
 
     String rule
+
+    DataElementGormService dataElementGormService
 
     static constraints = {
         name size: 1..255
@@ -33,23 +36,7 @@ class DataType extends CatalogueElement implements Validating {
         tablePerHierarchy false
     }
 
-    static transients = ['relatedDataElements', 'regexDef']
-
-    @Override
-    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
-        DataElement.findAllByDataType(this).collectEntries {
-            if (toBeDeleted) {
-                // if DataModel is going to be deleted, then DataElement needs to be from same DataModel
-                if (it.dataModel != this.dataModel)
-                    return [(it): it.dataModel]
-                else
-                    return [:]
-            } else {
-                // if deletes DataType, it should not be used anywhere
-                return [(it): null]
-            }
-        }
-    }
+    static transients = ['relatedDataElements', 'regexDef', 'dataElementGormService']
 
     void setRegexDef(String regex) {
         if (!regex) {
@@ -75,8 +62,16 @@ class DataType extends CatalogueElement implements Validating {
      * @param x
      * @return
      */
+//    boolean validateRule(Object x) {
+//        ValueValidator.validateRule(this, x)
+//    }
     boolean validateRule(Object x) {
+        rule = processDtRule(rule)
         ValueValidator.validateRule(this, x)
+    }
+
+    String processDtRule(String rule) {
+        return rule.replaceAll(/&amp;/, '&')
     }
 
     @Override
@@ -118,9 +113,9 @@ class DataType extends CatalogueElement implements Validating {
             return []
         }
         if (archived) {
-            return DataElement.findAllByDataType(this)
+            return dataElementGormService.findAllByDataType(this)
         }
-        return DataElement.findAllByDataTypeAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
+        return dataElementGormService.findAllByDataTypeAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     Long countRelatedDataElements() {
@@ -128,9 +123,9 @@ class DataType extends CatalogueElement implements Validating {
             return 0
         }
         if (archived) {
-            return DataElement.countByDataType(this)
+            return dataElementGormService.countByDataType(this)
         }
-        return DataElement.countByDataTypeAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
+        return dataElementGormService.countByDataTypeAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     DataType removeFromRelatedDataElements(DataElement element) {
@@ -163,15 +158,14 @@ class DataType extends CatalogueElement implements Validating {
         }
     }
 
-    @Override
-    protected String getModelCatalogueResourceName() {
-        'dataType'
+
+
+    String processRule(String rule) {
+        return rule.replaceAll(/&amp;/, '&')
     }
 
     @Override
-    Long getFirstParentId() {
-        return getRelatedDataElements().find {
-            it.getDataModelId() == getDataModelId()
-        }?.getId() ?: super.getFirstParentId()
+    protected String getModelCatalogueResourceName() {
+        'dataType'
     }
 }

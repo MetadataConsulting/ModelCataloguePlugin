@@ -6,7 +6,7 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
   templateUrl: 'modelcatalogue/core/ui/diffTable.html'
 
   controller: ['$scope', 'names', 'catalogueElementProperties', 'security', 'enhance', '$filter', '$state', '$q', 'modelCatalogueApiRoot', '$http', ($scope, names, catalogueElementProperties, security, enhance, $filter, $state, $q, modelCatalogueApiRoot, $http)->
-    propExcludes = ['version', 'id', 'link', 'modelCatalogueId', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReports', 'archived', 'dateCreated', 'lastUpdated', 'versionCreated',  '__enhancedBy', 'defaultExcludes', 'updatableProperties']
+    propExcludes = ['version', 'id', 'link', 'modelCatalogueId', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReportDescriptors', 'archived', 'dateCreated', 'lastUpdated', 'versionCreated',  '__enhancedBy', 'defaultExcludes', 'updatableProperties']
 
     printNumber = (number) -> '' + number
 

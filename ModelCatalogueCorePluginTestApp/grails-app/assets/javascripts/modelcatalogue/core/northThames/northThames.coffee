@@ -22,9 +22,8 @@ stewardship.config ['detailSectionsProvider', (detailSectionsProvider)->
     title: 'North Thames Metadata'
     position: 50
     types: [
-      'dataClass' # this detailSection applies to these types
-      'dataElement'
       'dataModel'
+      'dataElement'
       # may later extend to Data Types
     ]
     keys: [

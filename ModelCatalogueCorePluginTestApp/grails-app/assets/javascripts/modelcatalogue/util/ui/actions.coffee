@@ -17,6 +17,14 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
 
   getRoleAwareId = (role, id) -> "role_#{role}_#{id}"
 
+  # moved from contextualMenu
+  makeCSSClassesForchild = (child) ->
+    childClasses = []
+    childClasses.push 'text-muted navbar-dropdown-heading' if child.heading
+    childClasses.push 'active' if child.active
+    childClasses.push 'disabled' if child.disabled
+
+    child.$$class = childClasses.join ' '
 
   registerActionInternal = (parentId, id, actionFactory, roles) ->
     throw {message: "Missing action id"} if not id
@@ -99,9 +107,10 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
             action.children.push childAction
             continue
 
-          action.createActionsFrom = (watchExpression, createActionsFunction) ->
+          # getExpression to get the reports JSON, which should return the reports and also assign them to the object specified by the watchExpression
+          action.createActionsFrom = (getExpression, watchExpression, createActionsFunction) ->
             generatorAction = childAction
-            updateChildActions = (input)->
+            updateChildActions = (input)-> # named input to be generic, but the only use case so far is report descriptor data.
               ret = $filter('filter')(action.children, (cha) -> cha.generatedBy != generatorAction.id and cha.id != generatorAction.id)
               createdActions = createActionsFunction(input) ? []
               for createdAction, i in createdActions
@@ -120,11 +129,16 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
               action.sortChildren()
               action.watches = watchExpression
 
-            updateChildActions($scope.$eval(watchExpression))
+            # resolve: if it's a promise, keep it a promise, otherwise wrap data into a promise.
+            $q.resolve($scope.$eval(getExpression)).then (reportData) ->
+              updateChildActions(reportData)
+
 
           childAction.heading = true
 
           childAction.generator(action, childAction)
+          makeCSSClassesForchild(childAction)
+
 
 
         action.sortChildren = ->

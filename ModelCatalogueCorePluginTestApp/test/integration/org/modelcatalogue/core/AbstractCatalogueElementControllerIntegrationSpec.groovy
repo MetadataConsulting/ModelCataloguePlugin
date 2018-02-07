@@ -254,7 +254,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         assert json.size == 0
         assert json.offset == offset
         assert json.page == max
-        assert json.availableReports != null
+        assert json.availableReportDescriptors == null // Since we no longer include reports with the JSON
         type2.delete()
         resourceCount == totalCount
     }
@@ -484,9 +484,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     def getRelationshipPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 1, 1, 0, 3, "${baseLink}?max=1&offset=1", ""],
-                [2, 1, 1, 1, 3, "${baseLink}?max=1&offset=2", "${baseLink}?max=1&offset=0"],
-                [3, 1, 1, 2, 3, "", "${baseLink}?max=1&offset=1"],
+                [1, 1, 1, 0, 3, "${baseLink}?max=1&total=3&offset=1", ""],
+                [2, 1, 1, 1, 3, "${baseLink}?max=1&total=3&offset=2", "${baseLink}?max=1&total=3&offset=0"],
+                [3, 1, 1, 2, 3, "", "${baseLink}?max=1&total=3&offset=1"],
         ]
     }
 
@@ -684,9 +684,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     def getMappingPaginationParameters(baseLink){
         [
                 // no,size, max , off. tot. next, previous
-                [1, 1, 1, 0, 3, "${baseLink}?max=1&offset=1", ""],
-                [2, 1, 1, 1, 3, "${baseLink}?max=1&offset=2", "${baseLink}?max=1&offset=0"],
-                [3, 1, 1, 2, 3, "", "${baseLink}?max=1&offset=1"],
+                [1, 1, 1, 0, 3, "${baseLink}?max=1&total=3&offset=1", ""],
+                [2, 1, 1, 1, 3, "${baseLink}?max=1&total=3&offset=2", "${baseLink}?max=1&total=3&offset=0"],
+                [3, 1, 1, 2, 3, "", "${baseLink}?max=1&total=3&offset=1"],
         ]
 
     }
@@ -705,6 +705,4 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     protected  getBadNameJSON() {
         [name: "g" * 256, dataModel: dataModelForSpec]
     }
-
-
 }

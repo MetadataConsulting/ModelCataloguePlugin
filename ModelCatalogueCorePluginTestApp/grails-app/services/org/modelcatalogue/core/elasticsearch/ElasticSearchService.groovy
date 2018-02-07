@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.elasticsearch
 
+import org.modelcatalogue.core.security.DataModelAclService
+
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
 import static rx.Observable.just
@@ -83,7 +85,8 @@ class ElasticSearchService implements SearchCatalogue {
             full_version: 90,
             latest_id: 80,
             entity_id : 70,
-            description: 1
+            description: 1,
+            model_catalogue_id: 80
     ]
 
     GrailsApplication grailsApplication
@@ -91,6 +94,7 @@ class ElasticSearchService implements SearchCatalogue {
     ElementService elementService
     SecurityService modelCatalogueSecurityService
     DataModelGormService dataModelGormService
+    DataModelAclService dataModelAclService
 
     Node node
     Client client
@@ -260,8 +264,7 @@ class ElasticSearchService implements SearchCatalogue {
                 .setIndicesOptions(IndicesOptions.lenientExpandOpen())
                 .setQuery(boolQuery)
 
-
-        return ElasticSearchQueryList.search(params, Relationship, request)
+        ElasticSearchQueryList.search(params, Relationship, request, dataModelAclService)
     }
 
     @Override
@@ -344,7 +347,7 @@ class ElasticSearchService implements SearchCatalogue {
                 .setQuery(qb)
 
 
-        return ElasticSearchQueryList.search(params,resource, request)
+        ElasticSearchQueryList.search(params, resource, request, dataModelAclService)
     }
 
     @CompileStatic
@@ -385,6 +388,8 @@ class ElasticSearchService implements SearchCatalogue {
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
             boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
+            boolQuery.should(QueryBuilders.fuzzyQuery('name', search)).boost(200)
+
             qb = boolQuery
         } else if (RelationshipType.isAssignableFrom(resource)) {
             indicies = [getGlobalIndexName(resource)]
@@ -421,9 +426,9 @@ class ElasticSearchService implements SearchCatalogue {
                 .setTypes(collectTypes(resource) as String[])
                 .setIndicesOptions(IndicesOptions.lenientExpandOpen())
                 .setQuery(qb)
-                .setMinScore(minScore.toFloat())
+                //.setMinScore(minScore.toFloat())
 
-        return ElasticSearchQueryList.search(params,resource, request)
+        ElasticSearchQueryList.search(params,resource, request, dataModelAclService)
     }
 
 
@@ -933,6 +938,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     private DataModelFilter getOverridableDataModelFilter(SearchParams params, List<DataModel> subscribedModels) {
         if (params.dataModelId) {
+            //Included again after
             Long dataModelId = params.dataModelId
                 //check that there is a data model is
                 // and check that you should include the results for the imports as well in search results

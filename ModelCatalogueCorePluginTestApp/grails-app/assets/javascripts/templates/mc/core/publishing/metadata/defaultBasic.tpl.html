@@ -1,0 +1,117 @@
+
+
+    <!--
+    <div class="alert alert-warning" ng-if="editableForm.$visible">
+        The form metadata only applies on the root model of the form and is ignored for any nested models.
+    </div>
+    -->
+    <!--
+      "http://www.modelcatalogue.org/metadata/#authors" # name
+      "http://www.modelcatalogue.org/metadata/#reviewers" # name
+      "http://www.modelcatalogue.org/metadata/#owner" # name
+      "http://www.modelcatalogue.org/metadata/#reviewed" # date
+      "http://www.modelcatalogue.org/metadata/#approved" # date
+      "http://www.modelcatalogue.org/metadata/#released" # date
+
+      -->
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-6"><strong class="small">Owner</strong></div>
+            <div class="full-width-editable col-md-6">
+                <small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#owner']" e-name="metadata-owner">
+                    {{element.ext.get('http://www.modelcatalogue.org/metadata/#owner') || 'empty'}}
+                </small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"><strong class="small">Authors</strong></div>
+            <div class="full-width-editable col-md-6">
+                <small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#authors']" e-name="metadata-authors">
+                    {{element.ext.get('http://www.modelcatalogue.org/metadata/#authors') || 'empty'}}
+                </small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"><strong class="small">Reviewers</strong></div>
+            <div class="full-width-editable col-md-6">
+                <small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#reviewers']" e-name="metadata-reviewers">
+                    {{element.ext.get('http://www.modelcatalogue.org/metadata/#reviewers') || 'empty'}}
+                </small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"><strong class="small">Reviewed</strong></div>
+
+            <div class="col-md-6 datepicker-xs">
+                <small editable-bsdate="extAsMap['http://www.modelcatalogue.org/metadata/#reviewed']"
+                       e-name="metadata-reviewed" e-readonly="true" e-datepicker-popup="dd/MM/yyyy" e-init-date="false"
+                       e-is-open="data.isOpen" e-ng-click="data.isOpen = true" e-on-open-focus="false">
+                    {{element.ext.get('http://www.modelcatalogue.org/metadata/#reviewed') | date: "dd/MM/yyyy" || 'empty'}}
+                </small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"><strong class="small">Approved</strong></div>
+            <div class="col-md-6 datepicker-xs">
+                <small editable-bsdate="extAsMap['http://www.modelcatalogue.org/metadata/#approved']"
+                       e-name="metadata-approved" e-readonly="true" e-datepicker-popup="dd/MM/yyyy" e-init-date="false"
+                       e-is-open="data.isOpen" e-ng-click="data.isOpen = true" e-on-open-focus="false">
+                    {{element.ext.get('http://www.modelcatalogue.org/metadata/#approved') | date: "dd/MM/yyyy" || 'empty'}}
+                </small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"><strong class="small">Released</strong></div>
+            <div class="col-md-6 datepicker-xs">
+                <small editable-bsdate="extAsMap['http://www.modelcatalogue.org/metadata/#released']"
+                       e-name="metadata-released" e-readonly="true" e-datepicker-popup="dd/MM/yyyy" e-init-date="false"
+                       e-is-open="data.isOpen" e-ng-click="data.isOpen = true" e-on-open-focus="false">
+                    {{element.ext.get('http://www.modelcatalogue.org/metadata/#released') | date: "dd/MM/yyyy" || 'empty'}}
+                </small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-6"><strong class="small">Status</strong></div>
+            <div class="col-md-6">
+                <small>{{element.status}}</small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"><strong class="small">Effective From</strong></div>
+            <div class="col-md-6 datepicker-xs">
+                <small editable-bsdate="extAsMap['http://www.modelcatalogue.org/metadata/#effectiveFrom']"
+                       e-name="metadata-effectiveFrom" e-readonly="true" e-datepicker-popup="dd/MM/yyyy" e-init-date="false"
+                       e-is-open="data.isOpen" e-ng-click="data.isOpen = true" e-on-open-focus="false" >
+                    {{element.ext.get('http://www.modelcatalogue.org/metadata/#effectiveFrom') | date: "dd/MM/yyyy" || 'empty'}}
+                    </span>
+                </small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"><strong class="small">Effective To</strong></div>
+            <div class="col-md-6 datepicker-xs">
+                <small editable-bsdate="extAsMap['http://www.modelcatalogue.org/metadata/#effectiveTo'] "
+                       e-name="metadata-effectiveTo" e-readonly="true" e-datepicker-popup="dd/MM/yyyy" e-init-date="false" e-force-parse="true"
+                       e-is-open="data.isOpen" e-ng-click="data.isOpen = true" e-on-open-focus="false" >
+                    {{element.ext.get('http://www.modelcatalogue.org/metadata/#effectiveTo') | date: "dd/MM/yyyy" || 'empty'}}
+                    </span>
+                </small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"><strong class="small">Created</strong></div>
+            <div class="col-md-6">
+                <small>{{element.versionCreated | date}}</small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"><strong class="small">Last Updated</strong></div>
+            <div class="col-md-6">
+                <small>{{element.lastUpdated | date}}</small>
+            </div>
+        </div>
+
+    </div>
+

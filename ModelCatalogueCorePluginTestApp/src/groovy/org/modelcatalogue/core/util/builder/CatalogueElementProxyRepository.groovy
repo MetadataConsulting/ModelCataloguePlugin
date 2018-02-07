@@ -258,17 +258,19 @@ class CatalogueElementProxyRepository {
         }
 
 
-        //can't work out why this is here
+        // can't work out why this is here
         // I believe this is relevant for finalised models i.e. you can overide the relationships on finalised models
         // see CatalogueBuilderIntegrationSpec
         // def "should be able to copy relationships where the model is finalized"()
         // but this gives you problems where it removes all the supersession and related to relationships
 
        if (!copyRelationships) {
-            elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
+
+           for(CatalogueElementProxy element: elementProxiesToBeResolved){
                 if (!element.underControl) {
                     return
                 }
+
                 CatalogueElement catalogueElement = element.resolve() as CatalogueElement
                 Set<Long> relations = []
                 relations.addAll catalogueElement.incomingRelationships*.getId()

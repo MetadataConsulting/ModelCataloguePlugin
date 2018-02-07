@@ -7,7 +7,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.persistence.UserRoleGormService
-import org.modelcatalogue.core.reports.RegisterReportsService
+import org.modelcatalogue.core.reports.RegisterReportDescriptorsService
 import org.modelcatalogue.core.security.*
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
@@ -28,7 +28,7 @@ class BootStrap {
     def modelCatalogueSearchService
     def userService
     GrailsApplication grailsApplication
-    RegisterReportsService registerReportsService
+    RegisterReportDescriptorsService registerReportDescriptorsService
     InitSecurityService initSecurityService
     MetadataSecurityService metadataSecurityService
     InitPoliciesAndTagsService initPoliciesAndTagsService
@@ -65,6 +65,8 @@ class BootStrap {
 
         }  else if ( isProduction() ) {
             initProd()
+            log.info 'init register reports'
+            registerReportDescriptorsService.register()
         }
     }
 
@@ -100,7 +102,7 @@ class BootStrap {
         }
 
         log.info 'init register reports'
-        registerReportsService.register()
+        registerReportDescriptorsService.register()
 
 
     }
@@ -181,7 +183,7 @@ class BootStrap {
                 modelCatalogueSearchService.reindex(true)
             }
             log.info 'init register reports'
-            registerReportsService.register()
+            registerReportDescriptorsService.register()
         }
     }
 

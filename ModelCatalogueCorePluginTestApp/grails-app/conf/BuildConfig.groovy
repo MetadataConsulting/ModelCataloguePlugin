@@ -72,7 +72,7 @@ grails.project.dependency.resolution = {
         String mcToolkitVersion = '2.2.0'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
-        compile "org.modelcatalogue:mc-datatype-validation:$mcToolkitVersion"
+        //compile "org.modelcatalogue:mc-datatype-validation:$mcToolkitVersion"
 
         compile 'me.xdrop:fuzzywuzzy:1.1.7'
 
@@ -142,6 +142,8 @@ grails.project.dependency.resolution = {
         test "org.gebish:geb-spock:$gebVersion"
         test "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
+
+        compile 'com.github.mpkorstanje:simmetrics-core:4.1.1'
     }
 
     plugins {

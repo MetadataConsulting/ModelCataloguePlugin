@@ -11,7 +11,23 @@ import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
-import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.persistence.ActionGormService
+import org.modelcatalogue.core.persistence.AssetGormService
+import org.modelcatalogue.core.persistence.CatalogueElementGormService
+import org.modelcatalogue.core.persistence.DataClassGormService
+import org.modelcatalogue.core.persistence.DataElementGormService
+import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.persistence.DataModelPolicyGormService
+import org.modelcatalogue.core.persistence.DataTypeGormService
+import org.modelcatalogue.core.persistence.EnumeratedTypeGormService
+import org.modelcatalogue.core.persistence.ExtensionValueGormService
+import org.modelcatalogue.core.persistence.MappingGormService
+import org.modelcatalogue.core.persistence.MeasurementUnitGormService
+import org.modelcatalogue.core.persistence.PrimitiveTypeGormService
+import org.modelcatalogue.core.persistence.ReferenceTypeGormService
+import org.modelcatalogue.core.persistence.RelationshipGormService
+import org.modelcatalogue.core.persistence.RelationshipTypeGormService
+import org.modelcatalogue.core.reports.ReportDescriptorRegistry
 import org.modelcatalogue.core.security.ajax.AjaxAwareLoginUrlAuthenticationEntryPoint
 import org.modelcatalogue.core.security.ss2x.ApiKeyDaoAuthenticationProvider
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -48,7 +64,7 @@ import org.modelcatalogue.core.xml.render.RelationshipsXmlRenderer
 import org.modelcatalogue.core.errors.MetadataExceptionResolver
 import java.util.concurrent.Executors
 import  grails.plugin.executor.PersistenceContextExecutorWrapper
-
+import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionsService
 // Place your Spring DSL code here
 beans = {
     exceptionHandler(MetadataExceptionResolver) {
@@ -84,7 +100,7 @@ beans = {
     mergeConfig(application)
 
     relationshipsXmlRenderer(RelationshipsXmlRenderer)
-    reportsRegistry(ReportsRegistry)
+    reportDescriptorRegistry(ReportDescriptorRegistry)
     jsonMarshallingCustomizerRegistry(JsonMarshallingCustomizerRegistry)
     frontendConfigurationProviderRegistry(FrontendConfigurationProviderRegistry)
 
@@ -151,5 +167,28 @@ beans = {
         (application.config.mc.search.elasticsearch.local || application.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host') || System.getProperty('mc.search.elasticsearch.local'))
     ) {
         springConfig.addAlias('modelCatalogueSearchService','elasticSearchService')
+    }
+
+    mappingsSuggestionsGateway(MappingSuggestionsService) {
+        actionService = ref('actionService')
+        messageSource = ref('messageSource')
+        batchGormService = ref('batchGormService')
+        actionGormService = ref('actionGormService')
+        catalogueElementGormService = ref('catalogueElementGormService')
+        assetGormService = ref('assetGormService')
+        catalogueElementGormService = ref('catalogueElementGormService')
+        dataClassGormService = ref('dataClassGormService')
+        dataElementGormService = ref('dataElementGormService')
+        dataModelGormService = ref('dataModelGormService')
+        dataModelPolicyGormService = ref('dataModelPolicyGormService')
+        dataTypeGormService = ref('dataTypeGormService')
+        enumeratedTypeGormService = ref('enumeratedTypeGormService')
+        extensionValueGormService = ref('extensionValueGormService')
+        mappingGormService = ref('mappingGormService')
+        measurementUnitGormService = ref('measurementUnitGormService')
+        primitiveTypeGormService = ref('primitiveTypeGormService')
+        referenceTypeGormService = ref('referenceTypeGormService')
+        relationshipGormService = ref('relationshipGormService')
+        relationshipTypeGormService = ref('relationshipTypeGormService')
     }
 }

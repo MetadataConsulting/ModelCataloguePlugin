@@ -11,6 +11,7 @@ class UserUrlMappings {
         "/api/modelCatalogue/core/user/$id/validate"(controller: 'user', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/user/validate"(controller: 'user', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/user/$id"(controller: 'user', action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/user/$id/availableReportDescriptors"(controller: 'user', action: 'availableReportDescriptors', method: HttpMethod.GET)
         "/api/modelCatalogue/core/user/$id"(controller: 'user', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/user/$id"(controller: 'user', action: 'delete', method: HttpMethod.DELETE)
         "/api/modelCatalogue/core/user/$id/outgoing/search"(controller: 'user', action: 'searchOutgoing', method: HttpMethod.GET)

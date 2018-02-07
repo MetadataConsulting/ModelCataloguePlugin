@@ -4,6 +4,8 @@ import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
+import org.modelcatalogue.core.persistence.AssetGormService
+import org.modelcatalogue.core.persistence.DataClassGormService
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.serializer.CaseReportFormSerializer
@@ -19,16 +21,20 @@ class FormGeneratorController {
     def assetService
     def modelToFormExporterService
 
+    AssetGormService assetGormService
+
+    DataClassGormService dataClassGormService
+
     def generateForm() {
         Long modelId = params.id as Long
-        DataClass model = DataClass.findById(modelId)
+        DataClass model = dataClassGormService.findById(modelId)
 
         if (!model) {
             render status: HttpStatus.NOT_FOUND
             return
         }
 
-        Asset asset = new Asset(
+        Asset asset = assetGormService.save(new Asset(
                 dataModel: model.dataModel,
                 name: "$model.name Case Report Form",
                 originalFileName: "$model.name Case Report Form.xls",
@@ -36,9 +42,13 @@ class FormGeneratorController {
                 status: ElementStatus.PENDING,
                 contentType: CatalogueElementToXlsxExporter.EXCEL.name,
                 size: 0
-        )
+        ))
 
-        asset.save(flush: true, failOnError: true)
+        if ( asset.hasErrors() ) {
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+
 
         Long id = asset.id
 

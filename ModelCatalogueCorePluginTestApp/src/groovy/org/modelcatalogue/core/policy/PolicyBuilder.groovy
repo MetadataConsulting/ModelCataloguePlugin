@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList
 import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 
 @CompileStatic class PolicyBuilder implements DomainClassesShortcuts, KnownCheckersShortcuts {
 

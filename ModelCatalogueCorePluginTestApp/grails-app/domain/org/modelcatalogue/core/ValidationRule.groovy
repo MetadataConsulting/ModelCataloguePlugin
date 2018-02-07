@@ -51,11 +51,6 @@ class ValidationRule extends CatalogueElement {
     ]
 
     @Override
-    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
-        return [:]
-    }
-
-    @Override
     protected PublishingChain preparePublishChain(PublishingChain chain) {
         super.preparePublishChain(chain)
              .add(this.appliedWithin)

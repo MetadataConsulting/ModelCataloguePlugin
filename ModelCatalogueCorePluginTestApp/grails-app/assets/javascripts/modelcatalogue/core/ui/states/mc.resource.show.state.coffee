@@ -14,10 +14,11 @@ angular.module('mc.core.ui.states.mc.resource.show', ['mc.core.ui.states.control
 
       resolve:
         element: ($stateParams , catalogueElementResource ,  lastSelectedElementHolder ,  $rootScope ,  $http ,  names, $log) ->
-          if lastSelectedElementHolder.element \
-            and "#{lastSelectedElementHolder.element.id}" == "#{$stateParams.id}" \
-            and $stateParams.resource == names.getPropertyNameFromType(lastSelectedElementHolder.element.elementType)
-              return lastSelectedElementHolder.element
+          lastSelectedElement = lastSelectedElementHolder.element
+          if lastSelectedElement \
+            and "#{lastSelectedElement.id}" == "#{$stateParams.id}" \
+            and $stateParams.resource == names.getPropertyNameFromType(lastSelectedElement.elementType)
+              return lastSelectedElement.refreshIfMinimal() # lastSelectedElement might be minimal, so get the full element
 
           catalogueElementResource($stateParams.resource).get($stateParams.id).then (result) ->
             if angular.isFunction(result.focus)

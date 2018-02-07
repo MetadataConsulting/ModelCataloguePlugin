@@ -24,6 +24,7 @@ import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.Shared
 import spock.lang.Unroll
+import spock.lang.Ignore
 
 class LoincExcelLoaderSpec extends AbstractIntegrationSpec {
     @Shared String resourcePath = (new File("test/integration/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
@@ -45,7 +46,7 @@ class LoincExcelLoaderSpec extends AbstractIntegrationSpec {
         excelLoader = new LoincExcelLoader()
     }
 
-
+    @Ignore
     def "test default catalogue builder imports gosh dataset"(){
 
         when: "I load the Excel file"
@@ -53,8 +54,8 @@ class LoincExcelLoaderSpec extends AbstractIntegrationSpec {
         excelLoader.buildModelFromStandardWorkbookSheet(
             LoincHeadersMap.createForGoshExcelLoader(),
 //            LoincHeadersMap.createForLoincExcelLoader(),
-//            WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'loinc.xlsx'))),
-            WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'GOSH_lab_test_codes100.xlsx'))),
+//            WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'loinc/loinc.xlsx'))),
+            WorkbookFactory.create((new FileInputStream(resourcePath + '/' + 'goshTestCodes/GOSH_lab_test_codes100.xlsx'))),
             catalogueBuilder,
             0)
 

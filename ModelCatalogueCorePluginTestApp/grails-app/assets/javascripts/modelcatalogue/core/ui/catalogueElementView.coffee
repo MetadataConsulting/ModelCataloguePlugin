@@ -78,9 +78,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           promise.then (result) ->
             tab.value       = result
-            $scope.reports  = result.availableReports
+            $scope.reports  = result.availableReportDescriptors
         else
-          $scope.reports    = tab.value?.availableReports
+          $scope.reports    = tab.value?.availableReportDescriptors
 
 
       onPropertyUpdate = (newProperty, oldProperty) ->

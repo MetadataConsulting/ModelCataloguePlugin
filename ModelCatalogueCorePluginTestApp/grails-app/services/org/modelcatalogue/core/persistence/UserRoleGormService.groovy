@@ -52,4 +52,14 @@ class UserRoleGormService implements WarnGormErrors {
     protected DetachedCriteria<UserRole> findQueryByAuthority(String authority) {
         UserRole.where { role.authority == authority }
     }
+
+    @Transactional(readOnly = true)
+    Set<Role> findRolesByUser(User user) {
+        findQueryByUser(user).collect { it.role } as Set<Role>
+    }
+
+    protected
+    DetachedCriteria<UserRole> findQueryByUser(User userParam ) {
+        UserRole.where { user == userParam }
+    }
 }

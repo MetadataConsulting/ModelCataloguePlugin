@@ -1,11 +1,18 @@
 package org.modelcatalogue.core.dataexport.excel.gmcgridreport
 
+import org.modelcatalogue.core.DataClassService
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Relationship
+
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.modelcatalogue.core.*
 import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
+
+import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 
 /**
  * GridReportXlsxExporter.groovy
@@ -28,13 +35,16 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     String organization = ''
     static String defaultOrganization = 'UCLH'
     static String organizationMetadataKey = 'http://www.modelcatalogue.org/metadata/#organization'
+    static String dataSourceNameMetadataKey = "http://www.modelcatalogue.org/metadata/#dataSourceName"
     protected List<String> excelHeaders = GMCGridReportHeaders.excelHeaders
+
+    BuildProgressMonitor buildProgressMonitor = null // originally for CatalogueBuilder but using it for monitoring the progress of the export.
 
     /**
      * The report is triggered from a DataModel (element), and is on the
      * location of data elements specified by that DataModel in the given 'organization'.
      * @param element
-     * @param dataClassService
+     * @param
      * @param grailsApplication
      * @param depth
      * @param organization
@@ -42,6 +52,18 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
      */
     static GMCGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = defaultOrganization) {
         return new GMCGridReportXlsxExporter(element, dataClassService, grailsApplication, depth, organization)
+    }
+
+    static GMCGridReportXlsxExporter createWithBuildProgressMonitor(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth, String organization, BuildProgressMonitor buildProgressMonitor) {
+        GMCGridReportXlsxExporter gmcGridReportXlsxExporter = create(element, dataClassService, grailsApplication, depth, organization)
+        gmcGridReportXlsxExporter.buildProgressMonitor = buildProgressMonitor
+        return gmcGridReportXlsxExporter
+    }
+
+    void logToMonitorIfExists(String message) {
+        if (buildProgressMonitor) {
+            buildProgressMonitor.onNext(message)
+        }
     }
 
 
@@ -78,7 +100,11 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
     @Override
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
+
         DataElement dataElement = dataElementRelationship.destination
+
+        logToMonitorIfExists("Printing data element ${dataElement.name}")
+
         List placeholders  = []
         placeholders = dataElement.relatedTo.findAll{ it.dataModel.ext.get(organizationMetadataKey) == organization }
         addToSystemsMap(placeholders, dataElement)
@@ -139,7 +165,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
             }
 
             Closure sourceSystem = {
-                value "${getRelatedToModel(placeholders)}"
+                value "${getRelatedToDataSourceName(placeholders)}"
                 style standardCellStyle
             } as Closure
 
@@ -393,9 +419,14 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
     }
 
-    String getRelatedToModel(List relatedTo){
+    /**
+     * Not the same as the Data Model name! Data Model name has organization and GEL model added on.
+     * @param relatedTo
+     * @return
+     */
+    String getRelatedToDataSourceName(List relatedTo){
         if(relatedTo.size()==1){
-            "${relatedTo[0].dataModel.name}"
+            "${relatedTo[0].dataModel.ext.get(dataSourceNameMetadataKey)}"
         }else if(relatedTo.size()>1){
             multipleSourcesMessage
         }else{

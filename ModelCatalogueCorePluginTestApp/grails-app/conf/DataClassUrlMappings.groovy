@@ -9,6 +9,7 @@ class DataClassUrlMappings {
         "/api/modelCatalogue/core/dataClass/$id/validate"(controller: 'dataClass', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataClass/validate"(controller: 'dataClass', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/dataClass/$id"(controller: 'dataClass', action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataClass/$id/availableReportDescriptors"(controller: 'dataClass', action: 'availableReportDescriptors', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataClass/$id"(controller: 'dataClass', action: 'update', method: HttpMethod.PUT)
         "/api/modelCatalogue/core/dataClass/$id"(controller: 'dataClass', action: 'delete', method: HttpMethod.DELETE)
         "/api/modelCatalogue/core/dataClass/$id/outgoing/search"(controller: 'dataClass', action: 'searchOutgoing', method: HttpMethod.GET)

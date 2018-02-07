@@ -77,14 +77,42 @@ class UserController extends AbstractCatalogueElementController<User> {
         User currentUser = userGormService.findById(userId)
         DataModelFilter filter = DataModelFilter.from(currentUser)
 
+        Long dataModelId = params.long('dataModelId')
+        List<String> roleList = currentRoleList(dataModelId)
+
         Map m = [
                 success: true,
                 username: currentUser.username,
-                roles: currentUser.getAuthorities()*.authority,
+                roles: roleList,
                 id: currentUser.hasProperty('id') ? currentUser.id : null,
                 dataModels: filter.toMap()
         ]
         render(m as JSON)
+    }
+
+    List<String> currentRoleList(Long dataModelId) {
+        List<String> roleList = []
+        if ( SpringSecurityUtils.ifAllGranted(MetadataRolesUtils.ROLE_SUPERVISOR) ) {
+            roleList << MetadataRolesUtils.ROLE_SUPERVISOR
+        }
+        if ( SpringSecurityUtils.ifAllGranted(MetadataRolesUtils.ROLE_ADMIN) ) {
+            roleList << MetadataRolesUtils.ROLE_ADMIN
+        }
+        roleList += uiRolesForDataModel(dataModelId)
+        roleList
+    }
+
+    protected List<String> uiRolesForDataModel(Long dataModelId) {
+        if ( dataModelId ) {
+            DataModel dataModel = dataModelGormService.findById(dataModelId)
+            if ( dataModelAclService.isAdminOrHasAdministrationPermission(dataModel) ) {
+                return MetadataRolesUtils.getRolesForDataModelAdministrationPermission()
+
+            } else if ( dataModelAclService.isAdminOrHasReadPermission(dataModel) ) {
+                return MetadataRolesUtils.getRolesForDataModelReadPermission()
+            }
+        }
+        []
     }
 
     def lastSeen() {
@@ -178,9 +206,4 @@ class UserController extends AbstractCatalogueElementController<User> {
             }
         }
     }
-
-
-
-
-
 }
