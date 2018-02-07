@@ -219,7 +219,7 @@ class ConfigExcelLoader extends ExcelLoader {
                 }
             } else {
                 // we are before the header row or between the header and data rows
-                log.info("Ignoring row ${rowNum}: ${row.toString()}")
+                log.info("Ignoring row ${rowNum}: ${getRowData(row).toString()}")
             }
             ++rowNum
         }
