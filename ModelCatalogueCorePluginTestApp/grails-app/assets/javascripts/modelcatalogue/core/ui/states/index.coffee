@@ -66,10 +66,9 @@ angular.module('mc.core.ui.states', [
         align: "left"
       }
     }
-  notifyAboutMemoryLeak()
   $interval notifyAboutMemoryLeak,
     # 5*1000 # repeat every 5 seconds (for development)
-    30*60*1000 # repeat every 30 minutes
+    15*60*1000 # repeat every 15 minutes
 
 )
 
