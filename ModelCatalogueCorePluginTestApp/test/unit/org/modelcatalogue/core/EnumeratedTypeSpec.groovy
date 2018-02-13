@@ -31,7 +31,7 @@ class EnumeratedTypeSpec extends Specification {
     }
 
 
-    void 'test name can have a maximum of 255 characters'() {
+    void 'test enumAsString can have a maximum of 255 characters'() {
         given:
         EnumeratedType domain = new EnumeratedType()
 
@@ -39,7 +39,7 @@ class EnumeratedTypeSpec extends Specification {
         String str = 'a' * 5_000_001
         domain.enumAsString = str
 
-        then: 'name validation fails'
+        then: 'enumAsString validation fails'
         !domain.validate(['enumAsString'])
         domain.errors['enumAsString'].code == 'maxSize.exceeded'
 
