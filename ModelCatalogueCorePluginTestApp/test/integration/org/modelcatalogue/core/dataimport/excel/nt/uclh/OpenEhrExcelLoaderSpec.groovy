@@ -24,6 +24,7 @@ import spock.lang.Shared
 /**
  * Created by adammilward on 31/08/2017.
  */
+@Ignore
 class OpenEhrExcelLoaderSpec extends AbstractIntegrationSpec {
 
     @Shared String resourcePath = (new File("test/integration/org/modelcatalogue/core/dataimport/excel/nt/uclh")).getAbsolutePath()
@@ -58,7 +59,6 @@ class OpenEhrExcelLoaderSpec extends AbstractIntegrationSpec {
         modelCatalogueSearchService.reindex(true)
     }
 
-    @Ignore
     def "test expected output for OpenEHR #file"() {
 
         when:
