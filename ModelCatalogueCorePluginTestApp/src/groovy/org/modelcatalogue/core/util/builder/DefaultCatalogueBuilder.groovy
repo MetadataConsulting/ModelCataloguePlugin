@@ -596,7 +596,7 @@ class DefaultCatalogueBuilder extends AbstractCatalogueBuilder {
         repository.clear()
         repository.monitor = monitor
         createAutomatically.clear()
-        created.clear()
+        created?.clear()
     }
 
     /**
