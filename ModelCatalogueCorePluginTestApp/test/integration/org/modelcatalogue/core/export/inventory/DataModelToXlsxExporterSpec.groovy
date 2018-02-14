@@ -12,6 +12,7 @@ import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.IgnoreIf
 
+@IgnoreIf({ System.getProperty('IGNORE_OFFICE') })
 class DataModelToXlsxExporterSpec extends AbstractIntegrationSpec {
 
     ElementService elementService

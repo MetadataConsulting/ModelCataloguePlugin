@@ -10,6 +10,7 @@ import org.modelcatalogue.core.DataElement
 /**
  * Created by rickrees on 18/04/2016.
  */
+@IgnoreIf({ System.getProperty('IGNORE_OFFICE') })
 class RareDiseasePhenotypeChangeLogXlsExporterSpec extends AbstractRareDiseasesExporterSpec {
 
 
