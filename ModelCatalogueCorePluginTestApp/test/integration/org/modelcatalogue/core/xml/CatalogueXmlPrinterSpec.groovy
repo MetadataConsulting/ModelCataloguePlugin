@@ -49,6 +49,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         similar newton, 'newton.catalogue.xml'
     }
 
+    @Ignore
     def "write simple data type"() {
         expect:
         similar integer, 'integer.catalogue.xml'
