@@ -8,8 +8,12 @@ import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.audit.AuditService
+import spock.lang.IgnoreIf
 import spock.lang.Shared
 
+@IgnoreIf({
+    System.getProperty('IGNORE_OFFICE')
+})
 class ConfigExcelLoaderSpec extends AbstractIntegrationSpec {
     Boolean doGosh = false
 //    String dataModelName = 'LOINC_TEST7'
