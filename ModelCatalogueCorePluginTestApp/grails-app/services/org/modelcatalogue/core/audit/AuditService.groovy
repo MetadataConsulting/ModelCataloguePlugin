@@ -364,7 +364,7 @@ class AuditService {
     }
 
     CatalogueElement logNewVersionCreated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        Long changeId = auditor.get().logNewVersionCreated(element, loggedUserId()).toBlocking().first()
+        Long changeId = auditor.get().logNewVersionCreated(element, loggedUserId())?.toBlocking()?.first()
         CatalogueElement ce = withParentId(changeId, createDraftBlock)
         if (!ce) {
             return ce
