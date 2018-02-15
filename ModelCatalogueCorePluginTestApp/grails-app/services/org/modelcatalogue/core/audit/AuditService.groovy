@@ -476,7 +476,7 @@ class AuditService {
             return ((GrailsUser) principal).id
         }
         if ( principal.respondsTo('id') ) {
-            return springSecurityService.principal.id as Long
+            return principal.id as Long
         }
         null
     }
