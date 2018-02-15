@@ -37,11 +37,11 @@ class UserRoleGormService implements WarnGormErrors {
 
     @Transactional
     UserRole saveUserRoleByUserAndRole(User user, Role role) {
-        UserRole userRole = findQueryByUserAndRole(user, role).get()
-        if ( userRole ) {
-            return userRole
+        List<UserRole> userRoleList = findQueryByUserAndRole(user, role).list()
+        if ( userRoleList ) {
+            return userRoleList.first()
         }
-        userRole = new UserRole(role: role, user: user)
+        UserRole userRole = new UserRole(role: role, user: user)
         if ( !userRole.save() ) {
             warnErrors(userRole, messageSource)
             transactionStatus.setRollbackOnly()
