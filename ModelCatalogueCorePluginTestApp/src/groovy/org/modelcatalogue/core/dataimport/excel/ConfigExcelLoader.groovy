@@ -7,6 +7,7 @@ import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.springframework.context.ApplicationContext
@@ -16,22 +17,25 @@ import org.springframework.context.ApplicationContext
  */
 @Log
 class ConfigExcelLoader extends ExcelLoader {
+    ElementService elementService
     final String DEFAULT_MU_NAME = null
     final Integer MAX_METADATA_LEN = 2000
     final Integer MAX_NAME_LEN = 255
     final Integer GORM_BATCH_SIZE = 50
     final Integer EXCEL_BATCH_SIZE = 1000
 //    AuditService auditService
-    String dataModelName
+    private String dataModelName
+    private DataModel dataModel = null
     Map<String, Object> headersMap = null
     String classHierarchySeparatorRegEx = "\\."
     String ruleSeparatorRegEx = "\\n"
     Integer headerRow = 1
     Integer dataStartRow = 2
 
-    ConfigExcelLoader(String dataModelName, InputStream xmlInput) {
+    ConfigExcelLoader(String dataModelName, InputStream xmlInput, ElementService elementService) {
         this.dataModelName = dataModelName
         this.headersMap = this.parseXml(xmlInput)
+        this.elementService = elementService
     }
     /**
      * This also processes the tag
@@ -198,6 +202,7 @@ class ConfigExcelLoader extends ExcelLoader {
     }
 
     List<Map<String, String>> getRowMaps(Sheet sheet, headersMap) {
+        dataModel = processDataModel(dataModelName)
         Iterator<Row> rowIt = sheet.rowIterator()
         List<String> headers
         List<Map<String, String>> rowMaps = []
@@ -362,25 +367,25 @@ class ConfigExcelLoader extends ExcelLoader {
     DataModel processDataModel(String dataModelName) {
         //see if an open EHR model already exists, if not create one
         //could consider changing this - if there are multiple versions - should make sure we use the latest one.
-        DataModel dataModel
+        DataModel dm
         List<DataModel> dataModels =  DataModel.findAllByName(dataModelName, [sort: 'versionNumber', order: 'desc'])
         if(dataModels) {
-            dataModel = dataModels.first()
+            dm = dataModels.first()
         }
 
-        if (!dataModel) {
+        if (!dm) {
             log.info("Creating new DataModel: ${dataModelName}")
-            dataModel = new DataModel(name: dataModelName).save()
+            dm = new DataModel(name: dataModelName).save()
         } else {
             log.info("Found Data Model: ${dataModelName}")
             //if one exists, check to see if it's a draft
             // but if it's finalised create a new version
-            if(dataModel.status != ElementStatus.DRAFT) {
+            if(dm.status != ElementStatus.DRAFT) {
                 DraftContext context = DraftContext.userFriendly()
-                dataModel = elementService.createDraftVersion(dataModel, PublishingContext.nextPatchVersion(dataModel.semanticVersion), context)
+                dm = elementService.createDraftVersion(dm, PublishingContext.nextPatchVersion(dm.semanticVersion), context)
             }
         }
-        return dataModel
+        return dm
     }
 
     String[] toStringArray(String s) {
@@ -804,10 +809,10 @@ class ConfigExcelLoader extends ExcelLoader {
      * @param dataModelName
      * @return
      */
-    def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName) {
+    def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap) {
         int rowNum = 1
         if (rowMaps && headersMap) {
-            DataModel dataModel = processDataModel(dataModelName)
+//            DataModel dataModel = processDataModel(dataModelName)
 
             for (Map<String, String> rowMap in rowMaps) {
                 log.info("creating row " + rowNum)
