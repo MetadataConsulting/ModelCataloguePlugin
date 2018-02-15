@@ -39,8 +39,13 @@ class InitSecurityService {
                 [username: 'registered', password: 'registered', apiKey: 'registeredabcdef123456'],
 
         ] ) {
-            if ( !userGormService.findByNameOrUsername(m.username, m.username) ) {
-                User user = new User(name: m.username, username: m.username, enabled: true, password: m.password, email: m.email, apiKey: m.apiKey)
+            if ( !userGormService.findByUsername(m.username as String) ) {
+                User user = new User(name: m.username,
+                        username: m.username,
+                        enabled: true,
+                        password: m.password,
+                        email: m.email,
+                        apiKey: m.apiKey)
                 userGormService.save(user)
             }
         }
