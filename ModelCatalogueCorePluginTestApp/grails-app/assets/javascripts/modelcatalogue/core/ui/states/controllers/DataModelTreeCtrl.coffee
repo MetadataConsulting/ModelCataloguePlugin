@@ -17,7 +17,6 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
         if element.getDataModelId() == currentDataModel?.id
           if element.tagId
             if element.tagId == 'all'
-              console.log('here')
               $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: 'dataElement', status: 'active', tag: 'all'
               return
             if element.tagId == 'none'
