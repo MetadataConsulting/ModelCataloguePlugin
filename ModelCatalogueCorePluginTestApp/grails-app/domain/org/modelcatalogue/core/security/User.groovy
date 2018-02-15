@@ -32,7 +32,7 @@ class User extends CatalogueElement {
             Integer maxUsers = grailsApplication.config.mc.max.active.users as Integer
 
             Integer numOfUsers = User.withNewSession {
-                Role supervisorRole = Role.findByAuthority(UserService.ROLE_SUPERVISOR)
+                Role supervisorRole = Role.findByAuthority(MetadataRoles.ROLE_SUPERVISOR)
 
                 if (!supervisorRole) {
                     return User.countByEnabled(true)

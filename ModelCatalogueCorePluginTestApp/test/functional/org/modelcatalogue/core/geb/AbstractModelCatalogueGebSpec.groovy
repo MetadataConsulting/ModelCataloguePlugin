@@ -18,7 +18,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     // keep the passwords simply stupid, they are only for dev/test or very first setup
     // sauce labs connector for some reason fails with the six in the input
-    def loginAdmin() { loginUser("admin", "admin") }
+    def loginSupervisor() { loginUser("supervisor", "supervisor") }
     def loginViewer() { loginUser("viewer", "viewer") }
     def loginCurator() { loginUser("curator", "curator") }
 

@@ -24,7 +24,7 @@
             <dataElement ref="http://www.example.com/elements/Adhesion"/>
         </dataClass>
     </dataModel>
-    <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
+    <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-supervisor users, the types are always imported as system ones and they need to be approved by the catalogue supervisor first. -->
     <relationshipTypes>
         <relationshipType name="classification" source="org.modelcatalogue.integration.Classification" destination="org.modelcatalogue.integration.CatalogueElement" versionSpecific="true">
             <sourceToDestination label="classifies">Classification can classify multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the classifications filter in the bottom left corner. When classification is finalized all classified elements are finalized as well.</sourceToDestination>

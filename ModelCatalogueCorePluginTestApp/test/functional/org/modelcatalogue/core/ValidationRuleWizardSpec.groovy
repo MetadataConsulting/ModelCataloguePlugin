@@ -10,7 +10,7 @@ import spock.lang.Stepwise
 class ValidationRuleWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
-        login admin
+        login supervisor
 
         when:
         select 'Test 3' select "Business Rules"

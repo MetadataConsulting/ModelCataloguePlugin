@@ -31,7 +31,7 @@ class LoginSpec extends AbstractModelCatalogueGebSpec {
     def "login to model catalogue as an admin"() {
 
         when:
-        loginAdmin()
+        loginSupervisor()
 
         then:
         check adminTag isDisplayed()

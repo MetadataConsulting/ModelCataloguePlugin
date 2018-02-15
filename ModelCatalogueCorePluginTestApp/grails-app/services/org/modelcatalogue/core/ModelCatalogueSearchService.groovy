@@ -106,10 +106,6 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         Map params = paramArgs.toMap()
         List<DataModel> subscribedModels = subscribedModels()
 
-        // if the user doesn't have at least VIEWER role, don't return other elements than finalized
-//        if (!params.status && !false /*modelCatalogueSecurityService.hasRole('VIEWER')*/) {
-//            params.status = 'FINALIZED'
-//        }
 
         String query = "%${search}%"
 

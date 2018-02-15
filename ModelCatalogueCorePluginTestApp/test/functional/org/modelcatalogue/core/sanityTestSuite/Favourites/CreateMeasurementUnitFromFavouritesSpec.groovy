@@ -33,7 +33,7 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
 
     def "Login to model catalogue and select a data model"() {
         when:
-        loginAdmin()
+        loginSupervisor()
         select 'Test 3'
         click favourite
 

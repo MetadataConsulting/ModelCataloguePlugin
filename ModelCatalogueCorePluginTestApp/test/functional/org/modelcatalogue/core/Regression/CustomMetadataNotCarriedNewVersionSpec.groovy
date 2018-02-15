@@ -14,7 +14,7 @@ class CustomMetadataNotCarriedNewVersionSpec extends AbstractModelCatalogueGebSp
 
     def "login to model catalogue and select version"() {
         when:
-        loginAdmin()
+        loginSupervisor()
         select 'Clinical Tags' open 'Versions'
 
         then:

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import groovy.transform.CompileDynamic
+import org.modelcatalogue.core.security.MetadataRoles
 
 import static org.springframework.http.HttpStatus.*
 import grails.plugin.springsecurity.SpringSecurityService
@@ -15,7 +16,6 @@ import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.security.DataModelAclService
-import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -381,11 +381,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected boolean allowSaveAndEdit() {
 
         DataModel dataModel = getDataModel()
-        boolean isCurator = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('CURATOR').join(','))
+        boolean isCurator = SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_CURATOR)
         if ( !dataModel ) {
             return isCurator
         }
-        boolean isAdmin = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('ADMIN').join(','))
+        boolean isAdmin = SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_SUPERVISOR)
         Authentication authentication = springSecurityService.authentication
         isAdmin || (isCurator && aclUtilService.hasPermission(authentication, dataModel, BasePermission.ADMINISTRATION))
     }

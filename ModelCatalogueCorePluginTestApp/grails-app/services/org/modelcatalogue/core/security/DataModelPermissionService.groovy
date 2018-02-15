@@ -26,7 +26,6 @@ class DataModelPermissionService {
 
     public final static Set<String> AUTHORITIES_ALLOWED_TO_HAVE_ACL_ADMIN = [
             MetadataRoles.ROLE_SUPERVISOR,
-            MetadataRoles.ROLE_ADMIN,
             MetadataRoles.ROLE_CURATOR,
     ] as Set<String>
 

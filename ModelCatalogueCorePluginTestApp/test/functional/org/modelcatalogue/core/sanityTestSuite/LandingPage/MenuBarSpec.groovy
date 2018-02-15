@@ -30,7 +30,7 @@ class MenuBarSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue"() {
         when:
-        loginAdmin()
+        loginSupervisor()
 
         then:
         check flash displayed

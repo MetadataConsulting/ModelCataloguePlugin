@@ -10,7 +10,7 @@ import spock.lang.Stepwise
 class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
-        login admin
+        login supervisor
 
         when:
         select 'Test 2' select "Measurement Units"

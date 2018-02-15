@@ -15,7 +15,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
     public static final String FIRST_NEW_ELEMENT_CREATED_CHANGE = "a.change-NEW_ELEMENT_CREATED:first-of-type"
 
     def "go to login"() {
-        loginAdmin()
+        loginSupervisor()
 
         select 'Test 1' select 'Data Types'
 
@@ -63,13 +63,13 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
         expect:
         check 'h3' is 'Users'
-        check { infTableCell(1, 1).find('a', text: 'admin') } displayed
+        check { infTableCell(1, 1).find('a', text: 'supervisor') } displayed
 
         when:
-        click { infTableCell(1, 1).find('a', text: 'admin') }
+        click { infTableCell(1, 1).find('a', text: 'supervisor') }
 
         then:
-        check 'h3' contains 'admin'
+        check 'h3' contains 'supervisor'
 
         check { tab('activity') } displayed
         check { tab('history') } displayed

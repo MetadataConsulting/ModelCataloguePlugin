@@ -30,7 +30,7 @@ class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec 
     void addPolicies() {
 
         when: 'login to model catalogue'
-        loginAdmin()
+        loginSupervisor()
         then:
         check create isDisplayed()
 

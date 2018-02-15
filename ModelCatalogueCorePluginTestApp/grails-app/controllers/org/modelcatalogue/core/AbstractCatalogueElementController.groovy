@@ -28,7 +28,6 @@ import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.DestinationClass
 import org.modelcatalogue.core.util.OrderedMap
@@ -311,14 +310,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def index(Integer max) {
         handleParams(max)
 
-        //before interceptor deals with this security - this is only applicable to data models and users
-
-        boolean hasRoleViewer = modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())
-        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !hasRoleViewer) {
-            unauthorized()
-            return
-        }
-
         ListWithTotalAndType<T> items
 
         //use elasticsearch for anything that isn't a data model or a user list
@@ -467,7 +458,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             dataModel = instance.dataModel
         }
 
-        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles(authority))
+        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(authority)
         dataModel && ( isCuratorOrAdminOrSupervisor || dataModelAclService.hasAdministratorPermission(dataModel))
     }
 
@@ -915,19 +906,14 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected ListWrapper<T> getAllEffectiveItems(Integer max) {
 
         if (params.status?.toLowerCase() == 'active') {
-            if (modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())){
-                return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                    'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
-                }), overridableDataModelFilter)
-            }
             return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'eq' 'status', ElementStatus.FINALIZED
+                'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
             }), overridableDataModelFilter)
         }
 
         if (params.status) {
             return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER', getDataModel()))
+                'in' 'status', ElementService.getStatusFromParams(params)
             }), overridableDataModelFilter)
         }
 

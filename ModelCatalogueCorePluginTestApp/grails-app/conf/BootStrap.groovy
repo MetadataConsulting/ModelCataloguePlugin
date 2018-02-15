@@ -1,3 +1,4 @@
+
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -61,7 +62,7 @@ class BootStrap {
         initSecurityService.initRoles()
 
         log.info 'init role hierarchy'
-        initSecurityService.initRoles()
+        initSecurityService.initRoleHierarchyEntry()
 
         if ( isDev() ) {
             initDev()
@@ -161,9 +162,6 @@ class BootStrap {
 
                 log.info 'init policies and tags'
                 initPoliciesAndTagsService.initPoliciesAndTags()
-
-                log.info 'init roles'
-                initSecurityService.initRoles()
 
                 log.info 'init users'
                 initSecurityService.initUsers()

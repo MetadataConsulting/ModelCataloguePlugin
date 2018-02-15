@@ -38,3 +38,4 @@ mc-config.groovy
 
 # Grails asset plugin cache
 *.asscache
+ModelCatalogueCorePluginTestApp/null

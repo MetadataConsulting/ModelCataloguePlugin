@@ -4,6 +4,7 @@ import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserService
 import org.springframework.context.MessageSource
@@ -15,6 +16,12 @@ class UserGormService implements WarnGormErrors {
     @Transactional
     User findById(long id) {
         User.get(id)
+    }
+
+    @Transactional(readOnly = true)
+    List<User> findAll(Map args) {
+        DetachedCriteria<User> query = User.where {}
+        query.list(args)
     }
 
     /**
@@ -30,7 +37,7 @@ class UserGormService implements WarnGormErrors {
             return null
         }
 
-        if (user.authorities.contains(UserService.ROLE_SUPERVISOR)) {
+        if (user.authorities.contains(MetadataRoles.ROLE_SUPERVISOR)) {
             user.errors.rejectValue('enabled', 'user.cannot.edit.supervisor', 'Cannot edit supervisor account')
             return user
         }
@@ -86,6 +93,19 @@ class UserGormService implements WarnGormErrors {
 
     protected DetachedCriteria<User> findQueryByUsername(String usernameParam) {
         User.where { username == usernameParam }
+    }
+
+    @Transactional(readOnly = true)
+    String findApiKeyByUsername(String username) {
+        String apiKey = findQueryByUsername(username).projections {
+            property('apiKey')
+        }.get()
+    }
+
+    @Transactional
+    void updateApiKeyByUsername(String username, String apiKey) {
+        DetachedCriteria<User> query = findQueryByUsername(username)
+        query.updateAll(apiKey: apiKey)
     }
 
     @Transactional(readOnly = true)

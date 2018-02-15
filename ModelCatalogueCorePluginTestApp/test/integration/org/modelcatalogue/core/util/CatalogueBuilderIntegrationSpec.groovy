@@ -1037,12 +1037,12 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         final String valueDomainId2 = 'http://www.example.com/201'
 
 
-        User admin = User.findByName('admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
+        User supervisor = User.findByName('supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: 'supervisor').save(failOnError: true)
         DataModel assetDataModel = new DataModel(name: assetModelName).save(failOnError: true)
         Asset asset = new Asset(dataModel: assetDataModel, name: testAssetName).save(failOnError: true)
 
         expect:
-        admin
+        supervisor
         asset.dataModel == assetDataModel
         asset in assetDataModel.declares
 
@@ -1050,7 +1050,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         build {
             dataModel name: assetModelName, {
                 dataClass name: dataClassName, {
-                    rel 'favourite' from(ref(admin.getDefaultModelCatalogueId(true)))
+                    rel 'favourite' from(ref(supervisor.getDefaultModelCatalogueId(true)))
                     rel 'relatedTo' from(ref(asset.getDefaultModelCatalogueId(true)))
                 }
             }
@@ -1061,7 +1061,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         when:
         build {
             dataModel name: assetModelName, {
-                rel 'classificationFilter' to(ref(admin.getDefaultModelCatalogueId(true))) {}
+                rel 'classificationFilter' to(ref(supervisor.getDefaultModelCatalogueId(true))) {}
                 dataClass name: dataClassName, {
                     rel 'synonym' from ref('http://www.example.com/100.1')
                     rel 'synonym' from 'Foo', 'Bar'

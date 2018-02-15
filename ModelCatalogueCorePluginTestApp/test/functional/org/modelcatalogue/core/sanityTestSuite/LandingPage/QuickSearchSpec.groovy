@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import static org.modelcatalogue.core.geb.Common.admin
+import static org.modelcatalogue.core.geb.Common.supervisor
 import static org.modelcatalogue.core.geb.Common.getModalDialog
 import static org.modelcatalogue.core.geb.Common.getNameLabel
 import static org.modelcatalogue.core.geb.Common.getSave
@@ -29,7 +29,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 
 
     def "go to login"() {
-        login admin
+        login supervisor
 
         when:
         select 'Test 1' select "Business Rules"

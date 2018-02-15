@@ -25,7 +25,7 @@ class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec{
     def "search option"() {
 
         when:
-         loginAdmin()
+         loginSupervisor()
         then:
         check modelCatalogue displayed
 

@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.DataModelAclService
-import org.modelcatalogue.core.security.MetadataRolesUtils
 import spock.lang.Specification
 
 @TestFor(UserController)

@@ -31,7 +31,7 @@ class RelationshipRelatedToSpec extends AbstractModelCatalogueGebSpec{
     def "login to model catalogue and select a data model"() {
 
         when:
-        loginAdmin()
+        loginSupervisor()
         select'Test 3'
 
         then:'verify title of the page '

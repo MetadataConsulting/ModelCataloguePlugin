@@ -23,7 +23,7 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
 
 
     def "search for patient identity details"() {
-        login admin
+        login supervisor
 
         go "#/dataModels"
 

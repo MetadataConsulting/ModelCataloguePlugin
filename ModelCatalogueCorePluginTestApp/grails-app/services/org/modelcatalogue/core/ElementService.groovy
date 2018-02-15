@@ -52,19 +52,19 @@ class ElementService implements Publisher<CatalogueElement> {
 
 //    NONE OF THESE ARE USED OR IMPLEMENTED - Commenting them out - will remove
 //    List<CatalogueElement> list(Map params = [:]) {
-//        CatalogueElement.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
+//        CatalogueElement.findAllByStatusInList(getStatusFromParams(params), params)
 //    }
 //
 //    public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
-//        resource.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
+//        resource.findAllByStatusInList(getStatusFromParams(params), params)
 //    }
 //
 //    Long count(params = [:]) {
-//        CatalogueElement.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+//        CatalogueElement.countByStatusInList(getStatusFromParams(params))
 //    }
 //
 //    public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
-//        resource.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+//        resource.countByStatusInList(getStatusFromParams(params))
 //    }
 
     DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {
@@ -416,15 +416,12 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-    static List<ElementStatus> getStatusFromParams(params, boolean canViewDrafts) {
+    static List<ElementStatus> getStatusFromParams(params) {
         if (!params.status) {
             return ImmutableList.copyOf(ElementStatus.values().toList())
         }
         if (params.status == 'active') {
-            if (canViewDrafts) {
-                return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
-            }
-            return ImmutableList.of(ElementStatus.FINALIZED)
+            return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
         }
         if (params.status instanceof ElementStatus) {
             return ImmutableList.of(params.status as ElementStatus)
@@ -432,15 +429,12 @@ class ElementService implements Publisher<CatalogueElement> {
         return ImmutableList.of(ElementStatus.valueOf(params.status.toString().toUpperCase()))
     }
 
-    static List<ElementStatus> findAllElementStatus(String status, boolean canViewDrafts) {
+    static List<ElementStatus> findAllElementStatus(String status) {
         if (!status) {
             return ImmutableList.copyOf(ElementStatus.values().toList())
         }
         if (status == 'active') {
-            if (canViewDrafts) {
-                return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
-            }
-            return ImmutableList.of(ElementStatus.FINALIZED)
+            return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
         }
         ImmutableList.of(ElementStatus.valueOf(status.toUpperCase()))
     }

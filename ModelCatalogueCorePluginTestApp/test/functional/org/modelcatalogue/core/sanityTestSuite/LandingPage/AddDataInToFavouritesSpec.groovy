@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import static org.modelcatalogue.core.geb.Common.admin
+import static org.modelcatalogue.core.geb.Common.supervisor
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
@@ -26,7 +26,7 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue"() {
         when:
-        login admin
+        login supervisor
 
         then:
         check creates displayed

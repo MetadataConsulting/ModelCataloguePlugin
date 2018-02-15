@@ -32,7 +32,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "go to login"() {
-        login admin
+        login supervisor
 
         expect:
         waitFor(120) { browser.title == 'Data Models' }
@@ -168,7 +168,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
             def uuid = UUID.randomUUID().toString()
 
         when:
-            login admin
+            login supervisor
             click createNewDataModel
 
         then: 'the model dialog opens'

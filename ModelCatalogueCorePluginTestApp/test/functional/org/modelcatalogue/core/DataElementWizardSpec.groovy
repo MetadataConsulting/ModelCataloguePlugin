@@ -13,7 +13,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
     static final String detailSectionFormItemContent = ".metadata-form-item-content"
 
     def "login and select Data Element"() {
-        login admin
+        login supervisor
         select 'Test 1' open 'Data Elements' select 'No tags'
 
         expect:

@@ -29,7 +29,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     private static final String NEW_DATA_CLASS_NAME = "New ${UUID.randomUUID().toString()}"
 
     def "go to login"() {
-        login admin
+        login supervisor
 
         select 'Test 2'
 

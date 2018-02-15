@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import static org.modelcatalogue.core.geb.Common.getAdmin
+import static org.modelcatalogue.core.geb.Common.getSupervisor
 import static org.modelcatalogue.core.geb.Common.getModalHeader
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
@@ -19,7 +19,7 @@ class FastActionsVersionSpec extends AbstractModelCatalogueGebSpec{
 
 
     def "login to model catalogue "() {
-        login admin
+        login supervisor
 
         expect:
         check create displayed

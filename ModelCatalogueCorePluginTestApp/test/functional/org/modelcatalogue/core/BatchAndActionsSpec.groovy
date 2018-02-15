@@ -34,7 +34,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
 
     def "see test batch in action "() {
-        loginAdmin()
+        loginSupervisor()
 
         click showBatches
 

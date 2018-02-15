@@ -49,7 +49,7 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
 
     def "login to model catalogue and create data model"() {
         when:
-        loginAdmin()
+        loginSupervisor()
 
         then:
         check createButton isDisplayed()

@@ -26,7 +26,7 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue and navigate to data model"() {
         when:
-        loginAdmin()
+        loginSupervisor()
         select 'Test 1'
         then:
         check rightSideTitle contains 'Test 1'

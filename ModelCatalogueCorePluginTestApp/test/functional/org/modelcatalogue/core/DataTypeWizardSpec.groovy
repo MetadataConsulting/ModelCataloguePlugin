@@ -54,7 +54,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String primitiveContent = '[data-view-name="Measurement Unit"]'
 
     def "go to login"() {
-        login admin
+        login supervisor
 
         when:
         select 'NHIC' select 'Data Types'

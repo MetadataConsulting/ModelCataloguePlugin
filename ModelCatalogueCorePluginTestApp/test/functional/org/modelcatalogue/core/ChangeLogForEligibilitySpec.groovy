@@ -18,7 +18,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
         CatalogueContent.create('.menu-item-link', text: 'Change Log for RD Eligibility (Excel)')
 
     def "go to login"() {
-        login Common.admin
+        login Common.supervisor
 
         expect:
             waitFor(120) { browser.title == 'Data Models' }

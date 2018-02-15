@@ -73,7 +73,7 @@ class RelationshipService {
         Lists.fromCriteria(params,
                 direction.composeWhere(element,
                         type,
-                        ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/),
+                        ElementService.getStatusFromParams(params),
                         element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(currentUser())))
     }
 

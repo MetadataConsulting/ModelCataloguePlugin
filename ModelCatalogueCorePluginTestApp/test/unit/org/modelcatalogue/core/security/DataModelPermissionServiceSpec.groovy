@@ -30,7 +30,6 @@ class DataModelPermissionServiceSpec extends Specification {
         expected | authorities
         true     | [MetadataRoles.ROLE_SUPERVISOR, MetadataRoles.ROLE_USER]
         true     | [MetadataRoles.ROLE_CURATOR, MetadataRoles.ROLE_USER]
-        true     | [MetadataRoles.ROLE_ADMIN, MetadataRoles.ROLE_USER]
         false    | [MetadataRoles.ROLE_USER]
         false    | []
         description = expected ? 'can be granted ACL ADMIN' : 'cannot be granted ACL ADMIN'
@@ -188,8 +187,5 @@ class DataModelPermissionServiceSpec extends Specification {
         'message' | BasePermission.ADMINISTRATION | new UserMissingAnyGranted()
         'message' | BasePermission.ADMINISTRATION | new UserNotFoundEvent()
         description = expected != null ? 'error message is returned' : 'no error message is return'
-
     }
-
-
 }

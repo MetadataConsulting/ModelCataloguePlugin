@@ -46,7 +46,7 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
 
     def "login to model catalogue and create a data model"() {
         when:
-        loginAdmin()
+        loginSupervisor()
 
         then:
         check createButton isDisplayed()

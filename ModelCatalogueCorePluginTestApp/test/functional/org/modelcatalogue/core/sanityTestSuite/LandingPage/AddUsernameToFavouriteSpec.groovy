@@ -22,7 +22,7 @@ class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue"() {
         when:
-        loginAdmin()
+        loginSupervisor()
 
         then:
         check adminTag displayed

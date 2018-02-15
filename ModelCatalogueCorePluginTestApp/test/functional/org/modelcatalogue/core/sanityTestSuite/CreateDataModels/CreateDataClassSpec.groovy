@@ -54,7 +54,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
 
     def "login and navigate to the model "() {
         when:
-        loginAdmin()
+        loginSupervisor()
         select 'Test 3'
         selectInTree 'Data Classes'
 

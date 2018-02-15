@@ -33,7 +33,7 @@ class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
 
     def "login and navigate to Data Model"() {
         when:
-        loginAdmin()
+        loginSupervisor()
 
         select 'Test 3'
         selectInTree 'Data Elements'

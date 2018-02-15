@@ -17,7 +17,7 @@ import org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader
 import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.persistence.UserGormService
-import org.modelcatalogue.core.security.MetadataRolesUtils
+import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -99,8 +99,8 @@ class DataImportController  {
 
         String confType = file.getContentType()
 
-        boolean isAdmin = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('ADMIN').join(','))
-        DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
+        boolean isSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_SUPERVISOR)
+        DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService, isSupervisor)
 
         Long userId = modelCatalogueSecurityService.currentUser?.id
 

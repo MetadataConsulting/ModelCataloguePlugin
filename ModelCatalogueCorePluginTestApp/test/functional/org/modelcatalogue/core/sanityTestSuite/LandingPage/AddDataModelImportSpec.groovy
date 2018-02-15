@@ -26,7 +26,7 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
     def "login to model catalogue and select a data model"() {
 
         when:
-        loginAdmin()
+        loginSupervisor()
         Thread.sleep(4000l)
         select 'Test 3'
 
