@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import static org.modelcatalogue.core.geb.Common.create
-import static org.modelcatalogue.core.geb.Common.delete
 import static org.modelcatalogue.core.geb.Common.description
 import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getPick

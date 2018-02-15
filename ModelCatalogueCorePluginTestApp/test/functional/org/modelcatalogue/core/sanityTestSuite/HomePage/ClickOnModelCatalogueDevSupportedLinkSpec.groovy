@@ -1,11 +1,9 @@
 package org.modelcatalogue.core.sanityTestSuite.HomePage
 
-import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
 @IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })

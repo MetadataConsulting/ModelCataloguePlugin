@@ -5,11 +5,8 @@ import grails.test.mixin.TestFor
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionParameter
-import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.persistence.DataElementGormService
 import spock.lang.Specification
-import spock.lang.Unroll
-
 
 @TestFor(MappingSuggestionsService)
 @Mock([Action, ActionParameter])

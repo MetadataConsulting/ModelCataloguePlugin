@@ -13,7 +13,6 @@ import spock.lang.IgnoreIf
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-
 //@IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore
 @Stepwise

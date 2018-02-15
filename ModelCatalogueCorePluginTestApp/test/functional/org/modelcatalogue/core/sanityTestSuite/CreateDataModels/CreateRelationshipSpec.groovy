@@ -2,7 +2,6 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import static org.modelcatalogue.core.geb.Common.*
 import geb.module.Select
-import groovy.transform.NotYetImplemented
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf

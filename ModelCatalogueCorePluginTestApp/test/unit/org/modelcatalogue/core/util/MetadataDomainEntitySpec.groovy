@@ -3,7 +3,6 @@ package org.modelcatalogue.core.util
 import spock.lang.Specification
 import spock.lang.Unroll
 
-
 class MetadataDomainEntitySpec extends Specification {
 
     @Unroll

@@ -1,8 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
-import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import spock.lang.Ignore
 

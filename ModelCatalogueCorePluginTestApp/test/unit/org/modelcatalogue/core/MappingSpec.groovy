@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 import spock.lang.Specification
 

@@ -5,13 +5,8 @@ import geb.Browser
 import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
 import geb.waiting.WaitTimeoutException
-import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.StaleElementReferenceException
-import org.openqa.selenium.WebElement
-import org.openqa.selenium.logging.LogEntries
-import org.openqa.selenium.logging.LogEntry
-import org.openqa.selenium.logging.LogType
 import org.openqa.selenium.Keys
 
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {

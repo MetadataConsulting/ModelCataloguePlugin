@@ -4,7 +4,6 @@ import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import org.modelcatalogue.core.geb.Common
-import org.modelcatalogue.core.geb.ScrollDirection
 import spock.lang.Ignore
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
