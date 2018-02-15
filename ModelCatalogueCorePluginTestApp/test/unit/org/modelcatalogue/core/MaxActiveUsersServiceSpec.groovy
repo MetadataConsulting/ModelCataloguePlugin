@@ -43,9 +43,9 @@ class MaxActiveUsersServiceSpec extends Specification {
         service.numberOfEnabledUsers() == 2
     }
 
-    def "maxActiveUsers returns true if property mc.max.active.users is not set"() {
+    def "maxActiveUsers returns false if property mc.max.active.users is not set"() {
         expect:
-        service.maxActiveUsers()
+        !service.maxActiveUsers()
     }
 
     def "maxActiveUsers"() {

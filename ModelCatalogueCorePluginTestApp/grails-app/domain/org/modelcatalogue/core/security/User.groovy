@@ -19,23 +19,11 @@ class User extends CatalogueElement {
 
     String apiKey
 
-    MaxActiveUsersService maxActiveUsersService
-
-    static transients = ['maxActiveUsersService']
-
     static constraints = {
         username blank: false, unique: true, maxSize: 255
         password blank: false, maxSize: 255
         email    nullable: true, email: true, unique: true, maxSize: 255
         apiKey   nullable: true, maxSize: 255
-        enabled validator: { val, obj, errors ->
-            if ( maxActiveUsersService.maxActiveUsers() ) {
-                errors.rejectValue('enabled', 'mc.max.active.users.limit.reached', [maxActiveUsersService.maxUsers] as Object[], "Limit of ${maxActiveUsersService.maxUsers} users has been reached")
-                return
-            }
-            return true
-
-        }
     }
 
     static relationships = [
