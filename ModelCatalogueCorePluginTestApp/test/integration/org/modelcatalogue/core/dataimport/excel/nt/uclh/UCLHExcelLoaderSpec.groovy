@@ -18,6 +18,7 @@ import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
+import spock.lang.IgnoreIf
 import spock.lang.Shared
 
 import java.nio.charset.StandardCharsets
@@ -25,7 +26,9 @@ import java.nio.charset.StandardCharsets
 /**
  * Created by david on 04/08/2017.
  */
-
+@IgnoreIf({
+    System.getProperty('IGNORE_OFFICE')
+})
 class UCLHExcelLoaderSpec extends AbstractIntegrationSpec {
 
     @Shared ElementService elementService

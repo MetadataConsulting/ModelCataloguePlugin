@@ -1,5 +1,7 @@
 package org.modelcatalogue.gel.export
 
+import spock.lang.IgnoreIf
+
 import static junit.framework.Assert.assertEquals
 import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.hibernate.SessionFactory
@@ -12,6 +14,7 @@ import spock.lang.Ignore
  * Test for Data Spec change log reports class.
  */
 @Ignore
+@IgnoreIf({ System.getProperty('IGNORE_OFFICE') })
 class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
 
     def "Export data spec change logs to xls"() {

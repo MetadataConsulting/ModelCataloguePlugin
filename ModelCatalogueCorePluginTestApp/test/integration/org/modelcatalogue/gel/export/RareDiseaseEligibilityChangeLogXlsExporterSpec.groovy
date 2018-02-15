@@ -9,7 +9,10 @@ import org.modelcatalogue.core.DataClass
 /**
  * Test for RD eligibility criteria change log reports class using test model with similar format to expected data.
  */
-@IgnoreIf( { System.getProperty('spock.ignore.slow') })
+@IgnoreIf( {
+    System.getProperty('spock.ignore.slow') ||
+    System.getProperty('IGNORE_OFFICE')
+})
 class RareDiseaseEligibilityChangeLogXlsExporterSpec extends AbstractRareDiseasesExporterSpec {
 
     def "Export rare disease eligibility change logs to xls"() {
