@@ -31,8 +31,8 @@ class MaxActiveUsersService {
     }
 
     boolean maxActiveUsers() {
-        if (!maxUsers) {
-            return true
+        if ( !maxUsers ) {
+            return false
         }
 
         Number numOfUsers = numberOfEnabledUsers()
