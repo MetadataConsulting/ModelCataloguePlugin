@@ -12,13 +12,13 @@ environments {
     development {
         dataSource {
             pooled = true
-            driverClassName = System.getenv('MDX_DB_DRIVER') ?: 'org.h2.Driver'
-            if ( System.getenv('MC_JDBC_DRIVER') == 'com.mysql.jdbc.Driver' ) {
-                dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
-            }
-            url = System.getenv('MDX_DB_URL') ?: "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
-            username = System.getenv('MDX_DB_USERNAME') ?: 'sa'
-            password = System.getenv('MDX_DB_PASSWORD') ?: ''
+            driverClassName = 'com.mysql.jdbc.Driver'//System.getenv('MDX_DB_DRIVER') ?: 'org.h2.Driver'
+            //if ( System.getenv('MC_JDBC_DRIVER') == 'com.mysql.jdbc.Driver' ) {
+              //  dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
+           // }
+            url = 'jdbc:mysql://localhost:3306/nhsdemo'///System.getenv('MDX_DB_URL') ?: "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+            username = 'mdradmin' //System.getenv('MDX_DB_USERNAME') ?: 'sa'
+            password = 'mdradmin123'//System.getenv('MDX_DB_PASSWORD') ?: ''
             dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
         }
     }

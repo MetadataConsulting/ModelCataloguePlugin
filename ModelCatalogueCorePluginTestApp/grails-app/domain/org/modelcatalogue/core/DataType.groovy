@@ -6,9 +6,9 @@ import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.scripting.Validating
 import org.modelcatalogue.core.scripting.ValueValidator
-import org.modelcatalogue.core.scripting.DataTypeRuleScript
+import org.modelcatalogue.core.util.DataTypeRuleScript
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.scripting.SecuredRuleExecutor
+import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 /**
  * A Data Type is like a primitive type
@@ -66,8 +66,8 @@ class DataType extends CatalogueElement implements Validating {
 //        ValueValidator.validateRule(this, x)
 //    }
     boolean validateRule(Object x) {
-        rule = processDtRule(rule)
-        ValueValidator.validateRule(this, x)
+        rule = processDtRule(x)
+        ValueValidator.validateRule(this, rule)
     }
 
     String processDtRule(String rule) {
