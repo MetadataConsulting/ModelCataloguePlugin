@@ -14,7 +14,8 @@ import spock.lang.Ignore
 import spock.lang.Unroll
 
 @IgnoreIf({
-    System.getProperty('IGNORE_OFFICE')
+    System.getProperty('IGNORE_OFFICE')||
+        System.getenv('JENKINS_IGNORE')
 })
 class ConfigStatelessExcelLoaderSpec extends AbstractIntegrationSpec {
 

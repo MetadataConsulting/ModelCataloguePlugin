@@ -11,7 +11,8 @@ import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.IgnoreIf
 
-@IgnoreIf( { System.getProperty('IGNORE_OFFICE') })
+@IgnoreIf( { System.getProperty('IGNORE_OFFICE') }||
+    System.getenv('JENKINS_IGNORE'))
 class ExcelExporterSpec extends AbstractIntegrationSpec {
 
     public static final String ROOT_DATA_MODEL_NAME = 'Grid Report Data Model'

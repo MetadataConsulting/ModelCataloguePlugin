@@ -12,7 +12,8 @@ import spock.lang.IgnoreIf
 import spock.lang.Shared
 
 @IgnoreIf({
-    System.getProperty('IGNORE_OFFICE')
+    System.getProperty('IGNORE_OFFICE')||
+    System.getenv('JENKINS_IGNORE')
 })
 class ConfigExcelLoaderSpec extends AbstractIntegrationSpec {
     Boolean doGosh = false
