@@ -845,10 +845,12 @@ class ConfigExcelLoader extends ExcelLoader {
         if (!workbook) {
             throw new IllegalArgumentException("Excel file contains no worksheet!")
         }
+
         Sheet sheet = workbook.getSheetAt(index)
         List<Map<String,String>> rowMaps = getRowMaps(sheet, headersMap)
         //Iterate through the modelMaps to build new DataModel
         processRowMaps(rowMaps, headersMap)
+
     }
     /**
      * This thing with headersMap is done in a particular way to generically handle a few excel formats;
