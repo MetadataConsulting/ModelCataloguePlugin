@@ -59,19 +59,19 @@ class NorthThamesMappingReportXlsxSqlExporter {
     private List getMappedDataElements(String lpcModel = lpcModelName, String localModel = localModelName, String loincModel = loincModelName, String gelModel = gelModelName){
         String query = '''
 SELECT DISTINCT
-	IFNULL(lpc_dm.`name`, '') AS 'lpc_model',
-	IFNULL(lpc.`code`, '') AS 'lpc_code',
-	IFNULL(lpc.`name`, '') AS 'lpc_name',
-	IF(wpath.`code` IS NULL, '', wpath_dm.`name`) AS 'local_model',
-	IFNULL(wpath.`code`, '') AS 'local_code',
-	IFNULL(wpath.`name`, '') AS 'local_name',
-	IFNULL(loinc.`code`, '') AS 'loinc_code',
-	IFNULL(loinc.`name`, '') AS 'loinc_name',
-	IFNULL(loinc.system, '') AS 'loinc_system',
-	IFNULL(gel.`code`, '') AS 'gel_code',
-	IFNULL(gel.`name`, '') AS 'gel_name',
-	IFNULL(gel.openehr, '') AS 'gel_openehr',
-	IFNULL(lpc.ref_range, '') AS 'ref_range'
+	IFNULL(lpc_dm.`name`, '') AS `lpc_model`,
+	IFNULL(lpc.`code`, '') AS `lpc_code`,
+	IFNULL(lpc.`name`, '') AS `lpc_name`,
+	IF(wpath.`code` IS NULL, '', wpath_dm.`name`) AS `local_model`,
+	IFNULL(wpath.`code`, '') AS `local_code`,
+	IFNULL(wpath.`name`, '') AS `local_name`,
+	IFNULL(loinc.`code`, '') AS `loinc_code`,
+	IFNULL(loinc.`name`, '') AS `loinc_name`,
+	IFNULL(loinc.system, '') AS `loinc_system`,
+	IFNULL(gel.`code`, '') AS `gel_code`,
+	IFNULL(gel.`name`, '') AS `gel_name`,
+	IFNULL(gel.openehr, '') AS `gel_openehr`,
+	IFNULL(lpc.ref_range, '') AS `ref_range`
 FROM
 	(catalogue_element AS lpc_dm, catalogue_element AS wpath_dm, catalogue_element AS loinc_dm, catalogue_element AS gel_dm)
 	JOIN (
@@ -114,7 +114,7 @@ WHERE
 	AND gel_dm.id = IFNULL((SELECT id FROM catalogue_element JOIN data_model USING (id) WHERE `name` = :gelModel ORDER BY version_number DESC LIMIT 1), (SELECT id FROM data_element ORDER BY id LIMIT 1))
 	AND (wpath.`code` IS NOT NULL OR loinc.`code` IS NOT NULL OR gel.`code` IS NOT NULL)
 ORDER BY
-	lpc.`name`, wpath.`code`, loinc.`code`, gel.`code`
+    `lpc_name`, `local_model`, `loinc_code`, `gel_code`
 '''
         final session = sessionFactory.currentSession
         final sqlQuery = session.createSQLQuery(query)

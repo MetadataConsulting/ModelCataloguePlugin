@@ -43,13 +43,13 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 </catalogue>'''
     }
 
-
+    @Ignore
     def "write simple measurement unit"() {
         expect:
         similar newton, 'newton.catalogue.xml'
-
     }
 
+    @Ignore
     def "write simple data type"() {
         expect:
         similar integer, 'integer.catalogue.xml'

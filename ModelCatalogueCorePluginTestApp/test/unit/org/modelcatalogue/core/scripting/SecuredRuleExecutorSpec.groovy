@@ -1,15 +1,12 @@
-package org.modelcatalogue.core.util
+package org.modelcatalogue.core.scripting
 
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 import spock.lang.Specification
 import spock.lang.Unroll
 
 @Unroll
 class SecuredRuleExecutorSpec extends Specification {
 
-    DataType x = new DataType()
-    SecuredRuleExecutor executor = [x: x]
+    SecuredRuleExecutor executor = [x: new Object()]
 
     static List<String> VALID_EXPRESSIONS = [
         "x",
@@ -25,7 +22,7 @@ class SecuredRuleExecutorSpec extends Specification {
         "throw new RuntimeException()",
         "x.delete()",
         "package org.modelcatalogue.core.util",
-        "import org.modelcatalogue.core.scripting.SecuredRuleExecutor",
+        "import org.modelcatalogue.core.util.SecuredRuleExecutor",
         "y",
         "x.unitOfMeasure = null"
 

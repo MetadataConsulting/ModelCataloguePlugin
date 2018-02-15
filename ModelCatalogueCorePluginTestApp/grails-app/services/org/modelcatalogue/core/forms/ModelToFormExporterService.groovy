@@ -12,7 +12,7 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.util.Metadata
-import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.DataType as FormDataType
 import org.modelcatalogue.crf.model.GenericItem

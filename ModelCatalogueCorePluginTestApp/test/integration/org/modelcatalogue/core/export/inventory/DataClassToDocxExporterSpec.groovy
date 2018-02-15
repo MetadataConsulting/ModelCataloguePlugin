@@ -11,6 +11,9 @@ import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 
+@IgnoreIf({
+    System.getProperty('IGNORE_OFFICE')
+})
 class DataClassToDocxExporterSpec extends AbstractIntegrationSpec {
 
     ElementService elementService
