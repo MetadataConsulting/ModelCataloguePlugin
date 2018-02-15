@@ -6,7 +6,6 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.persistence.UserGormService
-import org.modelcatalogue.core.persistence.UserRoleGormService
 import org.modelcatalogue.core.reports.RegisterReportDescriptorsService
 import org.modelcatalogue.core.security.*
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
@@ -33,7 +32,6 @@ class BootStrap {
     MetadataSecurityService metadataSecurityService
     InitPoliciesAndTagsService initPoliciesAndTagsService
     SetupSimpleCsvTransformationService setupSimpleCsvTransformationService
-    UserRoleGormService userRoleGormService
     UserGormService userGormService
     DataModelAclService dataModelAclService
 
