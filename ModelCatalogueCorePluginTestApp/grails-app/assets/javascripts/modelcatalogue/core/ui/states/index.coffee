@@ -55,6 +55,22 @@ angular.module('mc.core.ui.states', [
 
   $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
     $log.error "ui.router state change error when changing from state [#{fromState.name}] to [#{toState.name}]", error
+
+
+  notifyAboutMemoryLeak = ->
+    $.notify {
+      message: "Reminder: There is a memory leak (when you switch pages the content is not cleared from the browser memory). We are working on fixing it but in the meantime if the app gets slow please refresh the page. This will clear the memory."
+    }, {
+      type: "warning",
+      placement: {
+        from: "bottom",
+        align: "left"
+      }
+    }
+  $interval notifyAboutMemoryLeak,
+    # 5*1000 # repeat every 5 seconds (for development)
+    15*60*1000 # repeat every 15 minutes
+
 )
 
 .config(($urlRouterProvider, $uibModalProvider) ->
