@@ -286,7 +286,7 @@ abstract class AbstractCatalogueElementService<T extends CatalogueElement> imple
                 : null
 
         RelationshipDefinition definition = buildRelationshipDefinition(definitionBuilder, dataModel, objectToBind)
-        boolean alreadyExisting = relationshipService.findExistingRelationship(definition)
+        boolean existsRelationshipWithoutChanges = relationshipService.existsRelationshipWithoutChanges(definition)
 
         if (otherWayDefinitionBuilder) {
             RelationshipDefinition otherwayDefinition = buildRelationshipDefinition(otherWayDefinitionBuilder, dataModel, objectToBind)
@@ -294,15 +294,15 @@ abstract class AbstractCatalogueElementService<T extends CatalogueElement> imple
         }
         
         Relationship rel = addRelationshipFromRelationshipDefinition(definition)
-        buildRelationAddEvent(rel, alreadyExisting, outgoing, source)
+        buildRelationAddEvent(rel, existsRelationshipWithoutChanges, outgoing, source)
     }
 
-    MetadataResponseEvent buildRelationAddEvent(Relationship rel, boolean alreadyExisting, Boolean outgoing, CatalogueElement source) {
+    MetadataResponseEvent buildRelationAddEvent(Relationship rel, boolean existsRelationshipWithoutChanges, Boolean outgoing, CatalogueElement source) {
         if ( rel.hasErrors() ) {
             return new RelationshipWithErrorsEvent(relationship: rel)
         }
         RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
-        if ( alreadyExisting ) {
+        if ( existsRelationshipWithoutChanges ) {
             return new AlreadyExistingRelationEvent(rel: rel, source: source, direction: direction)
         }
         new RelationAddedEvent(rel: rel, source: source, direction: direction)
