@@ -739,7 +739,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         Object otherSide = parseOtherSide()
         DestinationClass destinationClass = new DestinationClass(
             className: otherSide.relation ? otherSide.relation.elementType : otherSide.elementType,
-            id: otherSide.relation ? otherSide.relation.id : otherSide.id
+            id: otherSide.relation ? otherSide.relation.id as Long : otherSide.id as Long
         )
         String relationshipTypeName = otherSide.type ? otherSide.type.name : type
         def dataModelObject = otherSide.dataModel ?: otherSide.classification
