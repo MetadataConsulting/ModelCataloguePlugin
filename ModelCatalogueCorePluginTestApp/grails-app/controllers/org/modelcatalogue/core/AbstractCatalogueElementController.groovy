@@ -720,7 +720,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        Relationship rel = (RelationshipMovedEvent as RelationshipMovedEvent).relationship
+        Relationship rel = (responseEvent as RelationshipMovedEvent).relationship
         respond(id: rel.id,
                 type: rel.relationshipType,
                 ext: OrderedMap.toJsonMap(rel.ext),
