@@ -89,7 +89,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
         $("#loginForm").find("button.btn-primary").first().click()
 
-        go "#/dataModels"
+       go "#/dataModels?type=catalogue"
 
         waitFor {
             $("#role_navigation-right_user-menu-menu-item-link").first().displayed
