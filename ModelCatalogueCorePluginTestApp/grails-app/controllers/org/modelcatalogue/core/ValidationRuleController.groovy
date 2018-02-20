@@ -5,6 +5,8 @@ import grails.transaction.Transactional
 import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.catalogueelement.ValidationRuleCatalogueElementService
 import org.modelcatalogue.core.persistence.ValidationRuleGormService
+import org.modelcatalogue.core.scripting.Validating
+import org.modelcatalogue.core.scripting.ValidatingImpl
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.MetadataDomainEntity
@@ -12,7 +14,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.validation.ValidationRuleJsonView
-import org.modelcatalogue.core.validation.ValidationRules
+import org.modelcatalogue.core.validation.ValidationRulesJsonView
 
 class ValidationRuleController extends AbstractCatalogueElementController<ValidationRule> {
 
@@ -78,7 +80,9 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
         } else {
                 List<ValidationRule> validationRuleList = Relationship.where {
                     destination.id == metadataDomainEntity.id && relationshipType.sourceToDestination == 'involves'
-                }.join('source').list().collect { Relationship relationship -> relationship.source as ValidationRule }.findAll { ValidationRule validationRule ->
+                }.join('source').list().collect { Relationship relationship ->
+                    relationship.source as ValidationRule
+                }.findAll { ValidationRule validationRule ->
                     validationRule.rule
                 }
                 List<ValidationRuleJsonView> rules = validationRuleList.collect { ValidationRule validationRule ->
@@ -90,15 +94,21 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
                             name: validationRule.name,
                             identifiersToGormUrls: m)
                 }
+                ValidatingImpl validating = null
 
-                if ( !rules ) {
+                CatalogueElement catalogueElement = metadataDomainEntityService.findByMetadataDomainEntity(metadataDomainEntity)
+                if ( catalogueElement instanceof Validating ) {
+                    validating = ValidatingImpl.of(catalogueElement)
+                }
+
+                if ( !rules && !validating ) {
                     render status: 204
                     return
                 }
 
-                CatalogueElement catalogueElement = metadataDomainEntityService.findByMetadataDomainEntity(metadataDomainEntity)
-                String name = "${catalogueElement?.dataModel?.name}:${catalogueElement?.dataModel?.modelCatalogueId} - ${catalogueElement?.name}"
-                respond new ValidationRules(name: name, gormUrl: gormUrl, rules: rules)
+                String name = "${catalogueElement?.dataModel?.name ?: ''}:${catalogueElement?.dataModel?.modelCatalogueId ?: ''} - ${catalogueElement?.name ?: ''}"
+
+                respond new ValidationRulesJsonView(name: name, gormUrl: gormUrl, rules: rules, validating: validating)
         }
     }
 
