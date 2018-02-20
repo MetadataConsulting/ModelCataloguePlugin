@@ -90,6 +90,24 @@ class RelationshipService {
                 .definition
     }
 
+    boolean existsRelationshipWithoutChanges(RelationshipDefinition relationshipDefinition) {
+        Relationship relationshipInstance = relationshipDefinition.skipUniqueChecking ? null : findExistingRelationship(relationshipDefinition)
+
+        if (relationshipInstance) {
+            if (relationshipDefinition.metadataSet && (relationshipInstance.ext != relationshipDefinition.metadata) ) {
+                return false
+            }
+            if (relationshipDefinition.resetIndices) {
+                return false
+            }
+            if (relationshipInstance.archived != relationshipDefinition.archived) {
+                return false
+            }
+            return true
+        }
+        false
+    }
+
 
     // Typical timing for last measurement:
     //    StopWatch 'Relationship Service Link': running time (millis) = 16
