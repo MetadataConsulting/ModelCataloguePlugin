@@ -365,7 +365,7 @@ class AuditService {
     }
 
     CatalogueElement logNewVersionCreated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        Long changeId = auditor.get().logNewVersionCreated(element, loggedUserId()).toBlocking().first()
+        Long changeId = auditor.get().logNewVersionCreated(element, loggedUserId())?.toBlocking()?.first()
         CatalogueElement ce = withParentId(changeId, createDraftBlock)
         if (!ce) {
             return ce
@@ -390,16 +390,19 @@ class AuditService {
     }
 
     CatalogueElement logElementFinalized(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        withParentId(auditor.get().logElementFinalized(element, loggedUserId()).toBlocking().first(), createDraftBlock)
+        Long parentId = auditor.get().logElementFinalized(element, loggedUserId())?.toBlocking()?.first()
+        withParentId(parentId, createDraftBlock)
     }
 
 
     CatalogueElement logElementDeprecated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        withParentId(auditor.get().logElementDeprecated(element, loggedUserId()).toBlocking().first(), createDraftBlock)
+        Long parentId = auditor.get().logElementDeprecated(element, loggedUserId())?.toBlocking()?.first()
+        withParentId(parentId, createDraftBlock)
     }
 
     CatalogueElement logExternalChange(CatalogueElement source, Long authorId, String message, Closure<CatalogueElement> createDraftBlock) {
-        withDefaultAuthorAndParentAction(authorId ,auditor.get().logExternalChange(source, message, loggedUserId()).toBlocking().first(), createDraftBlock)
+        Long parentId = auditor.get().logExternalChange(source, message, loggedUserId())?.toBlocking()?.first()
+        withDefaultAuthorAndParentAction(authorId, parentId, createDraftBlock)
     }
 
 

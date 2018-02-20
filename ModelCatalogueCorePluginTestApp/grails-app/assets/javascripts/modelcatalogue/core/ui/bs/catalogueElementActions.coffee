@@ -518,40 +518,6 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerChildActionInRoles 'catalogue-element',  'restore-relationship',[actionsProvider.ROLE_ITEM_ACTION], ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', 'rest', 'enhance', 'modelCatalogueApiRoot', ($rootScope, $scope, $state, messages, names, security, $q, rest, enhance, modelCatalogueApiRoot) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction($scope.element.isInstanceOf)
-    return undefined if not $scope.element.isInstanceOf('relationship')
-    return undefined if not security.hasRole('CURATOR')
-
-    action =
-      position:   1000
-      label:      'Restore Archived'
-      icon:       'glyphicon glyphicon-refresh'
-      type:       'primary'
-      watches:    'element.archived'
-      disabled:   !$scope.element.archived
-      action:     ->
-        rel   = $scope.element
-        messages.confirm('Restore Relationship', "Do you really want to restore relation '#{rel.element.name} #{rel.type[rel.direction]} #{rel.relation.name}'?").then () ->
-          enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/relationship/#{rel.id}/restore")).then ->
-            messages.success('Relationship restored!', "Relation '#{rel.element.name} #{rel.type[rel.direction]} #{rel.relation.name}' is no longer archived")
-            rel.archived = false
-          , (response) ->
-            if response.data?.errors
-              if angular.isString response.data.errors
-                messages.error response.data.errors
-              else
-                for err in response.data.errors
-                  messages.error err.message
-            else if response.status == 404
-              messages.error('Error restoring relationship', 'Relationship cannot be restored, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
-            else
-              messages.error('Error restoring relationship', 'Relationship cannot be restored, see application logs for details')
-
-    return action
-  ]
-
   actionsProvider.registerActionInRoles 'edit-relationship', [actionsProvider.ROLE_ITEM_ACTION], ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
     getRelationship = ->
       $scope.element ? $scope.tab?.value
