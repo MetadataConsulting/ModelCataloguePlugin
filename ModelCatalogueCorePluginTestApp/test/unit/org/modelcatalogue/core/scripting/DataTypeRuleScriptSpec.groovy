@@ -8,8 +8,6 @@ import spock.lang.Specification
  */
 class DataTypeRuleScriptSpec extends Specification {
 
-
-
     def "test 'is' method"() {
         expect:
         ValueValidator.evaluateRule(rule, x)
