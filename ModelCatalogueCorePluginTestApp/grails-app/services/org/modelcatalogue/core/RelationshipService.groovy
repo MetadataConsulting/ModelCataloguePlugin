@@ -481,14 +481,28 @@ class RelationshipService {
         userGormService.findById(userId)
     }
 
+
     Long loggedUserId() {
-        if ( springSecurityService.principal == null ) {
+        Object principal = springSecurityService.principal
+        if ( principal == null ) {
             return null
         }
-        if ( springSecurityService.principal instanceof String ) {
-            return null
+        if ( principal instanceof String ) {
+            try {
+                return principal as Long
+            } catch(NumberFormatException e) {
+                return null
+            }
         }
-        springSecurityService.principal.id as Long
+        if ( principal instanceof GrailsUser ) {
+            return ((GrailsUser) principal).id
+        }
+
+        if ( principal.respondsTo('id') ) {
+            return principal.id as Long
+        }
+
+        null
     }
 
     boolean isFavorite(CatalogueElement el) {
