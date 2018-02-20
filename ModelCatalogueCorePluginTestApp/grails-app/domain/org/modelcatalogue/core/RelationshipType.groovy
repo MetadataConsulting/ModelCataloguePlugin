@@ -9,7 +9,10 @@ import org.codehaus.groovy.grails.exceptions.StackTraceFilterer
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.rx.ErrorSubscriber
 import org.modelcatalogue.core.util.RelationshipTypeRuleScript
-import org.modelcatalogue.core.scripting.SecuredRuleExecutor
+import org.modelcatalogue.core.util.SecuredRuleExecutor
+
+//import org.modelcatalogue.core.util.RelationshipTypeRuleScript
+//import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 import java.util.concurrent.Callable
 
 class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {

@@ -19,9 +19,9 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.MatchResult
 import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.MetadataDomainEntity
+import org.modelcatalogue.core.util.SecuredRuleExecutor
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
-import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 

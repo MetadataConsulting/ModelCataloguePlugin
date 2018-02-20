@@ -19,7 +19,6 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
 @Stepwise
 class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     private static final String metadataStep ="button#step-metadata"
@@ -57,7 +56,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     def "login and navigate to the model "() {
         when:
         loginAdmin()
-        select 'Test 3'
+        select 'Test 1'
         selectInTree 'Data Classes'
 
         then:

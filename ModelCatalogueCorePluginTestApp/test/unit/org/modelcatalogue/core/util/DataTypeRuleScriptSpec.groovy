@@ -2,7 +2,6 @@ package org.modelcatalogue.core.util
 
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.scripting.DataTypeRuleScript
-import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 import spock.lang.Specification
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges

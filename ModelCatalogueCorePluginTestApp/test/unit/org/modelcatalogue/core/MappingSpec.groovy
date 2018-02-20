@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.test.mixin.Mock
-import org.modelcatalogue.core.scripting.SecuredRuleExecutor
+import org.modelcatalogue.core.util.SecuredRuleExecutor
 import spock.lang.Specification
 
 /**

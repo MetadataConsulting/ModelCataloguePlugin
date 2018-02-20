@@ -4,7 +4,7 @@ import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.PolicyBuilder
 import org.modelcatalogue.core.policy.PolicyBuilderScript
 import org.modelcatalogue.core.rx.ErrorSubscriber
-import org.modelcatalogue.core.scripting.SecuredRuleExecutor
+import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class DataModelPolicy {
 

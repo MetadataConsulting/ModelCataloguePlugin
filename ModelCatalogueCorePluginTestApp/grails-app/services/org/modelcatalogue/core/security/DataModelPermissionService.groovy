@@ -72,17 +72,17 @@ class DataModelPermissionService {
         if ( BasePermission.ADMINISTRATION == permission ) {
 
             if ( dataModelAclService.hasAdministrationPermission(dataModel, username) ) {
-                return new AlreadyHasAclPermissionEvent()
+                return //new AlreadyHasAclPermissionEvent()
             }
 
             Set<Role> roles = userRoleGormService.findRolesByUser(user)
             if ( !aclAdminGrantAllowed(roles, AUTHORITIES_ALLOWED_TO_HAVE_ACL_ADMIN) ) {
-                return new UserMissingAnyGranted(anyGranted: AUTHORITIES_ALLOWED_TO_HAVE_ACL_ADMIN)
+                return //new UserMissingAnyGranted(anyGranted: AUTHORITIES_ALLOWED_TO_HAVE_ACL_ADMIN)
             }
 
         } else if ( BasePermission.READ == permission ) {
             if (dataModelAclService.hasReadPermission(dataModel, username)) {
-                return new AlreadyHasAclPermissionEvent()
+                //return new AlreadyHasAclPermissionEvent()
             }
         }
 

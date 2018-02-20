@@ -18,7 +18,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     // keep the passwords simply stupid, they are only for dev/test or very first setup
     // sauce labs connector for some reason fails with the six in the input
-    def loginAdmin() { loginUser("admin", "admin") }
+    def loginAdmin() { loginUser("supervisor", "supervisor") }
     def loginViewer() { loginUser("viewer", "viewer") }
     def loginCurator() { loginUser("curator", "curator") }
 
@@ -38,6 +38,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
         for (int i = 0; i < 10; i++) {
             try {
+                driver.navigate().to("http://localhost:8080/#/144/dataModel/144")
                 go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
 
                 waitFor {
@@ -89,7 +90,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
         $("#loginForm").find("button.btn-primary").first().click()
 
-       go "#/dataModels?type=catalogue"
+//       go "#/dataModels?type=catalogue"
 
         waitFor {
             $("#role_navigation-right_user-menu-menu-item-link").first().displayed
