@@ -31,7 +31,7 @@ class CompoundAuditor implements Auditor {
 
     @Override
     Long getParentChangeId() {
-        return auditors.first().parentChangeId
+        auditors ? auditors.first().parentChangeId : null
     }
 
     @Override
