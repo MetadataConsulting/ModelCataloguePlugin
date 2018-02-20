@@ -4,6 +4,7 @@ import grails.util.Holders
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.MaxActiveUsersService
 import org.modelcatalogue.core.publishing.PublishingContext
 
 class User extends CatalogueElement {
@@ -23,37 +24,6 @@ class User extends CatalogueElement {
         password blank: false, maxSize: 255
         email    nullable: true, email: true, unique: true, maxSize: 255
         apiKey   nullable: true, maxSize: 255
-        enabled validator: { val, obj, errors ->
-            GrailsApplication grailsApplication = Holders.grailsApplication
-            if (!val || !grailsApplication.config.mc.max.active.users) {
-                return true
-            }
-
-            Integer maxUsers = grailsApplication.config.mc.max.active.users as Integer
-
-            Integer numOfUsers = User.withNewSession {
-                Role supervisorRole = Role.findByAuthority(UserService.ROLE_SUPERVISOR)
-
-                if (!supervisorRole) {
-                    return User.countByEnabled(true)
-                }
-
-                List<UserRole> supervisorsUserRole = UserRole.findAllByRole(supervisorRole)
-
-                if (supervisorsUserRole) {
-                    return User.countByEnabledAndUsernameNotInList(true, supervisorsUserRole*.user*.username)
-                }
-
-                return User.countByEnabled(true)
-            }
-
-            if (numOfUsers >= maxUsers) {
-                errors.rejectValue('enabled', 'mc.max.active.users.limit.reached', [maxUsers] as Object[], "Limit of $maxUsers users has been reached")
-                return
-            }
-            return true
-
-        }
     }
 
     static relationships = [

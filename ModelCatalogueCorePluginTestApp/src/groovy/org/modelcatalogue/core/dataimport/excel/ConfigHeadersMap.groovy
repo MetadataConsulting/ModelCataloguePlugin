@@ -15,6 +15,7 @@ class ConfigHeadersMap extends HeadersMap {
     static String measurementUnitSymbol = 'measurementUnitSymbol'
     static String validationRules = 'validationRules'
     static String mandatoryRule = 'mandatoryRule'
+    static String ruleSeparator = 'ruleSeparator'
 
     static Map<String, Object> createForConfigExcelLoader(Map<String, Object> params = [:]){
         Map<String,String> headersMap = new LinkedHashMap<String, Object>()

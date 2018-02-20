@@ -21,7 +21,7 @@ import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.MetadataDomainEntity
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
-import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 
@@ -63,7 +63,8 @@ class DataArchitectService {
             }
         }
 
-        log.info("matchAgainst=" + matchAgainst)
+        log.info("matchAgainst =" + matchAgainst )
+
     }
 
     //commented out the functions that are no longer relevant or don't work

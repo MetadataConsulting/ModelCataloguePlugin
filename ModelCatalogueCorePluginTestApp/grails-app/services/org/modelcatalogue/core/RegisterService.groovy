@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.plugin.springsecurity.ui.RegistrationCode
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.persistence.RegistrationCodeGormService
 import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.persistence.UserRoleGormService
@@ -9,16 +10,26 @@ import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 
+@Slf4j
 class RegisterService {
 
     UserGormService userGormService
     UserRoleGormService userRoleGormService
     RegistrationCodeGormService registrationCodeGormService
+    MaxActiveUsersService maxActiveUsersService
 
     List<String> DEFAULT_AUTHORITES_GRANTED = [MetadataRoles.ROLE_USER]
 
     @Transactional
     RegistrationCode register(String username, String password, String email, boolean enabled = true) {
+        if ( maxActiveUsersService.maxActiveUsers() ) {
+            if ( maxActiveUsersService.maxActiveUsers() ) {
+                log.info 'Limit of {} users has been reached', maxActiveUsersService.maxUsers
+                return
+            }
+
+            return null
+        }
         User user = new User(username: username,
                 password: password,
                 email: email,
@@ -31,6 +42,10 @@ class RegisterService {
 
     @Transactional
     RegistrationCode register(User user) {
+        if ( maxActiveUsersService.maxActiveUsers() ) {
+            log.info 'Limit of {} users has been reached', maxActiveUsersService.maxUsers
+            return null
+        }
 
         User u = userGormService.save(user)
         if ( u.hasErrors() ) {

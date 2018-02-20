@@ -14,7 +14,7 @@ import org.modelcatalogue.gel.GenomicsService
 /**
  * Created by amilward on 11/07/2017.
  */
-@IgnoreIf( { System.getProperty('spock.ignore.slow') })
+@IgnoreIf( { System.getProperty('spock.ignore.slow') || System.getProperty('IGNORE_OFFICE') })
 class RareDiseaseMaintenanceSplitDocsExporterSpec extends AbstractIntegrationSpec {
 
     ElementService elementService

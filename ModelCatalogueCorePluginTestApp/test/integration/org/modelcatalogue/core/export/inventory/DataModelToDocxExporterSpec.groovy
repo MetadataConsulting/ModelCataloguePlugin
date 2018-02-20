@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.export.inventory
 
+import spock.lang.IgnoreIf
 import static org.modelcatalogue.core.util.test.FileOpener.open
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import spock.lang.Ignore
@@ -11,6 +12,7 @@ import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 
 @Ignore
+@IgnoreIf( { System.getProperty('IGNORE_OFFICE') })
 class DataModelToDocxExporterSpec extends AbstractIntegrationSpec {
 
     ElementService elementService

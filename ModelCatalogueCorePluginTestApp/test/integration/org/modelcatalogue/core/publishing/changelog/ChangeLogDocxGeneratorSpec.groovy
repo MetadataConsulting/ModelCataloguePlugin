@@ -23,7 +23,10 @@ import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 * THE CHANGE LOG STUFF DOESN'T REALLY WORK SO NOT SURE IT's worth fixing this test
 *
 * */
-@IgnoreIf( { System.getProperty('spock.ignore.slow') })
+@IgnoreIf( {
+    System.getProperty('spock.ignore.slow') ||
+    System.getProperty('IGNORE_OFFICE')
+})
 class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
 
     AuditService auditService

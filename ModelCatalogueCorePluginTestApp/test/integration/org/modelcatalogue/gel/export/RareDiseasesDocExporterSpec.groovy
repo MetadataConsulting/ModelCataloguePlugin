@@ -9,7 +9,7 @@ import org.modelcatalogue.core.DataClass
 /**
  * Created by rickrees on 10/03/2016.
  */
-@IgnoreIf( { System.getProperty('spock.ignore.slow') })
+@IgnoreIf( { System.getProperty('spock.ignore.slow') || System.getProperty('IGNORE_OFFICE') })
 class RareDiseasesDocExporterSpec extends AbstractRareDiseasesExporterSpec {
 
     def "export eligibility dataClasses to docx"() {
