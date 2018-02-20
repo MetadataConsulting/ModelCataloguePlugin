@@ -66,8 +66,8 @@ class DataType extends CatalogueElement implements Validating {
 //        ValueValidator.validateRule(this, x)
 //    }
     boolean validateRule(Object x) {
-        rule = processDtRule(rule)
-        ValueValidator.validateRule(this, x)
+        rule = processDtRule(x)
+        ValueValidator.validateRule(this, rule)
     }
 
     String processDtRule(String rule) {
