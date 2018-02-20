@@ -3,13 +3,11 @@ package org.modelcatalogue.core.mappingsuggestions
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.MetadataDomainEntityService
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionParameter
-import org.modelcatalogue.core.actions.ActionState
-import org.modelcatalogue.core.persistence.DataElementGormService
+import org.modelcatalogue.core.util.MetadataDomainEntity
 import spock.lang.Specification
-import spock.lang.Unroll
-
 
 @TestFor(MappingSuggestionsService)
 @Mock([Action, ActionParameter])
@@ -24,9 +22,13 @@ class MappingSuggestionsServiceSpec extends Specification {
         actionInstance.addToExtensions(new ActionParameter(name: 'matchScore', extensionValue: '60'))
 
         when:
-        service.dataElementGormService = Stub(DataElementGormService) {
-            findById(1l) >> new DataElement(name: 'Glicose', modelCatalogueId: '001')
-            findById(2l) >> new DataElement(name: 'Glucose', modelCatalogueId: '002')
+        service.metadataDomainEntityService = Stub(MetadataDomainEntityService) {
+            findByMetadataDomainEntity(_ as MetadataDomainEntity) >> { MetadataDomainEntity metadataDomainEntity ->
+                if ( metadataDomainEntity.id == 1 ) {
+                    return new DataElement(name: 'Glicose', modelCatalogueId: '001')
+                }
+                new DataElement(name: 'Glucose', modelCatalogueId: '002')
+            }
         }
         MappingSuggestion mappingSuggestion = service.mappingSuggestionOfAction(actionInstance)
 
@@ -38,19 +40,6 @@ class MappingSuggestionsServiceSpec extends Specification {
         mappingSuggestion.destination
         mappingSuggestion.destination.name == 'Glucose'
         mappingSuggestion.destination.code == '002'
-        mappingSuggestion.score == 60.0
-    }
-
-    MappingSuggestion mappingSuggestionOfAction(Action actionInstance) {
-        ActionParameter source = actionInstance.extensions.find { ActionParameter actionParameter -> actionParameter.name == 'source' }
-        ActionParameter destination = actionInstance.extensions.find { ActionParameter actionParameter -> actionParameter.name == 'destination' }
-        ActionParameter score = actionInstance.extensions.find { ActionParameter actionParameter -> actionParameter.name == 'matchScore' }
-        new MappingSuggestionImpl(
-                mappingSuggestionId: actionInstance.id,
-                source: instantiateElementCompared(source),
-                destination: instantiateElementCompared(destination),
-                score: score.extensionValue as float,
-                status: mappingSuggestionStatusOfActionState(actionInstance.state)
-        )
+        mappingSuggestion.score == (60.0 as float)
     }
 }
