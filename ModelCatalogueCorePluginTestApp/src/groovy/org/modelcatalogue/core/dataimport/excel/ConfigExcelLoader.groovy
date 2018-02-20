@@ -28,10 +28,12 @@ class ConfigExcelLoader extends ExcelLoader {
     String ruleSeparatorRegEx = "\\n"
     Integer headerRow = 1
     Integer dataStartRow = 2
+    ElementService elementService
 
-    ConfigExcelLoader(String dataModelName, InputStream xmlInput) {
+    ConfigExcelLoader(String dataModelName, InputStream xmlInput, ElementService elementService) {
         this.dataModelName = dataModelName
         this.headersMap = this.parseXml(xmlInput)
+        this.elementService = elementService
     }
     /**
      * This also processes the tag
