@@ -13,7 +13,7 @@ class DataTypeGormService implements WarnGormErrors {
     MessageSource messageSource
 
     @Transactional
-    DataType findById(long id) {
+    DataType findById(Long id) {
         DataType.get(id)
     }
 
