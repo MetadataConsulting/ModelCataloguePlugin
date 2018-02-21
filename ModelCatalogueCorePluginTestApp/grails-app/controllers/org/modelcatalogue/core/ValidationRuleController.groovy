@@ -21,6 +21,7 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
     ValidationRuleGormService validationRuleGormService
     ValidationRuleCatalogueElementService validationRuleCatalogueElementService
     MetadataDomainEntityService metadataDomainEntityService
+    ValidationRuleService validationRuleService
 
     ValidationRuleController() {
         super(ValidationRule, false)
@@ -94,12 +95,10 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
                             name: validationRule.name,
                             identifiersToGormUrls: m)
                 }
-                ValidatingImpl validating = null
+
 
                 CatalogueElement catalogueElement = metadataDomainEntityService.findByMetadataDomainEntity(metadataDomainEntity)
-                if ( catalogueElement instanceof Validating ) {
-                    validating = ValidatingImpl.of(catalogueElement)
-                }
+                ValidatingImpl validating = validationRuleService.validatingByCatalogueElement(catalogueElement)
 
                 if ( !rules && !validating ) {
                     render status: 204
