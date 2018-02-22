@@ -20,7 +20,6 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
 
     ValidationRuleGormService validationRuleGormService
     ValidationRuleCatalogueElementService validationRuleCatalogueElementService
-    MetadataDomainEntityService metadataDomainEntityService
     ValidationRuleService validationRuleService
 
     ValidationRuleController() {
@@ -78,37 +77,13 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
         if ( metadataDomainEntity == null ) {
             render status: 204
             return
-        } else {
-                List<ValidationRule> validationRuleList = Relationship.where {
-                    destination.id == metadataDomainEntity.id && relationshipType.sourceToDestination == 'involves'
-                }.join('source').list().collect { Relationship relationship ->
-                    relationship.source as ValidationRule
-                }.findAll { ValidationRule validationRule ->
-                    validationRule.rule
-                }
-                List<ValidationRuleJsonView> rules = validationRuleList.collect { ValidationRule validationRule ->
-                    Map m = [:]
-                    validationRule.extensions.each { ExtensionValue extensionValue ->
-                        m[extensionValue.name] = extensionValue.extensionValue
-                    }
-                    new ValidationRuleJsonView(rule: validationRule.rule,
-                            name: validationRule.name,
-                            identifiersToGormUrls: m)
-                }
-
-
-                CatalogueElement catalogueElement = metadataDomainEntityService.findByMetadataDomainEntity(metadataDomainEntity)
-                ValidatingImpl validating = validationRuleService.validatingByCatalogueElement(catalogueElement)
-
-                if ( !rules && !validating ) {
-                    render status: 204
-                    return
-                }
-
-                String name = "${catalogueElement?.dataModel?.name ?: ''}:${catalogueElement?.dataModel?.modelCatalogueId ?: ''} - ${catalogueElement?.name ?: ''}"
-
-                respond new ValidationRulesJsonView(name: name, gormUrl: gormUrl, rules: rules, validating: validating)
         }
+        ValidationRulesJsonView validationRulesJsonView = validationRuleService.findValidationRulesByMetadataDomainEntity(metadataDomainEntity)
+        if ( validationRulesJsonView == null ) {
+            render status: 204
+            return
+        }
+        respond validationRulesJsonView
     }
 
     protected ValidationRule findById(long id) {
