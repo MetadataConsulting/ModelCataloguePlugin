@@ -113,6 +113,13 @@ class MetadataDomainEntity {
         "${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.${name}:$id".toString()
     }
 
+    static String link(Long dataModelId, MetadataDomainEntity entity, String serverUrl) {
+        String link = link(dataModelId, entity)
+        if ( !link ) {
+            return null
+        }
+        "${serverUrl}${link}".toString()
+    }
 
     static String link(Long dataModelId, MetadataDomainEntity entity) {
         String name = MetadataDomain.lowerCamelCaseDomainName(entity.domain)
