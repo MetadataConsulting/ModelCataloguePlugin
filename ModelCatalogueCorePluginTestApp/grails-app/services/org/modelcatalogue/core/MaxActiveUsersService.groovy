@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.persistence.RoleGormService
 import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.persistence.UserRoleGormService
+import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.security.UserService
@@ -41,7 +42,7 @@ class MaxActiveUsersService {
     }
 
     Number numberOfEnabledUsers() {
-        Role supervisorRole = roleGormService.findByAuthority(UserService.ROLE_SUPERVISOR)
+        Role supervisorRole = roleGormService.findByAuthority(MetadataRoles.ROLE_SUPERVISOR)
         if ( supervisorRole ) {
             return numberOfUsersExceptUsersWithRole(supervisorRole)
         }
