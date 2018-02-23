@@ -1,7 +1,14 @@
 package org.modelcatalogue.core
 
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.User
+import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.core.context.SecurityContextHolder
+import spock.lang.Unroll
 
 class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
@@ -83,4 +90,22 @@ class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIn
         ]
     }
 
+    @Unroll
+    def "currentRoleList for #roleList is #expected"(String username, List<String> roleList, List<String> expected) {
+        setup:
+        when:
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roleList as String[])
+        SecurityContextHolder.context.setAuthentication(new TestingAuthenticationToken(username, "password", authorities))
+
+        List<String> result = controller.currentRoleList(null)
+
+        then:
+        result.size() == expected.size()
+        result == expected
+
+        where:
+        username     | roleList                        | expected
+        'supervisor' | [MetadataRoles.ROLE_SUPERVISOR] | [MetadataRoles.ROLE_SUPERVISOR, 'ROLE_ADMIN', MetadataRoles.ROLE_CURATOR, MetadataRoles.ROLE_USER]
+        'curator'    | [MetadataRoles.ROLE_CURATOR]    | [ MetadataRoles.ROLE_CURATOR, MetadataRoles.ROLE_USER]
+    }
 }
