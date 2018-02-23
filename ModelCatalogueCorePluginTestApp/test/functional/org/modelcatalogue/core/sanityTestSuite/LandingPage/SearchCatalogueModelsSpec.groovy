@@ -6,7 +6,8 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@Ignore
 @Stepwise
 class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
     private static final String searchInput2 ="#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > div:nth-child(1) > div > div:nth-child(1) > div > div > div > div > input"

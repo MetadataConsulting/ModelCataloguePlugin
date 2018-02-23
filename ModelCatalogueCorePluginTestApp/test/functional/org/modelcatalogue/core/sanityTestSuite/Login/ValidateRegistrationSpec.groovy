@@ -2,7 +2,6 @@ package org.modelcatalogue.core.sanityTestSuite.Login
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.RegisterPage
-import org.openqa.selenium.WebDriver
 
 class ValidateRegistrationSpec extends GebSpec {
 

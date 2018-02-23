@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import com.google.common.collect.ImmutableMap
 import grails.gorm.DetachedCriteria
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.userdetails.GrailsUser
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.modelcatalogue.core.api.ElementStatus

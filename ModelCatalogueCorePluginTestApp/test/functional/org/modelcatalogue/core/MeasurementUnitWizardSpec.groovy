@@ -1,11 +1,14 @@
 package org.modelcatalogue.core
 
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.*
 import spock.lang.IgnoreIf
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@Ignore
 @Stepwise
 class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
 

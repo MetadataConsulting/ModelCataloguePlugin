@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
@@ -7,7 +9,8 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@Ignore
 @Stepwise
 class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
 

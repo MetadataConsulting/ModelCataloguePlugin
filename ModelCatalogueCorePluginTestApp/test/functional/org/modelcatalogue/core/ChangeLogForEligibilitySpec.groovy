@@ -4,11 +4,15 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import org.modelcatalogue.core.geb.Common
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@Ignore
 @Stepwise
 class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 
@@ -18,17 +22,27 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
         CatalogueContent.create('.menu-item-link', text: 'Change Log for RD Eligibility (Excel)')
 
     def "go to login"() {
-        login Common.admin
-
-        expect:
-            waitFor(120) { browser.title == 'Data Models' }
-
         when:
-            select 'Rare Disease Conditions'
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
-            check Common.rightSideTitle contains 'Rare Disease Conditions'
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Rare Disease Conditions')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+
+        then:
+        dataModelPage.titleContains 'Rare Disease Conditions'
     }
+
     @Ignore
     def "download the change log as MS Excel spreadsheet"() {
 

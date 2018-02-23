@@ -3,7 +3,9 @@ import grails.test.mixin.TestFor
 import org.modelcatalogue.core.genomics.GenomicsController
 import org.modelcatalogue.core.genomics.RareDiseaseImportController
 import spock.lang.Specification
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ System.getProperty('IGNORE_URLMAPPINGS') })
 @TestFor(ModelCatalogueGenomicsUrlMappings)
 @Mock([GenomicsController, RareDiseaseImportController])
 class ModelCatalogueGenomicsUrlMappingsSpec extends Specification {

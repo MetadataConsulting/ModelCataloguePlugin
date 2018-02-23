@@ -2,7 +2,9 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionsController
 import spock.lang.Specification
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ System.getProperty('IGNORE_URLMAPPINGS') })
 @TestFor(MappingSuggestionsUrlMappings)
 @Mock(MappingSuggestionsController)
 class MappingSuggestionsUrlMappingsSpec extends Specification {

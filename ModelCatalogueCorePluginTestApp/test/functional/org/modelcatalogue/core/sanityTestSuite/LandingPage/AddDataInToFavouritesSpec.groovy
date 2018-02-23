@@ -11,7 +11,8 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@Ignore
 @Stepwise
 class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
     private static final String  creates  = "a#role_data-models_create-data-modelBtn"

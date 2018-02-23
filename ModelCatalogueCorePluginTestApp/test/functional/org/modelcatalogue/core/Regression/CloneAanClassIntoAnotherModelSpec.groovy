@@ -14,7 +14,8 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@Ignore
 @Stepwise
 class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
 

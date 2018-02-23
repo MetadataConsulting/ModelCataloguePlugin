@@ -2,10 +2,12 @@ package org.modelcatalogue.core.sanityTestSuite.Login
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.WebDriver
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@Ignore
 @Stepwise
 class LoginAsViewerSpec extends AbstractModelCatalogueGebSpec {
 

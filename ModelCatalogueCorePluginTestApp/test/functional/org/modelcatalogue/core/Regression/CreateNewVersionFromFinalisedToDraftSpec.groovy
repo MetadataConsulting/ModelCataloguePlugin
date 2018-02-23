@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.Regression
 
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.getDescription
 import static org.modelcatalogue.core.geb.Common.getModalHeader
@@ -14,8 +16,9 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
 @Stepwise
+@Ignore
 class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGebSpec {
 
     static final String stepImports = "#step-imports"

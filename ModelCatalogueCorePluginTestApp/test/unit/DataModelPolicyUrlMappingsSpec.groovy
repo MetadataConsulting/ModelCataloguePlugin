@@ -2,7 +2,9 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.DataModelPolicyController
 import spock.lang.Specification
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ System.getProperty('IGNORE_URLMAPPINGS') })
 @TestFor(DataModelPolicyUrlMappings)
 @Mock(DataModelPolicyController)
 class DataModelPolicyUrlMappingsSpec extends Specification {

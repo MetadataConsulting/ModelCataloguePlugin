@@ -1,11 +1,14 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.curator
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@Ignore
 @Stepwise
 class ShowAllDataModelsSpec  extends AbstractModelCatalogueGebSpec {
 

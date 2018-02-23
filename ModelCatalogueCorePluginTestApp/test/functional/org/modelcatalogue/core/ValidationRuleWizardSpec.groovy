@@ -1,11 +1,14 @@
 package org.modelcatalogue.core
 
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@Ignore
 @Stepwise
 class ValidationRuleWizardSpec extends AbstractModelCatalogueGebSpec {
 
