@@ -90,6 +90,24 @@ class RelationshipService {
                 .definition
     }
 
+    boolean existsRelationshipWithoutChanges(RelationshipDefinition relationshipDefinition) {
+        Relationship relationshipInstance = relationshipDefinition.skipUniqueChecking ? null : findExistingRelationship(relationshipDefinition)
+
+        if (relationshipInstance) {
+            if (relationshipDefinition.metadataSet && (relationshipInstance.ext != relationshipDefinition.metadata) ) {
+                return false
+            }
+            if (relationshipDefinition.resetIndices) {
+                return false
+            }
+            if (relationshipInstance.archived != relationshipDefinition.archived) {
+                return false
+            }
+            return true
+        }
+        false
+    }
+
 
     // Typical timing for last measurement:
     //    StopWatch 'Relationship Service Link': running time (millis) = 16
@@ -463,14 +481,28 @@ class RelationshipService {
         userGormService.findById(userId)
     }
 
+
     Long loggedUserId() {
-        if ( springSecurityService.principal == null ) {
+        Object principal = springSecurityService.principal
+        if ( principal == null ) {
             return null
         }
-        if ( springSecurityService.principal instanceof String ) {
-            return null
+        if ( principal instanceof String ) {
+            try {
+                return principal as Long
+            } catch(NumberFormatException e) {
+                return null
+            }
         }
-        springSecurityService.principal.id as Long
+        if ( principal instanceof GrailsUser ) {
+            return ((GrailsUser) principal).id
+        }
+
+        if ( principal.respondsTo('id') ) {
+            return principal.id as Long
+        }
+
+        null
     }
 
     boolean isFavorite(CatalogueElement el) {

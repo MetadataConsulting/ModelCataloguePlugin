@@ -97,7 +97,7 @@ class UserGormService implements WarnGormErrors {
 
     @Transactional(readOnly = true)
     String findApiKeyByUsername(String username) {
-        String apiKey = findQueryByUsername(username).projections {
+        findQueryByUsername(username).projections {
             property('apiKey')
         }.get()
     }
@@ -115,5 +115,24 @@ class UserGormService implements WarnGormErrors {
 
     DetachedCriteria<User> findQueryByEmail(String emailParam) {
         User.where { email == emailParam }
+    }
+
+    @Transactional(readOnly = true)
+    Number countByEnabled(boolean enabled) {
+        queryByEnabled(enabled).count()
+    }
+
+    DetachedCriteria<User> queryByEnabled(boolean enabledParam) {
+        User.where { enabled == enabledParam}
+    }
+
+    @Transactional(readOnly = true)
+    Number countByEnabledAndUsernameNotInList(boolean enabled, List<String> usernameList) {
+        queryByEnabledAndUsernameNotInList(enabled, usernameList).count()
+    }
+
+    DetachedCriteria<User> queryByEnabledAndUsernameNotInList(boolean enabled, List<String> usernameList) {
+        DetachedCriteria<User> query = queryByEnabled(enabled)
+        query.where { user.username in usernameList }
     }
 }

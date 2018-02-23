@@ -29,8 +29,8 @@ class NorthThamesMappingReportXlsxSqlExporter {
 //    final GrailsApplication grailsApplication
     ApplicationContext context = Holders.getApplicationContext()
     SessionFactory sessionFactory = (SessionFactory) context.getBean('sessionFactory')
-    String lpcModelName = 'LONDONPATHOLOGYCODES'
-    String localModelName = 'WinPath'
+    String lpcModelName = 'RFH_LONDONPATHOLOGYCODES'
+    String localModelName = 'RFH_WinPath'
     String loincModelName = 'LOINC'
     String gelModelName = 'Rare Diseases'
     protected List<String> excelHeaders = ['LOCAL SITE', 'LOCAL CODESET 1', 'LOCAL CODE 1', 'LOCAL CODE 1 NAME', "LOCAL CODESET 2",	"LOCAL CODE 2",	"LOCAL CODE 2 DESCRIPTION",	"LOINC CODE",	"LOINC CODE DESCRIPTION",	"LOINC SYSTEM(SPECIMEN)",	"GEL CODE",	"GEL CODE DESCRIPTION",	"OPENEHR QUERY", "REF RANGE"]
@@ -59,28 +59,26 @@ class NorthThamesMappingReportXlsxSqlExporter {
     private List getMappedDataElements(String lpcModel = lpcModelName, String localModel = localModelName, String loincModel = loincModelName, String gelModel = gelModelName){
         String query = '''
 SELECT DISTINCT
-	IFNULL(lpc_dm.`name`, '') AS 'lpc_model',
-	IFNULL(lpc.`code`, '') AS 'lpc_code',
-	IFNULL(lpc.`name`, '') AS 'lpc_name',
-	IF(wpath.`code` IS NULL, '', wpath_dm.`name`) AS 'local_model',
-	IFNULL(wpath.`code`, '') AS 'local_code',
-	IFNULL(wpath.`name`, '') AS 'local_name',
-	IFNULL(loinc.`code`, '') AS 'loinc_code',
-	IFNULL(loinc.`name`, '') AS 'loinc_name',
-	IFNULL(loinc.system, '') AS 'loinc_system',
-	IFNULL(gel.`code`, '') AS 'gel_code',
-	IFNULL(gel.`name`, '') AS 'gel_name',
-	IFNULL(gel.openehr, '') AS 'gel_openehr',
-	IFNULL(lpc.ref_range, '') AS 'ref_range'
+	IFNULL(lpc_dm.`name`, '') AS `lpc_model`,
+	IFNULL(lpc.`code`, '') AS `lpc_code`,
+	IFNULL(lpc.`name`, '') AS `lpc_name`,
+	IF(wpath.`code` IS NULL, '', wpath_dm.`name`) AS `local_model`,
+	IFNULL(wpath.`code`, '') AS `local_code`,
+	IFNULL(wpath.`name`, '') AS `local_name`,
+	IFNULL(loinc.`code`, '') AS `loinc_code`,
+	IFNULL(loinc.`name`, '') AS `loinc_name`,
+	IFNULL(loinc.system, '') AS `loinc_system`,
+	IFNULL(gel.`code`, '') AS `gel_code`,
+	IFNULL(gel.`name`, '') AS `gel_name`,
+	IFNULL(gel.openehr, '') AS `gel_openehr`,
+	IFNULL(lpc.ref_range, '') AS `ref_range`
 FROM
 	(catalogue_element AS lpc_dm, catalogue_element AS wpath_dm, catalogue_element AS loinc_dm, catalogue_element AS gel_dm)
 	JOIN (
 		SELECT 
-			ce.id, r.source_id, ev.extension_value AS `code`, ce.`name`, ce.data_model_id, ev2.extension_value AS ref_range
-		FROM
-			catalogue_element AS ce
+			ce.id, r.source_id, ce.model_catalogue_id AS `code`, ce.`name`, ce.data_model_id, ev2.extension_value AS ref_range
+		FROM catalogue_element AS ce
 			JOIN data_element AS de USING (id)
-			JOIN extension_value AS ev ON ev.element_id = ce.id AND ev.`name` = 'Index'
 			LEFT JOIN extension_value AS ev2 ON ev2.element_id = ce.id AND ev2.`name`  = 'Ref Range'
 			JOIN relationship AS r ON r.source_id = ce.id AND r.relationship_type_id = 7
 	) AS lpc ON lpc.data_model_id = lpc_dm.id
@@ -116,7 +114,7 @@ WHERE
 	AND gel_dm.id = IFNULL((SELECT id FROM catalogue_element JOIN data_model USING (id) WHERE `name` = :gelModel ORDER BY version_number DESC LIMIT 1), (SELECT id FROM data_element ORDER BY id LIMIT 1))
 	AND (wpath.`code` IS NOT NULL OR loinc.`code` IS NOT NULL OR gel.`code` IS NOT NULL)
 ORDER BY
-	lpc.`name`, wpath.`code`, loinc.`code`, gel.`code`
+    `lpc_name`, `local_model`, `loinc_code`, `gel_code`
 '''
         final session = sessionFactory.currentSession
         final sqlQuery = session.createSQLQuery(query)

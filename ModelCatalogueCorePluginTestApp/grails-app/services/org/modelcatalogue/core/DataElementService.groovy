@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import groovy.transform.CompileStatic
 import org.hibernate.SQLQuery
 import org.hibernate.Session
 import org.hibernate.SessionFactory
@@ -13,6 +14,15 @@ class DataElementService {
 
     SessionFactory sessionFactory
 
+    @CompileStatic
+    String tagIdOfParams(Map params) {
+        String tagId = params?.tag
+        if ( tagId == 'all' ) {
+            return null
+        }
+        tagId
+    }
+
     ListWithTotalAndType<DataElement> findAllDataElementsInModel(Map params, DataModel model){
 
         long modelId = model.id
@@ -20,7 +30,7 @@ class DataElementService {
         long containmentType = RelationshipType.containmentType.id
         long tagTypeId = RelationshipType.tagType.id
 
-        def tagId = params.tag
+        String tagId = tagIdOfParams(params)
 
         // if tagId is null, run the same query as it is at the moment
         // if tagId in ['none', 'null', 'undefined'] then search for every data element not destination of tag relationship

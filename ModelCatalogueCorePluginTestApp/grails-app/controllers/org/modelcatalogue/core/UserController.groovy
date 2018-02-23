@@ -101,7 +101,6 @@ class UserController extends AbstractCatalogueElementController<User> {
         List<String> roleList = []
         if ( SpringSecurityUtils.ifAllGranted(MetadataRoles.ROLE_SUPERVISOR) ) {
             roleList.addAll([MetadataRoles.ROLE_SUPERVISOR, 'ROLE_ADMIN', MetadataRoles.ROLE_CURATOR, MetadataRoles.ROLE_USER])
-
         } else if ( SpringSecurityUtils.ifAllGranted(MetadataRoles.ROLE_CURATOR) ) {
             roleList.addAll([MetadataRoles.ROLE_CURATOR, MetadataRoles.ROLE_USER])
         }

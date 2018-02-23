@@ -2,6 +2,7 @@ package org.modelcatalogue.core.audit
 
 import grails.gorm.DetachedCriteria
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.util.Holders
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
@@ -45,9 +46,9 @@ class AuditService {
    @PostConstruct
    void hookSearchService() {
        auditorFactory =  { return CompoundAuditor.from(new DefaultAuditor(executorService), new EventNotifier(brokerMessagingTemplate, executorService)) }
-       if (modelCatalogueSearchService.indexingManually) {
-        Callable<Auditor> oldFactory = auditorFactory
-        auditorFactory = { CompoundAuditor.from(oldFactory(), new SearchNotifier(modelCatalogueSearchService))}
+       if ( modelCatalogueSearchService?.indexingManually ) {
+           Callable<Auditor> oldFactory = auditorFactory
+           auditorFactory = { CompoundAuditor.from(oldFactory(), new SearchNotifier(modelCatalogueSearchService)) }
        }
    }
 
@@ -364,7 +365,7 @@ class AuditService {
     }
 
     CatalogueElement logNewVersionCreated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        Long changeId = auditor.get().logNewVersionCreated(element, loggedUserId()).toBlocking().first()
+        Long changeId = auditor.get().logNewVersionCreated(element, loggedUserId())?.toBlocking()?.first()
         CatalogueElement ce = withParentId(changeId, createDraftBlock)
         if (!ce) {
             return ce
@@ -389,16 +390,19 @@ class AuditService {
     }
 
     CatalogueElement logElementFinalized(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        withParentId(auditor.get().logElementFinalized(element, loggedUserId()).toBlocking().first(), createDraftBlock)
+        Long parentId = auditor.get().logElementFinalized(element, loggedUserId())?.toBlocking()?.first()
+        withParentId(parentId, createDraftBlock)
     }
 
 
     CatalogueElement logElementDeprecated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        withParentId(auditor.get().logElementDeprecated(element, loggedUserId()).toBlocking().first(), createDraftBlock)
+        Long parentId = auditor.get().logElementDeprecated(element, loggedUserId())?.toBlocking()?.first()
+        withParentId(parentId, createDraftBlock)
     }
 
     CatalogueElement logExternalChange(CatalogueElement source, Long authorId, String message, Closure<CatalogueElement> createDraftBlock) {
-        withDefaultAuthorAndParentAction(authorId ,auditor.get().logExternalChange(source, message, loggedUserId()).toBlocking().first(), createDraftBlock)
+        Long parentId = auditor.get().logExternalChange(source, message, loggedUserId())?.toBlocking()?.first()
+        withDefaultAuthorAndParentAction(authorId, parentId, createDraftBlock)
     }
 
 
@@ -463,15 +467,19 @@ class AuditService {
     }
 
     Long loggedUserId() {
-        if ( springSecurityService.principal instanceof String ) {
+        Object principal = springSecurityService.principal
+        if ( principal instanceof String ) {
             try {
-                return springSecurityService.principal as Long
+                return principal as Long
             } catch(NumberFormatException e) {
                 return null
             }
         }
-        if ( springSecurityService.principal.respondsTo('id') ) {
-            return springSecurityService.principal.id as Long
+        if ( principal instanceof GrailsUser ) {
+            return ((GrailsUser) principal).id
+        }
+        if ( principal.respondsTo('id') ) {
+            return principal.id as Long
         }
         null
     }

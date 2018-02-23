@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mcExcelConfig>
+  <headersMap>
+    <dataClassName>Data Class Name</dataClassName>
+    <dataElementID></dataElementID>
+    <dataElementName>Data Element Name</dataElementName> <!-- must occur-->
+    <dataElementDescription>Description</dataElementDescription>
+	<validationRules>Validation Rules</validationRules>
+	<mandatoryRule>M/R/O</mandatoryRule>
+	<metadata>NHS Data Dictionary Fields</metadata>
+    <metadata>NHS Data Dictionary Link</metadata>
+    <metadata>XML (from TRUD)</metadata>
+    <metadata>Format</metadata>
+    <metadata>Validation Rules</metadata>
+    <metadata>M/R/O</metadata>
+    <metadata>CSV Validation Note</metadata>
+    <metadata>Defaults</metadata>
+    <metadata>Notes</metadata>
+    <metadata>DQ Metrics</metadata>
+    <metadata>Linked DataItem</metadata>
+    <metadata>Coverage</metadata>
+    <metadata>Completeness</metadata>
+    <metadata>Validity</metadata>
+    <metadata>Defaults</metadata>
+    <metadata>Consistency</metadata>
+    <metadata>Integrity</metadata>
+    <metadata>Timeliness</metadata>
+    <metadata>Other dimensions</metadata>
+  </headersMap>
+  <ruleSeparator>\$\n</ruleSeparator>
+  <classHierarchySeparator></classHierarchySeparator>
+  <headerRow>2</headerRow>
+  <dataStartRow>4</dataStartRow>
+</mcExcelConfig>

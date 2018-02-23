@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.MappingScript
-import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.scripting.MappingScript
+import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 import org.springframework.validation.Errors
 
 class Mapping {

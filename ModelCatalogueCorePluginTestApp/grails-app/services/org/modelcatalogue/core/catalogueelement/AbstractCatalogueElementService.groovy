@@ -14,6 +14,7 @@ import org.modelcatalogue.core.RelationshipDefinitionBuilder
 import org.modelcatalogue.core.RelationshipService
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.events.AlreadyExistingRelationEvent
 import org.modelcatalogue.core.events.CatalogueElementArchivedEvent
 import org.modelcatalogue.core.events.CatalogueElementNotFoundEvent
 import org.modelcatalogue.core.events.CatalogueElementRestoredEvent
@@ -285,32 +286,45 @@ abstract class AbstractCatalogueElementService<T extends CatalogueElement> imple
                            RelationshipDefinition.create(source, destination, relationshipType))
                 : null
 
+        RelationshipDefinition definition = buildRelationshipDefinition(definitionBuilder, dataModel, objectToBind)
+        boolean existsRelationshipWithoutChanges = relationshipService.existsRelationshipWithoutChanges(definition)
+
         if (otherWayDefinitionBuilder) {
-            addRelationshipFromDefinitionBuilder(otherWayDefinitionBuilder, !outgoing, dataModel, objectToBind, source, destination)
+            RelationshipDefinition otherwayDefinition = buildRelationshipDefinition(otherWayDefinitionBuilder, dataModel, objectToBind)
+            addRelationshipFromRelationshipDefinition(otherwayDefinition)
         }
-        addRelationshipFromDefinitionBuilder(definitionBuilder, outgoing, dataModel, objectToBind, source, destination)
+        
+        Relationship rel = addRelationshipFromRelationshipDefinition(definition)
+        buildRelationAddEvent(rel, existsRelationshipWithoutChanges, outgoing, source)
     }
 
-    private MetadataResponseEvent addRelationshipFromDefinitionBuilder(RelationshipDefinitionBuilder relationshipDefinitionBuilder, Boolean outgoing, DataModel dataModel, Object objectToBind, CatalogueElement source, CatalogueElement destination) {
+    MetadataResponseEvent buildRelationAddEvent(Relationship rel, boolean existsRelationshipWithoutChanges, Boolean outgoing, CatalogueElement source) {
+        if ( rel.hasErrors() ) {
+            return new RelationshipWithErrorsEvent(relationship: rel)
+        }
+        RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
+        if ( existsRelationshipWithoutChanges ) {
+            return new AlreadyExistingRelationEvent(rel: rel, source: source, direction: direction)
+        }
+        new RelationAddedEvent(rel: rel, source: source, direction: direction)
+    }
 
+    RelationshipDefinition buildRelationshipDefinition(RelationshipDefinitionBuilder relationshipDefinitionBuilder, DataModel dataModel, Object objectToBind) {
         relationshipDefinitionBuilder.withDataModel(dataModel).withMetadata(metadataFromObjectToBind(objectToBind))
 
         if ( isSupervisor() ) {
             relationshipDefinitionBuilder.withIgnoreRules(true)
         }
-        Relationship rel = relationshipService.link(relationshipDefinitionBuilder.definition)
+        relationshipDefinitionBuilder.definition
+    }
 
+    private Relationship addRelationshipFromRelationshipDefinition(RelationshipDefinition definition) {
+        Relationship rel = relationshipService.link(definition)
         if (rel.hasErrors()) {
-            return new RelationshipWithErrorsEvent(relationship: rel)
+            return rel
         }
-
-        RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
-
-
         rel.save(flush: true, deepValidate: false, validate: false)
-
-        return new RelationAddedEvent(rel: rel, source: source, direction: direction)
-
+        rel
     }
 
     private boolean isSupervisor() {

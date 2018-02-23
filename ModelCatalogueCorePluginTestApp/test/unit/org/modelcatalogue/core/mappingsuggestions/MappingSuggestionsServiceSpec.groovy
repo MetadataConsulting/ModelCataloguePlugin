@@ -37,17 +37,4 @@ class MappingSuggestionsServiceSpec extends Specification {
         mappingSuggestion.destination.code == '002'
         mappingSuggestion.score == 60.0
     }
-
-    MappingSuggestion mappingSuggestionOfAction(Action actionInstance) {
-        ActionParameter source = actionInstance.extensions.find { ActionParameter actionParameter -> actionParameter.name == 'source' }
-        ActionParameter destination = actionInstance.extensions.find { ActionParameter actionParameter -> actionParameter.name == 'destination' }
-        ActionParameter score = actionInstance.extensions.find { ActionParameter actionParameter -> actionParameter.name == 'matchScore' }
-        new MappingSuggestionImpl(
-                mappingSuggestionId: actionInstance.id,
-                source: instantiateElementCompared(source),
-                destination: instantiateElementCompared(destination),
-                score: score.extensionValue as float,
-                status: mappingSuggestionStatusOfActionState(actionInstance.state)
-        )
-    }
 }
