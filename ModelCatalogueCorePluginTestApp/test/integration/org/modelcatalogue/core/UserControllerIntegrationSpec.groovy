@@ -5,9 +5,11 @@ import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.User
 import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
+import spock.lang.Ignore
 import spock.lang.Unroll
 
 class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
@@ -93,15 +95,19 @@ class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIn
     @Unroll
     def "currentRoleList for #roleList is #expected"(String username, List<String> roleList, List<String> expected) {
         setup:
-        when:
+        Authentication originalAuthentication = SecurityContextHolder.context.authentication
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roleList as String[])
         SecurityContextHolder.context.setAuthentication(new TestingAuthenticationToken(username, "password", authorities))
 
+        when:
         List<String> result = controller.currentRoleList(null)
 
         then:
         result.size() == expected.size()
         result == expected
+
+        cleanup:
+        SecurityContextHolder.context.setAuthentication(originalAuthentication)
 
         where:
         username     | roleList                        | expected
