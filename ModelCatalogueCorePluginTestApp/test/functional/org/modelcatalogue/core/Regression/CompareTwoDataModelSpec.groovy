@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.Regression
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.getItem
@@ -19,7 +20,9 @@ class CompareTwoDataModelSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "compare two models"() {
         when:
-        loginCurator()
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('curator', 'curator')
 
         then:
         noExceptionThrown()

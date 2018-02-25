@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.getAdmin
@@ -10,7 +12,6 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
-@Ignore
 @Stepwise
 class FastActionsVersionSpec extends AbstractModelCatalogueGebSpec{
 
@@ -22,9 +23,15 @@ class FastActionsVersionSpec extends AbstractModelCatalogueGebSpec{
 
 
     def "login to model catalogue "() {
-        login admin
+        when:
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
-        expect:
+        then:
+        at DataModelListPage
+
+        and:
         check create displayed
     }
 

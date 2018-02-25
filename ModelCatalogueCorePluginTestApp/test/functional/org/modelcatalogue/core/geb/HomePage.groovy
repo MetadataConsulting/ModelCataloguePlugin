@@ -6,11 +6,12 @@ class HomePage extends Page {
 
     static at = { title == 'Model Catalogue'}
 
-    static url = '/#/'
+    static url = '/'
 
     static content = {
         loginButton { $('button.btn', text: 'Login') }
         signupButton { $('button.btn', text: 'Sign Up') }
+        footer { $( 'footer.site-footer', 0).module(DevelopmentSupportModule) }
     }
 
     void login() {

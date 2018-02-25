@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.getModalHeader
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
@@ -8,7 +11,6 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
-@Ignore
 @Stepwise
 class FastActionsAsViewerSpec extends AbstractModelCatalogueGebSpec {
 
@@ -19,7 +21,13 @@ class FastActionsAsViewerSpec extends AbstractModelCatalogueGebSpec {
     private static final String allDataModels = 'div.modal-body>div:nth-child(2)>div>a:nth-child(3)'
 
     def "login to model catalogue"() {
-        loginViewer()
+        when:
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('viewer', 'viewer')
+
+        then:
+        at DataModelListPage
 
         expect:
         Thread.sleep(2000l)

@@ -1,5 +1,8 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
@@ -11,7 +14,6 @@ import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA') })
-@Ignore
 @Stepwise
 class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
@@ -33,10 +35,13 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "go to login"() {
-        login admin
+        when:
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
-        expect:
-        waitFor(120) { browser.title == 'Data Models' }
+        then:
+        at DataModelListPage
     }
 
     def "add new data model"() {
@@ -83,6 +88,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle contains "New Data Model $uuid"
     }
 
+    @Ignore
     def "finalize element"() {
         check backdrop gone
 
@@ -122,6 +128,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         check status has 'label-primary'
     }
 
+    @Ignore
     def "create new version of the element"() {
         check backdrop gone
         when: "new version is clicked"
@@ -164,12 +171,20 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     }
 
+    @Ignore
     def "create new data model, hard delete the data model and create new with the same name"() {
         given:
-            def uuid = UUID.randomUUID().toString()
+        def uuid = UUID.randomUUID().toString()
 
         when:
-            login admin
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
+        then:
+        at DataModelListPage
+
+        when:
             click createNewDataModel
 
         then: 'the model dialog opens'

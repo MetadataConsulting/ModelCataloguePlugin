@@ -1,5 +1,10 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.DataTypesPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
@@ -13,7 +18,6 @@ import spock.lang.IgnoreIf
 
 @Stepwise
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
-@Ignore
 class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     public static final String expandTableHeader = '.inf-table thead .inf-cell-expand'
@@ -54,22 +58,62 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String removeRelationshipButton = '#role_item_remove-relationshipBtn'
     public static final String primitiveContent = '[data-view-name="Measurement Unit"]'
 
+    @Ignore
     def "go to login"() {
-        login admin
-
         when:
-        select 'NHIC' select 'Data Types'
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('NHIC')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Types')
+
+        then:
+        at DataTypesPage
+
+        and:
         check rightSideTitle is 'Active Data Types'
     }
 
+    @Ignore
     def "create reference"() {
-        select 'Test 1'
+        when:
+        to DataModelListPage
 
+        then:
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.search('Test 1')
+        dataModelListPage.select('Test 1')
+
+        then:
+        at DataModelPage
+
+        when:
         addDataModelImport 'XMLSchema', 'NHIC'
 
-        selectInTree 'Data Types'
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Types')
+
+        then:
+        at DataTypesPage
 
         when:
         remove messages
@@ -95,6 +139,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 2, text: 'DEMOGRAPHICS') } displayed
     }
 
+    @Ignore
     def "create primitive"() {
         when:
         remove messages
@@ -122,6 +167,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 2, text: 'new unit') } displayed
     }
 
+    @Ignore
     def "create enum"() {
         when:
         remove messages
@@ -148,6 +194,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 1) } contains "Enumeration 1"
     }
 
+    @Ignore
     def "create subset 2"() {
         when:
         remove messages
@@ -176,6 +223,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 1) } contains "Enumeration 2"
     }
 
+    @Ignore
     def "create subset 3"() {
         when:
         remove messages

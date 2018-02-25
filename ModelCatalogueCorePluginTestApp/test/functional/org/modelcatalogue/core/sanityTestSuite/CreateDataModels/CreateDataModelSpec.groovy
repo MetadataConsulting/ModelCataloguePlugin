@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
@@ -9,7 +12,6 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
 @Stepwise
 class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
@@ -24,7 +26,12 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
 
     def "do create data model"() {
         when:
-        login curator
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('curator', 'curator')
+
+        then:
+        at DataModelListPage
 
         then:
         check create displayed
@@ -70,6 +77,7 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
         "TESTING_DATA_MODEL" | "2.1.28"       | "MT-234"  | "c"      | "c"
     }
 
+    @Ignore
     def "delete the created data model"() {
         when:
         refresh browser

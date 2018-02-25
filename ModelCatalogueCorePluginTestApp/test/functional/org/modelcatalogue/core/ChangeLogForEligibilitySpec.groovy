@@ -12,7 +12,6 @@ import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
-@Ignore
 @Stepwise
 class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 
@@ -21,6 +20,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
     final CatalogueContent changeLogForRDEligibilityXSLX =
         CatalogueContent.create('.menu-item-link', text: 'Change Log for RD Eligibility (Excel)')
 
+    @Ignore
     def "go to login"() {
         when:
         LoginPage loginPage = to LoginPage

@@ -1,16 +1,20 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import org.modelcatalogue.core.geb.DataElementsPage
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.Keys
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
-import spock.lang.IgnoreRest
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
-@Ignore
 @Stepwise
+@Ignore
 class CreateTagSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String  table = 'td.col-md-4'
@@ -18,12 +22,34 @@ class CreateTagSpec extends AbstractModelCatalogueGebSpec {
     private static final String  deleteButton = 'a#delete-menu-item-link>span:nth-child(3)'
     private static final String   dataElementButton = 'a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
 
-    @IgnoreRest
+
     def "login to model catalogue and select element"() {
 
         when:
-        loginCurator()
-        select 'Test 3' open 'Data Elements' select 'No tags'
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
+        then:
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 1')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Elements')
+
+        then:
+        at DataElementsPage
+
+        when:
+        select 'No tags'
+
         then:
         check rightSideTitle is 'Active Data Elements'
     }

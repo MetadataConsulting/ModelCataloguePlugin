@@ -1,5 +1,11 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.geb.AssetsPage
+import org.modelcatalogue.core.geb.BusinessRulesPage
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.admin
 import static org.modelcatalogue.core.geb.Common.getModalDialog
 import static org.modelcatalogue.core.geb.Common.getNameLabel
@@ -13,9 +19,7 @@ import spock.lang.IgnoreIf
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-
 //@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
 @Stepwise
 class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 
@@ -27,17 +31,35 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
     public static final String asset = 'asset'
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 2000
 
-
+    @Ignore
     def "go to login"() {
-        login admin
-
         when:
-        select 'Test 1' select "Business Rules"
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
-        check rightSideTitle contains  'Active Validation Rules'
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 1')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Business Rules')
+
+        then:
+        at BusinessRulesPage
+
+        and:
+        check rightSideTitle contains  'Active Business Rules'
     }
 
+    @Ignore
     def "create new validation rule"() {
         when:
         click createButton
@@ -54,17 +76,28 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         check { infTableCell(1, 1) } contains 'TESTING Validation Rule'
     }
 
-
+    @Ignore
     def "NAVIGATE BACK TO THE HOME PAGE"() {
         when:
         click modelCatalogue
-
-        select "Test 2" select "Assets"
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 2')
 
         then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Assets')
+
+        then:
+        at AssetsPage
+
+        and:
         check rightSideTitle is 'Active Assets'
     }
 
+    @Ignore
     def "upload new asset"() {
         when:
         click createButton
@@ -82,6 +115,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         check infiniteTableRow displayed
     }
 
+    @Ignore
     def "navigate to quick search and search a data model"() {
         when:
         click modelCatalogue
@@ -93,6 +127,8 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         then:
         check rightSideTitle contains "Cancer Model"
     }
+
+    @Ignore
     def "navigate to the quick search and search for a data class"() {
 
         click modelCatalogue
@@ -103,11 +139,10 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 
         expect:
         check rightSideTitle contains "NHIC Datasets"
-
-
     }
-    def "navigate to quick search and search for a data element"() {
 
+    @Ignore
+    def "navigate to quick search and search for a data element"() {
         when:
         click modelCatalogue
         click quickSearch
@@ -117,8 +152,9 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check rightSideTitle contains "Test Element 1"
-
     }
+
+    @Ignore
     def "quick search a data type"() {
 
         when:
@@ -132,6 +168,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         check rightSideTitle contains'xs:strin'
     }
 
+    @Ignore
     def "quick search a Measurement unit"() {
 
         when:
@@ -146,8 +183,8 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         check rightSideTitle contains "second"
     }
 
+    @Ignore
     def "quick search a business rule"() {
-
         when:
         click modelCatalogue
         click quickSearch
@@ -161,8 +198,8 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         check rightSideTitle contains "TESTING Validation Rule"
     }
 
+    @Ignore
     def "quick search an asset"() {
-
         when:
         click modelCatalogue
         click quickSearch
@@ -174,12 +211,9 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         then:
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         check rightSideTitle contains "testing"
-
-
     }
+
     String file(String name) {
         new File(AssetWizardSpec.getResource(name).toURI()).absolutePath
     }
-
-
 }

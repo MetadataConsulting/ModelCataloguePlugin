@@ -1,5 +1,9 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.DataElementsPage
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -9,17 +13,40 @@ import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
-@Ignore
 @Stepwise
+@Ignore
 class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
     static final String detailSectionFormItemContent = ".metadata-form-item-content"
 
     def "login and select Data Element"() {
-        login admin
-        select 'Test 1' open 'Data Elements' select 'No tags'
+        when:
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
-        expect:
+        then:
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.search('Test 1')
+        dataModelListPage.select('Test 1')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Elements')
+
+        then:
+        at DataElementsPage
+
+        when:
+        select 'No tags'
+
+        then:
         check rightSideTitle is 'Active Data Elements'
     }
 

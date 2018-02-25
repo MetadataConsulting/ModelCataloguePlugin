@@ -1,38 +1,30 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.LoginPage
 import org.openqa.selenium.WebDriver
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
-@Ignore
 @Stepwise
 class LoginAsViewerSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String createButton = 'a#role_data-models_create-data-modelBtn'
-    private static final String login = "button.btn"
-    private static final String username = "input#username"
-    private static final String password = "input#password"
-    private static final String loginButton = "button.btn-success"
-
-    def "login to model catalogue as a viewer"() {
+    def "Create data Model button is not displayed for viewer"() {
         when:
-        go(baseUrl)
-        click login
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('viewer', 'viewer')
 
         then:
-        $("a.btn-block").text() == "Login with Google"
+        at DataModelListPage
 
-        when:'enter the username and password'
-        fill(username) with("viewer")
-        fill(password) with("viewer")
-
-        and:'click on login button'
-        click loginButton
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
 
         then:
-        check createButton isMissing()
+        !dataModelListPage.isCreateButtonDisplayed()
     }
 }

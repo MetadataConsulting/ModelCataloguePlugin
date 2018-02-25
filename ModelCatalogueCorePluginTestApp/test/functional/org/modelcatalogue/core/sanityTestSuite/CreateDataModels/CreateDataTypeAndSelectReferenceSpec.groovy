@@ -1,5 +1,11 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.DataTypesPage
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Unroll
+
 import static org.modelcatalogue.core.geb.Common.getCreate
 import static org.modelcatalogue.core.geb.Common.getDescription
 import static org.modelcatalogue.core.geb.Common.getItem
@@ -33,11 +39,27 @@ class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec
 
     def "login to Model Catalogue and select Model"() {
         when:
-               loginCurator()
-              select 'Test 3'
-              selectInTree 'Data Types'
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('admin', 'admin')
 
         then:
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Types')
+
+        then:
+        at DataTypesPage
+        and:
         check rightSideTitle contains 'Active Data Types'
     }
 
@@ -76,6 +98,8 @@ class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec
         check table contains 'TESTING_DATA_TYPE'
     }
 
+    @Ignore
+    @Unroll
     def "delete the created data type"() {
         when:'click on the created data type'
         click dataType

@@ -1,5 +1,11 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.DataTypesPage
+import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.MeasurementUnitsPage
+
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
@@ -7,7 +13,6 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
-@Ignore
 @Stepwise
 class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
     private static final String name="input#name"
@@ -19,12 +24,32 @@ class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
 
     def "login to model catalogue and navigate to the model"() {
         when:
-              loginCurator()
-              select'Test 3'
-              selectInTree 'Measurement Units'
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('curator', 'curator')
+
         then:
-              check rightSideTitle contains 'Active Measurement Units'
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.search('Test 3')
+        dataModelListPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Measurement Units')
+
+        then:
+        at MeasurementUnitsPage
+
+        and:
+        check rightSideTitle contains 'Active Measurement Units'
     }
+
     def "Navigate to measure unit page"() {
 
         when:
@@ -45,6 +70,7 @@ class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
             check table contains 'kilogram'
     }
 
+    @Ignore
     def "remove the created measurement"() {
         when:'click on the created  measurement unit'
         click measurementUnit

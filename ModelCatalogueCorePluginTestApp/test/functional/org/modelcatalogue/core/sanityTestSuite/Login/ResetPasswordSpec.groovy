@@ -14,7 +14,6 @@ class ResetPasswordSpec extends AbstractModelCatalogueGebSpec {
     private static final String email ="input#username-new"
     private static final String resetMyPassword ="button.btn"
 
-    @Ignore
     void doResetPassword() {
         when:
         to HomePage

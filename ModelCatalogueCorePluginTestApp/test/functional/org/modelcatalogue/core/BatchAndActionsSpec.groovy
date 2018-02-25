@@ -36,6 +36,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
     def "see test batch in action "() {
         when:
         LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
         at DataModelListPage

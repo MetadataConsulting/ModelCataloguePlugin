@@ -1,5 +1,10 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.ChangesPage
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.DataTypesPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -14,29 +19,47 @@ import spock.lang.IgnoreIf
 @Stepwise
 class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
-
     public static final String FIRST_NEW_ELEMENT_CREATED_CHANGE = "a.change-NEW_ELEMENT_CREATED:first-of-type"
 
     def "go to login"() {
-        loginAdmin()
+        when:
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
-        select 'Test 1' select 'Data Types'
+        then:
+        at DataModelListPage
 
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 1')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Types')
+
+        then:
+        at DataTypesPage
+
+        when:
         click create
 
         fill 'name' with "Data Type Change Test"
 
         click save
 
-        expect:
+        then:
         check 'div.modal' gone
         remove messages
 
         when:
-        go "#/catalogue/change/all"
+        to ChangesPage
 
         then:
-        check 'h3' is 'Changes'
+        at ChangesPage
     }
 
     def "check the unit shows up with own detail page"() {
