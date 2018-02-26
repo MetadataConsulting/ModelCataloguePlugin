@@ -1,5 +1,9 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import org.apache.tomcat.jni.Thread
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
@@ -7,10 +11,9 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
-
 
     private static final String  adminTag = "#role_navigation-right_admin-menu-menu-item-link > span.fa.fa-cog"
     private static final String userName="#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td:nth-child(3) > span > span > a"
@@ -22,18 +25,28 @@ class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue"() {
         when:
-        loginAdmin()
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
+        at DataModelListPage
+
+        and:
         check adminTag displayed
     }
 
+    @Ignore
     def "select a data model and navigate to the user profile"() {
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 3')
 
-    select('Test 3')
+        then:
+        at DataModelPage
 
-    expect:
-    check rightSideTitle contains 'Test 3'
+        and:
+        check rightSideTitle contains 'Test 3'
     }
 
     @Ignore

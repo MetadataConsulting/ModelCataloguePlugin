@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
@@ -7,7 +9,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
 
@@ -16,15 +18,16 @@ class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
      private static final String   search  ='input#value'
 
     def "login to model catalogue"() {
+        when:
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('curator', 'curator')
 
-        loginCurator()
-
-        expect:
+        then:
         check catalogueModels contains 'Catalogue Models'
     }
 
     def "navigate to the top menu and select quick search"() {
-
         when:
         click quickSearch
         Thread.sleep(1000)
@@ -35,6 +38,5 @@ class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check rightSideTitle contains 'Clinical'
-
     }
 }

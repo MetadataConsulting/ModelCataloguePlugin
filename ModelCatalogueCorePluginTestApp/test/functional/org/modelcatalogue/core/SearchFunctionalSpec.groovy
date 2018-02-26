@@ -1,12 +1,16 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
 
@@ -23,10 +27,13 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
 
 
     def "search for patient identity details"() {
-        login admin
+        when:
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
-        go "#/dataModels"
-
+        then:
+        at DataModelListPage
 
         when:
         click search

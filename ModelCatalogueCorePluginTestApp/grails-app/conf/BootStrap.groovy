@@ -56,7 +56,7 @@ class BootStrap {
         log.info 'completed:registerMarshallers'
 
         if ( isDev() ) {
-            initDev()
+            initProd()
 
         } else if ( isTest() ) {
             initTest()

@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -7,7 +9,6 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@Ignore
 @Stepwise
 class MenuBarSpec extends AbstractModelCatalogueGebSpec {
 
@@ -27,12 +28,16 @@ class MenuBarSpec extends AbstractModelCatalogueGebSpec {
     private static final String  activeUsers='div.form-group>table>tbody>tr:nth-child(1)>th'
     private static final String  login ='button.btn'
 
-
     def "login to model catalogue"() {
         when:
-        loginAdmin()
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
+        at DataModelListPage
+
+        and:
         check flash displayed
     }
     def "navigate to the search"() {

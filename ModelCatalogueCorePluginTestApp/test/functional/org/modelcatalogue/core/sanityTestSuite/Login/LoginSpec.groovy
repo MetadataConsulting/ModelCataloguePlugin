@@ -1,39 +1,62 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
-import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.openqa.selenium.WebDriver
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
+import spock.lang.Unroll
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
 class LoginSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String createButton = 'a#role_data-models_create-data-modelBtn'
-    private static final String adminTag = 'span.fa-cog'
-
-    void doLoginAndClickCheckBox() {
-       when:
-           loginViewer()
+    @Unroll
+    void 'create button #description for #username'(String username, String password, boolean displayed, String description) {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login(username, password)
 
         then:
-            check createButton isMissing()
-    }
-
-    def "login to model catalogue as a curator"() {
+        at DataModelListPage
 
         when:
-        loginCurator()
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
 
         then:
-        check adminTag isMissing()
+        waitFor {
+            displayed == dataModelListPage.isCreateButtonDisplayed()
+        }
+
+        where:
+        username     | password     | displayed
+        'viewer'     | 'viewer'     | false
+        'supervisor' | 'supervisor' | true
+        'curator'    | 'curator'    | true
+        description = displayed ? 'is displayed' : 'is not displayed'
     }
 
-    def "login to model catalogue as an admin"() {
-
+    @Unroll
+    void 'Cog icon #description for #username'(String username, String password, boolean displayed, String description) {
         when:
-        loginAdmin()
+        LoginPage loginPage = to LoginPage
+        loginPage.login(username, password)
 
         then:
-        check adminTag isDisplayed()
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+
+        then:
+        waitFor {
+            displayed == dataModelListPage.navbar.isCogIconDisplayed()
+        }
+
+        where:
+        username     | password     | displayed
+        'viewer'     | 'viewer'     | false
+        'supervisor' | 'supervisor' | true
+        'curator'    | 'curator'    | true
+        description = displayed ? 'is displayed' : 'is not displayed'
     }
 }

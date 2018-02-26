@@ -1,10 +1,14 @@
 package org.modelcatalogue.core.Regression
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.description
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
 class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String create = "a#role_data-models_create-data-modelBtn>span:nth-child(2)"
@@ -26,12 +30,17 @@ class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec 
     private static String VERSION = "0.0.1"
     private static String catalogue = "MET-89765}"
 
-
     void addPolicies() {
 
         when: 'login to model catalogue'
-        loginAdmin()
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
         then:
+        at DataModelListPage
+
+        and:
         check create isDisplayed()
 
         when: 'click on create and fill form'

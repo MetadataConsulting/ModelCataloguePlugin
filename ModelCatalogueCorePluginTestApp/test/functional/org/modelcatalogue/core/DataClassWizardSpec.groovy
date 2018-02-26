@@ -1,5 +1,8 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -29,15 +32,26 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     private static final String NEW_DATA_CLASS_NAME = "New ${UUID.randomUUID().toString()}"
 
     def "go to login"() {
-        login admin
+        when:
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
-        select 'Test 2'
+        then:
+        at DataModelListPage
 
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 2')
+
+        then:
+        at DataModelPage
+
+        when:
         addDataModelImport 'nhic'
-
         selectInTree "Data Classes"
 
-        expect:
+        then:
         check '#jserrors' gone
         check rightSideTitle contains "Active Data Classes"
     }

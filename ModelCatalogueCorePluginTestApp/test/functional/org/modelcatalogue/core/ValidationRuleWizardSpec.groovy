@@ -1,22 +1,46 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.BusinessRulesPage
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
 @Stepwise
+@Ignore
 class ValidationRuleWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
-        login admin
-
         when:
-        select 'Test 3' select "Business Rules"
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
-        check rightSideTitle is 'Active Validation Rules'
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Business Rules')
+
+        then:
+        at BusinessRulesPage
+
+        and:
+        check rightSideTitle is 'Active Business Rules'
     }
 
     def "create new validation rule"() {

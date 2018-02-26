@@ -1,5 +1,11 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.DataTypesPage
+import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.MeasurementUnitsPage
+
 import static org.modelcatalogue.core.geb.Common.getCreate
 import static org.modelcatalogue.core.geb.Common.getDescription
 import static org.modelcatalogue.core.geb.Common.getModalHeader
@@ -15,7 +21,6 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
 @Stepwise
 class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 
@@ -27,13 +32,30 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
     private static final String table = "tr.inf-table-item-row>td:nth-child(1)"
 
     def "login and navigate to Data model"() {
-
         when:
-        loginCurator()
-        select 'Test 3'
-        selectInTree 'Data Types'
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('curator', 'curator')
 
         then:
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.search('Test 3')
+        dataModelListPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Types')
+
+        then:
+        at DataTypesPage
+
+        and:
         check rightSideTitle contains 'Active Data Types'
     }
 
