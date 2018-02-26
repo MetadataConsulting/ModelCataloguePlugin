@@ -16,26 +16,40 @@
     <g:layoutHead/>
 </head>
 <body>
-<div class="navbar navbar-default navbar-static-top" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/#">
-                <i class="fas fa-book"></i> <span><g:message code="navigation.home" default="Model Catalogue"/></span>
-            </a>
-        </div>
-        <div class="navbar-collapse collapse" aria-expanded="false" style="height: 0.8px;">
-            <ul class="nav navbar-nav navbar-right">
-                <g:pageProperty name="page.nav" />
-            </ul>
-        </div>
-    </div>
-</div>
+<ul class="nav nav-pills">
+    <li>
+        <a class="navbar-brand" href="${g.createLink(controller: 'dashboard', action: 'index')}">
+            <i class="fas fa-book"></i> <span><g:message code="navigation.home" default="Model Catalogue"/></span>
+        </a>
+    </li>
+    <li role="presentation" class="dropdown navbar-right">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-user-circle"></i> <span class="caret"></span>
+        </a>
+
+        <ul class="dropdown-menu">
+            <li><a href="#"><i class="fas fa-user"></i> <sec:loggedInUserInfo field='username'/></a></li>
+            <li><a href="/#/catalogue/favourites"><i class="fas fa-thumbs-up"></i> Favourites</a></li>
+            <li><a href="#"><i class="fas fa-key"></i> API Key</a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+        </ul>
+    </li>
+    <li role="presentation" class="dropdown navbar-right">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-cog"></i> <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li><a href="/userAdmin"><i class="fas fa-user-plus"></i> Users</a></li>
+            <li><a href="/batch/all"><i class="fas fa-bolt"></i> Mapping Utility</a></li>
+            <li><a href="/#/catalogue/relationshipType/all"><i class="fas fa-link"></i> Relationship Types</a></li>
+            <li><a href="/#/catalogue/dataModelPolicy/all"><i class="far fa-check-square"></i> Data Model Policies</a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i>Activity</a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i>Reindex Catalogue</a></li>
+            <li><a href="/monitoring"><i class="fas fa-cogs"></i> Monitoring</a></li>
+            <li><a href="#"><i class="fas fa-archive"></i> Logs</a></li>
+        </ul>
+    </li>
+</ul>
 
 <g:layoutBody/>
 

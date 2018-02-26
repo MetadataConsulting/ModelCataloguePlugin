@@ -14,7 +14,7 @@
     </thead>
     <tbody>
     <g:each var="catalogueElement" in="${catalogueElementList}">
-        <g:render template="dataElementViewRow" model="[catalogueElement: catalogueElement]"/>
+        <g:render template="catalogueElementViewRow" model="[catalogueElement: catalogueElement, serverUrl: serverUrl]"/>
     </g:each>
     </tbody>
 </table>

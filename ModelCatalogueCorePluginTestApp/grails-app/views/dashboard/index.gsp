@@ -1,4 +1,4 @@
-<%@ page import="org.modelcatalogue.core.view.DataElementViewModel; org.modelcatalogue.core.view.DataModelViewModel; org.modelcatalogue.core.util.MetadataDomain; org.modelcatalogue.core.dashboard.DashboardDropdown; org.modelcatalogue.core.util.PublishedStatus;" %>
+<%@ page import="org.modelcatalogue.core.view.CatalogueElementViewModel; org.modelcatalogue.core.view.DataElementViewModel; org.modelcatalogue.core.view.DataModelViewModel; org.modelcatalogue.core.util.MetadataDomain; org.modelcatalogue.core.dashboard.DashboardDropdown; org.modelcatalogue.core.util.PublishedStatus;" %>
 <html>
 <head>
     <title><g:message code="dashboard.title" default="Data Models"/></title>
@@ -11,6 +11,7 @@
             <div>
                 <div class="input-group">
                     <g:textField name="search" value="${search}" aria-label="..."/>
+                    <g:select name="dataModelId" noSelection="${['null':'Select One...']}" from="${dataModelList}" optionKey="id" optionValue="name"/>
                     <g:select name="metadataDomain" from="${metadataDomainList}" value="${metadataDomain}"/>
                     <g:select name="status" from="${DashboardDropdown.values()}" value="${status}"/>
                     <input type="submit" class="btn btn-default" value="${g.message(code:'datamodel.filter', default: 'Filter')}" />
@@ -26,12 +27,23 @@
 
 <div class="panel-body">
 <g:if test="${catalogueElementList}">
+    <b><g:message code="pagination.total" default="Total: {0}" args="[total]"/></b>
+    <div class="pagination">
+        <g:paginate total="${total ?: 0}" params="${[max: paginationQuery?.offset,
+                                                     metadataDomain: metadataDomain,
+                                                     status: status,
+                                                     search: search,
+                                                     order: sortQuery?.order,
+                                                     sort: sortQuery?.sort,
+                                                     offset: paginationQuery?.offset]}"/>
+    </div>
     <g:if test="${catalogueElementList.first() instanceof DataModelViewModel}">
         <g:render template="dataModelViewTable"/>
     </g:if>
-    <g:elseif test="${catalogueElementList.first() instanceof DataElementViewModel}">
-        <g:render template="dataElementViewTable"/>
+    <g:elseif test="${catalogueElementList.first() instanceof CatalogueElementViewModel}">
+        <g:render template="catalogueElementViewTable"/>
     </g:elseif>
+    <b><g:message code="pagination.total" default="Total: {0}" args="[total]"/></b>
     <div class="pagination">
         <g:paginate total="${total ?: 0}" params="${[max: paginationQuery?.offset,
                                                      metadataDomain: metadataDomain,

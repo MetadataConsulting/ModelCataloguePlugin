@@ -4,17 +4,19 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.IdName
+import org.modelcatalogue.core.util.MetadataDomain
 
 @CompileStatic
-class DataElementViewModelUtils {
+class CatalogueElementViewModelUtils {
 
     @CompileDynamic
-    static List<DataElementViewModel> ofProjections(def dataElementList) {
+    static List<CatalogueElementViewModel> ofProjections(MetadataDomain domain, def dataElementList) {
         if ( !dataElementList ) {
-            return [] as List<DataElementViewModel>
+            return [] as List<CatalogueElementViewModel>
         }
         dataElementList.collect { def arr ->
-            new DataElementViewModel(id: arr[0] as Long,
+            new CatalogueElementViewModel(id: arr[0] as Long,
+                    domain: domain,
                     name: arr[1] as String,
                     lastUpdated: arr[2] as Date,
                     status: arr[3] as ElementStatus,

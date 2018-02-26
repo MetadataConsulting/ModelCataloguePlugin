@@ -1,7 +1,11 @@
 package org.modelcatalogue.core.dashboard
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.persistence.AssetGormService
+import org.modelcatalogue.core.util.IdName
+import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.PublishedStatus
@@ -10,11 +14,21 @@ import org.modelcatalogue.core.view.AssetViewModel
 import org.modelcatalogue.core.view.DataModelViewModel
 import org.springframework.context.MessageSource
 
+import javax.annotation.PostConstruct
+
 @CompileStatic
 class DashboardController {
 
     DashboardService dashboardService
     MessageSource messageSource
+    GrailsApplication grailsApplication
+    String serverUrl
+
+    @CompileDynamic
+    @PostConstruct
+    void init() {
+        this.serverUrl = grailsApplication.config.grails.serverURL
+    }
 
     static allowedMethods = [
             index: 'GET'
@@ -35,16 +49,19 @@ class DashboardController {
                 searchStatusQuery,
                 sortQuery,
                 paginationQuery) ?: [] as List<DataModelViewModel>
+        List<IdName> dataModelList = dashboardService.findAllDataModel()
         int total = dashboardService.countAllBySearchStatusQuery(cmd.metadataDomain, searchStatusQuery)
         [
+                dataModelList: dataModelList,
                 metadataDomain: cmd.metadataDomain,
-                metadataDomainList: [MetadataDomain.DATA_MODEL, MetadataDomain.DATA_ELEMENT],
+                metadataDomainList: dashboardService.metadataDomainList(),
                 sortQuery: sortQuery,
                 paginationQuery: paginationQuery,
                 search: cmd.search,
                 status: cmd.status,
                 catalogueElementList: catalogueElementList,
                 total: total,
+                serverUrl: serverUrl
         ]
     }
 

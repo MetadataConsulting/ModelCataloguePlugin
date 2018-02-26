@@ -1,10 +1,12 @@
 package org.modelcatalogue.core.persistence
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
-import org.modelcatalogue.core.DataElement
+import groovy.transform.CompileStatic
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dashboard.SearchStatusQuery
 import org.springframework.context.MessageSource
 
 class EnumeratedTypeGormService implements WarnGormErrors {
@@ -28,6 +30,24 @@ class EnumeratedTypeGormService implements WarnGormErrors {
             transactionStatus.setRollbackOnly()
         }
         enumeratedTypeInstance
+    }
+
+    @Transactional(readOnly = true)
+    Number countBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
+        findQueryBySearchStatusQuery(searchStatusQuery).count()
+    }
+
+    @CompileStatic
+    DetachedCriteria<EnumeratedType> findQueryBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
+        DetachedCriteria<EnumeratedType> query = EnumeratedType.where {}
+        if ( searchStatusQuery.statusList ) {
+            query = query.where { status in searchStatusQuery.statusList }
+        }
+        if ( searchStatusQuery.search ) {
+            String term = "%${searchStatusQuery.search}%".toString()
+            query = query.where { name =~ term }
+        }
+        query
     }
 }
 

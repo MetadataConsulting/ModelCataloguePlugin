@@ -2,10 +2,11 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
-import org.modelcatalogue.core.DataClass
+import groovy.transform.CompileStatic
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dashboard.SearchStatusQuery
 import org.springframework.context.MessageSource
 
 class DataTypeGormService implements WarnGormErrors {
@@ -39,5 +40,23 @@ class DataTypeGormService implements WarnGormErrors {
     @Transactional
     DataType saveWithStatusAndNameAndDescription(ElementStatus status, String name, String description) {
         save(new DataType(name: name, description: description, status: status))
+    }
+
+    @Transactional(readOnly = true)
+    Number countBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
+        findQueryBySearchStatusQuery(searchStatusQuery).count()
+    }
+
+    @CompileStatic
+    DetachedCriteria<DataType> findQueryBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
+        DetachedCriteria<DataType> query = DataType.where {}
+        if ( searchStatusQuery.statusList ) {
+            query = query.where { status in searchStatusQuery.statusList }
+        }
+        if ( searchStatusQuery.search ) {
+            String term = "%${searchStatusQuery.search}%".toString()
+            query = query.where { name =~ term }
+        }
+        query
     }
 }
