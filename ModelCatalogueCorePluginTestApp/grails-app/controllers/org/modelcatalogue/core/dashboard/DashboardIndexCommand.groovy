@@ -9,6 +9,7 @@ import org.modelcatalogue.core.util.SortQuery
 @Validateable
 class DashboardIndexCommand {
 
+    String dataModelId
     Integer max = 25
     MetadataDomain metadataDomain = MetadataDomain.DATA_MODEL
     DashboardDropdown status = DashboardDropdown.ACTIVE
@@ -18,12 +19,13 @@ class DashboardIndexCommand {
     Integer offset = 0
 
     static constraints = {
+        dataModelId nullable: true
         metadataDomain nullable: false
         status nullable: false
         search nullable: true, blank: true
-        offset nullable: false, min: 0
-        sort nullable: false, inList: ['name', 'status', 'semanticVersion', 'lastUpdated']
-        order nullable: false, inList: ['asc', 'desc']
+        offset nullable: true, min: 0
+        sort nullable: true, inList: ['name', 'status', 'semanticVersion', 'lastUpdated']
+        order nullable: true, inList: ['asc', 'desc']
     }
 
     SearchStatusQuery toSearchStatusQuery() {

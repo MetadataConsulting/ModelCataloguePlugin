@@ -5,6 +5,8 @@ import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import org.grails.datastore.mapping.transactions.Transaction
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.util.FriendlyErrors
 
 @Slf4j
@@ -25,6 +27,8 @@ class UserService {
     public static final String ENV_SUPERVISOR_EMAIL = 'MC_SUPERVISOR_EMAIL'
     public static final String ENV_INVITATION_EMAIL_SUBJECT = 'MC_INVITATION_EMAIL_SUBJECT'
     public static final String ENV_INVITATION_EMAIL_BODY = 'MC_INVITATION_EMAIL_BODY'
+
+    UserGormService userGormService
 
     def mailService
 
@@ -109,5 +113,13 @@ class UserService {
             return resetApiKey(username)?.apiKey
         }
         apiKey
+    }
+
+    @Transactional(readOnly = true)
+    String findApiKeyById(Long id) {
+        DetachedCriteria<User> query = userGormService.queryById(id)
+        query.projections {
+            property('apiKey')
+        }.get()
     }
 }

@@ -17,6 +17,10 @@ class UserGormService implements WarnGormErrors {
         User.get(id)
     }
 
+    DetachedCriteria<User> queryById(Long idParam) {
+        User.where { id == idParam }
+    }
+
     /**
      *
      * @param userId

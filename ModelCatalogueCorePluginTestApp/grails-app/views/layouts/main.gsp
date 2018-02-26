@@ -30,8 +30,8 @@
         <ul class="dropdown-menu">
             <li><a href="#"><i class="fas fa-user"></i> <sec:loggedInUserInfo field='username'/></a></li>
             <li><a href="/#/catalogue/favourites"><i class="fas fa-thumbs-up"></i> Favourites</a></li>
-            <li><a href="#"><i class="fas fa-key"></i> API Key</a></li>
-            <li><a href="#"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+            <li><a href="${g.createLink(controller: 'apiKey')}"><i class="fas fa-key"></i> API Key</a></li>
+            <li><a href="${g.createLink(controller: 'logout')}"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
         </ul>
     </li>
     <li role="presentation" class="dropdown navbar-right">

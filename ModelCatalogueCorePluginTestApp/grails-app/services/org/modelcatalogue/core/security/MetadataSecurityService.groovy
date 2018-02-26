@@ -15,6 +15,11 @@ class MetadataSecurityService {
             ['/api/modelCatalogue/core/northThames/northThamesGridHierarchyMappingSummaryReport/*', 'isAuthenticated()', HttpMethod.GET]
     ]
 
+    public static final List APIKEY_URL_MAPPINGS = [
+            ["/apiKey/index",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+            ["/apiKey/reset",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
+    ]
+
     public static final List MAPPINGS_SUGGESTIONS_URL_MAPPINGS = [
             ["/mappingsuggestions",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/mappingsuggestions",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
@@ -831,7 +836,7 @@ class MetadataSecurityService {
         secureDataModelPermissionEndpoints()
 
         secureMappings(MAPPINGS_SUGGESTIONS_URL_MAPPINGS)
-
+        secureMappings(APIKEY_URL_MAPPINGS)
     }
 
     void secureDataModelPermissionEndpoints() {

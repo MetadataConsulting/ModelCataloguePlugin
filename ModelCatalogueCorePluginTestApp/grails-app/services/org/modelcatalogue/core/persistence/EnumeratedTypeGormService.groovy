@@ -3,6 +3,7 @@ package org.modelcatalogue.core.persistence
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
@@ -33,13 +34,16 @@ class EnumeratedTypeGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
-    Number countBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
-        findQueryBySearchStatusQuery(searchStatusQuery).count()
+    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+        findQueryByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery).count()
     }
 
     @CompileStatic
-    DetachedCriteria<EnumeratedType> findQueryBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
+    DetachedCriteria<EnumeratedType> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
         DetachedCriteria<EnumeratedType> query = EnumeratedType.where {}
+        if ( dataModelId ) {
+            query = query.where { dataModel == DataModel.load(dataModelId) }
+        }
         if ( searchStatusQuery.statusList ) {
             query = query.where { status in searchStatusQuery.statusList }
         }

@@ -11,6 +11,7 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
+import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.persistence.DataClassGormService
@@ -19,6 +20,7 @@ import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.persistence.DataTypeGormService
 import org.modelcatalogue.core.persistence.EnumeratedTypeGormService
 import org.modelcatalogue.core.persistence.MeasurementUnitGormService
+import org.modelcatalogue.core.persistence.TagGormService
 import org.modelcatalogue.core.persistence.ValidationRuleGormService
 import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.util.MetadataDomain
@@ -42,30 +44,44 @@ class DashboardService {
     DataTypeGormService dataTypeGormService
     MeasurementUnitGormService measurementUnitGormService
     ValidationRuleGormService validationRuleGormService
+    TagGormService tagGormService
 
-    List findAllBySearchStatusQuery(MetadataDomain metadataDomain, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    List findAllBySearchStatusQuery(Long dataModelId, MetadataDomain metadataDomain, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         if ( metadataDomain == MetadataDomain.DATA_MODEL ) {
-            return findAllDataModelViewBySearchStatusQuery(searchStatusQuery, sortQuery, paginationQuery)
+            return findAllDataModelViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+
         } else if ( metadataDomain == MetadataDomain.DATA_ELEMENT ) {
-            return findAllDataElementViewBySearchStatusQuery(searchStatusQuery, sortQuery, paginationQuery)
+            return findAllDataElementViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+
         } else if ( metadataDomain == MetadataDomain.DATA_CLASS ) {
-            return findAllDataClassViewBySearchStatusQuery(searchStatusQuery, sortQuery, paginationQuery)
+            return findAllDataClassViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+
         } else if ( metadataDomain == MetadataDomain.ENUMERATED_TYPE ) {
-            return findAllEnumeratedTypeViewBySearchStatusQuery(searchStatusQuery, sortQuery, paginationQuery)
+            return findAllEnumeratedTypeViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+
         } else if ( metadataDomain == MetadataDomain.DATA_TYPE ) {
-            return findAllDataTypeViewBySearchStatusQuery(searchStatusQuery, sortQuery, paginationQuery)
+            return findAllDataTypeViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+
         } else if ( metadataDomain == MetadataDomain.MEASUREMENT_UNIT ) {
-            return findAllMeasurementUnitViewBySearchStatusQuery(searchStatusQuery, sortQuery, paginationQuery)
+            return findAllMeasurementUnitViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+
         } else if ( metadataDomain == MetadataDomain.BUSINESS_RULE) {
-            return findAllBusinessRuleViewBySearchStatusQuery(searchStatusQuery, sortQuery, paginationQuery)
+            return findAllBusinessRuleViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+
+        } else if ( metadataDomain == MetadataDomain.TAG) {
+            return findAllTagViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
         }
         []
     }
 
     @CompileDynamic
-    Object resultsOfBuildableCriteriaBySearchStatusQuery(BuildableCriteria criteria, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    Object resultsOfBuildableCriteriaBySearchStatusQuery(BuildableCriteria criteria, Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         criteria.list {
+            createAlias('dataModel', 'dataModel')
             and {
+                if (dataModelId) {
+                    eq("dataModel.id", dataModelId)
+                }
                 if (searchStatusQuery.search) {
                     ilike("name", "%${searchStatusQuery.search}%")
                 }
@@ -76,7 +92,6 @@ class DashboardService {
             maxResults(paginationQuery.max)
             firstResult(paginationQuery.offset)
             order(sortQuery.sort, sortQuery.order)
-            createAlias('dataModel', 'dataModel')
             projections {
                 property('id', 'id')
                 property('name', 'name')
@@ -104,51 +119,61 @@ class DashboardService {
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllBusinessRuleViewBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    List<CatalogueElementViewModel> findAllBusinessRuleViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = ValidationRule.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
+        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
         CatalogueElementViewModelUtils.ofProjections(MetadataDomain.BUSINESS_RULE, results)
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllMeasurementUnitViewBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    List<CatalogueElementViewModel> findAllMeasurementUnitViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = MeasurementUnit.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
+        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
         CatalogueElementViewModelUtils.ofProjections(MetadataDomain.MEASUREMENT_UNIT, results)
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllDataTypeViewBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    List<CatalogueElementViewModel> findAllDataTypeViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = DataType.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
+        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
         CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_TYPE, results)
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllEnumeratedTypeViewBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    List<CatalogueElementViewModel> findAllEnumeratedTypeViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = DataElement.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
+        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
         CatalogueElementViewModelUtils.ofProjections(MetadataDomain.ENUMERATED_TYPE, results)
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllDataClassViewBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    List<CatalogueElementViewModel> findAllDataClassViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = DataElement.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
+        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
         CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_CLASS, results)
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllDataElementViewBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    List<CatalogueElementViewModel> findAllDataElementViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = DataElement.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
+        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
         CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_ELEMENT, results)
+    }
+
+    @Transactional(readOnly = true)
+    List<CatalogueElementViewModel> findAllTagViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+        BuildableCriteria c = Tag.createCriteria()
+        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+        CatalogueElementViewModelUtils.ofProjections(MetadataDomain.TAG, results)
     }
 
     @CompileDynamic
     @Transactional(readOnly = true)
-    List<DataModelViewModel> findAllDataModelViewBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    List<DataModelViewModel> findAllDataModelViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         DetachedCriteria<DataModel> query = dataModelGormService.findQueryBySearchStatusQuery(searchStatusQuery, sortQuery)
+        if ( dataModelId ) {
+            query = query.where { id == dataModelId }
+        }
         query.join('asset')
 
         Map m = paginationQuery.toMap()
@@ -205,21 +230,30 @@ class DashboardService {
         }
     }
 
-    int countAllBySearchStatusQuery(MetadataDomain metadataDomain, SearchStatusQuery searchStatusQuery) {
+    int countAllBySearchStatusQuery(Long dataModelId, MetadataDomain metadataDomain, SearchStatusQuery searchStatusQuery) {
         if ( metadataDomain == MetadataDomain.DATA_MODEL ) {
             return countAllDataModelBySearchStatusQuery(searchStatusQuery)
+
         } else if ( metadataDomain == MetadataDomain.DATA_ELEMENT ) {
-            return dataElementGormService.countBySearchStatusQuery(searchStatusQuery) as int
+            return dataElementGormService.countByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery) as int
+
         } else if ( metadataDomain == MetadataDomain.DATA_CLASS ) {
-            return dataClassGormService.countBySearchStatusQuery(searchStatusQuery) as int
+            return dataClassGormService.countByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery) as int
+
         } else if ( metadataDomain == MetadataDomain.ENUMERATED_TYPE ) {
-            return enumeratedTypeGormService.countBySearchStatusQuery(searchStatusQuery) as int
+            return enumeratedTypeGormService.countByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery) as int
+
         } else if ( metadataDomain == MetadataDomain.DATA_TYPE ) {
-            return dataTypeGormService.countBySearchStatusQuery(searchStatusQuery) as int
+            return dataTypeGormService.countByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery) as int
+
         } else if ( metadataDomain == MetadataDomain.MEASUREMENT_UNIT ) {
-            return measurementUnitGormService.countBySearchStatusQuery(searchStatusQuery) as int
+            return measurementUnitGormService.countByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery) as int
+
         } else if ( metadataDomain == MetadataDomain.BUSINESS_RULE ) {
-            return validationRuleGormService.countBySearchStatusQuery(searchStatusQuery) as int
+            return validationRuleGormService.countByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery) as int
+
+        } else if ( metadataDomain == MetadataDomain.TAG ) {
+            return tagGormService.countByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery) as int
         }
 
         0
@@ -238,7 +272,8 @@ class DashboardService {
                 MetadataDomain.ENUMERATED_TYPE,
                 MetadataDomain.DATA_TYPE,
                 MetadataDomain.MEASUREMENT_UNIT,
-                MetadataDomain.BUSINESS_RULE
+                MetadataDomain.BUSINESS_RULE,
+                MetadataDomain.TAG
         ]
     }
 }

@@ -1,4 +1,4 @@
-<%@ page import="org.modelcatalogue.core.view.CatalogueElementViewModel; org.modelcatalogue.core.view.DataElementViewModel; org.modelcatalogue.core.view.DataModelViewModel; org.modelcatalogue.core.util.MetadataDomain; org.modelcatalogue.core.dashboard.DashboardDropdown; org.modelcatalogue.core.util.PublishedStatus;" %>
+<%@ page import="org.modelcatalogue.core.view.CatalogueElementViewModel; org.modelcatalogue.core.view.DataModelViewModel; org.modelcatalogue.core.util.MetadataDomain; org.modelcatalogue.core.dashboard.DashboardDropdown; org.modelcatalogue.core.util.PublishedStatus;" %>
 <html>
 <head>
     <title><g:message code="dashboard.title" default="Data Models"/></title>
@@ -11,7 +11,7 @@
             <div>
                 <div class="input-group">
                     <g:textField name="search" value="${search}" aria-label="..."/>
-                    <g:select name="dataModelId" noSelection="${['null':'Select One...']}" from="${dataModelList}" optionKey="id" optionValue="name"/>
+                    <g:select name="dataModelId" noSelection="${['null':'Select One...']}" from="${dataModelList}" optionKey="id" optionValue="name" value="${dataModelId}"/>
                     <g:select name="metadataDomain" from="${metadataDomainList}" value="${metadataDomain}"/>
                     <g:select name="status" from="${DashboardDropdown.values()}" value="${status}"/>
                     <input type="submit" class="btn btn-default" value="${g.message(code:'datamodel.filter', default: 'Filter')}" />
@@ -31,6 +31,7 @@
     <div class="pagination">
         <g:paginate total="${total ?: 0}" params="${[max: paginationQuery?.offset,
                                                      metadataDomain: metadataDomain,
+                                                     dataModelId: dataModelId,
                                                      status: status,
                                                      search: search,
                                                      order: sortQuery?.order,
@@ -47,6 +48,7 @@
     <div class="pagination">
         <g:paginate total="${total ?: 0}" params="${[max: paginationQuery?.offset,
                                                      metadataDomain: metadataDomain,
+                                                     dataModelId: dataModelId,
                                                      status: status,
                                                      search: search,
                                                      order: sortQuery?.order,
@@ -55,7 +57,7 @@
     </div>
     </g:if>
     <g:else>
-        <h1><g:message code="datamodel.notFound" default="Data Models not found"/></h1>
+        <h1><g:message code="results.notFound" default="No results found"/></h1>
     </g:else>
 </div><!-- /.panel-body -->
 </body>

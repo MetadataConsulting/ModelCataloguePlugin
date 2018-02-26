@@ -81,6 +81,28 @@ class DashboardControllerSpec extends Specification {
         model['total'] == 0
     }
 
+    def "dashboard.index model contains dataModelId"() {
+        given:
+        controller.dashboardService = Mock(DashboardService)
+
+        when:
+        Map model = controller.index()
+
+        then:
+        model.keySet().contains('dataModelId')
+    }
+
+    def "dashboard.index model contains serverUrl"() {
+        given:
+        controller.dashboardService = Mock(DashboardService)
+
+        when:
+        Map model = controller.index()
+
+        then:
+        model.keySet().contains('serverUrl')
+    }
+
     def "findAllBySearchStatusQuery and count are invoked once"() {
         given:
         controller.dashboardService = Mock(DashboardService)
@@ -89,7 +111,7 @@ class DashboardControllerSpec extends Specification {
         controller.index()
 
         then:
-        1 * controller.dashboardService.findAllBySearchStatusQuery(_, _, _, _)
-        1 * controller.dashboardService.countAllBySearchStatusQuery(_, _)
+        1 * controller.dashboardService.findAllBySearchStatusQuery(_, _, _, _, _)
+        1 * controller.dashboardService.countAllBySearchStatusQuery(_, _, _)
     }
 }

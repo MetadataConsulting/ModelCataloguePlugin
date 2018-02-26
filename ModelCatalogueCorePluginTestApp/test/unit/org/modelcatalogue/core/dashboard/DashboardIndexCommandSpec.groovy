@@ -7,6 +7,17 @@ import spock.lang.Unroll
 @Mock(DashboardController)
 class DashboardIndexCommandSpec extends Specification {
 
+    void 'test dataModelId can be null'() {
+        given:
+        DashboardIndexCommand cmd = new DashboardIndexCommand()
+
+        when:
+        cmd.dataModelId = null
+
+        then:
+        cmd.validate(['dataModelId'])
+    }
+
     void 'test search can be null'() {
         given:
         DashboardIndexCommand cmd = new DashboardIndexCommand()

@@ -80,13 +80,16 @@ class DataClassGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
-    Number countBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
-        findQueryBySearchStatusQuery(searchStatusQuery).count()
+    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+        findQueryByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery).count()
     }
 
     @CompileStatic
-    DetachedCriteria<DataClass> findQueryBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
+    DetachedCriteria<DataClass> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
         DetachedCriteria<DataClass> query = DataClass.where {}
+        if ( dataModelId ) {
+            query = query.where { dataModel == DataModel.load(dataModelId) }
+        }
         if ( searchStatusQuery.statusList ) {
             query = query.where { status in searchStatusQuery.statusList }
         }

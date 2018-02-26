@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.DataModel
@@ -155,9 +156,12 @@ class DataElementGormService implements WarnGormErrors {
         query
     }
 
-    @CompileStatic
-    DetachedCriteria<DataElement> findQueryBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery) {
+    @CompileDynamic
+    DetachedCriteria<DataElement> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery) {
         DetachedCriteria<DataElement> query = findQueryBySearchStatusQuery(searchStatusQuery)
+        if ( dataModelId ) {
+            query = query.where { dataModel == DataModel.load(dataModelId) }
+        }
         if ( sortQuery?.sort != null && sortQuery?.order != null) {
             query = query.sort(sortQuery.sort, sortQuery.order)
         }
@@ -165,7 +169,7 @@ class DataElementGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
-    Number countBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
+    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
         findQueryBySearchStatusQuery(searchStatusQuery).count()
     }
 }

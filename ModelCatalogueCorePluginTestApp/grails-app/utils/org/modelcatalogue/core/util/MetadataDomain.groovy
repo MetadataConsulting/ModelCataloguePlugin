@@ -33,7 +33,8 @@ enum MetadataDomain {
     RELATIONSHIP_METADATA,
     RELATIONSHIP_TYPE,
     RELATIONSHIP_TAG,
-    BUSINESS_RULE
+    BUSINESS_RULE,
+    TAG
 
     static MetadataDomain of(CatalogueElement catalogueElement) {
 
@@ -66,6 +67,9 @@ enum MetadataDomain {
 
         } else if ( catalogueElement instanceof ValidationRule ) {
             return BUSINESS_RULE
+
+        } else if ( catalogueElement instanceof ValidationRule ) {
+            return TAG
         }
         CATALOGUE_ELEMENT
     }
@@ -110,6 +114,8 @@ enum MetadataDomain {
                 return 'relationshipTag'
             case BUSINESS_RULE:
                 return 'validationRule'
+            case TAG:
+                return 'tag'
             default:
                 return null
         }
@@ -155,6 +161,8 @@ enum MetadataDomain {
                 return 'RelationshipTag'
             case BUSINESS_RULE:
                 return 'ValidationRule'
+            case TAG:
+                return 'Tag'
             default:
                 return null
         }

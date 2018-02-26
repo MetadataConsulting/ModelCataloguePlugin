@@ -36,6 +36,12 @@ class DashboardController {
 
     def index(DashboardIndexCommand cmd) {
 
+        String dataModelIdStr = cmd.dataModelId
+        if ( dataModelIdStr == 'null') {
+            dataModelIdStr = null
+        }
+        Long dataModelId = dataModelIdStr as Long
+
         if  ( cmd.hasErrors() ) {
             flash.error = messageSource.getMessage('dashboard.params.notvalid', [] as Object[], 'Invalid Parameters', request.locale)
             return
@@ -45,12 +51,12 @@ class DashboardController {
         SortQuery sortQuery = cmd.toSortQuery()
         PaginationQuery paginationQuery = cmd.toPaginationQuery()
 
-        List catalogueElementList = dashboardService.findAllBySearchStatusQuery(cmd.metadataDomain,
+        List catalogueElementList = dashboardService.findAllBySearchStatusQuery(dataModelId, cmd.metadataDomain,
                 searchStatusQuery,
                 sortQuery,
                 paginationQuery) ?: [] as List<DataModelViewModel>
         List<IdName> dataModelList = dashboardService.findAllDataModel()
-        int total = dashboardService.countAllBySearchStatusQuery(cmd.metadataDomain, searchStatusQuery)
+        int total = dashboardService.countAllBySearchStatusQuery(dataModelId, cmd.metadataDomain, searchStatusQuery)
         [
                 dataModelList: dataModelList,
                 metadataDomain: cmd.metadataDomain,
@@ -61,7 +67,8 @@ class DashboardController {
                 status: cmd.status,
                 catalogueElementList: catalogueElementList,
                 total: total,
-                serverUrl: serverUrl
+                serverUrl: serverUrl,
+                dataModelId: dataModelId
         ]
     }
 

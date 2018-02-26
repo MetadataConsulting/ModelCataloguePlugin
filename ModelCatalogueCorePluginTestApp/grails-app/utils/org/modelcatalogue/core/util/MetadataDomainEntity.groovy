@@ -97,6 +97,10 @@ class MetadataDomainEntity {
                 className = 'ValidationRule'
                 metadataDomain =  MetadataDomain.BUSINESS_RULE
 
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.Tag:")) {
+                className = 'Tag'
+                metadataDomain =  MetadataDomain.TAG
+
             }
             if ( className == null ||metadataDomain == null ) {
                 return null
