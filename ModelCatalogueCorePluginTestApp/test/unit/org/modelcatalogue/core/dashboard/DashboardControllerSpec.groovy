@@ -65,8 +65,8 @@ class DashboardControllerSpec extends Specification {
         Map model = controller.index()
 
         then:
-        model.keySet().contains('models')
-        model['models'] == []
+        model.keySet().contains('catalogueElementList')
+        model['catalogueElementList'] == []
     }
 
     def "dashboard.index model contains total"() {
@@ -89,7 +89,7 @@ class DashboardControllerSpec extends Specification {
         controller.index()
 
         then:
-        1 * controller.dashboardService.findAllBySearchStatusQuery(_, _, _)
-        1 * controller.dashboardService.countAllBySearchStatusQuery(_)
+        1 * controller.dashboardService.findAllBySearchStatusQuery(_, _, _, _)
+        1 * controller.dashboardService.countAllBySearchStatusQuery(_, _)
     }
 }
