@@ -1,5 +1,9 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.*
 import geb.module.Select
 import groovy.transform.NotYetImplemented
@@ -26,9 +30,20 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue and navigate to data model"() {
         when:
-        loginAdmin()
-        select 'Test 1'
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
         then:
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 1')
+
+        then:
+        at DataModelPage
+        and:
         check rightSideTitle contains 'Test 1'
     }
 

@@ -8,6 +8,7 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.*
 
+@IgnoreIf({ System.getProperty('IGNORE_OFFICE') })
 class DataClassToXlsxExporterSpec extends AbstractIntegrationSpec {
 
     ElementService elementService

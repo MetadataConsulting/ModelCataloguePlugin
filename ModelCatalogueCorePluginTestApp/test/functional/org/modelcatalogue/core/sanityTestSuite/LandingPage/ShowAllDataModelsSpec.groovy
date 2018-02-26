@@ -1,11 +1,14 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.curator
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class ShowAllDataModelsSpec  extends AbstractModelCatalogueGebSpec {
 
@@ -15,7 +18,9 @@ class ShowAllDataModelsSpec  extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue"() {
         when:
-        login curator
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('curator', 'curator')
 
         then:
         check create displayed

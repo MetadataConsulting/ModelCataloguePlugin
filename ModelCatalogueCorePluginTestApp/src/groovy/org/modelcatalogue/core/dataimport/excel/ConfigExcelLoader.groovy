@@ -18,14 +18,50 @@ import org.springframework.context.ApplicationContext
 class ConfigExcelLoader extends ExcelLoader {
     final String DEFAULT_MU_NAME = null
     final Integer MAX_METADATA_LEN = 2000
+    final Integer MAX_NAME_LEN = 255
+    final Integer GORM_BATCH_SIZE = 50
+    final Integer EXCEL_BATCH_SIZE = 1000
 //    AuditService auditService
     String dataModelName
     Map<String, Object> headersMap = null
     String classHierarchySeparatorRegEx = "\\."
+    String ruleSeparatorRegEx = "\\n"
+    Integer headerRow = 1
+    Integer dataStartRow = 2
+    ElementService elementService
 
-    ConfigExcelLoader(String dataModelName, InputStream xmlInput) {
+    ConfigExcelLoader(String dataModelName, InputStream xmlInput, ElementService elementService) {
         this.dataModelName = dataModelName
         this.headersMap = this.parseXml(xmlInput)
+        this.elementService = elementService
+    }
+    /**
+     * This also processes the tag
+     * @param tag
+     * @param value
+     * @return true if it was a metatag and has been processed
+     */
+    Boolean isMetaTag(String tag, String value) {
+        switch (tag) {
+            case 'classHierarchySeparator':
+                classHierarchySeparatorRegEx = value
+                return true
+            case 'ruleSeparator':
+                ruleSeparatorRegEx = value
+                return true
+            case 'headerRow':
+                if (value.isInteger()) {
+                    headerRow = value.toInteger()
+                }
+                return true
+            case 'dataStartRow':
+                if (value.isInteger()) {
+                    dataStartRow = value.toInteger()
+                }
+                return true
+            default:
+                return false
+        }
     }
     /**
      * This iterates through the headersMap XML nodes and builds a Map object with the mappings.
@@ -39,19 +75,14 @@ class ConfigExcelLoader extends ExcelLoader {
         List<String> metadataKeys = []
         for (groovy.util.slurpersupport.Node n in xml.childNodes()) {
             String nName = n.name()
-            System.out.println(nName + ": '" + n.text() + "',")
-            switch (nName) {
-                case 'metadata':
-                    metadataKeys += n.text()
-                    break;
-                case 'classHierarchySeparator':
-                    classHierarchySeparatorRegEx = n.text()
-                    break;
-                default:
-                    if (n.text()) {
-                        hdrMap[nName] = n.text()
-                    }
-                    break;
+            String nValue = n.text()
+//            log.info(nName + ": '" + nValue + "',")
+            if (nName == 'metadata') {
+                metadataKeys += nValue
+            } else if (isMetaTag(nName, nValue)) {
+                // no need to do anything
+            } else if (nValue){
+                hdrMap[nName] = n.text()
             }
         }
         hdrMap['metadata'] = metadataKeys
@@ -69,19 +100,14 @@ class ConfigExcelLoader extends ExcelLoader {
         List<String> metadataKeys = []
         for (groovy.util.slurpersupport.Node n in xml.childNodes()) {
             String nName = n.name()
-            System.out.println(nName + ": '" + n.text() + "',")
-            switch (nName) {
-                case 'metadata':
-                    metadataKeys += n.text()
-                    break;
-                case 'classHierarchySeparator':
-                    classHierarchySeparatorRegEx = n.text()
-                    break;
-                default:
-                    if (n.text()) {
-                        hdrMap[nName] = n.text()
-                    }
-                    break;
+            String nValue = n.text()
+//            log.info(nName + ": '" + nValue + "',")
+            if (nName == 'metadata') {
+                metadataKeys += nValue
+            } else if (isMetaTag(nName, nValue)) {
+                // no need to do anything
+            } else if (nValue){
+                hdrMap[nName] = n.text()
             }
         }
         hdrMap['metadata'] = metadataKeys
@@ -98,16 +124,15 @@ class ConfigExcelLoader extends ExcelLoader {
         switch (xml.name()) {
             case 'mcExcelConfig':
                 for (groovy.util.slurpersupport.Node n in xml.childNodes()) {
-                    System.out.println(n.name() + ": '" + n.text() + "',")
-                    switch (n.name()) {
-                        case 'headersMap':
-                            hdrMap = parseHeadersMap(n)
-                            break;
-                        case 'classHierarchySeparator':
-                            classHierarchySeparatorRegEx = n.text()
-                            break;
-                        default:
-                            break;
+                    String nName = n.name()
+                    String nValue = n.text()
+//                  log.info(nName + ": '" + nValue + "',")
+                    if (nName == 'headersMap') {
+                        hdrMap = parseHeadersMap(n)
+                    } else if (isMetaTag(nName, nValue)) {
+                        // no need to do anything
+                    } else {
+                        log.info("parseXml: unexpected tag: ${nName} => ${nValue}")
                     }
                 }
                 break;
@@ -176,21 +201,29 @@ class ConfigExcelLoader extends ExcelLoader {
 
     List<Map<String, String>> getRowMaps(Sheet sheet, headersMap) {
         Iterator<Row> rowIt = sheet.rowIterator()
-        Row row = rowIt.next()
-        List<String> headers = getRowData(row)
-        log.info("Headers are ${headers as String}")
+        List<String> headers
         List<Map<String, String>> rowMaps = []
-        int counter = 0
-        int batchSize = 1000
+        int rowNum = 1
         while (rowIt.hasNext()) {
 //            println("processing row" + counter)
-            if(++counter % batchSize == 0 ) {
+            if(rowNum % EXCEL_BATCH_SIZE == 0 ) {
                 processRowMaps(rowMaps, headersMap)
                 rowMaps.clear()
             }
-            row = rowIt.next()
-            Map<String, String> rowMap = createRowMap(row, headers)
-            rowMaps << rowMap
+            Row row = rowIt.next()
+            if (rowNum == headerRow) {
+                headers = getRowData(row)
+                log.info("Headers are ${headers as String}")
+            } else if (rowNum >= dataStartRow) {
+                if (!isRowEmpty(row)) {
+                    Map<String, String> rowMap = createRowMap(row, headers)
+                    rowMaps << rowMap
+                }
+            } else {
+                // we are before the header row or between the header and data rows
+                log.info("Ignoring row ${rowNum}: ${getRowData(row).toString()}")
+            }
+            ++rowNum
         }
         return rowMaps
     }
@@ -266,6 +299,14 @@ class ConfigExcelLoader extends ExcelLoader {
         session.clear()
         propertyInstanceMap.get().clear()
         log.info("cleaned up GORM")
+    }
+
+    String toName(String name) {
+        return name.length() <= MAX_NAME_LEN ? name : name.substring(0, MAX_NAME_LEN)
+    }
+
+    void setName(CatalogueElement ce, String name) {
+        ce.name = toName(name)
     }
     /**
      *
@@ -365,9 +406,6 @@ class ConfigExcelLoader extends ExcelLoader {
         }
         String dcDescription = tryHeader(ConfigHeadersMap.containingDataClassDescription, headersMap, rowMap)
 
-        if (!dcNames) {
-            return null
-        }
         String[] dcNameList = classHierarchySeparatorRegEx ? dcNames.split(classHierarchySeparatorRegEx) : toStringArray(dcNames)
         Integer maxDcNameIx = dcNameList.length - 1
         Integer dcNameIx = 0
@@ -562,6 +600,84 @@ class ConfigExcelLoader extends ExcelLoader {
         }
         return  updated
     }
+    Relationship findSource(List<Relationship> rels, CatalogueElement src) {
+        if (rels && src) {
+            for (Relationship rel in rels) {
+                if (rel.source == src) {
+                    return rel
+                }
+            }
+        }
+        return null
+    }
+    Boolean containsSource(List<Relationship> rels, CatalogueElement src) {
+        Relationship r = findSource(rels, src)
+        return (r != null)
+    }
+    Relationship findSourceName(List<Relationship> rels, String srcName) {
+        String srcName2 = toName(srcName)
+        if (rels && srcName2) {
+            for (Relationship rel in rels) {
+                if (rel.source.name == srcName2) {
+                    return rel
+                }
+            }
+        }
+        return null
+    }
+    Boolean containsSourceName(List<Relationship> rels, String srcName) {
+        Relationship r = findSourceName(rels, srcName)
+        return (r != null)
+    }
+    Relationship findSourceDesc(List<Relationship> rels, String srcDesc) {
+        if (rels && srcDesc) {
+            for (Relationship rel in rels) {
+                if (rel.source.description == srcDesc) {
+                    return rel
+                }
+            }
+        }
+        return null
+    }
+    Boolean containsSourceDesc(List<Relationship> rels, String srcDesc) {
+        Relationship r = findSourceDesc(rels, srcDesc)
+        return (r != null)
+    }
+    Boolean isMandatory(Map<String, Object> headersMap, Map<String, String> rowMap) {
+        String mandStr = tryHeader(ConfigHeadersMap.mandatoryRule, headersMap, rowMap)
+        return mandStr == null ? null : ('M' == mandStr)
+    }
+    void setMandatory(Relationship rel, Boolean mandatory) {
+        if (mandatory != null) {
+            rel.ext['Usage'] = (mandatory ? 'Required' : 'Optional')
+            rel.ext['Min Occurs'] = (mandatory ? '1' : '0')
+            rel.ext['Max Occurs'] = '1'
+        }
+    }
+    Relationship createRelationship(DataModel dm, CatalogueElement dest, CatalogueElement src, RelationshipType rt) {
+        Relationship rel = new Relationship()
+        rel.dataModel = dm
+        rel.destination = dest
+        rel.source = src
+        rel.relationshipType = rt
+        dest.addToIncomingRelationships(rel)
+        rel.save()
+        return rel
+    }
+    void addToContainedIn(DataModel dm, DataElement de, DataClass dc, Boolean mandatory) {
+        List<Relationship> containers = de.getIncomingRelationshipsByType(RelationshipType.containmentType)
+        Relationship container = findSource(containers, dc)
+        if (container == null) {
+            de.addToContainedIn(dc)
+            containers = de.getIncomingRelationshipsByType(RelationshipType.containmentType)
+            container = findSource(containers, dc)
+//            log.info("added to contained in: ", container)
+        }
+        if (mandatory != null) { // only update if supplied
+            setMandatory(container, mandatory)
+            container.save()
+        }
+    }
     /**
      *
      * @param dataModel
@@ -589,7 +705,7 @@ class ConfigExcelLoader extends ExcelLoader {
      * @param dt
      * @return
      */
-    DataElement processDataElement(DataModel dataModel, Map<String, Object> headersMap, Map<String, String> rowMap, DataType dt) {
+    DataElement processDataElement(DataModel dataModel, Map<String, Object> headersMap, Map<String, String> rowMap, DataClass dc, DataType dt) {
         Boolean updated = false
         List<String> metadataKeys = headersMap['metadata']
         String deCode = tryHeader(ConfigHeadersMap.dataElementCode, headersMap, rowMap)
@@ -639,7 +755,49 @@ class ConfigExcelLoader extends ExcelLoader {
         if (de && updated) {
             de.save()
         }
+        if (de && dc) {
+            addToContainedIn(dataModel, de, dc, isMandatory(headersMap, rowMap))    // was            de.addToContainedIn(dc)
+        }
         return de
+    }
+
+
+    /**
+     *
+     * @param dataModel
+     * @param headersMap
+     * @param rowMap
+     * @param dc
+     * @param de
+     * @return
+     */
+    void processValidationRules(DataModel dataModel, Map<String, Object> headersMap, Map<String, String> rowMap, DataClass dc, DataElement de) {
+//        Boolean updated = false
+        String vRules = tryHeader(ConfigHeadersMap.validationRules, headersMap, rowMap)
+        List<Relationship> deRules = de?.getIncomingRelationshipsByType(RelationshipType.involvednessType)
+        List<Relationship> dcRules = dc?.getIncomingRelationshipsByType(RelationshipType.ruleContextType)
+//        log.info("processValidationRules:\n\tdeRules = ${deRules ? deRules.toString() : 'NULL'}\n\tdcRules = ${dcRules ? dcRules.toString() : 'NULL'}")
+        if (vRules != null) { // just insert them at the moment
+            String[] vRuleList = ruleSeparatorRegEx ? vRules.split(ruleSeparatorRegEx) : toStringArray(vRules)
+//            log.info("processValidationRules: vRuleList = ${vRuleList.toString()}")
+            //ValidationRule
+            for (String vRule in vRuleList) {
+                if (vRule) { // ignore any blank lines
+                    ValidationRule vr = new ValidationRule()
+                    vr.dataModel = dataModel
+                    vr.name = toName(vRule)
+                    vr.description = vRule
+                    vr.save()
+                    if (de && !containsSourceDesc(deRules, vRule)) {
+                        createRelationship(dataModel, de, vr, RelationshipType.involvednessType)
+                    }
+                    if (dc && !containsSourceDesc(dcRules, vRule)) {
+                        createRelationship(dataModel, dc, vr, RelationshipType.ruleContextType)
+                    }
+                }
+            }
+        } else { // do nothing at the moment  - should we delete existing rules??
+        }
     }
     /**
      *
@@ -649,22 +807,19 @@ class ConfigExcelLoader extends ExcelLoader {
      * @return
      */
     def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName) {
-        int count = 0
-        int batchSize = 50
+        int rowNum = 1
         if (rowMaps && headersMap) {
             DataModel dataModel = processDataModel(dataModelName)
 
             for (Map<String, String> rowMap in rowMaps) {
-                log.info("creating row" + count)
+                log.info("creating row " + rowNum)
                 DataClass dc = processDataClass(dataModel, headersMap, rowMap)
                 MeasurementUnit mu = processMeasurementUnit(dataModel, headersMap, rowMap)
                 DataType dt = processDataType(dataModel, headersMap, rowMap, mu)
-                DataElement de = processDataElement(dataModel, headersMap, rowMap, dt)
-                if (de && dc) {
-                    de.addToContainedIn(dc)
-                    if (++count % batchSize == 0) {
-                        cleanGORM()
-                    }
+                DataElement de = processDataElement(dataModel, headersMap, rowMap, dc, dt)
+                processValidationRules(dataModel, headersMap, rowMap, dc, de)
+                if (rowNum++ % GORM_BATCH_SIZE == 0) {
+                    cleanGORM()
                 }
             }
             cleanGORM()
@@ -692,19 +847,11 @@ class ConfigExcelLoader extends ExcelLoader {
         if (!workbook) {
             throw new IllegalArgumentException("Excel file contains no worksheet!")
         }
-//        if (auditService) {
-//            auditService.mute {
-//                Sheet sheet = workbook.getSheetAt(index);
-//                List<Map<String,String>> rowMaps = getRowMaps(sheet, headersMap)
-//                //Iterate through the modelMaps to build new DataModel
-//                processRowMaps(rowMaps, headersMap)
-//            }
-//        } else {
-            Sheet sheet = workbook.getSheetAt(index)
-            List<Map<String,String>> rowMaps = getRowMaps(sheet, headersMap)
-            //Iterate through the modelMaps to build new DataModel
-            processRowMaps(rowMaps, headersMap)
-//        }
+
+        Sheet sheet = workbook.getSheetAt(index)
+        List<Map<String,String>> rowMaps = getRowMaps(sheet, headersMap)
+        //Iterate through the modelMaps to build new DataModel
+        processRowMaps(rowMaps, headersMap)
 
     }
     /**
@@ -726,20 +873,10 @@ class ConfigExcelLoader extends ExcelLoader {
         if (!workbook) {
             throw new IllegalArgumentException("Excel file contains no worksheet!")
         }
-//        if (auditService) {
-//            auditService.mute {
-//                Sheet sheet = workbook.getSheetAt(index);
-//                List<Map<String,String>> rowMaps = getRowMaps(sheet, headersMap)
-//                //Iterate through the modelMaps to build new DataModel
-//                processRowMaps(rowMaps, headersMap)
-//            }
-//        } else {
         Sheet sheet = workbook.getSheetAt(0)
         List<Map<String,String>> rowMaps = getRowMaps(sheet, headersMap)
         //Iterate through the modelMaps to build new DataModel
         processRowMaps(rowMaps, headersMap)
-//        }
-
     }
     String outOfBoundsWith(Closure<String> c, String s = '') {
         try {

@@ -26,7 +26,7 @@ class MeasurementUnitMarshaller extends CatalogueElementMarshaller {
         Map<String, Object> ret = super.prepareJsonMap(unit)
         ret.putAll(symbol: unit.symbol)
         ret.primitiveTypes = [
-                count: primitiveTypeGormService.countByMeasurementUnit(unit),
+                count: unit.isAttached() ? primitiveTypeGormService.countByMeasurementUnit(unit) : 0,
                 itemType: PrimitiveType.name,
                 link: "/${GrailsNameUtils.getPropertyName(unit.getClass())}/$unit.id/primitiveType"]
         ret

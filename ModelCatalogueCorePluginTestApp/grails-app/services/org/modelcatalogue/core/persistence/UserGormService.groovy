@@ -88,4 +88,24 @@ class UserGormService implements WarnGormErrors {
         User.where { username == usernameParam }
     }
 
+    @Transactional(readOnly = true)
+    Number countByEnabled(boolean enabled) {
+        queryByEnabled(enabled).count()
+    }
+
+    DetachedCriteria<User> queryByEnabled(boolean enabledParam) {
+        User.where { enabled == enabledParam}
+    }
+
+    @Transactional(readOnly = true)
+    Number countByEnabledAndUsernameNotInList(boolean enabled, List<String> usernameList) {
+        queryByEnabledAndUsernameNotInList(enabled, usernameList).count()
+    }
+
+    DetachedCriteria<User> queryByEnabledAndUsernameNotInList(boolean enabled, List<String> usernameList) {
+        DetachedCriteria<User> query = queryByEnabled(enabled)
+        query.where { user.username in usernameList }
+    }
+
+
 }

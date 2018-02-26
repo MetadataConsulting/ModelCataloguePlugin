@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.Regression
 
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.getDescription
 import static org.modelcatalogue.core.geb.Common.getModalHeader
@@ -14,7 +17,7 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
 @Stepwise
 class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGebSpec {
 
@@ -47,9 +50,12 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
 
     private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
 
+    @Ignore
     def "login to model catalogue and create data model"() {
         when:
-        loginAdmin()
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
         check createButton isDisplayed()
@@ -86,6 +92,7 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
         check rightSideTitle contains 'TESTING_DATA_MODEL_NEW_VERSION'
     }
 
+    @Ignore
     def "finalized the data model and create new version"() {
 
         when:'refresh the page and select data model'
@@ -176,6 +183,7 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
         check rightSideTitle contains'TESTING_CLASS'
     }
 
+    @Ignore
     @Unroll
     def "verify that data are not duplicated"(int location,String dataElement) {
         //add a refresh

@@ -72,7 +72,7 @@ grails.project.dependency.resolution = {
         String mcToolkitVersion = '2.2.0'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
-        compile "org.modelcatalogue:mc-datatype-validation:$mcToolkitVersion"
+        //compile "org.modelcatalogue:mc-datatype-validation:$mcToolkitVersion"
 
         compile 'me.xdrop:fuzzywuzzy:1.1.7'
 

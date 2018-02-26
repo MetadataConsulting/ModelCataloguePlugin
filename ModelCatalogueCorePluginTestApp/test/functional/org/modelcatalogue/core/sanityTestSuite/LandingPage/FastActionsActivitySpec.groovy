@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import static org.modelcatalogue.core.geb.Common.admin
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.LoginPage
 import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
@@ -8,7 +9,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class FastActionsActivitySpec extends AbstractModelCatalogueGebSpec{
 
@@ -18,9 +19,15 @@ class FastActionsActivitySpec extends AbstractModelCatalogueGebSpec{
     private static final String  user = "td.col-md-8"
 
     def "login to model catalogue "() {
-        login admin
+        when:
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
-        expect:
+        then:
+        at DataModelListPage
+
+        and:
         check create displayed
     }
 

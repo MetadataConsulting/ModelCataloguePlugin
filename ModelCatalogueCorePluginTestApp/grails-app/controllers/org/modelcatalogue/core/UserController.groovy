@@ -93,10 +93,11 @@ class UserController extends AbstractCatalogueElementController<User> {
     List<String> currentRoleList(Long dataModelId) {
         List<String> roleList = []
         if ( SpringSecurityUtils.ifAllGranted(MetadataRolesUtils.ROLE_SUPERVISOR) ) {
-            roleList << MetadataRolesUtils.ROLE_SUPERVISOR
-        }
-        if ( SpringSecurityUtils.ifAllGranted(MetadataRolesUtils.ROLE_ADMIN) ) {
-            roleList << MetadataRolesUtils.ROLE_ADMIN
+            roleList.addAll([MetadataRolesUtils.ROLE_SUPERVISOR, MetadataRolesUtils.ROLE_ADMIN, MetadataRolesUtils.ROLE_METADATA_CURATOR])
+        } else if ( SpringSecurityUtils.ifAllGranted(MetadataRolesUtils.ROLE_ADMIN) ) {
+            roleList.addAll([MetadataRolesUtils.ROLE_ADMIN, MetadataRolesUtils.ROLE_METADATA_CURATOR])
+        } else if ( SpringSecurityUtils.ifAllGranted(MetadataRolesUtils.ROLE_METADATA_CURATOR) ) {
+            roleList << MetadataRolesUtils.ROLE_METADATA_CURATOR
         }
         roleList += uiRolesForDataModel(dataModelId)
         roleList

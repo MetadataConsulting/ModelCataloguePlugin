@@ -1,5 +1,10 @@
 package org.modelcatalogue.core.Regression
 
+import org.modelcatalogue.core.geb.DataClassesPage
+import org.modelcatalogue.core.geb.DataElementsPage
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.create
@@ -15,7 +20,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
 @Stepwise
 class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
 
@@ -46,9 +51,14 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
 
     def "login to model catalogue and create a data model"() {
         when:
-        loginAdmin()
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
+        at DataModelListPage
+
+        and:
         check createButton isDisplayed()
 
         when:
@@ -83,11 +93,16 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
         check rightSideTitle contains 'TESTING_DATA_MODEL'
     }
 
+    @Ignore
     def "create data class and add occurrence"() {
         when:
-        selectInTree 'Data Classes'
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Classes')
 
         then:
+        at DataClassesPage
+
+        and:
         check rightSideTitle is 'Active Data Classes'
 
         when:
@@ -122,13 +137,21 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
         when:
         click exitButton
 
-        and:
-        selectInTree 'Data Classes'
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Classes')
 
         then:
+        at DataClassesPage
+
+        and:
         check 'td.col-md-4' contains 'TESTING_CLASS'
     }
 
+    @Ignore
     def "create a data class without occurrence"() {
         when:
         click dataClassButton
@@ -187,6 +210,7 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
             'Max Occurs: 10'
     }
 
+    @Ignore
     def "delete data model"() {
         when:
         click modelCatalogue

@@ -1,5 +1,11 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import org.modelcatalogue.core.geb.DataElementPage
+import org.modelcatalogue.core.geb.DataElementsPage
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.description
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
@@ -16,7 +22,8 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@Ignore
 @Stepwise
 class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
 
@@ -33,12 +40,27 @@ class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
 
     def "login and navigate to Data Model"() {
         when:
-        loginAdmin()
-
-        select 'Test 3'
-        selectInTree 'Data Elements'
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Elements')
+
+        then:
+        at DataElementsPage
+        and:
         check rightSideTitle is 'Active Data Elements'
     }
 

@@ -1,5 +1,10 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.geb.AssetsPage
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.getCreate
 import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getModalDialog
@@ -17,7 +22,6 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
 @Stepwise
 class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
 
@@ -32,16 +36,36 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
     public static final String asset = 'asset'
     public static final String  modelCatalogue = 'span.mc-name'
 
-
+    @Ignore
     def "login to model catalogue and select a data model"() {
 
         when:
-        loginAdmin()
-        select "Test 3" select "Assets"
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select("Test 3")
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Assets")
+
+        then:
+        at AssetsPage
+
+        and:
         check rightSideTitle is 'Active Assets'
     }
+
+    @Ignore
     def "upload new asset"() {
         when:
         click create
@@ -62,6 +86,7 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         check modalDialog gone
     }
 
+    @Ignore
     def "navigate back to data model"() {
         when:
         click modelCatalogue
@@ -73,6 +98,7 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         check rightSideTitle contains 'Test 3'
     }
 
+    @Ignore
     def "navigate to the top menu and select create relationship"() {
 
         when:'navigate to createRelationship page'
@@ -81,8 +107,9 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
 
         then:'verify that the text Destination is displayed'
         check destination displayed
-
     }
+
+    @Ignore
     def "select based on,destination and create relationship"() {
         when: 'select relation'
         click hasAttachmentOf

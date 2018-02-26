@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import com.google.common.collect.ImmutableMap
 import grails.gorm.DetachedCriteria
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.userdetails.GrailsUser
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.modelcatalogue.core.api.ElementStatus
@@ -88,6 +89,24 @@ class RelationshipService {
                 .withIgnoreRules(theIgnoreRules)
                 .withResetIndices(theResetIndices)
                 .definition
+    }
+
+    boolean existsRelationshipWithoutChanges(RelationshipDefinition relationshipDefinition) {
+        Relationship relationshipInstance = relationshipDefinition.skipUniqueChecking ? null : findExistingRelationship(relationshipDefinition)
+
+        if (relationshipInstance) {
+            if (relationshipDefinition.metadataSet && (relationshipInstance.ext != relationshipDefinition.metadata) ) {
+                return false
+            }
+            if (relationshipDefinition.resetIndices) {
+                return false
+            }
+            if (relationshipInstance.archived != relationshipDefinition.archived) {
+                return false
+            }
+            return true
+        }
+        false
     }
 
 
@@ -463,14 +482,28 @@ class RelationshipService {
         userGormService.findById(userId)
     }
 
+
     Long loggedUserId() {
-        if ( springSecurityService.principal == null ) {
+        Object principal = springSecurityService.principal
+        if ( principal == null ) {
             return null
         }
-        if ( springSecurityService.principal instanceof String ) {
-            return null
+        if ( principal instanceof String ) {
+            try {
+                return principal as Long
+            } catch(NumberFormatException e) {
+                return null
+            }
         }
-        springSecurityService.principal.id as Long
+        if ( principal instanceof GrailsUser ) {
+            return ((GrailsUser) principal).id
+        }
+
+        if ( principal.respondsTo('id') ) {
+            return principal.id as Long
+        }
+
+        null
     }
 
     boolean isFavorite(CatalogueElement el) {

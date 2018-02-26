@@ -1,5 +1,9 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import static org.modelcatalogue.core.geb.Common.item
@@ -11,7 +15,6 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
 @Stepwise
 class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
 
@@ -25,15 +28,27 @@ class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
     private static final String  table ="#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-7 > span > span > code"
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
 
+    @Ignore
     def "login to model catalogue and select a data model"() {
         when:
-        loginAdmin()
-        select'Test 3'
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
-        then:'verify title of the page '
+        then:
+        at DataModelListPage
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        and:'verify title of the page '
         check rightSideTitle contains 'Test 3'
     }
 
+    @Ignore
     def "navigate to the top menu and select create relationship "() {
 
         when:'navigate to createRelationship page'
@@ -45,6 +60,7 @@ class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
         check destination displayed
     }
 
+    @Ignore
     def "select is synonym for, destination and create relationship"() {
         when: 'select relation'
         click isSynonymFor
@@ -60,6 +76,7 @@ class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
         check table contains "is synonym for"
     }
 
+    @Ignore
     def "remove the is synonym for that was created"() {
         when: 'click on the plus button to expand the file'
         click plusButton

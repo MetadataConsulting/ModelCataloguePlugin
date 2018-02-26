@@ -21,7 +21,7 @@ import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.MetadataDomainEntity
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
-import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.scripting.SecuredRuleExecutor
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 
@@ -63,6 +63,7 @@ class DataArchitectService {
             }
         }
 
+        log.info("matchAgainst =" + matchAgainst )
 
     }
 
@@ -493,7 +494,7 @@ class DataArchitectService {
     String mappingsNameSuffix(DataModel dataModelA, DataModel dataModelB) {
         "for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
     }
-    
+
     String suggestedExactMatchesName(DataModel dataModelA, DataModel dataModelB) {
         "Suggested DataElement Exact Matches  ${mappingsNameSuffix(dataModelA, dataModelB)}"
     }

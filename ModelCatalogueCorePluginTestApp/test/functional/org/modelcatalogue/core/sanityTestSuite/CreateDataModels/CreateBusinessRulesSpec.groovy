@@ -1,5 +1,10 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import org.modelcatalogue.core.geb.BusinessRulesPage
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
@@ -29,12 +34,29 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue and select business rules"() {
         when:
-        loginAdmin()
-        select'Test 3' select 'Business Rules'
-        selectInTree "Business Rules"
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
-        check rightSideTitle  contains 'Active Validation Rules'
+        at DataModelListPage
+
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Business Rules')
+
+        then:
+        at BusinessRulesPage
+
+        and:
+        check rightSideTitle  contains 'Active Business Rules'
     }
 
      def "Navigate to business rules page"() {
@@ -68,13 +90,21 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
     def "delete the validation rules from the data model"() {
         when:
         click modelCatalogue
-
-        and:
-        select'Test 3' select 'Business Rules'
-        selectInTree "Business Rules"
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.select('Test 3')
 
         then:
-        check rightSideTitle  contains 'Active Validation Rules'
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Business Rules')
+
+        then:
+        at BusinessRulesPage
+
+        and:
+        check rightSideTitle  contains 'Active Business Rules'
 
         when:
         click businessRule

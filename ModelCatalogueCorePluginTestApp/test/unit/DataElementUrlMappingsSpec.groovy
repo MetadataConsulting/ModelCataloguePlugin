@@ -3,7 +3,9 @@ import grails.test.mixin.TestFor
 import org.modelcatalogue.core.DataElementController
 import org.springframework.http.HttpMethod
 import spock.lang.Specification
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ System.getProperty('IGNORE_URLMAPPINGS') })
 @TestFor(DataElementUrlMappings)
 @Mock(DataElementController)
 class DataElementUrlMappingsSpec extends Specification {

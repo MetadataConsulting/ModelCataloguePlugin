@@ -2,13 +2,17 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.DataTypesPage
+import org.modelcatalogue.core.geb.LoginPage
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') })
+//@IgnoreIf({ !System.getProperty('geb.env') })
 class ModelCatalogueDevelopmentSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String modelDevBox="footer.row>div>div>div"
@@ -17,11 +21,12 @@ class ModelCatalogueDevelopmentSpec extends AbstractModelCatalogueGebSpec {
     void clickOnDevelopmentSupported() {
 
         when:
-        // enter username , password
-        loginCurator()
+        to LoginPage
+        LoginPage loginPage = browser.page LoginPage
+        loginPage.login('curator', 'curator')
 
         then:
-        noExceptionThrown()
+        at DataModelListPage
 
         when:
         // selectRelation model catalogue development supported

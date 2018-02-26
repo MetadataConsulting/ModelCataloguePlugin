@@ -214,10 +214,13 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
       # event broadcasters and listeners
       $scope.select = (node) ->
-        # Hack: Don't expand for a node which is DataElements/Tag resource
-        if (!node.item.resource || (node.item.resource != 'tag'
-            # && node.item.resource != 'dataElement'
-        ))
+        # Hack: Expand only for dataClass
+        if (!node.item.resource || node.item.resource == 'dataClass'
+## Hack: Don't expand for a node which is DataElements/Tag resource
+#          (node.item.resource != 'tag'
+#            # && node.item.resource != 'dataElement'
+#        )
+        )
         # if true
         # Triggers loading of node's children
           $scope.collapseOrExpand()
