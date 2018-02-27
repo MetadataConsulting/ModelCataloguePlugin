@@ -35,6 +35,16 @@ class ValidationRuleServiceSpec extends Specification {
         !result
     }
 
+    def "findAllValidationRuleByRelationshipList returns only validation rules with a not-null rule"() {
+        when:
+        List<ValidationRule> results = service.findAllValidationRuleByRelationshipList([new Relationship(source: new ValidationRule(rule: 'a rule')), new Relationship(source: new ValidationRule(rule: null))])
+
+        then:
+        results
+        results.size() == 1
+        results.first().rule == 'a rule'
+    }
+
     def "validating of DataElement is extracted"() {
         when:
         DataElement dataElement = new DataElement(dataType: new DataType(rule: "x == null || x in ['red', 'blue']"))

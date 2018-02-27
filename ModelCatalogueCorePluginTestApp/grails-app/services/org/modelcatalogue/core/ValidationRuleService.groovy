@@ -45,21 +45,30 @@ class ValidationRuleService {
         validating
     }
 
+    @Transactional(readOnly = true)
     @CompileDynamic
+    List<Relationship> findAllRelationshipByMetadataDomainEntity(MetadataDomainEntity metadataDomainEntity) {
+        relationshipGormService.queryByDestinationIdAndRelationshipTypeSourceToDestination(metadataDomainEntity?.id, 'involves')
+                ?.join('source')
+                ?.list()
+    }
+
     @Transactional(readOnly = true)
     List<ValidationRule> findAllValidationRuleByMetadataDomainEntity(MetadataDomainEntity metadataDomainEntity) {
-        relationshipGormService.queryByDestinationIdAndRelationshipTypeSourceToDestination(metadataDomainEntity.id, 'involves')
-                .join('source')
-                .list()
-                .collect { Relationship relationship ->
+        List<Relationship> relationshipList = findAllRelationshipByMetadataDomainEntity(metadataDomainEntity)
+        findAllValidationRuleByRelationshipList(relationshipList)
+    }
+
+    List<ValidationRule> findAllValidationRuleByRelationshipList(List<Relationship> relationshipList) {
+        relationshipList?.collect { Relationship relationship ->
             relationship.source as ValidationRule
-        }.findAll { ValidationRule validationRule ->
+        }?.findAll { ValidationRule validationRule ->
             validationRule.rule
         } as List<ValidationRule>
     }
 
     List<ValidationRuleJsonView> rulesOfValidationRuleList(List<ValidationRule> validationRuleList) {
-        validationRuleList.collect { ValidationRule validationRule ->
+        validationRuleList?.collect { ValidationRule validationRule ->
             Map m = [:]
             validationRule.extensions.each { ExtensionValue extensionValue ->
                 m[extensionValue.name] = extensionValue.extensionValue
