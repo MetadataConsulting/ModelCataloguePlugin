@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -44,13 +45,16 @@ class ValidationRuleService {
         validating
     }
 
+    @CompileDynamic
+    @Transactional(readOnly = true)
     List<ValidationRule> findAllValidationRuleByMetadataDomainEntity(MetadataDomainEntity metadataDomainEntity) {
-        List<Relationship> relationshipList = relationshipGormService.findAllByDestinationIdAndRelationshipTypeSourceToDestination(metadataDomainEntity.id, 'involves')
-        if ( !relationshipList ) {
-            return [] as List<ValidationRule>
-        }
-        relationshipList.findAll { Relationship relationship ->
-            (relationship.source instanceof ValidationRule) && ((ValidationRule) relationship.source).rule
+        relationshipGormService.queryByDestinationIdAndRelationshipTypeSourceToDestination(metadataDomainEntity.id, 'involves')
+                .join('source')
+                .list()
+                .collect { Relationship relationship ->
+            relationship.source as ValidationRule
+        }.findAll { ValidationRule validationRule ->
+            validationRule.rule
         } as List<ValidationRule>
     }
 
