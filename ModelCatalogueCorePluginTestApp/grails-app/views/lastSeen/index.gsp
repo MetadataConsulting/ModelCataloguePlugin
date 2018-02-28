@@ -1,13 +1,14 @@
 <html>
 <head>
-    <title><g:message code="lastSeen.title" default="Last Seen"/></title>
+    <title><g:message code="user.activity" default="User Activity"/></title>
     <meta name="layout" content="main" />
 </head>
 <body>
-<div class="page-header">
-    <h1><g:message code="user.activity" default="User Activity"/></h1>
-</div>
 <div class="panel-body">
+    <div class="page-header">
+        <h1><g:message code="user.activity" default="User Activity"/></h1>
+    </div>
+
     <g:render template="/templates/flashmessage" />
     <g:render template="/templates/flasherror" />
 

@@ -15,12 +15,27 @@ class MetadataSecurityService {
             ['/api/modelCatalogue/core/northThames/northThamesGridHierarchyMappingSummaryReport/*', 'isAuthenticated()', HttpMethod.GET]
     ]
 
+    public static final List DATAIMPORTCREATE_URL_MAPPINGS = [
+        ["/dataImport/obo",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+        ["/dataImport/dsl",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+        ["/dataImport/excel",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+        ["/dataImport/xml",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+    ]
+
+    public static final List LOGS_MAPPINGS = [
+            ["/logs/index",  MetadataRolesUtils.roles('SUPERVISOR'), HttpMethod.GET],
+    ]
+
+    public static final List REINDEXCATALOGUE_MAPPINGS = [
+            ["/reindexCatalogue/index",  MetadataRolesUtils.roles('SUPERVISOR'), HttpMethod.GET],
+    ]
+
     public static final List LASTSEEN_URL_MAPPINGS = [
-            ["/lastSeen/index",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+            ["/lastSeen/index",  MetadataRolesUtils.roles('SUPERVISOR'), HttpMethod.GET],
     ]
 
     public static final List MODELCATALOGUEVERSION_URL_MAPPINGS = [
-            ["/modelCatalogueVersion/index",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+            ["/modelCatalogueVersion/index",  MetadataRolesUtils.roles('SUPERVISOR'), HttpMethod.GET],
     ]
 
     public static final List APIKEY_URL_MAPPINGS = [
@@ -842,11 +857,6 @@ class MetadataSecurityService {
         secureModelCatalogueCorePluginUrlMappings()
 
         secureDataModelPermissionEndpoints()
-
-        secureMappings(MAPPINGS_SUGGESTIONS_URL_MAPPINGS)
-        secureMappings(APIKEY_URL_MAPPINGS)
-        secureMappings(MODELCATALOGUEVERSION_URL_MAPPINGS)
-        secureMappings(LASTSEEN_URL_MAPPINGS)
     }
 
     void secureDataModelPermissionEndpoints() {
@@ -916,7 +926,12 @@ class MetadataSecurityService {
         secureMappings(CSV_TRANSFORMATION_MAPPINGS)
         secureMappings(DATA_MODEL_POLICY_MAPPINGS)
         secureMappings(DATA_ARCHITECT_MAPPINGS)
-
-
+        secureMappings(MAPPINGS_SUGGESTIONS_URL_MAPPINGS)
+        secureMappings(APIKEY_URL_MAPPINGS)
+        secureMappings(MODELCATALOGUEVERSION_URL_MAPPINGS)
+        secureMappings(LASTSEEN_URL_MAPPINGS)
+        secureMappings(DATAIMPORTCREATE_URL_MAPPINGS)
+        secureMappings(REINDEXCATALOGUE_MAPPINGS)
+        secureMappings(LOGS_MAPPINGS)
     }
 }

@@ -371,7 +371,7 @@ grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatal
 grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.security.Role'
 grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
-
+grails.plugin.springsecurity.useSecurityEventListener=true
 //this is so that spring econtext can be accessed in seperate threads i.e. in the executer service
 grails.plugin.springsecurity.sch.strategyName = org.springframework.security.core.context.SecurityContextHolder.MODE_INHERITABLETHREADLOCAL
 

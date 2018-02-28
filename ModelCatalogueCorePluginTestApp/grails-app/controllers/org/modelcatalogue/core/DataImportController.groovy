@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
+import javax.servlet.http.HttpServletRequest
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -48,7 +49,10 @@ class DataImportController  {
 
     private static final List<String> CONTENT_TYPES = [MicrosoftOfficeDocument.contentType(MicrosoftOfficeDocument.EXCEL), MicrosoftOfficeDocument.contentType(MicrosoftOfficeDocument.XLSX), 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
     static responseFormats = ['json']
-    static allowedMethods = [upload: "POST", excelImportTypesHumanReadable: 'GET']
+    static allowedMethods = [
+            upload: "POST",
+            excelImportTypesHumanReadable: 'GET'
+    ]
 
     protected static List<String> getErrors(Map params, MultipartFile file) {
         def errors = []
@@ -67,6 +71,12 @@ class DataImportController  {
         Map<String, List<String>> result = ['excelImportTypes': ExcelImportType.humanReadableNames]
         render result as JSON
     }
+
+    protected String modelName(HttpServletRequest request, MultipartFile file) {
+        String modelName = request.getParameter('modelName')
+        modelName ?: file.originalFilename
+    }
+
     def upload() {
         // called from importCtrl.coffee which is the AngularJS controller for ALL import dialogues.
         // having just one upload action (and on the front-end, one importCtrl) is a bit hairy but there we go...
@@ -77,19 +87,14 @@ class DataImportController  {
             return
         }
 
-        //// get stuff from the request.
-        // user-provided model name. It's the filename by default. In the past we have just gotten the filename directly anyways. But it's here.
-        String modelName = request.getParameter('modelName')
-
+        // the actual file to be imported.
+        MultipartFile file = request.getFile("file") // may be excel, Obo, etc. etc.
+        final String modelName = modelName(request, file)
 
         // XML config (including headers map) file for any "generic/customizable" excel importer. At some point, we might want to introduce some validation, either on front or back end or both. If both, the XSD file used to validate should be the same, and provided by the backend. You can access file.inputStream.
         MultipartFile excelConfigXMLFileMultipart = request.getFile("excelConfigXMLFile")
 
         ExcelImportType excelImportType = ExcelImportType.fromHumanReadableName(request.getParameter('excelImportType'))
-
-
-        // the actual file to be imported.
-        MultipartFile file = request.getFile("file") // may be excel, Obo, etc. etc.
 
         List<String> errors = getErrors(params, file)
         if (errors) {
@@ -112,7 +117,6 @@ class DataImportController  {
                 Long id = asset.id
                 InputStream inputStream = file.inputStream
                 InputStream xmlConfigStream = excelConfigXMLFileMultipart.inputStream
-                String filename = file.originalFilename
                 Workbook wb = WorkbookFactory.create(inputStream)
                 defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
                 executeInBackground(id, "Imported from Excel") {
@@ -134,11 +138,10 @@ class DataImportController  {
                 Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
                 Long id = asset.id
                 InputStream inputStream = file.inputStream
-                String filename = file.originalFilename
                 Workbook wb = WorkbookFactory.create(inputStream)
                 defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
                 executeInBackground(id, "Imported from Excel") {
-                    loadNTSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+                    loadNTSpreadsheet( wb, modelName, defaultCatalogueBuilder, suffix, id, userId)
                 }
                 redirectToAsset(id)
                 return
@@ -150,11 +153,10 @@ class DataImportController  {
                 Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
                 Long id = asset.id
                 InputStream inputStream = file.inputStream
-                String filename = file.originalFilename
                 Workbook wb = WorkbookFactory.create(inputStream)
                 defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
                 executeInBackground(id, "Imported from Excel") {
-                    loadNTSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+                    loadNTSpreadsheet(wb, modelName, defaultCatalogueBuilder, suffix, id, userId)
                 }
                 redirectToAsset(id)
                 return
@@ -167,11 +169,10 @@ class DataImportController  {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             Long id = asset.id
             InputStream inputStream = file.inputStream
-            String filename = file.originalFilename
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             executeInBackground(id, "Imported from Excel") {
-                loadOpenEhrSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+                loadOpenEhrSpreadsheet(wb, modelName ,defaultCatalogueBuilder, suffix, id, userId)
             }
             finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
             redirectToAsset(id)
@@ -276,7 +277,7 @@ class DataImportController  {
 
         Asset assetInstance = assetGormService.finalizeAsset(id, dataModel, userId)
 
-        if ( userId && userGormService.exists(userId) ) {
+        if ( dataModel && userId && userGormService.exists(userId) ) {
             User userInstance = userGormService.findById(userId)
             userInstance.createLinkTo(dataModel, RelationshipType.favouriteType)
         }
@@ -348,7 +349,11 @@ class DataImportController  {
                 ConfigExcelLoader loader = new ConfigExcelLoader(modelName, xmlConfigStream, elementService)
 //                ConfigStatelessExcelLoader loader = new ConfigStatelessExcelLoader(modelName, xmlConfigStream)
                 loader.buildModel(wb)
-                finalizeAsset(id, (DataModel) (DataModel.findByName(modelName)), userId)
+                DataModel dataModel = (DataModel) DataModel.findByName(modelName)
+                if ( !dataModel ) {
+                    log.warn('Data Model not created from asset')
+                }
+                finalizeAsset(id, dataModel, userId)
             }
             catch (Exception e) {
                 logError(id, e)

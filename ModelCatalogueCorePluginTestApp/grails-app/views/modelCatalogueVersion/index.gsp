@@ -4,10 +4,10 @@
     <meta name="layout" content="main" />
 </head>
 <body>
-<div class="page-header">
-    <h1><g:message code="modelCatalogueVersion.activity" default="Model Catalogue Version"/></h1>
-</div>
 <div class="panel-body">
+    <div class="page-header">
+        <h1><g:message code="modelCatalogueVersion.activity" default="Model Catalogue Version"/></h1>
+    </div>
     <g:render template="/templates/flashmessage" />
     <g:render template="/templates/flasherror" />
 

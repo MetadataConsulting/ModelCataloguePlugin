@@ -8,7 +8,7 @@ import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.IgnoreIf
 
 @IgnoreIf( { System.getProperty('spock.ignore.slow') })
-class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder {
+class DataImportControllerIntegrationSpec extends AbstractIntegrationSpec implements ResultRecorder {
 
     def fileName, recorder, filenameXsd, filenameXsd2, fileNameStarUML
 

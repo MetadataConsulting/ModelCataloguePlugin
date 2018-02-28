@@ -12,6 +12,5 @@ class ApiKeyUrlMappingsSpec extends Specification {
     void "test apiKey mappings"() {
         expect:
         assertForwardUrlMapping("/apiKey/index", controller: 'apiKey', action: 'index')
-        //assertForwardUrlMapping("/apiKey/reset", controller: 'apiKey', action: 'reset')
     }
 }

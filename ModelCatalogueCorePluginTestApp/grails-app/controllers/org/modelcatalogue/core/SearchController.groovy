@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.springframework.context.MessageSource
+
 import static org.springframework.http.HttpStatus.OK
 import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.rx.LoggingSubscriber
@@ -15,6 +17,8 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
     ExecutorService executorService
 
     CatalogueElementGormService catalogueElementGormService
+
+    MessageSource messageSource
 
     SearchController() {
         super(CatalogueElement, true)
@@ -53,7 +57,12 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
                 modelCatalogueSearchService.reindex(soft).toBlocking().subscribe(LoggingSubscriber.create(log, "... reindexing finished", "Error reindexing the catalogue"))
         }
 
-        respond(success: true, status: OK)
+        if(request.getHeader('Accept')?.contains('application/json')) {
+            respond(success: true, status: OK)
+            return
+        }
+        flash.message = messageSource.getMessage('reindexCatalogue.scheduled', [] as Object[], 'Catalogue Reindexed scheduled', request.locale)
+        redirect controller: 'reindexCatalogue', action: 'index'
     }
 
     protected setSafeMax(Integer max) {

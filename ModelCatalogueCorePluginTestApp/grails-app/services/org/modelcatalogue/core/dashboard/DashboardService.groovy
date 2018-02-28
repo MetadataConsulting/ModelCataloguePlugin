@@ -7,9 +7,11 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 import org.grails.datastore.mapping.transactions.Transaction
 import org.modelcatalogue.core.Asset
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
@@ -141,14 +143,14 @@ class DashboardService {
 
     @Transactional(readOnly = true)
     List<CatalogueElementViewModel> findAllEnumeratedTypeViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        BuildableCriteria c = DataElement.createCriteria()
+        BuildableCriteria c = EnumeratedType.createCriteria()
         Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
         CatalogueElementViewModelUtils.ofProjections(MetadataDomain.ENUMERATED_TYPE, results)
     }
 
     @Transactional(readOnly = true)
     List<CatalogueElementViewModel> findAllDataClassViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        BuildableCriteria c = DataElement.createCriteria()
+        BuildableCriteria c = DataClass.createCriteria()
         Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
         CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_CLASS, results)
     }
