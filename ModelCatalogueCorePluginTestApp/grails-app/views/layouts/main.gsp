@@ -40,6 +40,7 @@
         </a>
         <ul class="dropdown-menu">
             <li><a href="/userAdmin"><i class="fas fa-user-plus"></i> Users</a></li>
+            <li><a href="${g.createLink(controller: 'modelCatalogueVersion')}"><i class="fas fa-code-branch"></i> Code Version</a></li>
             <li><a href="/batch/all"><i class="fas fa-bolt"></i> Mapping Utility</a></li>
             <li><a href="/#/catalogue/relationshipType/all"><i class="fas fa-link"></i> Relationship Types</a></li>
             <li><a href="/#/catalogue/dataModelPolicy/all"><i class="far fa-check-square"></i> Data Model Policies</a></li>

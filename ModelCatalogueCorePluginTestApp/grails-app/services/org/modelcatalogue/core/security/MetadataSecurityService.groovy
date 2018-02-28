@@ -19,6 +19,10 @@ class MetadataSecurityService {
             ["/lastSeen/index",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
     ]
 
+    public static final List MODELCATALOGUEVERSION_URL_MAPPINGS = [
+            ["/modelCatalogueVersion/index",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+    ]
+
     public static final List APIKEY_URL_MAPPINGS = [
             ["/apiKey/index",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
             ["/apiKey/reset",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
@@ -841,6 +845,7 @@ class MetadataSecurityService {
 
         secureMappings(MAPPINGS_SUGGESTIONS_URL_MAPPINGS)
         secureMappings(APIKEY_URL_MAPPINGS)
+        secureMappings(MODELCATALOGUEVERSION_URL_MAPPINGS)
         secureMappings(LASTSEEN_URL_MAPPINGS)
     }
 
