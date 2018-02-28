@@ -65,6 +65,8 @@ import org.modelcatalogue.core.errors.MetadataExceptionResolver
 import java.util.concurrent.Executors
 import  grails.plugin.executor.PersistenceContextExecutorWrapper
 import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionsService
+import org.modelcatalogue.core.security.MetadataSecurityEventListener
+
 // Place your Spring DSL code here
 beans = {
     exceptionHandler(MetadataExceptionResolver) {
@@ -191,4 +193,5 @@ beans = {
         relationshipGormService = ref('relationshipGormService')
         relationshipTypeGormService = ref('relationshipTypeGormService')
     }
+    metadataSecurityEventListener(MetadataSecurityEventListener)
 }

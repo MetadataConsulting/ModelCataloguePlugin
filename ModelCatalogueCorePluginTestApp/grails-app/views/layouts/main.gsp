@@ -43,7 +43,7 @@
             <li><a href="/batch/all"><i class="fas fa-bolt"></i> Mapping Utility</a></li>
             <li><a href="/#/catalogue/relationshipType/all"><i class="fas fa-link"></i> Relationship Types</a></li>
             <li><a href="/#/catalogue/dataModelPolicy/all"><i class="far fa-check-square"></i> Data Model Policies</a></li>
-            <li><a href="#"><i class="fas fa-sign-out-alt"></i>Activity</a></li>
+            <li><a href="${g.createLink(controller: 'lastSeen')}"><i class="fas fa-eye"></i> Activity</a></li>
             <li><a href="#"><i class="fas fa-sign-out-alt"></i>Reindex Catalogue</a></li>
             <li><a href="/monitoring"><i class="fas fa-cogs"></i> Monitoring</a></li>
             <li><a href="#"><i class="fas fa-archive"></i> Logs</a></li>
