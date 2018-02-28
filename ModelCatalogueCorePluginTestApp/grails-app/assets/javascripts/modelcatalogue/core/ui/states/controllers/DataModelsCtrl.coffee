@@ -85,7 +85,8 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
     $state.go '.', type: undefined
 
   $scope.showPreload = ->
-    return false if dataModelsForPreload.length == 0
-    return true if list.total > 1
-    return true if list.list.length > 0 and list.list[0].name is 'Clinical Tags'
-    return false
+    return true  # show always preload
+    # return false if dataModelsForPreload.length == 0
+    # return true if list.total > 1
+    # return true if list.list.length > 0 and list.list[0].name is 'Clinical Tags'
+    # return false

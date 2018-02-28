@@ -205,8 +205,8 @@
           <span class="icon-bar"></span>
 
         </button>
-        <a class="navbar-brand" href="#/"><span class="fa fa-fw fa-book fa-2x"></span></a>
-        <a class="navbar-brand mc-name-parent" href="#/"><span
+        <a class="navbar-brand" href="${g.createLink(controller: 'dashboard')}"><span class="fa fa-fw fa-book fa-2x"></span></a>
+        <a class="navbar-brand mc-name-parent" href="${g.createLink(controller: 'dashboard')}"><span
           class="mc-name">${grailsApplication.config.mc.name ?: 'Model Catalogue'}</span></a>
       </div>
 

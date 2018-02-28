@@ -73,7 +73,8 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 
 
   actionsProvider.registerActionInRole 'create-data-model', 'data-models' ,['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
-      return undefined unless security.hasRole('CURATOR')
+      return undefined
+      # return undefined unless security.hasRole('CURATOR')
       {
         label:      "Create"
         icon:       'fa fa-fw fa-plus-circle'

@@ -3,8 +3,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerActionInRole 'search-menu', actionsProvider.ROLE_NAVIGATION_RIGHT, [
     '$scope', 'security', 'messages',
     ($scope ,  security ,  messages) ->
-
-      return undefined unless security.isUserLoggedIn()
+      return undefined
       {
         position:   -10000
         icon:       'fa fa-search fa-fw fa-2x-if-wide'
@@ -17,8 +16,20 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       }
   ]
 
+  actionsProvider.registerActionInRole 'create-data-model', actionsProvider.ROLE_NAVIGATION_RIGHT, ['$window', 'security', ($window, security) ->
+    return undefined unless security.hasRole('CURATOR')
+    {
+      position:   -5000
+      icon:       'fa fa-plus fa-fw'
+      label:      'Create Data Model'
+      iconOnly:   true
+      action: ->
+        $window.open("#{security.contextPath}/dashboard/index")
+    }
+  ]
+
   actionsProvider.registerActionInRole 'fast-action', actionsProvider.ROLE_NAVIGATION_RIGHT, ['security', 'messages', (security, messages) ->
-    return undefined unless security.isUserLoggedIn()
+    return undefined
     {
       position:   -5000
       icon:       'fa fa-flash fa-fw fa-2x-if-wide'
@@ -33,7 +44,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     return undefined unless security.isUserLoggedIn()
     {
       position:   10000
-      icon:       'fa fa-user fa-fw fa-2x-if-wide'
+      icon:       'fa fa-user'
       abstract:   true
       label:      'User'
       iconOnly:   true
@@ -74,7 +85,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   actionsProvider.registerChildAction 'user-menu', 'user-favorites', (security, $state, $rootScope) ->
     'ngInject'
-    return undefined if not security.isUserLoggedIn()
+    return undefined unless security.isUserLoggedIn()
     action =
       position:   1000
       label:      'Favourites'
@@ -90,9 +101,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   actionsProvider.registerChildAction 'user-menu', 'user-api-key', (messages, security, rest, modelCatalogueApiRoot) ->
     'ngInject'
-
-    return undefined if not security.isUserLoggedIn()
-
+    return undefined unless security.isUserLoggedIn()
     {
       position:   10000
       label:      "API Key"
@@ -118,7 +127,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     return undefined unless security.hasRole('CURATOR')
     {
       position:   5000
-      icon:       'fa fa-cog fa-fw fa-2x-if-wide'
+      icon:       'fa fa-cog fa-fw'
       label:      'Admin'
       iconOnly:   true
     }
@@ -135,6 +144,17 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         $window.open("#{security.contextPath}/userAdmin")
     }
 
+  actionsProvider.registerChildAction 'admin-menu', 'code-version', ($window, security) ->
+    "ngInject"
+    return undefined unless security.isUserLoggedIn()
+    {
+      position:   1000
+      icon:       'fa fa-fw fa-question'
+      label:      'Code Version'
+      action: ->
+        $window.open("#{security.contextPath}/modelCatalogueVersion/index")
+    }
+
   actionsProvider.registerChildAction 'admin-menu', 'user-simple-admin', ($window, $state, security) ->
     "ngInject"
     return undefined if security.hasRole('SUPERVISOR')
@@ -147,6 +167,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
 
   actionsProvider.registerChildAction 'admin-menu', 'relationship-types', ['$state', ($state) ->
+    return undefined unless security.isUserLoggedIn()
     {
       position:   2000
       icon:       'fa fa-chain fa-fw'
@@ -157,6 +178,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   ]
 
   actionsProvider.registerChildAction 'admin-menu', 'data-model-policies', ['$state', ($state) ->
+    return undefined unless security.isUserLoggedIn()
     {
       position:   2100
       icon:       'fa fa-check-square-o fa-fw'
@@ -177,43 +199,27 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         $window.open("#{security.contextPath}/batch/all")
     }
 
-  userLastSeen = [
-    '$scope', 'names','security', '$state', 'messages',
-    ($scope ,  names , security ,  $state ,  messages) ->
-      return undefined if not security.hasRole('ADMIN')
-
-      {
-      position: 10100
-      label: "Activity"
-      icon: 'fa fa-users fa-fw'
-      type: 'success'
+  actionsProvider.registerChildAction 'admin-menu', 'user-last-seen', ($window, security) ->
+    "ngInject"
+    return undefined unless security.hasRole('SUPERVISOR')
+    {
+      position:   1000
+      icon:       'fa fa-fw fa-eye'
+      label:      'Activity'
       action: ->
-        messages.prompt('Recent Activity', '', type: 'current-activity')
-      }
-  ]
+        $window.open("#{security.contextPath}/lastSeen/index")
+    }
 
-  actionsProvider.registerActionInRoles 'user-last-seen', [actionsProvider.ROLE_GLOBAL_ACTION], userLastSeen
-  actionsProvider.registerChildAction 'admin-menu', 'user-last-seen-child', userLastSeen
-
-  reindexCatalogue = [
-    '$scope', 'names','security', '$state', 'messages', 'rest', 'modelCatalogueApiRoot'
-    ($scope ,  names , security ,  $state ,  messages ,  rest ,  modelCatalogueApiRoot ) ->
-      return undefined unless security.hasRole('SUPERVISOR')
-
-      {
-      position: 10200
-      label: "Reindex Catalogue"
-      icon: 'fa fa-search fa-fw'
-      type: 'success'
+  actionsProvider.registerChildAction 'admin-menu', 'reindex-catalogue', ($window, security) ->
+    "ngInject"
+    return undefined unless security.hasRole('SUPERVISOR')
+    {
+      position:   1000
+      icon:       'fa fa-fw fa-search'
+      label:      'Reindex Catalogue'
       action: ->
-        messages.confirm("Do you want to reindex catalogue?", "Whole catalogue will be reindexed. This may take a long time and it can have negative impact on the performance.").then ->
-          rest(url: "#{modelCatalogueApiRoot}/search/reindex", method: 'POST', params: {soft: true}).then ->
-            messages.success('Reindex Catalogue', 'Reindexing the catalogue scheduled.')
-      }
-  ]
-
-  actionsProvider.registerActionInRoles 'reindex-catalogue', [actionsProvider.ROLE_GLOBAL_ACTION], reindexCatalogue
-  actionsProvider.registerChildAction 'admin-menu', 'reindex-catalogue-child', reindexCatalogue
+        $window.open("#{security.contextPath}/reindexCatalogue/index")
+    }
 
   actionsProvider.registerChildAction 'admin-menu', 'monitoring', ($window, security) ->
     "ngInject"
@@ -226,49 +232,81 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         $window.open("#{security.contextPath}/monitoring")
     }
 
+  actionsProvider.registerChildAction 'admin-menu', 'logs-archive', ($window, security) ->
+    "ngInject"
+    return undefined unless security.hasRole('SUPERVISOR')
+    {
+      position:   10400
+      icon:       'fa fa-fw fa-archive'
+      label:      'Logs'
+      action: ->
+        $window.open("#{security.contextPath}/logs/index")
+    }
+
+  actionsProvider.registerChildAction 'admin-menu', 'feedbacks', ($window, security) ->
+    "ngInject"
+    return undefined unless security.isUserLoggedIn()
+    {
+      position:   10400
+      icon:       'fa fa-tasks fa-fw'
+      label:      'Feedbacks'
+      action: ->
+        $window.open("#{security.contextPath}/#/catalogue/feedback/all")
+    }
+
   actionsProvider.registerActionInRole 'curator-menu', actionsProvider.ROLE_NAVIGATION_RIGHT, ['security', (security) ->
     return undefined unless security.hasRole('CURATOR')
     {
       position:   1000
-      icon:       'fa fa-object-group fa-2x-if-wide'
+      icon:       'fa fa-upload'
       label:      'Curator'
       iconOnly:   true
     }
   ]
 
-  actionsProvider.registerChildAction 'curator-menu', 'csv-transformations', ['$state', ($state) ->
-    {
-      position:   10000
-      icon:       'fa fa-long-arrow-right fa-fw'
-      label:      'CSV Transformations'
-      action: ->
-        $state.go 'simple.resource.list', resource: 'csvTransformation'
-    }
-  ]
-
-  actionsProvider.registerChildAction 'curator-menu', 'feedbacks', ($state) ->
-    'ngInject'
-
-    {
-      position:   200000
-      icon:       'fa fa-tasks fa-fw'
-      label:      'Feedbacks'
-      action: ->
-        $state.go 'simple.resource.list', resource: 'feedback'
-    }
-
-  actionsProvider.registerChildAction 'admin-menu', 'logs', (messages,  enhance, rest,  modelCatalogueApiRoot) ->
+  actionsProvider.registerChildAction 'curator-menu', 'import-excel', ($window, security) ->
     "ngInject"
+    return undefined unless security.hasRole('CURATOR')
     {
-      position:   10300
-      icon:       'fa fa-fw fa-archive'
-      label:      'Logs'
+      position:   10400
+      icon:       'fa fa-fw fa-file'
+      label:      'Import Excel'
       action: ->
-        messages.confirm("Do you want to create logs archive?", "New asset containing the application logs will be created and accessible to all users.").then ->
-          enhance(rest(url: "#{modelCatalogueApiRoot}/logs")).then (asset) ->
-            asset.show()
+        $window.open("#{security.contextPath}/dataImport/excel")
     }
 
+  actionsProvider.registerChildAction 'curator-menu', 'import-obo', ($window, security) ->
+    "ngInject"
+    return undefined unless security.hasRole('CURATOR')
+    {
+      position:   10400
+      icon:       'fa fa-fw fa-file'
+      label:      'Import OBO'
+      action: ->
+        $window.open("#{security.contextPath}/dataImport/obo")
+    }
+
+  actionsProvider.registerChildAction 'curator-menu', 'import-dsl', ($window, security) ->
+    "ngInject"
+    return undefined unless security.hasRole('CURATOR')
+    {
+      position:   10400
+      icon:       'fa fa-fw fa-file'
+      label:      'Import Model Catalogue DSL File'
+      action: ->
+        $window.open("#{security.contextPath}/dataImport/dsl")
+    }
+
+  actionsProvider.registerChildAction 'curator-menu', 'import-xml', ($window, security) ->
+    "ngInject"
+    return undefined unless security.hasRole('CURATOR')
+    {
+      position:   10400
+      icon:       'fa fa-fw fa-file'
+      label:      'Import Catalogue XML'
+      action: ->
+        $window.open("#{security.contextPath}/dataImport/xml")
+    }
 
   actionsProvider.registerActionInRole 'new-import', actionsProvider.ROLE_LIST_ACTION, [
     '$scope', 'names','security', '$state',
@@ -276,7 +314,6 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       return undefined if not security.hasRole('CURATOR')
       return undefined if $state.current.name != 'mc.resource.list'
       return undefined if $scope.resource != 'asset'
-
       {
         position: 10000
         label: "Import"
@@ -284,8 +321,6 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         type: 'success'
       }
   ]
-
-
 
   loincImport = ($scope, messages, security) ->
     'ngInject'
@@ -303,37 +338,6 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     actionsProvider.registerChildAction 'curator-menu', 'import-loinc', loincImport
     actionsProvider.registerActionInRole 'global-import-loinc', actionsProvider.ROLE_GLOBAL_ACTION, loincImport
 
-  excelImport = ($scope, messages, security) ->
-    'ngInject'
-    return undefined if not security.hasRole('CURATOR')
-    {
-      position: 13002
-      label:  "Import Excel"
-      icon:  'fa fa-upload fa-fw'
-      action: ->
-        messages.prompt('Import Excel File', '', type: 'new-excel-import')
-    }
-
-  actionsProvider.registerChildAction 'new-import', 'import-excel', excelImport
-  actionsProvider.registerChildAction 'import-data-models-screen', 'import-excel', excelImport
-  actionsProvider.registerChildAction 'curator-menu', 'import-excel', excelImport
-  actionsProvider.registerActionInRole 'global-import-excel', actionsProvider.ROLE_GLOBAL_ACTION, excelImport
-
-  oboImport = ($scope, messages, security) ->
-    'ngInject'
-    return undefined if not security.hasRole('CURATOR')
-    {
-      position: 13003
-      label: "Import OBO"
-      icon:  'fa fa-upload fa-fw'
-      action: ->
-        messages.prompt('Import OBO File', '', type: 'new-obo-import')
-    }
-  actionsProvider.registerChildAction 'new-import', 'import-obo', oboImport
-  actionsProvider.registerChildAction 'import-data-models-screen', 'import-obo', oboImport
-  actionsProvider.registerChildAction 'curator-menu', 'import-obo', oboImport
-  actionsProvider.registerActionInRole 'global-import-obo', actionsProvider.ROLE_GLOBAL_ACTION, oboImport
-
   umlImport = ($scope, messages, security) ->
     'ngInject'
     return undefined if not security.hasRole('CURATOR')
@@ -349,36 +353,6 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     actionsProvider.registerChildAction 'import-data-models-screen', 'import-umlj', umlImport
     actionsProvider.registerChildAction 'curator-menu', 'import-umlj', umlImport
     actionsProvider.registerActionInRole 'global-import-uml', actionsProvider.ROLE_GLOBAL_ACTION, umlImport
-
-  mcImport = ($scope, messages, security) ->
-    'ngInject'
-    return undefined if not security.hasRole('CURATOR')
-    {
-      position: 13005
-      label: "Import Model Catalogue DSL File"
-      icon:  'fa fa-upload fa-fw'
-      action: ->
-        messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
-    }
-  actionsProvider.registerChildAction 'new-import', 'import-mc', mcImport
-  actionsProvider.registerChildAction 'import-data-models-screen', 'import-mc', mcImport
-  actionsProvider.registerChildAction 'curator-menu', 'import-mc', mcImport
-  actionsProvider.registerActionInRole 'global-import-mc', actionsProvider.ROLE_GLOBAL_ACTION, mcImport
-
-  xmlImport = ($scope, messages, security) ->
-    'ngInject'
-    return undefined if not security.hasRole('CURATOR')
-    {
-      position: 13006
-      label: "Import Catalogue XML"
-      icon:  'fa fa-upload fa-fw'
-      action: ->
-        messages.prompt('Import Model Catalogue XML File', '', type: 'new-catalogue-xml-import')
-    }
-  actionsProvider.registerChildAction 'new-import', 'import-catalogue-xml', xmlImport
-  actionsProvider.registerChildAction 'import-data-models-screen', 'import-catalogue-xml', xmlImport
-  actionsProvider.registerChildAction 'curator-menu', 'import-catalogue-xml', xmlImport
-  actionsProvider.registerActionInRole 'global-import-xml', actionsProvider.ROLE_GLOBAL_ACTION, xmlImport
 
   rareDiseaseCsvImport = ($scope, messages, security) ->
     'ngInject'
