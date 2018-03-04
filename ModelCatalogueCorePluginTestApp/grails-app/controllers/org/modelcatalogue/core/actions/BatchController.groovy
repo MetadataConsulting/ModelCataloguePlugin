@@ -13,7 +13,7 @@ import org.springframework.context.MessageSource
 import org.springframework.validation.ObjectError
 
 @Slf4j
-class BatchController extends AbstractRestfulController<Batch> implements BeanMessage {
+class BatchController extends AbstractRestfulController<Batch> {
 
     def actionService
     BatchService batchService

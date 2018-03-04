@@ -3,10 +3,10 @@ package org.modelcatalogue.core.util
 import groovy.transform.CompileDynamic
 import org.springframework.context.MessageSource
 
-trait BeanMessage {
+class BeanMessageUtils {
 
     @CompileDynamic
-    private List<String> beanMessage(def bean, MessageSource messageSource, Locale locale = Locale.getDefault()) {
+    static List<String> beanMessages(def bean, MessageSource messageSource, Locale locale = Locale.getDefault()) {
         List<String> errorMsgs = []
         for (fieldErrors in bean.errors) {
             for (error in fieldErrors.allErrors) {

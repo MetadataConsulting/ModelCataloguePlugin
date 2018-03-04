@@ -660,6 +660,8 @@ class MetadataSecurityService {
     ]
 
     public static final List DATA_MODEL_MAPPINGS = [
+            ["/dataModel/create", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
+            ["/dataModel/save", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/dataModel", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataModel", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/dataModel/search/*", 'isAuthenticated()', HttpMethod.GET],

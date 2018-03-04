@@ -1,9 +1,13 @@
 package org.modelcatalogue.core.persistence
 
 import grails.transaction.Transactional
+import groovy.transform.CompileDynamic
+import org.grails.datastore.mapping.query.api.BuildableCriteria
+import org.hibernate.transform.Transformers
 import org.modelcatalogue.core.DataModelPolicy
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.WarnGormErrors
+import org.modelcatalogue.core.util.IdName
 import org.springframework.context.MessageSource
 
 class DataModelPolicyGormService implements WarnGormErrors {
@@ -18,6 +22,26 @@ class DataModelPolicyGormService implements WarnGormErrors {
     @Transactional(readOnly = true)
     DataModelPolicy findByName(String name) {
         findQueryByName(name).get()
+    }
+
+    @Transactional(readOnly = true)
+    List<DataModelPolicy> findAllByIds(List<Long> ids) {
+        DataModelPolicy.where {
+            id in ids
+        }.list()
+    }
+
+    @Transactional(readOnly = true)
+   @CompileDynamic
+    List<IdName> findAll() {
+        BuildableCriteria c = DataModelPolicy.createCriteria()
+        c.list {
+            resultTransformer(Transformers.aliasToBean(IdName))
+            projections {
+                property('id', 'id')
+                property('name', 'name')
+            }
+        }
     }
 
     protected DetachedCriteria<DataModelPolicy> findQueryByName(String nameParam) {
