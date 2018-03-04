@@ -1,6 +1,6 @@
 angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc.util.ui'])
 .controller 'mc.core.ui.states.controllers.DataModelsCtrl', ($scope, $state, $stateParams, list, applicationTitle,
-  catalogueElementResource, catalogue, names, $timeout, messages, dataModelsForPreload, modelCatalogueApiRoot, rest) ->
+  catalogueElementResource, catalogue, names, $timeout, messages, dataModelsForPreload, modelCatalogueApiRoot, rest, security) ->
   "ngInject"
 
   # if my list is empty, redirect to catalogue
@@ -9,6 +9,7 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
     return
 
   original = list
+  $scope.security = security
 
   $scope.status = $stateParams.status
   $scope.type = $stateParams.type
@@ -90,3 +91,5 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
     # return true if list.total > 1
     # return true if list.list.length > 0 and list.list[0].name is 'Clinical Tags'
     # return false
+  $scope.showCreateNewButton = ->
+    return security.hasRole('CURATOR')

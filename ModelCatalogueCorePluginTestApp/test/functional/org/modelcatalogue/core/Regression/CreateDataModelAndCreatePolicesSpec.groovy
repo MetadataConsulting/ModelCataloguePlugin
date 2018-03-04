@@ -43,10 +43,10 @@ class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec 
         DataModelListPage dataModelListPage = browser.page DataModelListPage
 
         then:
-        waitFor { !dataModelListPage.createNewButton.isDisplayed() }
+        waitFor { dataModelListPage.createNewButton.isDisplayed() }
 
         when: 'click on create and fill form'
-        click create
+        dataModelListPage.createNew()
         fill name with models
         fill version with VERSION
 

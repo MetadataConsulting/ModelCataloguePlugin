@@ -10,10 +10,9 @@
           <div class="jumbotron">
             <h2>Welcome to Metadata Registry</h2>
             <p>
+
               <a id="dashboard-button-link" href="/dashboard/index"><button class="btn btn-primary btn-lg">Dashboard</button></a>
-              <button id="create-new-button" class="btn btn-success btn-lg" ng-click="createElement()"><span class="fa fa-plus-circle"></span>
-                Create New
-              </button>
+              <button ng-if="showCreateNewButton()" id="create-new-button" class="btn btn-success btn-lg" ng-click="createElement()"><span class="fa fa-plus-circle"></span>Create New</button>
             </p>
           </div>
         </div>

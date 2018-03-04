@@ -20,7 +20,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
 
@@ -61,10 +61,10 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
         DataModelListPage dataModelListPage = browser.page DataModelListPage
 
         then:
-        waitFor { !dataModelListPage.createNewButton.isDisplayed() }
+        waitFor { dataModelListPage.createNewButton.isDisplayed() }
 
         when:
-        click createButton
+        dataModelListPage.createNew()
 
         and:'fill the form '
         fill nameLabel with 'TESTING_DATA_MODEL_MAX'

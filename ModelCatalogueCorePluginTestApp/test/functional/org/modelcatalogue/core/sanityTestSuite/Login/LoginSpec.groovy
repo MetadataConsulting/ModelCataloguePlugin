@@ -7,7 +7,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Unroll
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 class LoginSpec extends AbstractModelCatalogueGebSpec {
 
     @Unroll
@@ -23,7 +23,10 @@ class LoginSpec extends AbstractModelCatalogueGebSpec {
         DataModelListPage dataModelListPage = browser.page DataModelListPage
 
         then:
-        waitFor { !dataModelListPage.createNewButton.isDisplayed() }
+        waitFor { dataModelListPage.dashboardButtonLink.isDisplayed() }
+
+        and:
+        displayed == dataModelListPage.createNewButton.isDisplayed()
 
         where:
         username     | password     | displayed
