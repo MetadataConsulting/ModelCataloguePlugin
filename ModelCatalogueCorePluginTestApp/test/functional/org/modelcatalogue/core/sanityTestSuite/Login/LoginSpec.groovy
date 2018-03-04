@@ -23,34 +23,7 @@ class LoginSpec extends AbstractModelCatalogueGebSpec {
         DataModelListPage dataModelListPage = browser.page DataModelListPage
 
         then:
-        waitFor {
-            displayed == dataModelListPage.isCreateButtonDisplayed()
-        }
-
-        where:
-        username     | password     | displayed
-        'viewer'     | 'viewer'     | false
-        'supervisor' | 'supervisor' | true
-        'curator'    | 'curator'    | true
-        description = displayed ? 'is displayed' : 'is not displayed'
-    }
-
-    @Unroll
-    void 'Cog icon #description for #username'(String username, String password, boolean displayed, String description) {
-        when:
-        LoginPage loginPage = to LoginPage
-        loginPage.login(username, password)
-
-        then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-
-        then:
-        waitFor {
-            displayed == dataModelListPage.navbar.isCogIconDisplayed()
-        }
+        waitFor { !dataModelListPage.createNewButton.isDisplayed() }
 
         where:
         username     | password     | displayed

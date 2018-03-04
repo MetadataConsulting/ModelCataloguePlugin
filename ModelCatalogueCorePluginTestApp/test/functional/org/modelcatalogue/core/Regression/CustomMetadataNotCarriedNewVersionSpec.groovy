@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.Regression
 
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -29,8 +30,7 @@ class CustomMetadataNotCarriedNewVersionSpec extends AbstractModelCatalogueGebSp
 
     def "login to model catalogue and select version"() {
         when:
-        at LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
@@ -38,7 +38,14 @@ class CustomMetadataNotCarriedNewVersionSpec extends AbstractModelCatalogueGebSp
 
         when:
         DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Clinical Tags')
+        dataModelListPage.dashboard()
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Clinical Tags')
 
         then:
         at DataModelPage

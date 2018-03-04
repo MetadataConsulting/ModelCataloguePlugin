@@ -29,8 +29,7 @@ class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec{
     @Unroll
     def "search option"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('admin', 'admin')
 
         then:

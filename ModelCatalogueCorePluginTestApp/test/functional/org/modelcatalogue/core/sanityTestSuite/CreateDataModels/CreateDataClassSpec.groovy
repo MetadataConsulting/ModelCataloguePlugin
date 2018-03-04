@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import groovy.util.logging.Slf4j
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataClassesPage
 import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
@@ -60,8 +61,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     @Ignore
     def "login and navigate to the model "() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
@@ -69,7 +69,14 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
 
         when:
         DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 3')
+        dataModelListPage.dashboard()
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
         at DataModelPage
@@ -221,7 +228,14 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         when:
         click modelCatalogue
         DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 3')
+        dataModelListPage.dashboard()
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
         at DataModelPage

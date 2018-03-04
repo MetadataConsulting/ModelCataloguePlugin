@@ -37,8 +37,7 @@ class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
 
     def "login to model catalogue and create a data model"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:

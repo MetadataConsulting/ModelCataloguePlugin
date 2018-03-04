@@ -4,6 +4,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import org.modelcatalogue.core.geb.Common
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -31,7 +32,14 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 
         when:
         DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Rare Disease Conditions')
+        dataModelListPage.dashboard()
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select("Rare Disease Conditions")
 
         then:
         at DataModelPage

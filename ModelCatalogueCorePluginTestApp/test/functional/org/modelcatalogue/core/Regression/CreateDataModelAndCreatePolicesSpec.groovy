@@ -33,15 +33,17 @@ class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec 
     void addPolicies() {
 
         when: 'login to model catalogue'
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
         at DataModelListPage
 
-        and:
-        check create isDisplayed()
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+
+        then:
+        waitFor { !dataModelListPage.createNewButton.isDisplayed() }
 
         when: 'click on create and fill form'
         click create

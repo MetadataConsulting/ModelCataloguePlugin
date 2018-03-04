@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.LoginPage
 
@@ -29,21 +30,30 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
         at DataModelListPage
 
-        and:
-        check creates displayed
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+
+        then:
+        dataModelListPage.createNewButton.isDisplayed()
+
+        when:
+        dataModelListPage.dashboard()
+
+        then:
+        at DashboardPage
     }
 
     def "navigate to favourites"() {
         when:
-        click user
-        click favouriteButton
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.favourite()
 
         then:
         check catalogueID contains "Model Catalogue ID"

@@ -1,7 +1,7 @@
 <%@ page import="org.modelcatalogue.core.view.CatalogueElementViewModel; org.modelcatalogue.core.view.DataModelViewModel; org.modelcatalogue.core.util.MetadataDomain; org.modelcatalogue.core.dashboard.DashboardDropdown; org.modelcatalogue.core.util.PublishedStatus;" %>
 <html>
 <head>
-    <title><g:message code="dashboard.title" default="Data Models"/></title>
+    <title><g:message code="dashboard.title" default="Dashboard"/></title>
     <meta name="layout" content="main" />
 </head>
 <body>
@@ -10,11 +10,11 @@
         <g:form controller="dashboard" action="index" method="GET">
             <div>
                 <div class="input-group">
-                    <g:textField name="search" value="${search}" aria-label="..."/>
+                    <g:textField id="search" name="search" value="${search}" aria-label="..."/>
                     <g:select name="dataModelId" noSelection="${['null':'Select One...']}" from="${dataModelList}" optionKey="id" optionValue="name" value="${dataModelId}"/>
                     <g:select name="metadataDomain" from="${metadataDomainList}" value="${metadataDomain}"/>
                     <g:select name="status" from="${DashboardDropdown.values()}" value="${status}"/>
-                    <input type="submit" class="btn btn-default" value="${g.message(code:'datamodel.filter', default: 'Filter')}" />
+                    <input type="submit" id="filter-btn" class="btn btn-default" value="${g.message(code:'datamodel.filter', default: 'Filter')}" />
                 </div><!-- /input-group -->
 
             </div><!-- /input-group -->

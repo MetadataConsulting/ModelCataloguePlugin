@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title><g:message code="user.apiKey" default="Api Key"/></title>
+    <title><g:message code="modelCatalogueVersion.title" default="Model Catalogue Version"/></title>
     <meta name="layout" content="main" />
 </head>
 <body>

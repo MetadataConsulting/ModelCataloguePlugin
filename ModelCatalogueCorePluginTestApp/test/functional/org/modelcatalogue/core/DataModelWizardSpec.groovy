@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.CreateDataModelPage
 import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.LoginPage
 
@@ -36,8 +37,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
@@ -45,37 +45,37 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "add new data model"() {
-
+        given:
         def uuid = UUID.randomUUID().toString()
-
-        click createNewDataModel
-
-        expect: 'the model dialog opens'
-        check classificationWizzard displayed
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
 
         when:
-        fill wizardName with "New Data Model $uuid"
-        fill modelCatalogueId with "http://www.example.com/$uuid"
-        fill description with "Description of Data Model"
+        dataModelListPage.createNew()
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+
+        then: 'the model dialog opens'
+        createDataModelPage.wizard.isDisplayed()
+
+        when:
+        createDataModelPage.name = "New Data Model $uuid"
+        createDataModelPage.modelCatalogueIdInput = "http://www.example.com/$uuid"
+        createDataModelPage.description = "Description of Data Model"
 
         then:
-        // TODO: check does not work even if the button is enabled
-        //check stepImports enabled
-        true
+        createDataModelPage.stepImports.isDisplayed()
 
         when:
-        click stepImports
+        createDataModelPage.importsStep()
 
         then:
         check stepImports has 'btn-primary'
 
         when:
-        fill wizardName with 'NHIC'
+        createDataModelPage.name = 'NHIC'
         selectCepItemIfExists()
 
-
         and:
-        click stepFinish
+        createDataModelPage.finish()
 
         then:
         check '#summary' is "Data Model New Data Model $uuid created"
@@ -177,8 +177,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         def uuid = UUID.randomUUID().toString()
 
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:

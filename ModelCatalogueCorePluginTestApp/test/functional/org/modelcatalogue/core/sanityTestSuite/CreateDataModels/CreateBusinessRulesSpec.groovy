@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.BusinessRulesPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -34,8 +35,7 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue and select business rules"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
@@ -43,7 +43,14 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 3')
+        dataModelListPage.dashboard()
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
         at DataModelPage
@@ -91,7 +98,14 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
         when:
         click modelCatalogue
         DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 3')
+        dataModelListPage.dashboard()
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
         at DataModelPage

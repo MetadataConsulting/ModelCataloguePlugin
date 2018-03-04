@@ -1,1 +1,1 @@
-<a href="/#/${dataModel?.id}/dataModel/${dataModel?.id}">${dataModel?.name}</a>
+<a class="data-model-link" href="/#/${dataModel?.id}/dataModel/${dataModel?.id}">${dataModel?.name}</a>

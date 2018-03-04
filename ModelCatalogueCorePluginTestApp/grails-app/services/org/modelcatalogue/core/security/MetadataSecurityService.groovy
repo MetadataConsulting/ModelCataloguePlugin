@@ -2,7 +2,6 @@ package org.modelcatalogue.core.security
 
 import grails.util.Environment
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.grails.commons.env.GrailsEnvironment
 import org.modelcatalogue.core.persistence.RequestmapGormService
 import org.springframework.http.HttpMethod
 
@@ -35,12 +34,12 @@ class MetadataSecurityService {
     ]
 
     public static final List MODELCATALOGUEVERSION_URL_MAPPINGS = [
-            ["/modelCatalogueVersion/index",  MetadataRolesUtils.roles('SUPERVISOR'), HttpMethod.GET],
+            ["/modelCatalogueVersion/index", 'isAuthenticated()', HttpMethod.GET],
     ]
 
     public static final List APIKEY_URL_MAPPINGS = [
-            ["/apiKey/index",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
-            ["/apiKey/reset",  MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
+            ["/apiKey/index", 'isAuthenticated()', HttpMethod.GET],
+            ["/apiKey/reset", 'isAuthenticated()', HttpMethod.POST],
     ]
 
     public static final List MAPPINGS_SUGGESTIONS_URL_MAPPINGS = [
@@ -539,7 +538,7 @@ class MetadataSecurityService {
 
 
     public static final List DASHBOARD_MAPPINGS = [
-            ["/dashboard/index", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET]
+            ["/dashboard/index", 'isAuthenticated()', HttpMethod.GET]
             ]
 
     public static final List BATCH_MAPPINGS = [

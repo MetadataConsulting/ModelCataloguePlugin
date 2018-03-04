@@ -11,7 +11,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <g:form controller="apiKey" action="reset">
-                <input type="submit" value="Regenerate API Key"/>
+                <input id="regenerateKey" type="submit" value="Regenerate API Key"/>
             </g:form>
         </div><!-- /.panel-heading -->
     </div><!-- /.panel-default -->
@@ -19,7 +19,7 @@
     <g:render template="/templates/flashmessage" />
     <g:render template="/templates/flasherror" />
 
-    <h2>${apiKey}</h2>
+    <h2 id="apiKey">${apiKey}</h2>
 
 </div><!-- /.panel-body -->
 </body>

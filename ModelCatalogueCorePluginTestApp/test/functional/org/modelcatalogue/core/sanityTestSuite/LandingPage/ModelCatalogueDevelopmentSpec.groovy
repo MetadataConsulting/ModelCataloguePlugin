@@ -19,10 +19,8 @@ class ModelCatalogueDevelopmentSpec extends AbstractModelCatalogueGebSpec {
 
     @Ignore
     void clickOnDevelopmentSupported() {
-
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
 
         then:

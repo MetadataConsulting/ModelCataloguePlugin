@@ -1,42 +1,43 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
+import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
-
-import static org.modelcatalogue.core.geb.Common.item
-import static org.modelcatalogue.core.geb.Common.pick
-import static org.modelcatalogue.core.geb.Common.rightSideTitle
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
-class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
-
-     private static final String catalogueModels = "#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > div:nth-child(1) > div > div:nth-child(2) > div > ul > li:nth-child(2) > a"
-     private static final String  quickSearch='a#role_navigation-right_search-menu-menu-item-link>span:nth-child(1)'
-     private static final String   search  ='input#value'
+class QuickSearchAsViewerSpec extends GebSpec {
 
     def "login to model catalogue"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
 
         then:
-        check catalogueModels contains 'Catalogue Models'
-    }
+        at DataModelListPage
 
-    def "navigate to the top menu and select quick search"() {
         when:
-        click quickSearch
-        Thread.sleep(1000)
-
-        and:'search for an element'
-        fill search with 'Clinical trial' and pick first item
-        Thread.sleep(1000)
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        dataModelListPage.dashboard()
 
         then:
-        check rightSideTitle contains 'Clinical'
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Clinical trial')
+        dashboardPage.selectFirst()
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+
+        then:
+        dataModelPage.rightSideTitle.contains('Clinical')
     }
 }

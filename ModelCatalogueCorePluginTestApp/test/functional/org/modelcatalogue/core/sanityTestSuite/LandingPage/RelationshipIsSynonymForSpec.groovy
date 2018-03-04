@@ -31,8 +31,7 @@ class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "login to model catalogue and select a data model"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:

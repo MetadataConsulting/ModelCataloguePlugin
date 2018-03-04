@@ -26,19 +26,20 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
 
     def "do create data model"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
 
         then:
         at DataModelListPage
 
+        when:
+        DataModelListPage dataModelListPage = browser.page DataModelListPage
+
         then:
-        check create displayed
+        dataModelListPage.createNewButton.isDisplayed()
 
         when:
-        // click on create
-        click create
+        dataModelListPage.createNew()
         // type a name . please change value
         fill name with newModelName
         fill version with versionElement

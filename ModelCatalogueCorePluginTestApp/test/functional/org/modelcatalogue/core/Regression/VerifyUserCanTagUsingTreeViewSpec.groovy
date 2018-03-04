@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.Regression
 
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataElementPage
 import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
@@ -45,8 +46,7 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
 
     def "login to model catalogue and select a draft data model"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
@@ -54,7 +54,14 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
 
         when:
         DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 3')
+        dataModelListPage.dashboard()
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
         at DataModelPage
@@ -103,7 +110,14 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
 
         when:
         DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 3')
+        dataModelListPage.dashboard()
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
         at DataModelPage

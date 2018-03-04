@@ -9,26 +9,15 @@ class DataModelListPage extends Page {
     static at = { title == 'Data Models' }
 
     static content = {
-        searchInputField { $('input#data-model-search-box') }
-        dataModelLink { $('h3.panel-title', title: it).$('a', 0) }
-        navbar { $('ul.nav.navbar-nav.navbar-right').module(MainNavigationModule) }
-        createButton(required: false) { $('a#role_data-models_create-data-modelBtn', 0) }
+        dashboardButtonLink(wait: true) { $('#dashboard-button-link', 0) }
+        createNewButton(wait: true, required: false) { $('#create-new-button', 0) }
     }
 
-    void search(String query) {
-        for ( char c : query.toCharArray() ) {
-            searchInputField << "${c}"
-            sleep(2_000)
-        }
+    void createNew() {
+        createNewButton.click()
     }
 
-    void select(String dataModelName) {
-        waitFor {
-            dataModelLink(dataModelName).click()
-        }
-    }
-
-    boolean isCreateButtonDisplayed() {
-        createButton.isDisplayed()
+    void dashboard() {
+        dashboardButtonLink.click()
     }
 }

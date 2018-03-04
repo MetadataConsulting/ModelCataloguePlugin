@@ -34,8 +34,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
     @Ignore
     def "go to login"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:

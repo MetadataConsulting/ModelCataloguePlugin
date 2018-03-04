@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataElementPage
 import org.modelcatalogue.core.geb.DataElementsPage
 import org.modelcatalogue.core.geb.DataModelListPage
@@ -23,13 +24,7 @@ class EditDataElementSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue and select a draft model"() {
         when:
-        to LoginPage
-
-        then:
-        at LoginPage
-
-        when:
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
 
         then:
@@ -37,8 +32,14 @@ class EditDataElementSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.search('Test 3')
-        dataModelListPage.select('Test 3')
+        dataModelListPage.dashboard()
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
         at DataModelPage

@@ -19,10 +19,10 @@ class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
     private static final String  catalogueModels ='ul.nav-tabs>li:nth-child(2)>a'
     private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
 
+    @Ignore
     def "login to model catalogue"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
 
         and:'click on the catalogue model'

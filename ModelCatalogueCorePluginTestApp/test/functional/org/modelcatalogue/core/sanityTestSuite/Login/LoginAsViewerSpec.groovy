@@ -14,8 +14,7 @@ class LoginAsViewerSpec extends AbstractModelCatalogueGebSpec {
 
     def "Create data Model button is not displayed for viewer"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('viewer', 'viewer')
 
         then:
@@ -25,6 +24,6 @@ class LoginAsViewerSpec extends AbstractModelCatalogueGebSpec {
         DataModelListPage dataModelListPage = browser.page DataModelListPage
 
         then:
-        !dataModelListPage.isCreateButtonDisplayed()
+        waitFor { !dataModelListPage.createNewButton.isDisplayed() }
     }
 }

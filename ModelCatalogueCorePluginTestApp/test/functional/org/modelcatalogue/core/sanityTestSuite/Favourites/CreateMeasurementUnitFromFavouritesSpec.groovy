@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.Favourites
 
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -38,8 +39,7 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
     @Ignore
     def "Login to model catalogue and select a data model"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('admin', 'admin')
 
         then:
@@ -47,7 +47,14 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
 
         when:
         DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 3')
+        dataModelListPage.dashboard()
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
         at DataModelPage
