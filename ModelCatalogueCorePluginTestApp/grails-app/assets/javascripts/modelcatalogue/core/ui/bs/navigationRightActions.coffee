@@ -166,7 +166,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         $state.go 'simple.resource.list', resource: 'user'
     }
 
-  actionsProvider.registerChildAction 'admin-menu', 'relationship-types', ['$state', ($state) ->
+  actionsProvider.registerChildAction 'admin-menu', 'relationship-types', ['$state', 'security', ($state, security) ->
     return undefined unless security.isUserLoggedIn()
     {
       position:   2000
@@ -177,7 +177,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
-  actionsProvider.registerChildAction 'admin-menu', 'data-model-policies', ['$state', ($state) ->
+  actionsProvider.registerChildAction 'admin-menu', 'data-model-policies', ['$state', 'security', ($state, security) ->
     return undefined unless security.isUserLoggedIn()
     {
       position:   2100
