@@ -2,7 +2,6 @@ package org.modelcatalogue.core.sanityTestSuite
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.HomePage
 import org.modelcatalogue.core.geb.LoginPage
 
@@ -12,13 +11,6 @@ class LogoutSpec extends GebSpec {
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login('viewer', 'viewer')
-
-        then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
 
         then:
         at DashboardPage

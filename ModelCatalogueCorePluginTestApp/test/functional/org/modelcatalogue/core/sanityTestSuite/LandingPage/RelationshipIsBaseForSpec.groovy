@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
@@ -31,11 +31,11 @@ class RelationshipIsBaseForSpec extends AbstractModelCatalogueGebSpec {
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('NHIC')
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('NHIC')
 
         then:'verify  title of the page '
         check rightSideTitle contains 'NHIC'

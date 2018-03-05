@@ -15,13 +15,6 @@ class CodeVersionSpec extends GebSpec {
         loginPage.login(username, password)
 
         then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
-
-        then:
         at DashboardPage
 
         when:

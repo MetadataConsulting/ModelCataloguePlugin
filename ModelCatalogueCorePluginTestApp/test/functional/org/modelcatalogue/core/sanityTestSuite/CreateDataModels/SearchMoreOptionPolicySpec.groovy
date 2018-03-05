@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Unroll
 
@@ -33,7 +33,7 @@ class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec{
         loginPage.login('admin', 'admin')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         and:
         check modelCatalogue displayed

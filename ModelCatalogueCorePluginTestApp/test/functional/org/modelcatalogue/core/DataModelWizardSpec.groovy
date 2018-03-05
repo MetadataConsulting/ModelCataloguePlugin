@@ -1,7 +1,8 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.geb.CreateDataModelPage
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -41,50 +42,32 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
     }
 
     def "add new data model"() {
         given:
         def uuid = UUID.randomUUID().toString()
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        DashboardPage dashboardPage = browser.page DashboardPage
 
         when:
-        dataModelListPage.createNew()
+        dashboardPage.nav.createDataModel()
+
+        then:
+        at CreateDataModelPage
+
+        when:
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-
-        then: 'the model dialog opens'
-        createDataModelPage.wizard.isDisplayed()
-
-        when:
         createDataModelPage.name = "New Data Model $uuid"
-        createDataModelPage.modelCatalogueIdInput = "http://www.example.com/$uuid"
+        createDataModelPage.modelCatalogueId = "http://www.example.com/$uuid"
         createDataModelPage.description = "Description of Data Model"
+        createDataModelPage.check('NHIC')
+        createDataModelPage.submit()
 
         then:
-        createDataModelPage.stepImports.isDisplayed()
-
-        when:
-        createDataModelPage.importsStep()
-
-        then:
-        check stepImports has 'btn-primary'
-
-        when:
-        createDataModelPage.name = 'NHIC'
-        selectCepItemIfExists()
+        at DataModelPage
 
         and:
-        createDataModelPage.finish()
-
-        then:
-        check '#summary' is "Data Model New Data Model $uuid created"
-
-        when:
-        click exitButton
-        remove messages
-
-        then:
         check rightSideTitle contains "New Data Model $uuid"
     }
 
@@ -181,7 +164,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
             click createNewDataModel

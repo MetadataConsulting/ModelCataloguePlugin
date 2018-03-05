@@ -2,7 +2,7 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -24,7 +24,7 @@ class ModelCatalogueDevelopmentSpec extends AbstractModelCatalogueGebSpec {
         loginPage.login('curator', 'curator')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
         // selectRelation model catalogue development supported

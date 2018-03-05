@@ -8,12 +8,8 @@
         <div class="leave-10-before"></div>
         <div ng-if="showPreload()">
           <div class="jumbotron">
-            <h2>Welcome to Metadata Registry</h2>
-            <p>
-
-              <a id="dashboard-button-link" href="/dashboard/index"><button class="btn btn-primary btn-lg">Dashboard</button></a>
-              <button ng-if="showCreateNewButton()" id="create-new-button" class="btn btn-success btn-lg" ng-click="createElement()"><span class="fa fa-plus-circle"></span>Create New</button>
-            </p>
+            <h2>Loading ...</h2>
+            <script type="text/javascript">window.location.href = '/dashboard/index';</script>
           </div>
         </div>
 

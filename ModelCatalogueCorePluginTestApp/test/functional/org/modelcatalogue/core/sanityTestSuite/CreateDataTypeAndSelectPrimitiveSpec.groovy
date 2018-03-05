@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite
 
 import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -36,13 +35,6 @@ class CreateDataTypeAndSelectPrimitiveSpec extends AbstractModelCatalogueGebSpec
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
-
-        then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
 
         then:
         at DashboardPage

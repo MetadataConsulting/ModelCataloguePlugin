@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.Regression
 
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
@@ -41,7 +41,7 @@ class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         and:
         check createButton isDisplayed()

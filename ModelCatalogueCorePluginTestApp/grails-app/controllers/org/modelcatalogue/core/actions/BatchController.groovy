@@ -6,7 +6,6 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.dataarchitect.DataArchitectService
 import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
-import org.modelcatalogue.core.util.BeanMessage
 import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.context.MessageSource

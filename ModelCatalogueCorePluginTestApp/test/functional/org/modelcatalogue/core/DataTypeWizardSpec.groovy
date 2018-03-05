@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -66,13 +65,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
-
-        then:
         at DashboardPage
 
         when:
@@ -96,20 +88,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "create reference"() {
         when:
-        to DataModelListPage
-
-        then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
-
-        then:
-        at DashboardPage
-
-        when:
-        DashboardPage dashboardPage = browser.page DashboardPage
+        DashboardPage dashboardPage = to DashboardPage
         dashboardPage.search('Test 1')
         dashboardPage.select('Test 1')
 

@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
@@ -36,13 +35,6 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
-
-        then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
 
         then:
         at DashboardPage

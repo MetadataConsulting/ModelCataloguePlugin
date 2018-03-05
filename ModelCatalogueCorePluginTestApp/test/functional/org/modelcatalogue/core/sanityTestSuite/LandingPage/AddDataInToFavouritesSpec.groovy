@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.LoginPage
 
 import static org.modelcatalogue.core.geb.Common.admin
@@ -32,18 +31,6 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
-
-        then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-
-        then:
-        dataModelListPage.createNewButton.isDisplayed()
-
-        when:
-        dataModelListPage.dashboard()
 
         then:
         at DashboardPage

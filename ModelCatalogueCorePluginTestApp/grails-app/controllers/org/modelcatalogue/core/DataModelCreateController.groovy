@@ -2,8 +2,6 @@ package org.modelcatalogue.core
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import org.modelcatalogue.core.persistence.DataModelPolicyGormService
-import org.modelcatalogue.core.util.BeanMessage
 import org.modelcatalogue.core.util.BeanMessageUtils
 import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.util.MetadataDomain
@@ -25,7 +23,7 @@ class DataModelCreateController {
 
     def create() {
         List<IdName> dataModelPolicyList = dataModelCreateService.findAllDataModelPolicyGormService()
-        List<IdName> dataModelList = dataModelCreateService.findAllDataWhichMaybeImported()
+        List<IdName> dataModelList = dataModelCreateService.findAllDataModelWhichMaybeImported()
         Map<String, Object> m = [
                 dataModelList: dataModelList,
                 dataModelPolicyList: dataModelPolicyList
@@ -39,16 +37,18 @@ class DataModelCreateController {
         if ( cmd.hasErrors() ) {
             flash.error = BeanMessageUtils.beanMessages(cmd, messageSource, request.locale)
             render view: '/dataModel/create', model: cmd.toMap()
+            return
         }
 
         if ( dataModelCreateService.isDataModelUsedAlready(cmd.name) ) {
             flash.error = 'Name is already used in other data model.'
             render view: '/dataModel/create', model: cmd.toMap()
+            return
         }
 
         DataModel dataModel = dataModelCreateService.saveDataModel(cmd.toDataModel(), cmd.dataModelPolicies, cmd.dataModels)
 
-        if ( dataModel.hasErrors() ) {
+        if ( !dataModel || dataModel.hasErrors() ) {
             flash.error = messageSource.getMessage('dataModel.save.failed', [] as Object[], 'Unable to save data Model', request.locale)
             render view: '/dataModel/create', model: cmd.toMap()
             return

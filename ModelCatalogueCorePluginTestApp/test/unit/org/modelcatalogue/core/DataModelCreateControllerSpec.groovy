@@ -14,7 +14,7 @@ class DataModelCreateControllerSpec extends Specification {
         Map model = controller.create()
 
         then:
-        model.keySet().contains('dataModelList')
+        controller.modelAndView.model.containsKey('dataModelList')
     }
 
     def "create model contains dataModelPolicyList"() {
@@ -22,10 +22,10 @@ class DataModelCreateControllerSpec extends Specification {
         controller.dataModelCreateService = Mock(DataModelCreateService)
 
         when:
-        Map model = controller.create()
+        controller.create()
 
         then:
-        model.keySet().contains('dataModelPolicyList')
+        controller.modelAndView.model.containsKey('dataModelPolicyList')
     }
 
     def "create calls collaborator DataModelCreateService twice"() {
@@ -37,7 +37,7 @@ class DataModelCreateControllerSpec extends Specification {
 
         then:
         1 * controller.dataModelCreateService.findAllDataModelPolicyGormService()
-        1 * controller.dataModelCreateService.findAllDataWhichMaybeImported()
+        1 * controller.dataModelCreateService.findAllDataModelWhichMaybeImported()
     }
 
 }

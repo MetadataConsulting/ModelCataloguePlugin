@@ -34,14 +34,15 @@
                         <label for="policies"><b><g:message code="dataModel.policies" default="Policies"/></b></label>
                         <ul>
                            <g:each var="dataModelPolicy" in="${dataModelPolicyList}">
-                                <li>
-                                    <span>${dataModelPolicy.name}</span>
+                                <li class="checkbox">
+
                                     <g:if test="${dataModelPolicies && dataModelPolicies.contains(dataModelPolicy.id)}">
                                         <g:checkBox name="dataModelPolicies" value="${dataModelPolicy.id}" checked="true"/>
                                     </g:if>
                                     <g:else>
                                         <g:checkBox name="dataModelPolicies" value="${dataModelPolicy.id}" checked="false"/>
                                     </g:else>
+                                    <span>${dataModelPolicy.name}</span>
                                 </li>
                            </g:each>
                         </ul>
@@ -56,21 +57,21 @@
                         <label for="importExistingDataModels"><g:message code="dataModel.imports.existingDataModels" default="Import Existing Data Models"/></label>
                         <ul>
                             <g:each var="dataModel" in="${dataModelList}">
-                                <li>
-                                    <span>${dataModel.name}</span>
+                                <li class="checkbox">
                                     <g:if test="${dataModels && dataModels.contains(dataModel.id)}">
                                         <g:checkBox name="dataModels" value="${dataModel.id}" checked="true"/>
                                     </g:if>
                                     <g:else>
                                         <g:checkBox name="dataModels" value="${dataModel.id}" checked="false"/>
                                     </g:else>
+                                    <span>${dataModel.name}</span>
                                 </li>
                             </g:each>
                         </ul>
                         <p><small><g:message code="dataModel.imports.existingDataModels.legend" default="Import data models already contained in the catalogue for use within your new data model. You can import only finalized data models."/></small></p>
                     </li>
                 </g:if>
-                <li><input type="submit" value="${g.message(code: 'dataModel.save', default: 'Save')}"/></li>
+                <li><input type="submit" id="createdatamodel-submit" value="${g.message(code: 'dataModel.save', default: 'Save')}"/></li>
             </ol>
         </fieldset>
     </g:form>

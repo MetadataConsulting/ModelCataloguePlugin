@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
@@ -39,7 +39,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
         click showBatches

@@ -8,6 +8,8 @@ import org.modelcatalogue.core.DataModelPolicy
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.util.IdName
+import org.modelcatalogue.core.util.PaginationQuery
+import org.modelcatalogue.core.util.SortQuery
 import org.springframework.context.MessageSource
 
 class DataModelPolicyGormService implements WarnGormErrors {
@@ -32,11 +34,26 @@ class DataModelPolicyGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
-   @CompileDynamic
-    List<IdName> findAll() {
+    List<DataModelPolicy> findAll(PaginationQuery paginationQuery, SortQuery sortQuery) {
+        DetachedCriteria<DataModelPolicy> query = DataModelPolicy.where { }
+        if ( sortQuery?.sort != null && sortQuery?.order != null) {
+            query = query.sort(sortQuery.sort, sortQuery.order)
+        }
+        Map m = paginationQuery?.toMap() ?: Collections.emptyMap()
+        query.list(m)
+    }
+
+    @Transactional(readOnly = true)
+    Number count() {
+        DataModelPolicy.where { }.count()
+    }
+
+    @Transactional(readOnly = true)
+    @CompileDynamic
+    List findAllToBean(Class bean) {
         BuildableCriteria c = DataModelPolicy.createCriteria()
         c.list {
-            resultTransformer(Transformers.aliasToBean(IdName))
+            resultTransformer(Transformers.aliasToBean(bean))
             projections {
                 property('id', 'id')
                 property('name', 'name')
@@ -61,4 +78,5 @@ class DataModelPolicyGormService implements WarnGormErrors {
         }
         dataModelPolicyInstance
     }
+
 }

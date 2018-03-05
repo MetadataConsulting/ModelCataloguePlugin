@@ -3,7 +3,6 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataClassesPage
-import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 
@@ -63,13 +62,6 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
-
-        then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
 
         then:
         at DashboardPage
@@ -227,8 +219,6 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     def "delete the created data class"() {
         when:
         click modelCatalogue
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
 
         then:
         at DashboardPage

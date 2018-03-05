@@ -2,7 +2,6 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.LoginPage
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
@@ -12,13 +11,6 @@ class NavItemVisibilitySpec extends GebSpec {
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login('viewer', 'viewer')
-
-        then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
 
         then:
         at DashboardPage
@@ -60,7 +52,7 @@ class NavItemVisibilitySpec extends GebSpec {
         then:
         dashboardPage.nav.codeversionLink.isDisplayed()
         dashboardPage.nav.relationshipTypesLink.isDisplayed()
-        dashboardPage.nav.dataModelLink.isDisplayed()
+        dashboardPage.nav.dataModelPolicyLink.isDisplayed()
         dashboardPage.nav.feedbacksLink.isDisplayed()
 
         and:
@@ -79,13 +71,6 @@ class NavItemVisibilitySpec extends GebSpec {
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
-
-        then:
         at DashboardPage
 
         when:
@@ -131,7 +116,7 @@ class NavItemVisibilitySpec extends GebSpec {
         then:
         dashboardPage.nav.codeversionLink.isDisplayed()
         dashboardPage.nav.relationshipTypesLink.isDisplayed()
-        dashboardPage.nav.dataModelLink.isDisplayed()
+        dashboardPage.nav.dataModelPolicyLink.isDisplayed()
         dashboardPage.nav.feedbacksLink.isDisplayed()
         dashboardPage.nav.usersLink.isDisplayed()
         dashboardPage.nav.mappingUtilityLink.isDisplayed()
@@ -148,13 +133,6 @@ class NavItemVisibilitySpec extends GebSpec {
         loginPage.login('curator', 'curator')
 
         then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
-
-        then:
         at DashboardPage
 
         when:
@@ -200,7 +178,7 @@ class NavItemVisibilitySpec extends GebSpec {
         then:
         dashboardPage.nav.codeversionLink.isDisplayed()
         dashboardPage.nav.relationshipTypesLink.isDisplayed()
-        dashboardPage.nav.dataModelLink.isDisplayed()
+        dashboardPage.nav.dataModelPolicyLink.isDisplayed()
         dashboardPage.nav.feedbacksLink.isDisplayed()
         dashboardPage.nav.mappingUtilityLink.isDisplayed()
 

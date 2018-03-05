@@ -58,7 +58,7 @@
                     <li><a href="${g.createLink(controller: 'reindexCatalogue', action: 'index')}" id="reindexcatalogue-link"><i class="fas fa-search"></i> Reindex Catalogue</a></li>
                 </sec:ifAllGranted>
                 <li><a href="/#/catalogue/relationshipType/all" id="relationshiptypes-link"><i class="fas fa-link"></i> Relationship Types</a></li>
-                <li><a href="/#/catalogue/dataModelPolicy/all" id="datamodel-link"><i class="far fa-check-square"></i> Data Model Policies</a></li>
+                <li><a href="/#/catalogue/dataModelPolicy/all" id="datamodelpolicy-link"><i class="far fa-check-square"></i> Data Model Policies</a></li>
                 <sec:ifAllGranted roles="ROLE_SUPERVISOR">
                     <li><a href="/monitoring" id="monitoring-link"><i class="fas fa-cogs"></i> Monitoring</a></li>
                 </sec:ifAllGranted>
@@ -84,7 +84,7 @@
     </sec:ifAnyGranted>
     <sec:ifAnyGranted roles="ROLE_METADATA_CURATOR,ROLE_SUPERVISOR">
         <li role="presentation" class="navbar-right">
-            <a href="/#/dataModels" id="createdatamodel-link" ><i class="fas fa-plus"></i></a>
+            <a href="/dataModel/create" id="createdatamodel-link" ><i class="fas fa-plus"></i></a>
         </li>
     </sec:ifAnyGranted>
 </ul>

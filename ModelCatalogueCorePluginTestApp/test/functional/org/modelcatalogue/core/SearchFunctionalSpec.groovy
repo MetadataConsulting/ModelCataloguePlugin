@@ -1,9 +1,8 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
@@ -32,7 +31,7 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
         click search

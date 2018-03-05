@@ -19,6 +19,17 @@ class DataModelPage extends Page {
         h3CeName { $('h3.ce-name', 0) }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         rightSideTitleH3 { $("h3:not(.ng-hide):not(.data-model-heading)", 0) }
+        dataModelButton(required: false) { $('#role_item_catalogue-element-menu-item-link', 0) }
+        deleteButton(required: false) { $('#delete-menu-item-link', 0) }
+        modalDialog(required: false) { $('.modal-dialog', 0).module(ModalDialogModule) }
+    }
+
+    void delete() {
+        deleteButton.click()
+    }
+
+    void dataModel() {
+        dataModelButton.click()
     }
 
     boolean titleContains(String query) {

@@ -1,8 +1,9 @@
 package org.modelcatalogue.core.Regression
 
+import org.modelcatalogue.core.geb.CreateDataModelPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataClassesPage
 import org.modelcatalogue.core.geb.DataElementsPage
-import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
@@ -55,43 +56,27 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
 
         then:
-        waitFor { dataModelListPage.createNewButton.isDisplayed() }
+        at CreateDataModelPage
 
         when:
-        dataModelListPage.createNew()
-
-        and:'fill the form '
-        fill nameLabel with 'TESTING_DATA_MODEL_MAX'
-        fill modelCatalogueId with 'MET-00263'
-        fill description with 'this my testing data'
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-
-        then:
-        true
-        //check stepImports enabled
-
-        when:
-        click stepImports
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = 'TESTING_DATA_MODEL_MAX'
+        createDataModelPage.modelCatalogueId = 'MET-00263'
+        createDataModelPage.description = 'this my testing data'
+        createDataModelPage.check('Cancer Model')
+        createDataModelPage.submit()
 
         then:
-        check stepImports has 'btn-primary'
+        DataModelPage
 
-        when:'import  Clinical Tags'
-        fill wizardName with 'Clinical Tags'
-        selectCepItemIfExists()
-
-        and:'create the dat class'
-        click finishButton
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        click closeButton
-
-        then:
+        and:
         check rightSideTitle contains 'TESTING_DATA_MODEL'
     }
 

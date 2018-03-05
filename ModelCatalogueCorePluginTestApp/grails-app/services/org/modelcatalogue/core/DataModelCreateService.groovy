@@ -21,10 +21,10 @@ class DataModelCreateService {
     RelationshipGormService relationshipGormService
 
     List<IdName> findAllDataModelPolicyGormService() {
-        dataModelPolicyGormService.findAll()
+        dataModelPolicyGormService.findAllToBean(IdName) as List<IdName>
     }
 
-    List<IdName> findAllDataWhichMaybeImported() {
+    List<IdName> findAllDataModelWhichMaybeImported() {
         dataModelGormService.findAllInStatus(ElementStatus.FINALIZED).collect { DataModel dataModel ->
             new IdName(id: dataModel.id, name: dataModel.name)
         }

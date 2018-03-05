@@ -12,13 +12,6 @@ class LastSeenSpec extends GebSpec {
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.dashboard()
-
-        then:
         at DashboardPage
 
         when:

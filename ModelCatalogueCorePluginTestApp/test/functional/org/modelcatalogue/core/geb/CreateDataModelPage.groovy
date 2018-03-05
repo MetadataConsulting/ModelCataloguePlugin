@@ -1,8 +1,13 @@
 package org.modelcatalogue.core.geb
 
 import geb.Page
+import geb.module.Checkbox
 
 class CreateDataModelPage extends Page {
+
+    static url = '/dataModel/create'
+
+    static at = { title == 'Create Data Model' }
 
     static content = {
         wizard(wait: true, required: false) { $('div.create-classification-wizard', 0) }
@@ -11,30 +16,29 @@ class CreateDataModelPage extends Page {
         semanticVersionInput { $('#semanticVersion', 0) }
         modelCatalogueIdInput { $('#modelCatalogueId', 0) }
         descriptionTextArea { $('#description', 0) }
-        dataModelButtons { $('#step-classification', 0) }
-        importsButton { $('#step-imports', 0) }
-        nextButton { $('#step-next', 0) }
-        finishButton { $('#step-finish', 0) }
+        field { $('li.checkbox span', text: it).parent() }
+        fieldCheckbox { field(it).find('input', type: 'checkbox', 0).module(Checkbox) }
+        submitButton { $('#createdatamodel-submit', 0) }
     }
 
-    void nextStep() {
-        nextButton.click()
+    void submit() {
+        submitButton.click()
     }
 
-    void finish() {
-        finishButton.click()
+    void check(String name) {
+        fieldCheckbox(name).check()
     }
 
-    void dataModelStep() {
-        dataModelButtons.click()
-    }
-
-    void importsStep() {
-        importsButton.click()
+    void uncheck(String name) {
+        fieldCheckbox(name).uncheck()
     }
 
     void setName(String value) {
         fillInput(nameInput, value)
+    }
+
+    void setModelCatalogueId(String value) {
+        fillInput(modelCatalogueIdInput, value)
     }
 
     void setSemanticVersion(String value) {
