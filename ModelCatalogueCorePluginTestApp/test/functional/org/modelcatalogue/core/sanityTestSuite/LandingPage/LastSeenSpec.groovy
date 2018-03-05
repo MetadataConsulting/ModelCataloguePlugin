@@ -2,8 +2,9 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
+import spock.lang.IgnoreIf
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 class LastSeenSpec extends GebSpec {
 
     def "login to model catalogue "() {
