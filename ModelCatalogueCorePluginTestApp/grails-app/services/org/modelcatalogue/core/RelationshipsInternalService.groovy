@@ -36,7 +36,7 @@ class RelationshipsInternalService {
             return new RelationshipTypeNotFoundEvent()
         }
         Map params = paramsArgs.toMap()
-        List<ElementStatus> elementStatusList = ElementService.getStatusFromParams(params, true)
+        List<ElementStatus> elementStatusList = ElementService.getStatusFromParams(params)
         DetachedCriteria criteria = direction.composeWhere(element, type, elementStatusList, overridableDataModelFilter)
         String base = base(catalogueElementId, typeParam, resourceName, direction)
         ListWrapper<Relationship> list = Lists.fromCriteria(params, base, criteria)

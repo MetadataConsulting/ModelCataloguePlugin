@@ -3,8 +3,6 @@ package org.modelcatalogue.core.sanityTestSuite.Favourites
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
-import spock.lang.Unroll
-
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.ScrollDirection
@@ -12,7 +10,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebSpec {
 

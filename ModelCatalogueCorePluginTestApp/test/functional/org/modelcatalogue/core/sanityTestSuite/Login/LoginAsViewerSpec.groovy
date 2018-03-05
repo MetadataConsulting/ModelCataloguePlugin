@@ -11,7 +11,7 @@ class LoginAsViewerSpec extends AbstractModelCatalogueGebSpec {
     def "Create data Model button is not displayed for viewer"() {
         when:
         LoginPage loginPage = to LoginPage
-        loginPage.login('viewer', 'viewer')
+        loginPage.login('user', 'user')
 
         then:
         at DashboardPage

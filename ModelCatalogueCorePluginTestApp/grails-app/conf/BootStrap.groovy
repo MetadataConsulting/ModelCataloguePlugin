@@ -1,3 +1,4 @@
+
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -55,6 +56,12 @@ class BootStrap {
         grailsApplication.mainContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
         log.info 'completed:registerMarshallers'
 
+        log.info 'init roles'
+        initSecurityService.initRoles()
+
+        log.info 'init role hierarchy'
+        initSecurityService.initRoleHierarchyEntry()
+
         if ( isDev() ) {
             initDev()
 
@@ -77,9 +84,6 @@ class BootStrap {
 
         log.info 'init policies and tags'
         initPoliciesAndTagsService.initPoliciesAndTags()
-
-        log.info 'init roles'
-        initSecurityService.initRoles()
 
         log.info 'init users'
         initSecurityService.initUsers()
@@ -129,7 +133,6 @@ class BootStrap {
         if ( isBlankDev() ) {
             initEmptyDataBase()
             log.info 'init register reports'
-            userService.inviteAdmins()
         } else {
             log.info 'init request maps'
             metadataSecurityService.secureUrlMappings()
@@ -156,9 +159,6 @@ class BootStrap {
 
                 log.info 'init policies and tags'
                 initPoliciesAndTagsService.initPoliciesAndTags()
-
-                log.info 'init roles'
-                initSecurityService.initRoles()
 
                 log.info 'init users'
                 initSecurityService.initUsers()

@@ -2,7 +2,6 @@ package org.modelcatalogue.core.util.delayable
 
 import spock.lang.Specification
 
-
 class DelayableSpec extends Specification {
 
     def "Can delay execution"() {

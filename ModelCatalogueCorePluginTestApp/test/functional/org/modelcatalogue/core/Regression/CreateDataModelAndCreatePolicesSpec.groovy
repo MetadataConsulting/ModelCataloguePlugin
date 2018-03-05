@@ -15,6 +15,7 @@ class CreateDataModelAndCreatePolicesSpec extends GebSpec {
     void "create a data model policy and use it in the creation of a data model"() {
 
         when: 'login to model catalogue'
+
         LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 

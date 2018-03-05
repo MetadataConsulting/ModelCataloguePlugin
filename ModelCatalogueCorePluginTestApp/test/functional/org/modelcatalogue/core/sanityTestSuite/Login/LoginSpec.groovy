@@ -26,7 +26,7 @@ class LoginSpec extends AbstractModelCatalogueGebSpec {
 
         where:
         username     | password     | displayed
-        'viewer'     | 'viewer'     | false
+        'user'       | 'user'       | false
         'supervisor' | 'supervisor' | true
         'curator'    | 'curator'    | true
         description = displayed ? 'is displayed' : 'is not displayed'

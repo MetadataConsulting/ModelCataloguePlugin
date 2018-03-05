@@ -110,9 +110,11 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
     @Ignore
     def "login and navigate to model"() {
         when:
-        loginCurator()
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
         select 'Test 3'
         selectInTree 'Imported Data Models'
+
         then:
         check rightSideTitle contains 'Imports'
     }

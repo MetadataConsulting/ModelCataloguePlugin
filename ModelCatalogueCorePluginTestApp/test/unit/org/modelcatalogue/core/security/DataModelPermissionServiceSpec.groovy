@@ -28,10 +28,9 @@ class DataModelPermissionServiceSpec extends Specification {
 
         where:
         expected | authorities
-        true     | [MetadataRolesUtils.ROLE_SUPERVISOR, MetadataRolesUtils.ROLE_USER]
-        true     | [MetadataRolesUtils.ROLE_METADATA_CURATOR, MetadataRolesUtils.ROLE_USER]
-        true     | [MetadataRolesUtils.ROLE_ADMIN, MetadataRolesUtils.ROLE_USER]
-        false    | [MetadataRolesUtils.ROLE_USER]
+        true     | [MetadataRoles.ROLE_SUPERVISOR, MetadataRoles.ROLE_USER]
+        true     | [MetadataRoles.ROLE_CURATOR, MetadataRoles.ROLE_USER]
+        false    | [MetadataRoles.ROLE_USER]
         false    | []
         description = expected ? 'can be granted ACL ADMIN' : 'cannot be granted ACL ADMIN'
     }
@@ -81,7 +80,7 @@ class DataModelPermissionServiceSpec extends Specification {
             findByUsername(_ as String) >> new User()
         }
         service.userRoleGormService = Stub(UserRoleGormService) {
-            findRolesByUser(_ as User) >> [new Role(authority: MetadataRolesUtils.ROLE_METADATA_CURATOR)]
+            findRolesByUser(_ as User) >> [new Role(authority: MetadataRoles.ROLE_CURATOR)]
         }
 
         when:
@@ -104,7 +103,7 @@ class DataModelPermissionServiceSpec extends Specification {
             findByUsername(_ as String) >> new User()
         }
         service.userRoleGormService = Stub(UserRoleGormService) {
-            findRolesByUser(_ as User) >> [new Role(authority: MetadataRolesUtils.ROLE_METADATA_CURATOR)]
+            findRolesByUser(_ as User) >> [new Role(authority: MetadataRoles.ROLE_CURATOR)]
         }
 
         when:
@@ -127,7 +126,7 @@ class DataModelPermissionServiceSpec extends Specification {
             findByUsername(_ as String) >> new User()
         }
         service.userRoleGormService = Stub(UserRoleGormService) {
-            findRolesByUser(_ as User) >> [new Role(authority: MetadataRolesUtils.ROLE_METADATA_CURATOR)]
+            findRolesByUser(_ as User) >> [new Role(authority: MetadataRoles.ROLE_CURATOR)]
         }
         service.aclUtilService = Mock(AclUtilService) {
             1 * addPermission(DataModel, 1L, 'steve', BasePermission.ADMINISTRATION)
@@ -153,7 +152,7 @@ class DataModelPermissionServiceSpec extends Specification {
             findByUsername(_ as String) >> new User()
         }
         service.userRoleGormService = Stub(UserRoleGormService) {
-            findRolesByUser(_ as User) >> [new Role(authority: MetadataRolesUtils.ROLE_USER)]
+            findRolesByUser(_ as User) >> [new Role(authority: MetadataRoles.ROLE_USER)]
         }
         service.aclUtilService = Mock(AclUtilService) {
             1 * addPermission(DataModel, 1L, 'steve', BasePermission.READ)
@@ -188,8 +187,5 @@ class DataModelPermissionServiceSpec extends Specification {
         'message' | BasePermission.ADMINISTRATION | new UserMissingAnyGranted()
         'message' | BasePermission.ADMINISTRATION | new UserNotFoundEvent()
         description = expected != null ? 'error message is returned' : 'no error message is return'
-
     }
-
-
 }

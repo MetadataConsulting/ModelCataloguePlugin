@@ -13,9 +13,7 @@ import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.save
-import groovy.transform.NotYetImplemented
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 

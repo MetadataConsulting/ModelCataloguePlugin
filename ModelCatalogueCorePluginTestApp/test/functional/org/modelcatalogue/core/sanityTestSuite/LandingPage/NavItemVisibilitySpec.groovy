@@ -10,7 +10,7 @@ class NavItemVisibilitySpec extends GebSpec {
     def "check navigation item visibility for viewers"() {
         when:
         LoginPage loginPage = to LoginPage
-        loginPage.login('viewer', 'viewer')
+        loginPage.login('user', 'user')
 
         then:
         at DashboardPage

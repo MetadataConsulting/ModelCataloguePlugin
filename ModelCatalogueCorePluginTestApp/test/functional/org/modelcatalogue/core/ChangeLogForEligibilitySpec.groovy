@@ -11,7 +11,7 @@ import spock.lang.Ignore
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 

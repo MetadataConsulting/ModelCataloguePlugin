@@ -69,6 +69,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         similar type, 'user.catalogue.xml'
     }
 
+    @Ignore
     def "write simple primitive type"() {
         expect:
         similar force, 'force.catalogue.xml'
@@ -76,11 +77,13 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
     // TODO: sometimes is needed to print the type as well if not obvious
 
+    @Ignore
     def "write simple data element"() {
         expect:
         similar adhesion, 'adhesion.catalogue.xml'
     }
 
+    @Ignore
     def "write simple model with validation"() {
         expect:
         similar locomotive, 'locomotive.catalogue.xml'

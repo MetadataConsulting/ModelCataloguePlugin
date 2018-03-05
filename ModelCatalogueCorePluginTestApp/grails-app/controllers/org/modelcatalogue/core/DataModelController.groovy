@@ -7,7 +7,6 @@ import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
-
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import com.google.common.collect.ImmutableSet
@@ -738,7 +737,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     protected ListWrapper<DataModel> getAllEffectiveItems(Integer max) {
         dataModelService.getAllEffectiveItems(max, params)
     }
-
 
     @Override
     def search(Integer max) {

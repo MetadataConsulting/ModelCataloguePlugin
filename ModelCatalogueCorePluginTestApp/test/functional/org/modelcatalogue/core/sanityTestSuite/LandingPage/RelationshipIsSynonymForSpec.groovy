@@ -14,7 +14,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
 

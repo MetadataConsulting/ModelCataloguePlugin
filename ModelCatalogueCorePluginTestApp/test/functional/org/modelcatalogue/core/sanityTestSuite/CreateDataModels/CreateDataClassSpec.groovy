@@ -7,7 +7,6 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 
 import static org.modelcatalogue.core.geb.Common.create
-import static org.modelcatalogue.core.geb.Common.delete
 import static org.modelcatalogue.core.geb.Common.description
 import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getPick
@@ -22,7 +21,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     private static final String metadataStep ="button#step-metadata"

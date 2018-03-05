@@ -8,7 +8,6 @@ import org.modelcatalogue.core.persistence.UserRoleGormService
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 @TestFor(MaxActiveUsersService)

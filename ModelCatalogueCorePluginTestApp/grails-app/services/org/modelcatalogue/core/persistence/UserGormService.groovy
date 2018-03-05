@@ -4,13 +4,25 @@ import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserService
 import org.springframework.context.MessageSource
 
 class UserGormService implements WarnGormErrors {
 
     MessageSource messageSource
+
+    DetachedCriteria<User> queryByUsername(String usernameParam) {
+        DetachedCriteria<User> q = User.where { username == usernameParam }
+    }
+
+    @Transactional(readOnly = true)
+    String findApiKeyById(Long id) {
+        DetachedCriteria<User> query = queryById(id)
+        query.projections {
+            property('apiKey')
+        }.get()
+    }
 
     @Transactional
     User findById(long id) {
@@ -19,6 +31,12 @@ class UserGormService implements WarnGormErrors {
 
     DetachedCriteria<User> queryById(Long idParam) {
         User.where { id == idParam }
+    }
+
+    @Transactional(readOnly = true)
+    List<User> findAll(Map args) {
+        DetachedCriteria<User> query = User.where {}
+        query.list(args)
     }
 
     /**
@@ -34,7 +52,7 @@ class UserGormService implements WarnGormErrors {
             return null
         }
 
-        if (user.authorities.contains(UserService.ROLE_SUPERVISOR)) {
+        if (user.authorities.contains(MetadataRoles.ROLE_SUPERVISOR)) {
             user.errors.rejectValue('enabled', 'user.cannot.edit.supervisor', 'Cannot edit supervisor account')
             return user
         }
@@ -93,6 +111,28 @@ class UserGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
+    String findApiKeyByUsername(String username) {
+        findQueryByUsername(username).projections {
+            property('apiKey')
+        }.get()
+    }
+
+    @Transactional
+    void updateApiKeyByUsername(String username, String apiKey) {
+        DetachedCriteria<User> query = findQueryByUsername(username)
+        query.updateAll(apiKey: apiKey)
+    }
+
+    @Transactional(readOnly = true)
+    User findByEmail(String email) {
+        findQueryByEmail(email).get()
+    }
+
+    DetachedCriteria<User> findQueryByEmail(String emailParam) {
+        User.where { email == emailParam }
+    }
+
+    @Transactional(readOnly = true)
     Number countByEnabled(boolean enabled) {
         queryByEnabled(enabled).count()
     }
@@ -110,6 +150,4 @@ class UserGormService implements WarnGormErrors {
         DetachedCriteria<User> query = queryByEnabled(enabled)
         query.where { user.username in usernameList }
     }
-
-
 }

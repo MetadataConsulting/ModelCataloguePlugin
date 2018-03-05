@@ -6,7 +6,6 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.TagsPage
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.description
 import static org.modelcatalogue.core.geb.Common.item
@@ -21,7 +20,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 @Ignore
 class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{

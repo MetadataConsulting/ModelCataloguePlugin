@@ -5,10 +5,10 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.MeasurementUnitsPage
+import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 

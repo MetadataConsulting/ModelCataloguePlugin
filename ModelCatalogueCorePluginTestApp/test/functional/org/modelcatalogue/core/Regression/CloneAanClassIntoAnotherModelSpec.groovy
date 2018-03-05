@@ -3,7 +3,6 @@ package org.modelcatalogue.core.Regression
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.getDescription
 import static org.modelcatalogue.core.geb.Common.getModelCatalogueId
 import static org.modelcatalogue.core.geb.Common.getNameLabel
@@ -16,7 +15,7 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env')  })
 @Stepwise
 @Ignore
 class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{

@@ -4,7 +4,6 @@ import org.modelcatalogue.core.geb.AssetsPage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
-
 import static org.modelcatalogue.core.geb.Common.*
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder

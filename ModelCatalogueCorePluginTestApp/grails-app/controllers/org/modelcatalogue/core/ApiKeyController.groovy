@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.plugin.springsecurity.SpringSecurityService
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.security.UserService
 import org.modelcatalogue.core.util.LoggedUserUtils
 import org.springframework.context.MessageSource
@@ -11,6 +12,7 @@ import org.springframework.context.MessageSource
 class ApiKeyController {
 
     UserService userService
+    UserGormService userGormService
 
     MessageSource messageSource
 
@@ -24,7 +26,7 @@ class ApiKeyController {
     def index() {
         Object principal = springSecurityService.principal
         Long userId = LoggedUserUtils.id(principal) as Long
-        String apiKey = userService.findApiKeyById(userId)
+        String apiKey = userGormService.findApiKeyById(userId)
         [apiKey: apiKey]
     }
 

@@ -1,14 +1,12 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.LoginPage
-
-import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@IgnoreIf({ !System.getProperty('geb.env')  })
 @Stepwise
 class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
     private static final String searchInput2 ="#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > div:nth-child(1) > div > div:nth-child(1) > div > div > div > div > input"

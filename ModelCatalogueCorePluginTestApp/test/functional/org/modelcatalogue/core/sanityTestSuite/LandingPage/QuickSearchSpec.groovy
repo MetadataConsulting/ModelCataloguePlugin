@@ -5,8 +5,6 @@ import org.modelcatalogue.core.geb.BusinessRulesPage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
-
-import static org.modelcatalogue.core.geb.Common.admin
 import static org.modelcatalogue.core.geb.Common.getModalDialog
 import static org.modelcatalogue.core.geb.Common.getNameLabel
 import static org.modelcatalogue.core.geb.Common.getSave
@@ -19,7 +17,7 @@ import spock.lang.IgnoreIf
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 

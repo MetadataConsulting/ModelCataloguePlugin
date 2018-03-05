@@ -10,7 +10,6 @@ import org.modelcatalogue.core.dashboard.SearchStatusQuery
 import org.modelcatalogue.core.datamodel.DataModelRow
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.SortQuery
-import org.modelcatalogue.core.view.DataModelViewModel
 import org.springframework.context.MessageSource
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
@@ -50,25 +49,25 @@ class DataModelGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
-    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_SUPERVISOR')")
     List<DataModel> findAllByCriteria(DetachedCriteria<DataModel> criteria) {
         criteria.list()
     }
 
     @Transactional(readOnly = true)
-    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_SUPERVISOR')")
     List<DataModel> findAllByNameNotEqual(String nameParam) {
         DataModel.where { name != nameParam }.list()
     }
 
     @Transactional(readOnly = true)
-    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_SUPERVISOR')")
     List<DataModel> findAll() {
         DataModel.findAll()
     }
 
     @Transactional(readOnly = true)
-    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_SUPERVISOR')")
     List<DataModel> findAllNotInStatus(ElementStatus statusParam) {
         DataModel.where {
             status != statusParam
@@ -76,7 +75,7 @@ class DataModelGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
-    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_SUPERVISOR')")
     List<DataModel> findAllInStatus(ElementStatus statusParam) {
         DataModel.where {
             status == statusParam
@@ -84,12 +83,12 @@ class DataModelGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
-    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_SUPERVISOR')")
     List<DataModel> findAllInIdList(List<Long> dataModelIdList) {
         DataModel.where { id in dataModelIdList }.list()
     }
 
-    @PreAuthorize("hasPermission(#id, 'org.modelcatalogue.core.DataModel', read) or hasPermission(#id, 'org.modelcatalogue.core.DataModel', admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    @PreAuthorize("hasPermission(#id, 'org.modelcatalogue.core.DataModel', read) or hasPermission(#id, 'org.modelcatalogue.core.DataModel', admin) or hasRole('ROLE_SUPERVISOR')")
     @Transactional(readOnly = true)
     DataModel findById(long id) {
         DataModel.get(id)
@@ -104,7 +103,7 @@ class DataModelGormService implements WarnGormErrors {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_METADATA_CURATOR') or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
+    @PreAuthorize("hasRole('ROLE_METADATA_CURATOR') or hasRole('ROLE_SUPERVISOR')")
     @Transactional
     DataModel saveWithNameAndDescriptonAndStatus(String name, String description, ElementStatus status) {
         DataModel dataModelInstance = new DataModel(name: name, description: description, status: status)

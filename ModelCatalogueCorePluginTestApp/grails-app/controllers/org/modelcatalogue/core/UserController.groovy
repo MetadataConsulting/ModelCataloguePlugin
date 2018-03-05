@@ -3,8 +3,12 @@ package org.modelcatalogue.core
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
+import groovy.transform.CompileStatic
 import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.catalogueelement.UserCatalogueElementService
+import org.modelcatalogue.core.persistence.RoleGormService
+import org.modelcatalogue.core.persistence.UserRoleGormService
+import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
@@ -17,7 +21,11 @@ class UserController extends AbstractCatalogueElementController<User> {
 
     UserService userService
 
+    RoleGormService roleGormService
+
     UserGormService userGormService
+
+    UserRoleGormService userRoleGormService
 
     SpringSecurityService springSecurityService
 
@@ -51,9 +59,7 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     protected isAdminOrSupervisorOrLoggedUser(Long id) {
-        String roles = MetadataRolesUtils.roles('ADMIN')
-        boolean requestedIdIsForTheLoggedUser = id == springSecurityService.principal.id
-        requestedIdIsForTheLoggedUser || SpringSecurityUtils.ifAnyGranted(roles)
+        (id == springSecurityService.principal.id) || SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_SUPERVISOR)
     }
 
     protected User findById(long id) {
@@ -90,16 +96,15 @@ class UserController extends AbstractCatalogueElementController<User> {
         render(m as JSON)
     }
 
+    @CompileStatic
     List<String> currentRoleList(Long dataModelId) {
         List<String> roleList = []
-        if ( SpringSecurityUtils.ifAllGranted(MetadataRolesUtils.ROLE_SUPERVISOR) ) {
-            roleList.addAll([MetadataRolesUtils.ROLE_SUPERVISOR, MetadataRolesUtils.ROLE_ADMIN, MetadataRolesUtils.ROLE_METADATA_CURATOR])
-        } else if ( SpringSecurityUtils.ifAllGranted(MetadataRolesUtils.ROLE_ADMIN) ) {
-            roleList.addAll([MetadataRolesUtils.ROLE_ADMIN, MetadataRolesUtils.ROLE_METADATA_CURATOR])
-        } else if ( SpringSecurityUtils.ifAllGranted(MetadataRolesUtils.ROLE_METADATA_CURATOR) ) {
-            roleList << MetadataRolesUtils.ROLE_METADATA_CURATOR
+        if ( SpringSecurityUtils.ifAllGranted(MetadataRoles.ROLE_SUPERVISOR) ) {
+            roleList.addAll([MetadataRoles.ROLE_SUPERVISOR, 'ROLE_ADMIN', MetadataRoles.ROLE_CURATOR, MetadataRoles.ROLE_USER])
+        } else if ( SpringSecurityUtils.ifAllGranted(MetadataRoles.ROLE_CURATOR) ) {
+            roleList.addAll([MetadataRoles.ROLE_CURATOR, MetadataRoles.ROLE_USER])
         }
-        roleList += uiRolesForDataModel(dataModelId)
+        roleList.addAll(uiRolesForDataModel(dataModelId))
         roleList
     }
 
@@ -157,7 +162,7 @@ class UserController extends AbstractCatalogueElementController<User> {
             return
         }
 
-        if (user.authorities.contains(UserService.ROLE_SUPERVISOR) || params.role == 'supervisor') {
+        if (user.authorities.contains(MetadataRoles.ROLE_SUPERVISOR) || params.role == 'supervisor') {
             notFound()
             return
         }
@@ -203,7 +208,7 @@ class UserController extends AbstractCatalogueElementController<User> {
     protected Closure buildAdditionalIndexCriteria() {
         return {
             not {
-                'in' 'username', UserRole.findAllByRole(Role.findByAuthority(UserService.ROLE_SUPERVISOR))*.user.name
+                'in' 'username', userRoleGormService.findAllByAuthority(MetadataRoles.ROLE_SUPERVISOR)*.user.name
             }
         }
     }

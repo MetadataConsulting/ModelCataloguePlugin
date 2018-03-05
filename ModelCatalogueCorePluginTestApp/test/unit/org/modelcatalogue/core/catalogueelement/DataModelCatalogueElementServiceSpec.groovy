@@ -3,7 +3,6 @@ package org.modelcatalogue.core.catalogueelement
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.events.CatalogueElementStatusNotDeprecatedEvent
 import org.modelcatalogue.core.events.CatalogueElementStatusNotFinalizedEvent
@@ -13,9 +12,7 @@ import org.modelcatalogue.core.events.RelationshipTypeNotFoundEvent
 import org.modelcatalogue.core.events.UnauthorizedEvent
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.DataModelAclService
-import org.modelcatalogue.core.util.DestinationClass
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.SearchParams
 import spock.lang.Ignore
 import spock.lang.Specification
 

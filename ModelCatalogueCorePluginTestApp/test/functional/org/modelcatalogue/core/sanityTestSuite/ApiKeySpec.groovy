@@ -43,6 +43,6 @@ class ApiKeySpec extends GebSpec {
         username     | password
         'supervisor' | 'supervisor'
         'curator'    | 'curator'
-        'viewer'     | 'viewer'
+        'user'       | 'user'
     }
 }

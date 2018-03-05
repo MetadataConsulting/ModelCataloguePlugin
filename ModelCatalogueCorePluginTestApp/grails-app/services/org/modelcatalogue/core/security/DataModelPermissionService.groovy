@@ -25,9 +25,8 @@ import org.springframework.context.MessageSource
 class DataModelPermissionService {
 
     public final static Set<String> AUTHORITIES_ALLOWED_TO_HAVE_ACL_ADMIN = [
-            MetadataRolesUtils.ROLE_SUPERVISOR,
-            MetadataRolesUtils.ROLE_ADMIN,
-            MetadataRolesUtils.ROLE_METADATA_CURATOR,
+            MetadataRoles.ROLE_SUPERVISOR,
+            MetadataRoles.ROLE_CURATOR,
     ] as Set<String>
 
     DefaultPermissionFactory aclPermissionFactory

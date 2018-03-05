@@ -3,7 +3,6 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
-
 import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.getPick
@@ -14,7 +13,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class RelationshipRelatedToSpec extends AbstractModelCatalogueGebSpec{
 

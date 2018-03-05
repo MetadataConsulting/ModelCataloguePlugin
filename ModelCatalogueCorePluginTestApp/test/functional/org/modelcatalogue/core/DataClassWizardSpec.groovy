@@ -4,7 +4,6 @@ import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
@@ -12,7 +11,7 @@ import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore
 @Stepwise
 class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {

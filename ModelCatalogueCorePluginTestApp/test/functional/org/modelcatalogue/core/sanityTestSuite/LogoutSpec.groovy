@@ -10,7 +10,7 @@ class LogoutSpec extends GebSpec {
     def "user is able to logout"() {
         when:
         LoginPage loginPage = to LoginPage
-        loginPage.login('viewer', 'viewer')
+        loginPage.login('user', 'user')
 
         then:
         at DashboardPage

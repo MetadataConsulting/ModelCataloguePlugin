@@ -32,7 +32,16 @@ class UserRoleGormService implements WarnGormErrors {
             log.warn("unable to find role with authority ${authority}".toString())
             return
         }
-        userRole = new UserRole(role: role, user: user)
+        saveUserRoleByUserAndRole(user, role)
+    }
+
+    @Transactional
+    UserRole saveUserRoleByUserAndRole(User user, Role role) {
+        List<UserRole> userRoleList = findQueryByUserAndRole(user, role).list()
+        if ( userRoleList ) {
+            return userRoleList.first()
+        }
+        UserRole userRole = new UserRole(role: role, user: user)
         if ( !userRole.save() ) {
             warnErrors(userRole, messageSource)
             transactionStatus.setRollbackOnly()
@@ -40,12 +49,16 @@ class UserRoleGormService implements WarnGormErrors {
         userRole
     }
 
+    protected DetachedCriteria<UserRole> findQueryByUserAndRole(User userParam, Role roleParam) {
+        UserRole.where { user == userParam && role == roleParam }
+    }
+
 
     protected DetachedCriteria<UserRole> findQueryByUsernameAndAuthority(String username, String authority) {
         UserRole.where { user.username == 'username' && role.authority == authority }
     }
 
-    protected List<UserRole> findAllByAuthority(String authority) {
+    List<UserRole> findAllByAuthority(String authority) {
         findQueryByAuthority(authority).list()
     }
 

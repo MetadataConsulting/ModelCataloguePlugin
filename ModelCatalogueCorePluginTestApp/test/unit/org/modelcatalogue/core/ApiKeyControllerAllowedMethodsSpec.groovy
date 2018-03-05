@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.test.mixin.TestFor
+import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.security.UserService
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -29,6 +30,7 @@ class ApiKeyControllerAllowedMethodsSpec extends Specification {
         given:
         controller.springSecurityService = Mock(SpringSecurityService)
         controller.userService = Mock(UserService)
+        controller.userGormService = Mock(UserGormService)
 
         when:
         request.method = 'GET'

@@ -5,14 +5,13 @@ import org.modelcatalogue.core.geb.DataElementsPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 @Ignore
 class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {

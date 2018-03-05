@@ -17,7 +17,7 @@ import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf
 
 @Stepwise
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     public static final String expandTableHeader = '.inf-table thead .inf-cell-expand'

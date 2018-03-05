@@ -35,9 +35,9 @@ class DataModelSearchSpec extends GebSpec {
         dataModelPage.rightSideTitle.contains('Cancer Model')
 
         where:
-        username         | password
+        username     | password
         'supervisor' | 'supervisor'
         'curator'    | 'curator'
-        'viewer'     | 'viewer'
+        'user'       | 'user'
     }
 }

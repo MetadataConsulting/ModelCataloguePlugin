@@ -14,7 +14,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 @Ignore
 class RelationshipIsImportedBySpec extends AbstractModelCatalogueGebSpec{

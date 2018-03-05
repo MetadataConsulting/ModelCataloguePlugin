@@ -9,10 +9,9 @@ import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@IgnoreIf({ !System.getProperty('geb.env')  })
 @Stepwise
 class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
-
 
     private static final CatalogueAction search = CatalogueAction.runFirst('navigation-right', 'search-menu')
     private static final String searchInput = '.modal-body .input-group-lg input'

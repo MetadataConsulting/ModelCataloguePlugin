@@ -280,7 +280,7 @@ class DataModelService {
         //then return the models by the status - providing you have the correct role
         if (params.status) {
             return this.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))
+                'in' 'status', ElementService.getStatusFromParams(params)
             }), overridableDataModelFilter)
         }
 
