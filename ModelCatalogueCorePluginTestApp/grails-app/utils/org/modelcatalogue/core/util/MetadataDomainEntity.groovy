@@ -113,6 +113,10 @@ class MetadataDomainEntity {
         }
     }
 
+    static String stringRepresentation(MetadataDomainEntity entity) {
+        stringRepresentation(entity.domain, entity.id)
+    }
+
     static String stringRepresentation(MetadataDomain domain, Long id) {
         if ( domain == null || id == null ) {
             return null

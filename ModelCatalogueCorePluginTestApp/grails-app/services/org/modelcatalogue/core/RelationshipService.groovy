@@ -483,7 +483,6 @@ class RelationshipService {
         userGormService.findById(userId)
     }
 
-
     Long loggedUserId() {
         Object principal = springSecurityService.principal
         LoggedUserUtils.id(principal)

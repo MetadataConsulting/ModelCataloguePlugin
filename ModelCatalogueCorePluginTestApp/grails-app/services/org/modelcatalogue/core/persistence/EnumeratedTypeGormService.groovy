@@ -15,7 +15,7 @@ class EnumeratedTypeGormService implements WarnGormErrors {
     MessageSource messageSource
 
     @Transactional(readOnly = true)
-    EnumeratedType findById(long id) {
+    EnumeratedType findById(Long id) {
         EnumeratedType.get(id)
     }
 

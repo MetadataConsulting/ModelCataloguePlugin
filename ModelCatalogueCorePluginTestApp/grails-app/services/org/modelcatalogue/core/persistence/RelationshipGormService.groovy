@@ -32,6 +32,17 @@ class RelationshipGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
+    List<Relationship> findAllByDestinationIdAndRelationshipTypeSourceToDestination(Long destinationId, String relationshipTypeSourceToDestination) {
+        queryByDestinationIdAndRelationshipTypeSourceToDestination(destinationId, relationshipTypeSourceToDestination).list()
+    }
+
+    DetachedCriteria<Relationship> queryByDestinationIdAndRelationshipTypeSourceToDestination(Long destinationId, String relationshipTypeSourceToDestination) {
+        Relationship.where {
+            destination.id == destinationId && relationshipType.sourceToDestination == relationshipTypeSourceToDestination
+        }
+    }
+
+    @Transactional(readOnly = true)
     Number countByRelationshipTypeAndSourceAndDestination(RelationshipType relationshipType, CatalogueElement source, CatalogueElement destination) {
         findQueryByRelationshipTypeAndSourceAndDestination(relationshipType, source, destination).count()
     }

@@ -1,17 +1,26 @@
 package org.modelcatalogue.core
 
+import grails.gorm.DetachedCriteria
+import grails.transaction.Transactional
 import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.catalogueelement.ValidationRuleCatalogueElementService
 import org.modelcatalogue.core.persistence.ValidationRuleGormService
+import org.modelcatalogue.core.scripting.Validating
+import org.modelcatalogue.core.scripting.ValidatingImpl
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.MetadataDomain
+import org.modelcatalogue.core.util.MetadataDomainEntity
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
+import org.modelcatalogue.core.validation.ValidationRuleJsonView
+import org.modelcatalogue.core.validation.ValidationRulesJsonView
 
 class ValidationRuleController extends AbstractCatalogueElementController<ValidationRule> {
 
     ValidationRuleGormService validationRuleGormService
     ValidationRuleCatalogueElementService validationRuleCatalogueElementService
+    ValidationRuleService validationRuleService
 
     ValidationRuleController() {
         super(ValidationRule, false)
@@ -58,6 +67,23 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
                 sort('incomingIndex')
             }
         )
+    }
+
+    @Transactional
+    def rules(String gormUrl) {
+
+        MetadataDomainEntity metadataDomainEntity = MetadataDomainEntity.of(gormUrl)
+
+        if ( metadataDomainEntity == null ) {
+            render status: 204
+            return
+        }
+        ValidationRulesJsonView validationRulesJsonView = validationRuleService.findValidationRulesByMetadataDomainEntity(metadataDomainEntity)
+        if ( validationRulesJsonView == null ) {
+            render status: 204
+            return
+        }
+        respond validationRulesJsonView
     }
 
     protected ValidationRule findById(long id) {

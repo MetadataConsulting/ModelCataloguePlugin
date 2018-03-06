@@ -88,7 +88,12 @@ class DataType extends CatalogueElement implements Validating {
 
     @Override
     List<? extends Validating> getBases() {
-        return isBasedOn as List<DataType>
+        try {
+            return isBasedOn as List<DataType>
+        } catch(MissingPropertyException e) {
+            return [] as List<DataType>
+        }
+
     }
 
     static String suggestName(Set<String> suggestions) {
