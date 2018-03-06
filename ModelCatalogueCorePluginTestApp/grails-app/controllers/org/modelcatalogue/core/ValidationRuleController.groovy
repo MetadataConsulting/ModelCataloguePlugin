@@ -69,13 +69,12 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
         )
     }
 
-    @Transactional
     def rules(String gormUrl) {
 
         MetadataDomainEntity metadataDomainEntity = MetadataDomainEntity.of(gormUrl)
 
         if ( metadataDomainEntity == null ) {
-            render status: 204
+            render status: 404
             return
         }
         ValidationRulesJsonView validationRulesJsonView = validationRuleService.findValidationRulesByMetadataDomainEntity(metadataDomainEntity)
