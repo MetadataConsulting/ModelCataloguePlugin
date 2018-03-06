@@ -43,6 +43,7 @@
             <ul class="dropdown-menu">
                 <sec:ifAllGranted roles="ROLE_SUPERVISOR">
                     <li><a href="/userAdmin" id="users-link"><i class="fas fa-user-plus"></i> Users</a></li>
+                    <li><g:link controller="dataModelPermission" action="index" id="dataModelPermission-link"><i class="fas fa-lock"></i> <g:message code="nav.dataModelPermission" default="Data Model ACL"/></g:link></li>
                 </sec:ifAllGranted>
                 <li><a href="${g.createLink(controller: 'modelCatalogueVersion')}" id="codeversion-link"><i class="fas fa-code-branch"></i> Code Version</a></li>
                 <sec:ifAnyGranted roles="ROLE_METADATA_CURATOR,ROLE_SUPERVISOR">

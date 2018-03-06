@@ -144,6 +144,17 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         $window.open("#{security.contextPath}/userAdmin")
     }
 
+  actionsProvider.registerChildAction 'admin-menu', 'datamodelpermission-admin', ($window, security) ->
+    "ngInject"
+    return undefined unless security.hasRole('SUPERVISOR')
+    {
+      position:   1000
+      icon:       'fa fa-fw fa-lock'
+      label:      'Data Model ACL'
+      action: ->
+        $window.open("#{security.contextPath}/dataModelPermission/index")
+    }
+
   actionsProvider.registerChildAction 'admin-menu', 'code-version', ($window, security) ->
     "ngInject"
     return undefined unless security.isUserLoggedIn()

@@ -7,6 +7,7 @@ class NavModule extends Module {
     static content = {
         homeLink(required: false, wait: true) { $("#home-link", 0) }
         userMenuLink(required: false, wait: true) { $("#usermenu-link", 0) }
+        dataModelPermissionLink(required: false, wait: true) { $("#dataModelPermission-link", 0) }
         usernameLink(required: false, wait: true) { $("#username-link", 0) }
         favouriteLink(required: false, wait: true) { $("#favourite-link", 0) }
         apiKeyLink(required: false, wait: true) { $("#apikey-link", 0) }
@@ -28,6 +29,10 @@ class NavModule extends Module {
         importDslLink(required: false, wait: true) { $("#importdsl-link", 0) }
         importXmlLink(required: false, wait: true) { $("#importxml-link", 0) }
         createDataModelLink(required: false, wait: true) { $("#createdatamodel-link", 0) }
+    }
+
+    void dataModelPermission() {
+        dataModelPermissionLink.click()
     }
 
     void home() {

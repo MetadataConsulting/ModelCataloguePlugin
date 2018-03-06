@@ -3,8 +3,9 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.IgnoreIf
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 class NavItemVisibilitySpec extends GebSpec {
 
     def "check navigation item visibility for viewers"() {
@@ -56,6 +57,7 @@ class NavItemVisibilitySpec extends GebSpec {
         dashboardPage.nav.feedbacksLink.isDisplayed()
 
         and:
+        !dashboardPage.nav.dataModelPermissionLink.isDisplayed()
         !dashboardPage.nav.usersLink.isDisplayed()
         !dashboardPage.nav.mappingUtilityLink.isDisplayed()
         !dashboardPage.nav.activityLink.isDisplayed()
@@ -118,6 +120,7 @@ class NavItemVisibilitySpec extends GebSpec {
         dashboardPage.nav.relationshipTypesLink.isDisplayed()
         dashboardPage.nav.dataModelPolicyLink.isDisplayed()
         dashboardPage.nav.feedbacksLink.isDisplayed()
+        dashboardPage.nav.dataModelPermissionLink.isDisplayed()
         dashboardPage.nav.usersLink.isDisplayed()
         dashboardPage.nav.mappingUtilityLink.isDisplayed()
         dashboardPage.nav.activityLink.isDisplayed()
@@ -183,6 +186,7 @@ class NavItemVisibilitySpec extends GebSpec {
         dashboardPage.nav.mappingUtilityLink.isDisplayed()
 
         and:
+        !dashboardPage.nav.dataModelPermissionLink.isDisplayed()
         !dashboardPage.nav.usersLink.isDisplayed()
         !dashboardPage.nav.activityLink.isDisplayed()
         !dashboardPage.nav.reindexCatalogueLink.isDisplayed()

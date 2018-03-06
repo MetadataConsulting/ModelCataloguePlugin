@@ -85,4 +85,9 @@ class UserRoleGormService implements WarnGormErrors {
         UserRole.where { role == roleParam }
 
     }
+
+    @Transactional(readOnly = true)
+    Boolean hasRole(Long userId, String authority) {
+        UserRole.where { user == User.load(userId) && role.authority == authority }.count() as Boolean
+    }
 }
