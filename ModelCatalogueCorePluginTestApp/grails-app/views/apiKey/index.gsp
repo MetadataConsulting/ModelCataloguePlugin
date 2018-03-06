@@ -5,9 +5,6 @@
 </head>
 <body>
 <div class="panel-body">
-    <div class="page-header">
-        <h1><g:message code="user.apiKey" default="Api Key"/></h1>
-    </div>
     <div class="panel panel-default">
         <div class="panel-heading">
             <g:form controller="apiKey" action="reset">
@@ -15,6 +12,10 @@
             </g:form>
         </div><!-- /.panel-heading -->
     </div><!-- /.panel-default -->
+    <div class="page-header">
+        <h1><g:message code="user.apiKey" default="Api Key"/></h1>
+    </div>
+
 
     <g:render template="/templates/flashmessage" />
     <g:render template="/templates/flasherror" />
