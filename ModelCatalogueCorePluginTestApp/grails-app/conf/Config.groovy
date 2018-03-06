@@ -435,6 +435,7 @@ grails.assets.less.compiler = 'less4j'
 grails.plugin.springsecurity.useBasicAuth = true
 grails.plugin.springsecurity.basic.realmName = "Model Catalogue"
 grails.plugin.springsecurity.filterChain.chainMap = [
+        '/api/modelCatalogue/core/validationRule/rules': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/catalogue/upload':                    'JOINED_FILTERS,-exceptionTranslationFilter',
         '/catalogue/*/*/export':                'JOINED_FILTERS,-exceptionTranslationFilter',
         '/user/current':                        'JOINED_FILTERS,-exceptionTranslationFilter',

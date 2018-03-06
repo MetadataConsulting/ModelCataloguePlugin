@@ -500,7 +500,7 @@ class MetadataSecurityService {
     ]
 
     public static final List VALIDATION_RULE_MAPPINGS = [
-            ["/api/modelCatalogue/core/validationRule/rules", 'IS_AUTHENTICATED_ANONYMOUSLY', HttpMethod.GET],
+            ["/api/modelCatalogue/core/validationRule/rules", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/validationRule", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/validationRule", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/validationRule/search/*", 'isAuthenticated()', HttpMethod.GET],
