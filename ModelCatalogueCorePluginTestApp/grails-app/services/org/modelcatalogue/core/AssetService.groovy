@@ -12,6 +12,7 @@ import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.publishing.CloningContext
+import org.modelcatalogue.core.util.PublishedStatus
 import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
 import java.security.DigestInputStream
@@ -45,7 +46,7 @@ class AssetService {
         "$value B"
     }
 
-    Asset upload(Long id, Long dataModelId, String name, String description, MultipartFile file, String filename = file.originalFilename) {
+    Asset upload(Long id, Long dataModelId, String name, String description, MultipartFile file, String filename = file.originalFilename, String publishedStatus) {
         Asset asset = dataModelId ? new Asset(dataModel: dataModelGormService.findById(dataModelId)) : new Asset()
 
         if (file.size > modelCatalogueStorageService.maxFileSize) {
@@ -60,6 +61,7 @@ class AssetService {
         asset.contentType       = getOverridableContentType(file)
         asset.size              = file.size
         asset.originalFileName  = filename
+        asset.publishedStatus = publishedStatus as PublishedStatus
 
         asset.validate()
 
@@ -86,6 +88,7 @@ class AssetService {
             clone.description       = asset.description
             clone.contentType       = asset.contentType
             clone.originalFileName  = asset.originalFileName
+            asset.publishedStatus = publishedStatus
 
             clone.latestVersionId   = existing.latestVersionId ?: existing.id
 

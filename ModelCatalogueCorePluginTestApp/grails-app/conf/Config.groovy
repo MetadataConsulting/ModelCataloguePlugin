@@ -375,6 +375,8 @@ grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatal
 grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.security.Role'
 grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
+grails.plugin.springsecurity.useSecurityEventListener=true
+grails.plugin.springsecurity.roleHierarchyEntryClassName = 'org.modelcatalogue.core.security.RoleHierarchyEntry'
 
 //this is so that spring econtext can be accessed in seperate threads i.e. in the executer service
 grails.plugin.springsecurity.sch.strategyName = org.springframework.security.core.context.SecurityContextHolder.MODE_INHERITABLETHREADLOCAL
@@ -437,6 +439,7 @@ grails.assets.less.compiler = 'less4j'
 grails.plugin.springsecurity.useBasicAuth = true
 grails.plugin.springsecurity.basic.realmName = "Model Catalogue"
 grails.plugin.springsecurity.filterChain.chainMap = [
+        '/api/modelCatalogue/core/validationRule/rules': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/catalogue/upload':                    'JOINED_FILTERS,-exceptionTranslationFilter',
         '/catalogue/*/*/export':                'JOINED_FILTERS,-exceptionTranslationFilter',
         '/user/current':                        'JOINED_FILTERS,-exceptionTranslationFilter',

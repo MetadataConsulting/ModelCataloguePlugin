@@ -3,7 +3,9 @@ import grails.test.mixin.TestFor
 import org.modelcatalogue.core.DataArchitectController
 import org.modelcatalogue.core.DataImportController
 import spock.lang.Specification
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ System.getProperty('IGNORE_URLMAPPINGS') })
 @TestFor(DataArchitectUrlMappings)
 @Mock([DataArchitectController, DataImportController])
 class DataArchitectUrlMappingsSpec extends Specification {

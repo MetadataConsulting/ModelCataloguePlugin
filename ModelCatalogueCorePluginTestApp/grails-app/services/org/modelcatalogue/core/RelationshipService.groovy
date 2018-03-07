@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import com.google.common.collect.ImmutableMap
 import grails.gorm.DetachedCriteria
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.userdetails.GrailsUser
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.modelcatalogue.core.api.ElementStatus
@@ -13,6 +14,7 @@ import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
+import org.modelcatalogue.core.util.LoggedUserUtils
 import org.modelcatalogue.core.util.RelationshipsCounts
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
@@ -73,7 +75,7 @@ class RelationshipService {
         Lists.fromCriteria(params,
                 direction.composeWhere(element,
                         type,
-                        ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/),
+                        ElementService.getStatusFromParams(params),
                         element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(currentUser())))
     }
 
@@ -482,13 +484,8 @@ class RelationshipService {
     }
 
     Long loggedUserId() {
-        if ( springSecurityService.principal == null ) {
-            return null
-        }
-        if ( springSecurityService.principal instanceof String ) {
-            return null
-        }
-        springSecurityService.principal.id as Long
+        Object principal = springSecurityService.principal
+        LoggedUserUtils.id(principal)
     }
 
     boolean isFavorite(CatalogueElement el) {

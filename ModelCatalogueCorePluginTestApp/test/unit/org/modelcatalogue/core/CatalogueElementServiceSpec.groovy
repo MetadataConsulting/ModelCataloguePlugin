@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.test.MockUtils
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.audit.AuditService

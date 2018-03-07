@@ -13,7 +13,6 @@ import org.modelcatalogue.core.ReferenceType
 import spock.lang.Specification
 import spock.lang.Unroll
 
-
 class MetadataDomainSpec extends Specification {
 
     @Unroll

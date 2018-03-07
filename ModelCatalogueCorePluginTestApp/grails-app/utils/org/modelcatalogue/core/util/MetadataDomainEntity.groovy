@@ -93,6 +93,14 @@ class MetadataDomainEntity {
                 className = 'RelationshipTag'
                 metadataDomain =  MetadataDomain.RELATIONSHIP_TAG
 
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.ValidationRule:")) {
+                className = 'ValidationRule'
+                metadataDomain =  MetadataDomain.BUSINESS_RULE
+
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.Tag:")) {
+                className = 'Tag'
+                metadataDomain =  MetadataDomain.TAG
+
             }
             if ( className == null ||metadataDomain == null ) {
                 return null
@@ -105,6 +113,10 @@ class MetadataDomainEntity {
         }
     }
 
+    static String stringRepresentation(MetadataDomainEntity entity) {
+        stringRepresentation(entity.domain, entity.id)
+    }
+
     static String stringRepresentation(MetadataDomain domain, Long id) {
         if ( domain == null || id == null ) {
             return null
@@ -113,6 +125,13 @@ class MetadataDomainEntity {
         "${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.${name}:$id".toString()
     }
 
+    static String link(Long dataModelId, MetadataDomainEntity entity, String serverUrl) {
+        String link = link(dataModelId, entity)
+        if ( !link ) {
+            return null
+        }
+        "${serverUrl}${link}".toString()
+    }
 
     static String link(Long dataModelId, MetadataDomainEntity entity) {
         String name = MetadataDomain.lowerCamelCaseDomainName(entity.domain)

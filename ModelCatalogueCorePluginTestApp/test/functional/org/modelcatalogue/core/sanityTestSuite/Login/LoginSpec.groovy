@@ -1,39 +1,34 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
-import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.openqa.selenium.WebDriver
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.IgnoreIf
+import spock.lang.Unroll
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 class LoginSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String createButton = 'a#role_data-models_create-data-modelBtn'
-    private static final String adminTag = 'span.fa-cog'
-
-    void doLoginAndClickCheckBox() {
-       when:
-           loginViewer()
+    @Unroll
+    void 'create button #description for #username'(String username, String password, boolean displayed, String description) {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login(username, password)
 
         then:
-            check createButton isMissing()
-    }
-
-    def "login to model catalogue as a curator"() {
+        at DashboardPage
 
         when:
-        loginCurator()
+        DashboardPage dashboardPage = browser.page DashboardPage
 
         then:
-        check adminTag isMissing()
-    }
+        displayed == dashboardPage.nav.createDataModelLink.isDisplayed()
 
-    def "login to model catalogue as an admin"() {
-
-        when:
-        loginAdmin()
-
-        then:
-        check adminTag isDisplayed()
+        where:
+        username     | password     | displayed
+        'user'       | 'user'       | false
+        'supervisor' | 'supervisor' | true
+        'curator'    | 'curator'    | true
+        description = displayed ? 'is displayed' : 'is not displayed'
     }
 }

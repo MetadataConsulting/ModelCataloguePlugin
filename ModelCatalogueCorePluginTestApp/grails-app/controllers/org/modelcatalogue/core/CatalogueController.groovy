@@ -138,7 +138,7 @@ class CatalogueController {
 
         List<DataModel> dataModelList = dataModelGormService.findAllByNameNotEqual('Clinical Tags')
         // only render data models for preload if there is no data model in the catalogue (very likely the first run)
-        if ( !dataModelList.isEmpty() /*|| !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)*/) {
+        if ( !dataModelList.isEmpty() ) {
             render([] as JSON)
             return
         }

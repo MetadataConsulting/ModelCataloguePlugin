@@ -1,16 +1,15 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.Stepwise
-import spock.lang.IgnoreIf
 
 @Ignore
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
 @Stepwise
 class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
@@ -32,13 +31,18 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
     private static final String  dropdown ="select.form-control"
     private static final String  minScore ="input#min-score"
 
-
     def "see test batch in action "() {
-        loginAdmin()
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
+        then:
+        at DashboardPage
+
+        when:
         click showBatches
 
-        expect:
+        then:
         check linkToTestBatch displayed
     }
 

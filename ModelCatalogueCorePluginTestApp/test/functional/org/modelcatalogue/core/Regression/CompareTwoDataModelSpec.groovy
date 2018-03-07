@@ -1,13 +1,14 @@
 package org.modelcatalogue.core.Regression
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getPick
 
 //functionality has been removed so ignore for the moment
-class CompareTwoDataModelSpec extends AbstractModelCatalogueGebSpec{
+class CompareTwoDataModelSpec extends AbstractModelCatalogueGebSpec {
     private static final String Icon ="div.content-row>div>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(2)>div>div:nth-child(4)>div>div>div>div:nth-child(9)>div:nth-child(1)>div:nth-child(1)>h3>a>span:nth-child(1)"
     private static final String dataModel="a#role_item_catalogue-element-menu-item-link>span:nth-child(1)"
     private static final String compare ="a#compare-catalogue-element-menu-item-link>span:nth-child(3)"
@@ -19,7 +20,8 @@ class CompareTwoDataModelSpec extends AbstractModelCatalogueGebSpec{
     @Ignore
     def "compare two models"() {
         when:
-        loginCurator()
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
 
         then:
         noExceptionThrown()

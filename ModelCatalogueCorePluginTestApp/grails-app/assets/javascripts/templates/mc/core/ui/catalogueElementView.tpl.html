@@ -15,6 +15,9 @@
           <small class="text-muted" editable-text="copy.modelCatalogueId" e-name="modelCatalogueId" ng-if="element.getVersionAndId()">
               {{element.getVersionAndId()}}
           </small>
+          <small class="text-muted" editable-select="copy.publishedStatus" e-name="publishedStatus" e-ng-options="s for s in publishedStatuses" ng-if="element.isInstanceOf('asset')">
+            {{element.publishedStatus}}
+          </small>
           <small ng-if="element.getDataModelWithVersion()">
             <a ng-href="{{element.dataModel.href()}}"
                class="label"

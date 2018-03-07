@@ -46,8 +46,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if (!authority) {
             return false
         }
-        Collection<String> roles = MetadataRolesUtils.getRolesFromAuthority(authority)
-        if ( !SpringSecurityUtils.ifAnyGranted(roles.join(',')) ) {
+        if ( !SpringSecurityUtils.ifAnyGranted(authority) ) {
             return false
         }
         dataModelAclService.isAdminOrHasReadPermission(dataModel)
@@ -61,8 +60,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if (!authority) {
             return false
         }
-        String roles = MetadataRolesUtils.getRolesFromAuthority(authority).join(',')
-        return SpringSecurityUtils.ifAnyGranted(roles)
+        return SpringSecurityUtils.ifAnyGranted(authority)
     }
 
     String encodePassword(String password) {

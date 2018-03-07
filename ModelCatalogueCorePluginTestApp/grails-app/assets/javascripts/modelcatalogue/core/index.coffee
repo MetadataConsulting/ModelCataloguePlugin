@@ -19,6 +19,7 @@ angular.module 'mc.core', [
   'mc.core.actionableItemEnhancer'
   'mc.core.orderedMapEnhancer'
   'mc.core.serverPushUpdates'
+  'mc.core.publishedStatuses'
 ]
 
 angular.module('mc.core').config(

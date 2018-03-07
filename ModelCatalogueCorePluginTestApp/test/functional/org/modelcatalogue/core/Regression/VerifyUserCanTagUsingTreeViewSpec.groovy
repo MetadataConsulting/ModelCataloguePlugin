@@ -1,7 +1,11 @@
 package org.modelcatalogue.core.Regression
 
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataElementPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.TagsPage
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.description
 import static org.modelcatalogue.core.geb.Common.item
@@ -16,8 +20,9 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
 
     private static final String table='tr.inf-table-item-row>td:nth-child(2)'
@@ -39,11 +44,27 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
 
     def "login to model catalogue and select a draft data model"() {
         when:
-        loginAdmin()
-        select 'Test 3' select 'Tags'
-
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Tags')
+
+        then:
+        at TagsPage
+
+        and:
         check rightSideTitle contains 'Active Tags'
         noExceptionThrown()
 
@@ -70,15 +91,29 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
         check table contains 'TESTING_TAG'
     }
 
+    @Ignore
     def "create a data element"() {
         when:
         click modelCatalogue
 
-        and:
-        select 'Test 3' open 'Data Elements'
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Elements')
+
+        then:
+        at DataElementPage
+
+        and:
         check rightSideTitle contains ' Active Data Elements'
 
         when:
@@ -95,9 +130,9 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check dataElement is 'TESTING_ELEMENT'
-
     }
 
+    @Ignore
     def "add the tag to the data element created"() {
 
         when:

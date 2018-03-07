@@ -6,7 +6,7 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.persistence.UserGormService
-import org.modelcatalogue.core.security.MetadataRolesUtils
+import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -37,7 +37,8 @@ abstract class AbstractDataImportService {
      * @return stored asset id
      */
     void importFile(Long assetId, GrailsParameterMap params, MultipartFile file) {
-        boolean isAdmin = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('ADMIN').join(','))
+        
+        boolean isAdmin = SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_SUPERVISOR)
         DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
         defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", assetId)
         InputStream inputStream = file.inputStream

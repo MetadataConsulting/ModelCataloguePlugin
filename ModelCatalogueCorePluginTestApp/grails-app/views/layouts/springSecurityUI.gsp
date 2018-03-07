@@ -106,7 +106,6 @@
 				</ul>
 			</li>
 			<g:if test="${Holders.pluginManager.hasGrailsPlugin('springSecurityAcl')}">
-				<li><g:link controller="dataModelPermission" action="index"><g:message code="dataModel.acl" default="Data Model"/></g:link></li>
 				<li><a class="accessible"><g:message code="spring.security.ui.menu.acl"/></a>
 					<ul>
 						<li><g:message code="spring.security.ui.menu.aclClass"/> &raquo;

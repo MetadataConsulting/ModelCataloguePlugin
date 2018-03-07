@@ -23,5 +23,6 @@ databaseChangeLog = {
 //    include  file: 'changelog_021_validation_rule.groovy'
 //    include  file: 'changelog_022_changelog.groovy'
 //    include  file: 'changelog_023_searchable_relationships.groovy'
-    include  file: 'changelog_025_security.groovy'
+//    include  file: 'changelog_025_security.groovy'
+    include  file: 'changelog_026_asset_publishing.groovy'
 }

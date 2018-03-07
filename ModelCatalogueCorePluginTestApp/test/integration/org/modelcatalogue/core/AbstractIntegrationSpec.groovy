@@ -6,6 +6,9 @@ import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.custommonkey.xmlunit.DetailedDiff
 import org.custommonkey.xmlunit.Diff
 import org.hibernate.SessionFactory
+import org.modelcatalogue.core.persistence.RoleGormService
+import org.modelcatalogue.core.persistence.UserGormService
+import org.modelcatalogue.core.persistence.UserRoleGormService
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
@@ -25,6 +28,9 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     def cacheService
     def relationshipTypeService
     TestDataService testDataService
+    UserGormService userGormService
+    RoleGormService roleGormService
+    UserRoleGormService userRoleGormService
 
     void loadMarshallers() {
         relationshipTypeService.clearCache()
@@ -55,11 +61,14 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
             testDataService.createTestData()
         }
         cacheService.clearCache()
-        Role adminRole = Role.findOrCreateWhere(authority: 'ROLE_SUPERVISOR').save(failOnError: true)
-        User user = User.list(max: 1).first()
-        UserRole.create(user, adminRole, true)
-        user.save(failOnError: true)
-        adminRole.save(failOnError: true)
+
+        Role adminRole = roleGormService.findByAuthority('ROLE_SUPERVISOR')
+        if ( !adminRole ) {
+            adminRole = roleGormService.saveByAuthority('ROLE_SUPERVISOR')
+        }
+        User user = userGormService.findAll([max: 1, offset: 0]).first()
+        userRoleGormService.saveUserRoleByUserAndRole(user, adminRole)
+
         SpringSecurityUtils.reauthenticate(user.username, null)
     }
 

@@ -19,7 +19,8 @@ class AssetMarshaller extends CatalogueElementMarshaller {
                 contentType: el.contentType,
                 originalFileName: el.originalFileName,
                 size: el.size,
-                md5: el.md5
+                md5: el.md5,
+                publishedStatus:  "${el.publishedStatus}".toString(),
         )
         if (el.md5) {
             ret.downloadUrl = linkGenerator.link(uri: "/api/modelCatalogue/core/asset/$el.id/download",  absolute: true)

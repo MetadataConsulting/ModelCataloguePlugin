@@ -2,6 +2,7 @@ package org.modelcatalogue.core.dataimport.excel
 
 import grails.util.Holders
 import groovy.util.logging.Log
+import groovy.util.logging.Slf4j
 import org.apache.poi.ss.usermodel.*
 import org.hibernate.Session
 import org.hibernate.SessionFactory
@@ -14,8 +15,9 @@ import org.springframework.context.ApplicationContext
 /**
  * This uses an XML file that specifies the mapping from columns to concepts
  */
-@Log
+@Slf4j
 class ConfigExcelLoader extends ExcelLoader {
+
     final String DEFAULT_MU_NAME = null
     final Integer MAX_METADATA_LEN = 2000
     final Integer MAX_NAME_LEN = 255
@@ -372,7 +374,10 @@ class ConfigExcelLoader extends ExcelLoader {
 
         if (!dataModel) {
             log.info("Creating new DataModel: ${dataModelName}")
-            dataModel = new DataModel(name: dataModelName).save()
+            dataModel = new DataModel(name: dataModelName)
+            if ( !dataModel.save() ) {
+                log.warn('unable to save data model')
+            }
         } else {
             log.info("Found Data Model: ${dataModelName}")
             //if one exists, check to see if it's a draft

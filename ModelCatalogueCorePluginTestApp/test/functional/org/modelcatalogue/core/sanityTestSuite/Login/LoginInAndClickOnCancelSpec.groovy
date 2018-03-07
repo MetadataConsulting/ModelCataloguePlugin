@@ -1,10 +1,10 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.openqa.selenium.WebDriver
+import org.modelcatalogue.core.geb.HomePage
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String cancel = "button.btn-warning"
@@ -15,7 +15,7 @@ class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
 
     void clickOnCancel() {
         when:
-        go(baseUrl)
+        to HomePage
         click login
         then:
         $("a.btn-block").text() == "Login with Google"
@@ -29,8 +29,6 @@ class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check(primaryBtn) is("Login")
-
-
     }
 
 }

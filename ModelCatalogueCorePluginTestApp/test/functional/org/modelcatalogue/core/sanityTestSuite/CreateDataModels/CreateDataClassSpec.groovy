@@ -1,7 +1,12 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import groovy.util.logging.Slf4j
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataClassesPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.create
-import static org.modelcatalogue.core.geb.Common.delete
 import static org.modelcatalogue.core.geb.Common.description
 import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getPick
@@ -16,8 +21,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     private static final String metadataStep ="button#step-metadata"
@@ -52,16 +56,34 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     private static final String   search='input#element'
     private static final String  closeButton='div.modal-footer>button:nth-child(2)'
 
+    @Ignore
     def "login and navigate to the model "() {
         when:
-        loginAdmin()
-        select 'Test 3'
-        selectInTree 'Data Classes'
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Classes')
+
+        then:
+        at DataClassesPage
+
+        and:
         check rightSideTitle contains 'Active Data Classes'
     }
 
+    @Ignore
     def "navigate to create data classes page"() {
         when:
         click create
@@ -70,6 +92,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         check modalHeader contains "Data Class Wizard"
     }
 
+    @Ignore
     def "create data class"() {
         when: ' fill data class step'
         fill nameLabel with "NEW_TESTING_MODEL "
@@ -134,6 +157,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         click exitButton
     }
 
+    @Ignore
     def "create a data class and create a relationship is based on"() {
         when:
         selectInTree 'Data Classes'
@@ -190,15 +214,29 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
     }
 
+    @Ignore
     def "delete the created data class"() {
         when:
         click modelCatalogue
 
-        and:
-        select 'Test 3'
-        selectInTree 'Data Classes'
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Classes')
+
+        then:
+        at DataClassesPage
+
+        and:
         check rightSideTitle contains 'Active Data Classes'
 
         when:

@@ -3,7 +3,7 @@ package org.modelcatalogue.core.secured
 import geb.spock.GebSpec
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
-import spock.lang.Specification
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Unroll
 import spock.lang.IgnoreIf
 
@@ -28,6 +28,7 @@ class DataModelUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
+        '/dataModel/save',
         '/api/modelCatalogue/core/dataModel',
         '/api/modelCatalogue/core/dataModel/$id/validate',
         '/api/modelCatalogue/core/dataModel/validate',
@@ -55,6 +56,7 @@ class DataModelUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
+        '/dataModel/create',
         '/api/modelCatalogue/core/dataModel',
         '/api/modelCatalogue/core/dataModel/search/$search',
         '/api/modelCatalogue/core/dataModel/$id',

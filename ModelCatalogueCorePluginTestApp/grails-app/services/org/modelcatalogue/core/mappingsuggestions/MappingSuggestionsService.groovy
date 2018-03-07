@@ -3,12 +3,13 @@ package org.modelcatalogue.core.mappingsuggestions
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.MetadataDomainEntityService
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionParameter
 import org.modelcatalogue.core.actions.ActionService
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
-import org.modelcatalogue.core.actions.IdName
+import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.persistence.ActionGormService
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.persistence.BatchGormService
@@ -36,41 +37,13 @@ class MappingSuggestionsService implements MappingsSuggestionsGateway {
 
     MessageSource messageSource
 
-    ActionService actionService
+    MetadataDomainEntityService metadataDomainEntityService
 
     BatchGormService batchGormService
 
     ActionGormService actionGormService
 
-    AssetGormService assetGormService
-
-    CatalogueElementGormService catalogueElementGormService
-
-    DataClassGormService dataClassGormService
-
-    DataElementGormService dataElementGormService
-
-    DataModelGormService dataModelGormService
-
-    DataModelPolicyGormService dataModelPolicyGormService
-
-    DataTypeGormService dataTypeGormService
-
-    EnumeratedTypeGormService enumeratedTypeGormService
-
-    ExtensionValueGormService extensionValueGormService
-
-    MappingGormService mappingGormService
-
-    MeasurementUnitGormService measurementUnitGormService
-
-    PrimitiveTypeGormService primitiveTypeGormService
-
-    ReferenceTypeGormService referenceTypeGormService
-
-    RelationshipGormService relationshipGormService
-
-    RelationshipTypeGormService relationshipTypeGormService
+    ActionService actionService
 
     @Override
     MappingSuggestionResponse findAll(MappingSuggestionRequest req) {
@@ -171,40 +144,7 @@ class MappingSuggestionsService implements MappingsSuggestionsGateway {
 
     CatalogueElement catalogueElementOfActionParameter(ActionParameter actionParameter) {
         MetadataDomainEntity domainEntity = MetadataDomainEntity.of(actionParameter.extensionValue)
-        switch (domainEntity.domain) {
-            case MetadataDomain.ASSET:
-                return assetGormService.findById(domainEntity.id)
-                break
-            case MetadataDomain.CATALOGUE_ELEMENT:
-                return catalogueElementGormService.findById(domainEntity.id)
-                break
-            case MetadataDomain.DATA_CLASS:
-                return dataClassGormService.findById(domainEntity.id)
-                break
-            case MetadataDomain.DATA_ELEMENT:
-                return dataElementGormService.findById(domainEntity.id)
-                break
-            case MetadataDomain.DATA_MODEL:
-                return dataModelGormService.findById(domainEntity.id)
-                break
-            case MetadataDomain.DATA_TYPE:
-                return dataTypeGormService.findById(domainEntity.id)
-                break
-            case MetadataDomain.ENUMERATED_TYPE:
-                return enumeratedTypeGormService.findById(domainEntity.id)
-                break
-            case MetadataDomain.MEASUREMENT_UNIT:
-                return measurementUnitGormService.findById(domainEntity.id)
-                break
-            case MetadataDomain.PRIMITIVE_TYPE:
-                return primitiveTypeGormService.findById(domainEntity.id)
-                break
-            case MetadataDomain.REFERENCE_TYPE:
-                return referenceTypeGormService.findById(domainEntity.id)
-                break
-            default:
-                return null
-        }
+        metadataDomainEntityService.findByMetadataDomainEntity(domainEntity)
     }
 
     ElementCompared instantiateElementCompared(CatalogueElement catalogueElement) {

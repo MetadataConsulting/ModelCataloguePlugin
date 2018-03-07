@@ -1,15 +1,17 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@IgnoreIf({ !System.getProperty('geb.env')  })
 @Stepwise
 class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
-
 
     private static final CatalogueAction search = CatalogueAction.runFirst('navigation-right', 'search-menu')
     private static final String searchInput = '.modal-body .input-group-lg input'
@@ -21,12 +23,14 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
     private static final String UNIQUE_EXTENSION_VALUE = 'TEST_27'
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
 
-
+    @Ignore
     def "search for patient identity details"() {
-        login admin
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
-        go "#/dataModels"
-
+        then:
+        at DashboardPage
 
         when:
         click search

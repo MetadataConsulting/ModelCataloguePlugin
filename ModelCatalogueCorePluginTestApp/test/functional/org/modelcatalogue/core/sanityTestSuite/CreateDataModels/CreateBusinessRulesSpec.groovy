@@ -1,12 +1,16 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import org.modelcatalogue.core.geb.BusinessRulesPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore
 @Stepwise
 class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
@@ -29,12 +33,28 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue and select business rules"() {
         when:
-        loginAdmin()
-        select'Test 3' select 'Business Rules'
-        selectInTree "Business Rules"
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
-        check rightSideTitle  contains 'Active Validation Rules'
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Business Rules')
+
+        then:
+        at BusinessRulesPage
+
+        and:
+        check rightSideTitle  contains 'Active Business Rules'
     }
 
      def "Navigate to business rules page"() {
@@ -69,12 +89,25 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
         when:
         click modelCatalogue
 
-        and:
-        select'Test 3' select 'Business Rules'
-        selectInTree "Business Rules"
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
-        check rightSideTitle  contains 'Active Validation Rules'
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Business Rules')
+
+        then:
+        at BusinessRulesPage
+
+        and:
+        check rightSideTitle  contains 'Active Business Rules'
 
         when:
         click businessRule
