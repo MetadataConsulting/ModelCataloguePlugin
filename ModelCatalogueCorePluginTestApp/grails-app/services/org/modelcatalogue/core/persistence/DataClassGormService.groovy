@@ -2,11 +2,13 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dashboard.SearchStatusQuery
 import org.springframework.context.MessageSource
 
 @Slf4j
@@ -75,5 +77,26 @@ class DataClassGormService implements WarnGormErrors {
     @Transactional
     DataClass saveWithNameAndDescriptionAndStatus(String name, String description, ElementStatus status) {
         save(new DataClass(name: name, description: description, status: status))
+    }
+
+    @Transactional(readOnly = true)
+    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+        findQueryByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery).count()
+    }
+
+    @CompileStatic
+    DetachedCriteria<DataClass> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+        DetachedCriteria<DataClass> query = DataClass.where {}
+        if ( dataModelId ) {
+            query = query.where { dataModel == DataModel.load(dataModelId) }
+        }
+        if ( searchStatusQuery.statusList ) {
+            query = query.where { status in searchStatusQuery.statusList }
+        }
+        if ( searchStatusQuery.search ) {
+            String term = "%${searchStatusQuery.search}%".toString()
+            query = query.where { name =~ term }
+        }
+        query
     }
 }

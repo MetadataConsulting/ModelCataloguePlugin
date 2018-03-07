@@ -1,17 +1,16 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.BusinessRulesPage
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
-
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore
 @Stepwise
 class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
@@ -34,16 +33,15 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue and select business rules"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 3')
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
         at DataModelPage
@@ -90,8 +88,13 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
     def "delete the validation rules from the data model"() {
         when:
         click modelCatalogue
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 3')
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
         at DataModelPage

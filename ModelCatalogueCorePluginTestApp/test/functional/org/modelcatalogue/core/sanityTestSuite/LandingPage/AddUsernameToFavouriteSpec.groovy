@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 
@@ -11,7 +11,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
 
@@ -25,22 +25,24 @@ class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
-        and:
-        check adminTag displayed
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+
+        then:
+        dashboardPage.nav.cogMenuLink.isDisplayed()
     }
 
     @Ignore
     def "select a data model and navigate to the user profile"() {
         when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 3')
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
 
         then:
         at DataModelPage

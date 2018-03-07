@@ -1,9 +1,8 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Unroll
-
 import static org.modelcatalogue.core.geb.Common.getModalCloseButton
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.pick
@@ -11,7 +10,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore
 class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec{
 
@@ -29,12 +28,11 @@ class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec{
     @Unroll
     def "search option"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('admin', 'admin')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         and:
         check modelCatalogue displayed

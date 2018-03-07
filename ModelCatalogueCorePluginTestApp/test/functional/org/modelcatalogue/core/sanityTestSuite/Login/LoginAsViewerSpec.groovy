@@ -1,30 +1,25 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
-import org.openqa.selenium.WebDriver
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
-import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
-@Stepwise
+@IgnoreIf({ !System.getProperty('geb.env') })
 class LoginAsViewerSpec extends AbstractModelCatalogueGebSpec {
 
     def "Create data Model button is not displayed for viewer"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
-        loginPage.login('viewer', 'viewer')
+        LoginPage loginPage = to LoginPage
+        loginPage.login('user', 'user')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
+        DashboardPage dashboardPage = browser.page DashboardPage
 
         then:
-        !dataModelListPage.isCreateButtonDisplayed()
+        !dashboardPage.nav.createDataModelLink.isDisplayed()
     }
 }

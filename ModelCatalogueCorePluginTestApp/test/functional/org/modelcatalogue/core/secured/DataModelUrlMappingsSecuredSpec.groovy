@@ -28,6 +28,7 @@ class DataModelUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
+        '/dataModel/save',
         '/api/modelCatalogue/core/dataModel',
         '/api/modelCatalogue/core/dataModel/$id/validate',
         '/api/modelCatalogue/core/dataModel/validate',
@@ -55,6 +56,7 @@ class DataModelUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
+        '/dataModel/create',
         '/api/modelCatalogue/core/dataModel',
         '/api/modelCatalogue/core/dataModel/search/$search',
         '/api/modelCatalogue/core/dataModel/$id',

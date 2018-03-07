@@ -38,6 +38,12 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
                 <label for="description" class="">Description</label>
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
+              <div class="form-group">
+                <label for="publishedStatus" class="">Published Status</label>
+                <select ng-model="copy.publishedStatus" placeholder="Published Status" class="form-control" id="publishedStatus" ng-options="item for item in publishedStatuses">
+                </select>
+
+              </div>
               <fake-submit-button/>
             </form>
         </div>
@@ -45,7 +51,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', '$rootScope', '$controller', ($scope, messages, names, catalogueElementResource, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance, $rootScope, $controller) ->
+        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', '$rootScope', '$controller', 'publishedStatuses', ($scope, messages, names, catalogueElementResource, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance, $rootScope, $controller, publishedStatuses) ->
           $scope.pending        = {dataModel: null}
           $scope.newEntity      = -> {dataModels: $scope.copy?.dataModels ? []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
@@ -53,6 +59,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create
           $scope.currentDataModel = args.currentDataModel
+          $scope.publishedStatuses = publishedStatuses
 
           angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
 
@@ -96,6 +103,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
                   id: $scope.copy.id,
                   name: $scope.copy.name,
                   description: $scope.copy.description,
+                  publishedStatus: $scope.copy.publishedStatus,
                   dataModel: $scope.currentDataModel?.id
                 }
                 data: {asset: $scope.copy.file}

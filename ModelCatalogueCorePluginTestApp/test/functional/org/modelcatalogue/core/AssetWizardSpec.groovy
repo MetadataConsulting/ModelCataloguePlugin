@@ -1,10 +1,9 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.geb.AssetsPage
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
-
 import static org.modelcatalogue.core.geb.Common.*
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -19,7 +18,7 @@ import spock.lang.Issue
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
@@ -38,16 +37,15 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select("Test 1")
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select("Test 1")
 
         then:
         at DataModelPage

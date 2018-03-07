@@ -4,6 +4,7 @@ class ValidationRuleUrlMappings {
 
     static mappings = {
         // ValidationRule
+        "/api/modelCatalogue/core/validationRule/rules"(controller: 'validationRule', action: 'rules', method: HttpMethod.GET)
         "/api/modelCatalogue/core/validationRule"(controller: 'validationRule', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/validationRule"(controller: 'validationRule', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/validationRule/search/$search?"(controller: 'validationRule', action: 'search', method: HttpMethod.GET)

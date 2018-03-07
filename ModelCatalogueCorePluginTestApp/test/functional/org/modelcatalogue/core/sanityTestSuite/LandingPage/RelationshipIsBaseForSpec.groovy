@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 
@@ -12,7 +13,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@IgnoreIf({ !System.getProperty('geb.env')   })
 @Stepwise
 @Ignore
 class RelationshipIsBaseForSpec extends AbstractModelCatalogueGebSpec {
@@ -27,21 +28,21 @@ class RelationshipIsBaseForSpec extends AbstractModelCatalogueGebSpec {
 
     def "login to model catalogue and select a data model"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('NHIC')
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('NHIC')
 
-        then:'verify  title of the page '
-        check rightSideTitle contains 'NHIC'
+        then:
+        at DataModelPage
+
         and:
-        Thread.sleep(2000l)
+        check rightSideTitle contains 'NHIC'
     }
 
     def "Navigate to the top menu and select create relationship"() {

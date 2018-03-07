@@ -1,9 +1,10 @@
 <div class="col-md-12">
+  <hr/>
   <table class="table table-responsive table-condensed table-borderless table-inline table-no-margin"
          ng-if="!editableForm.$visible">
     <tbody>
       <tr ng-repeat="value in customMetadata.values">
-        <th class="col-md-3" ng-switch on="value.key">
+        <th class="col-md-6" ng-switch on="value.key">
           <strong class="small" ng-switch-when="http://www.modelcatalogue.org/metadata/genomics/#rare-disease-reports">
             Rare Disease Report Available
           </strong>

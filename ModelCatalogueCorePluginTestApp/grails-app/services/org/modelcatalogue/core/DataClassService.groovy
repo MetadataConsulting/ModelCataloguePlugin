@@ -36,7 +36,7 @@ class DataClassService {
         }
 
         RelationshipType hierarchy = RelationshipType.hierarchyType
-        List<ElementStatus> status = ElementService.getStatusFromParams(params, canViewDrafts)
+        List<ElementStatus> status = ElementService.getStatusFromParams(params)
 
         if (dataModelFilter.unclassifiedOnly) {
             // language=HQL

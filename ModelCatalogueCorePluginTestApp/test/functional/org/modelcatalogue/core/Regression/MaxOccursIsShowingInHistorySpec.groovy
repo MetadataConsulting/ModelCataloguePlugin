@@ -1,8 +1,9 @@
 package org.modelcatalogue.core.Regression
 
+import org.modelcatalogue.core.geb.CreateDataModelPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataClassesPage
 import org.modelcatalogue.core.geb.DataElementsPage
-import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
@@ -20,7 +21,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
 
@@ -51,45 +52,31 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
 
     def "login to model catalogue and create a data model"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = 'TESTING_DATA_MODEL_MAX'
+        createDataModelPage.modelCatalogueId = 'MET-00263'
+        createDataModelPage.description = 'this my testing data'
+        createDataModelPage.check('Cancer Model')
+        createDataModelPage.submit()
+
+        then:
+        DataModelPage
 
         and:
-        check createButton isDisplayed()
-
-        when:
-        click createButton
-
-        and:'fill the form '
-        fill nameLabel with 'TESTING_DATA_MODEL_MAX'
-        fill modelCatalogueId with 'MET-00263'
-        fill description with 'this my testing data'
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-
-        then:
-        true
-        //check stepImports enabled
-
-        when:
-        click stepImports
-
-        then:
-        check stepImports has 'btn-primary'
-
-        when:'import  Clinical Tags'
-        fill wizardName with 'Clinical Tags'
-        selectCepItemIfExists()
-
-        and:'create the dat class'
-        click finishButton
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        click closeButton
-
-        then:
         check rightSideTitle contains 'TESTING_DATA_MODEL'
     }
 

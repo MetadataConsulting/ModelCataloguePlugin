@@ -2,11 +2,9 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.AssetsPage
 import org.modelcatalogue.core.geb.BusinessRulesPage
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
-
-import static org.modelcatalogue.core.geb.Common.admin
 import static org.modelcatalogue.core.geb.Common.getModalDialog
 import static org.modelcatalogue.core.geb.Common.getNameLabel
 import static org.modelcatalogue.core.geb.Common.getSave
@@ -19,7 +17,7 @@ import spock.lang.IgnoreIf
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 
@@ -34,16 +32,15 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
     @Ignore
     def "go to login"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 1')
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 1')
 
         then:
         at DataModelPage
@@ -80,8 +77,13 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
     def "NAVIGATE BACK TO THE HOME PAGE"() {
         when:
         click modelCatalogue
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 2')
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 2')
 
         then:
         at DataModelPage

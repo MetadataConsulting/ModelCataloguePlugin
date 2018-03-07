@@ -1,17 +1,16 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.MeasurementUnitsPage
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.*
 import spock.lang.IgnoreIf
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 @Ignore
 class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
@@ -22,11 +21,12 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('Test 2')
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Test 2')
+        dashboardPage.select('Test 2')
 
         then:
         at DataModelPage

@@ -73,7 +73,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
     protected bindRelations(DataType instance, boolean newVersion, Object objectToBind) {
         super.bindRelations(instance, newVersion, objectToBind)
 
-        if (objectToBind.baseEnumeration) {
+        if ( objectToBind.baseEnumeration && (objectToBind.baseEnumeration.respondsTo('id') || objectToBind.baseEnumeration.hasProperty('id')) ) {
             EnumeratedType baseEnum = EnumeratedType.get(objectToBind.baseEnumeration.id)
             Enumerations selectedEnumerations = Enumerations.from(objectToBind.selectedEnumerations)
             instance.addToIsBasedOn baseEnum, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): selectedEnumerations.iterator().collect { it.id } .join(',')]

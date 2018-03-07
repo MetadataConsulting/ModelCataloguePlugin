@@ -93,6 +93,14 @@ class MetadataDomainEntity {
                 className = 'RelationshipTag'
                 metadataDomain =  MetadataDomain.RELATIONSHIP_TAG
 
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.ValidationRule:")) {
+                className = 'ValidationRule'
+                metadataDomain =  MetadataDomain.BUSINESS_RULE
+
+            } else if ( str.startsWith("${GORM_PREFFIX}://${DOMAIN_CLASS_PACKAGE}.Tag:")) {
+                className = 'Tag'
+                metadataDomain =  MetadataDomain.TAG
+
             }
             if ( className == null ||metadataDomain == null ) {
                 return null
@@ -103,6 +111,10 @@ class MetadataDomainEntity {
         } catch( NumberFormatException e ) {
             return null
         }
+    }
+
+    static String stringRepresentation(MetadataDomainEntity entity) {
+        stringRepresentation(entity.domain, entity.id)
     }
 
     static String stringRepresentation(MetadataDomain domain, Long id) {

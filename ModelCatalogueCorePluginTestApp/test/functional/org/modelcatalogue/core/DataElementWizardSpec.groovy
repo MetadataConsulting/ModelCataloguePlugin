@@ -1,18 +1,17 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataElementsPage
-import org.modelcatalogue.core.geb.DataModelListPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 @Ignore
 class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
@@ -21,17 +20,16 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "login and select Data Element"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.search('Test 1')
-        dataModelListPage.select('Test 1')
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Test 1')
+        dashboardPage.select('Test 2')
 
         then:
         at DataModelPage

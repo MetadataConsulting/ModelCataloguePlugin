@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.geb.DataModelListPage
+import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -17,7 +17,7 @@ import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf
 
 @Stepwise
-//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     public static final String expandTableHeader = '.inf-table thead .inf-cell-expand'
@@ -61,16 +61,15 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "go to login"() {
         when:
-        to LoginPage
-        LoginPage loginPage = browser.page LoginPage
+        LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
         then:
-        at DataModelListPage
+        at DashboardPage
 
         when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.select('NHIC')
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('NHIC')
 
         then:
         at DataModelPage
@@ -89,15 +88,9 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "create reference"() {
         when:
-        to DataModelListPage
-
-        then:
-        at DataModelListPage
-
-        when:
-        DataModelListPage dataModelListPage = browser.page DataModelListPage
-        dataModelListPage.search('Test 1')
-        dataModelListPage.select('Test 1')
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.search('Test 1')
+        dashboardPage.select('Test 1')
 
         then:
         at DataModelPage

@@ -14,6 +14,7 @@ import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
+import org.modelcatalogue.core.util.LoggedUserUtils
 import org.modelcatalogue.core.util.RelationshipsCounts
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
@@ -74,7 +75,7 @@ class RelationshipService {
         Lists.fromCriteria(params,
                 direction.composeWhere(element,
                         type,
-                        ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/),
+                        ElementService.getStatusFromParams(params),
                         element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(currentUser())))
     }
 
@@ -482,28 +483,9 @@ class RelationshipService {
         userGormService.findById(userId)
     }
 
-
     Long loggedUserId() {
         Object principal = springSecurityService.principal
-        if ( principal == null ) {
-            return null
-        }
-        if ( principal instanceof String ) {
-            try {
-                return principal as Long
-            } catch(NumberFormatException e) {
-                return null
-            }
-        }
-        if ( principal instanceof GrailsUser ) {
-            return ((GrailsUser) principal).id
-        }
-
-        if ( principal.respondsTo('id') ) {
-            return principal.id as Long
-        }
-
-        null
+        LoggedUserUtils.id(principal)
     }
 
     boolean isFavorite(CatalogueElement el) {

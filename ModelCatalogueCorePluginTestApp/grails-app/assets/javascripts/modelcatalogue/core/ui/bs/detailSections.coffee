@@ -134,7 +134,7 @@ x in ['apple', 'banana', 'cherry']
       'asset'
     ]
     keys: []
-    hideByDefault: true
+    hideByDefault: false
     template: '/mc/core/ui/detail-sections/metadata.html'
     toHumanReadableSize: (size) ->
       GIGA = 1024 * 1024 * 1024
