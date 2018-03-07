@@ -6,8 +6,10 @@ import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.Stepwise
+import spock.lang.Ignore
 
 @Stepwise
+@Ignore
 class MET1441Spec extends AbstractModelCatalogueGebSpec {
     private static final myModel = "#my-models"
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
