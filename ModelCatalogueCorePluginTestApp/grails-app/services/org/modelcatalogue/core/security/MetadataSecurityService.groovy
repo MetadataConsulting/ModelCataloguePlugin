@@ -527,7 +527,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/batch/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/batch/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.PUT],
             ["/api/modelCatalogue/core/batch/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.DELETE],
-        
+
             ["/api/modelCatalogue/core/batch/*/archive", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/run", MetadataRolesUtils.roles('CURATOR'), HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/actions/*", MetadataRolesUtils.roles('CURATOR'), HttpMethod.GET],
@@ -871,7 +871,6 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/feedback/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/logs", 'ROLE_SUPERVISOR', HttpMethod.GET],
             ["/", 'permitAll', HttpMethod.GET],
-            ["/load", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/search/reindex", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/search/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/relationship/*/restore", 'ROLE_SUPERVISOR()', HttpMethod.POST],

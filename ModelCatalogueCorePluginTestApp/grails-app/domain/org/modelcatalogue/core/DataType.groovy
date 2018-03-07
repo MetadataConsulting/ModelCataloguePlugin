@@ -71,7 +71,7 @@ class DataType extends CatalogueElement implements Validating {
     }
 
     String processDtRule(String rule) {
-        return rule.replaceAll(/&amp;/, '&')
+        return rule?.replaceAll(/&amp;/, '&')
     }
 
     @Override
