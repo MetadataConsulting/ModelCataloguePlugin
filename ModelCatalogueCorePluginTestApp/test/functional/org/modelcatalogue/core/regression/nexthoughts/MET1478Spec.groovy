@@ -40,7 +40,6 @@ class MET1478Spec extends AbstractModelCatalogueGebSpec {
         click removeTag
         fill policies with "c" and Common.pick first Common.item
         String firstPolicy = $(policyTag).text()
-        println("??????????????????$firstPolicy????????????????")
 
         then: "Check the policies are displayed"
         check policies displayed
@@ -49,7 +48,6 @@ class MET1478Spec extends AbstractModelCatalogueGebSpec {
         click removeTag
         fill policies with "C" and Common.pick first Common.item
         String secondPolicy = $(policyTag).text()
-        println("??????????????????$secondPolicy????????????????")
 
         then: "Check the policies are displayed"
         check policies displayed
