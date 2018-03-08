@@ -51,22 +51,14 @@ class MET1441Spec extends AbstractModelCatalogueGebSpec {
     def "Click on the green button to complete the Data Model Creation"() {
         when: "Clicked on Green Button"
         fill name with uuid
-        println("/..111/////..")
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        println("/..222/////..")
         check finishButton displayed
-        println("/..333/////..")
         click finishButton
-        println("/..444/////..")
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        println("/..555/////..")
 
         then: "Summary Should display New Data Model Creation Message"
-        println("/..666/////..")
         check '#summary' displayed
-        println("/..777/////..")
         println $("#summary").text()
-        println("/..888/////..")
         check '#summary' contains uuid
     }
 
@@ -121,22 +113,15 @@ class MET1441Spec extends AbstractModelCatalogueGebSpec {
         when: "Click on the Main Menu and finalized data model"
         click modelInTree
         click dataModelMenuButton
-        println "///////////////1////////////"
         click finalize
-        println "///////////////2////////////"
 
         and:
-        println "///////////////3////////////"
         fill versionNote with 'THIS IS THE VERSION NOTE'
-        println "///////////////4////////////"
         click finalizeButton
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        println "///////////////5////////////"
         click Common.modalPrimaryButton
 
-        println "///////////////6////////////"
         then:
-        println "///////////////1////////////"
         check table contains "$uuid (0.0.1) finalized"
     }
 
