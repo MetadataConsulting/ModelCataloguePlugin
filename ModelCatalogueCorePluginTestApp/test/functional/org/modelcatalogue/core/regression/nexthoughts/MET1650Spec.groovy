@@ -10,7 +10,7 @@ import spock.lang.Stepwise
 import spock.lang.Ignore
 
 @Stepwise
-//@Ignore
+@Ignore
 class MET1650Spec extends AbstractModelCatalogueGebSpec {
     private static final myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'
