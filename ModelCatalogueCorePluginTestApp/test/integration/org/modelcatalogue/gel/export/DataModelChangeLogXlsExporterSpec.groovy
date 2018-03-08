@@ -11,7 +11,7 @@ import org.modelcatalogue.core.util.DataModelFilter
 /**
  * Test for Data Spec change log reports class.
  */
-@IgnoreIf({ System.getProperty('IGNORE_OFFICE') || System.getProperty('JENKINS_IGNORE') })
+@IgnoreIf({ System.getProperty('IGNORE_OFFICE') || System.getenv('JENKINS_IGNORE') })
 class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
 
     def "Export data spec change logs to xls"() {
