@@ -9,7 +9,7 @@ import spock.lang.Stepwise
 import spock.lang.Ignore
 
 @Stepwise
-//@Ignore
+@Ignore
 class MET1478Spec extends AbstractModelCatalogueGebSpec {
     private static final myModel = "#my-models"
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
