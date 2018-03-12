@@ -81,9 +81,6 @@ class CopyAssociationsAndRelationships {
                 return
             }
 
-            if (r.archived) {
-                return
-            }
 
             //don't copy inherited relationships - if they are inherited the based on relationships will be copied and they will get handled by that function
 
@@ -97,9 +94,20 @@ class CopyAssociationsAndRelationships {
 
             if (direction == RelationshipDirection.INCOMING) {
                 otherSide = context.resolve(r.source)
+                //if the relationships is archived and points to a deprecated item
+                //get the latest version of the item (or the preferred draft)
+                if (r.archived) {
+                    otherSide = context.findExisting(otherSide)
+                }
                 hash = PublishingContext.hashForRelationship(otherSide, draft, r.relationshipType)
             } else {
                 otherSide = context.resolve(r.destination)
+                //if the relationships is archived and points to a deprecated item
+                //get the latest version of the item (or the preferred draft)
+                if (r.archived) {
+                    otherSide = context.findExisting(otherSide)
+                }
+
                 hash = PublishingContext.hashForRelationship(draft, otherSide, r.relationshipType)
             }
 
@@ -159,6 +167,7 @@ class CopyAssociationsAndRelationships {
 
         return true
     }
+
 
     int hashCode() {
         int result
