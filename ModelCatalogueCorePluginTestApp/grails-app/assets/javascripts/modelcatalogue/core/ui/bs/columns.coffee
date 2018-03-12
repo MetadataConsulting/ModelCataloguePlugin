@@ -121,7 +121,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     {
       header: "File Name"
       value: 'originalFileName'
-      classes: 'col-md-'
+      classes: 'col-md-3'
       sort: {property: 'originalFileName', type: 'alpha'}
     }
     {header: "Mime Type", value: 'contentType', classes: 'col-md-2', sort: {property: 'contentType', type: 'alpha'}}
