@@ -160,7 +160,7 @@ grails.project.dependency.resolution = {
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
 
-        test ":geb:$gebVersion"
+        test ":geb:1.0"
         test ':build-test-data:2.1.2'
         test ':fixtures:1.3'
 

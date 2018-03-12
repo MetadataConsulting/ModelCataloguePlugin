@@ -1,21 +1,44 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.MeasurementUnitsPage
+import spock.lang.Ignore
 import static org.modelcatalogue.core.geb.Common.*
 import spock.lang.IgnoreIf
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
-        login admin
-
         when:
-        select 'Test 2' select "Measurement Units"
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Test 2')
+        dashboardPage.select('Test 2')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Measurement Units')
+
+        then:
+        at MeasurementUnitsPage
+
+        and:
         check rightSideTitle is 'Active Measurement Units'
     }
 

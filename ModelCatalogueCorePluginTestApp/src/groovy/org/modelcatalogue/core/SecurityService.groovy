@@ -17,7 +17,7 @@ public interface SecurityService {
     /**
      * Returns true if the user has particular role or it doesn't matter if she has any role.
      *
-     * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN. Any
+     * Following roles are supported by the core plugin: USER, CURATOR, SUPERVISOR. Any
      * service implementations should map to these roles as well.
      *
      * @param role the role to be tested

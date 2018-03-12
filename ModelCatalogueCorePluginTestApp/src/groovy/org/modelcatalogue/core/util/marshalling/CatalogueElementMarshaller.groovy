@@ -206,6 +206,8 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
             return minimalCatalogueElementJSON(element as DataElement)
         } else if (DataType.isAssignableFrom(entityClass)) {
             return minimalCatalogueElementJSON(element as DataType)
+        } else if (Asset.isAssignableFrom(entityClass)) {
+            return minimalCatalogueElementJSON(element as Asset)
         } else if (DataClass.isAssignableFrom(entityClass)) {
             return minimalCatalogueElementJSON(element as DataClass)
         } else if (!element) {
@@ -227,6 +229,17 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         def minimalJSON = minimalCatalogueElementJSONSkeleton(element)
         minimalJSON.remove('dataModel')
         minimalJSON.put('symbol', element.symbol)
+        return minimalJSON
+    }
+
+
+    static Map<String, Object> minimalCatalogueElementJSON(Asset element) {
+        if (!element) return null
+        def minimalJSON = minimalCatalogueElementJSONSkeleton(element)
+        minimalJSON.remove('dataModel')
+        minimalJSON.put('originalFileName', element.originalFileName)
+        minimalJSON.put('contentType', element.contentType)
+        minimalJSON.put('publishedStatus', "${element.publishedStatus}".toString() )
         return minimalJSON
     }
 

@@ -1,7 +1,9 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
-
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
@@ -9,7 +11,7 @@ import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore
 @Stepwise
 class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
@@ -29,15 +31,25 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     private static final String NEW_DATA_CLASS_NAME = "New ${UUID.randomUUID().toString()}"
 
     def "go to login"() {
-        login admin
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
-        select 'Test 2'
+        then:
+        at DashboardPage
 
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select("Test 2")
+
+        then:
+        at DataModelPage
+
+        when:
         addDataModelImport 'nhic'
-
         selectInTree "Data Classes"
 
-        expect:
+        then:
         check '#jserrors' gone
         check rightSideTitle contains "Active Data Classes"
     }

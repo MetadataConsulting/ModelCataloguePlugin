@@ -32,7 +32,7 @@
             </validationRule>
         </dataClass>
     </dataClass>
-    <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
+    <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-supervisor users, the types are always imported as system ones and they need to be approved by the catalogue supervisor first. -->
     <relationshipTypes>
         <relationshipType name="base" source="org.modelcatalogue.core.CatalogueElement" destination="org.modelcatalogue.core.CatalogueElement">
             <sourceToDestination label="is base for">Any catalogue element can be base for multiple elements of the same type.</sourceToDestination>

@@ -124,8 +124,8 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
       classes: 'col-md-3'
       sort: {property: 'originalFileName', type: 'alpha'}
     }
-    {header: "Size", value: computeBytes, classes: 'col-md-2', sort: {property: 'size', type: 'numeric'}}
     {header: "Mime Type", value: 'contentType', classes: 'col-md-2', sort: {property: 'contentType', type: 'alpha'}}
+    {header: "Published", value: 'publishedStatus', classes: 'col-md-2', sort: {property: 'publishedStatus', type: 'alpha'}}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.Mapping', [

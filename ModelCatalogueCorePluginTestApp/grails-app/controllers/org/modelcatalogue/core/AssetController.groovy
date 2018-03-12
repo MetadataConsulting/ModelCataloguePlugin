@@ -37,7 +37,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
 
         MultipartFile file = request.getFile('asset')
 
-        Asset asset = assetService.upload(params.long('id'), params.long('dataModel'), params.name, params.description, file, params.filename ?: file.originalFilename)
+        Asset asset = assetService.upload(params.long('id'), params.long('dataModel'), params.name, params.description, file, params.filename ?: file.originalFilename, params.publishedStatus)
 
         if (!asset) {
             notFound()

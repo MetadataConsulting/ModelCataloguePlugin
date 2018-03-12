@@ -1,89 +1,49 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
-import static org.modelcatalogue.core.geb.Common.*
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueAction
-import org.openqa.selenium.Keys
-import spock.lang.Ignore
+import org.modelcatalogue.core.geb.*
 import spock.lang.IgnoreIf
-import spock.lang.Stepwise
+import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
-@Stepwise
+@IgnoreIf({ !System.getProperty('geb.env') })
 class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
-    private static final String name = "input#name"
-    private static final String version = "input#semanticVersion"
-    private static final String catalogueId = "input#modelCatalogueId"
-    private static final String policies = "input#dataModelPolicy"
-    private static final String importData = "input#name"
-    private static final String finish = "button#step-finish"
     private static final String deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
     private static final String dataModelButton ="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
 
     def "do create data model"() {
         when:
-        login curator
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
 
         then:
-        check create displayed
+        at DashboardPage
 
         when:
-        // click on create
-        click create
-        // type a name . please change value
-        fill name with newModelName
-        fill version with versionElement
-        fill catalogueId with catalogue
-        fill policies with policy and pick first item
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
 
         then:
-        check policies displayed
+        at CreateDataModelPage
 
         when:
-        // switch to import
-        $(policies) << Keys.ENTER
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.with {
+            name = "TESTING_DATA_MODEL"
+            semanticVersion = "2.1.28"
+            modelCatalogueId = "MT-234"
+            check('Default Checks')
+            check('Cancer Model')
+            submit()
+        }
 
         then:
-        // verify import button present
-        check "button#step-imports" is "2. Imports"
+        at DataModelPage
 
         when:
-        // type c in the search box and selectRelation first item
-        fill importData with text and pick first item
-
-        // click on finish
-        click finish
-
-
-        then:
-        noExceptionThrown()
-
-        cleanup:
-        // click on close
-        click modalCloseButton
-        click modalPrimaryButton
-
-        where:
-        newModelName         | versionElement | catalogue | policy   | text
-        "TESTING_DATA_MODEL" | "2.1.28"       | "MT-234"  | "c"      | "c"
-    }
-
-    def "delete the created data model"() {
-        when:
-        refresh browser
-        Thread.sleep(4000L)
-        select 'TESTING_DATA_MODEL'
-
-        and:' navigate to the top menu and click on the data model button'
-        click dataModelButton
-
-        and:'select the delete button'
-        click deleteButton
-
-        and:'confirm'
-        click modalPrimaryButton
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dataModel()
+        dataModelPage.delete()
+        dataModelPage.modalDialog.ok()
 
         then:
         noExceptionThrown()

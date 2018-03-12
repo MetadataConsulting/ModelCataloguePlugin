@@ -1,26 +1,29 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.HomePage
 import org.openqa.selenium.WebDriver
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') })
+//@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 class ResetPasswordSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String login ="button.btn"
     private static final String resetPassword ="p.help-block>a"
     private static final String email ="input#username-new"
     private static final String resetMyPassword ="button.btn"
 
-
-     @Ignore
     void doResetPassword() {
+        when:
+        to HomePage
 
-        when:'navigate to model catalogue and click on login button'
-        WebDriver driver = browser.driver
-        go(baseUrl)
-        click login
+        then:
+        at HomePage
+
+        when:
+        HomePage homePage = browser.page HomePage
+        homePage.login()
 
         then:'verify that username or email present on the page'
         $("label", for: "username").text() == "Username or Email"
@@ -48,10 +51,5 @@ class ResetPasswordSpec extends AbstractModelCatalogueGebSpec {
 
         then:'verify the second error message'
         $("div.alert-danger").text() == "Given user doesn't have any email associated. Please, contact the administrator."
-
-
     }
-
-
-
 }

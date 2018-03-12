@@ -1,75 +1,65 @@
 package org.modelcatalogue.core.Regression
 
-import static org.modelcatalogue.core.geb.Common.description
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.CreateDataModelPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.DataModelPolicyCreatePage
+import org.modelcatalogue.core.geb.DataModelPolicyListPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
-class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec {
+@IgnoreIf({ !System.getProperty('geb.env') })
+class CreateDataModelAndCreatePolicesSpec extends GebSpec {
 
-    private static final String create = "a#role_data-models_create-data-modelBtn>span:nth-child(2)"
-    private static final String name = "input#name"
-    private static final String createPolicy = "a.create-new-cep-item"
-    private static final String version = "input#semanticVersion"
-    private static final String catalogueId = "input#modelCatalogueId"
-    private static final String icon = "span.search-for-more-icon"
-    private static final String importedButton = "button#step-imports"
-    private static final String search = "input#dataModelPolicy"
-    private static final String savePolicy = "a#role_modal_modal-save-elementBtn"
-    private static
-    final String allDataElement = "div.basic-edit-modal-prompt>div>div>div:nth-child(2)>form>div:nth-child(2)>p>a:nth-child(4)"
-    private static
-    final String regularExpression = "div.basic-edit-modal-prompt>div>div>div:nth-child(2)>form>div:nth-child(2)>p>a:nth-child(5)"
-    final String policyName = "#name"
-    private static final String finishButton = "button#step-finish"
-    private static String models = "My First Test"
-    private static String VERSION = "0.0.1"
-    private static String catalogue = "MET-89765}"
-
-
-    void addPolicies() {
+    void "create a data model policy and use it in the creation of a data model"() {
 
         when: 'login to model catalogue'
-        loginAdmin()
-        then:
-        check create isDisplayed()
 
-        when: 'click on create and fill form'
-        click create
-        fill name with models
-        fill version with VERSION
-
-        and:
-        fill catalogueId with catalogue
-        fill search with 'tester'
-        click createPolicy
-
-        and: 'create data policy'
-        Thread.sleep(3000L)
-        fill policyName with 'TESTING_POLICY'
-
-        and:
-        click allDataElement
-        click regularExpression
-
-        and:
-        click savePolicy
-
-        and:
-        fill description with 'Testing_policy'
-        click importedButton
-
-        and:
-        click icon
-        Thread.sleep(3000L)
-
-        and:
-        selectInSearch(2)
-        click finishButton
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
-        noExceptionThrown()
+        at DashboardPage
 
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.cogMenu()
+        dashboardPage.nav.dataModelPolicies()
 
+        then:
+        at DataModelPolicyListPage
+
+        when:
+        DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
+        int numberOfDataModelPolicyListPage = dataModelPolicyListPage.countDataModelPolicyLinks()
+
+        dataModelPolicyListPage.create()
+        DataModelPolicyCreatePage dataModelPolicyCreatePage = browser.page DataModelPolicyCreatePage
+        dataModelPolicyCreatePage.name = 'TESTING_POLICY'
+        dataModelPolicyCreatePage.policyText = "check dataElement property 'name' is 'unique'"
+        dataModelPolicyCreatePage.save()
+        dataModelPolicyListPage = browser.page DataModelPolicyListPage
+
+        then:
+        waitFor {(numberOfDataModelPolicyListPage + 1) == dataModelPolicyListPage.countDataModelPolicyLinks()}
+
+        when:
+        dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = "My First Test"
+        createDataModelPage.semanticVersion = "0.0.1"
+        createDataModelPage.modelCatalogueId = "MET-89765"
+        createDataModelPage.check('TESTING_POLICY')
+        createDataModelPage.submit()
+
+        then:
+        at DataModelPage
     }
 }

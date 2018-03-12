@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.sanityTestSuite.Favourites
 
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.ScrollDirection
@@ -7,8 +10,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebSpec {
 
@@ -31,16 +33,30 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
     private static final String  measurementUnitButton="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
     private static final String  deleteButton="a#delete-menu-item-link>span:nth-child(3)"
 
+    @Ignore
     def "Login to model catalogue and select a data model"() {
         when:
-        loginAdmin()
-        select 'Test 3'
+        LoginPage loginPage = to LoginPage
+        loginPage.login('admin', 'admin')
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        when:
         click favourite
 
         then:
         check modelCatalogue displayed
     }
 
+    @Ignore
     def "navigate to favourite tag ,click on plus button and click  on data model"() {
 
         when:
@@ -67,6 +83,7 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
         check modalHeader contains('Create Measurement Unit')
     }
 
+    @Ignore
     def "create Measurement unit"() {
         when:
         click icon
@@ -85,6 +102,7 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
          check model_link displayed
     }
 
+    @Ignore
     def "delete the created measurement unit"() {
         when:
         click modelCatalogue

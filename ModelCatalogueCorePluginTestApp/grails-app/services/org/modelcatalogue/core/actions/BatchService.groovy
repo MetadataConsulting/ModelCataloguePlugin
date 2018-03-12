@@ -1,9 +1,9 @@
 package org.modelcatalogue.core.actions
 
-import grails.util.GrailsNameUtils
 import groovy.transform.CompileStatic
 import org.modelcatalogue.core.persistence.ActionGormService
 import org.modelcatalogue.core.persistence.BatchGormService
+import org.modelcatalogue.core.util.IdName
 
 @CompileStatic
 class BatchService {

@@ -45,14 +45,14 @@ class DataModelAclService {
     }
 
     boolean isAdminOrHasAdministrationPermission(Object instance) {
-        if ( SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('ADMIN')) ) {
+        if ( SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_SUPERVISOR) ) {
             return true
         }
         hasAdministratorPermission(instance)
     }
 
     boolean isAdminOrHasReadPermission(Object instance) {
-        if ( SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('ADMIN')) ) {
+        if ( SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_SUPERVISOR) ) {
             return true
         }
         hasReadPermission(instance)
@@ -97,7 +97,7 @@ class DataModelAclService {
     }
 
     boolean isAdminOrHasAdministratorPermission(DataModel dataModel) {
-        if ( SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('ADMIN')) ) {
+        if ( SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_SUPERVISOR) ) {
             return true
         }
         hasAdministratorPermission(dataModel)
@@ -113,7 +113,7 @@ class DataModelAclService {
     }
 
     boolean isAdminOrHasAdministratorPermission(Object instance) {
-        if ( SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('ADMIN')) ) {
+        if ( SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_SUPERVISOR) ) {
             return true
         }
 

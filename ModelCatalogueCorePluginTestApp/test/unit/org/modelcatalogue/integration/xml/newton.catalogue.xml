@@ -10,7 +10,7 @@
             <to ref="http://www.bipm.org/en/publications/si-brochure/metre.html" relationshipType="derivedFrom"/>
         </relationships>
     </measurementUnit>
-    <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
+    <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-supervisor users, the types are always imported as system ones and they need to be approved by the catalogue supervisor first. -->
     <relationshipTypes>
         <relationshipType name="derivedFrom" source="org.modelcatalogue.integration.MeasurementUnit" destination="org.modelcatalogue.integration.MeasurementUnit">
             <sourceToDestination label="is derived from"/>

@@ -107,9 +107,9 @@
                 allowRegistration: ${grailsApplication.config.mc.allow.signup.asBoolean()},
                 canResetPassword:  ${grailsApplication.config.grails.mail.host.asBoolean() || grailsApplication.config.grails.mc.can.reset.password.asBoolean()},
                 roles: {
-                    VIEWER:     ['ROLE_USER', 'ROLE_METADATA_CURATOR', 'ROLE_ADMIN', 'ROLE_SUPERVISOR'],
-                    CURATOR:    ['ROLE_METADATA_CURATOR', 'ROLE_ADMIN', 'ROLE_SUPERVISOR'],
-                    ADMIN:      ['ROLE_ADMIN', 'ROLE_SUPERVISOR'],
+                    VIEWER:     ['ROLE_USER', 'ROLE_METADATA_CURATOR', 'ROLE_SUPERVISOR'],
+                    CURATOR:    ['ROLE_METADATA_CURATOR', 'ROLE_SUPERVISOR'],
+                    ADMIN:      ['ROLE_SUPERVISOR'],
                     SUPERVISOR: ['ROLE_SUPERVISOR']
                 },
                 <sec:ifLoggedIn>
@@ -205,8 +205,8 @@
           <span class="icon-bar"></span>
 
         </button>
-        <a class="navbar-brand" href="#/"><span class="fa fa-fw fa-book fa-2x"></span></a>
-        <a class="navbar-brand mc-name-parent" href="#/"><span
+        <a class="navbar-brand" href="${g.createLink(controller: 'dashboard')}"><span class="fa fa-fw fa-book fa-2x"></span></a>
+        <a class="navbar-brand mc-name-parent" href="${g.createLink(controller: 'dashboard')}"><span
           class="mc-name">${grailsApplication.config.mc.name ?: 'Model Catalogue'}</span></a>
       </div>
 

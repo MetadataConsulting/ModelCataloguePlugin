@@ -1,19 +1,18 @@
 package org.modelcatalogue.core.actions
 
-import grails.validation.ValidationErrors
 import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.AbstractRestfulController
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.dataarchitect.DataArchitectService
 import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
-import org.modelcatalogue.core.util.BeanMessage
+import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.context.MessageSource
 import org.springframework.validation.ObjectError
 
 @Slf4j
-class BatchController extends AbstractRestfulController<Batch> implements BeanMessage {
+class BatchController extends AbstractRestfulController<Batch> {
 
     def actionService
     BatchService batchService

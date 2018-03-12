@@ -5,7 +5,7 @@ import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 class InvalidRegistrationSpec extends GebSpec {
 
     public static final String model = "div.panel-body>div"
@@ -13,8 +13,6 @@ class InvalidRegistrationSpec extends GebSpec {
     static WebDriver driver
 
     void invalidRegistration() {
-
-
         when:'navigate to Model Catalogue and click on the signUP button'
         driver = browser.driver
         go(baseUrl)
@@ -37,7 +35,5 @@ class InvalidRegistrationSpec extends GebSpec {
 
         then:'VERIFY THIS TEXT PRESENT'
         $("div.panel-body>div:nth-child(1)").text() == "Please provide a valid email address"
-
-
     }
 }

@@ -1,39 +1,63 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.ChangesPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.DataTypesPage
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
-import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 @Stepwise
 class ChangesSpec extends AbstractModelCatalogueGebSpec {
-
 
     public static final String FIRST_NEW_ELEMENT_CREATED_CHANGE = "a.change-NEW_ELEMENT_CREATED:first-of-type"
 
     def "go to login"() {
-        loginAdmin()
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
-        select 'Test 1' select 'Data Types'
+        then:
+        at DashboardPage
 
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select("Test 1")
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Types')
+
+        then:
+        at DataTypesPage
+
+        when:
         click create
 
         fill 'name' with "Data Type Change Test"
 
         click save
 
-        expect:
+        then:
         check 'div.modal' gone
         remove messages
 
         when:
-        go "#/catalogue/change/all"
+        to ChangesPage
 
         then:
-        check 'h3' is 'Changes'
+        at ChangesPage
     }
 
     def "check the unit shows up with own detail page"() {
@@ -63,13 +87,13 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
         expect:
         check 'h3' is 'Users'
-        check { infTableCell(1, 1).find('a', text: 'admin') } displayed
+        check { infTableCell(1, 1).find('a', text: 'supervisor') } displayed
 
         when:
-        click { infTableCell(1, 1).find('a', text: 'admin') }
+        click { infTableCell(1, 1).find('a', text: 'supervisor') }
 
         then:
-        check 'h3' contains 'admin'
+        check 'h3' contains 'supervisor'
 
         check { tab('activity') } displayed
         check { tab('history') } displayed
