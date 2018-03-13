@@ -3,7 +3,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerActionInRole 'search-menu', actionsProvider.ROLE_NAVIGATION_RIGHT, [
     '$scope', 'security', 'messages',
     ($scope ,  security ,  messages) ->
-      return undefined
+      return undefined unless security.isUserLoggedIn()
       {
         position:   -10000
         icon:       'fa fa-search fa-fw fa-2x-if-wide'
