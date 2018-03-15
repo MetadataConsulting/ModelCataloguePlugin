@@ -19,6 +19,7 @@
                 <label>
                     <g:render template="actionState" model="[actionState: state]"/>
                 </label>
+
                 <g:checkBox name="state"
                             value="${state}"
                             checked="${filter.stateList.contains(state)}"  />
@@ -88,7 +89,7 @@
                     total="${pagination.total}"
                     offset="${pagination.offset}"
                     max="${pagination.max}"
-                    params="[batchId: batchId]"
+                    params="[batchId: batchId, state: filter.stateList]"
         />
         <g:message code="pagination.legend" args="[pagination.offset, Math.min(pagination.offset + pagination.max, pagination.total), pagination.total]" default="Displaying ${pagination.offset}-${Math.min(pagination.offset + pagination.max, pagination.total)} of ${pagination.total}"/>
     </div>
