@@ -500,6 +500,8 @@ class MetadataSecurityService {
     ]
 
     public static final List VALIDATION_RULE_MAPPINGS = [
+            ['/api/dashboard/dataModels','isAuthenticated()', HttpMethod.GET],
+            ['/api/dashboard/*/catalogueElements', 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/validationRule/rules", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/validationRule", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/validationRule", 'isAuthenticated()', HttpMethod.POST],

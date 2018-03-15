@@ -84,16 +84,23 @@ class DashboardService {
                 if (dataModelId) {
                     eq("dataModel.id", dataModelId)
                 }
-                if (searchStatusQuery.search) {
-                    ilike("name", "%${searchStatusQuery.search}%")
+                if ( searchStatusQuery ) {
+                    if (searchStatusQuery.search) {
+                        ilike("name", "%${searchStatusQuery.search}%")
+                    }
+                    if (searchStatusQuery.statusList) {
+                        inList("status", searchStatusQuery.statusList)
+                    }
                 }
-                if (searchStatusQuery.statusList) {
-                    inList("status", searchStatusQuery.statusList)
-                }
+
             }
-            maxResults(paginationQuery.max)
-            firstResult(paginationQuery.offset)
-            order(sortQuery.sort, sortQuery.order)
+            if ( paginationQuery ) {
+                maxResults(paginationQuery.max)
+                firstResult(paginationQuery.offset)
+            }
+            if ( sortQuery ) {
+                order(sortQuery.sort, sortQuery.order)
+            }
             projections {
                 property('id', 'id')
                 property('name', 'name')
