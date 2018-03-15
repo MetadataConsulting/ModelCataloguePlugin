@@ -11,7 +11,7 @@ import spock.lang.Ignore
 @Stepwise
 @Ignore
 class MET1478Spec extends AbstractModelCatalogueGebSpec {
-    private static final myModel = "#my-models"
+    private static final String myModel = "#my-models"
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
     private static final String policies = "input#dataModelPolicy"
     private static final String removeTag = "a.remove-tag"

@@ -11,7 +11,7 @@ import spock.lang.Ignore
 @Stepwise
 @Ignore
 class MET1469Spec extends AbstractModelCatalogueGebSpec {
-    private static final myModel = "#my-models"
+    private static final String  myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'
     private static final String metadataStep = "button#step-metadata"
     private static final String label = "textarea#section-label"

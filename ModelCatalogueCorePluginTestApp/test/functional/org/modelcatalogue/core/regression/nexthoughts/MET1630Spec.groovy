@@ -11,7 +11,7 @@ import spock.lang.Ignore
 @Stepwise
 @Ignore
 class MET1630Spec extends AbstractModelCatalogueGebSpec {
-    private static final myModel = "#my-models"
+    private static final String myModel = "#my-models"
 // private static
 //     final String catalogueModels = "#metadataCurator>div.container-fluid.container-main>div>div>div.ng-scope>div:nth-child(1)>div>div:nth-child(2)>div>ul>li:nth-child(2)>a"
     private static final long TIME_TO_REFRESH_SEARCH_RESULTS = 10000L

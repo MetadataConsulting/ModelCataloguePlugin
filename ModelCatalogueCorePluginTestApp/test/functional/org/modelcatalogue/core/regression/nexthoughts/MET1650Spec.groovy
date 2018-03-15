@@ -12,7 +12,7 @@ import spock.lang.Ignore
 @Stepwise
 @Ignore
 class MET1650Spec extends AbstractModelCatalogueGebSpec {
-    private static final myModel = "#my-models"
+    private static final String myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'
     private static final String tableImported = "td.col-md-5"
     private static final String removeButton = "a#role_item_remove-relationshipBtn"

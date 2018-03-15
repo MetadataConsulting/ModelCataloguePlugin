@@ -13,7 +13,7 @@ import spock.lang.Ignore
 @Ignore
 class MET1566Spec extends AbstractModelCatalogueGebSpec {
     private static final String modelHeaderName = 'h3.ce-name'
-    private static final myModel = "#my-models"
+    private static final String myModel = "#my-models"
     private static
     final String addItemIcon = "div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle"
 

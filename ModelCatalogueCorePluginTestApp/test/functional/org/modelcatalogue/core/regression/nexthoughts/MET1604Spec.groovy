@@ -11,7 +11,7 @@ import spock.lang.Stepwise
 @Stepwise
 @Ignore
 class MET1604Spec extends AbstractModelCatalogueGebSpec {
-    private static final myModel = "#my-models"
+    private static final String myModel = "#my-models"
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
     private static final String name = "input#name"
     private static final String policies = "input#dataModelPolicy"

@@ -12,7 +12,7 @@ import groovy.io.FileType
 @Stepwise
 @Ignore
 class MET1561Spec extends AbstractModelCatalogueGebSpec {
-    private static final myModel = "#my-models"
+    private static final String myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'
     private static final String exportButton = "a#role_item_export-menu-item-link"
     private static final String catalogueExportButton = "a#catalogue-element-export-specific-reports_12-menu-item-link"

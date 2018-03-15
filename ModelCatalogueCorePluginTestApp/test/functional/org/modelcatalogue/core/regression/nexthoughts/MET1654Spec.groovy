@@ -9,9 +9,9 @@ import spock.lang.Stepwise
 import spock.lang.Ignore
 
 @Stepwise
-@Ignore
+//@Ignore
 class MET1654Spec extends AbstractModelCatalogueGebSpec {
-    private static final myModel = "#my-models"
+    private static final String myModel = "#my-models"
     static
     final String addItemIcon = "div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle"
 

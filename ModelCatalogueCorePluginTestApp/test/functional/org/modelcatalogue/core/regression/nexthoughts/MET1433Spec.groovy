@@ -11,7 +11,7 @@ import spock.lang.Ignore
 @Stepwise
 @Ignore
 class MET1433Spec extends AbstractModelCatalogueGebSpec {
-    private static final myModel = "#my-models"
+    private static final String myModel = "#my-models"
     private static
     final String versionsTreeViews = 'ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(10)>div>span>span'
     private static final String modelHeaderName = 'h3.ce-name'
