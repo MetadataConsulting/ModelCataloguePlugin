@@ -36,6 +36,13 @@ class ActionGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
+    Number countByBatchAndStates(Batch batchParam, List<ActionState> states) {
+        Action.where {
+            batch == batchParam && state in states
+        }.count()
+    }
+
+    @Transactional(readOnly = true)
     List<Action> findAllByBatch(Batch batchParam, List<ActionState> stateList, Integer offset, Integer max) {
         DetachedCriteria<Action> query = Action.where {
             batch == batchParam && state in stateList

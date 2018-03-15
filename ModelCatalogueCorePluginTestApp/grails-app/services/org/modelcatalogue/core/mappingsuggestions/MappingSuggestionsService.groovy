@@ -92,8 +92,11 @@ class MappingSuggestionsService implements MappingsSuggestionsGateway {
     }
 
     @Override
-    Number count(MappingSuggestionCountRequest req) {
+    Number count(MappingSuggestionCountRequest req, List<ActionState> states) {
         Batch batch = batchGormService.findById(req.batchId)
+        if(states && states?.size()>0) {
+            return actionGormService.countByBatchAndStates(batch, states)
+        }
         actionGormService.countByBatch(batch)
     }
 
