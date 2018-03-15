@@ -11,7 +11,7 @@ import spock.lang.Ignore
 @Stepwise
 @Ignore
 class MET1469Spec extends AbstractModelCatalogueGebSpec {
-    private static final String  myModel = "#my-models"
+    private static final String myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'
     private static final String metadataStep = "button#step-metadata"
     private static final String label = "textarea#section-label"
@@ -40,6 +40,9 @@ class MET1469Spec extends AbstractModelCatalogueGebSpec {
     static String myCatalogue = UUID.randomUUID().toString()
     static String myDescription = "This a test element"
     static String tagName = "myTag"
+    private final static String dataModel = "Test 1"
+    private static
+    final String table = "#activity-changes>div.inf-table-body>table>tbody>tr:nth-child(1)>td.inf-table-item-cell.ng-scope.col-md-7"
 
     def "Login to Model Catalouge"() {
 
@@ -51,7 +54,6 @@ class MET1469Spec extends AbstractModelCatalogueGebSpec {
     }
 
     def "Select a finalized Data Model"() {
-        String dataModel = "Test 1"
         when: "Selected an Finalized Data Model"
         select dataModel
 
@@ -166,7 +168,6 @@ class MET1469Spec extends AbstractModelCatalogueGebSpec {
         Thread.sleep(2000l)
 
         and: 'click on the save button'
-        println("////////////////////111111111111/////////////////")
         click saveElement
 
         then: 'verify that data is created'
@@ -200,5 +201,12 @@ class MET1469Spec extends AbstractModelCatalogueGebSpec {
         then:
         check Common.rightSideTitle is 'Active Tags'
         check tagElement is tagName
+    }
+
+    def "check history"() {
+        when:
+        select dataModel
+        then:
+        check table contains tagName
     }
 }
