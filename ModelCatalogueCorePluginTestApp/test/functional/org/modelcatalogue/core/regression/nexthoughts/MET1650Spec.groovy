@@ -10,7 +10,7 @@ import spock.lang.Stepwise
 import spock.lang.Ignore
 
 @Stepwise
-@Ignore
+//@Ignore
 class MET1650Spec extends AbstractModelCatalogueGebSpec {
     private static final String myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'
@@ -18,8 +18,10 @@ class MET1650Spec extends AbstractModelCatalogueGebSpec {
     private static final String removeButton = "a#role_item_remove-relationshipBtn"
     private static final String plusButton = "span.fa-plus-square-o"
     private static final String modelCatalogue = "span.mc-name"
-    private static final String  importedDataModel= "td.col-md-5"
+    private static final String importedDataModel = "td.col-md-5"
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
+    private
+    final String table = "#activity-changes>div.inf-table-body>table>tbody>tr:nth-child(1)>td.inf-table-item-cell.ng-scope.col-md-7"
 
     static String selectModelToEdit = "Test 1"
 
@@ -62,7 +64,7 @@ class MET1650Spec extends AbstractModelCatalogueGebSpec {
 
         when: 'navigate back to the main page'
         click modelCatalogue
-        
+
         and:
         select selectModelToEdit
         selectInTree 'Imported Data Models'
@@ -81,5 +83,15 @@ class MET1650Spec extends AbstractModelCatalogueGebSpec {
 
         then: 'verify that imported is removed'
         check tableImported gone
+    }
+
+
+    def "check history"() {
+        when:
+        select selectModelToEdit
+        Thread.sleep(2000)
+        then:
+        String history = $(table).text()
+        history.contains("Deleted relationship")
     }
 }
