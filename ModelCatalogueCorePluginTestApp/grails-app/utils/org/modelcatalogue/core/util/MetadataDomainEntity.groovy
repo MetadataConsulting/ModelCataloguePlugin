@@ -142,6 +142,20 @@ class MetadataDomainEntity {
         null
     }
 
+    static String linkAjax(Long dataModelId, MetadataDomainEntity entity) {
+        String name = MetadataDomain.lowerCamelCaseDomainName(entity.domain)
+
+        if ( name ) {
+            return linkAjax(dataModelId,name, entity.id)
+        }
+        null
+    }
+
+    static String linkAjax(Long dataModelId, String lowerCamelCaseDomain, Long domainId) {
+        return "/api/modelCatalogue/core/${lowerCamelCaseDomain}/${domainId}"
+    }
+
+
     static String link(Long dataModelId, String lowerCamelCaseDomain, Long domainId) {
         return "/#/${dataModelId}/${lowerCamelCaseDomain}/${domainId}"
     }

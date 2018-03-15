@@ -5,9 +5,12 @@ import org.modelcatalogue.core.catalogueelement.DataElementCatalogueElementServi
 import org.modelcatalogue.core.catalogueelement.ManageCatalogueElementService
 import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.util.lists.CustomizableJsonListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
 import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
 class DataElementController extends AbstractCatalogueElementController<DataElement> {
 
