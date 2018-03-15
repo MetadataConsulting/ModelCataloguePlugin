@@ -10,7 +10,7 @@ import spock.lang.Ignore
 import groovy.io.FileType
 
 @Stepwise
-//@Ignore
+@Ignore
 class MET1561Spec extends AbstractModelCatalogueGebSpec {
     private static final myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'

@@ -22,11 +22,17 @@ class MET1447Spec extends AbstractModelCatalogueGebSpec {
     private static final String first_row = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)"
     private static final String dataTypeName = 'TypeMET1447'
     private static final String search = "input#dataType"
+    private static final String searchDataModel = "input#value"
     private static final String saveElement = "a#role_modal_modal-save-elementBtn"
     static String myName = " testing data element"
     static String myCatalogue = UUID.randomUUID().toString()
     static String myDescription = "This a test element"
-    private static final String dataTypeCreated = 'tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a'
+    private static final String myElement = "td.col-md-4>span>span>a"
+    private static final String dataTypeCreated1 = 'tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a'
+    private static final String dataTypeCreated2 = 'tbody.ng-scope>tr:nth-child(2)>td:nth-child(1)>span>span>a'
+    private static final String dataElement = "a#role_item_catalogue-element-menu-item-link"
+    private static final String cloneCurrentElement = "a#clone-menu-item-link"
+    private static final String modelCatalogue = "span.mc-name"
 
     def "Login to Model Catalouge"() {
 
@@ -138,6 +144,43 @@ class MET1447Spec extends AbstractModelCatalogueGebSpec {
         selectInTree 'Data Elements'
 
         then: 'verify that data is created'
-        $(dataTypeCreated).text()?.trim() == myName.trim()
+        $(dataTypeCreated1)?.text()?.trim() == myName?.trim()
+    }
+
+    def "Clone the Current Data Model"() {
+        when: 'Select the created data model'
+        click modelCatalogue
+        select uuid select 'Data Elements'
+        click myElement
+
+        and: 'navigate to the top menu and click on the data element'
+        click dataElement
+
+        and: "Click on Clone Data element"
+        click cloneCurrentElement
+
+        then:
+        check Common.modalHeader contains myName
+    }
+
+    def "Fill the data model to be cloned"() {
+        when: 'Search the data model'
+        fill searchDataModel with 'Test 1' and pick first item
+
+        click Common.modalPrimaryButton
+        Thread.sleep(5000)
+
+        then:
+        check modelHeaderName displayed
+        check modelHeaderName contains 'Test 1'
+    }
+
+    def "check the data model have the same data element"() {
+        when:
+        selectInTree 'Data Elements'
+
+        then:
+        check Common.rightSideTitle is 'Active Data Elements'
+        $(dataTypeCreated2)?.text()?.trim()?.contains(myName)
     }
 }
