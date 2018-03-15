@@ -49,7 +49,7 @@ class DashboardService {
     ValidationRuleGormService validationRuleGormService
     TagGormService tagGormService
 
-    CatalogueElementSearchResult findAllBySearchStatusQuery(Long dataModelId, MetadataDomain metadataDomain, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    CatalogueElementSearchResult findAllBySearchStatusQuery(Long dataModelId, MetadataDomain metadataDomain, SearchStatusQuery searchStatusQuery = null, SortQuery sortQuery = null, PaginationQuery paginationQuery = null) {
         if ( metadataDomain == MetadataDomain.DATA_MODEL ) {
             return findAllDataModelViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
 
