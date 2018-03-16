@@ -3,8 +3,10 @@
 <head>
     <title><g:message code="mappingsuggestions.title" default="Mapping Suggestions"/></title>
     <meta name="layout" content="main" />
+    <asset:javascript src="mdx.js"/>
 </head>
 <body>
+
 <div class="container">
     <div class="page-header">
         <h1><g:link controller="batch" action="all"><g:message code="batch.title" default="Mapping Batches"/></g:link> &rarr; <g:message code="batch.title" default="Mapping"/></h1>
@@ -17,6 +19,7 @@
                 <label>
                     <g:render template="actionState" model="[actionState: state]"/>
                 </label>
+
                 <g:checkBox name="state"
                             value="${state}"
                             checked="${filter.stateList.contains(state)}"  />
@@ -65,9 +68,9 @@
             <tr>
                 <td><g:checkBox name="mappingSuggestionIds" value="${mappingSuggestionInstance.mappingSuggestionId}" checked="false"  /></td>
                 <td>${mappingSuggestionInstance.source.code}</td>
-                <td><a href="${MetadataDomainEntity.link(sourceId, mappingSuggestionInstance.source.metadataDomainEntity)}">${mappingSuggestionInstance.source.name}</a></td>
+                <td><a class="target" data-api="${MetadataDomainEntity.linkAjax(destinationId, mappingSuggestionInstance.source.metadataDomainEntity)}" href="${MetadataDomainEntity.link(sourceId, mappingSuggestionInstance.source.metadataDomainEntity)}">${mappingSuggestionInstance.source.name}</a></td>
                 <td>${mappingSuggestionInstance.destination.code}</td>
-                <td><a href="${MetadataDomainEntity.link(destinationId, mappingSuggestionInstance.destination.metadataDomainEntity)}">${mappingSuggestionInstance.destination.name}</a></td>
+                <td><a class="target" data-api="${MetadataDomainEntity.linkAjax(destinationId, mappingSuggestionInstance.destination.metadataDomainEntity)}" href="${MetadataDomainEntity.link(destinationId, mappingSuggestionInstance.destination.metadataDomainEntity)}">${mappingSuggestionInstance.destination.name}</a></td>
                 <td>${mappingSuggestionInstance.score}</td>
                 <td><g:render template="actionState" model="[actionState: mappingSuggestionInstance.state]"/></td>
             </tr>
@@ -86,7 +89,7 @@
                     total="${pagination.total}"
                     offset="${pagination.offset}"
                     max="${pagination.max}"
-                    params="[batchId: batchId]"
+                    params="[batchId: batchId, state: filter.stateList]"
         />
         <g:message code="pagination.legend" args="[pagination.offset, Math.min(pagination.offset + pagination.max, pagination.total), pagination.total]" default="Displaying ${pagination.offset}-${Math.min(pagination.offset + pagination.max, pagination.total)} of ${pagination.total}"/>
     </div>

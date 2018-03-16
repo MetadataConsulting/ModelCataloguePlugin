@@ -577,10 +577,11 @@ class DataArchitectService {
             MatchAgainst matchAgainst = matchAgainstDependingOnDataModelSize(dataModelB)
 
             log.info 'Using match against: {}', matchAgainst.name()
-            mappingSuggestionsGeneratorService.execute(batch.id, DataClass.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
+//  currently only need to match the data elements
+//  mappingSuggestionsGeneratorService.execute(batch.id, DataClass.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
             mappingSuggestionsGeneratorService.execute(batch.id, DataElement.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
-
-            batch.name = suggestedFuzzyMappingsName(dataModelA, dataModelB)
+s
+            batch.name = suggestedFuzzyMappingsName(dsataModelA, dataModelB)
             batch.save()
 
         } catch(Exception ex){

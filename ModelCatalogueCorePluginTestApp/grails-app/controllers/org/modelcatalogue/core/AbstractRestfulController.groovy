@@ -310,7 +310,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 case DeleteBlockerReason.SOURCE_BELONGS_TO_DIFFERENT_DATAMODEL:
                 case DeleteBlockerReason.DESTINATION_BELONGS_TO_DIFFERENT_DATAMODEL:
                     return [message: "Cannot delete ${catalogueElementDeleteBlocker.elementTargetedToDeletion}. Cannot delete [${deleteBlocker.elementPreventsDeletion}] as it belongs to different data model [${deleteBlocker.elementPreventsDeletion.dataModel}]. Remove the relationship to this element first."]
-                
+
                 case DeleteBlockerReason.BELONGS_TO_DIFFERENT_DATAMODEL:
                     return [message: "Cannot delete ${catalogueElementDeleteBlocker.elementTargetedToDeletion}. Cannot delete [${deleteBlocker.elementPreventsDeletion}] as it belongs to different data model [${deleteBlocker.elementPreventsDeletion.dataModel}]. Remove the relationship to this element first."]
 
@@ -328,7 +328,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         withFormat {
             json {
-                paramArgs.max = Math.min(max ?: 25, 100)
+                paramArgs.max = Math.min(max ?: 25, 500)
             }
             xml {
                 paramArgs.max = Math.min(max ?: 10000, 10000)
@@ -353,12 +353,13 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
     protected handleParams(Integer max) {
+
         withFormat {
             json {
-                params.max = Math.min(max ?: 25, 100)
+                params.max = Math.min(max ?: 25, 500).toString()
             }
             xml {
-                params.max = Math.min(max ?: 10000, 10000)
+                params.max = Math.min(max ?: 10000, 10000).toString()
             }
         }
         if (defaultSort && !params.sort) params.sort = defaultSort

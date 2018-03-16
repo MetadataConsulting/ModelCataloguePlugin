@@ -328,7 +328,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             if (listWrapper.list instanceof CustomizableJsonListWithTotalAndType) {
                 CustomizableJsonListWithTotalAndType<T> customizable = listWrapper.list as CustomizableJsonListWithTotalAndType<T>
                 customizable.customize {
-                    it.collect { CatalogueElementMarshaller.minimalCatalogueElementJSON(it) }
+                    it.collect {
+                        CatalogueElementMarshaller.minimalCatalogueElementJSON(it)
+                    }
                 }
             }
         }

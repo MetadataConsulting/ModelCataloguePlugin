@@ -2,7 +2,7 @@ angular.module('mc.core.ui.states.mc.resource.list', ['mc.core.ui.states.control
   '$stateProvider', 'catalogueProvider',
   ($stateProvider ,  catalogueProvider) ->
 
-    DEFAULT_ITEMS_PER_PAGE = 25
+    DEFAULT_ITEMS_PER_PAGE = 500
 
     $stateProvider.state 'mc.resource.list', {
       url: '/all?page&order&sort&status&q&max&classification&display&tag'

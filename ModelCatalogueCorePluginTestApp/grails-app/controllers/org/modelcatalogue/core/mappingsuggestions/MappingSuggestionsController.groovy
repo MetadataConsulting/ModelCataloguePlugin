@@ -50,7 +50,7 @@ class MappingSuggestionsController {
                 term: cmd.term
         )
         MappingSuggestionResponse rsp = mappingsSuggestionsGateway.findAll(mappingSuggestionRequest)
-        Number total = mappingsSuggestionsGateway.count(mappingSuggestionRequest)
+        Number total = mappingsSuggestionsGateway.count(mappingSuggestionRequest, cmd.state )
         MappingSuggestionsFilter mappingSuggestionsFilter = new MappingSuggestionsFilterImpl(
                 score: mappingSuggestionRequest.scorePercentage,
                 stateList: mappingSuggestionRequest.stateList,
