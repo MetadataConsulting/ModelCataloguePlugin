@@ -219,6 +219,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         if (!element) return null
         def minimalJSON = minimalCatalogueElementJSONSkeleton(element)
         minimalJSON.remove('dataModel')
+        minimalJSON.put('semanticVersion', element.semanticVersion)
         return minimalJSON
     }
 
