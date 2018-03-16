@@ -17,8 +17,13 @@ module.config ['messagesProvider', (messagesProvider)->
                 <div class="input-group-addon with-pointer" ng-click='$dismiss()'><span class='fa fa-fw fa-close'></span></div>
               </div>
               <p class='help-block' ng-if='currentDataModel'>
-                <span ng-if="!global">Showing only results from {{currentDataModel.name}} and its imports. <a ng-if="allowGlobal" ng-click='setGlobal(true)'>Show All</a><span ng-if='allowGlobal &amp;&amp; canAddImports'> or </span><a ng-if='canAddImports' ng-click='addImport()'>Add Import</a></span>
-                <span ng-if="global">Showing all results. <a ng-click='setGlobal(false)'>Show only results from {{currentDataModel.name}} and its imports </a></span>
+                <span ng-if="!searchOptions.globalSearch">
+                  Search Imports? <input type="checkbox" ng-model="searchOptions.searchImports"/><br/>
+                  <span ng-if="searchOptions.searchImports">Showing only results from {{currentDataModel.name}} and its imports.</span>
+                  <span ng-if="!searchOptions.searchImports">Showing only results from {{currentDataModel.name}}.</span>
+                  <a ng-if="searchOptions.allowGlobal" ng-click='setGlobal(true)'>Show All</a><span ng-if='searchOptions.allowGlobal &amp;&amp; canAddImports'> or </span><a ng-if='canAddImports' ng-click='addImport()'>Add Import</a>
+                </span>
+                <span ng-if="searchOptions.globalSearch">Showing all results. <a ng-click='setGlobal(false)'>Show only results from {{currentDataModel.name}} and its imports </a></span>
               </p>
             </div>
             <div ng-if="elements.length == 0 &amp;&amp; !loading">
@@ -49,21 +54,24 @@ module.config ['messagesProvider', (messagesProvider)->
           $scope.currentDataModel = args.currentDataModel
           $scope.query = args.query
 
+          $scope.searchOptions = {}
+          $scope.searchOptions.searchImports = true
+
           if args.global == 'allow'
-            $scope.allowGlobal = true
-            $scope.global = false
+            $scope.searchOptions.allowGlobal = true
+            $scope.searchOptions.globalSearch = false
           else if args.global == true
-            $scope.allowGlobal = true
-            $scope.global = true
+            $scope.searchOptions.allowGlobal = true
+            $scope.searchOptions.globalSearch = true
           else
-            $scope.allowGlobal = false
-            $scope.global = false
+            $scope.searchOptions.allowGlobal = false
+            $scope.searchOptions.globalSearch = false
 
           $scope.canAddImports = security.hasRole('CURATOR')
 
           $scope.setGlobal = (global) ->
-            $scope.global = global
-            listOrSearch($scope.query ? args.query, replaceElements)
+            $scope.searchOptions.globalSearch = global
+            listOrSearch($scope.query ? args.query, $scope.searchOptions.searchImports, replaceElements)
 
           $scope.addImport = ->
             unless $scope.currentDataModel
@@ -73,7 +81,7 @@ module.config ['messagesProvider', (messagesProvider)->
               angular.forEach elements, (element) ->
                 unless angular.isString(element)
                   $scope.currentDataModel.imports.add(element).then ->
-                    listOrSearch($scope.query ? args.query, replaceElements)
+                    listOrSearch($scope.query ? args.query, $scope.searchOptions.searchImports, replaceElements)
 
           appendToElements = (list) ->
             $scope.list     = list
@@ -90,12 +98,12 @@ module.config ['messagesProvider', (messagesProvider)->
             $scope.loading  = not args.empty
             $scope.selected = -1
 
-          listOrSearch = (query, callback) ->
+          listOrSearch = (query, searchImports, callback) ->
             params = {}
             params.status = args.status if args.status
             params.contentType = args.contentType if args.contentType
-
-            if not $scope.global and $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
+            params.searchImports = searchImports.toString()
+            if not $scope.searchOptions.globalSearch and $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
               params.dataModel = $state.params.dataModelId
 
             if query
@@ -104,15 +112,17 @@ module.config ['messagesProvider', (messagesProvider)->
               catalogueElementResource(args.resource ? 'catalogueElement').list(params).then(callback)
 
           reset()
-          listOrSearch($scope.query ? args.query, replaceElements)
+          listOrSearch($scope.query ? args.query, $scope.searchOptions.searchImports, replaceElements)
 
           $scope.loadMore = ->
             $scope.loading = true
             $scope.list.next().then(appendToElements)
-
-          $scope.$watch 'query', (query) ->
-            $scope.loading  = if query then true else not args.empty
-            listOrSearch(query, replaceElements)
+          $scope.$watchCollection("{queryString: query, searchImports: searchOptions.searchImports}", (newObj) ->
+              listOrSearch(newObj.queryString, newObj.searchImports, replaceElements)
+          )
+#          $scope.$watch 'query', (query) ->
+#            $scope.loading  = if query then true else not args.empty
+#            listOrSearch(query, replaceElements)
 
           if $state.params.dataModelId and not $scope.currentDataModel
             catalogueElementResource('dataModel').get($state.params.dataModelId).then (dataModel) ->
