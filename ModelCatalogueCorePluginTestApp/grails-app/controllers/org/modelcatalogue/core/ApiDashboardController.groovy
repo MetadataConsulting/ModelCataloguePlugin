@@ -40,12 +40,6 @@ class ApiDashboardController {
         List<GormUrlName> measurementUnitList = dashboardService.findAllBySearchStatusQuery(dataModelId, MetadataDomain.MEASUREMENT_UNIT, null, null, null).collect {
             new GormUrlName(dataModelId: dataModelId, gormUrl: MetadataDomainEntity.stringRepresentation(new MetadataDomainEntity(domain: MetadataDomain.MEASUREMENT_UNIT, id: it.id)), name: it.name)
         } as List<GormUrlName>
-        List<GormUrlName> businessRuleList = dashboardService.findAllBySearchStatusQuery(dataModelId, MetadataDomain.BUSINESS_RULE, null, null, null).collect {
-            new GormUrlName(dataModelId: dataModelId, gormUrl: MetadataDomainEntity.stringRepresentation(new MetadataDomainEntity(domain: MetadataDomain.BUSINESS_RULE, id: it.id)), name: it.name)
-        } as List<GormUrlName>
-        List<GormUrlName> tagsList = dashboardService.findAllBySearchStatusQuery(dataModelId, MetadataDomain.TAG, null, null, null).collect {
-            new GormUrlName(dataModelId: dataModelId, gormUrl: MetadataDomainEntity.stringRepresentation(new MetadataDomainEntity(domain: MetadataDomain.TAG, id: it.id)), name: it.name)
-        } as List<GormUrlName>
         render(contentType: "application/json") {
             [
                 dataElements    : dataElementList,
@@ -53,8 +47,6 @@ class ApiDashboardController {
                 enumeratedTypes : enumeratedTypeList,
                 dataTypes       : dataTypeList,
                 measurementUnits: measurementUnitList,
-                businessRules   : businessRuleList,
-                tags            : tagsList,
             ]
         }
     }
