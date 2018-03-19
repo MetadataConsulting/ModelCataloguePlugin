@@ -32,7 +32,6 @@ class BootStrap {
     InitSecurityService initSecurityService
     MetadataSecurityService metadataSecurityService
     InitPoliciesAndTagsService initPoliciesAndTagsService
-    SetupSimpleCsvTransformationService setupSimpleCsvTransformationService
     UserGormService userGormService
     DataModelAclService dataModelAclService
 
@@ -160,6 +159,12 @@ class BootStrap {
                 log.info 'init policies and tags'
                 initPoliciesAndTagsService.initPoliciesAndTags()
 
+                log.info 'init roles'
+                initSecurityService.initRoles()
+
+                log.info 'init role hierarchy'
+                initSecurityService.initRoleHierarchyEntry()
+
                 log.info 'init users'
                 initSecurityService.initUsers()
 
@@ -256,7 +261,6 @@ class BootStrap {
                 throw new AssertionError("Failed to create relationship actions!")
             }
 
-            setupSimpleCsvTransformationService.setupSimpleCsvTransformation()
 
             DataType theType = FriendlyErrors.failFriendlySave(new DataType(name: 'data type without any data model', modelCatalogueId: 'http://www.example.com/no-data-model'))
 
@@ -281,18 +285,7 @@ class BootStrap {
                     }
                 }
             }
-            catalogueBuilder.build {
-                automatic dataType
-                dataModel(name: 'Test 3') {
-                    dataElement(name: "data element with orphaned data type")
-                }
-            }
 
-            DataElement dataElement = DataElement.findByName("data element with orphaned data type")
-
-            dataElement.dataType = theType
-
-            FriendlyErrors.failFriendlySave(dataElement)
 
             log.info "Init finished in ${new Date()}"
         } catch (e) {
