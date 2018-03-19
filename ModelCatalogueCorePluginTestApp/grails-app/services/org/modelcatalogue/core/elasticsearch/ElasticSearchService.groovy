@@ -293,6 +293,7 @@ class ElasticSearchService implements SearchCatalogue {
                     boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
                 }
 
+                boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
                 boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
                 boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
             }else{
@@ -301,6 +302,7 @@ class ElasticSearchService implements SearchCatalogue {
                     boolQuery.should(QueryBuilders.wildcardQuery(property, search).boost(boost))
                 }
 
+                boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
                 boolQuery.should(QueryBuilders.wildcardQuery('name', search.toLowerCase()).boost(200))
                 boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.wildcardQuery('ext.value', search)).boost(10))
 
@@ -316,6 +318,7 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
 
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
 
             qb = boolQuery
@@ -327,6 +330,8 @@ class ElasticSearchService implements SearchCatalogue {
             CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
+
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
 
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
 
@@ -346,7 +351,7 @@ class ElasticSearchService implements SearchCatalogue {
 
         ElasticSearchQueryList.search(params, resource, request, dataModelAclService)
     }
-    
+
     // may want to build on this query at a later date
     public <T> ElasticSearchQueryList<T> fuzzySearch(Class<T> resource, SearchParams params) {
         String search = params.search
@@ -372,14 +377,14 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
-            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
-                boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
-            }
 
+            boolQuery.should(QueryBuilders.matchQuery("name_not_analyzed", search).boost(200))
+            boolQuery.should(QueryBuilders.matchQuery("name", search).boost(200))
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(200))
+            boolQuery.should(QueryBuilders.matchQuery("description", search).boost(10))
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
             boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
-            boolQuery.should(QueryBuilders.fuzzyQuery('name', search)).boost(200)
 
             qb = boolQuery
         } else if (RelationshipType.isAssignableFrom(resource)) {
@@ -785,7 +790,7 @@ class ElasticSearchService implements SearchCatalogue {
                         // ignore and keep the latest
                         continue
                     }
-                    return Observable.error(new RuntimeException("There were error indexing at least of one item from the batch: $response.type#$response.id@$response.index", response.failure.cause))
+                    //return Observable.error(new RuntimeException("There were error indexing at least of one item from the batch: $response.type#$response.id@$response.index", response.failure.cause))
                 }
             }
             return just(it)

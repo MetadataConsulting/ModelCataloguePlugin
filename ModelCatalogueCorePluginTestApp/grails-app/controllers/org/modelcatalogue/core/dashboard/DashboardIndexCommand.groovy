@@ -10,7 +10,7 @@ import org.modelcatalogue.core.util.SortQuery
 class DashboardIndexCommand {
 
     String dataModelId
-    Integer max = 25
+    Integer max = 10
     MetadataDomain metadataDomain = MetadataDomain.DATA_MODEL
     DashboardDropdown status = DashboardDropdown.ACTIVE
     String order = 'asc'

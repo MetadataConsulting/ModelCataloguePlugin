@@ -82,6 +82,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 DataModel draft = PublishingChain.createDraft(dataModel, context.within(dataModel)).run(this, context.monitor) as DataModel
                 if (draft.hasErrors()) {
                     status?.setRollbackOnly()
+                    log.warn 'Model has errors' & draft.errors
                     return dataModel
                 }
 

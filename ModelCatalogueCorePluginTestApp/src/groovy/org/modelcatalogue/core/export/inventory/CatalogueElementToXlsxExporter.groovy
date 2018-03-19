@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.export.inventory
 
+import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
 
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_NEW
@@ -239,7 +240,10 @@ class CatalogueElementToXlsxExporter {
                 buildIntroduction(sheet, element)
             }
             sheet(CONTENT) { }
-            sheet('Changes') { }
+
+            //CHANGES DOESN'T CURRENTLY WORK
+
+//            sheet('Changes') { }
 
             //add all the sheets for classes based on the metadata
             buildDataClassesDetails(dataClasses, previousVersionElementForDiff, workbook, null)
@@ -252,32 +256,33 @@ class CatalogueElementToXlsxExporter {
             log.info "Printing all changes summary."
 
             //fill changes sheet
-            sheet('Changes') { SheetDefinition sheet ->
-                row {
-                    cell {
-                        style H1
-                        value 'Changes Summary'
-                        colspan 6
-                }
-                }
-
-
-                log.info "Sorting changes"
-                Iterable<Diff> allDiffs = Iterables.concat(computedDiffs.values().collect { it.values() })
-
-                //load diffs by class
-                //key is the class id
-                //if a data element diff is included - it's included with the class id
-
-                Map diffsByClass = getDiffsMapByClass(allDiffs)
-
-                diffsByClass.each { key, val ->
-                    printClassDetails(key, val, sheet)
-                }
-
-
-
-            }
+            //CHANGES DOESN'T CURRENTLY WORK
+//            sheet('Changes') { SheetDefinition sheet ->
+//                row {
+//                    cell {
+//                        style H1
+//                        value 'Changes Summary'
+//                        colspan 6
+//                }
+//                }
+//
+//
+//                log.info "Sorting changes"
+//                Iterable<Diff> allDiffs = Iterables.concat(computedDiffs.values().collect { it.values() })
+//
+//                //load diffs by class
+//                //key is the class id
+//                //if a data element diff is included - it's included with the class id
+//
+//                Map diffsByClass = getDiffsMapByClass(allDiffs)
+//
+//                diffsByClass.each { key, val ->
+//                    printClassDetails(key, val, sheet)
+//                }
+//
+//
+//
+//            }
 
         }
 
@@ -995,10 +1000,11 @@ class CatalogueElementToXlsxExporter {
 
         }
 
+
         if (typeHierarchy.items.any { it?.rule } || dataType?.rule) {
             sheet.row {
                 cell("F") {
-                    text 'Rules', {
+                    text 'Implicit Type Rules', {
                         size 12
                         make bold
                     }
@@ -1024,6 +1030,7 @@ class CatalogueElementToXlsxExporter {
                 }
             }
         }
+
 
         if (element.ext && printMetadata) {
             for (Map.Entry<String, String> entry in element.ext) {
@@ -1200,7 +1207,8 @@ class CatalogueElementToXlsxExporter {
 
 
         //check if the previous data model had additional top level classes so they can be included in the outline
-        List<DataClass> previousVersionDataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(previousVersionElementForDiff as DataModel), [:], true).items
+        List<DataClass> previousVersionDataClasses = []
+        if(previousVersionElementForDiff) previousVersionDataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(previousVersionElementForDiff as DataModel), [:], true).items
         List<DataClass> previousVersionDataClassesChanged = []
         for ( DataClass previousVersionDataClass : previousVersionDataClasses ) {
             //if the data class was in the previous version of the data model and isn't in the new one, then delete it

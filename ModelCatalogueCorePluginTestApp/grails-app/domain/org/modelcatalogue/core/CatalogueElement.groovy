@@ -11,11 +11,9 @@ import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.*
-import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import rx.Observer
-import java.security.acl.Acl
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model

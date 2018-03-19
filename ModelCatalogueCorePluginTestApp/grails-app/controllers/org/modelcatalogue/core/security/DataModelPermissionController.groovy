@@ -65,10 +65,10 @@ class DataModelPermissionController {
     protected List<String> warningMessages() {
         Long loggedUserId = loggedUserId()
         List<String> warningMessages = []
-        if (!userRoleGormService.hasRole(loggedUserId, MetadataRoles.ROLE_USER) ) {
+        if (!userRoleGormService.hasRole(loggedUserId, MetadataRoles.ROLE_USER) && !userRoleGormService.hasRole(loggedUserId, MetadataRoles.ROLE_SUPERVISOR)) {
             warningMessages << messageSource.getMessage('acluser.missing.roleUser', [MetadataRoles.ROLE_USER] as Object[], 'You miss role {0} necessary to grant/revoke ACL read permission', request.locale)
         }
-        if (!userRoleGormService.hasRole(loggedUserId, MetadataRoles.ROLE_ADMIN) ) {
+        if (!userRoleGormService.hasRole(loggedUserId, MetadataRoles.ROLE_ADMIN) && !userRoleGormService.hasRole(loggedUserId, MetadataRoles.ROLE_SUPERVISOR)) {
             warningMessages << messageSource.getMessage('acluser.missing.roleAdmin', [MetadataRoles.ROLE_ADMIN] as Object[], 'You miss role {0} necessary to grant/revoke ACL administration permission', request.locale)
         }
         if ( warningMessages ) {

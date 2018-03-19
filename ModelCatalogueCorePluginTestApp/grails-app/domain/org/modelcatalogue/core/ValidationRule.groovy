@@ -32,7 +32,7 @@ class ValidationRule extends CatalogueElement {
         component(nullable: true, maxSize: 255)
         ruleFocus(nullable: true, maxSize: 255)
         trigger(nullable: true, maxSize: 255)
-        rule(nullable: true, maxSize: 10000)
+        rule(nullable: true, maxSize: 100000)
         errorCondition(nullable: true, maxSize: 255)
         issueRecord(nullable: true, maxSize: 255)
         notification(nullable: true, maxSize: 255)
