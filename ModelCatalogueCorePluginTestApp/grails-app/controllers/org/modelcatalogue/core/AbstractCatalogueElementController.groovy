@@ -381,7 +381,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR') && instance.status.ordinal() >= ElementStatus.FINALIZED.ordinal()) {
+        if (!modelCatalogueSecurityService.hasRole('ROLE_SUPERVISOR') && instance.status.ordinal() >= ElementStatus.FINALIZED.ordinal()) {
             instance.errors.rejectValue 'status', 'cannot.modify.finalized.or.deprecated', 'Cannot modify element in finalized or deprecated state!'
             respond instance.errors, view: 'edit' // STATUS CODE 422
             return
