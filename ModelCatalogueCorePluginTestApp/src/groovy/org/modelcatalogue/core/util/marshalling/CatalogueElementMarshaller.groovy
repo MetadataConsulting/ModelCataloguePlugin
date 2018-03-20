@@ -210,7 +210,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                  elementType: element.getClass().name,
                  link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(),
                  status: "${element.status}".toString(),
-                 dataModel: minimalDataModelJSONSkeleton(element.dataModel)
+                 dataModel: minimalDataModelJSONSkeleton(element.dataModel),
         ]
     }
 
@@ -246,8 +246,6 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(),
         ] as Map<String, Object>
     }
-
-
 
     static Map<String, Object> minimalCatalogueElementJSON(CatalogueElement element) {
         Class entityClass = HibernateHelper.getEntityClass(element)
