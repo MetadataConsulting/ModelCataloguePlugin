@@ -98,7 +98,6 @@ class DashboardService {
                         inList("status", searchStatusQuery.statusList)
                     }
                 }
-
             }
             if ( paginationQuery ) {
                 maxResults(paginationQuery.max)
