@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.dashboard
 
 import grails.gorm.DetachedCriteria
+import grails.orm.PagedResultList
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -48,7 +49,7 @@ class DashboardService {
     ValidationRuleGormService validationRuleGormService
     TagGormService tagGormService
 
-    List findAllBySearchStatusQuery(Long dataModelId, MetadataDomain metadataDomain, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    CatalogueElementSearchResult findAllBySearchStatusQuery(Long dataModelId, MetadataDomain metadataDomain, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         if ( metadataDomain == MetadataDomain.DATA_MODEL ) {
             return findAllDataModelViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
 
@@ -73,12 +74,12 @@ class DashboardService {
         } else if ( metadataDomain == MetadataDomain.TAG) {
             return findAllTagViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
         }
-        []
+        new CatalogueElementSearchResult(total: 0, viewModels: [])
     }
 
     @CompileDynamic
-    Object resultsOfBuildableCriteriaBySearchStatusQuery(BuildableCriteria criteria, Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        criteria.list {
+    PagedResultList resultsOfBuildableCriteriaBySearchStatusQuery(BuildableCriteria criteria, Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+        def items = criteria.list(max: paginationQuery?.max, offset: paginationQuery?.offset ?: 0) {
             createAlias('dataModel', 'dataModel')
             and {
                 if (dataModelId) {
@@ -86,7 +87,16 @@ class DashboardService {
                 }
                 if ( searchStatusQuery ) {
                     if (searchStatusQuery.search) {
-                        ilike("name", "%${searchStatusQuery.search}%")
+                        if (searchStatusQuery.searchWithWhitespace) {
+
+                                ilike("name", "% ${searchStatusQuery.search} %")// ||
+//                                rlike("name", ~/.*\s${searchStatusQuery.search}$/) ||
+//                                rlike("name", ~/.*\s${searchStatusQuery.search}\s.*/)
+
+                        }
+                        else {
+                            ilike("name", "%${searchStatusQuery.search}%")
+                        }
                     }
                     if (searchStatusQuery.statusList) {
                         inList("status", searchStatusQuery.statusList)
@@ -111,6 +121,7 @@ class DashboardService {
                 property('dataModel.name', 'dataModel.name')
             }
         }
+        return items
     }
 
     @CompileDynamic
@@ -128,65 +139,65 @@ class DashboardService {
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllBusinessRuleViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    CatalogueElementSearchResult findAllBusinessRuleViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = ValidationRule.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
-        CatalogueElementViewModelUtils.ofProjections(MetadataDomain.BUSINESS_RULE, results)
+        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.BUSINESS_RULE, results))
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllMeasurementUnitViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    CatalogueElementSearchResult findAllMeasurementUnitViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = MeasurementUnit.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
-        CatalogueElementViewModelUtils.ofProjections(MetadataDomain.MEASUREMENT_UNIT, results)
+        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.MEASUREMENT_UNIT, results))
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllDataTypeViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    CatalogueElementSearchResult findAllDataTypeViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = DataType.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
-        CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_TYPE, results)
+        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_TYPE, results))
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllEnumeratedTypeViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    CatalogueElementSearchResult findAllEnumeratedTypeViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = EnumeratedType.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
-        CatalogueElementViewModelUtils.ofProjections(MetadataDomain.ENUMERATED_TYPE, results)
+        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.ENUMERATED_TYPE, results))
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllDataClassViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    CatalogueElementSearchResult findAllDataClassViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = DataClass.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
-        CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_CLASS, results)
+        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_CLASS, results))
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllDataElementViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    CatalogueElementSearchResult findAllDataElementViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = DataElement.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
-        CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_ELEMENT, results)
+        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_ELEMENT, results))
     }
 
     @Transactional(readOnly = true)
-    List<CatalogueElementViewModel> findAllTagViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    CatalogueElementSearchResult findAllTagViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         BuildableCriteria c = Tag.createCriteria()
-        Object results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
-        CatalogueElementViewModelUtils.ofProjections(MetadataDomain.TAG, results)
+        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.TAG, results))
     }
 
     @CompileDynamic
     @Transactional(readOnly = true)
-    List<DataModelViewModel> findAllDataModelViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    CatalogueElementSearchResult findAllDataModelViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         DetachedCriteria<DataModel> query = dataModelGormService.findQueryBySearchStatusQuery(searchStatusQuery, sortQuery)
         if ( dataModelId ) {
             query = query.where { id == dataModelId }
         }
         query.join('asset')
 
-        Map m = paginationQuery.toMap()
-        def results = query.list(m) {
+//        PagedResultList results = query.list(max: paginationQuery?.max, offset: paginationQuery?.offset ?: 0) {
+        Object results = query.list(max: paginationQuery?.max, offset: paginationQuery?.offset ?: 0) {
             projections {
                 property('id')
                 property('name')
@@ -196,7 +207,9 @@ class DashboardService {
             }
         }
         Map<Long, List<AssetViewModel>> dataModelToAssets = findAllAssetViewModelByPublishedStatus(results)
-        DataModelViewModelUtils.ofProjections(results, dataModelToAssets)
+//        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: DataModelViewModelUtils.ofProjections(results, dataModelToAssets))
+        new CatalogueElementSearchResult(total: countAllDataModelBySearchStatusQuery(searchStatusQuery), viewModels: DataModelViewModelUtils.ofProjections(results, dataModelToAssets))
+
     }
 
     @CompileDynamic
@@ -285,4 +298,13 @@ class DashboardService {
                 MetadataDomain.TAG
         ]
     }
+}
+
+
+
+
+@CompileStatic
+class CatalogueElementSearchResult {
+    int total
+    List viewModels
 }
