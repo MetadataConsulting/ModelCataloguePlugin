@@ -198,7 +198,10 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
 
 
     static Map<String, Object> minimalDataTypeJSONSkeleton(DataType element) {
-        return [ internalModelCatalogueId: element.defaultModelCatalogueId,
+        if ( !element ) {
+            return [:]
+        }
+        [ internalModelCatalogueId: element.defaultModelCatalogueId,
                  modelCatalogueId: element.modelCatalogueId,
                  minimal: true,
                  name: element.name,
@@ -207,10 +210,14 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                  elementType: element.getClass().name,
                  link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(),
                  status: "${element.status}".toString(),
-                 dataModel: minimalDataModelJSONSkeleton(element.dataModel)]
+                dataModel: minimalDataModelJSONSkeleton(element.dataModel)
+        ]
     }
 
     static Map<String, Object> minimalDataElementElementJSONSkeleton(DataElement element) {
+        if ( !element ) {
+            return [:]
+        }
         return [ internalModelCatalogueId: element.defaultModelCatalogueId,
                 modelCatalogueId: element.modelCatalogueId,
                 minimal: true,
@@ -224,6 +231,9 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
     }
 
     static Map<String, Object> minimalDataModelJSONSkeleton(CatalogueElement element) {
+        if ( !element ) {
+            return [:]
+        }
         return [internalModelCatalogueId: element.defaultModelCatalogueId,
                 modelCatalogueId: element.modelCatalogueId,
                 name: element.name,
@@ -301,8 +311,10 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
     }
 
     static Map<String, Object> minimalCatalogueElementJSON(DataType element) {
-        if (!element) return null
-        def minimalJSON = minimalDataTypeJSONSkeleton(element)
+        if ( !element ) {
+            return null
+        }
+        Map<String, Object>  minimalJSON = minimalDataTypeJSONSkeleton(element)
 
         Class cls = HibernateHelper.getEntityClass(element)
 
