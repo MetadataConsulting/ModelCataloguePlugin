@@ -86,7 +86,16 @@ class DashboardService {
                 }
                 if ( searchStatusQuery ) {
                     if (searchStatusQuery.search) {
-                        ilike("name", "%${searchStatusQuery.search}%")
+                        if (searchStatusQuery.searchWithWhitespace) {
+
+                                ilike("name", "% ${searchStatusQuery.search} %")// ||
+//                                rlike("name", ~/.*\s${searchStatusQuery.search}$/) ||
+//                                rlike("name", ~/.*\s${searchStatusQuery.search}\s.*/)
+
+                        }
+                        else {
+                            ilike("name", "%${searchStatusQuery.search}%")
+                        }
                     }
                     if (searchStatusQuery.statusList) {
                         inList("status", searchStatusQuery.statusList)

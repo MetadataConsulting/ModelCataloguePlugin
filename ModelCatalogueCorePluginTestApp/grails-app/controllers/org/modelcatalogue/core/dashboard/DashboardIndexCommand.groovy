@@ -16,6 +16,7 @@ class DashboardIndexCommand {
     String order = 'asc'
     String sort = 'name'
     String search
+    Boolean searchWithWhitespace = false // whether to search with whitespace around the query
     Integer offset = 0
 
     static constraints = {
@@ -30,7 +31,7 @@ class DashboardIndexCommand {
 
     SearchStatusQuery toSearchStatusQuery() {
         String search = search?.trim() ?: null
-        new SearchStatusQuery(search: search, statusList: ElementStatusUtils.of(status))
+        new SearchStatusQuery(search: search, statusList: ElementStatusUtils.of(status), searchWithWhitespace: searchWithWhitespace)
     }
 
     SortQuery toSortQuery() {

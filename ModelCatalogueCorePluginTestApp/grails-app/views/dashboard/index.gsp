@@ -11,6 +11,8 @@
             <div>
                 <div class="input-group">
                     <g:textField id="search" name="search" value="${search}" aria-label="..."/>
+                    Search With Whitespace Around Query:
+                    <g:checkBox name="searchWithWhitespace" value="${false}"/>
                     <g:select name="dataModelId" noSelection="${['null':'Select One...']}" from="${dataModelList}" optionKey="id" optionValue="name" value="${dataModelId}"/>
                     <g:select name="metadataDomain" from="${metadataDomainList}" value="${metadataDomain}"/>
                     <g:select name="status" from="${DashboardDropdown.values()}" value="${status}"/>
