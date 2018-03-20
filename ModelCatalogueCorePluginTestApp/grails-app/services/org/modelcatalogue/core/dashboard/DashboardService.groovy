@@ -202,7 +202,6 @@ class DashboardService {
         }
         Map<Long, List<AssetViewModel>> dataModelToAssets = findAllAssetViewModelByPublishedStatus(results, [PublishedStatus.PUBLISHED])
         new CatalogueElementSearchResult(total: countAllDataModelBySearchStatusQuery(searchStatusQuery), viewModels: DataModelViewModelUtils.ofProjections(results, dataModelToAssets))
-
     }
 
     @CompileDynamic
