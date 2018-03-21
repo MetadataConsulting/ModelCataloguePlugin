@@ -155,13 +155,20 @@ ORDER BY
 
         builder.build(outputStream) {
             apply ModelCatalogueStyles
+            style ('data') {
+                wrap text
+                border(left) {
+                    color black
+                    style medium
+                }
+            }
             sheet("Mapped Elements") { SheetDefinition sheetDefinition ->
                 row {
+                    style H1
                     for (String header in excelHeaders) {
                         cell {
                             value header
                             width auto
-                            style H1
                         }
                     }
                 }
@@ -173,94 +180,75 @@ ORDER BY
             }
         }
     }
-//    protected static Closure dataCellStyle = {
-//        wrap text
-//        border left, {
-//            color black
-//            style medium
-//        }
-//    }
+
     void printMapping(String siteName, deRow, SheetDefinition sheet){
         //print a row with all the mappings form the source models to the mapped models
         //get the mapped items from the source data element
 //        log.info(deRow)
         sheet.with { SheetDefinition sheetDefinition ->
             row {
+                style 'data'
                 cell {
                     value siteName
                     width auto
-//                    style dataCellStyle
                 }
                 cell {
                     value deRow[cols.lpc_model.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
                 cell {
                     value deRow[cols.lpc_code.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
                 cell {
                     value deRow[cols.lpc_name.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
 
                 //mapped items local
                 cell {
                     value deRow[cols.local_model.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
                 cell {
                     value deRow[cols.local_code.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
                 cell {
                     value deRow[cols.local_name.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
 
                 //mapped loinc items
                 cell {
                     value  deRow[cols.loinc_code.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
                 cell {
                     value deRow[cols.loinc_name.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
                 cell {
                     value deRow[cols.loinc_system.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
 
                 //mapped gel items
                 cell {
                     value deRow[cols.gel_code.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
                 cell {
                     value deRow[cols.gel_name.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
                 cell {
                     value deRow[cols.gel_openehr.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
                 cell {
                     value deRow[cols.ref_range.ordinal()]
                     width auto
-//                    style dataCellStyle
                 }
             }
         }
