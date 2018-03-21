@@ -84,12 +84,6 @@ class BootStrap {
         log.info 'init policies and tags'
         initPoliciesAndTagsService.initPoliciesAndTags()
 
-        log.info 'init users'
-        initSecurityService.initUsers()
-
-        log.info 'init user roles'
-        initSecurityService.initUserRoles()
-
         log.info 'init request maps'
         metadataSecurityService.secureUrlMappings()
 
@@ -286,6 +280,18 @@ class BootStrap {
                 }
             }
 
+            catalogueBuilder.build {
+                automatic dataType
+                dataModel(name: 'Test 3') {
+                    dataElement(name: "data element with orphaned data type")
+                }
+            }
+
+            DataElement dataElement = DataElement.findByName("data element with orphaned data type")
+
+            dataElement.dataType = theType
+
+            FriendlyErrors.failFriendlySave(dataElement)
 
             log.info "Init finished in ${new Date()}"
         } catch (e) {
