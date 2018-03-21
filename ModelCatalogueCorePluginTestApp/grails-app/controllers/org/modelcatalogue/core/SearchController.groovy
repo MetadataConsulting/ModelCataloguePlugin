@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.security.DataModelAclService
 import org.springframework.context.MessageSource
 
 import static org.springframework.http.HttpStatus.OK
@@ -19,6 +20,8 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
     CatalogueElementGormService catalogueElementGormService
 
     MessageSource messageSource
+
+    DataModelAclService dataModelAclService
 
     SearchController() {
         super(CatalogueElement, true)
@@ -45,7 +48,8 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
      * @return
      */
     def reindex() {
-        if (!modelCatalogueSecurityService.hasRole("ADMIN", getDataModel())) {
+        DataModel dataModel = getDataModel()
+        if ( !dataModelAclService.isAdminOrHasAdministratorPermission(dataModel) ) {
             unauthorized()
             return
         }
