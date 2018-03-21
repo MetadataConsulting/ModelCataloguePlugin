@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Holders
 import groovy.transform.CompileDynamic
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -11,6 +12,7 @@ import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.util.DataModelFilter
@@ -264,7 +266,7 @@ class DataModelService {
         //if you only want the active data models (draft and finalised)
         if (params?.status?.toLowerCase() == 'active') {
             //if you have the role viewer you can see drafts
-            if (modelCatalogueSecurityService.hasRole('VIEWER')) {
+            if ( SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_USER) ) {
                 return this.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                     'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
                 }), overridableDataModelFilter)
