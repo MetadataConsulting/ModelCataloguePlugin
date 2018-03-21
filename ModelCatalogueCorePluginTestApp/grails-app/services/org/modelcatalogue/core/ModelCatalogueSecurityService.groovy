@@ -15,16 +15,6 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
     }
 
     @Override
-    boolean hasRole(String role) {
-        return true
-    }
-
-    @Override
-    boolean hasRole(String role, DataModel dataModel) {
-        return true
-    }
-
-    @Override
     String encodePassword(String password) {
         return password
     }
