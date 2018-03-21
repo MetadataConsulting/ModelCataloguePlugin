@@ -112,6 +112,5 @@ class DashboardControllerSpec extends Specification {
 
         then:
         1 * controller.dashboardService.findAllBySearchStatusQuery(_, _, _, _, _)
-        1 * controller.dashboardService.countAllBySearchStatusQuery(_, _, _)
     }
 }
