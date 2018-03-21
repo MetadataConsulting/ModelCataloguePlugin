@@ -291,6 +291,8 @@ class BootStrap {
 
             dataElement.dataType = theType
 
+            FriendlyErrors.failFriendlySave(dataElement)
+
             log.info "Init finished in ${new Date()}"
         } catch (e) {
             e.printStackTrace()
