@@ -21,6 +21,8 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
 
     MessageSource messageSource
 
+    DataModelAclService dataModelAclService
+
     SearchController() {
         super(CatalogueElement, true)
     }
@@ -46,7 +48,8 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
      * @return
      */
     def reindex() {
-        if (!modelCatalogueSecurityService.hasRole("ADMIN", getDataModel())) {
+        DataModel dataModel = getDataModel()
+        if ( !dataModelAclService.isAdminOrHasAdministratorPermission(dataModel) ) {
             unauthorized()
             return
         }
