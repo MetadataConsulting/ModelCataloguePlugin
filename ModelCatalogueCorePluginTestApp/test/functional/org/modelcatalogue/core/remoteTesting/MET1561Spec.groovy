@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.regression.nexthoughts
+package org.modelcatalogue.core.remoteTesting
 
 import org.modelcatalogue.core.geb.Common
 
