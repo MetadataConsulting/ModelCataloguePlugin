@@ -55,11 +55,9 @@ class DashboardController {
                 searchStatusQuery,
                 sortQuery,
                 paginationQuery)
-        List catalogueElementList = catalogueElementSearchResult.viewModels
-
+        List catalogueElementList = catalogueElementSearchResult?.viewModels ?: []
         List<IdName> dataModelList = dashboardService.findAllDataModel()
-//        int total = dashboardService.countAllBySearchStatusQuery(dataModelId, cmd.metadataDomain, searchStatusQuery)
-        int total = catalogueElementSearchResult.total
+        int total = catalogueElementSearchResult?.total ?: 0
         [
                 dataModelList: dataModelList,
                 metadataDomain: cmd.metadataDomain,

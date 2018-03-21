@@ -88,11 +88,7 @@ class DashboardService {
                 if ( searchStatusQuery ) {
                     if (searchStatusQuery.search) {
                         if (searchStatusQuery.searchWithWhitespace) {
-
-                                ilike("name", "% ${searchStatusQuery.search} %")// ||
-//                                rlike("name", ~/.*\s${searchStatusQuery.search}$/) ||
-//                                rlike("name", ~/.*\s${searchStatusQuery.search}\s.*/)
-
+                            ilike("name", "% ${searchStatusQuery.search} %")
                         }
                         else {
                             ilike("name", "%${searchStatusQuery.search}%")
@@ -196,7 +192,6 @@ class DashboardService {
         }
         query.join('asset')
 
-//        PagedResultList results = query.list(max: paginationQuery?.max, offset: paginationQuery?.offset ?: 0) {
         Object results = query.list(max: paginationQuery?.max, offset: paginationQuery?.offset ?: 0) {
             projections {
                 property('id')
@@ -207,7 +202,6 @@ class DashboardService {
             }
         }
         Map<Long, List<AssetViewModel>> dataModelToAssets = findAllAssetViewModelByPublishedStatus(results)
-//        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: DataModelViewModelUtils.ofProjections(results, dataModelToAssets))
         new CatalogueElementSearchResult(total: countAllDataModelBySearchStatusQuery(searchStatusQuery), viewModels: DataModelViewModelUtils.ofProjections(results, dataModelToAssets))
 
     }
