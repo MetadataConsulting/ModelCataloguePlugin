@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.security.DataModelAclService
 import org.springframework.context.MessageSource
 
 import static org.springframework.http.HttpStatus.OK
