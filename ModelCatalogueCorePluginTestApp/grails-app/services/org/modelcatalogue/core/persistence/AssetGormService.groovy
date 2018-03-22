@@ -121,7 +121,7 @@ class AssetGormService implements WarnGormErrors {
 
         DetachedCriteria<Asset> query = findQueryByDataModel(dataModel)
         if ( statusList ) {
-            query = query.where { publishedStatus in statusList }
+            query = query.where { 'in'('publishedStatus', statusList) }
         }
         query
     }
