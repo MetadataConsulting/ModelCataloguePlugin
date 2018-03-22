@@ -87,6 +87,10 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         dataModelGormService.findById(id)
     }
 
+    def showAssetInAngular() {
+        redirect(url: "/#/${params.id}/asset/${params.subResourceId}")
+    }
+
     /**
      * Saves a resource
      * Overrides the base method - there is a slightly different security model
