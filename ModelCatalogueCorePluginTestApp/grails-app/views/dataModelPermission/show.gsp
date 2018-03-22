@@ -28,7 +28,7 @@
     <tbody>
     <g:each var="userAndPermissionList" in="${userAndPermissionListList}">
         <tr>
-            <th rowspan="${userAndPermissionList.permissionList.size()}">${userAndPermissionList.username}</th>
+          <td><b>${userAndPermissionList.username}</b></td>
             <g:each var="permission" in="${userAndPermissionList.permissionList}">
                 <td><sec:permissionAsString permission="${permission}"/></td>
                 <td>
