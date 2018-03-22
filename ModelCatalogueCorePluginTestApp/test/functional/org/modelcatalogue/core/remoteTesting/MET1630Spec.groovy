@@ -1,60 +1,93 @@
-package org.modelcatalogue.core.regression.nexthoughts
+package org.modelcatalogue.core.remoteTesting
 
-import org.modelcatalogue.core.geb.Common
-
-import static org.modelcatalogue.core.geb.Common.*
+import org.modelcatalogue.core.geb.CreateDataTypePage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.DataTypesPage
+import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.Stepwise
-import spock.lang.Ignore
 
 @Stepwise
-//@Ignore
 class MET1630Spec extends AbstractModelCatalogueGebSpec {
-    private static final myModel = "#my-models"
-// private static
-//     final String catalogueModels = "#metadataCurator>div.container-fluid.container-main>div>div>div.ng-scope>div:nth-child(1)>div>div:nth-child(2)>div>ul>li:nth-child(2)>a"
-    private static final long TIME_TO_REFRESH_SEARCH_RESULTS = 10000L
 
-    def "Login to Model Catalouge"() {
+    def "Login to Model Catalogue"() {
+        when: "Login to Model Catalogue as curator"
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
 
-        when: "Login using Curator Account"
-        login curator
-
-        then: "My Modal Should be displayed"
-        check myModel displayed
+        then: "then you get to DashboardPage"
+        at DashboardPage
     }
 
-    def "Select Admin Data Model"() {
+    def "select a data model for which the user has administration roles"() {
         when:
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        select 'Test 1'
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        selectInTree 'Data Types'
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 1')
 
         then:
-        check Common.rightSideTitle contains 'Active Data Types'
+        at DataModelPage
+    }
+
+    def "Within the tree, select Data Types"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Types')
+
+        then:
+        at DataTypesPage
     }
 
     def "navigate to data type creation page "() {
         when:
-        click Common.create
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
 
         then:
-        check Common.modalHeader contains 'Create Data Type'
-    }
+        dataTypesPage.areCreateButtonsVisible()
 
-    def "fill the create data type form"() {
         when:
-        println("////////////1/////////////")
-        fill Common.nameLabel with dataTypeName
-        println("////////////2/////////////")
-        fill Common.description with "my description of data type"
-        println("////////////4/////////////")
-        click Common.save
-        println("////////////8/////////////")
+        int numberOfDataTypes = dataTypesPage.count()
+        dataTypesPage.createDataTypeFromNavigation()
 
         then:
-        check Common.modalHeader contains 'Login'
+        at CreateDataTypePage
+
+        when: "fill the create data type form"
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.name = 'dataTypeName'
+        createDataTypePage.description = "my description of data type"
+        createDataTypePage.buttons.save()
+
+        then: 'user is again in the data types page'
+        at DataTypesPage
+
+        when:
+        dataTypesPage = browser.page DataTypesPage
+
+        then: 'a new data type is in the data types list'
+        waitFor { dataTypesPage.count() == ( numberOfDataTypes + 1 ) }
+
+        when: 'the user clicks the green plus button in the button'
+        numberOfDataTypes = dataTypesPage.count()
+        dataTypesPage.createDataTypeFromTableFooter()
+
+        then: 'the create data type modal opens'
+        at CreateDataTypePage
+
+        when: "fill the create data type form"
+        createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.name = 'dataTypeName 2'
+        createDataTypePage.description = "my description of data type"
+        createDataTypePage.buttons.save()
+
+        then: 'user is again in the data types page'
+        at DataTypesPage
+
+        when:
+        dataTypesPage = browser.page DataTypesPage
+
+        then: 'a new data type is in the data types list'
+        waitFor { dataTypesPage.count() == ( numberOfDataTypes + 1 ) }
+
     }
 }

@@ -1,15 +1,19 @@
-package org.modelcatalogue.core.regression.nexthoughts
+package org.modelcatalogue.core.remoteTesting
 
 import org.modelcatalogue.core.geb.Common
+import org.modelcatalogue.core.geb.CreateDataModelPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.DataTypesPage
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Issue
 
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.Stepwise
-import spock.lang.Ignore
 
 @Stepwise
-//@Ignore
 class MET1447Spec extends AbstractModelCatalogueGebSpec {
     private static final myModel = "#my-models"
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
@@ -28,61 +32,44 @@ class MET1447Spec extends AbstractModelCatalogueGebSpec {
     static String myDescription = "This a test element"
     private static final String dataTypeCreated = 'tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a'
 
+    @Issue('https://metadata.atlassian.net/browse/MET-1447')
     def "Login to Model Catalouge"() {
-
-        when: "Login using Curator Account"
-        login curator
-
-        then: "My Modal Should be displayed"
-        check myModel displayed
-        check create displayed
-    }
-
-    def "Create a Data model using Create button"() {
-        when: "Click on the create button"
-        click create
-
-        then: "Data model popup should open"
-        check modalHeader contains "Data Model Wizard"
-    }
-
-    def "Fill the form to Create Data Model"() {
-        when: "Fill the form "
-        fill name with uuid
-        fill policies with "c" and pick first item
-
-        then: "Check the policies are displayed"
-        check policies displayed
-    }
-
-    def "Click on the green button to complete the Data Model Creation"() {
-        when: "Clicked on Green Button"
-        click finishButton
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-
-        then: "Summary Should display New Data Model Creation Message"
-        check '#summary' displayed
-        $("#summary").text()
-        check '#summary' contains uuid
-    }
-
-    def "When close the data model then new created model should open"() {
-        when: "Click on the close button of model"
-
-        click Common.modalCloseButton
-
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-
-        then: "New Created Data Model Page should open"
-        check modelHeaderName displayed
-        check modelHeaderName contains uuid
-    }
-
-    def "Create a DataType"() {
         when:
-        selectInTree 'Data Types'
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
 
         then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = uuid
+        createDataModelPage.check('Default Checks')
+        createDataModelPage.submit()
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+
+        then:
+        dataModelPage.titleContains uuid
+
+        when:
+        dataModelPage.treeView.select('Data Types')
+
+        then:
+        at DataTypesPage
+
+        and:
         check Common.rightSideTitle contains 'Active Data Types'
     }
 

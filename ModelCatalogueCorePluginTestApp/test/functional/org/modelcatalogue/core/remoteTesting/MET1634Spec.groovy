@@ -1,6 +1,7 @@
-package org.modelcatalogue.core.regression.nexthoughts
+package org.modelcatalogue.core.remoteTesting
 
 import org.modelcatalogue.core.geb.Common
+import spock.lang.Issue
 
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
@@ -25,6 +26,7 @@ class MET1634Spec extends AbstractModelCatalogueGebSpec {
     private static final String table = 'tbody.ng-scope>tr:nth-child(1)>td:nth-child(4)'
     private static final String modelInTree = 'ul.catalogue-element-treeview-list-root>li>div>span>span'
 
+    @Issue('https://metadata.atlassian.net/browse/MET-1634')
     def "Login to Model Catalouge"() {
 
         when: "Login using Curator Account"

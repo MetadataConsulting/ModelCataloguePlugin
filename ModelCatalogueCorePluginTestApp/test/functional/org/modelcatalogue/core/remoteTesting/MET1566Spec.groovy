@@ -1,46 +1,46 @@
-package org.modelcatalogue.core.regression.nexthoughts
+package org.modelcatalogue.core.remoteTesting
 
 import org.modelcatalogue.core.geb.Common
-
-import static org.modelcatalogue.core.geb.Common.*
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Issue
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
+@Issue('https://metadata.atlassian.net/browse/MET-1566')
 @Stepwise
 class MET1566Spec extends AbstractModelCatalogueGebSpec {
-    private static final String modelHeaderName = 'h3.ce-name'
-    private static final myModel = "#my-models"
     private static
     final String addItemIcon = "div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle"
 
-    def "Login to Model Catalouge"() {
+    def "Login to Model Catalogue with curator and select Cancer Model"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
 
-        when: "Login using Curator Account"
-        login curator
+        then:
+        at DashboardPage
 
-        then: "My Modal Should be displayed"
-        check myModel displayed
-    }
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Cancer Model')
 
-    def "Select a finalized Data Model"() {
-        when: "Selected an Finalized Data Model"
-        select 'Cancer Model'
-
-        then: "Data Model Page Should Open"
-        check modelHeaderName displayed
-        check modelHeaderName contains 'Cancer Model'
+        then:
+        at DataModelPage
     }
 
     @Unroll("Going to Test  Add #sno for #treeItem")
     def "Navigate and Select #treeItem"() {
         when:
-        selectInTree treeItem
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select(treeItem)
 
         then:
         check Common.rightSideTitle contains "Active $treeItem"
         $(addItemIcon).displayed == false
+
         where:
         sno | treeItem
         1   | "Data Classes"
