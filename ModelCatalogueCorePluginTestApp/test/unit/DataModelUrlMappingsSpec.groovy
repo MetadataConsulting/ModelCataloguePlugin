@@ -35,6 +35,7 @@ class DataModelUrlMappingsSpec extends Specification {
         request.method = 'get'
 
         expect:
+        assertForwardUrlMapping('/dataModel/showAssetInAngular/$id', controller: 'dataModel', action: 'showAssetInAngular')
         assertForwardUrlMapping('/api/modelCatalogue/core/dataModel', controller: 'dataModel', action: 'index')
         assertForwardUrlMapping('/api/modelCatalogue/core/dataModel/search/$search', controller: 'dataModel', action: 'search')
         assertForwardUrlMapping('/api/modelCatalogue/core/dataModel/$id', controller: 'dataModel', action: 'show')

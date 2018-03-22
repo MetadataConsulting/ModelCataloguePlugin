@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.export.inventory
 
+import groovy.transform.CompileStatic
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
 
@@ -56,6 +57,7 @@ import org.modelcatalogue.core.util.lists.Lists
 @Log4j
 class CatalogueElementToXlsxExporter {
 
+    static final String CHANGES = 'Changes'
     static final String CONTENT = 'Content'
     static final String DATA_CLASSES = 'DataClasses'
     public static final String DATA_TYPE_FIRST_COLUMN = 'F'
@@ -241,10 +243,6 @@ class CatalogueElementToXlsxExporter {
             }
             sheet(CONTENT) { }
 
-            //CHANGES DOESN'T CURRENTLY WORK
-
-//            sheet('Changes') { }
-
             //add all the sheets for classes based on the metadata
             buildDataClassesDetails(dataClasses, previousVersionElementForDiff, workbook, null)
 
@@ -256,77 +254,77 @@ class CatalogueElementToXlsxExporter {
             log.info "Printing all changes summary."
 
             //fill changes sheet
-            //CHANGES DOESN'T CURRENTLY WORK
-//            sheet('Changes') { SheetDefinition sheet ->
-//                row {
-//                    cell {
-//                        style H1
-//                        value 'Changes Summary'
-//                        colspan 6
-//                }
-//                }
-//
-//
-//                log.info "Sorting changes"
-//                Iterable<Diff> allDiffs = Iterables.concat(computedDiffs.values().collect { it.values() })
-//
-//                //load diffs by class
-//                //key is the class id
-//                //if a data element diff is included - it's included with the class id
-//
-//                Map diffsByClass = getDiffsMapByClass(allDiffs)
-//
-//                diffsByClass.each { key, val ->
-//                    printClassDetails(key, val, sheet)
-//                }
-//
-//
-//
-//            }
+            sheet(CHANGES) { SheetDefinition sheet ->
+                row {
+                    cell {
+                        style H1
+                        value 'Changes Summary'
+                        colspan 6
+                    }
+                }
 
+                log.info "Sorting changes"
+                Iterable<Diff> allDiffs = Iterables.concat(computedDiffs.values().collect { it.values() })
+
+                //load diffs by class
+                //key is the class id
+                //if a data element diff is included - it's included with the class id
+
+                Map<String, Set> diffsByClass = getDiffsMapByClass(allDiffs)
+
+                diffsByClass.each { String key, Set val ->
+                    printClassDetails(key, val, sheet)
+                }
+            }
         }
 
         log.info "Exported ${GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(element).simpleName)} ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
 
     }
 
-    protected Map getDiffsMapByClass(allDiffs){
-        Map diffsByClass = [:]
+    @CompileStatic
+    protected Map<String, Set> getDiffsMapByClass(Iterable<Diff> allDiffs){
+        Map<String, Set> diffsByClass = [:]
 
-        allDiffs.each { Diff diff ->
-            if(diff!=null) {
-                Set classDiffs = []
-                classDiffs.add(diff)
-                //if this is a class use it's id as the key
-                // and add these diffs to those already recorded
-                if (diff?.element && diff.element.instanceOf(DataClass)) {
-                    //get the diffs that have already been collected
-                    if(diffsByClass.get(diff.element.name)) {
-                        classDiffs.addAll(diffsByClass.get(diff.element.name))
-                    }
-                    diffsByClass.put(diff.element.name, classDiffs)
-                } else {
-
-                    if (diff.parentClass) {
-                        //get the diffs that have already been collected using the parent id
-                        if(diffsByClass.get(diff.parentClass.name)) {
-                            classDiffs.addAll(diffsByClass.get(diff.parentClass.name))
+        if ( allDiffs ) {
+            for ( Diff diff : allDiffs ) {
+                if ( diff != null ) {
+                    Set<Diff> classDiffs = []
+                    classDiffs.add(diff)
+                    //if this is a class use it's id as the key
+                    // and add these diffs to those already recorded
+                    if (diff?.element && diff.element.instanceOf(DataClass)) {
+                        //get the diffs that have already been collected
+                        if(diffsByClass.get(diff.element.name)) {
+                            classDiffs.addAll(diffsByClass.get(diff.element.name))
                         }
-                        diffsByClass.put(diff.parentClass.name, classDiffs)
+                        diffsByClass.put(diff.element.name, classDiffs)
                     } else {
-                        //they are top level deleted diffs - so look in the otherValue
-                        if(diffsByClass.get(diff.otherValue.name)) {
-                            classDiffs.addAll(diffsByClass.get(diff.otherValue.name))
+
+                        if (diff.parentClass) {
+                            //get the diffs that have already been collected using the parent id
+                            if(diffsByClass.get(diff.parentClass.name)) {
+                                classDiffs.addAll(diffsByClass.get(diff.parentClass.name))
+                            }
+                            diffsByClass.put(diff.parentClass.name, classDiffs)
+                        } else {
+                            //they are top level deleted diffs - so look in the otherValue
+                            Object othervalue = diff.otherValue
+                            if ( othervalue.hasProperty('name') ) {
+                                String name = othervalue.properties['name'] as String
+                                if(diffsByClass.get(name)) {
+                                    classDiffs.addAll(diffsByClass.get(name))
+                                }
+                                diffsByClass.put(name, classDiffs)
+                            }
+
                         }
-                        diffsByClass.put(diff.otherValue.name, classDiffs)
                     }
                 }
             }
         }
-
         diffsByClass
     }
-
 
     protected void printClassDetails(String key, Set val,  SheetDefinition sheet){
 

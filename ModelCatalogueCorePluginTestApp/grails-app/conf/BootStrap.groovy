@@ -32,7 +32,6 @@ class BootStrap {
     InitSecurityService initSecurityService
     MetadataSecurityService metadataSecurityService
     InitPoliciesAndTagsService initPoliciesAndTagsService
-    SetupSimpleCsvTransformationService setupSimpleCsvTransformationService
     UserGormService userGormService
     DataModelAclService dataModelAclService
 
@@ -84,12 +83,6 @@ class BootStrap {
 
         log.info 'init policies and tags'
         initPoliciesAndTagsService.initPoliciesAndTags()
-
-        log.info 'init users'
-        initSecurityService.initUsers()
-
-        log.info 'init user roles'
-        initSecurityService.initUserRoles()
 
         log.info 'init request maps'
         metadataSecurityService.secureUrlMappings()
@@ -159,6 +152,12 @@ class BootStrap {
 
                 log.info 'init policies and tags'
                 initPoliciesAndTagsService.initPoliciesAndTags()
+
+                log.info 'init roles'
+                initSecurityService.initRoles()
+
+                log.info 'init role hierarchy'
+                initSecurityService.initRoleHierarchyEntry()
 
                 log.info 'init users'
                 initSecurityService.initUsers()
@@ -256,7 +255,6 @@ class BootStrap {
                 throw new AssertionError("Failed to create relationship actions!")
             }
 
-            setupSimpleCsvTransformationService.setupSimpleCsvTransformation()
 
             DataType theType = FriendlyErrors.failFriendlySave(new DataType(name: 'data type without any data model', modelCatalogueId: 'http://www.example.com/no-data-model'))
 
@@ -281,6 +279,7 @@ class BootStrap {
                     }
                 }
             }
+
             catalogueBuilder.build {
                 automatic dataType
                 dataModel(name: 'Test 3') {
