@@ -21,22 +21,22 @@ abstract class PublishingChain {
 
     protected ElementStatus initialStatus
 
-    public static PublishingChain finalize(DataModel published) {
+    public static PublishingChain createFinalizationChain(DataModel published) {
         FinalizationChain.create(published)
     }
 
-    public static PublishingChain finalize(CatalogueElement published) {
+    public static PublishingChain createFinalizationChain(CatalogueElement published) {
         if (HibernateProxyHelper.getClassWithoutInitializingProxy(published) == DataModel) {
             return FinalizationChain.create(published as DataModel)
         }
         LegacyFinalizationChain.create(published)
     }
 
-    public static PublishingChain createDraft(DataModel published, DraftContext strategy) {
+    public static PublishingChain createDraftChain(DataModel published, DraftContext strategy) {
         return DraftChain.create(published as DataModel, strategy)
     }
 
-    public static PublishingChain clone(CatalogueElement toBeCloned, CloningContext context) {
+    public static PublishingChain createCloneChain(CatalogueElement toBeCloned, CloningContext context) {
         CloningChain.create(toBeCloned, context)
     }
 
