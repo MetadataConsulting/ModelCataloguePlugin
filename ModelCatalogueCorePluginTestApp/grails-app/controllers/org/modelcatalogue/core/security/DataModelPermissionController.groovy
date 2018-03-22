@@ -54,11 +54,11 @@ class DataModelPermissionController {
 
     protected Map showModel(Long id, DataModel dataModel = null) {
         List<String> usernameList = userGormService.findAllUsername()
-        List<UserPermissionList> userPermissionsList = dataModelPermissionService.findAllUserPermissions(id)
+        List<UserAndPermissionList> userAndPermissionListList = dataModelPermissionService.findAllUserPermissions(id)
         [
                 usernameList: usernameList,
                 dataModel: dataModel ?: dataModelGormService.findById(id),
-                userPermissionsList: userPermissionsList
+                userAndPermissionListList: userAndPermissionListList
         ]
     }
 
