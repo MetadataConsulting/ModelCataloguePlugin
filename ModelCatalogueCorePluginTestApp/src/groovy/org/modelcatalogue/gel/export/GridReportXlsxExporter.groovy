@@ -1,5 +1,6 @@
 package org.modelcatalogue.gel.export
 
+import static org.modelcatalogue.gel.export.GridReportXlsxStyles.*
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import com.google.common.collect.ImmutableMap
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -15,10 +16,10 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
-import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.api.RowDefinition
+import builders.dsl.spreadsheet.builder.api.SheetDefinition
+import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 
 /**
  * GridReportXlsxExporter.groovy
@@ -38,7 +39,6 @@ class GridReportXlsxExporter  {
         return new GridReportXlsxExporter(element, dataClassService, grailsApplication,  depth)
     }
 
-
     GridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3){
         this.element = element
         this.dataClassService = dataClassService
@@ -46,13 +46,6 @@ class GridReportXlsxExporter  {
         this.depth = depth
     }
 
-    protected Closure standardCellStyle = {
-        wrap text
-        border top, {
-            color black
-            style medium
-        }
-    }
     List<DataClass> getDataClasses() {
         return getDataClassesFromModel(element as DataModel)
     }
@@ -64,38 +57,41 @@ class GridReportXlsxExporter  {
     Map<String, Closure> sheetsAfterMainSheetExport() {}
 
     void export(OutputStream outputStream) {
-        SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
+        SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
         List<DataClass> dataClasses = Collections.emptyList()
         dataClasses = getDataClasses()
 
-        builder.build(outputStream) {
-            apply ModelCatalogueStyles
+        builder.build {
+//            apply ModelCatalogueStyles
+            style(H1, h1CellStyle)
+            style(STANDARD, standardCellStyle)
+            style(ANALYSIS, analysisStyle)
+            style(TOP_BORDER, topBorderCellStyle)
+            style(TOP_LEFT_BORDER, topLeftBorderCellStyle)
+            style(LEFT_BORDER, leftBorderCellStyle)
             sheet("$element.name $element.dataModelSemanticVersion" ) { SheetDefinition sheetDefinition ->
                 row {
+                    style H1
                     cell {
                         value 'Class Hierarchy'
                         colspan depth
-                        style H1
                     }
-
                     excelHeaders.each { header ->
                         cell {
                             value header
                             width auto
-                            style H1
                         }
                     }
                 }
                 dataClasses.each { dataClass->
+                    debugLine("GridReportXlsxExporter.export() dataClass: ${dataClass.name}")
                     buildRows(sheetDefinition, dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), 1, 2)
                 }
-
             }
             sheetsAfterMainSheetExport().each{name, instructions ->
                 sheet(name, instructions)
             }
         }
-
     }
 
     /**
@@ -116,52 +112,33 @@ class GridReportXlsxExporter  {
         rowDepth
     }
 
-
     private Integer printClass(DataClass child, SheetDefinition sheet, int columnDepth, int rowDepth, int childrenSize, List outline = []) {
 
         Collection<Relationship> dataElements = child.getOutgoingRelationshipsByType(RelationshipType.containmentType)
         sheet.with { SheetDefinition sheetDefinition ->
             row(rowDepth) { RowDefinition rowDefinition ->
+                debugLine("GridReportXlsxExporter.printClass() dataClass: ${child.name}")
                 (1..depth).each{
-                    if(it==columnDepth){
+                    if (it == columnDepth) {
                         cell(columnDepth) {
                             value child.name
                             link to url "${child.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + child.defaultModelCatalogueId}"
-                            style {
-                                wrap text
-                                border top, left, {
-                                    color black
-                                    style medium
-                                }
-                            }
+                            style TOP_LEFT_BORDER
                         }
                         outline.add(it)
-                    }else if (!outline.contains(it)){
-                       cell(it){
-                           style {
-                               wrap text
-                               border top, {
-                                   color black
-                                   style medium
-                               }
-                           }
-                       }
-
+                    } else if (!outline.contains(it)){
+                        cell(it){
+                            style TOP_BORDER
+                        }
                     }
                 }
                 if (dataElements) {
                     printDataElement(rowDefinition, dataElements.head(), outline)
-                }else{
+                } else {
                     outline.each {
-                            cell(it) {
-                                style {
-                                    wrap text
-                                    border left, {
-                                        color black
-                                        style medium
-                                    }
-                                }
-                            }
+                        cell(it) {
+                            style LEFT_BORDER
+                        }
                     }
                 }
             }
@@ -181,88 +158,68 @@ class GridReportXlsxExporter  {
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
         DataElement dataElement = dataElementRelationship.destination
         Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
-        if(relatedTo.empty && dataElement?.dataType) relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
+        if (relatedTo.empty && dataElement?.dataType)
+            relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
+        debugLine("GridReportXlsxExporter.printDataElement() dataElement: ${dataElement.name}")
         rowDefinition.with {
 
-                outline.each{
-
-                    cell(it){
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-
+            outline.each {
+                cell(it){
+                    style LEFT_BORDER
                 }
+            }
 
-                cell(depth + 1) {
-                    value dataElement.name
-                    link to url "${getLoadURL(dataElement)}"
-                    style {
-                        wrap text
-                        border top, left, {
-                            color black
-                            style medium
-                        }
-                    }
+            cell(depth + 1) {
+                value dataElement.name
+                link to url "${getLoadURL(dataElement)}"
+                style TOP_LEFT_BORDER
+            }
+
+            [ "${getMultiplicity(dataElementRelationship)}",
+              "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}",
+              "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}",
+              "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}",
+              "${(dataElement?.ext.get("LabKey Field Name")) ?: ""}",
+              "${(dataElement?.ext.get("Additional Review")) ?: ""}",
+              "${(dataElement?.ext.get("Additional Rule")) ?: ""}",
+              "${(dataElement?.ext.get("Additional Rule Dependency")) ?: ""}"].each { cellValue ->
+                cell {
+                    value cellValue
+                    style STANDARD
                 }
-
-                [ "${getMultiplicity(dataElementRelationship)}",
-                  "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}",
-                  "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}",
-                  "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}",
-                  "${(dataElement?.ext.get("LabKey Field Name")) ?: ""}",
-                  "${(dataElement?.ext.get("Additional Review")) ?: ""}",
-                  "${(dataElement?.ext.get("Additional Rule")) ?: ""}",
-                  "${(dataElement?.ext.get("Additional Rule Dependency")) ?: ""}"].
-                    each{cellValue ->
-                        cell {
-                            value cellValue
-                            style standardCellStyle
-                        }
-
-                    }
-
             }
         }
+    }
 
+    String printDataType(DataType dataType) {
 
-
-    String printDataType(DataType dataType){
-
-        if(dataType.instanceOf(EnumeratedType)){
+        if (dataType.instanceOf(EnumeratedType)) {
             return dataType.prettyPrint()
         }
 
         return dataType.name
-
     }
 
-    String getMultiplicity(Relationship dataElementRelationship){
+    String getMultiplicity(Relationship dataElementRelationship) {
         String multiplicityText = " "
 
-        if(dataElementRelationship?.ext.get("Min Occurs")=="0"){
+        if (dataElementRelationship?.ext.get("Min Occurs")=="0") {
             multiplicityText += "Optional "
-        }else if(dataElementRelationship?.ext.get("Min Occurs")=="1"){
+        } else if (dataElementRelationship?.ext.get("Min Occurs")=="1") {
             multiplicityText += "Mandatory "
         }
 
-        if(dataElementRelationship?.ext.get("Max Occurs")=="*"){
+        if (dataElementRelationship?.ext.get("Max Occurs")=="*") {
             multiplicityText += "Multiple "
         }
 
-        if(dataElementRelationship.source.ext.get("http://xsd.modelcatalogue.org/section#type")=="choice"){
+        if (dataElementRelationship.source.ext.get("http://xsd.modelcatalogue.org/section#type")=="choice") {
             multiplicityText += " CHOICE "
         }
 
-        if(dataElementRelationship?.ext.get("Max Occurs") && dataElementRelationship?.ext.get("Min Occurs")){
-         multiplicityText += "(" + dataElementRelationship?.ext.get("Min Occurs") + ".." + dataElementRelationship?.ext.get("Max Occurs") + ")"
+        if (dataElementRelationship?.ext.get("Max Occurs") && dataElementRelationship?.ext.get("Min Occurs")) {
+            multiplicityText += "(" + dataElementRelationship?.ext.get("Min Occurs") + ".." + dataElementRelationship?.ext.get("Max Occurs") + ")"
         }
-
-
         multiplicityText
     }
 
