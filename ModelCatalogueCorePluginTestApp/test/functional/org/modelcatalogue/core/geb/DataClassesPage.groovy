@@ -14,5 +14,18 @@ class DataClassesPage extends Page {
     }
 
     static content = {
+        createDateClassLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
+        addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
+    }
+
+    boolean isAddItemIconVisible() {
+        if ( addItemIcon.empty ) {
+            return false
+        }
+        true
+    }
+
+    void createDataClass() {
+        createDateClassLink.click()
     }
 }

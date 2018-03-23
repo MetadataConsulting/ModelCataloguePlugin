@@ -6,33 +6,42 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.VersionsPage
 import spock.lang.Issue
+import spock.lang.Narrative
+import spock.lang.Title
 
+@Issue('https://metadata.atlassian.net/browse/MET-1433')
+@Title('Verify navigation to old version of a model using the tree view')
+@Narrative('''
+- Login to the model Catalogue
+- Click on any Data Model
+- On the tree view, click on the Versions link
+- Verify version is displaying at the end of every model
+''')
 class MET1433Spec extends GebSpec {
 
-    @Issue('https://metadata.atlassian.net/browse/MET-1433')
     void "Verify navigation to old version of a model using the tree view"() {
-        when:
+        when: 'login to the model catalogue'
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
 
         then:
         at DashboardPage
 
-        when:
+        when: 'select cancer model'
         DashboardPage dashboardPage = browser.page DashboardPage
         dashboardPage.select('Cancer Model')
 
         then:
         at DataModelPage
 
-        when:
+        when: 'On the tree view, click on the Versions link'
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select('Versions')
 
         then:
         at VersionsPage
 
-        when:
+        when: 'Verify version is displaying at the end of every model'
         VersionsPage versionsPage = browser.page VersionsPage
 
         then:

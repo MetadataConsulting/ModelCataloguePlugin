@@ -1,17 +1,16 @@
 package org.modelcatalogue.core.remoteTesting
 
 import org.modelcatalogue.core.geb.Common
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
-
-import static org.modelcatalogue.core.geb.Common.*
+import spock.lang.Shared
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.Stepwise
 
-import spock.lang.Ignore
-
 @Stepwise
-//@Ignore
+@Issue('https://metadata.atlassian.net/browse/MET-1650')
 class MET1650Spec extends AbstractModelCatalogueGebSpec {
     private static final myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'
@@ -22,23 +21,50 @@ class MET1650Spec extends AbstractModelCatalogueGebSpec {
     private static final String  importedDataModel= "td.col-md-5"
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
 
-    static String selectModelToEdit = "Test 1"
+    @Shared
+    String selectModelToEdit = "Test 1"
 
-    @Issue('https://metadata.atlassian.net/browse/MET-1650')
+//    def "Login to model catalogue (gel)"() {
+//
+//    }
+//
+//    def "select a draft model"() {
+//
+//    }
+//    def "Navigate to Import By tag"() {
+//
+//    }
+//    def "Import a data model"() {
+//
+//    }
+//    def "Check that the imported data model appears on the list of activity"() {
+//
+//    }
+//    def "Remove the imported data model"() {
+//
+//    }
+//    def "Check that Remove the imported data model appears on the list of Activity"() {
+//
+//    }
+
     def "Login to Model Catalouge"() {
+        when: "Login to Model Catalogue as curator"
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
 
-        when: "Login using Curator Account"
-        login curator
-
-        then: "My Modal Should be displayed"
-        check myModel displayed
+        then: "then you get to DashboardPage"
+        at DashboardPage
     }
 
     def "Select a finalized Data Model"() {
         when: "Selected an Finalized Data Model"
-        select selectModelToEdit
+        DashboardPage dashboardPage = browser.page(DashboardPage)
+        dashboardPage.select(selectModelToEdit)
 
-        then: "Data Model Page Should Open"
+        then:
+        at DataModelPage
+
+        and: "Data Model Page Should Open"
         check modelHeaderName displayed
         check modelHeaderName contains selectModelToEdit
     }

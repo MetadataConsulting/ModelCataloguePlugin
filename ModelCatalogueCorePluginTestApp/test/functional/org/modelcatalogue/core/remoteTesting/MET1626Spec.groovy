@@ -7,11 +7,22 @@ import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 import spock.lang.Issue
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Narrative
 import spock.lang.Shared
 import spock.lang.Stepwise
+import spock.lang.Title
 
 @Stepwise
 @Issue('https://metadata.atlassian.net/browse/MET-1626')
+@Title('Check that a curator can Add Data Model Import from Data Model tag')
+@Narrative('''
+- Login to model catalogue
+- Select a draft model
+- Navigate to the top menu and select data model
+- Scroll down and select Add Data Model Import
+- Select a data model and import
+- Check that data model is imported
+''')
 class MET1626Spec extends AbstractModelCatalogueGebSpec {
     private static final String search = "input#elements"
     private static
@@ -22,7 +33,7 @@ class MET1626Spec extends AbstractModelCatalogueGebSpec {
     @Shared
     String dataModelName = 'Test 1'
 
-    def "Login to Model catalogue"() {
+    def "Login to model catalogue"() {
         when: "Login to Model Catalogue as curator"
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')

@@ -6,8 +6,18 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Narrative
 import spock.lang.Stepwise
+import spock.lang.Title
 
+@Issue('https://metadata.atlassian.net/browse/MET-1630')
+@Title('Check that a viewer is not able to create a data type for unauthorised model')
+@Narrative('''
+- login to model catalogue
+- Select a data model user is not authorised to administrate
+- Navigate to the tree view and select Data Types
+- Click on the grey plus button
+''')
 @Stepwise
 class MET1630Spec extends AbstractModelCatalogueGebSpec {
 

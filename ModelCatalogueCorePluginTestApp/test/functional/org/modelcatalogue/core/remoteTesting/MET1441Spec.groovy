@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
+import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.CreateDataModelPage
 import org.modelcatalogue.core.geb.DashboardPage
@@ -7,18 +8,27 @@ import org.modelcatalogue.core.geb.DataClassesPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
+import spock.lang.Narrative
 import spock.lang.Shared
 import spock.lang.Stepwise
-
-import static org.modelcatalogue.core.geb.Common.*
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
+import spock.lang.Title
 
+@Issue('https://metadata.atlassian.net/browse/MET-1441')
+@Title('Verify that a curator is not able to delete a finalized Data Model after creation')
+@Narrative('''
+- Login to Model Catalogue
+- Click on Create and fill the form
+- Navigate to the top menu and click on the Data Model link
+- Scroll down and click on finalize
+- Finalized the data model 
+- On the top menu, click on the data model link
+- Click on the delete link
+''')
 @Stepwise
-class MET1441Spec extends AbstractModelCatalogueGebSpec {
+class MET1441Spec extends GebSpec {
     @Shared
     String uuid = UUID.randomUUID().toString()
-
 
     private static final myModel = "#my-models"
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
@@ -38,7 +48,6 @@ class MET1441Spec extends AbstractModelCatalogueGebSpec {
     private static final String exitButton = 'button#exit-wizard'
     private static final String modelInTree = 'ul.catalogue-element-treeview-list-root>li>div>span>span'
 
-    @Issue('https://metadata.atlassian.net/browse/MET-1441')
     def "Login to Model Catalouge"() {
         when:
         LoginPage loginPage = to LoginPage

@@ -1,11 +1,28 @@
 package org.modelcatalogue.core.remoteTesting
 
+import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
+import spock.lang.Narrative
+import spock.lang.Shared
 import spock.lang.Stepwise
+import spock.lang.Title
 
+@Issue('https://metadata.atlassian.net/browse/MET-1469')
+@Title('Verify that the history is populated according to activity made on a model')
+@Narrative('''
+- Login as curator
+- Select any Data Model
+- Create a data class
+- Create a data element
+- Edit the created data class and save
+- Create a new Tag
+''')
 @Stepwise
-class MET1469Spec extends AbstractModelCatalogueGebSpec {
+class MET1469Spec extends GebSpec {
+    @Shared
+    String nameLabel = "NEW_TESTING_MODEL"
+
     private static final myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'
     private static final String metadataStep = "button#step-metadata"
@@ -26,7 +43,6 @@ class MET1469Spec extends AbstractModelCatalogueGebSpec {
     private static final String formSection = 'ul.nav-pills>li:nth-child(1)>a'
     private static final long TIME_TO_REFRESH_SEARCH_RESULTS = 4000L
     private static final String exitButton = 'button#exit-wizard'
-    private static final String nameLabel = "NEW_TESTING_MODEL"
     private static final String saveElement = "a#role_modal_modal-save-elementBtn"
     private static final String tagElement = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(2)"
     private static final String search = "input#dataType"
@@ -36,22 +52,25 @@ class MET1469Spec extends AbstractModelCatalogueGebSpec {
     static String myDescription = "This a test element"
     static String tagName = "myTag"
 
-    @Issue('https://metadata.atlassian.net/browse/MET-1469')
-    def "Login to Model Catalouge"() {
+    def "Login as curator"() {
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
 
         then:
         at DashboardPage
+    }
 
+    def "Select any Data Model"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
         dashboardPage.select('Test 1')
 
         then:
         at DataModelPage
+    }
 
+    def "Create a data class"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select('Data Classes')
@@ -62,17 +81,19 @@ class MET1469Spec extends AbstractModelCatalogueGebSpec {
 
     def "Navigate to Create data classes page"() {
         when:
-        click Common.create
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
 
         then:
-        check Common.modalHeader contains "Data Class Wizard"
+        at CreateDataClassPage
     }
 
     def "Create a Data Class and select the created data class"() {
         when: ' fill data class step'
-        fill Common.nameLabel with nameLabel
-        fill Common.modelCatalogueId with "${UUID.randomUUID()}"
-        fill Common.description with 'THIS IS MY DATA CLASS'
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = nameLabel
+        createDataClassPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataClassPage.description = 'THIS IS MY DATA CLASS'
 
         then:
         $(metadataStep).isDisplayed()

@@ -1,86 +1,74 @@
 package org.modelcatalogue.core.remoteTesting
 
-import org.modelcatalogue.core.geb.Common
+import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.CreateDataModelPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.FinalizeDataModelPage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
-
-import static org.modelcatalogue.core.geb.Common.*
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueAction
+import spock.lang.Narrative
+import spock.lang.Shared
 import spock.lang.Stepwise
-import spock.lang.Ignore
+import spock.lang.Title
 
+@Issue('https://metadata.atlassian.net/browse/MET-1634')
+@Title('')
+@Narrative('''
+''')
 @Stepwise
-@Ignore
-class MET1634Spec extends AbstractModelCatalogueGebSpec {
-    private static final myModel = "#my-models"
-    private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
-    private static final String name = "input#name"
-    private static final String finishButton = "button#step-finish"
-    private static final long TIME_TO_REFRESH_SEARCH_RESULTS = 5000L
-    private static final String uuid = UUID.randomUUID().toString()
-    private static final String modelHeaderName = 'h3.ce-name'
-    private static final String dataModelMenuButton = 'a#role_item_catalogue-element-menu-item-link'
-    private static final String finalize = 'a#finalize-menu-item-link'
-    private static final String versionNote = 'textarea#revisionNotes'
-    private static final String finalizeButton = 'a#role_modal_modal-finalize-data-modalBtn'
+class MET1634Spec extends GebSpec {
+    @Shared
+    String uuid = UUID.randomUUID().toString()
     private static final String table = 'tbody.ng-scope>tr:nth-child(1)>td:nth-child(4)'
-    private static final String modelInTree = 'ul.catalogue-element-treeview-list-root>li>div>span>span'
 
-    @Issue('https://metadata.atlassian.net/browse/MET-1634')
-    def "Login to Model Catalouge"() {
+    def "Login to model catalogue"() {
+        when: "Login to Model Catalogue as curator"
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
 
-        when: "Login using Curator Account"
-        login curator
-
-        then: "My Modal Should be displayed"
-        check myModel displayed
-        check create displayed
+        then: "then you get to DashboardPage"
+        at DashboardPage
     }
 
-    def "Create a Data model using Create button"() {
-        when: "Click on the create button"
-        click create
+    def "Create a data model"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
 
-        then: "Data model popup should open"
-        check modalHeader contains "Data Model Wizard"
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = to CreateDataModelPage
+        createDataModelPage.name = uuid
+        createDataModelPage.submit()
+
+        then:
+        at DataModelPage
     }
 
-    def "Click on the green button to complete the Data Model Creation"() {
-        when: "Clicked on Green Button"
-        fill name with uuid
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        check finishButton displayed
-        click finishButton
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+    def "Navigate to the top menu and select Data Model, Scroll down and select Finalized"() {
+        when:
+        DataModelPage dataModelPage = to DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.dropdown.finalize()
 
-        then: "Summary Should display New Data Model Creation Message"
-        check '#summary' displayed
-        check '#summary' contains uuid
+        then:
+        at FinalizeDataModelPage
+
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = to FinalizeDataModelPage
+        finalizeDataModelPage.versionNote = 'THIS IS THE VERSION NOTE'
+        finalizeDataModelPage.submit()
+
+        then:
+        at DataModelPage
     }
 
-    def "When close the data model then new created model should open"() {
-        when: "Click on the close button of model"
-
-        click Common.modalCloseButton
-
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-
-        then: "New Created Data Model Page should open"
-        check modelHeaderName displayed
-        check modelHeaderName contains uuid
-    }
-
-    def "Finalized the Data Model"() {
-        when: "Click on the Main Menu and finalized data model"
-        click modelInTree
-        click dataModelMenuButton
-        click finalize
-
-        and:
-        fill versionNote with 'THIS IS THE VERSION NOTE'
-        click finalizeButton
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        click Common.modalPrimaryButton
+    def "Check that data model is finalized"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
 
         then:
         check table contains "$uuid (0.0.1) finalized"
