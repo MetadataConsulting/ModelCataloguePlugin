@@ -61,17 +61,23 @@ class BootStrap {
         log.info 'init role hierarchy'
         initSecurityService.initRoleHierarchyEntry()
 
-        if ( isDev() ) {
-            initDev()
+//        if ( isDev() ) {
+//            initDev()
+//
+//        } else if ( isTest() ) {
+//            initTest()
+//
+//        }  else if ( isProduction() ) {
+//            initProd()
+//            log.info 'init register reports'
+//            registerReportDescriptorsService.register()
+//        }
 
-        } else if ( isTest() ) {
-            initTest()
+        log.info 'init request maps'
+        metadataSecurityService.secureUrlMappings()
 
-        }  else if ( isProduction() ) {
-            initProd()
-            log.info 'init register reports'
-            registerReportDescriptorsService.register()
-        }
+        loginAs('davidm')
+        configureAcl()
     }
 
 
@@ -130,13 +136,19 @@ class BootStrap {
             log.info 'init request maps'
             metadataSecurityService.secureUrlMappings()
 
-            loginAs('supervisor')
+            loginAs('davidm')
             configureAcl()
+        }
+
+        User u = userGormService.findByUsername('davidm')
+        if ( u ) {
+            u.password = 'davidm'
+            userGormService.save(u)
         }
     }
 
     void initDev() {
-        initEmptyDataBase()
+        //initEmptyDataBase()
     }
 
     void initTest() {

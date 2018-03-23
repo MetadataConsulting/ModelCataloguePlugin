@@ -65,11 +65,9 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         List<DataModel> subscribedModels = subscribedModels()
 
-        boolean hasReadPermission = dataModelAclService.isAdminOrHasReadPermission(element)
-
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element,
                 type,
-                ElementService.findAllElementStatus(status, hasReadPermission),
+                ElementService.findAllElementStatus(status),
                 getOverridableDataModelFilter(dataModelId, subscribedModels)
         )
 

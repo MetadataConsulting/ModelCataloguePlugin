@@ -6,4 +6,11 @@ import groovy.transform.CompileStatic
 class SortQuery {
     String sort
     String order
+
+    Map toMap() {
+        if ( sort  != null && order != null ) {
+            return [sort: sort, order: order]
+        }
+        Collections.emptyMap()
+    }
 }

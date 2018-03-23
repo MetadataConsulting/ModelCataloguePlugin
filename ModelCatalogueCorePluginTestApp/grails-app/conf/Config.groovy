@@ -308,6 +308,10 @@ hibernate {
 
 // log4j configuration
 log4j.main = {
+    trace 'org.hibernate.type.descriptor.sql.BasicBinder'
+    debug 'org.hibernate.SQL', 'grails.app.controllers'
+    debug 'org.hibernate.SQL', 'grails.app.services'
+
     info 'grails.app.services.org.modelcatalogue'
     info 'grails.app.controllers.org.modelcatalogue'
 

@@ -21,6 +21,10 @@ class MetadataSecurityService {
         ["/dataImport/xml",  MetadataRoles.ROLE_CURATOR, HttpMethod.GET],
     ]
 
+    public static final List CHANGES_MAPPINGS = [
+            ["/changes/index",  'isAuthenticated()', HttpMethod.GET],
+    ]
+
     public static final List LOGS_MAPPINGS = [
             ["/logs/index",  MetadataRoles.ROLE_SUPERVISOR, HttpMethod.GET],
     ]
@@ -938,5 +942,6 @@ class MetadataSecurityService {
         secureMappings(DATAIMPORTCREATE_URL_MAPPINGS)
         secureMappings(REINDEXCATALOGUE_MAPPINGS)
         secureMappings(LOGS_MAPPINGS)
+        secureMappings(CHANGES_MAPPINGS)
     }
 }

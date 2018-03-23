@@ -4,6 +4,7 @@ hibernate {
     //    cache.region.factory_class = 'org.hibernate.cache.SingletonEhCacheRegionFactory' // Hibernate 3
     cache.region.factory_class = 'org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory' // Hibernate 4
 //    documentCache.region.factory_class = 'org.hibernate.documentCache.ehcache.EhCacheRegionFactory' // Hibernate 4
+    format_sql = true
 }
 
 // environment specific settings
@@ -66,6 +67,7 @@ environments {
             username = System.getenv('MDX_DB_USERNAME')//'mdradmin'
             password = System.getenv('MDX_DB_PASSWORD')//'mdradmin123'
             dbCreate = "update"
+            logsql = true
             properties {
                 maxActive = -1
                 minEvictableIdleTimeMillis=1800000
