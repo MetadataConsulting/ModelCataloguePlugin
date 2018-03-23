@@ -272,8 +272,9 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
-            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
             boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
+
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
 
 
             if(search.contains("*")) {
@@ -297,11 +298,12 @@ class ElasticSearchService implements SearchCatalogue {
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
 
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
+
             CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
 
-            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
 
             qb = boolQuery
@@ -346,13 +348,16 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
+            boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(200))
+
+            // almost subset of CATALOGUE_ELEMENT_BOOSTS
             boolQuery.should(QueryBuilders.matchQuery("name_not_analyzed", search).boost(200))
             boolQuery.should(QueryBuilders.matchQuery("name", search).boost(200))
-            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(200))
             boolQuery.should(QueryBuilders.matchQuery("description", search).boost(10))
+
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
-            boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
 
             qb = boolQuery
