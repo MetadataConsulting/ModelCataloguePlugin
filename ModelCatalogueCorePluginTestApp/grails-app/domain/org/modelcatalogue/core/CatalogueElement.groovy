@@ -413,7 +413,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     @Override
     final CatalogueElement publish(Publisher<CatalogueElement> publisher, Observer<String> monitor) {
-        preparePublishChain(PublishingChain.finalize(this)).run(publisher, monitor)
+        preparePublishChain(PublishingChain.createFinalizationChain(this)).run(publisher, monitor)
     }
 
     protected PublishingChain preparePublishChain(PublishingChain chain) { chain }
@@ -421,7 +421,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     List<CatalogueElement> collectExternalDependencies() { Collections.emptyList() }
 
     final CatalogueElement cloneElement(Publisher<CatalogueElement> publisher, CloningContext strategy) {
-        preparePublishChain(PublishingChain.clone(this, strategy)).run(publisher, strategy.monitor)
+        preparePublishChain(PublishingChain.createCloneChain(this, strategy)).run(publisher, strategy.monitor)
     }
 
     @Override

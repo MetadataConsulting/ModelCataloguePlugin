@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import org.springframework.security.acls.model.Permission
 
 @CompileStatic
-class UserPermissionList {
+class UserAndPermissionList {
     String username
     List<Permission> permissionList
 }
