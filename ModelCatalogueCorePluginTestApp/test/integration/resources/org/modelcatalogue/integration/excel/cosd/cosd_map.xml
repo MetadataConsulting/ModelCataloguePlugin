@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mcExcelConfig>
+  <headersMap>
+    <dataClassName>Data Item Section</dataClassName>
+    <dataElementID>Data item No.</dataElementID>
+    <dataElementName>Data Item Name</dataElementName> <!-- must occur-->
+    <dataElementDescription>Data Item Description</dataElementDescription>
+    <dataTypeName>Data Dictionary Element</dataTypeName>
+	  <classHierarchySeparator>;</classHierarchySeparator>
+    <dataTypeEnums>Enumerations</dataTypeEnums>
+    <metadata>Other Collections</metadata>
+    <metadata>Schema Specification*</metadata>
+    <metadata>Format</metadata>
+    <metadata>Data Type Description</metadata>
+  </headersMap>
+</mcExcelConfig>

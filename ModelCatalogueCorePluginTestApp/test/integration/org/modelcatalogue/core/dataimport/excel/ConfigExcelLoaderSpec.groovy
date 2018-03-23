@@ -37,7 +37,8 @@ class ConfigExcelLoaderSpec extends AbstractIntegrationSpec {
 
         where:
         path            | dataModelName  | headersMapXml           | dataXlsx
-        'loinc'         | 'LOINC_TEST03' | 'loinc_headers_map.xml' | 'loinc1000.xlsx'
-        'goshTestCodes' | 'GOSH_TEST1'   | 'gosh_headers_map.xml'  | 'GOSH_lab_test_codes100.xlsx'
+//        'loinc'         | 'LOINC_TEST03' | 'loinc_headers_map.xml' | 'loinc1000.xlsx'
+//        'goshTestCodes' | 'GOSH_TEST1'   | 'gosh_headers_map.xml'  | 'GOSH_lab_test_codes100.xlsx'
+        'cosd' | 'COSD'   | 'cosd_map.xml'  | 'cosd.xlsx'
     }
 }

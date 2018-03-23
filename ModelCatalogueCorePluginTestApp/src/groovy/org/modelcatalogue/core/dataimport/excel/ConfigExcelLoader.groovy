@@ -1,8 +1,10 @@
 package org.modelcatalogue.core.dataimport.excel
 
+import com.sun.jna.platform.win32.WinDef
 import grails.util.Holders
 import groovy.util.logging.Log
 import groovy.util.logging.Slf4j
+import jodd.util.StringUtil
 import org.apache.poi.ss.usermodel.*
 import org.hibernate.Session
 import org.hibernate.SessionFactory
@@ -522,6 +524,24 @@ class ConfigExcelLoader extends ExcelLoader {
         Boolean updated = false
         String dtCode = tryHeader(ConfigHeadersMap.dataTypeCode, headersMap, rowMap)
         String dtName = tryHeader(ConfigHeadersMap.dataTypeName, headersMap, rowMap)
+
+        //by default camelcase the data type
+        // (maybe remove for non COSD)
+        if(dtName) {
+            dtName = dtName.replace(/[^\w\s]/, '')
+            dtName = camelize(dtName)
+        }
+
+        String dataTypeEnumerations = tryHeader(ConfigHeadersMap.dataTypeEnumerations, headersMap, rowMap)
+
+        Map<String, String> enumerations
+
+        if(dataTypeEnumerations) {
+            String[] lines = dataTypeEnumerations?.split("\\r?\\n");
+            enumerations = dataTypeEnumerations ? parseMapStringLines(lines) : [:]
+        }
+
+
         DataType dt = null
 
         if (!(dtCode || dtName)) { // there is no code or name, so no data type
@@ -529,10 +549,17 @@ class ConfigExcelLoader extends ExcelLoader {
         }
         //see if a datatype with the model catalogue id already exists in this model
         if (dtCode && (dt = DataType.findByModelCatalogueIdAndDataModel(dtCode, dataModel))) {
+            //update the data type name
             if ((dtName ?: '') != dt.getName()) {
                 dt.setName(dtName)
                 updated = true
             }
+
+            //update the data type enums
+            if(dataTypeEnumerations){
+                dt.enumerations = enumerations
+            }
+
         } else if (dtName && (dt = DataType.findByNameAndDataModel(dtName, dataModel))) { //see if a datatype with this name already exists in this model
             if (dtCode != dt.getModelCatalogueId()) {
                 dt = null // create a new datatype further on - it is unlikely to have datatypes with the same name but different catalogue ids
@@ -542,7 +569,15 @@ class ConfigExcelLoader extends ExcelLoader {
         }
         //if no dt then create one
         if (!dt) {
-            if (mu) {
+
+
+            if(dataTypeEnumerations){
+                //create an enumerated type
+
+                def params = paramsAddCodeNameDesc([dataModel: dataModel, enumerations: enumerations], dtCode, dtName)
+                dt = new EnumeratedType(params)
+
+            } else if (mu) {
                 def params = paramsAddCodeNameDesc([dataModel: dataModel, measurementUnit: mu], dtCode, dtName)
                 dt  = new PrimitiveType(params)
             } else {
@@ -901,4 +936,22 @@ class ConfigExcelLoader extends ExcelLoader {
             return null
         }
     }
+
+
+    public static String camelize(final String source) {
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean nextToUpper = false;
+        for (char c : source.toCharArray()) {
+            if (!Character.isLetterOrDigit(c)) {
+                nextToUpper = true;
+                // do not append to builder
+            } else {
+                stringBuilder.append(nextToUpper ? Character.toUpperCase(c)
+                        : Character.toLowerCase(c));
+                nextToUpper = false;
+            }
+        }
+        return stringBuilder.toString();
+    }
+
 }
