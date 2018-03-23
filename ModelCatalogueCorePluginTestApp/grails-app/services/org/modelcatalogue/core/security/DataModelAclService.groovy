@@ -7,6 +7,7 @@ import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.persistence.UserGormService
 import org.springframework.security.acls.domain.BasePermission
 import org.springframework.security.acls.model.NotFoundException
 import org.springframework.security.acls.model.Permission
@@ -23,6 +24,8 @@ class DataModelAclService {
     SpringSecurityService springSecurityService
 
     UserDetailsService userDetailsService
+
+    UserGormService userGormService
 
     boolean hasReadPermission(Object instance) {
         DataModel dataModel = dataModelFromInstance(instance)
@@ -129,6 +132,10 @@ class DataModelAclService {
         addPermission(dataModel, BasePermission.ADMINISTRATION)
     }
 
+    void addAdministrationPermission(DataModel dataModel, String username) {
+        addPermission(dataModel, BasePermission.ADMINISTRATION, username)
+    }
+
     void addAdministrationPermission(Long dataModelId) {
         addPermission(dataModelId, BasePermission.ADMINISTRATION)
     }
@@ -137,7 +144,12 @@ class DataModelAclService {
         addPermission(dataModel, BasePermission.READ)
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+
+    void addReadPermission(DataModel dataModel, String username) {
+        addPermission(dataModel, BasePermission.READ, username)
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
     void addPermission(Long dataModelId, Permission permission) {
         String username = loggedUsername()
         if ( username == null ) {
@@ -147,14 +159,22 @@ class DataModelAclService {
         aclUtilService.addPermission(DataModel, dataModelId, username, permission)
     }
 
-    @Transactional
+    // REQUIRES_NEW: Independent physical transaction for each nested method call
+    @Transactional(propagation = Propagation.REQUIRED)
     void addPermission(DataModel dataModel, Permission permission) {
-        if ( hasPermission(dataModel, permission ) ) {
-            return
-        }
+
         String username = loggedUsername()
         if ( username == null ) {
             log.warn 'username is not set, cannot add permission'
+            return
+        }
+
+        addPermission(dataModel, permission, username)
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    void addPermission(DataModel dataModel, Permission permission, String username) {
+        if ( hasPermission(dataModel, username, permission) ) {
             return
         }
         try {
@@ -165,12 +185,23 @@ class DataModelAclService {
     }
 
     void copyPermissions(DataModel sourceModel, DataModel destinationModel){
-        if ( hasReadPermission(sourceModel) ) {
-            addReadPermission(destinationModel)
+        List<User> allUsers = userGormService.findAll([:])
+
+        allUsers.each {user ->
+            if (hasReadPermission(sourceModel, user.username)) {
+                addReadPermission(destinationModel, user.username)
+            }
+            if (hasAdministrationPermission(sourceModel, user.username)) {
+                addAdministrationPermission(destinationModel, user.username)
+            }
         }
-        if ( hasAdministratorPermission(sourceModel) ) {
-            addAdministrationPermission(destinationModel)
-        }
+//
+//        if ( hasReadPermission(sourceModel) ) {
+//            addReadPermission(destinationModel)
+//        }
+//        if ( hasAdministratorPermission(sourceModel) ) {
+//            addAdministrationPermission(destinationModel)
+//        }
     }
 
     @CompileDynamic

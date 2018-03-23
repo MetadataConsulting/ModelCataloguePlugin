@@ -201,7 +201,7 @@ class DashboardService {
                 property('semanticVersion')
             }
         }
-        Map<Long, List<AssetViewModel>> dataModelToAssets = findAllAssetViewModelByPublishedStatus(results)
+        Map<Long, List<AssetViewModel>> dataModelToAssets = findAllAssetViewModelByPublishedStatus(results, [PublishedStatus.PUBLISHED])
         new CatalogueElementSearchResult(total: countAllDataModelBySearchStatusQuery(searchStatusQuery), viewModels: DataModelViewModelUtils.ofProjections(results, dataModelToAssets))
 
     }
@@ -216,8 +216,7 @@ class DashboardService {
         }
     }
 
-    Map<Long, List<AssetViewModel>>  findAllAssetViewModelByPublishedStatus(def dataModelResults) {
-        List<PublishedStatus> statusList = []
+    Map<Long, List<AssetViewModel>>  findAllAssetViewModelByPublishedStatus(def dataModelResults, List<PublishedStatus> statusList = []) {
         List<Long> dataModelIds = collectDataModelIds(dataModelResults)
         Map<Long, List<AssetViewModel>> m = [:]
         for ( Long dataModelId : dataModelIds ) {

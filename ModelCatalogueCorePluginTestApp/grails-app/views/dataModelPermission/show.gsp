@@ -26,14 +26,14 @@
     </tr>
     </thead>
     <tbody>
-    <g:each var="userPermissions" in="${userPermissionsList}">
+    <g:each var="userAndPermissionList" in="${userAndPermissionListList}">
         <tr>
-            <th rowspan="${userPermissions.permissionList.size()}">${userPermissions.username}</th>
-            <g:each var="permission" in="${userPermissions.permissionList}">
+          <td><b>${userAndPermissionList.username}</b></td>
+            <g:each var="permission" in="${userAndPermissionList.permissionList}">
                 <td><sec:permissionAsString permission="${permission}"/></td>
                 <td>
                     <g:form action="revoke" controller="dataModelPermission" method="post">
-                        <g:hiddenField name="username" value="${userPermissions.username}" />
+                        <g:hiddenField name="username" value="${userAndPermissionList.username}" />
                         <g:hiddenField name="id" value="${dataModel.id}" />
                         <g:hiddenField name="permission" value="${sec.permissionAsString(permission: permission).toLowerCase()}" />
                         <g:actionSubmit name="revoke" action="revoke" class="btn btn-danger" value="${message(code: 'delete', default: 'Delete')}"/>
