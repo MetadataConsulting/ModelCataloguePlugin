@@ -221,34 +221,19 @@ class ElasticSearchService implements SearchCatalogue {
 
         //build query based on the relationship direction that you are searching on
         //i.e. are you searching parents of children
-        switch (direction) {
-            case RelationshipDirection.INCOMING:
-                boolQuery.should(QueryBuilders.prefixQuery('source.name', search))
-                boolQuery.should(QueryBuilders.matchQuery('source.name', search))
-                boolQuery.must(QueryBuilders.termsQuery('destination.entity_id', element.id?.toString()))
+        String sourceIfIncoming = (direction == RelationshipDirection.INCOMING) ? 'source' : 'destination'
+        String destinationIfIncoming = (direction == RelationshipDirection.INCOMING) ? 'destination' : 'source'
 
-                if (states) {
-                    boolQuery.must(QueryBuilders.termsQuery('source.status', states))
-                }
+        boolQuery.should(QueryBuilders.prefixQuery("${sourceIfIncoming}.name", search))
+        boolQuery.should(QueryBuilders.matchQuery("${sourceIfIncoming}.name", search))
+        boolQuery.must(QueryBuilders.termsQuery("${destinationIfIncoming}.entity_id", element.id?.toString()))
 
-                if (types) {
-                    boolQuery.must(QueryBuilders.termsQuery('source.fully_qualified_type', types))
-                }
-                break;
-            default:
-                boolQuery.should(QueryBuilders.prefixQuery('destination.name', search))
-                boolQuery.should(QueryBuilders.matchQuery('destination.name', search))
-                boolQuery.must(QueryBuilders.termsQuery('source.entity_id', element.id?.toString()))
+        if (states) {
+            boolQuery.must(QueryBuilders.termsQuery("${sourceIfIncoming}.status", states))
+        }
 
-                if (states) {
-                    boolQuery.must(QueryBuilders.termsQuery('destination.status', states))
-                }
-
-                if (types) {
-                    boolQuery.must(QueryBuilders.termsQuery('destination.fully_qualified_type', types))
-                }
-
-                break;
+        if (types) {
+            boolQuery.must(QueryBuilders.termsQuery("${sourceIfIncoming}.fully_qualified_type", types))
         }
 
         //collect indices that need to be searched based on params
