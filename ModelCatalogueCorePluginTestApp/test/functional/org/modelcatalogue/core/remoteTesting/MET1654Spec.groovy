@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.remoteTesting
 
 import org.modelcatalogue.core.geb.Common
+import spock.lang.Issue
 
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
@@ -15,6 +16,7 @@ class MET1654Spec extends AbstractModelCatalogueGebSpec {
     static
     final String addItemIcon = "div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle"
 
+    @Issue('https://metadata.atlassian.net/browse/MET-1654')
     def "Login to Model Catalouge"() {
 
         when: "Login using Curator Account"

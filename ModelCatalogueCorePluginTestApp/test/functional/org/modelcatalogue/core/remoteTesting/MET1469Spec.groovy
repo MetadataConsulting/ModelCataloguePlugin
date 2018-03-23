@@ -1,15 +1,10 @@
 package org.modelcatalogue.core.remoteTesting
 
-import org.modelcatalogue.core.geb.Common
-
-import static org.modelcatalogue.core.geb.Common.*
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueAction
+import org.modelcatalogue.core.geb.*
+import spock.lang.Issue
 import spock.lang.Stepwise
-import spock.lang.Ignore
 
 @Stepwise
-//@Ignore
 class MET1469Spec extends AbstractModelCatalogueGebSpec {
     private static final myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'
@@ -41,31 +36,28 @@ class MET1469Spec extends AbstractModelCatalogueGebSpec {
     static String myDescription = "This a test element"
     static String tagName = "myTag"
 
+    @Issue('https://metadata.atlassian.net/browse/MET-1469')
     def "Login to Model Catalouge"() {
-
-        when: "Login using Curator Account"
-        login curator
-
-        then: "My Modal Should be displayed"
-        check myModel displayed
-    }
-
-    def "Select a finalized Data Model"() {
-        String dataModel = "Test 1"
-        when: "Selected an Finalized Data Model"
-        select dataModel
-
-        then: "Data Model Page Should Open"
-        check modelHeaderName displayed
-        check modelHeaderName contains dataModel
-    }
-
-    def "login and navigate to the model "() {
         when:
-        selectInTree 'Data Classes'
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
 
         then:
-        check Common.rightSideTitle contains 'Active Data Classes'
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 1')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Classes')
+
+        then:
+        at DataClassesPage
     }
 
     def "Navigate to Create data classes page"() {

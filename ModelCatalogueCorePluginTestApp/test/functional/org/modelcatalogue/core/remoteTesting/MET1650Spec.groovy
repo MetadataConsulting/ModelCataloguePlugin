@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.remoteTesting
 
 import org.modelcatalogue.core.geb.Common
+import spock.lang.Issue
 
 import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
@@ -23,6 +24,7 @@ class MET1650Spec extends AbstractModelCatalogueGebSpec {
 
     static String selectModelToEdit = "Test 1"
 
+    @Issue('https://metadata.atlassian.net/browse/MET-1650')
     def "Login to Model Catalouge"() {
 
         when: "Login using Curator Account"
