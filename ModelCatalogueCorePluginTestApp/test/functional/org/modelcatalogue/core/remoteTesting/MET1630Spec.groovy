@@ -6,6 +6,7 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Stepwise
 import spock.lang.Title
