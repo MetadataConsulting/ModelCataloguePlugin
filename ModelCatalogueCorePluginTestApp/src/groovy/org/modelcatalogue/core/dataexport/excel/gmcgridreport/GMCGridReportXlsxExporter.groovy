@@ -75,16 +75,16 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
     }
 
-    @Override
-    Map<String, Closure> sheetsAfterMainSheetExport() {
-        Map<String, Closure> sheets =
-            ['Analysis': {SheetDefinition sheet -> writeAnalysis(sheet)} as Closure] +
-                systemsMap.collectEntries {name, v ->
-                    [(name), {SheetDefinition sheet -> writeSystemSheet(sheet, name)} as Closure]
-                }
-        println "Sheets: ${sheets}"
-        return sheets
-    }
+//    @Override
+//    Map<String, Closure> sheetsAfterMainSheetExport() {
+//        Map<String, Closure> sheets =
+//            ['Analysis': {SheetDefinition sheet -> writeAnalysis(sheet)} as Closure] +
+//                systemsMap.collectEntries {name, v ->
+//                    [(name), {SheetDefinition sheet -> writeSystemSheet(sheet, name)} as Closure]
+//                }
+//        println "Sheets: ${sheets}"
+//        return sheets
+//    }
     // export will do as it normally does, with new headers, and a different printDataElement, and then do sheetsAfterMainSheetExport at the end.
 
     static String noSourceMessage = 'No source identified'
