@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.Regression
+package org.modelcatalogue.core.regression
 
 import org.modelcatalogue.core.geb.CreateDataModelPage
 import org.modelcatalogue.core.geb.DashboardPage
