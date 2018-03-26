@@ -148,7 +148,7 @@ class BootStrap {
     }
 
     void initDev() {
-        //initEmptyDataBase()
+        initEmptyDataBase()
     }
 
     void initTest() {

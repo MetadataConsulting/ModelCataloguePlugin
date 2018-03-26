@@ -4,6 +4,8 @@ import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.PaginationQuery
+import org.modelcatalogue.core.util.SortQuery
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
 
@@ -11,17 +13,22 @@ class ChangeSqlService {
 
     def dataSource
 
-    ListWithTotalAndType<Change> findAllByDataModelFilter(DataModelFilter dataModels) {
-        List<Change> l = []
-        int total = 0
+    ListWithTotalAndType<Change> findAllByDataModelFilter(DataModelFilter dataModelFilter, PaginationQuery paginationQuery, SortQuery sortQuery) {
+        List<GroovyRowResult> countRows = findAllRowsByDataModelFilter(dataModelFilter, "count(*) ")
+        int total = countRows ? countRows.first()[0] as int : 0
+        List<GroovyRowResult> selectRows = findAllRowsByDataModelFilter(dataModelFilter, "`change`.id ", paginationQuery, sortQuery)
+        List<Long> ids = selectRows.collect { it[0] }
+        List<Change> l =Change.where {
+            id in (ids)
+        }.list()
         new ListWithTotalAndTypeImpl<Change>(Change, l, total)
     }
 
-    List<GroovyRowResult> findAllRowsByDataModelFilter(DataModelFilter dataModels) {
+    List<GroovyRowResult> findAllRowsByDataModelFilter(DataModelFilter dataModels, String selectQuery, PaginationQuery paginationQuery = null, SortQuery sortQuery = null) {
         final Sql sql = new Sql(dataSource)
         final String query = """\
-select `change`.id
-from `change`
+select ${selectQuery} 
+FROM `change`
 WHERE
   (
     `change`.changed_id IN (${queryByDataModelFilter(dataModels)})
@@ -31,6 +38,13 @@ WHERE
   `change`.system<>true and
   `change`.other_side<>true
 """
+        if ( paginationQuery ) {
+            query += " ${paginationQuery.toSQL()}".toString()
+        }
+        if ( sortQuery ) {
+            query += " ${sortQuery.toSQL()}".toString()
+        }
+        query = query.replaceAll('\n', '')
 
         Map params = queryMapByDataModelFilter(dataModels)
         sql.rows(query, params)

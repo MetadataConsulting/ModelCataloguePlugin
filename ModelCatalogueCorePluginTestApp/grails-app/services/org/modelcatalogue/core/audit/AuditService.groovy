@@ -4,11 +4,15 @@ import grails.gorm.DetachedCriteria
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.util.Holders
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.change.ChangeSqlService
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.PaginationQuery
+import org.modelcatalogue.core.util.SortQuery
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.messaging.core.MessageSendingOperations
@@ -33,6 +37,7 @@ class AuditService {
     def sessionFactory
     MessageSendingOperations brokerMessagingTemplate
     SpringSecurityService springSecurityService
+    ChangeSqlService changeSqlService
 
     static Callable<Auditor> auditorFactory = { throw new IllegalStateException("Application is not initialized yet") }
 
@@ -184,7 +189,7 @@ class AuditService {
         }
     }
 
-    ListWithTotalAndType<Change> getGlobalChanges(Map params, DataModelFilter dataModels) {
+    ListWithTotalAndType<Change> getGlobalChanges(GrailsParameterMap params, DataModelFilter dataModels) {
         if (!params.sort) {
             params.sort  = 'dateCreated'
             params.order = 'desc'
@@ -199,9 +204,11 @@ class AuditService {
             }
         }
 
-
         Map<String, Object> args = [:]
         String subquery = getClassifiedElementsSubQuery(dataModels, args)
+        PaginationQuery paginationQuery = PaginationQuery.of(params)
+        SortQuery sortQuery = SortQuery.of(params)
+        ListWithTotalAndType<Change> listWithTotalAndType = changeSqlService.findAllByDataModelFilter(dataModels, paginationQuery, sortQuery)
 
         //language=HQL
         Lists.fromQuery params, Change, """
