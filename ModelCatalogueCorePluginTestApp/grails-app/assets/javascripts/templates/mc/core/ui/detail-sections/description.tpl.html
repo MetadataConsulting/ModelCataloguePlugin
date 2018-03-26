@@ -1,7 +1,7 @@
 <div class="col-md-12 preserve-new-lines">
   <div>
     <small editable-textarea="copy.description" e-rows="5" e-cols="1000" class="ce-description">
-      <div ellipsis="{{element.description}}"></div>
+      <div ng-bind-html="element.description"></div> <!-- the description may be HTML. This also works if it's plaintext, though. -->
     </small>
   </div>
 </div>

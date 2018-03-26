@@ -561,7 +561,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/batch/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/batch/*", MetadataRoles.ROLE_CURATOR, HttpMethod.PUT],
             ["/api/modelCatalogue/core/batch/*", MetadataRoles.ROLE_CURATOR, HttpMethod.DELETE],
-        
+
             ["/api/modelCatalogue/core/batch/*/archive", MetadataRoles.ROLE_CURATOR, HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/run", MetadataRoles.ROLE_CURATOR, HttpMethod.POST],
             ["/api/modelCatalogue/core/batch/*/actions/*", MetadataRoles.ROLE_CURATOR, HttpMethod.GET],
@@ -665,6 +665,7 @@ class MetadataSecurityService {
     public static final List DATA_MODEL_MAPPINGS = [
             ["/dataModel/create", MetadataRoles.ROLE_CURATOR, HttpMethod.GET],
             ["/dataModel/save", MetadataRoles.ROLE_CURATOR, HttpMethod.POST],
+            ["/dataModel/showAssetInAngular/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataModel", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/dataModel", MetadataRoles.ROLE_CURATOR, HttpMethod.POST],
             ["/api/modelCatalogue/core/dataModel/search/*", 'isAuthenticated()', HttpMethod.GET],

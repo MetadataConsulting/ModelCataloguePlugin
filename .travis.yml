@@ -1,50 +1,9 @@
-language: groovy
-sudo: required
-dist: trusty
+sudo: false
 cache:
   directories:
-  - node_modules
-  - ModelCatalogueCorePluginTestApp/target/work/plugins
-  - ModelCatalogueCorePluginTestApp/node_modules
-  - ModelCatalogueCorePluginTestApp/.gradle
-  - $HOME/.m2
-  - $HOME/.grails/ivy-cache
-  - $HOME/.grails/wrapper
-  - $HOME/.gradle
-addons:
-  s3_region: eu-west-1
-  artifacts:
-    paths:
-    - $HOME/reports
-services:
-  - docker
+  - "$HOME/.gradle"
 jdk:
 - oraclejdk8
-before_install:
-- export CHROME_BIN=/usr/bin/google-chrome
-- export DISPLAY=:99.0
-- sudo apt-get update
-- sudo apt-get install -y libappindicator1 fonts-liberation
-- wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-- sudo dpkg -i google-chrome*.deb
-- /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1980x1080x16
-script:
-- echo -e "\nTest Results will be available at\n\nhttp://mc-test-results.metadata.org.uk.s3-website-eu-west-1.amazonaws.com/index.html?prefix=MetadataConsulting/ModelCataloguePlugin/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER/home/travis/reports/\n\n"
-- ModelCatalogueCorePluginTestApp/gradlew -p ModelCatalogueCorePluginTestApp runGrailsTests runKarmaTests
-after_script:
-- ModelCatalogueCorePluginTestApp/gradlew -p ModelCatalogueCorePluginTestApp collectTestReports
-before_deploy: ModelCatalogueCorePluginTestApp/gradlew -p ModelCatalogueCorePluginTestApp war
-after_deploy: ./catalogue docker notify
-deploy:
-  provider: releases
-  skip_cleanup: true
-  api_key:
-    secure: OwYHBvi8Mpb/VstwqmfPh+pvnA3xLx8ZSqtZSOTlCh6uzlP1To8Hv/mKAVjXSRrFrSL1udUais3K3yu29eX+AGAVpzZ+QYerSAY4oQWoNolBrE4O2Q6fINXk9jELJXdQU/xYiylt8WX3bYOKFsotXt2Bv3zyzsoUgaAHkk+Mp+8=
-  file:
-  - build/mc.war
-  - conf/docker/mc-config.groovy
-  on:
-    tags: true
-notifications:
-  slack:
-    secure: T234ojDb39JTjjtaNYICpTu3V0HNSwHb2LWq9cMrvDmoHjzKOOeudpel3ev1Am5/bI0WNKqQYBcIpgxJ6578425JDk0XmFR+AKJqMQdhTB9vDIvRI0p/vhoC6QbNF+Kdo6sXuOPAtqlU1L2CM/occnxbbI7mcxkjBADohmAlpbY=
+before_script:
+- rm -rf target
+script: "./travis-build.sh"

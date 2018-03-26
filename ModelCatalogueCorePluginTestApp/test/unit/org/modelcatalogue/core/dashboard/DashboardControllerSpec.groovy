@@ -28,8 +28,8 @@ class DashboardControllerSpec extends Specification {
 
         then:
         model.keySet().contains('paginationQuery')
-        model['paginationQuery'].max == 25
-        model['paginationQuery'].offset == 0
+        model['paginationQuery'].max == new DashboardIndexCommand().toPaginationQuery().max
+        model['paginationQuery'].offset == new DashboardIndexCommand().toPaginationQuery().offset
     }
 
     def "dashboard.index model contains search"() {
@@ -112,6 +112,5 @@ class DashboardControllerSpec extends Specification {
 
         then:
         1 * controller.dashboardService.findAllBySearchStatusQuery(_, _, _, _, _)
-        1 * controller.dashboardService.countAllBySearchStatusQuery(_, _, _)
     }
 }

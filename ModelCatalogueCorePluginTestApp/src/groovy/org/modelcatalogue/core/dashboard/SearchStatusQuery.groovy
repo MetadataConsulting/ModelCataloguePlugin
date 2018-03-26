@@ -7,4 +7,5 @@ import org.modelcatalogue.core.api.ElementStatus
 class SearchStatusQuery {
     List<ElementStatus> statusList
     String search
+    Boolean searchWithWhitespace
 }

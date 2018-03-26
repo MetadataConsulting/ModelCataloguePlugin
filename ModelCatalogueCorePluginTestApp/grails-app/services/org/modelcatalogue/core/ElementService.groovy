@@ -26,7 +26,6 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Legacy
 import org.modelcatalogue.core.util.MatchResultImpl
-import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -79,7 +78,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         Closure<DataModel> code = { TransactionStatus status = null ->
             return (DataModel) auditService.logNewVersionCreated(dataModel) {
-                DataModel draft = PublishingChain.createDraft(dataModel, context.within(dataModel)).run(this, context.monitor) as DataModel
+                DataModel draft = PublishingChain.createDraftChain(dataModel, context.within(dataModel)).run(this, context.monitor) as DataModel
                 if (draft.hasErrors()) {
                     status?.setRollbackOnly()
                     log.warn 'Model has errors' & draft.errors
