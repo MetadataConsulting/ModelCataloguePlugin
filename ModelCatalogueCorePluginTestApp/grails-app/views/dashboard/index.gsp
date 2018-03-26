@@ -10,9 +10,12 @@
         <g:form controller="dashboard" action="index" method="GET">
             <div>
                 <div class="input-group">
-                    <g:textField id="search" name="search" value="${search}" aria-label="..."/>
-                    Search With Whitespace Around Query:
-                    <g:checkBox name="searchWithWhitespace" value="${false}"/>
+                    <g:textField class="form-control" id="search" name="search" value="${search}" aria-label="..."/>
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="filter-btn" type="submit" value="${g.message(code:'datamodel.filter', default: 'Filter')}"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+                <div class="input-group">
                     <g:select name="dataModelId" noSelection="${['null':'Select One...']}" from="${dataModelList}" optionKey="id" optionValue="name" value="${dataModelId}"/>
                     <g:select name="metadataDomain" from="${metadataDomainList}" value="${metadataDomain}"/>
                     <g:select name="status" from="${DashboardDropdown.values()}" value="${status}"/>
