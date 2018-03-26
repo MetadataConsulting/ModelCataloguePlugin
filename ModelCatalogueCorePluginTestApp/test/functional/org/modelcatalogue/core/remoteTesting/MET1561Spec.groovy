@@ -3,6 +3,8 @@ package org.modelcatalogue.core.remoteTesting
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.HomePage
+import org.modelcatalogue.core.geb.LoginModalPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
 import org.modelcatalogue.core.geb.CatalogueAction
@@ -19,10 +21,8 @@ import spock.lang.Title
 - Open the downloaded file and verify that the status is marked as finalized
 ''')
 class MET1561Spec extends GebSpec {
-    public static final CatalogueAction exportAction = CatalogueAction.runFirst('item', 'export')
-
     def "Login to Model Catalogue"() {
-        when: 'login to MDX as curator'
+        when:
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
 
@@ -41,9 +41,9 @@ class MET1561Spec extends GebSpec {
 
     def "Examine that finalized data model is marked as finalized in the XML"() {
         when: 'click export'
-        click exportAction
+        DataModelPage dataModelPage = browser.page DataModelPage
 
         then:
-        noExceptionThrown()
+        dataModelPage.isExportVisible()
     }
 }

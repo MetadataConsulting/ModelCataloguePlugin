@@ -13,8 +13,13 @@ import spock.lang.Stepwise
 import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-1634')
-@Title('')
+@Title('Check that user is able to finalized a data model')
 @Narrative('''
+- Login to model catalogue
+- Create a data model
+- Navigate to the top menu and select Data Model
+- Scroll down and select Finalized
+- Check that data model is finalized
 ''')
 @Stepwise
 class MET1634Spec extends GebSpec {
@@ -50,7 +55,7 @@ class MET1634Spec extends GebSpec {
 
     def "Navigate to the top menu and select Data Model, Scroll down and select Finalized"() {
         when:
-        DataModelPage dataModelPage = to DataModelPage
+        DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.dropdown()
         dataModelPage.dropdown.finalize()
 
@@ -71,6 +76,6 @@ class MET1634Spec extends GebSpec {
         DataModelPage dataModelPage = browser.page DataModelPage
 
         then:
-        check table contains "$uuid (0.0.1) finalized"
+        dataModelPage.titleContains("$uuid (0.0.1) finalized")
     }
 }

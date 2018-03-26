@@ -47,10 +47,17 @@ class MET1469Spec extends GebSpec {
     private static final String tagElement = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(2)"
     private static final String search = "input#dataType"
 
-    static String myName = " testing data element "
-    static String myCatalogue = UUID.randomUUID().toString()
-    static String myDescription = "This a test element"
-    static String tagName = "myTag"
+    @Shared
+    String myName = " testing data element "
+
+    @Shared
+    String myCatalogue = UUID.randomUUID().toString()
+
+    @Shared
+    String myDescription = "This a test element"
+
+    @Shared
+    String tagName = "myTag"
 
     def "Login as curator"() {
         when:
@@ -94,84 +101,61 @@ class MET1469Spec extends GebSpec {
         createDataClassPage.name = nameLabel
         createDataClassPage.modelCatalogueId = UUID.randomUUID().toString()
         createDataClassPage.description = 'THIS IS MY DATA CLASS'
+        createDataClassPage.metadata()
+        createDataClassPage.fillMetadata foo: 'one', bar: 'two', baz: 'three', fubor: 'four'
+        createDataClassPage.parents()
+
+        createDataClassPage.formSection()
+        createDataClassPage.label = 'TEST_LABEL'
+        createDataClassPage.section = 'MY_TITLE'
+        createDataClassPage.sectionInstructions = 'this is my instruction'
+        createDataClassPage.formPageNumber = '1'
+
+        createDataClassPage.ocurrence()
+
+        createDataClassPage.minOccurs = '1'
+        createDataClassPage.maxOccurs = '10'
+
+        createDataClassPage.appearance()
+        createDataClassPage.appearanceName = ' this is my name'
+
+        createDataClassPage.elements()
+        createDataClassPage.dataElement = 'TEST_ELEMENT'
+        createDataClassPage.clickPlus()
+        createDataClassPage.raw()
+        createDataClassPage.addMetadata()
+        createDataClassPage.fillMetadata foo: 'five'
+        createDataClassPage.finish()
+        createDataClassPage.exit()
 
         then:
-        $(metadataStep).isDisplayed()
-
-        when: 'fill metadata step'
-        click metadataStep
-        fillMetadata foo: 'one', bar: 'two', baz: 'three', fubor: 'four'
-
-        and: 'click on parent button'
-        click parentStep
-
-        then:
-        check finishButton displayed
-
-        when: 'fill parent step'
-        click formSection
-        fill label with 'TEST_LABEL'
-        fill section_title with 'MY_TITLE'
-        fill instruction with 'this is my instruction'
-        fill page_number with '1'
-
-        and: 'click on occurrence '
-        click occurrence
-
-        then:
-        check finishButton displayed
-
-        when:
-        fillMetadata 'Min Occurs': '1', 'Max Occurs': '10'
-        // click on appearance
-        click appearance
-        fill name with ' this is my name'
-
-        then:
-        check elementStep displayed
-
-        when: 'fill Element'
-        click elementStep
-        fill dataElement with 'TEST_ELEMENT'
-        click plusButton
-        click raw
-
-        and:
-        click Common.modalSuccessButton
-        fillMetadata foo: 'five'
-
-        and: 'click green button'
-        click finishButton
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        click exitButton
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-
-        then:
-        check wizardSummary contains "NEW_TESTING_MODEL"
+        at DataClassesPage
     }
 
     def "Create Data Element"() {
         when:
-        selectInTree 'Data Elements'
+        DataClassesPage dataClassesPage = browser.page(DataClassesPage)
+        dataClassesPage.treeView.select('Data Elements')
 
         then:
-        check Common.rightSideTitle is 'Active Data Elements'
+        at DataElementsPage
     }
 
     def "navigate to data element creation page"() {
         when:
-        click Common.create
+        DataElementsPage dataElementsPage = browser.page(DataElementsPage)
+        dataElementsPage.createDataElement()
+
         then:
-        check Common.modalHeader contains 'Create Data Element'
+        at CreateDataElementPage
     }
 
     def "fill the create data element form"() {
         when:
-        fill Common.nameLabel with myName
-
-        fill Common.modelCatalogueId with myCatalogue
-
-        fill Common.description with myDescription
+        CreateDataElementPage createDataElementPage = browser.page(CreateDataElementPage)
+        createDataElementPage.name = myName
+        createDataElementPage.modelCatalogueId = myCatalogue
+        createDataElementPage.description = myDescription
 
         and: 'select a data type'
 
@@ -188,30 +172,37 @@ class MET1469Spec extends GebSpec {
 
     def "create tag"() {
         when:
-        selectInTree 'Tags'
+        DataElementsPage dataElementsPage = browser.page(DataElementsPage)
+        dataElementsPage.treeView.select('Tags')
 
         then:
-        check Common.rightSideTitle is 'Active Tags'
+        at TagsPage
     }
 
 
     def "navigate to tag creation page"() {
         when:
-        click Common.create
+        TagsPage tagsPage = browser.page(TagsPage)
+        tagsPage.createTag()
+
         then:
-        check Common.modalHeader contains 'Create Tag'
+        at CreateTagPage
     }
 
     def "fill tag form"() {
         when:
-        fill Common.nameLabel with tagName
-        fill Common.description with myDescription
-        click saveElement
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        selectInTree 'Tags'
+        CreateTagPage createTagPage = browser.page(CreateTagPage)
+        createTagPage.name = tagName
+        createTagPage.description = myDescription
+        createTagPage.save()
 
         then:
-        check Common.rightSideTitle is 'Active Tags'
-        check tagElement is tagName
+        at TagsPage
+
+        when:
+        TagsPage tagsPage = browser.page(TagsPage)
+
+        then:
+        tagsPage.count() == 1
     }
 }

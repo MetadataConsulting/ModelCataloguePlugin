@@ -5,25 +5,29 @@ import geb.Module
 class DataModelNavModule extends Module {
 
     static content = {
-        finalizeLink(wait: true) { $('li#finalize-menu-item a') }
-        creteNewVersionLink(wait: true) { $('li#create-new-version-menu-item a') }
-        archiveLink(wait: true) { $('li#archive-menu-item a') }
-        deleteLink(wait: true) { $('li#delete-menu-item a') }
-        addImportLink(wait: true) { $('li#add-import-menu-item a') }
-        createNewRelationshipLink(wait: true) { $('li#create-new-relationship-menu-item a') }
-        createDataClassLink(wait: true) { $('li#catalogue-element-create-dataClass-menu-item a') }
-        createDataElementLink(wait: true) { $('li#catalogue-element-create-dataElement-menu-item a') }
-        createDataTypeLink(wait: true) { $('li#catalogue-element-create-dataType-menu-item a') }
-        createMeasurementUnitLink(wait: true) { $('li#catalogue-element-create-measurementUnit-menu-item a') }
-        createAssetLink(wait: true) { $('li#catalogue-element-create-asset-menu-item a') }
-        createValidationRuleLink(wait: true) { $('li#catalogue-element-create-validationRule-menu-item a') }
-        mergeLink(wait: true) { $('li#merge-menu-item a') }
-        cloneAnotherIntoCurrentLink(wait: true) { $('li#clone-from-menu-item a') }
-        cloneCurrentIntoAnotherLink(wait: true) { $('li#clone-menu-item a') }
+        finalizeLink(required: false, wait: true) { $('a#finalize-menu-item-link') }
+        creteNewVersionLink(required: false, wait: true) { $('li#create-new-version-menu-item a') }
+        archiveLink(required: false, wait: true) { $('li#archive-menu-item a') }
+        deleteLink(required: false, wait: true) { $('li#delete-menu-item a') }
+        addImportLink(required: false,  wait: true) { $('li#add-import-menu-item a') }
+        createNewRelationshipLink(required: false, wait: true) { $('li#create-new-relationship-menu-item a') }
+        createDataClassLink(required: false, wait: true) { $('li#catalogue-element-create-dataClass-menu-item a') }
+        createDataElementLink(required: false, wait: true) { $('li#catalogue-element-create-dataElement-menu-item a') }
+        createDataTypeLink(required: false, wait: true) { $('li#catalogue-element-create-dataType-menu-item a') }
+        createMeasurementUnitLink(required: false, wait: true) { $('li#catalogue-element-create-measurementUnit-menu-item a') }
+        createAssetLink(required: false, wait: true) { $('li#catalogue-element-create-asset-menu-item a') }
+        createValidationRuleLink(required: false, wait: true) { $('li#catalogue-element-create-validationRule-menu-item a') }
+        mergeLink(required: false, wait: true) { $('li#merge-menu-item a') }
+        cloneAnotherIntoCurrentLink(required: false, wait: true) { $('li#clone-from-menu-item a') }
+        cloneCurrentIntoAnotherLink(required: false, wait: true) { $('li#clone-menu-item a') }
     }
 
+    boolean existsDelete() {
+        !deleteLink.empty
+    }
     void finalize() {
         finalizeLink.click()
+        sleep(3000)
     }
 
     void createNewVersion() {

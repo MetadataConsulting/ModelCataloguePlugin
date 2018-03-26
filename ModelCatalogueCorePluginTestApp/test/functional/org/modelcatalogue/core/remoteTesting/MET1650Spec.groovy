@@ -5,12 +5,23 @@ import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
+import spock.lang.Narrative
 import spock.lang.Shared
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
+import spock.lang.Title
 
 @Stepwise
 @Issue('https://metadata.atlassian.net/browse/MET-1650')
+@Title('Remove the imported data model appears in the list of Activity')
+@Narrative('''
+- Login to model catalogue (gel)
+-  Select a draft model
+- Navigate to Import By tag
+-  Import a data model
+- Check that the imported data model appears on the list of activity
+- Remove the imported data model
+''')
 class MET1650Spec extends AbstractModelCatalogueGebSpec {
     private static final myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'

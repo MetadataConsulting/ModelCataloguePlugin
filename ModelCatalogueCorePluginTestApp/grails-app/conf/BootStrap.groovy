@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.reports.RegisterReportDescriptorsService
 import org.modelcatalogue.core.security.*
@@ -34,6 +35,7 @@ class BootStrap {
     InitPoliciesAndTagsService initPoliciesAndTagsService
     UserGormService userGormService
     DataModelAclService dataModelAclService
+    DataModelGormService dataModelGormService
 
     def init = { servletContext ->
         log.info "BootStrap:addExtensionModules()"
@@ -174,6 +176,10 @@ class BootStrap {
                 log.info 'configure acl'
                 loginAs('curator')
                 configureAcl()
+
+                DataModel dataModel = DataModel.findByName('Cancer Model')
+                dataModelAclService.addReadPermission(dataModel, 'user')
+
             }
             if ( !skipReindex() ) {
                 log.info 'init reindexing catalogue'

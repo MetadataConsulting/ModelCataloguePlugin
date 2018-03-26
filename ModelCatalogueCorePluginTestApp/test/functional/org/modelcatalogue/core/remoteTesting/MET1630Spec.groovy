@@ -77,28 +77,5 @@ class MET1630Spec extends AbstractModelCatalogueGebSpec {
 
         then: 'a new data type is in the data types list'
         waitFor { dataTypesPage.count() == ( numberOfDataTypes + 1 ) }
-
-        when: 'the user clicks the green plus button in the button'
-        numberOfDataTypes = dataTypesPage.count()
-        dataTypesPage.createDataTypeFromTableFooter()
-
-        then: 'the create data type modal opens'
-        at CreateDataTypePage
-
-        when: "fill the create data type form"
-        createDataTypePage = browser.page CreateDataTypePage
-        createDataTypePage.name = 'dataTypeName 2'
-        createDataTypePage.description = "my description of data type"
-        createDataTypePage.buttons.save()
-
-        then: 'user is again in the data types page'
-        at DataTypesPage
-
-        when:
-        dataTypesPage = browser.page DataTypesPage
-
-        then: 'a new data type is in the data types list'
-        waitFor { dataTypesPage.count() == ( numberOfDataTypes + 1 ) }
-
     }
 }
