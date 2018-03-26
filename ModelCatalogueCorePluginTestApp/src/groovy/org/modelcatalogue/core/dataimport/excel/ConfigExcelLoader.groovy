@@ -848,7 +848,7 @@ class ConfigExcelLoader extends ExcelLoader {
      */
     def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName) {
         int rowNum = 1
-        if (rowMaps && headersMap) {
+        if (rowMaps != null && headersMap != null) {
             DataModel dataModel = processDataModel(dataModelName)
 
             for (Map<String, String> rowMap in rowMaps) {
