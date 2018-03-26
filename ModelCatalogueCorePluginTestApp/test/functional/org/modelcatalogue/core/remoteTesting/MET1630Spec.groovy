@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
+import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.CreateDataTypePage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
@@ -20,7 +21,7 @@ import spock.lang.Title
 - Click on the grey plus button
 ''')
 @Stepwise
-class MET1630Spec extends AbstractModelCatalogueGebSpec {
+class MET1630Spec extends GebSpec {
 
     def "Login to Model Catalogue"() {
         when: "Login to Model Catalogue as curator"

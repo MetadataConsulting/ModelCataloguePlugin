@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
+import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
@@ -23,7 +24,7 @@ import spock.lang.Title
 - Select a data model and import
 - Check that data model is imported
 ''')
-class MET1626Spec extends AbstractModelCatalogueGebSpec {
+class MET1626Spec extends GebSpec {
     private static final String search = "input#elements"
     private static
     final String table = "#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-7 > span > span > code"

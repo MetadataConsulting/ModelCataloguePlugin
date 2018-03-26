@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
+import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
@@ -22,7 +23,7 @@ import spock.lang.Title
 - Check that the imported data model appears on the list of activity
 - Remove the imported data model
 ''')
-class MET1650Spec extends AbstractModelCatalogueGebSpec {
+class MET1650Spec extends GebSpec {
     private static final myModel = "#my-models"
     private static final String modelHeaderName = 'h3.ce-name'
     private static final String tableImported = "td.col-md-5"

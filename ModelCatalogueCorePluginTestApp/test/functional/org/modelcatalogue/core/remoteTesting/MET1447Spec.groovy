@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
+import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.CreateDataModelPage
 import org.modelcatalogue.core.geb.CreateDataTypePage
@@ -31,7 +32,7 @@ import spock.lang.Stepwise
 - Verify that Data Element and Type are cloned
 ''')
 @Stepwise
-class MET1447Spec extends AbstractModelCatalogueGebSpec {
+class MET1447Spec extends GebSpec {
 
     @Shared
     String uuid = UUID.randomUUID().toString()
