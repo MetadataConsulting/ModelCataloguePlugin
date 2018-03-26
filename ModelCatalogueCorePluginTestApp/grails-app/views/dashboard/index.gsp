@@ -12,7 +12,7 @@
                 <div class="input-group">
                     <g:textField class="form-control" id="search" name="search" value="${search}" aria-label="..."/>
                     <div class="input-group-btn">
-                        <button class="btn btn-default" id="filter-btn" type="submit" value="${g.message(code:'datamodel.filter', default: 'Filter')}"><i class="fas fa-search"></i></button>
+                        <button class="btn btn-default" id="search-btn" type="submit" value="${g.message(code:'datamodel.filter', default: 'Filter')}"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
                 <div class="input-group">
