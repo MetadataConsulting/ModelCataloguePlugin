@@ -24,8 +24,8 @@ The Model Catalogue Plugin  allows users to define datasets as general platform-
 ## Development
 
 Note from James:
-
-There are a number of misnomers in this project, first of all the project itself being called ModelCataloguePlugin; secondly, the actual (Grails) app is in the subdirectory called ModelCatalogueCorePluginTestApp, and it is neither a test nor a plugin. All development, including gradle running, should be done in ModelCatalogueCorePluginTestApp.
+The grails app is in the subdirectory called ModelCatalogueCorePluginTestApp. 
+All development, including gradle running, should be done in ModelCatalogueCorePluginTestApp.
 
 
  * [Technology Stack](docs/development/frameworks/index.md)
@@ -48,5 +48,5 @@ There are a number of misnomers in this project, first of all the project itself
 
 ## Credits
 The model catalogue is maintained by [Metadata Consulting](http://www.metadataconsulting.co.uk).
-We also wish to thank [Genomics England](http://www.genomicsengland.co.uk/), [the Medical Research Council](http://www.mrc.ac.uk/) and [NIHR](http://www.nihr.ac.uk/) for their support, as well as Charles Chrichton, Jim Davies, Steve Harris, Matous Kucera, Adam Milward, David Milward, Vladimir Orany, Soheil Saifipour and James Welch
+We also wish to thank [Genomics England](http://www.genomicsengland.co.uk/), [the Medical Research Council](http://www.mrc.ac.uk/) and [NIHR](http://www.nihr.ac.uk/) for their support, as well as Charles Chrichton, John Cross, James Dai, Jim Davies, Sergio del Amo Caballero, Steve Harris, Matous Kucera, Adam Milward, David Milward, Vladimir Orany, Soheil Saifipour and James Welch.
 
