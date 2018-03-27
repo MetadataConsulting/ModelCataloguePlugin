@@ -2,7 +2,9 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.EnumeratedTypeController
 import spock.lang.Specification
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ System.getProperty('IGNORE_URLMAPPINGS') })
 @TestFor(EnumeratedTypeUrlMappings)
 @Mock(EnumeratedTypeController)
 class EnumeratedTypeUrlMappingsSpec extends Specification {

@@ -39,32 +39,6 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         return springSecurityService.isLoggedIn()
     }
 
-
-    //check if a user is authorised for a particular model
-    boolean hasRole(String authority, DataModel dataModel) {
-        //if no role is passed, can't have that role
-        if (!authority) {
-            return false
-        }
-        Collection<String> roles = MetadataRolesUtils.getRolesFromAuthority(authority)
-        if ( !SpringSecurityUtils.ifAnyGranted(roles.join(',')) ) {
-            return false
-        }
-        dataModelAclService.isAdminOrHasReadPermission(dataModel)
-    }
-
-    //check if a user a general role
-    //this is used for very general activities like creating models or viewing draft models
-
-    boolean hasRole(String authority) {
-        //if no role is passed, can't have that role
-        if (!authority) {
-            return false
-        }
-        String roles = MetadataRolesUtils.getRolesFromAuthority(authority).join(',')
-        return SpringSecurityUtils.ifAnyGranted(roles)
-    }
-
     String encodePassword(String password) {
         return springSecurityService.encodePassword(password)
     }

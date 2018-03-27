@@ -11,5 +11,17 @@
 *= require grails
 *= require main
 *= require mobile
+*= require jquery-ui.min
 *= require_self
 */
+
+
+.popover-content {
+    word-wrap: break-word;
+}
+
+.popover{
+    max-width: 100%; /* Max Width of the popover (depending on the container!) */
+    max-height: 100%;
+}
+

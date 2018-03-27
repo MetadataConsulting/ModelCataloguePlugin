@@ -1,20 +1,23 @@
-package org.modelcatalogue.core.Regression
+package org.modelcatalogue.core.regression
+
+import org.modelcatalogue.core.geb.CreateDataModelPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.getDescription
 import static org.modelcatalogue.core.geb.Common.getModalHeader
 import static org.modelcatalogue.core.geb.Common.getModelCatalogueId
 import static org.modelcatalogue.core.geb.Common.getNameLabel
-import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
-import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGebSpec {
 
@@ -47,21 +50,28 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
 
     private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
 
+    @Ignore
     def "login to model catalogue and create data model"() {
-        when:
-        loginAdmin()
+        when:HEAD
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
-        check createButton isDisplayed()
+        at DashboardPage
 
         when:
-        click createButton
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
 
-        and:'fill the form '
-        fill nameLabel with 'TESTING_DATA_MODEL_NEW_VERSION'
-        fill modelCatalogueId with 'MET-00263'
-        fill description with 'this my testing data'
+        then:
+        at CreateDataModelPage
 
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = 'TESTING_DATA_MODEL_NEW_VERSION'
+        createDataModelPage.modelCatalogueId = 'MET-00263'
+        createDataModelPage.description = 'this my testing data'
 
         then:
         //check stepImports enabled
@@ -86,6 +96,7 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
         check rightSideTitle contains 'TESTING_DATA_MODEL_NEW_VERSION'
     }
 
+    @Ignore
     def "finalized the data model and create new version"() {
 
         when:'refresh the page and select data model'
@@ -176,6 +187,7 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
         check rightSideTitle contains'TESTING_CLASS'
     }
 
+    @Ignore
     @Unroll
     def "verify that data are not duplicated"(int location,String dataElement) {
         //add a refresh

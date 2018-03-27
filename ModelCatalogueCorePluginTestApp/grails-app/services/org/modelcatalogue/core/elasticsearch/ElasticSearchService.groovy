@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.elasticsearch
 
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.DataModelAclService
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
@@ -39,7 +40,6 @@ import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.rx.RxService
-import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -193,11 +193,8 @@ class ElasticSearchService implements SearchCatalogue {
 
         List<String> states = []
 
-        //if the role is viewer, don't return elements that they shouldn't see i.e. drafts .
-        //TODO: NEED TO REMOVE THIS????????
-
         if (params.status) {
-            states = ElementService.findAllElementStatus(params.status, isViewer())*.toString()
+            states = ElementService.findAllElementStatus(params.status).collect { ElementStatus status -> status as String } as List<String>
         }
 
         List<String> types = []
@@ -283,7 +280,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.findAllElementStatus(params.status, isViewer())*.toString()))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.findAllElementStatus(params.status).collect { ElementStatus status -> status as String } as List<String>))
             }
 
             if (params.contentType) {
@@ -296,6 +293,7 @@ class ElasticSearchService implements SearchCatalogue {
                     boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
                 }
 
+                boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
                 boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
                 boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
             }else{
@@ -304,6 +302,7 @@ class ElasticSearchService implements SearchCatalogue {
                     boolQuery.should(QueryBuilders.wildcardQuery(property, search).boost(boost))
                 }
 
+                boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
                 boolQuery.should(QueryBuilders.wildcardQuery('name', search.toLowerCase()).boost(200))
                 boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.wildcardQuery('ext.value', search)).boost(10))
 
@@ -319,6 +318,7 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
 
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
 
             qb = boolQuery
@@ -330,6 +330,8 @@ class ElasticSearchService implements SearchCatalogue {
             CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
+
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
 
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
 
@@ -350,12 +352,6 @@ class ElasticSearchService implements SearchCatalogue {
         ElasticSearchQueryList.search(params, resource, request, dataModelAclService)
     }
 
-    @CompileStatic
-    protected boolean isViewer() {
-        SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles('VIEWER'))
-    }
-
-
     // may want to build on this query at a later date
     public <T> ElasticSearchQueryList<T> fuzzySearch(Class<T> resource, SearchParams params) {
         String search = params.search
@@ -374,21 +370,21 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.findAllElementStatus(params.status, isViewer())*.toString()))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.findAllElementStatus(params.status).collect { ElementStatus status -> status as String } as List<String>))
             }
 
             if (params.contentType) {
                 boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
-            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
-                boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
-            }
 
+            boolQuery.should(QueryBuilders.matchQuery("name_not_analyzed", search).boost(200))
+            boolQuery.should(QueryBuilders.matchQuery("name", search).boost(200))
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(200))
+            boolQuery.should(QueryBuilders.matchQuery("description", search).boost(10))
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
             boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
-            boolQuery.should(QueryBuilders.fuzzyQuery('name', search)).boost(200)
 
             qb = boolQuery
         } else if (RelationshipType.isAssignableFrom(resource)) {
@@ -487,6 +483,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     ListWithTotalAndType<CatalogueElement> search(SearchParams params) {
+
         search CatalogueElement, params
     }
 
@@ -793,7 +790,7 @@ class ElasticSearchService implements SearchCatalogue {
                         // ignore and keep the latest
                         continue
                     }
-                    return Observable.error(new RuntimeException("There were error indexing at least of one item from the batch: $response.type#$response.id@$response.index", response.failure.cause))
+                    //return Observable.error(new RuntimeException("There were error indexing at least of one item from the batch: $response.type#$response.id@$response.index", response.failure.cause))
                 }
             }
             return just(it)

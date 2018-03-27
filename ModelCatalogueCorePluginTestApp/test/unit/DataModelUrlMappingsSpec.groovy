@@ -3,7 +3,9 @@ import grails.test.mixin.TestFor
 import org.modelcatalogue.core.DataModelController
 import org.modelcatalogue.core.CatalogueController
 import spock.lang.Specification
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ System.getProperty('IGNORE_URLMAPPINGS') })
 @TestFor(DataModelUrlMappings)
 @Mock([DataModelController, CatalogueController])
 class DataModelUrlMappingsSpec extends Specification {
@@ -33,6 +35,7 @@ class DataModelUrlMappingsSpec extends Specification {
         request.method = 'get'
 
         expect:
+        assertForwardUrlMapping('/dataModel/showAssetInAngular/$id', controller: 'dataModel', action: 'showAssetInAngular')
         assertForwardUrlMapping('/api/modelCatalogue/core/dataModel', controller: 'dataModel', action: 'index')
         assertForwardUrlMapping('/api/modelCatalogue/core/dataModel/search/$search', controller: 'dataModel', action: 'search')
         assertForwardUrlMapping('/api/modelCatalogue/core/dataModel/$id', controller: 'dataModel', action: 'show')

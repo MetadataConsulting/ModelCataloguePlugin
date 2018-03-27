@@ -61,20 +61,37 @@ class DraftContext extends PublishingContext<DraftContext> {
         if (!element) {
             return element
         }
+
+        //if it's already a draft return it
         if (element.status == ElementStatus.DRAFT || element.status == ElementStatus.UPDATED) {
             return element
         }
 
+        //if there isn't a later version return it
         if (!element.latestVersionId) {
             return element
         }
 
+
+        //if you should prefer the draft version
         if (element.id in preferDraftsFor || element.latestVersionId in preferDraftsFor || element.dataModel?.id in preferDraftsFor || element.dataModel?.latestVersionId in preferDraftsFor) {
             CatalogueElement existingDraft =  CatalogueElement.findByLatestVersionIdAndStatusInList(element.latestVersionId, [ElementStatus.DRAFT, ElementStatus.UPDATED], [sort: 'versionNumber', order: 'desc'])
 
             if (existingDraft) {
                 return existingDraft
             }
+        }
+
+
+        //if you should prefer the finalised version (to the deprecated one)
+        if(element.status != ElementStatus.FINALIZED ){
+
+            CatalogueElement existingFinalised =  CatalogueElement.findByLatestVersionIdAndStatusInList(element.latestVersionId, [ElementStatus.FINALIZED], [sort: 'versionNumber', order: 'desc'])
+
+            if (existingFinalised) {
+                return existingFinalised
+            }
+
         }
 
         return element

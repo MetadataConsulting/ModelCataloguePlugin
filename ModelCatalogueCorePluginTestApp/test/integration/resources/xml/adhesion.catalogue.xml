@@ -16,7 +16,7 @@
             </measurementUnit>
         </dataType>
     </dataElement>
-    <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
+    <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-supervisor users, the types are always imported as system ones and they need to be approved by the catalogue supervisor first. -->
     <relationshipTypes>
         <relationshipType name="base" source="org.modelcatalogue.core.CatalogueElement" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true">
             <sourceToDestination label="is based on">A Catalogue Element can be based on multiple Catalogue Elements of the same type. Value domains will first use rules of the base value domains and then their own when validating input values.</sourceToDestination>

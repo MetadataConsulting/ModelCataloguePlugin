@@ -1,5 +1,10 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
+import org.modelcatalogue.core.geb.AssetsPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.description
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
@@ -14,7 +19,6 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
 @Stepwise
 class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
     private static final String asset ="input#asset"
@@ -28,16 +32,33 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
     private static final String  importedDataModel= "td.col-md-5"
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
 
+    @Ignore
     def "login and navigate to the model"() {
         when:
-        loginCurator()
-        select 'Test 3'
-        selectInTree 'Assets'
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
 
         then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Assets')
+
+        then:
+        at AssetsPage
+        and:
         check rightSideTitle contains 'Active Assets'
     }
 
+    @Ignore
     def "navigate to create asset page"() {
         when:
         click create
@@ -45,6 +66,7 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
         check modalHeader contains 'Create Asset'
     }
 
+    @Ignore
     def "create a new asset"() {
         when:
         fill nameLabel with " Sample excel${System.currentTimeMillis()}"
@@ -56,6 +78,7 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
         check table displayed
     }
 
+    @Ignore
     def "delete the created asset"() {
         when: 'click on the model catalogue to return home'
         click modelCatalogue
@@ -84,15 +107,19 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
         check table gone
     }
 
+    @Ignore
     def "login and navigate to model"() {
         when:
-        loginCurator()
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
         select 'Test 3'
         selectInTree 'Imported Data Models'
+
         then:
         check rightSideTitle contains 'Imports'
     }
 
+    @Ignore
     def "import model "() {
         when:
         addDataModelImport 'Clinical Tags'
@@ -101,6 +128,7 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
         check importedDataModel contains 'Clinical Tags'
     }
 
+    @Ignore
     def "remove the imported data model"() {
         when:
         click modelCatalogue

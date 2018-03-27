@@ -7,7 +7,9 @@ import org.modelcatalogue.core.logging.LoggingController
 import org.modelcatalogue.core.DataImportController
 import org.modelcatalogue.core.forms.FormGeneratorController
 import spock.lang.Specification
+import spock.lang.IgnoreIf
 
+@IgnoreIf({ System.getProperty('IGNORE_URLMAPPINGS') })
 @TestFor(ModelCatalogueCorePluginUrlMappings)
 @Mock([SearchController,RelationshipController, CatalogueController, LoggingController, DataImportController, FormGeneratorController])
 class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {

@@ -195,6 +195,57 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 latestVersionId: element.latestVersionId ?: element.id,
                 dataModel: minimalCatalogueElementJSON(element.dataModel)]
     }
+
+
+    static Map<String, Object> minimalDataTypeJSONSkeleton(DataType element) {
+        if ( !element ) {
+            return [:]
+        }
+        [ internalModelCatalogueId: element.defaultModelCatalogueId,
+                 modelCatalogueId: element.modelCatalogueId,
+                 minimal: true,
+                 name: element.name,
+                 id: element.id,
+                 description: element.description,
+                 elementType: element.getClass().name,
+                 link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(),
+                 status: "${element.status}".toString(),
+                dataModel: minimalDataModelJSONSkeleton(element.dataModel)
+        ]
+    }
+
+    static Map<String, Object> minimalDataElementElementJSONSkeleton(DataElement element) {
+        if ( !element ) {
+            return [:]
+        }
+        return [ internalModelCatalogueId: element.defaultModelCatalogueId,
+                modelCatalogueId: element.modelCatalogueId,
+                minimal: true,
+                name: element.name,
+                id: element.id,
+                description: element.description,
+                elementType: element.getClass().name,
+                link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(),
+                status: "${element.status}".toString(),
+                dataModel: minimalDataModelJSONSkeleton(element.dataModel)]
+    }
+
+    static Map<String, Object> minimalDataModelJSONSkeleton(CatalogueElement element) {
+        if ( !element ) {
+            return [:]
+        }
+        return [internalModelCatalogueId: element.defaultModelCatalogueId,
+                modelCatalogueId: element.modelCatalogueId,
+                name: element.name,
+                id: element.id,
+                description: element.description,
+                elementType: element.getClass().name,
+                link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString()
+                ]
+    }
+
+
+
     static Map<String, Object> minimalCatalogueElementJSON(CatalogueElement element) {
         Class entityClass = HibernateHelper.getEntityClass(element)
 
@@ -206,6 +257,8 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
             return minimalCatalogueElementJSON(element as DataElement)
         } else if (DataType.isAssignableFrom(entityClass)) {
             return minimalCatalogueElementJSON(element as DataType)
+        } else if (Asset.isAssignableFrom(entityClass)) {
+            return minimalCatalogueElementJSON(element as Asset)
         } else if (DataClass.isAssignableFrom(entityClass)) {
             return minimalCatalogueElementJSON(element as DataClass)
         } else if (!element) {
@@ -231,9 +284,20 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         return minimalJSON
     }
 
-    static Map<String, Object> minimalCatalogueElementJSON(DataElement element) {
+
+    static Map<String, Object> minimalCatalogueElementJSON(Asset element) {
         if (!element) return null
         def minimalJSON = minimalCatalogueElementJSONSkeleton(element)
+        minimalJSON.remove('dataModel')
+        minimalJSON.put('originalFileName', element.originalFileName)
+        minimalJSON.put('contentType', element.contentType)
+        minimalJSON.put('publishedStatus', "${element.publishedStatus}".toString() )
+        return minimalJSON
+    }
+
+    static Map<String, Object> minimalCatalogueElementJSON(DataElement element) {
+        if (!element) return null
+        def minimalJSON = minimalDataElementElementJSONSkeleton(element)
         minimalJSON.put('dataType', minimalCatalogueElementJSON(element.dataType))
         return minimalJSON
     }
@@ -247,8 +311,10 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
     }
 
     static Map<String, Object> minimalCatalogueElementJSON(DataType element) {
-        if (!element) return null
-        def minimalJSON = minimalCatalogueElementJSONSkeleton(element)
+        if ( !element ) {
+            return null
+        }
+        Map<String, Object>  minimalJSON = minimalDataTypeJSONSkeleton(element)
 
         Class cls = HibernateHelper.getEntityClass(element)
 

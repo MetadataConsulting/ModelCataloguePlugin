@@ -26,7 +26,6 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Legacy
 import org.modelcatalogue.core.util.MatchResultImpl
-import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -52,19 +51,19 @@ class ElementService implements Publisher<CatalogueElement> {
 
 //    NONE OF THESE ARE USED OR IMPLEMENTED - Commenting them out - will remove
 //    List<CatalogueElement> list(Map params = [:]) {
-//        CatalogueElement.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
+//        CatalogueElement.findAllByStatusInList(getStatusFromParams(params), params)
 //    }
 //
 //    public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
-//        resource.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
+//        resource.findAllByStatusInList(getStatusFromParams(params), params)
 //    }
 //
 //    Long count(params = [:]) {
-//        CatalogueElement.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+//        CatalogueElement.countByStatusInList(getStatusFromParams(params))
 //    }
 //
 //    public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
-//        resource.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+//        resource.countByStatusInList(getStatusFromParams(params))
 //    }
 
     DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {
@@ -79,9 +78,10 @@ class ElementService implements Publisher<CatalogueElement> {
 
         Closure<DataModel> code = { TransactionStatus status = null ->
             return (DataModel) auditService.logNewVersionCreated(dataModel) {
-                DataModel draft = PublishingChain.createDraft(dataModel, context.within(dataModel)).run(this, context.monitor) as DataModel
+                DataModel draft = PublishingChain.createDraftChain(dataModel, context.within(dataModel)).run(this, context.monitor) as DataModel
                 if (draft.hasErrors()) {
                     status?.setRollbackOnly()
+                    log.warn 'Model has errors' & draft.errors
                     return dataModel
                 }
 
@@ -416,15 +416,12 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-    static List<ElementStatus> getStatusFromParams(params, boolean canViewDrafts) {
+    static List<ElementStatus> getStatusFromParams(params) {
         if (!params.status) {
             return ImmutableList.copyOf(ElementStatus.values().toList())
         }
         if (params.status == 'active') {
-            if (canViewDrafts) {
-                return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
-            }
-            return ImmutableList.of(ElementStatus.FINALIZED)
+            return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
         }
         if (params.status instanceof ElementStatus) {
             return ImmutableList.of(params.status as ElementStatus)
@@ -432,19 +429,15 @@ class ElementService implements Publisher<CatalogueElement> {
         return ImmutableList.of(ElementStatus.valueOf(params.status.toString().toUpperCase()))
     }
 
-    static List<ElementStatus> findAllElementStatus(String status, boolean canViewDrafts) {
+    static List<ElementStatus> findAllElementStatus(String status) {
         if (!status) {
             return ImmutableList.copyOf(ElementStatus.values().toList())
         }
-        if (status == 'active') {
-            if (canViewDrafts) {
-                return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
-            }
-            return ImmutableList.of(ElementStatus.FINALIZED)
+        if (status.toLowerCase() == 'active') {
+            return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
         }
         ImmutableList.of(ElementStatus.valueOf(status.toUpperCase()))
     }
-
 
     public <E extends CatalogueElement> E merge(E source, E destination, DataModel dataModel = source.dataModel) {
         log.info "Merging $source into $destination"

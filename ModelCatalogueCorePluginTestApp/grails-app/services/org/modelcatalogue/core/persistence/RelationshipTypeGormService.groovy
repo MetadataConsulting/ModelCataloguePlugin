@@ -17,6 +17,13 @@ class RelationshipTypeGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
+    RelationshipType findByName(String nameParam) {
+        RelationshipType.where {
+            name == nameParam
+        }.get()
+    }
+
+    @Transactional(readOnly = true)
     List<RelationshipType> findRelationshipTypes() {
         RelationshipType.where { }.list()
     }

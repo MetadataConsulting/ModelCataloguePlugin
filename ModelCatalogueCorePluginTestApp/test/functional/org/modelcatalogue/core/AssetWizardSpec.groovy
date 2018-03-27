@@ -1,5 +1,9 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.AssetsPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
 import static org.modelcatalogue.core.geb.Common.*
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -14,8 +18,7 @@ import spock.lang.Issue
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
-//@IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
@@ -34,13 +37,31 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
         when:
-        loginAdmin()
-        select "Test 1" select "Assets"
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
 
         then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select("Test 1")
+
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Assets")
+
+        then:
+        AssetsPage
+
+        and:
         check rightSideTitle is 'Active Assets'
     }
 
+    @Ignore
     def "upload new asset"() {
         when:
         click create
@@ -61,6 +82,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog gone
     }
 
+    @Ignore
     def "Check the asset shows up with own detail page"() {
         expect:
         check { infTableCell(1, 2, text: "Sample XSD") } displayed
@@ -70,6 +92,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle contains 'Sample XSD'
     }
 
+    @Ignore
     def "validate xml schema"() {
         when:
         click validateXsd
@@ -96,7 +119,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog gone
     }
 
-
+    @Ignore
     def "upload mc file"() {
         click importMc
 
@@ -119,6 +142,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check 'h3' contains 'Import for MET-523.mc'
     }
 
+    @Ignore
     def "upload excel file"() {
         click importExcel
 
@@ -153,7 +177,8 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
      * bit of the application.
      */
     @Issue('MET-1050')
-    @Ignore def "export to excel"() {
+    @Ignore
+    def "export to excel"() {
         when:
         withNewWindow({
             click export

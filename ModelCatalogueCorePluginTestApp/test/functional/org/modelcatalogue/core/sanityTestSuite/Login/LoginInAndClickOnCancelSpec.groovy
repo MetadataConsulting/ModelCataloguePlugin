@@ -1,36 +1,30 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.openqa.selenium.WebDriver
+import org.modelcatalogue.core.geb.HomePage
+import org.modelcatalogue.core.geb.LoginModalPage
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB') })
+@IgnoreIf({ !System.getProperty('geb.env') })
 class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
-
-    private static final String cancel = "button.btn-warning"
-    private static final String username = "input#username"
-    private static final String password = "input#password"
-    private static final String login = "button.btn"
-    private static final String primaryBtn = "button.btn"
 
     void clickOnCancel() {
         when:
-        go(baseUrl)
-        click login
+        HomePage homePage = to HomePage
+        homePage.login()
+
         then:
-        $("a.btn-block").text() == "Login with Google"
+        at LoginModalPage
 
         when:'enter the username and password'
-        fill(username) with("viewer")
-        fill(password) with("viewer")
+        LoginModalPage loginModalPage = browser.page LoginModalPage
+        loginModalPage.username = 'viewer'
+        loginModalPage.password = 'viewer'
 
         and:'click on cancel'
-        click cancel
+        loginModalPage.cancel()
 
         then:
-        check(primaryBtn) is("Login")
-
-
+        at HomePage
     }
-
 }

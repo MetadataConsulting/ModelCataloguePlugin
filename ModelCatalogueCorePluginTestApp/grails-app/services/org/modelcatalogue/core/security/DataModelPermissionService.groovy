@@ -25,9 +25,8 @@ import org.springframework.context.MessageSource
 class DataModelPermissionService {
 
     public final static Set<String> AUTHORITIES_ALLOWED_TO_HAVE_ACL_ADMIN = [
-            MetadataRolesUtils.ROLE_SUPERVISOR,
-            MetadataRolesUtils.ROLE_ADMIN,
-            MetadataRolesUtils.ROLE_METADATA_CURATOR,
+            MetadataRoles.ROLE_SUPERVISOR,
+            MetadataRoles.ROLE_CURATOR,
     ] as Set<String>
 
     DefaultPermissionFactory aclPermissionFactory
@@ -127,24 +126,24 @@ class DataModelPermissionService {
     }
 
     @PreAuthorize("hasRole('ROLE_SUPERVISOR')")
-    List<UserPermissionList> findAllUserPermissions(Long dataModelId) {
+    List<UserAndPermissionList> findAllUserPermissions(Long dataModelId) {
         try {
             MutableAcl acl = (MutableAcl)aclUtilService.readAcl(DataModel, dataModelId)
-            Map<String, UserPermissionList> m = [:] as HashMap<String, UserPermissionList>
+            Map<String, UserAndPermissionList> m = [:] as HashMap<String, UserAndPermissionList>
             acl.entries.eachWithIndex { AccessControlEntry entry, int i ->
                 if ( entry.sid instanceof PrincipalSid ) {
                     String username = ((PrincipalSid)entry.sid).principal
                     if ( !m.containsKey(username) ) {
-                        m[username] = new UserPermissionList(username: username, permissionList: [])
+                        m[username] = new UserAndPermissionList(username: username, permissionList: [])
                     }
                     m[username].permissionList.add(entry.permission)
                 }
 
             }
 
-            m.values() as List<UserPermissionList>
+            m.values() as List<UserAndPermissionList>
         } catch (NotFoundException notFoundException ) {
-            return [] as List<UserPermissionList>
+            return [] as List<UserAndPermissionList>
         }
     }
 }

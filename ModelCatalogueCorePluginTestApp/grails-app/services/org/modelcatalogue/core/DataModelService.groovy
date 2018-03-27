@@ -2,21 +2,28 @@ package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Holders
 import groovy.transform.CompileDynamic
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.persistence.UserGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.lists.DetachedListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
 import org.modelcatalogue.core.util.lists.ListWrapper
+import org.modelcatalogue.core.util.lists.Lists
+
 import javax.annotation.PostConstruct
 
 class DataModelService {
@@ -27,6 +34,8 @@ class DataModelService {
     def sessionFactory
     UserGormService userGormService
     SpringSecurityService springSecurityService
+    def modelCatalogueSecurityService
+    DataModelGormService dataModelGormService
 
     private boolean legacyDataModels
 
@@ -242,5 +251,97 @@ class DataModelService {
             list()
         }
     }
+
+
+
+    protected ListWrapper<DataModel> getAllEffectiveItems(Integer max, GrailsParameterMap params) {
+        ListWrapper<DataModel> items = findUnfilteredEffectiveItems(max, params)
+        filterUnauthorized(items)
+    }
+
+    protected ListWrapper<DataModel> findUnfilteredEffectiveItems(Integer max, GrailsParameterMap params) {
+        Class resource = DataModel
+        String resourceName ="dataModel"
+
+        //if you only want the active data models (draft and finalised)
+        if (params?.status?.toLowerCase() == 'active') {
+            //if you have the role viewer you can see drafts
+            if ( SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_USER) ) {
+                return this.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                    'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
+                }), overridableDataModelFilter)
+            }
+            //if not you can only see finalised models
+            return this.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                'eq' 'status', ElementStatus.FINALIZED
+            }), overridableDataModelFilter)
+        }
+
+        //if you want models with a specific status
+        //check that you can access drafts i.e. you have a viewer role
+        //then return the models by the status - providing you have the correct role
+        if (params.status) {
+            return this.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                'in' 'status', ElementService.getStatusFromParams(params)
+            }), overridableDataModelFilter)
+        }
+
+        return this.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
+    }
+
+
+    protected ListWrapper<DataModel> filterUnauthorized(ListWrapper<DataModel> items) {
+        if ( items instanceof ListWithTotalAndTypeWrapper ) {
+            ListWithTotalAndTypeWrapper listWithTotalAndTypeWrapperInstance = (ListWithTotalAndTypeWrapper) items
+            DetachedCriteria<DataModel> criteria = listWithTotalAndTypeWrapperInstance.list.criteria
+            Map<String, Object> params = listWithTotalAndTypeWrapperInstance.list.params
+            ListWithTotalAndType<DataModel> listWithTotalAndType = instantiateListWithTotalAndTypeWithCriteria(criteria, params)
+            return ListWithTotalAndTypeWrapper.create(listWithTotalAndTypeWrapperInstance.params, listWithTotalAndTypeWrapperInstance.base, listWithTotalAndType)
+        }
+        items
+    }
+
+    protected ListWithTotalAndType<DataModel> instantiateListWithTotalAndTypeWithCriteria(DetachedCriteria<DataModel> criteria, Map<String, Object> params) {
+        List<DataModel> dataModelList = dataModelGormService.findAllByCriteria(criteria)
+        if ( !dataModelList ) {
+            return new ListWithTotalAndTypeImpl<DataModel>(DataModel, [], 0L)
+        }
+        int total = dataModelList.size()
+        dataModelList = MaxOffsetSublistUtils.subList(SortParamsUtils.sort(dataModelList, params), params)
+        new ListWithTotalAndTypeImpl<DataModel>(DataModel, dataModelList, total as Long)
+    }
+
+    //TODO: not sure what this does
+    protected <T> ListWrapper<T> withAdditionalIndexCriteria(ListWrapper<T> list) {
+        if (!hasAdditionalIndexCriteria()) {
+            return list
+        }
+
+        if (!(list instanceof ListWithTotalAndTypeWrapper)) {
+            throw new IllegalArgumentException("Cannot add additional criteria list $list. Only ListWithTotalAndTypeWrapper is currently supported")
+        }
+        if (!(list.list instanceof DetachedListWithTotalAndType)) {
+            throw new IllegalArgumentException("Cannot add additional criteria list $list. Only DetachedListWithTotalAndType is currently supported")
+        }
+
+        list.list.criteria.with buildAdditionalIndexCriteria()
+
+        return list
+    }
+
+    //TODO: not sure what this does
+    protected boolean hasAdditionalIndexCriteria() {
+        return false
+    }
+
+    //TODO: not sure what this does
+    protected Closure buildAdditionalIndexCriteria() {
+        return {}
+    }
+
+    protected DataModelFilter getOverridableDataModelFilter() {
+        this.dataModelFilter
+    }
+
 
 }

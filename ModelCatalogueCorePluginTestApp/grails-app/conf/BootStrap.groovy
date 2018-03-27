@@ -1,3 +1,4 @@
+
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -31,7 +32,6 @@ class BootStrap {
     InitSecurityService initSecurityService
     MetadataSecurityService metadataSecurityService
     InitPoliciesAndTagsService initPoliciesAndTagsService
-    SetupSimpleCsvTransformationService setupSimpleCsvTransformationService
     UserGormService userGormService
     DataModelAclService dataModelAclService
 
@@ -55,6 +55,12 @@ class BootStrap {
         grailsApplication.mainContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
         log.info 'completed:registerMarshallers'
 
+        log.info 'init roles'
+        initSecurityService.initRoles()
+
+        log.info 'init role hierarchy'
+        initSecurityService.initRoleHierarchyEntry()
+
         if ( isDev() ) {
             initDev()
 
@@ -77,9 +83,6 @@ class BootStrap {
 
         log.info 'init policies and tags'
         initPoliciesAndTagsService.initPoliciesAndTags()
-
-        log.info 'init roles'
-        initSecurityService.initRoles()
 
         log.info 'init users'
         initSecurityService.initUsers()
@@ -129,7 +132,6 @@ class BootStrap {
         if ( isBlankDev() ) {
             initEmptyDataBase()
             log.info 'init register reports'
-            userService.inviteAdmins()
         } else {
             log.info 'init request maps'
             metadataSecurityService.secureUrlMappings()
@@ -159,6 +161,9 @@ class BootStrap {
 
                 log.info 'init roles'
                 initSecurityService.initRoles()
+
+                log.info 'init role hierarchy'
+                initSecurityService.initRoleHierarchyEntry()
 
                 log.info 'init users'
                 initSecurityService.initUsers()
@@ -256,7 +261,6 @@ class BootStrap {
                 throw new AssertionError("Failed to create relationship actions!")
             }
 
-            setupSimpleCsvTransformationService.setupSimpleCsvTransformation()
 
             DataType theType = FriendlyErrors.failFriendlySave(new DataType(name: 'data type without any data model', modelCatalogueId: 'http://www.example.com/no-data-model'))
 
@@ -281,6 +285,7 @@ class BootStrap {
                     }
                 }
             }
+
             catalogueBuilder.build {
                 automatic dataType
                 dataModel(name: 'Test 3') {

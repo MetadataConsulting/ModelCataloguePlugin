@@ -3,7 +3,7 @@ package org.modelcatalogue.core.secured
 import geb.spock.GebSpec
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
-import spock.lang.Specification
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Unroll
 import spock.lang.IgnoreIf
 

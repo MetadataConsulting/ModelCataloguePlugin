@@ -8,6 +8,7 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.util.PublishedStatus
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.springframework.context.MessageSource
 
@@ -88,5 +89,44 @@ class AssetGormService implements WarnGormErrors {
             transactionStatus.setRollbackOnly()
         }
         assetInstance
+    }
+
+    @Transactional(readOnly = true)
+    List<Asset> findAllByDataModel(DataModel dataModel) {
+        findQueryByDataModel(dataModel).list()
+    }
+
+    DetachedCriteria<Asset> findQueryByDataModel(DataModel dataModelParam) {
+        Asset.where { dataModel == dataModelParam }
+    }
+
+    DetachedCriteria<Asset> findQueryByDataModelId(Long dataModelId) {
+        findQueryByDataModel(DataModel.load(dataModelId))
+    }
+
+    @Transactional(readOnly = true)
+    List<Asset> findAllByDataModelAndPublishedStatus(DataModel dataModel, PublishedStatus publishedStatus) {
+        findQueryByDataModelAndPublishedStatus(dataModel, publishedStatus).list()
+    }
+
+    DetachedCriteria<Asset> findQueryByDataModelAndPublishedStatus(DataModel dataModelParam, PublishedStatus status) {
+        findQueryByDataModelAndPublishedStatusList(dataModelParam, [status])
+    }
+
+    DetachedCriteria<Asset> findQueryByDataModelIdAndPublishedStatusList(Long dataModelId, List<PublishedStatus> statusList) {
+        findQueryByDataModelAndPublishedStatusList(DataModel.load(dataModelId), statusList)
+    }
+
+    DetachedCriteria<Asset> findQueryByDataModelAndPublishedStatusList(DataModel dataModel, List<PublishedStatus> statusList) {
+
+        DetachedCriteria<Asset> query = findQueryByDataModel(dataModel)
+        if ( statusList ) {
+            query = query.where { 'in'('publishedStatus', statusList) }
+        }
+        query
+    }
+
+    DetachedCriteria<Asset> findQueryByDataModelIdAndPublishedStatus(Long dataModelId, PublishedStatus status) {
+        findQueryByDataModelAndPublishedStatus(DataModel.load(dataModelId), status)
     }
 }

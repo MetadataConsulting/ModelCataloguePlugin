@@ -790,6 +790,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
   actionsProvider.registerActionInRole 'import-data-models-screen', 'data-models', [
     'security',
     (security) ->
+      return undefined # Never show import button
       return undefined unless security.hasRole('CURATOR')
       {
         position: 10000

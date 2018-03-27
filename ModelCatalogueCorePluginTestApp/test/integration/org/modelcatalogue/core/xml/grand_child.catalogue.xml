@@ -5,7 +5,7 @@
         <dataType name="grand parent" dataModel="based on test" id="http://localhost:8080/catalogue/dataType/142" status="DRAFT" />
       </dataType>
     </dataType>
-  </dataType><!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
+  </dataType><!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-supervisor users, the types are always imported as system ones and they need to be approved by the catalogue supervisor first. -->
     <relationshipTypes>
         <relationshipType name="base" source="org.modelcatalogue.core.CatalogueElement" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true">
             <sourceToDestination label="is based on">Any catalogue element can be based on multiple elements of the same type. Value domains will first use rules of the base value domains and than their owns when validating input values.</sourceToDestination>

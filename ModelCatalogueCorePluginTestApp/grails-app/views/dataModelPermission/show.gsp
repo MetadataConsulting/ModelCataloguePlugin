@@ -1,25 +1,42 @@
 <html>
 <head>
-    <title><g:message code="dataMode.permissions" default="Data Model Permissions"/></title>
-    <meta name='layout' content='springSecurityUI'/>
+    <title><g:message code="dataModel.permissions" default="Data Model Permissions"/></title>
+    <meta name='layout' content='main'/>
 </head>
 <body>
-<h1>
-    <span>${dataModel.name} ${dataModel.status} ${dataModel.semanticVersion}</span>
-</h1>
-<table>
+<ol class="breadcrumb">
+    <li class="breadcrumb-item"><g:link controller="dataModelPermission" action="index"><g:message code="dataModel.permissions" default="Data Model Permissions"/></g:link></li>
+    <li class="breadcrumb-item active">${dataModel.name} ${dataModel.status} ${dataModel.semanticVersion}</li>
+</ol>
+<div class="panel-body">
+    <div class="page-header">
+        <h1>
+            <span>${dataModel.name} ${dataModel.status} ${dataModel.semanticVersion}</span>
+        </h1>
+    </div>
+
+<g:render template="/templates/flashmessage" />
+<g:render template="/templates/flasherror" />
+<table class="table">
+    <thead>
+    <tr>
+        <th><g:message code="dataModel.permissions.username" default="Username"/></th>
+        <th><g:message code="dataModel.permissions.permission" default="ACL Permission"/></th>
+        <th><g:message code="dataModel.permissions.actions" default="Actions"/></th>
+    </tr>
+    </thead>
     <tbody>
-    <g:each var="userPermissions" in="${userPermissionsList}">
+    <g:each var="userAndPermissionList" in="${userAndPermissionListList}">
         <tr>
-            <th rowspan="${userPermissions.permissionList.size()}">${userPermissions.username}</th>
-            <g:each var="permission" in="${userPermissions.permissionList}">
+          <td><b>${userAndPermissionList.username}</b></td>
+            <g:each var="permission" in="${userAndPermissionList.permissionList}">
                 <td><sec:permissionAsString permission="${permission}"/></td>
                 <td>
                     <g:form action="revoke" controller="dataModelPermission" method="post">
-                        <g:hiddenField name="username" value="${userPermissions.username}" />
+                        <g:hiddenField name="username" value="${userAndPermissionList.username}" />
                         <g:hiddenField name="id" value="${dataModel.id}" />
                         <g:hiddenField name="permission" value="${sec.permissionAsString(permission: permission).toLowerCase()}" />
-                        <g:actionSubmit name="revoke" action="revoke" value="${message(code: 'delete', default: 'Delete')}"/>
+                        <g:actionSubmit name="revoke" action="revoke" class="btn btn-danger" value="${message(code: 'delete', default: 'Delete')}"/>
                     </g:form>
                 </td>
             </g:each>
@@ -31,12 +48,8 @@
     <g:select name="username" from="${usernameList}"/>
     <g:select name="permission" from="${['administration', 'read']}"/>
     <g:hiddenField name="id" value="${dataModel.id}" />
-    <g:actionSubmit name="grant" value="${message(code: 'grant', default: 'Grant')}"/>
+    <g:actionSubmit name="grant" class="btn btn-default" value="${message(code: 'grant', default: 'Grant')}"/>
 </g:form>
-
-<g:if test="${flash.error}">
-    <b>${flash.error}</b>
-</g:if>
-
+</div>
 </body>
 </html>

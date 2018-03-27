@@ -1,18 +1,23 @@
-package org.modelcatalogue.core.Regression
+package org.modelcatalogue.core.regression
 
 import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.HomePage
 import org.openqa.selenium.WebDriver
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteB')  })
+@IgnoreIf({ !System.getProperty('geb.env')  })
 class VerifyResetPasswordPresentOnLoginPageSpec extends GebSpec {
 
     def "verify reset password link present"() {
         when:
-        // navigate to model catalogue and click on Login button
-        WebDriver driver = browser.driver
-        go(baseUrl)
-        $("button.btn").click()
+        to HomePage
+
+        then:
+        at HomePage
+
+        when:
+        HomePage homePage = browser.page HomePage
+        homePage.login()
 
         then:
         noExceptionThrown()

@@ -1,10 +1,8 @@
 package org.modelcatalogue.core.util.marshalling
 
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.security.UserService
 
 class UserMarshaller extends CatalogueElementMarshaller {
-
 
     UserMarshaller() {
         super(User)
@@ -31,20 +29,7 @@ class UserMarshaller extends CatalogueElementMarshaller {
 
     static String getStrongestRole(User user) {
         Set<String> roles = user.authorities*.authority
-
-        if (UserService.ROLE_SUPERVISOR in roles) {
-            return UserService.ACCESS_LEVEL_SUPERVISOR
-        }
-        if (UserService.ROLE_ADMIN in roles) {
-            return UserService.ACCESS_LEVEL_ADMIN
-        }
-        if (UserService.ROLE_CURATOR in roles) {
-            return UserService.ACCESS_LEVEL_CURATOR
-        }
-        if (UserService.ROLE_USER in roles) {
-            return UserService.ACCESS_LEVEL_VIEWER
-        }
-        return UserService.ACCESS_LEVEL_GUEST
+        !roles.isEmpty() ? roles.first() : null
     }
 }
 

@@ -7,12 +7,15 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
+import org.modelcatalogue.core.MetadataDomainEntityService
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.ValidationRule
+import org.modelcatalogue.core.actions.ActionService
 import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
 import org.modelcatalogue.core.persistence.ActionGormService
 import org.modelcatalogue.core.persistence.AssetGormService
+import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.persistence.CatalogueElementGormService
 import org.modelcatalogue.core.persistence.DataClassGormService
 import org.modelcatalogue.core.persistence.DataElementGormService
@@ -65,6 +68,8 @@ import org.modelcatalogue.core.errors.MetadataExceptionResolver
 import java.util.concurrent.Executors
 import  grails.plugin.executor.PersistenceContextExecutorWrapper
 import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionsService
+import org.modelcatalogue.core.security.MetadataSecurityEventListener
+
 // Place your Spring DSL code here
 beans = {
     exceptionHandler(MetadataExceptionResolver) {
@@ -170,25 +175,11 @@ beans = {
     }
 
     mappingsSuggestionsGateway(MappingSuggestionsService) {
+        metadataDomainEntityService = ref('metadataDomainEntityService')
         actionService = ref('actionService')
         messageSource = ref('messageSource')
         batchGormService = ref('batchGormService')
         actionGormService = ref('actionGormService')
-        catalogueElementGormService = ref('catalogueElementGormService')
-        assetGormService = ref('assetGormService')
-        catalogueElementGormService = ref('catalogueElementGormService')
-        dataClassGormService = ref('dataClassGormService')
-        dataElementGormService = ref('dataElementGormService')
-        dataModelGormService = ref('dataModelGormService')
-        dataModelPolicyGormService = ref('dataModelPolicyGormService')
-        dataTypeGormService = ref('dataTypeGormService')
-        enumeratedTypeGormService = ref('enumeratedTypeGormService')
-        extensionValueGormService = ref('extensionValueGormService')
-        mappingGormService = ref('mappingGormService')
-        measurementUnitGormService = ref('measurementUnitGormService')
-        primitiveTypeGormService = ref('primitiveTypeGormService')
-        referenceTypeGormService = ref('referenceTypeGormService')
-        relationshipGormService = ref('relationshipGormService')
-        relationshipTypeGormService = ref('relationshipTypeGormService')
     }
+    metadataSecurityEventListener(MetadataSecurityEventListener)
 }

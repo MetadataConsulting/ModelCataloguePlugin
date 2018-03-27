@@ -3,7 +3,6 @@ package org.modelcatalogue.core.util
 import spock.lang.Specification
 import spock.lang.Unroll
 
-
 class MetadataDomainEntitySpec extends Specification {
 
     @Unroll
@@ -33,6 +32,35 @@ class MetadataDomainEntitySpec extends Specification {
         MetadataDomain.RELATIONSHIP_METADATA | 15   || 'gorm://org.modelcatalogue.core.RelationshipMetadata:15'
         MetadataDomain.RELATIONSHIP_TYPE     | 16   || 'gorm://org.modelcatalogue.core.RelationshipType:16'
         MetadataDomain.RELATIONSHIP_TAG      | 17   || 'gorm://org.modelcatalogue.core.RelationshipTag:17'
+    }
+
+    @Unroll
+    void "#domain #id #dataModelId link to: #expected"(MetadataDomain domain, Long id, Long dataModelId, String serverUrl, String expected) {
+
+        expect:
+        expected == MetadataDomainEntity.link(dataModelId, new MetadataDomainEntity(domain: domain, id: id), serverUrl)
+
+        where:
+        domain                               | id   | dataModelId | serverUrl               || expected
+        null                                 | null | 2           | 'http://localhost:8080' || null
+        MetadataDomain.ASSET                 | 16   | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/asset/16'
+        MetadataDomain.ASSET_FILE            | 1    | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/assetFile/1'
+        MetadataDomain.CATALOGUE_ELEMENT     | 2    | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/catalogueElement/2'
+        MetadataDomain.DATA_CLASS            | 3    | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/dataClass/3'
+        MetadataDomain.DATA_ELEMENT          | 4    | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/dataElement/4'
+        MetadataDomain.DATA_MODEL            | 5    | 5           | 'http://localhost:8080' || 'http://localhost:8080/#/5/dataModel/5'
+        MetadataDomain.DATA_MODEL_POLICY     | 6    | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/dataModelPolicy/6'
+        MetadataDomain.DATA_TYPE             | 7    | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/dataType/7'
+        MetadataDomain.ENUMERATED_TYPE       | 8    | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/enumeratedType/8'
+        MetadataDomain.EXTENSION_VALUE       | 9    | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/extensionValue/9'
+        MetadataDomain.MAPPING               | 10   | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/mapping/10'
+        MetadataDomain.MEASUREMENT_UNIT      | 11   | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/measurementUnit/11'
+        MetadataDomain.PRIMITIVE_TYPE        | 12   | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/primitiveType/12'
+        MetadataDomain.REFERENCE_TYPE        | 13   | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/referenceType/13'
+        MetadataDomain.RELATIONSHIP          | 14   | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/relationship/14'
+        MetadataDomain.RELATIONSHIP_METADATA | 15   | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/relationshipMetadata/15'
+        MetadataDomain.RELATIONSHIP_TYPE     | 16   | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/relationshipType/16'
+        MetadataDomain.RELATIONSHIP_TAG      | 17   | 2           | 'http://localhost:8080' || 'http://localhost:8080/#/2/relationshipTag/17'
     }
 
     @Unroll

@@ -1,5 +1,10 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.getPick
@@ -9,7 +14,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
+//@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
 class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
 
@@ -23,16 +28,26 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
     private static final String  tableImported ="td.col-md-5"
     private static final String  modelCatalogue ="span.mc-name"
 
+    @Ignore
     def "login to model catalogue and select a data model"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
+        then:
+        at DashboardPage
 
         when:
-        loginAdmin()
-        Thread.sleep(4000l)
-        select 'Test 3'
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select('Test 3')
+
+        then:
+        at DataModelPage
 
         then:'verify title of the page '
         check rightSideTitle contains 'Test 3'
     }
+    @Ignore
     def "navigate to the top menu and select create relationship"() {
         when:'navigate to createRelationship page'
         click dataModel
@@ -40,8 +55,9 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
 
         then:'verify that the text Destination is displayed'
         check  modelHeader displayed
-
     }
+
+    @Ignore
     def "select a data model"() {
         when: 'select a model'
         fill search with "cancer" and pick first item
@@ -52,6 +68,7 @@ class AddDataModelImportSpec extends AbstractModelCatalogueGebSpec{
         check table contains "imports"
     }
 
+    @Ignore
     def "delete the imported data model"() {
 
         when:'navigate back to the main page'

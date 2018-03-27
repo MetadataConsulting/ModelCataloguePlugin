@@ -37,6 +37,7 @@ import org.modelcatalogue.core.persistence.RelationshipGormService
 import org.modelcatalogue.core.reports.ReportDescriptor
 import org.modelcatalogue.core.reports.ReportDescriptorRegistry
 import org.modelcatalogue.core.security.DataModelAclService
+import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.DestinationClass
 import org.modelcatalogue.core.util.OrderedMap
@@ -327,7 +328,7 @@ abstract class AbstractCatalogueElementService<T extends CatalogueElement> imple
     }
 
     private boolean isSupervisor() {
-        SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.getRolesFromAuthority('SUPERVISOR').join(','))
+        SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_SUPERVISOR)
     }
 
     @CompileDynamic

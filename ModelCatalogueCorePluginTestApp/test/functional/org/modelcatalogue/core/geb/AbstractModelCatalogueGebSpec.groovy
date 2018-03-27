@@ -1,30 +1,25 @@
 package org.modelcatalogue.core.geb
 
+import grails.test.mixin.integration.Integration
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.util.MetadataDomain
+import org.modelcatalogue.core.util.MetadataDomainEntity
+import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.core.context.SecurityContextHolder
+
 import static org.modelcatalogue.core.geb.Common.*
 import geb.Browser
 import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
 import geb.waiting.WaitTimeoutException
-import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.StaleElementReferenceException
-import org.openqa.selenium.WebElement
-import org.openqa.selenium.logging.LogEntries
-import org.openqa.selenium.logging.LogEntry
-import org.openqa.selenium.logging.LogType
 import org.openqa.selenium.Keys
 
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
-
-    // keep the passwords simply stupid, they are only for dev/test or very first setup
-    // sauce labs connector for some reason fails with the six in the input
-    def loginAdmin() { loginUser("admin", "admin") }
-    def loginViewer() { loginUser("viewer", "viewer") }
-    def loginCurator() { loginUser("curator", "curator") }
-
-    def login(ApplicationUser user) {
-        loginUser(user.username, user.password)
-    }
 
     private void refreshIfConnectionLost() {
         noStale(1, true, {$('strong', text: contains('Connection lost'))}, {

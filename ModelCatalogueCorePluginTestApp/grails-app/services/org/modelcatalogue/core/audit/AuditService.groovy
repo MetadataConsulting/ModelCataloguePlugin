@@ -6,10 +6,14 @@ import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.util.Holders
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.change.ChangeSqlService
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.PaginationQuery
+import org.modelcatalogue.core.util.SortQuery
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.messaging.core.MessageSendingOperations
 import javax.annotation.PostConstruct
@@ -33,6 +37,7 @@ class AuditService {
     def sessionFactory
     MessageSendingOperations brokerMessagingTemplate
     SpringSecurityService springSecurityService
+    ChangeSqlService changeSqlService
 
     static Callable<Auditor> auditorFactory = { throw new IllegalStateException("Application is not initialized yet") }
 
@@ -186,7 +191,7 @@ class AuditService {
 
     ListWithTotalAndType<Change> getGlobalChanges(Map params, DataModelFilter dataModels) {
         if (!params.sort) {
-            params.sort  = 'dateCreated'
+            params.sort = 'dateCreated'
             params.order = 'desc'
         }
 
@@ -195,51 +200,11 @@ class AuditService {
                 isNull 'parentId'
                 ne 'system', true
                 ne 'otherSide', true
-
             }
         }
-
-
-        Map<String, Object> args = [:]
-        String subquery = getClassifiedElementsSubQuery(dataModels, args)
-
-        //language=HQL
-        Lists.fromQuery params, Change, """
-            from Change c
-            where c.parentId is null and c.system != true and c.otherSide != true and c.changedId  in (""" + subquery + """)""", args
-    }
-
-    private static String getClassifiedElementsSubQuery(DataModelFilter dataModels, Map<String, Object> args) {
-        if (dataModels.unclassifiedOnly) {
-            // language=HQL
-            return """
-                select ce.id
-                from CatalogueElement ce
-                where ce.dataModel is null
-            """
-        }
-        if (dataModels.excludes && !dataModels.includes) {
-            args.excludes = dataModels.excludes
-            // language=HQL
-            return """
-                select ce
-                from CatalogueElement ce
-                where
-                    ce.dataModel.id not in (:excludes) or ce.id not in (:excludes)
-            """
-        }
-        if (dataModels.excludes && dataModels.includes) {
-            throw new IllegalStateException("Combining exclusion and inclusion is no longer supported. Exclusion would be ignored!")
-        }
-        if (dataModels.includes && !dataModels.excludes) {
-            args.includes = dataModels.includes
-            // language=HQL
-            return """
-                select ce from CatalogueElement ce
-                where ce.dataModel.id in (:includes) or ce.id in (:includes)
-            """
-        }
-        throw new IllegalArgumentException("Data model filter must be set")
+        PaginationQuery paginationQuery = PaginationQuery.of(params)
+        SortQuery sortQuery = SortQuery.of(params)
+        changeSqlService.findAllByDataModelFilter(dataModels, paginationQuery, sortQuery)
     }
 
     ListWithTotalAndType<Change> getChanges(Map params, CatalogueElement element, @DelegatesTo(DetachedCriteria) Closure additionalCriteria = {}) {
@@ -252,8 +217,6 @@ class AuditService {
             eq 'changedId', element.id
             ne 'system', Boolean.TRUE
         }.build additionalCriteria
-
-
 
         Lists.fromCriteria(params, criteria)
     }

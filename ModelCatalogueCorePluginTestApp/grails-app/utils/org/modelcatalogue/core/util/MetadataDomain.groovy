@@ -11,6 +11,7 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
+import org.modelcatalogue.core.ValidationRule
 
 @CompileStatic
 enum MetadataDomain {
@@ -32,7 +33,8 @@ enum MetadataDomain {
     RELATIONSHIP_METADATA,
     RELATIONSHIP_TYPE,
     RELATIONSHIP_TAG,
-
+    BUSINESS_RULE,
+    TAG
 
     static MetadataDomain of(CatalogueElement catalogueElement) {
 
@@ -62,6 +64,12 @@ enum MetadataDomain {
 
         } else if ( catalogueElement instanceof DataType ) {
             return DATA_TYPE
+
+        } else if ( catalogueElement instanceof ValidationRule ) {
+            return BUSINESS_RULE
+
+        } else if ( catalogueElement instanceof ValidationRule ) {
+            return TAG
         }
         CATALOGUE_ELEMENT
     }
@@ -104,6 +112,10 @@ enum MetadataDomain {
                 return 'relationshipType'
             case RELATIONSHIP_TAG:
                 return 'relationshipTag'
+            case BUSINESS_RULE:
+                return 'validationRule'
+            case TAG:
+                return 'tag'
             default:
                 return null
         }
@@ -147,6 +159,10 @@ enum MetadataDomain {
                 return 'RelationshipType'
             case RELATIONSHIP_TAG:
                 return 'RelationshipTag'
+            case BUSINESS_RULE:
+                return 'ValidationRule'
+            case TAG:
+                return 'Tag'
             default:
                 return null
         }

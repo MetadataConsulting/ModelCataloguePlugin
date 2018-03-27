@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.path.PathFinderService
+import org.modelcatalogue.core.security.MetadataRoles
 
 import static org.springframework.http.HttpStatus.OK
 import grails.plugin.springsecurity.SpringSecurityUtils
@@ -28,7 +29,6 @@ import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.security.MetadataRolesUtils
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.DestinationClass
 import org.modelcatalogue.core.util.OrderedMap
@@ -301,7 +301,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
 
     /**
-     * Get a list of catalouge elements
+     * Get a list of catalogue elements
      * @param max, maximum number of results
      * check if the the user has a role of viewer - otherwise they can't see draft elements
      * @param status, filter by status
@@ -310,14 +310,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     @Override
     def index(Integer max) {
         handleParams(max)
-
-        //before interceptor deals with this security - this is only applicable to data models and users
-
-        boolean hasRoleViewer = modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())
-        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !hasRoleViewer) {
-            unauthorized()
-            return
-        }
 
         ListWithTotalAndType<T> items
 
@@ -337,7 +329,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             if (listWrapper.list instanceof CustomizableJsonListWithTotalAndType) {
                 CustomizableJsonListWithTotalAndType<T> customizable = listWrapper.list as CustomizableJsonListWithTotalAndType<T>
                 customizable.customize {
-                    it.collect { CatalogueElementMarshaller.minimalCatalogueElementJSON(it) }
+                    it.collect {
+                        CatalogueElementMarshaller.minimalCatalogueElementJSON(it)
+                    }
                 }
             }
         }
@@ -388,7 +382,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR') && instance.status.ordinal() >= ElementStatus.FINALIZED.ordinal()) {
+        boolean isSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRoles.ROLE_SUPERVISOR)
+        if ( !isSupervisor && instance.status.ordinal() >= ElementStatus.FINALIZED.ordinal()) {
             instance.errors.rejectValue 'status', 'cannot.modify.finalized.or.deprecated', 'Cannot modify element in finalized or deprecated state!'
             respond instance.errors, view: 'edit' // STATUS CODE 422
             return
@@ -467,7 +462,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             dataModel = instance.dataModel
         }
 
-        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(MetadataRolesUtils.roles(authority))
+        boolean isCuratorOrAdminOrSupervisor = SpringSecurityUtils.ifAnyGranted(authority)
         dataModel && ( isCuratorOrAdminOrSupervisor || dataModelAclService.hasAdministratorPermission(dataModel))
     }
 
@@ -915,19 +910,14 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected ListWrapper<T> getAllEffectiveItems(Integer max) {
 
         if (params.status?.toLowerCase() == 'active') {
-            if (modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())){
-                return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                    'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
-                }), overridableDataModelFilter)
-            }
             return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'eq' 'status', ElementStatus.FINALIZED
+                'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
             }), overridableDataModelFilter)
         }
 
         if (params.status) {
             return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER', getDataModel()))
+                'in' 'status', ElementService.getStatusFromParams(params)
             }), overridableDataModelFilter)
         }
 
@@ -1080,5 +1070,18 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         false
+    }
+
+
+    SearchParams getSearchParams(Integer max){
+        String search = params.search
+        if ( !search ) {
+            respond errors: "No query string to search on"
+            return
+        }
+        ParamArgs paramArgs = instantiateParamArgs(max)
+        SearchParams searchParams = SearchParams.of(params, paramArgs)
+
+        return searchParams
     }
 }

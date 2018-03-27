@@ -2,8 +2,8 @@ package org.modelcatalogue.core.geb
 
 class Common {
 
-    static final ApplicationUser admin = ApplicationUser.create('admin')
-    static final ApplicationUser viewer = ApplicationUser.create('viewer')
+    static final ApplicationUser supervisor = ApplicationUser.create('supervisor')
+    static final ApplicationUser viewer = ApplicationUser.create('user')
     static final ApplicationUser curator = ApplicationUser.create('curator')
 
     static final CatalogueAction save = CatalogueAction.runLast('modal', 'modal-save-element')

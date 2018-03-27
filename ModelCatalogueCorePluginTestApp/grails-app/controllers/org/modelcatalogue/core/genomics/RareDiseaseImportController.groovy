@@ -4,6 +4,7 @@ import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -20,6 +21,7 @@ class RareDiseaseImportController {
     def dataModelService
     def rareDiseaseImportService
     def modelCatalogueSecurityService
+    DataModelAclService dataModelAclService
 
     private static final CONTENT_TYPES = ['text/csv']
     static responseFormats = ['json']
@@ -41,7 +43,8 @@ class RareDiseaseImportController {
             return
         }
 
-        def builder = new DefaultCatalogueBuilder(dataModelService, elementService, modelCatalogueSecurityService.hasRole('ADMIN', getDataModel()))
+        boolean canCreateRelationshipTypes = dataModelAclService.isAdminOrHasAdministratorPermission(getDataModel())
+        def builder = new DefaultCatalogueBuilder(dataModelService, elementService, canCreateRelationshipTypes)
 
         if (CONTENT_TYPES.contains(file.contentType) && file.originalFilename.contains(".csv")) {
             def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')

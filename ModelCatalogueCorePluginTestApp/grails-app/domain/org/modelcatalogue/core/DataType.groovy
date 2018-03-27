@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import groovy.transform.CompileStatic
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.publishing.PublishingContext
@@ -62,16 +63,17 @@ class DataType extends CatalogueElement implements Validating {
      * @param x
      * @return
      */
-//    boolean validateRule(Object x) {
-//        ValueValidator.validateRule(this, x)
-//    }
     boolean validateRule(Object x) {
-        rule = processDtRule(x)
-        ValueValidator.validateRule(this, rule)
+        rule = replaceAmpersandHtmlEntityWithAmpersandSymbol(rule)
+        ValueValidator.validateRule(this, x)
     }
 
-    String processDtRule(String rule) {
-        return rule.replaceAll(/&amp;/, '&')
+    @CompileStatic
+    String replaceAmpersandHtmlEntityWithAmpersandSymbol(String rule) {
+        if ( !rule ) {
+            return rule
+        }
+        rule.replaceAll(/&amp;/, '&')
     }
 
     @Override
@@ -86,7 +88,12 @@ class DataType extends CatalogueElement implements Validating {
 
     @Override
     List<? extends Validating> getBases() {
-        return isBasedOn as List<DataType>
+        try {
+            return isBasedOn as List<DataType>
+        } catch(MissingPropertyException e) {
+            return [] as List<DataType>
+        }
+
     }
 
     static String suggestName(Set<String> suggestions) {
@@ -157,8 +164,6 @@ class DataType extends CatalogueElement implements Validating {
             }
         }
     }
-
-
 
     String processRule(String rule) {
         return rule.replaceAll(/&amp;/, '&')

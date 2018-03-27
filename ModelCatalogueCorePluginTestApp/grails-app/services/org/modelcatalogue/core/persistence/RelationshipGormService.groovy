@@ -5,12 +5,41 @@ import grails.transaction.Transactional
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.WarnGormErrors
+import org.springframework.context.MessageSource
 
-class RelationshipGormService {
+class RelationshipGormService implements WarnGormErrors {
+
+    MessageSource messageSource
 
     @Transactional(readOnly = true)
     Relationship findById(long id) {
         Relationship.get(id)
+    }
+
+    @Transactional
+    Relationship save(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
+        save(new Relationship(source: source, destination: destination, relationshipType: relationshipType))
+    }
+
+    @Transactional
+    Relationship save(Relationship relationship) {
+        if ( !relationship.save() ) {
+            warnErrors(relationship, messageSource)
+            transactionStatus.setRollbackOnly()
+        }
+        relationship
+    }
+
+    @Transactional(readOnly = true)
+    List<Relationship> findAllByDestinationIdAndRelationshipTypeSourceToDestination(Long destinationId, String relationshipTypeSourceToDestination) {
+        queryByDestinationIdAndRelationshipTypeSourceToDestination(destinationId, relationshipTypeSourceToDestination).list()
+    }
+
+    DetachedCriteria<Relationship> queryByDestinationIdAndRelationshipTypeSourceToDestination(Long destinationId, String relationshipTypeSourceToDestination) {
+        Relationship.where {
+            destination.id == destinationId && relationshipType.sourceToDestination == relationshipTypeSourceToDestination
+        }
     }
 
     @Transactional(readOnly = true)
