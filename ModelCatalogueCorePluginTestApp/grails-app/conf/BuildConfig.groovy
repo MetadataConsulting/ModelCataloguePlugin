@@ -82,6 +82,10 @@ grails.project.dependency.resolution = {
 
         compile 'org.modelcatalogue:spreadsheet-builder-poi:0.3.0-rc4'
 
+        compile 'builders.dsl:spreadsheet-builder-poi:1.0.5'
+        // for groovy support
+        compile 'builders.dsl:spreadsheet-builder-groovy:1.0.5'
+
         compile 'org.apache.poi:poi:3.13'
         compile 'org.apache.poi:poi-ooxml:3.13'
         compile 'org.apache.poi:ooxml-schemas:1.1'
