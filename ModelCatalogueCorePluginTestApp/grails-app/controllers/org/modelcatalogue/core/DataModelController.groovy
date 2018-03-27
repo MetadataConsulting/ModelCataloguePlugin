@@ -7,6 +7,7 @@ import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
+import org.modelcatalogue.gel.export.GridReportXlsxExporter
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -36,7 +37,6 @@ import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import grails.plugin.springsecurity.acl.AclUtilService
-import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.springframework.http.HttpStatus
 import org.springframework.validation.Errors
 import grails.plugin.springsecurity.SpringSecurityService
@@ -475,7 +475,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         Long assetId = asset.id
 
         assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->
-            GMCGridReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            GridReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -798,7 +798,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         ParamArgs paramArgs = instantiateParamArgs(max)
         SearchParams searchParams = SearchParams.of(params, paramArgs)
         ListWithTotalAndType<T> results = modelCatalogueSearchService.search(searchParams)
-       // ListWithTotalAndType<T> results = getAllEffectiveItems(max)
+        // ListWithTotalAndType<T> results = getAllEffectiveItems(max)
 
         respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(search, 'UTF-8')}", results)
     }
