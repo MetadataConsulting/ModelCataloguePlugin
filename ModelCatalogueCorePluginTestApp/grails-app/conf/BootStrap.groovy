@@ -84,6 +84,12 @@ class BootStrap {
         log.info 'init policies and tags'
         initPoliciesAndTagsService.initPoliciesAndTags()
 
+        log.info 'init users'
+        initSecurityService.initUsers()
+
+        log.info 'init user roles'
+        initSecurityService.initUserRoles()
+
         log.info 'init request maps'
         metadataSecurityService.secureUrlMappings()
 

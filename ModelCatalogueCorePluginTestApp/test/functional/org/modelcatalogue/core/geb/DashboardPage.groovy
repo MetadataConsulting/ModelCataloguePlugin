@@ -10,7 +10,7 @@ class DashboardPage extends Page {
 
     static content = {
         searchInputField { $('#search', 0) }
-        filterButton { $('#filter-btn')}
+        filterButton { $('#search-btn')}
         dataModelLinks { $('a.data-model-link') }
         dataModelLink { $('a.data-model-link', text: it) }
         nav { $('#topmenu', 0) .module(NavModule) }
