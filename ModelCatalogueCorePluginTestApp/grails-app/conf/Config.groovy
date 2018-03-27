@@ -201,24 +201,28 @@ environments {
         // ---
         grails.logging.jul.usebridge = false
         println "ServerURL:" + grails.serverURL
-        println "MDX_SERVER_URL:" + System.getenv('MDX_SERVER_URL')
-        grails.serverURL = System.getenv('MDX_SERVER_URL')//"https://localhost:8899/mc"
+        println "MC_SERVER_URL:" + System.getenv('MC_SERVER_URL')
+        grails.serverURL = System.getenv('MC_SERVER_URL')//"https://localhost:8899/mc"
         //println "ServerURL:" + grails.serverURL
         println "ServerURL:${grails.serverURL} END"
-        println "MDX_DB_URL:" + System.getenv('MDX_DB_URL')
-        println "MDX_DB_USERNAME:" + System.getenv('MDX_DB_USERNAME')
-        println "MDX_DB_PASSWORD:" + System.getenv('MDX_DB_PASSWORD')
-        println "MDX_ELASTIC_HOST:" + System.getenv('MDX_ELASTIC_HOST')
-        println "MDX_ELASTIC_PORT:" + System.getenv('MDX_ELASTIC_PORT')
+        println "MC_DB_URL:" + System.getenv('MC_DB_URL')
+        println "MC_DB_USERNAME:" + System.getenv('MC_DB_USERNAME')
+        println "MC_DB_PASSWORD:" + System.getenv('MC_DB_PASSWORD')
+        println "MC_ELASTIC_HOST:" + System.getenv('MC_ELASTIC_HOST')
+        println "MC_ELASTIC_PORT:" + System.getenv('MC_ELASTIC_PORT')
         println "MC_MAIL_FROM:" + System.getenv('MC_MAIL_FROM')
-        println "MDX_MAIL_HOST:" + System.getenv('MDX_MAIL_HOST')
-        println "MDX_MAIL_PORT:" + System.getenv('MDX_MAIL_PORT')
-        println "MDX_MAIL_USERNAME:" + System.getenv('MDX_MAIL_USERNAME')
-        println "MDX_MAIL_PASSWORD:" + System.getenv('MDX_MAIL_PASSWORD')
-        println "MDX_NAME:" + System.getenv('MDX_NAME')
-        println "MDX_WELCOME:" + System.getenv('MDX_WELCOME')
-        println "MDX_INFO:" + System.getenv('MDX_INFO')
-        println "MDX_ALLOW_SIGNUP:" + System.getenv('MDX_ALLOW_SIGNUP')
+        println "MC_MAIL_HOST:" + System.getenv('MC_MAIL_HOST')
+        println "MC_MAIL_PORT:" + System.getenv('MC_MAIL_PORT')
+        println "MC_MAIL_USERNAME:" + System.getenv('MC_MAIL_USERNAME')
+        println "MC_MAIL_PASSWORD:" + System.getenv('MC_MAIL_PASSWORD')
+        println "MC_NAME:" + System.getenv('MC_NAME')
+        println "MC_WELCOME:" + System.getenv('MC_WELCOME')
+        println "MC_INFO:" + System.getenv('MC_INFO')
+        println "MC_ALLOW_SIGNUP:" + System.getenv('MC_ALLOW_SIGNUP')
+
+        MC_ES_HOST
+        MC_ES_DELAY_AFTER_BATCH
+        MC_ES_ELEMENTS_PER_BATCH
 
         grails.plugin.springsecurity.auth.loginFormUrl = grails.serverURL + "/login/auth"
         println grails.serverURL + "/login/ajaxSuccess"
