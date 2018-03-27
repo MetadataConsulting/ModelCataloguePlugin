@@ -14,5 +14,16 @@ class VersionsPage extends Page {
     }
 
     static content = {
+        rows { $('#history-tab tbody tr') }
     }
+
+    boolean  rowsContainText(String text) {
+        for ( int i = 0; i < rows.size(); i++ ) {
+            if ( rows[i].text().contains(text) ) {
+                return true
+            }
+        }
+        false
+    }
+
 }

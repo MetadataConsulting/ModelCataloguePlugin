@@ -3,7 +3,7 @@ package org.modelcatalogue.core.geb
 import geb.Page
 import geb.module.Checkbox
 
-class CreateDataModelPage extends Page {
+class CreateDataModelPage extends Page implements InputUtils {
 
     static url = '/dataModel/create'
 
@@ -53,9 +53,5 @@ class CreateDataModelPage extends Page {
         fillInput(modelCatalogueIdInput, value)
     }
 
-    void fillInput(def input, String value) {
-        for ( char c : value.toCharArray() ) {
-            input << "${c}".toString()
-        }
-    }
+
 }
