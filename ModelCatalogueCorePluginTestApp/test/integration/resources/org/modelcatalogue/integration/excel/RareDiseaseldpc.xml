@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<headersMap xmlns="model_catalogue_excel_header_mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="model_catalogue_excel_header_mapping model_catalogue_excel_header_mapping.xsd">
+
+    <!-- How to use this configuration file: Put the header name e.g. LOINC_NUM in the tag dataElementID.
+  This will use the entry under LOINC_NUM as the Data Element ID.
+  <dataElementID>LOINC_NUM</dataElementID> -->
+	<dataClassName>data_class</dataClassName>
+    <dataElementID>model_catalogue_id</dataElementID>
+    <dataElementName>name</dataElementName> <!-- must occur-->
+    <dataElementDescription>description</dataElementDescription>
+	<dataTypeName>data_type</dataTypeName>
+</headersMap>

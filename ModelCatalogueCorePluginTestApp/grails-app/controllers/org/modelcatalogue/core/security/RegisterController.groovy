@@ -5,6 +5,9 @@ import grails.plugin.springsecurity.ui.RegisterCommand
 import grails.plugin.springsecurity.ui.RegistrationCode
 import org.modelcatalogue.core.RegisterService
 import org.modelcatalogue.core.TransactionalEmailService
+import org.modelcatalogue.core.persistence.RegistrationCodeGormService
+import org.modelcatalogue.core.persistence.UserGormService
+import org.modelcatalogue.core.persistence.UserRoleGormService
 import org.springframework.security.core.context.SecurityContextHolder
 
 class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
@@ -14,6 +17,12 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
     TransactionalEmailService transactionalEmailService
 
     RegisterService registerService
+
+    UserRoleGormService userRoleGormService
+
+    UserGormService userGormService
+
+    RegistrationCodeGormService registrationCodeGormService
 
     def register(RegisterCommand command) {
 
@@ -28,13 +37,12 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             return
         }
 
-        def adminEmail = System.getenv(UserService.ENV_ADMIN_EMAIL)
         def supervisorEmail = System.getenv(UserService.ENV_SUPERVISOR_EMAIL)
-        boolean shouldUserBeDisabled =  (adminEmail && command.email != adminEmail) && (supervisorEmail && command.email != supervisorEmail)
+        boolean shouldUserBeDisabled = (supervisorEmail && command.email != supervisorEmail)
         boolean enabled = !shouldUserBeDisabled
         if ( shouldUserBeDisabled ) {
             // notify admin
-            transactionalEmailService.sendEmail(adminEmail,
+            transactionalEmailService.sendEmail(supervisorEmail,
                     conf.ui.register.emailFrom,
                     "Metadata Registry - new user",
                     "New user registered to your Metadata Registry. Please enable that account in user administration.")
@@ -121,44 +129,33 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
         String token = params.t
 
-        def registrationCode = token ? RegistrationCode.findByToken(token) : null
+        RegistrationCode registrationCode = registrationCodeGormService.findByToken(token)
         if (!registrationCode) {
             flash.error = message(code: 'spring.security.ui.register.badCode')
             redirect uri: defaultTargetUrl
             return
         }
 
-        def user = null
-        // TODO to ui service
-        RegistrationCode.withTransaction { status ->
-            user = lookupUserClass().findWhere(username: registrationCode.username)
-            if (!user) {
-                return
-            }
-            user.save(flush: true)
-            def UserRole = lookupUserRoleClass()
-            def Role = lookupRoleClass()
-            for (roleName in conf.ui.register.defaultRoleNames) {
-                UserRole.create user, Role.findByAuthority(roleName)
-            }
-
-            if (System.getenv(UserService.ENV_ADMIN_EMAIL) && user.email == System.getenv(UserService.ENV_ADMIN_EMAIL)) {
-                userService.redefineRoles(user, UserService.ACCESS_LEVEL_ADMIN)
-            }
-            if (System.getenv(UserService.ENV_SUPERVISOR_EMAIL) && user.email == System.getenv(UserService.ENV_SUPERVISOR_EMAIL)) {
-                userService.redefineRoles(user, UserService.ACCESS_LEVEL_SUPERVISOR)
-            }
-
-            registrationCode.delete()
-        }
-
+        User user = userGormService.findByUsername(registrationCode.username)
         if (!user) {
             flash.error = message(code: 'spring.security.ui.register.badCode')
             redirect uri: defaultTargetUrl
             return
         }
+        Set<String> roles = conf.ui.register.defaultRoleNames as Set<String>
+        if (System.getenv(UserService.ENV_SUPERVISOR_EMAIL) && user.email == System.getenv(UserService.ENV_SUPERVISOR_EMAIL)) {
+            roles << MetadataRoles.ROLE_SUPERVISOR
+        }
 
-        if (user.accountLocked) {
+        RegistrationCode.withTransaction { status ->
+            for (String roleName in roles) {
+                userRoleGormService.saveUserRoleByUsernameAndAuthority(user.username, roleName)
+            }
+            registrationCodeGormService.delete()
+            registrationCode.delete()
+        }
+
+       if (user.accountLocked) {
             flash.message = message(code: 'spring.security.ui.register.complete.but.locked')
         } else {
             flash.message = message(code: 'spring.security.ui.register.complete')
