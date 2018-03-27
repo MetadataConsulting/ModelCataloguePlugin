@@ -14,7 +14,6 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValidationRule
-import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
 import org.modelcatalogue.core.util.DataModelFilter
 import builders.dsl.spreadsheet.builder.api.RowDefinition
 import builders.dsl.spreadsheet.builder.api.SheetDefinition
@@ -52,9 +51,8 @@ class GridReportXlsxExporter  {
     List<DataClass> getDataClassesFromModel(DataModel dataModel) {
         return dataClassService.getTopLevelDataClasses(DataModelFilter.includes(dataModel), ImmutableMap.of('status', 'active'), true).items
     }
-    protected List<String> excelHeaders = ['Data Element', 'Multiplicity', 'Data Type', 'Validation Rule', 'Business Rule', 'Labkey Field Name', 'Labkey View', 'Additional review', 'Additional Rule']
+    protected List<String> excelHeaders = ['Data Element', 'Multiplicity', 'Data Type', 'Validation Rule', 'Business Rule']
 
-    Map<String, Closure> sheetsAfterMainSheetExport() {}
 
     void export(OutputStream outputStream) {
         SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
@@ -62,7 +60,6 @@ class GridReportXlsxExporter  {
         dataClasses = getDataClasses()
 
         builder.build {
-//            apply ModelCatalogueStyles
             style(H1, h1CellStyle)
             style(STANDARD, standardCellStyle)
             style(ANALYSIS, analysisStyle)
@@ -85,11 +82,9 @@ class GridReportXlsxExporter  {
                 }
                 dataClasses.each { dataClass->
                     debugLine("GridReportXlsxExporter.export() dataClass: ${dataClass.name}")
-                    buildRows(sheetDefinition, dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), 1, 2)
+                    def childRels = dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
+                    printClass(dataClass, sheetDefinition, 1, 2, childRels.size(), [])
                 }
-            }
-            sheetsAfterMainSheetExport().each{name, instructions ->
-                sheet(name, instructions)
             }
         }
     }
@@ -117,7 +112,6 @@ class GridReportXlsxExporter  {
         Collection<Relationship> dataElements = child.getOutgoingRelationshipsByType(RelationshipType.containmentType)
         sheet.with { SheetDefinition sheetDefinition ->
             row(rowDepth) { RowDefinition rowDefinition ->
-                debugLine("GridReportXlsxExporter.printClass() dataClass: ${child.name}")
                 (1..depth).each{
                     if (it == columnDepth) {
                         cell(columnDepth) {
@@ -178,11 +172,7 @@ class GridReportXlsxExporter  {
             [ "${getMultiplicity(dataElementRelationship)}",
               "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}",
               "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}",
-              "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}",
-              "${(dataElement?.ext.get("LabKey Field Name")) ?: ""}",
-              "${(dataElement?.ext.get("Additional Review")) ?: ""}",
-              "${(dataElement?.ext.get("Additional Rule")) ?: ""}",
-              "${(dataElement?.ext.get("Additional Rule Dependency")) ?: ""}"].each { cellValue ->
+              "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}"].each { cellValue ->
                 cell {
                     value cellValue
                     style STANDARD
