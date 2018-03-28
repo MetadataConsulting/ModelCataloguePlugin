@@ -238,7 +238,7 @@ class RareDiseasesDocExporter {
     private void descendDataClasses(DocumentBuilder builder, DataClass dataClass, Integer level) {
         log.debug "descendDataClasses level=$level count=" + this.dataClassCount
 
-        String dataClassName = dataClass.name + " (${dataClass.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:dataClass.getLatestVersionId()})"
+        String dataClassName = dataClass.name + " (${(dataClass.modelCatalogueId)?:(dataClass.getLatestVersionId())?:dataClass.id})"
         levelNameDescriptions.put(level, dataClassName)
         levelDataClassDescriptions.put(level, dataClass.description)
 
@@ -294,7 +294,7 @@ class RareDiseasesDocExporter {
 
     private void printDataClass(DocumentBuilder builder, DataClass dataClass, Integer level, boolean phenotypeMode) {
         log.debug "printDataClass level=$level"
-        String dataClassName = dataClass.name + " (${dataClass.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:dataClass.getLatestVersionId()})"
+        String dataClassName = dataClass.name + " (${(dataClass.modelCatalogueId)?:(dataClass.getLatestVersionId())?:dataClass.id})"
         levelNameDescriptions.put(level, dataClassName)
 
         builder.with {
