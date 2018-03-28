@@ -276,7 +276,7 @@ class RareDiseasesDocExporter {
                         this.dataClassCount = this.dataClassCount + 1
                         printDataClass(builder, child, level + 1, false)
 
-                    } else if (child.name.matches("(?i:.*Phenotype.*)") && !eligibilityMode) {
+                    } else if (child.name.matches("(?i:.*Phenotype.*)") && !child.name.matches("(?i:.*Clinical Test.*)") && !child.name.matches("(?i:.*Eligibility.*)") && !eligibilityMode) {
                         this.dataClassCount = this.dataClassCount + 1
                         printDataClass(builder, child, level + 1, true)
 
