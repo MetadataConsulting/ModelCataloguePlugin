@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
+import org.junit.Ignore
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -17,6 +18,7 @@ import spock.lang.Title
 - On the tree view, click on the Versions link
 - Verify version is displaying at the end of every model
 ''')
+@Ignore
 class MET1433Spec extends GebSpec {
 
     void "Verify navigation to old version of a model using the tree view"() {

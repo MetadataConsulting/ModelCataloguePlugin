@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
+import org.junit.Ignore
 import org.modelcatalogue.core.geb.CreateDataModelPage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
@@ -22,10 +23,10 @@ import spock.lang.Title
 - Check that data model is finalized
 ''')
 @Stepwise
+@Ignore
 class MET1634Spec extends GebSpec {
     @Shared
     String uuid = UUID.randomUUID().toString()
-    private static final String table = 'tbody.ng-scope>tr:nth-child(1)>td:nth-child(4)'
 
     def "Login to model catalogue"() {
         when: "Login to Model Catalogue as curator"

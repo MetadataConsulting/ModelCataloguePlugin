@@ -19,6 +19,9 @@ class CreateDataModelPage extends Page implements InputUtils {
         field { $('li.checkbox span', text: it).parent() }
         fieldCheckbox { field(it).find('input', type: 'checkbox', 0).module(Checkbox) }
         submitButton { $('#createdatamodel-submit', 0) }
+        defaultTag { $("a.remove-tag") }
+        policies { $("input#dataModelPolicy") }
+        policyTag { $("span.with-pointer.ng-binding") }
     }
 
     void submit() {
@@ -53,5 +56,15 @@ class CreateDataModelPage extends Page implements InputUtils {
         fillInput(modelCatalogueIdInput, value)
     }
 
+    void removeTag() {
+        defaultTag.click()
+    }
 
+    void setPolicy(String policyName) {
+        fillInput(policies, policyName)
+    }
+
+    void getPolicies() {
+        policyTag.text()
+    }
 }

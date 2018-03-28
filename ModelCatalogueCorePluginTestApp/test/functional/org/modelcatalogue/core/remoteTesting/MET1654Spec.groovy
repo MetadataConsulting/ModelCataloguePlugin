@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
+import org.junit.Ignore
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.ImportedDataModelsPage
@@ -19,6 +20,7 @@ import spock.lang.Title
 - Click on the grey plus button
 ''')
 @Stepwise
+@Ignore
 class MET1654Spec extends GebSpec {
 
     def "Login to Model Catalouge"() {

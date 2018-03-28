@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
+import org.junit.Ignore
 import org.modelcatalogue.core.geb.CreateDataModelPage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
@@ -17,6 +18,7 @@ import spock.lang.Title
 - Fill the form and select Select unique of kind or default checks
 - Click on the green button
 ''')
+@Ignore
 class MET1604Spec extends GebSpec {
 
     def "Login to Model Catalogue"() {
