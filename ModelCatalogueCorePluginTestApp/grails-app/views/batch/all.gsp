@@ -11,19 +11,8 @@
         <h1><g:message code="batch.title" default="Mapping Batches"/></h1>
     </div>
 
-    <g:if test="${flash.message}">
-        <div class="alert alert-info">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <p>${flash.message}</p>
-        </div>
-    </g:if>
-
-    <g:if test="${flash.error}">
-        <div class="alert alert-danger">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <p>${flash.error}</p>
-        </div>
-    </g:if>
+    <g:render template="/templates/flashmessage" />
+    <g:render template="/templates/flasherror" />
 
     <g:if test="${batchList}">
 
