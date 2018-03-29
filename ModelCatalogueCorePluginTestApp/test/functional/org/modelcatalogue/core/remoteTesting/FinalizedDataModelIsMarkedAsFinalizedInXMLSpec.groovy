@@ -3,14 +3,10 @@ package org.modelcatalogue.core.remoteTesting
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.HomePage
-import org.modelcatalogue.core.geb.LoginModalPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
-import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.Narrative
 import spock.lang.Title
-import groovy.io.FileType
 import spock.lang.IgnoreIf
 
 @Issue('https://metadata.atlassian.net/browse/MET-1561')
@@ -22,12 +18,10 @@ import spock.lang.IgnoreIf
 - Scroll down and click on the Export to catalogue XML
 - Open the downloaded file and verify that the status is marked as finalized
 ''')
-
 @IgnoreIf({ !System.getProperty("downloadFilepath") })
 class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
 
     def 'Examine that finalized data model is marked as finalized in the XML'() {
-
         given:
         String dataModelName = "Cancer Model"
 
@@ -52,7 +46,6 @@ class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
         dataModelPage.isExportVisible()
 
         when:
-        List<String> files = []
         String downloadPath = System.getProperty("downloadFilepath")
         File file = new File(downloadPath)
 
