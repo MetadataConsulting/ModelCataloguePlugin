@@ -11,17 +11,24 @@ import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionRequestImpl
 import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionResponse
 import org.modelcatalogue.core.mappingsuggestions.MappingsSuggestionsGateway
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.modelcatalogue.core.mappingsuggestions.MatchAgainst
 =======
 >>>>>>> workaround issues with batch names
+=======
+import org.modelcatalogue.core.mappingsuggestions.MapppingSuggestionsConfigurationService
+>>>>>>> Display mapping suggestion being used at the bottom fo the page
 import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.context.MessageSource
 import org.springframework.validation.ObjectError
+<<<<<<< HEAD
 import javax.annotation.PostConstruct
 
+=======
+>>>>>>> Display mapping suggestion being used at the bottom fo the page
 import javax.annotation.PostConstruct
 
 @Slf4j
@@ -50,6 +57,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     protected List<ActionState> defaultActionStates() {
         ActionState.values()  as List<ActionState>
     }
+    MapppingSuggestionsConfigurationService mapppingSuggestionsConfigurationService
 
     int defaultMax
     int defaultScore
