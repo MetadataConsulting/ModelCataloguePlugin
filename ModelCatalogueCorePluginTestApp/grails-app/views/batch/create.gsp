@@ -10,12 +10,8 @@
             <h1><g:message code="batch.create" default="Generate Suggestions"/></h1>
         </div>
 
-        <g:if test="${flash.error}">
-            <div class="alert alert-danger">
-                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                <p>${flash.error}</p>
-            </div>
-        </g:if>
+        <g:render template="/templates/flashmessage" />
+        <g:render template="/templates/flasherror" />
         <g:form controller="batch" method="POST" action="generateSuggestions">
             <ol>
                 <li>
