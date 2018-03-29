@@ -1,4 +1,4 @@
-<%@ page import="org.modelcatalogue.core.actions.ActionState" %>
+<%@ page import="org.modelcatalogue.core.mappingsuggestions.MatchAgainst; org.modelcatalogue.core.actions.ActionState" %>
 <html>
 <head>
     <title><g:message code="batch.title" default="Mapping Batches"/></title>
@@ -54,6 +54,9 @@
         </g:form>
 
     </g:if>
+
+    <hr/>
+    <p><small><g:message code="mappingsuggestions.matchAgainst" args="[matchAgainst == MatchAgainst.ELASTIC_SEARCH ? 'Elastic Search' : 'Database']" default="Mapping Suggestion configured to use {0}"/></small></p>
 
 </div>
 </body>

@@ -2,6 +2,7 @@ package org.modelcatalogue.core.actions
 
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionsController
+import org.modelcatalogue.core.mappingsuggestions.MapppingSuggestionsConfigurationService
 import org.modelcatalogue.core.persistence.BatchGormService
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -50,6 +51,7 @@ class BatchControllerAllowedMethodsSpec extends Specification {
     def "test BatchController.all accepts GET requests"() {
         when:
         request.method = 'GET'
+        controller.mapppingSuggestionsConfigurationService = Mock(MapppingSuggestionsConfigurationService)
         controller.batchService = Mock(BatchService)
         controller.batchGormService = Mock(BatchGormService)
         controller.all()
