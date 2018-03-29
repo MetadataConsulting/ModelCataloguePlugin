@@ -13,7 +13,7 @@ class DashboardPage extends Page {
         filterButton { $('#filter-btn') }
         dataModelLinks(required: false) { $('a.data-model-link') }
         dataModelLink(wait: true) { $('a.data-model-link', text: it) }
-        nav { $('#topmenu', 0).module(NavModule) }
+        nav { $('#topmenu', 0) .module(NavModule) }
     }
 
     void search(String query) {
