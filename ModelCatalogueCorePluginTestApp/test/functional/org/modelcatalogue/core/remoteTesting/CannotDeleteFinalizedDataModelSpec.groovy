@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebReportingSpec
+import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.CreateDataClassPage
 import org.modelcatalogue.core.geb.CreateDataModelPage
 import org.modelcatalogue.core.geb.DashboardPage
@@ -26,7 +27,8 @@ import spock.lang.Title
 - On the top menu, click on the data model link
 - Click on the delete link
 ''')
-class CannotDeleteFinalizedDataModelSpec extends GebReportingSpec {
+class CannotDeleteFinalizedDataModelSpec extends GebSpec {
+
     @Shared
     String uuid = UUID.randomUUID().toString()
 
@@ -126,6 +128,7 @@ class CannotDeleteFinalizedDataModelSpec extends GebReportingSpec {
         then: 'The title of the data model displays "finalized" texts'
         dataModelPage.titleContains("$uuid")
         dataModelPage.titleContains("@0.0.1")
+        dataModelPage.titleContains("$uuid (0.0.1) finalized")
 
         when: "Click on the Main Menu"
         dataModelPage.dropdown()

@@ -1,11 +1,9 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebReportingSpec
+import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Title
-import spock.lang.Shared
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1634')
 @Title('Check that user is able to finalize a data model')
@@ -16,12 +14,14 @@ import spock.lang.Shared
 - Scroll down and select Finalized
 - Check that data model is finalized
 ''')
-class UserCanFinalizeDataModelSpec extends GebReportingSpec {
+class UserCanFinalizeDataModelSpec extends GebSpec {
 
     @Shared
     String uuid = UUID.randomUUID().toString()
 
     def "Check that user is able to finalized a data model"() {
+        given:
+        final String uuid = UUID.randomUUID().toString()
 
         when: 'login as a curator'
         LoginPage loginPage = to LoginPage
@@ -118,5 +118,6 @@ class UserCanFinalizeDataModelSpec extends GebReportingSpec {
         then: 'The title of the data model displays "finalized" texts'
         dataModelPage.titleContains("$uuid")
         dataModelPage.titleContains("@0.0.1")
+        dataModelPage.titleContains("$uuid (0.0.1) finalized")
     }
 }

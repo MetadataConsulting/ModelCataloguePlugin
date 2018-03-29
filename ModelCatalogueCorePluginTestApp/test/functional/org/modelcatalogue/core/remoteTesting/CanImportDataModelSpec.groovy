@@ -1,12 +1,9 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
-import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Shared
-import spock.lang.Stepwise
 import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-1626')
