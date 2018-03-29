@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
-import org.junit.Ignore
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.HomePage
@@ -21,7 +20,6 @@ import spock.lang.Title
 - Scroll down and click on the Export to catalogue XML
 - Open the downloaded file and verify that the status is marked as finalized
 ''')
-@Ignore
 class MET1561Spec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:

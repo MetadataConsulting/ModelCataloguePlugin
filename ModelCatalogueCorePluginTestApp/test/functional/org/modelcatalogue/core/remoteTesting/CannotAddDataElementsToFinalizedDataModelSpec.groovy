@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
-import org.junit.Ignore
 import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
 import spock.lang.Narrative
@@ -17,7 +16,6 @@ import spock.lang.Title
 - Verify that you can not create a new data element
 ''')
 @Stepwise
-@Ignore
 class CannotAddDataElementsToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:

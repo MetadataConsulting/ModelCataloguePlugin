@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
-import org.junit.Ignore
 import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.CreateDataClassPage
 import org.modelcatalogue.core.geb.CreateDataModelPage
@@ -29,7 +28,6 @@ import spock.lang.Title
 - Click on the delete link
 ''')
 @Stepwise
-@Ignore
 class MET1441Spec extends GebSpec {
     @Shared
     String uuid = UUID.randomUUID().toString()

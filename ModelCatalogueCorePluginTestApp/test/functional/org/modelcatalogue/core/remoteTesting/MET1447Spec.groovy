@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
-import org.junit.Ignore
 import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
@@ -26,7 +25,6 @@ import spock.lang.Stepwise
 - Verify that Data Element and Type are cloned
 ''')
 @Stepwise
-@Ignore
 class MET1447Spec extends GebSpec {
 
     @Shared

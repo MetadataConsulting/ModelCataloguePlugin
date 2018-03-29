@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
-import org.junit.Ignore
 import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
@@ -21,7 +20,6 @@ import spock.lang.Title
 - Check that the imported data model appears on the list of activity
 - Remove the imported data model
 ''')
-@Ignore
 class MET1650Spec extends GebSpec {
     @Shared
     String selectModelToEdit = "Test 1"

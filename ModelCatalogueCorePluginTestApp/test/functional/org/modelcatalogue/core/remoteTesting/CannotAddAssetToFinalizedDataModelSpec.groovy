@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
-import org.junit.Ignore
 import org.modelcatalogue.core.geb.AssetsPage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
@@ -10,7 +9,6 @@ import org.modelcatalogue.core.geb.MeasurementUnitsPage
 import spock.lang.Stepwise
 
 @Stepwise
-@Ignore
 class CannotAddAssetToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:

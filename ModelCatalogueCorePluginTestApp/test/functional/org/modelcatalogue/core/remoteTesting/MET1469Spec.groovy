@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
-import org.junit.Ignore
 import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
 import spock.lang.Narrative
@@ -20,7 +19,6 @@ import spock.lang.Title
 - Create a new Tag
 ''')
 @Stepwise
-@Ignore
 class MET1469Spec extends GebSpec {
     @Shared
     String nameLabel = "NEW_TESTING_MODEL"
