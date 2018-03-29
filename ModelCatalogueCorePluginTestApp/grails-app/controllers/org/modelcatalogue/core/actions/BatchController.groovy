@@ -1,15 +1,21 @@
 package org.modelcatalogue.core.actions
 
+import groovy.transform.CompileDynamic
 import groovy.util.logging.Slf4j
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.AbstractRestfulController
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.dataarchitect.DataArchitectService
+import org.modelcatalogue.core.mappingsuggestions.MapppingSuggestionsConfigurationService
+import org.modelcatalogue.core.mappingsuggestions.MatchAgainst
 import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.context.MessageSource
 import org.springframework.validation.ObjectError
+
+import javax.annotation.PostConstruct
 
 @Slf4j
 class BatchController extends AbstractRestfulController<Batch> {
@@ -21,6 +27,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     DataArchitectService dataArchitectService
     MessageSource messageSource
     def executorService
+    MapppingSuggestionsConfigurationService mapppingSuggestionsConfigurationService
 
     static allowedMethods = [
             all: 'GET',
@@ -44,8 +51,11 @@ class BatchController extends AbstractRestfulController<Batch> {
     def all() {
         List<BatchViewModel> batchList = batchService.findAllActive()
         Number total = batchGormService.countActive()
-
-        [batchList: batchList, total: total]
+        [
+                batchList: batchList,
+                total: total,
+                matchAgainst: mapppingSuggestionsConfigurationService.matchAgainst
+        ]
     }
 
     def create() {
