@@ -580,8 +580,8 @@ class DataArchitectService {
 //  currently only need to match the data elements
 //  mappingSuggestionsGeneratorService.execute(batch.id, DataClass.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
             mappingSuggestionsGeneratorService.execute(batch.id, DataElement.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
-s
-            batch.name = suggestedFuzzyMappingsName(dsataModelA, dataModelB)
+
+            batch.name = suggestedFuzzyMappingsName(dataModelA, dataModelB)
             batch.save()
 
         } catch(Exception ex){
