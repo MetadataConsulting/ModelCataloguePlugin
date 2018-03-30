@@ -27,18 +27,18 @@ class DataModelViewModelUtils {
     }
 
     @CompileDynamic
-    static List<DataModelViewModel> ofProjections(def dataModelList, Map<Long, List<AssetViewModel>> dataModelToAssets) {
+    static List<DataModelViewModel> ofProjections(List<DataModel> dataModelList, Map<Long, List<AssetViewModel>> dataModelToAssets) {
         if ( !dataModelList ) {
             return [] as List<DataModelViewModel>
         }
-        dataModelList.collect { def arr ->
-            Long dataModelId = arr[0] as Long
+        dataModelList.collect { DataModel dataModel ->
+            Long dataModelId = dataModel.id as Long
             List<AssetViewModel> assetList = dataModelToAssets[dataModelId]
             new DataModelViewModel(id: dataModelId,
-                    name: arr[1] as String,
-                    lastUpdated: arr[2] as Date,
-                    status: arr[3] as ElementStatus,
-                    semanticVersion: arr[4] as String,
+                    name: dataModel.name as String,
+                    lastUpdated: dataModel.lastUpdated as Date,
+                    status: dataModel.status as ElementStatus,
+                    semanticVersion: dataModel.semanticVersion as String,
                     assetsList: assetList)
         }
     }
