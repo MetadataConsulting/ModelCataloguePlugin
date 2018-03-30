@@ -23,24 +23,6 @@ class DataModelNavModule extends Module {
     public static final String reindexDataModelLinkSelector = 'li#reindex-data-model-menu-item a'
 
     static content = {
-<<<<<<< HEAD
-        finalizeLink(required: false, wait: true) { $('li#finalize-menu-item a') }
-        creteNewVersionLink(required: false, wait: true) { $('li#create-new-version-menu-item a') }
-        archiveLink(required: false, wait: true) { $('li#archive-menu-item a') }
-        deleteLink(required: false, wait: true) { $('li#delete-menu-item a') }
-        addImportLink(required: false,  wait: true) { $('li#add-import-menu-item a') }
-        createNewRelationshipLink(required: false, wait: true) { $('li#create-new-relationship-menu-item a') }
-        createDataClassLink(required: false, wait: true) { $('li#catalogue-element-create-dataClass-menu-item a') }
-        createDataElementLink(required: false, wait: true) { $('li#catalogue-element-create-dataElement-menu-item a') }
-        createDataTypeLink(required: false, wait: true) { $('li#catalogue-element-create-dataType-menu-item a') }
-        createMeasurementUnitLink(required: false, wait: true) { $('li#catalogue-element-create-measurementUnit-menu-item a') }
-        createAssetLink(required: false, wait: true) { $('li#catalogue-element-create-asset-menu-item a') }
-        createValidationRuleLink(required: false, wait: true) { $('li#catalogue-element-create-validationRule-menu-item a') }
-        mergeLink(required: false, wait: true) { $('li#merge-menu-item a') }
-        cloneAnotherIntoCurrentLink(required: false, wait: true) { $('li#clone-from-menu-item a') }
-        cloneCurrentIntoAnotherLink(required: false, wait: true) { $('li#clone-menu-item a') }
-
-=======
         finalizeLink(required: false, wait: true) { $(finalizeLinkSelector, 0) }
         creteNewVersionLink(required: false, wait: true) { $(creteNewVersionLinkSelector, 0) }
         archiveLink(required: false, wait: true) { $(archiveLinkSelector, 0) }
@@ -77,7 +59,6 @@ class DataModelNavModule extends Module {
 
     boolean existsArchive(Browser browser) {
         !browser.find(archiveLinkSelector).empty
->>>>>>> use selector with find
     }
 
     boolean existsDelete(Browser browser) {
