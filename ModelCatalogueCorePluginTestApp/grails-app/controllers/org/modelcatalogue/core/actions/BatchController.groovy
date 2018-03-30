@@ -5,11 +5,11 @@ import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.AbstractRestfulController
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.dataarchitect.DataArchitectService
+import org.modelcatalogue.core.mappingsuggestions.MapppingSuggestionsConfigurationService
 import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionRequest
 import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionRequestImpl
 import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionResponse
 import org.modelcatalogue.core.mappingsuggestions.MappingsSuggestionsGateway
-import org.modelcatalogue.core.mappingsuggestions.MapppingSuggestionsConfigurationService
 import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.IdName
@@ -28,6 +28,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     DataArchitectService dataArchitectService
     MessageSource messageSource
     def executorService
+    MapppingSuggestionsConfigurationService mapppingSuggestionsConfigurationService
     int defaultMax
     int defaultScore
 
@@ -43,7 +44,6 @@ class BatchController extends AbstractRestfulController<Batch> {
     protected List<ActionState> defaultActionStates() {
         ActionState.values()  as List<ActionState>
     }
-    MapppingSuggestionsConfigurationService mapppingSuggestionsConfigurationService
 
     static allowedMethods = [
             all: 'GET',
