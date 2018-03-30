@@ -32,7 +32,6 @@ import org.modelcatalogue.core.util.SortQuery
 import org.modelcatalogue.core.view.AssetViewModel
 import org.modelcatalogue.core.view.CatalogueElementViewModelUtils
 import org.modelcatalogue.core.view.DataModelViewModelUtils
-import org.springframework.security.access.prepost.PostFilter
 
 @CompileStatic
 class DashboardService {
