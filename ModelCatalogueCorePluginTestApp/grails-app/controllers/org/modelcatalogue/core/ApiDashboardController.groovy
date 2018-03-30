@@ -4,13 +4,9 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.modelcatalogue.core.dashboard.CatalogueElementSearchResult
 import org.modelcatalogue.core.dashboard.DashboardService
-import org.modelcatalogue.core.dashboard.SearchStatusQuery
 import org.modelcatalogue.core.util.GormUrlName
-import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.MetadataDomainEntity
-import org.modelcatalogue.core.util.PaginationQuery
-import org.modelcatalogue.core.util.SortQuery
 
 @CompileStatic
 class ApiDashboardController {

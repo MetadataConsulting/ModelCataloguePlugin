@@ -3,6 +3,7 @@ package org.modelcatalogue.core.geb
 import geb.Page
 
 class FinalizeDataModelPage extends Page implements InputUtils {
+    static atCheckWaiting = true
 
     static at = { $('.modal-dialog').text()?.contains('Finalize Data Model') }
 
@@ -17,5 +18,6 @@ class FinalizeDataModelPage extends Page implements InputUtils {
 
     void submit() {
         finalizeButton.click()
+        sleep(3_000)
     }
 }
