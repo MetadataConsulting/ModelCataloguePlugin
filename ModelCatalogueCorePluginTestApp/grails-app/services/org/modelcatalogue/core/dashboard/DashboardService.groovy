@@ -35,6 +35,7 @@ import org.modelcatalogue.core.view.CatalogueElementViewModel
 import org.modelcatalogue.core.view.CatalogueElementViewModelUtils
 import org.modelcatalogue.core.view.DataModelViewModel
 import org.modelcatalogue.core.view.DataModelViewModelUtils
+import org.springframework.security.access.prepost.PostFilter
 
 @CompileStatic
 class DashboardService {
@@ -49,9 +50,9 @@ class DashboardService {
     ValidationRuleGormService validationRuleGormService
     TagGormService tagGormService
 
-    CatalogueElementSearchResult findAllBySearchStatusQuery(Long dataModelId, MetadataDomain metadataDomain, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    CatalogueElementSearchResult findAllBySearchStatusQuery(Long dataModelId, MetadataDomain metadataDomain, SearchStatusQuery searchStatusQuery = null, SortQuery sortQuery = null, PaginationQuery paginationQuery = null) {
         if ( metadataDomain == MetadataDomain.DATA_MODEL ) {
-            return findAllDataModelViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
+            return findAllDataModelViewBySearchStatusQuery(searchStatusQuery, sortQuery, paginationQuery)
 
         } else if ( metadataDomain == MetadataDomain.DATA_ELEMENT ) {
             return findAllDataElementViewBySearchStatusQuery(dataModelId, searchStatusQuery, sortQuery, paginationQuery)
@@ -98,7 +99,6 @@ class DashboardService {
                         inList("status", searchStatusQuery.statusList)
                     }
                 }
-
             }
             if ( paginationQuery ) {
                 maxResults(paginationQuery.max)
@@ -185,39 +185,17 @@ class DashboardService {
 
     @CompileDynamic
     @Transactional(readOnly = true)
-    CatalogueElementSearchResult findAllDataModelViewBySearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        DetachedCriteria<DataModel> query = dataModelGormService.findQueryBySearchStatusQuery(searchStatusQuery, sortQuery)
-        if ( dataModelId ) {
-            query = query.where { id == dataModelId }
-        }
-        query.join('asset')
+    CatalogueElementSearchResult findAllDataModelViewBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+        List<DataModel> dataModelList = dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, sortQuery, paginationQuery, ['asset'])
 
-        Object results = query.list(max: paginationQuery?.max, offset: paginationQuery?.offset ?: 0) {
-            projections {
-                property('id')
-                property('name')
-                property('lastUpdated')
-                property('status')
-                property('semanticVersion')
-            }
-        }
-        Map<Long, List<AssetViewModel>> dataModelToAssets = findAllAssetViewModelByPublishedStatus(results, [PublishedStatus.PUBLISHED])
-        new CatalogueElementSearchResult(total: countAllDataModelBySearchStatusQuery(searchStatusQuery), viewModels: DataModelViewModelUtils.ofProjections(results, dataModelToAssets))
-
+        List<Long> dataModelIds = dataModelList*.id as List<Long>
+        Map<Long, List<AssetViewModel>> dataModelToAssets = findAllAssetViewModelByPublishedStatus(dataModelIds, [PublishedStatus.PUBLISHED])
+        int total = countAllDataModelBySearchStatusQuery(searchStatusQuery)
+        List viewModels = DataModelViewModelUtils.ofProjections(dataModelList, dataModelToAssets)
+        new CatalogueElementSearchResult(total: total, viewModels: viewModels)
     }
 
-    @CompileDynamic
-    List<Long> collectDataModelIds(def results) {
-        if ( !results ) {
-            return [] as List<Long>
-        }
-        results.collect { def arr ->
-            arr[0] as Long
-        }
-    }
-
-    Map<Long, List<AssetViewModel>>  findAllAssetViewModelByPublishedStatus(def dataModelResults, List<PublishedStatus> statusList = []) {
-        List<Long> dataModelIds = collectDataModelIds(dataModelResults)
+    Map<Long, List<AssetViewModel>>  findAllAssetViewModelByPublishedStatus(List<Long> dataModelIds, List<PublishedStatus> statusList = []) {
         Map<Long, List<AssetViewModel>> m = [:]
         for ( Long dataModelId : dataModelIds ) {
             m[dataModelId] = findAllAssetViewModelByDataModelIdAndPublishedStatus(dataModelId, statusList)
@@ -276,7 +254,7 @@ class DashboardService {
 
     @Transactional(readOnly = true)
     int countAllDataModelBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
-        (dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, null) ?: [] ).size()
+        (dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, null, []) ?: [] ).size()
     }
 
     List<MetadataDomain> metadataDomainList() {
