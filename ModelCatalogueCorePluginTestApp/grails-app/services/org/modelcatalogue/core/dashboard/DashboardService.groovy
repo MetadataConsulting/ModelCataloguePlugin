@@ -6,7 +6,6 @@ import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.query.api.BuildableCriteria
-import org.grails.datastore.mapping.transactions.Transaction
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
@@ -31,11 +30,8 @@ import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.PublishedStatus
 import org.modelcatalogue.core.util.SortQuery
 import org.modelcatalogue.core.view.AssetViewModel
-import org.modelcatalogue.core.view.CatalogueElementViewModel
 import org.modelcatalogue.core.view.CatalogueElementViewModelUtils
-import org.modelcatalogue.core.view.DataModelViewModel
 import org.modelcatalogue.core.view.DataModelViewModelUtils
-import org.springframework.security.access.prepost.PostFilter
 
 @CompileStatic
 class DashboardService {
