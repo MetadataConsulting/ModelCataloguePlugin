@@ -2,7 +2,6 @@ package org.modelcatalogue.core.actions
 
 import groovy.transform.CompileDynamic
 import groovy.util.logging.Slf4j
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.AbstractRestfulController
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.dataarchitect.DataArchitectService
@@ -11,7 +10,10 @@ import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionRequest
 import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionRequestImpl
 import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionResponse
 import org.modelcatalogue.core.mappingsuggestions.MappingsSuggestionsGateway
+<<<<<<< HEAD
 import org.modelcatalogue.core.mappingsuggestions.MatchAgainst
+=======
+>>>>>>> workaround issues with batch names
 import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.IdName
@@ -33,6 +35,21 @@ class BatchController extends AbstractRestfulController<Batch> {
     MessageSource messageSource
     def executorService
     MapppingSuggestionsConfigurationService mapppingSuggestionsConfigurationService
+    int defaultMax
+    int defaultScore
+
+    MappingsSuggestionsGateway mappingsSuggestionsGateway
+
+    @CompileDynamic
+    @PostConstruct
+    void setup() {
+        defaultMax = grailsApplication.config.mdx.mappingsuggestions.max ?: 20
+        defaultScore = grailsApplication.config.mdx.mappingsuggestions.score ?: 20
+    }
+
+    protected List<ActionState> defaultActionStates() {
+        ActionState.values()  as List<ActionState>
+    }
 
     int defaultMax
     int defaultScore
@@ -73,7 +90,10 @@ class BatchController extends AbstractRestfulController<Batch> {
     def all() {
         List<BatchViewModel> batchList = batchService.findAllActive()
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> workaround issues with batch names
         for ( BatchViewModel batch : batchList ) {
             MappingSuggestionRequest mappingSuggestionRequest = new MappingSuggestionRequestImpl(
                     batchId: batch.id,
@@ -98,7 +118,10 @@ class BatchController extends AbstractRestfulController<Batch> {
             }
         }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> workaround issues with batch names
         Number total = batchGormService.countActive()
         [
                 batchList: batchList,
