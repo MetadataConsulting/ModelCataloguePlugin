@@ -10,6 +10,7 @@ import spock.lang.Issue
 import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.Narrative
 import spock.lang.Title
+import groovy.io.FileType
 
 @Issue('https://metadata.atlassian.net/browse/MET-1561')
 @Title('Examine that finalized data model is marked as finalized in the XML')
@@ -23,6 +24,10 @@ import spock.lang.Title
 class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
 
     def 'Examine that finalized data model is marked as finalized in the XML'() {
+
+        given:
+        String dataModelName = "Cancer Model"
+
         when: 'login as a curator'
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
@@ -32,7 +37,7 @@ class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
 
         when: 'Select a Finalized Model'
         DashboardPage dashboardPage = browser.page DashboardPage
-        dashboardPage.select('Cancer Model')
+        dashboardPage.select(dataModelName)
 
         then:
         at DataModelPage
@@ -42,5 +47,28 @@ class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
 
         then:
         dataModelPage.isExportVisible()
+
+        when:
+        List<String> files = []
+        String downloadPath = System.getProperty("downloadFilepath")
+
+        File file = new File(downloadPath)
+        File cancelFile = new File(downloadPath + "Cancer_Model.mc.xml")
+
+        if (cancelFile.exists()) {
+            cancelFile.delete()
+        }
+
+        dataModelPage.export()
+        dataModelPage.exportXml()
+        Thread.sleep(2000)
+
+        file.eachFile(FileType.FILES) {
+            files.add(it.name)
+        }
+
+        then:
+        files.contains("Cancer_Model.mc.xml")
+        cancelFile.text.contains(dataModelName)
     }
 }
