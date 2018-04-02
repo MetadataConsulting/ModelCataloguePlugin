@@ -17,7 +17,7 @@ import spock.lang.Title
 - Check that the imported data model appears on the list of activity
 - Remove the imported data model
 ''')
-@Ignore
+//@Ignore
 class ImportAndRemoveDataModelReflectsInHistorySpec extends GebSpec {
 
     def "https://metadata.atlassian.net/browse/MET-1650"() {
@@ -79,7 +79,7 @@ class ImportAndRemoveDataModelReflectsInHistorySpec extends GebSpec {
 
         when: 'delete the imported data model'
         dataImportsPage = browser.page DataImportsPage
-//        dataImportsPage.expandTag()
+        dataImportsPage.expandTag()
         waitFor { dataImportsPage.isRemoveButtonVisible() }
         dataImportsPage.remove()
 
