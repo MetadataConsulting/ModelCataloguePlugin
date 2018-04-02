@@ -1,12 +1,13 @@
 package org.modelcatalogue.core.remoteTesting
 
-import geb.spock.GebSpec
+import geb.spock.GebReportingSpec
 import org.modelcatalogue.core.geb.CreateDataClassPage
 import org.modelcatalogue.core.geb.CreateDataModelPage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataClassesPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.FinalizeDataModelPage
+import org.modelcatalogue.core.geb.FinalizedDataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 import spock.lang.Issue
@@ -25,8 +26,7 @@ import spock.lang.Title
 - On the top menu, click on the data model link
 - Click on the delete link
 ''')
-@Ignore
-class CannotDeleteFinalizedDataModelSpec extends GebSpec {
+class CannotDeleteFinalizedDataModelSpec extends GebReportingSpec {
     @Shared
     String uuid = UUID.randomUUID().toString()
 
@@ -57,7 +57,7 @@ class CannotDeleteFinalizedDataModelSpec extends GebSpec {
         DataModelPage dataModelPage = browser.page DataModelPage
         String dataModelUrl = browser.driver.currentUrl
 
-        then: 'the random name we entered in the form is displayed in the data mdoel title'
+        then: 'the random name we entered in the form is displayed in the data model title'
         dataModelPage.titleContains uuid
 
         when: 'select Data Classes in the tree'
@@ -99,7 +99,8 @@ class CannotDeleteFinalizedDataModelSpec extends GebSpec {
         when: 'Select finalize in the data model options menu'
         dataModelPage = browser.page DataModelPage
         dataModelPage.dropdown()
-        dataModelPage.dropdown.finalize()
+        dataModelPage.finalizedDataModel()
+        Thread.sleep(1000)
 
         then: 'The Finalize Data Model Pops up'
         at FinalizeDataModelPage
@@ -109,6 +110,13 @@ class CannotDeleteFinalizedDataModelSpec extends GebSpec {
         finalizeDataModelPage.versionNote = 'THIS IS THE VERSION NOTE'
         finalizeDataModelPage.submit()
 
+        then:
+        at FinalizedDataModelPage
+
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+
         then: 'you are in the data model page'
         at DataModelPage
 
@@ -116,12 +124,13 @@ class CannotDeleteFinalizedDataModelSpec extends GebSpec {
         dataModelPage = browser.page DataModelPage
 
         then: 'The title of the data model displays "finalized" texts'
-        dataModelPage.titleContains("$uuid (0.0.1) finalized")
+        dataModelPage.titleContains("$uuid")
+        dataModelPage.titleContains("@0.0.1")
 
         when: "Click on the Main Menu"
         dataModelPage.dropdown()
 
-        then:  "No Option for the delete. Delete is disabled"
-        !dataModelPage.dropdown.existsDelete()
+        then: "No Option for the delete. Delete is disabled"
+        !dataModelPage.dropdownMenu.existsDelete()
     }
 }

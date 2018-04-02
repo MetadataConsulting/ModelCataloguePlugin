@@ -79,7 +79,7 @@ class ImportAndRemoveDataModelReflectsInHistorySpec extends GebSpec {
 
         when: 'delete the imported data model'
         dataImportsPage = browser.page DataImportsPage
-        dataImportsPage.expand()
+//        dataImportsPage.expandTag()
         waitFor { dataImportsPage.isRemoveButtonVisible() }
         dataImportsPage.remove()
 

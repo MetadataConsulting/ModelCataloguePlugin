@@ -44,7 +44,7 @@ class CanImportDataModelSpec extends GebSpec {
         when: 'navigate to createRelationship page'
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.dropdown()
-        dataModelPage.dropdown.addImport()
+        dataModelPage.dropdownMenu.addImport()
 
         then: 'verify that the text Destination is displayed'
         at DropDownImportPage
