@@ -11,6 +11,7 @@ import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.Narrative
 import spock.lang.Title
 import groovy.io.FileType
+import spock.lang.IgnoreIf
 
 @Issue('https://metadata.atlassian.net/browse/MET-1561')
 @Title('Examine that finalized data model is marked as finalized in the XML')
@@ -21,6 +22,8 @@ import groovy.io.FileType
 - Scroll down and click on the Export to catalogue XML
 - Open the downloaded file and verify that the status is marked as finalized
 ''')
+
+@IgnoreIf({ !System.getProperty("downloadFilepath") })
 class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
 
     def 'Examine that finalized data model is marked as finalized in the XML'() {
@@ -70,5 +73,7 @@ class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
         then:
         files.contains("Cancer_Model.mc.xml")
         cancelFile.text.contains(dataModelName)
+        String compareString = 'status="FINALIZED"'
+        cancelFile.text.toLowerCase().contains(compareString.toLowerCase())
     }
 }
