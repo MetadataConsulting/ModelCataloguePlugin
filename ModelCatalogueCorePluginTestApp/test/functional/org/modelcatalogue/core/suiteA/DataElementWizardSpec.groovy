@@ -1,4 +1,4 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.suiteA
 
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataElementsPage
@@ -45,22 +45,22 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
         select 'No tags'
 
         then:
-        check rightSideTitle is 'Active Data Elements'
+        check Common.rightSideTitle is 'Active Data Elements'
     }
 
     def "Add new data element"() {
         when: 'I click the add model button'
-        click create
+        click Common.create
 
         then: 'the data element dialog opens'
-        check wizard displayed
+        check Common.wizard displayed
 
         when:
-        fill nameLabel with "NewDE1"
-        fill description with "NT1 Description"
+        fill Common.nameLabel with "NewDE1"
+        fill Common.description with "NT1 Description"
 
         and: 'save button clicked'
-        click save
+        click Common.save
 
         then: 'the data element is saved and displayed at the top of the table'
         check { infTableCell(1, 1) } contains "NewDE1"
@@ -68,19 +68,19 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "Check the data element shows up with own details"() {
         expect:
-        check backdrop gone
+        check Common.backdrop gone
 
         when: 'Data Element is located'
         check { infTableCell(1, 1) } contains "NewDE1"
 
         then: 'Click the element'
         click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
-        check rightSideTitle contains 'NewDE1'
+        check Common.rightSideTitle contains 'NewDE1'
     }
 
     def "Check Form (Item) detail section is present and collapsed"() {
         expect:
-        check Common.detailSectionFormMetadata present once
+        check Common.detailSectionFormMetadata present Common.once
         check detailSectionFormItemContent gone
 
         when: "Click the title"

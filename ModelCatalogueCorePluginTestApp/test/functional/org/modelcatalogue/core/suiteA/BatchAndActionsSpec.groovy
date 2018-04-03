@@ -1,5 +1,6 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.suiteA
 
+import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
@@ -47,23 +48,23 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "generate suggestions"() {
-        check backdrop gone
+        check Common.backdrop gone
 
         when:
         click generateSuggestions
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        fill search1 with "test 1" and pick first item
-        fill search2 with "test 2" and pick first item
+        fill search1 with "test 1" and Common.pick first Common.item
+        fill search2 with "test 2" and Common.pick first Common.item
         click dropdown
         $(dropdown).find('option').find{it.value() =='string:Data Element Exact Match'}.click()
 
         fill minScore with "10"
 
-        click modalPrimaryButton
+        click Common.modalPrimaryButton
 
         while (check(linkToRename).missing) {
             click refreshList
@@ -75,7 +76,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "go to detail page and execute few actions"() {
-        check backdrop gone
+        check Common.backdrop gone
 
         when:
         click linkToTestBatch
@@ -84,7 +85,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
         check batchName displayed
         check batchName contains 'Test Batch'
         check noPerformedActions displayed
-        check pendingActions present 10 or more
+        check pendingActions present 10 or Common.more
         check pendingActions has 'alert-danger'
 
         when:
@@ -94,7 +95,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check '.modal-body' gone
-        remove messages
+        remove Common.messages
 
         check pendingActions contains 'BrandNewModel'
 

@@ -1,6 +1,7 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.suiteA
 
 import org.modelcatalogue.core.geb.ChangesPage
+import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypesPage
@@ -43,15 +44,15 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         at DataTypesPage
 
         when:
-        click create
+        click Common.create
 
         fill 'name' with "Data Type Change Test"
 
-        click save
+        click Common.save
 
         then:
         check 'div.modal' gone
-        remove messages
+        remove Common.messages
 
         when:
         to ChangesPage
@@ -73,10 +74,10 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         click CatalogueAction.runLast('item', 'undo-change')
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        click modalPrimaryButton
+        click Common.modalPrimaryButton
 
         then:
         check ".pp-table-property-element-value", 'data-value-for': 'Undone' is 'true'
