@@ -2,7 +2,6 @@ package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
@@ -17,7 +16,6 @@ import spock.lang.Title
 - Check that the imported data model appears on the list of activity
 - Remove the imported data model
 ''')
-//@Ignore
 class ImportAndRemoveDataModelReflectsInHistorySpec extends GebSpec {
 
     def "https://metadata.atlassian.net/browse/MET-1650"() {

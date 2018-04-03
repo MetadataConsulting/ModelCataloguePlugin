@@ -2,7 +2,6 @@ package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebReportingSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
@@ -17,7 +16,6 @@ import spock.lang.Shared
 - Scroll down and select Finalized
 - Check that data model is finalized
 ''')
-//@Ignore
 class UserCanFinalizeDataModelSpec extends GebReportingSpec {
 
     @Shared
