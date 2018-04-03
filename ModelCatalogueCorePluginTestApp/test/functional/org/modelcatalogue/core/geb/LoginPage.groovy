@@ -18,6 +18,7 @@ class LoginPage extends Page {
         fillUsername(username)
         fillPassword(password)
         submitButton.click()
+        sleep(3_000)
 
     }
 
