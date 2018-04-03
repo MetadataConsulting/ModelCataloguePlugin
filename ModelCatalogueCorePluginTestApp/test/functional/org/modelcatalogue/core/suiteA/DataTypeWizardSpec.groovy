@@ -1,4 +1,4 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.suiteA
 
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
@@ -43,7 +43,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String mapping = 'mapping'
     public static final String modalPrimaryButton = 'div.modal button.btn-primary, div.modal a.btn-primary'
     public static final String value = 'value'
-    public static final GString modalResponse = "$modalDialog pre"
+    public static final GString modalResponse = "$Common.modalDialog pre"
     public static final CatalogueAction editMapping = CatalogueAction.runLast('item', 'edit-mapping')
     public static final String expandMetadata = '.expand-metadata'
     public static final String metadataHelpBlock = '.metadata-help-block'
@@ -82,7 +82,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         at DataTypesPage
 
         and:
-        check rightSideTitle is 'Active Data Types'
+        check Common.rightSideTitle is 'Active Data Types'
     }
 
     @Ignore
@@ -109,25 +109,25 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         at DataTypesPage
 
         when:
-        remove messages
-        click create
+        remove Common.messages
+        click Common.create
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        fill nameLabel with 'New Reference Type'
+        fill Common.nameLabel with 'New Reference Type'
 
 
         click pickReferenceType
 
-        fill 'dataClass' with 'DEMOGRAPHICS' and prefer first existing item
-        fill description with "Test Reference Unit"
+        fill 'dataClass' with 'DEMOGRAPHICS' and Common.prefer first Common.existing item
+        fill Common.description with "Test Reference Unit"
 
-        click save
+        click Common.save
 
         then:
-        check modalDialog gone
+        check Common.modalDialog gone
         check { infTableCell(1, 1) } contains "New Reference Type"
         check { infTableCell(1, 2, text: 'DEMOGRAPHICS') } displayed
     }
@@ -135,15 +135,15 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "create primitive"() {
         when:
-        remove messages
-        click create
+        remove Common.messages
+        click Common.create
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        fill nameLabel with 'New Primitive Type'
-        fill description with "Test Primitive Unit"
+        fill Common.nameLabel with 'New Primitive Type'
+        fill Common.description with "Test Primitive Unit"
 
         click pickPrimitiveType
 
@@ -152,10 +152,10 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check "$primitiveContent .dropdown-menu" displayed
         pressKey("$primitiveContent input", Keys.ESCAPE)
 
-        click save
+        click Common.save
 
         then:
-        check modalDialog gone
+        check Common.modalDialog gone
         check { infTableCell(1, 1) } contains "New Primitive Type"
         check { infTableCell(1, 2, text: 'new unit') } displayed
     }
@@ -163,14 +163,14 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "create enum"() {
         when:
-        remove messages
-        click create
+        remove Common.messages
+        click Common.create
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        fill nameLabel with 'Enumeration 1'
+        fill Common.nameLabel with 'Enumeration 1'
 
         click pickEnumeratedType
 
@@ -179,68 +179,68 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         fillMetadata '01': 'one', '02': 'two', '03': 'three', '04': 'four', '05': 'five'
 
-        click save
+        click Common.save
 
         then:
-        check modalDialog gone
-        check backdrop gone
+        check Common.modalDialog gone
+        check Common.backdrop gone
         check { infTableCell(1, 1) } contains "Enumeration 1"
     }
 
     @Ignore
     def "create subset 2"() {
         when:
-        remove messages
-        click create
+        remove Common.messages
+        click Common.create
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        fill nameLabel with 'Enumeration 2'
+        fill Common.nameLabel with 'Enumeration 2'
 
         click pickSubset
 
         check baseEnumeration displayed
 
-        fill baseEnumeration with 'Enumeration 1' and pick first item
+        fill baseEnumeration with 'Enumeration 1' and Common.pick first Common.item
 
         click '#subtype-enum-1'
         click '#subtype-enum-2'
 
-        click save
+        click Common.save
 
         then:
-        check modalDialog gone
-        check backdrop gone
+        check Common.modalDialog gone
+        check Common.backdrop gone
         check { infTableCell(1, 1) } contains "Enumeration 2"
     }
 
     @Ignore
     def "create subset 3"() {
         when:
-        remove messages
-        click create
+        remove Common.messages
+        click Common.create
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        fill nameLabel with 'Enumeration 3'
+        fill Common.nameLabel with 'Enumeration 3'
 
         click pickSubset
 
         check baseEnumeration displayed
 
-        fill baseEnumeration with 'Enumeration 2' and pick first item
+        fill baseEnumeration with 'Enumeration 2' and Common.pick first Common.item
 
         click '#subtype-enum-1'
 
-        click save
+        click Common.save
 
         then:
-        check modalDialog gone
-        check backdrop gone
+        check Common.modalDialog gone
+        check Common.backdrop gone
         check { infTableCell(1, 1) } contains "Enumeration 3"
         check { infTableCell(1, 2) } contains '01: one'
     }
@@ -253,12 +253,12 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         select 'Test 1' open 'Data Types' select 'Enumeration 1'
 
         Thread.sleep(3000)
-        3.times { scroll up }
-        click inlineEdit
+        3.times { scroll Common.up }
+        click Common.inlineEdit
         Thread.sleep(3000)
         click removeEnumerationOne
         Thread.sleep(3000)
-        click inlineEditSubmit
+        click Common.inlineEditSubmit
 
         refresh browser
         Thread.sleep(3000)
@@ -272,20 +272,20 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     def "create standard"() {
         when:
         select 'Test 1' select 'Data Types'
-        remove messages
-        click create
+        remove Common.messages
+        click Common.create
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        fill nameLabel with 'New Data Type'
+        fill Common.nameLabel with 'New Data Type'
 
-        click save
+        click Common.save
 
         then:
-        check modalDialog gone
-        check backdrop gone
+        check Common.modalDialog gone
+        check Common.backdrop gone
         check { infTableCell(1, 1) } contains "New Data Type"
     }
 
@@ -295,13 +295,13 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
 
         then:
-        check rightSideTitle contains 'New Data Type'
+        check Common.rightSideTitle contains 'New Data Type'
     }
 
     @Ignore
     def "Check Form (Item) detail section is present and collapsed"() {
         expect:
-        check Common.detailSectionFormMetadata present once
+        check Common.detailSectionFormMetadata present Common.once
         check detailSectionFormItemContent gone
 
         when: "Click the title"
@@ -317,17 +317,17 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "add metadata"() {
         setup:
-        click inlineEdit
+        click Common.inlineEdit
         click Common.detailSectionMetadata.find('.title .btn')
         scroll metadataTable
 
         when:
         fillMetadata foo: 'bar'
         scrollTop()
-        click inlineEditSubmit
+        click Common.inlineEditSubmit
 
         then:
-        check inlineEditSubmit gone
+        check Common.inlineEditSubmit gone
         // wait some time in order to have the view rendered
         Thread.sleep(300)
         click Common.detailSectionMetadata.find('.title .btn')
@@ -339,17 +339,17 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "remove metadata"() {
         setup:
-        click inlineEdit
+        click Common.inlineEdit
         click Common.detailSectionMetadata.find('.title .btn')
         scroll metadataTable
 
         when:
         click removeMetadataRow
         scrollTop()
-        click inlineEditSubmit
+        click Common.inlineEditSubmit
 
         then:
-        check inlineEditSubmit gone
+        check Common.inlineEditSubmit gone
         // wait some time in order to have the view rendered
         Thread.sleep(300)
         click Common.detailSectionMetadata.find('.title .btn')
@@ -360,18 +360,18 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     @Ignore
     def "create new mapping"() {
-        remove messages
-        check backdrop gone
+        remove Common.messages
+        check Common.backdrop gone
 
         when: "create new mapping action is clicked"
         click createMapping
 
 
         then: "crate new mapping dialog opens"
-        check modalHeader is 'Create new mapping for New Data Type'
+        check Common.modalHeader is 'Create new mapping for New Data Type'
 
         when: "value domain is selected"
-        fill dataType with 'xs:boolean' and pick first item
+        fill dataType with 'xs:boolean' and Common.pick first Common.item
 
         and: "new mapping rule is created"
         fill mapping with "number(x).asType(Boolean)"
@@ -380,19 +380,19 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click modalPrimaryButton
 
         then: "there is exactly one mapping"
-        check backdrop gone
+        check Common.backdrop gone
         check tabTotal('mappings') is '1'
     }
 
     @Ignore
     def "convert value"() {
-        check backdrop gone
+        check Common.backdrop gone
 
         when: "convert action is clicked"
         click convert
 
         then: "modal is shown"
-        check modalHeader is 'Convert Value from New Data Type'
+        check Common.modalHeader is 'Convert Value from New Data Type'
 
         when: "truthy value is entered"
         fill value with '10'
@@ -407,15 +407,15 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalResponse is 'false'
 
         when:
-        click modalCloseButton
+        click Common.modalCloseButton
 
         then:
-        check modalDialog gone
+        check Common.modalDialog gone
     }
 
     @Ignore
     def "edit mapping"() {
-        remove messages
+        remove Common.messages
 
         when: "mappings tab selected"
         selectTab 'mappings'
@@ -430,7 +430,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click editMapping
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
         fill mapping with 'x'
@@ -442,19 +442,19 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     @Ignore
     def "create relationship"() {
-        check backdrop gone
-        remove messages
+        check Common.backdrop gone
+        remove Common.messages
 
         when: "create relationship action is clicked"
         click createRelationship
 
         then: "modal is shown"
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
         fill 'type' with 'related to'
 
-        fill 'element' with 'xs:boolean' and pick first item
+        fill 'element' with 'xs:boolean' and Common.pick first Common.item
 
         click expandMetadata
 
@@ -462,22 +462,22 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check metadataHelpBlock displayed
 
         when:
-        fillMetadata($(modalDialog), foo: 'bar', one: 'two')
+        fillMetadata($(Common.modalDialog), foo: 'bar', one: 'two')
 
-        remove messages
+        remove Common.messages
 
         click modalPrimaryButton
 
         then:
-        check backdrop gone
+        check Common.backdrop gone
         check tabTotal('relatedTo') is '1'
 
     }
 
     @Ignore
     def "create relationship from footer action"() {
-        check backdrop gone
-        remove messages
+        check Common.backdrop gone
+        remove Common.messages
 
         when: "related to tab selected"
         selectTab('relatedTo')
@@ -487,27 +487,27 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         waitFor { tabActive('relatedTo') }
 
         when: "click the footer action"
-        click CatalogueContent.create('#relatedTo-tab').find(tableFooterAction)
+        click CatalogueContent.create('#relatedTo-tab').find(Common.tableFooterAction)
 
         then: "modal is shown"
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        fill 'element' with 'xs:string' and pick first item
+        fill 'element' with 'xs:string' and Common.pick first Common.item
 
-        remove messages
+        remove Common.messages
 
         click modalPrimaryButton
 
         then:
-        check backdrop gone
+        check Common.backdrop gone
         check tabTotal('relatedTo') is '2'
     }
 
     @Ignore
     def "remove relationship"() {
-        check backdrop gone
-        remove messages
+        check Common.backdrop gone
+        remove Common.messages
         when:
         toggleInfTableRow(1)
         scroll removeRelationshipButton
@@ -515,10 +515,10 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click removeRelationship
 
         then:
-        check confirm displayed
+        check Common.confirm displayed
 
         when:
-        click OK
+        click Common.OK
 
         then:
         check tabTotal('relatedTo') is '1'
@@ -526,19 +526,19 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     @Ignore
     def "remove mapping"() {
-        check backdrop gone
-        remove messages
+        check Common.backdrop gone
+        remove Common.messages
         when:
         selectTab('mappings')
         toggleInfTableRow(1)
         click removeMapping
 
         then:
-        check confirm displayed
+        check Common.confirm displayed
 
         when:
-        click OK
-        remove messages
+        click Common.OK
+        remove Common.messages
 
         then:
         waitFor {
@@ -549,19 +549,19 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "change type"() {
         given:
-            scroll up
+            scroll Common.up
         expect:
-            check backdrop gone
-            remove messages
+            check Common.backdrop gone
+            remove Common.messages
         when:
             click changeType
         then:
-            check modalDialog displayed
+            check Common.modalDialog displayed
         when:
             fill dataTypeSelector with primitiveTypeValue
             click modalPrimaryButton
         then:
-            check backdrop gone
+            check Common.backdrop gone
             check primitiveTypeIcon displayed
     }
 }

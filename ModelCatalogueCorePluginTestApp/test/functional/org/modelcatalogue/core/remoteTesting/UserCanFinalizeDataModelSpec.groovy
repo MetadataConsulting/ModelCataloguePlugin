@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.remoteTesting
 
-import geb.spock.GebReportingSpec
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
 import spock.lang.*
@@ -50,7 +49,7 @@ class UserCanFinalizeDataModelSpec extends GebSpec {
         String dataModelUrl = browser.driver.currentUrl
 
         then: 'the random name we entered in the form is displayed in the data model title'
-        dataModelPage.titleContains uuid
+        dataModelPage.dataModelTitle.contains uuid
 
         when: 'select Data Classes in the tree'
         dataModelPage.treeView.select('Data Classes')
@@ -116,8 +115,8 @@ class UserCanFinalizeDataModelSpec extends GebSpec {
         dataModelPage = browser.page DataModelPage
 
         then: 'The title of the data model displays "finalized" texts'
-        dataModelPage.titleContains("$uuid")
-        dataModelPage.titleContains("@0.0.1")
-        dataModelPage.titleContains("$uuid (0.0.1) finalized")
+        dataModelPage.dataModelTitle.contains("$uuid")
+        dataModelPage.dataModelTitle.contains ("@0.0.1")
+        dataModelPage.rowsText.contains ("finalized")
     }
 }

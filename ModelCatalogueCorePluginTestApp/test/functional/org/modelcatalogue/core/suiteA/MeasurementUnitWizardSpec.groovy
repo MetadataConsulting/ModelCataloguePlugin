@@ -1,5 +1,6 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.suiteA
 
+import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -39,32 +40,32 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
         at MeasurementUnitsPage
 
         and:
-        check rightSideTitle is 'Active Measurement Units'
+        check Common.rightSideTitle is 'Active Measurement Units'
     }
 
     def "create new unit"() {
         when:
-        click create
+        click Common.create
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
         fill 'name' with 'Foos'
         fill 'symbol' with 'Foo'
 
-        click save
+        click Common.save
 
         then:
         check { infTableCell(1, 2, text: 'Foos') } displayed
     }
 
     def "check the unit shows up with own detail page"() {
-        remove messages
+        remove Common.messages
         click { infTableCell(1, 2).find('a') }
 
         expect:
-        check rightSideTitle contains 'Foos'
+        check Common.rightSideTitle contains 'Foos'
     }
 
     def "going to metadata tab changes the url"() {

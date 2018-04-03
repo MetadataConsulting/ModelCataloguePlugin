@@ -1,4 +1,4 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.suiteA
 
 import org.modelcatalogue.core.geb.CreateDataModelPage
 import org.modelcatalogue.core.geb.DashboardPage
@@ -67,15 +67,15 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         at DataModelPage
 
         and:
-        check rightSideTitle contains "New Data Model $uuid"
+        check Common.rightSideTitle contains "New Data Model $uuid"
     }
 
     @Ignore
     def "finalize element"() {
-        check backdrop gone
+        check Common.backdrop gone
 
         setup: "fill required data for finalization"
-        click inlineEdit
+        click Common.inlineEdit
         click Common.detailSectionMetadata.find('.title .btn')
         fill 'metadata-authors' with 'Neville Chamberlain'
         fill 'metadata-reviewers' with 'Édouard Daladier'
@@ -84,15 +84,15 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         fill metadataApproved with '29/04/2016'
         fill 'metadata-namespace' with 'Namespace'
         fill 'metadata-organization' with 'Organization'
-        3.times { scroll up }
-        click inlineEditSubmit
+        3.times { scroll Common.up }
+        click Common.inlineEditSubmit
         check "input[name='name']" gone
 
         when: "finalize is clicked"
-        click finalize
+        click Common.finalize
 
         then: "modal prompt is displayed"
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when: "ok is clicked"
         fill 'semanticVersion' with '1.0.0'
@@ -104,20 +104,20 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         check feedback contains 'COMPLETED SUCCESSFULLY'
 
         when:
-        click modalPrimaryButton
+        click Common.modalPrimaryButton
 
         then: "the element is finalized"
-        check status has 'label-primary'
+        check Common.status has 'label-primary'
     }
 
     @Ignore
     def "create new version of the element"() {
-        check backdrop gone
+        check Common.backdrop gone
         when: "new version is clicked"
-        click newVersion
+        click Common.newVersion
 
         then: "modal prompt is displayed"
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when: "ok is clicked"
         fill 'semanticVersion' with '1.0.1'
@@ -130,26 +130,26 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         click '.new-version-link'
-        click modalPrimaryButton
+        click Common.modalPrimaryButton
 
         then:
-        check status has 'label-warning'
+        check Common.status has 'label-warning'
     }
 
     @Ignore('Draft versions cannot be deprecated')
     def "deprecate the data model"() {
         waitUntilModalClosed()
         when: "deprecate action is clicked"
-        click archive
+        click Common.archive
 
         then: "modal prompt is displayed"
-        check confirm displayed
+        check Common.confirm displayed
 
         when: "ok is clicked"
-        click OK
+        click Common.OK
 
         then: "the element is now deprecated"
-        check status has 'label-danger'
+        check Common.status has 'label-danger'
 
     }
 
@@ -166,7 +166,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         at DashboardPage
 
         when:
-        click createNewDataModel
+        click Common.createNewDataModel
 
         then: 'the model dialog opens'
             check classificationWizzard displayed
@@ -189,27 +189,27 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
             click exitButton
-            remove messages
+            remove Common.messages
 
         then:
-            check rightSideTitle contains "New Data Model $uuid"
+            check Common.rightSideTitle contains "New Data Model $uuid"
 
-        check backdrop gone
+        check Common.backdrop gone
         when: "delete action is clicked"
-            click delete
+            click Common.delete
 
         then: "modal prompt is displayed"
-            check confirm displayed
+            check Common.confirm displayed
 
         when: "ok is clicked"
-            click OK
+            click Common.OK
 
         then: "you are redirected to the data models page"
             waitFor(120) { browser.title == 'Data Models' }
 
         when: "you try to create the data model with the same name"
 
-            click createNewDataModel
+            click Common.createNewDataModel
 
         then: 'the model dialog opens'
             check classificationWizzard displayed
@@ -232,9 +232,9 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
             click exitButton
-            remove messages
+            remove Common.messages
 
         then:
-            check rightSideTitle contains "New Data Model $uuid"
+            check Common.rightSideTitle contains "New Data Model $uuid"
     }
 }

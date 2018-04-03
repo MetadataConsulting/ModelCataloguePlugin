@@ -1,11 +1,11 @@
-package org.modelcatalogue.core.remoteTesting
+package org.modelcatalogue.core.finalized
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.Stepwise
+import spock.lang.*
 
 @Stepwise
-class CannotAddMeasurementUnitToFinalizedDataModelSpec extends GebSpec {
+class CannotAddDataClassesToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:
         LoginPage loginPage = to LoginPage
@@ -24,20 +24,20 @@ class CannotAddMeasurementUnitToFinalizedDataModelSpec extends GebSpec {
         at DataModelPage
     }
 
-    def "Navigate to tree view and click on the Measurement Units"() {
+    def "Navigate to tree view and click on the Data Element"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
-        dataModelPage.treeView.select('Measurement Units')
+        dataModelPage.treeView.select('Data Classes')
 
         then:
-        at MeasurementUnitsPage
+        at DataClassesPage
     }
 
-    def "Verify that you can not create a new Measurement Unit"() {
+    def "Verify that you can not create a new data element"() {
         when:
-        MeasurementUnitsPage measurementUnitsPage = browser.page MeasurementUnitsPage
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
 
         then:
-        !measurementUnitsPage.isAddItemIconVisible()
+        !dataClassesPage.isAddItemIconVisible()
     }
 }

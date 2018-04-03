@@ -11,7 +11,7 @@ import static org.modelcatalogue.core.geb.Common.getSave
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
-import org.modelcatalogue.core.AssetWizardSpec
+import org.modelcatalogue.core.suiteA.AssetWizardSpec
 import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec

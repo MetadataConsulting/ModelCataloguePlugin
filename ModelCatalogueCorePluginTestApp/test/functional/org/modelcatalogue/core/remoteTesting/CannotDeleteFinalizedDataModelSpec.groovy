@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.remoteTesting
 
-import geb.spock.GebReportingSpec
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.CreateDataClassPage
 import org.modelcatalogue.core.geb.CreateDataModelPage
@@ -10,7 +9,6 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.FinalizeDataModelPage
 import org.modelcatalogue.core.geb.FinalizedDataModelPage
 import org.modelcatalogue.core.geb.LoginPage
-import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Shared
@@ -60,7 +58,7 @@ class CannotDeleteFinalizedDataModelSpec extends GebSpec {
         String dataModelUrl = browser.driver.currentUrl
 
         then: 'the random name we entered in the form is displayed in the data model title'
-        dataModelPage.titleContains uuid
+        dataModelPage.dataModelTitle.contains uuid
 
         when: 'select Data Classes in the tree'
         dataModelPage.treeView.select('Data Classes')
@@ -126,9 +124,9 @@ class CannotDeleteFinalizedDataModelSpec extends GebSpec {
         dataModelPage = browser.page DataModelPage
 
         then: 'The title of the data model displays "finalized" texts'
-        dataModelPage.titleContains("$uuid")
-        dataModelPage.titleContains("@0.0.1")
-        dataModelPage.titleContains("$uuid (0.0.1) finalized")
+        dataModelPage.dataModelTitle.contains("$uuid")
+        dataModelPage.dataModelTitle.contains("@0.0.1")
+        dataModelPage.rowsText.contains("finalized")
 
         when: "Click on the Main Menu"
         dataModelPage.dropdown()

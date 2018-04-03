@@ -1,11 +1,11 @@
-package org.modelcatalogue.core.remoteTesting
+package org.modelcatalogue.core.finalized
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.*
+import spock.lang.Stepwise
 
 @Stepwise
-class CannotAddDataClassesToFinalizedDataModelSpec extends GebSpec {
+class CannotAddDataTypesToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:
         LoginPage loginPage = to LoginPage
@@ -24,20 +24,20 @@ class CannotAddDataClassesToFinalizedDataModelSpec extends GebSpec {
         at DataModelPage
     }
 
-    def "Navigate to tree view and click on the Data Element"() {
+    def "Navigate to tree view and click on the Data Types"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
-        dataModelPage.treeView.select('Data Classes')
+        dataModelPage.treeView.select('Data Types')
 
         then:
-        at DataClassesPage
+        at DataTypesPage
     }
 
-    def "Verify that you can not create a new data element"() {
+    def "Verify that you can not create a new data type"() {
         when:
-        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
 
         then:
-        !dataClassesPage.isAddItemIconVisible()
+        !dataTypesPage.isAddItemIconVisible()
     }
 }

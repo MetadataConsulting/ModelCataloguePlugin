@@ -56,7 +56,7 @@ class CanCreateDataElementAndCloneDataTypeSpec extends GebSpec {
         DataModelPage dataModelPage = browser.page DataModelPage
 
         then:
-        dataModelPage.titleContains uuid
+        dataModelPage.dataModelTitle.contains uuid
 
         when:
         dataModelPage.treeView.select('Data Types')

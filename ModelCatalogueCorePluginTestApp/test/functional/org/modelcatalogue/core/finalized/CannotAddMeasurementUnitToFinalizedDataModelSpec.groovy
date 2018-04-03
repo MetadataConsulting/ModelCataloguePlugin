@@ -1,11 +1,11 @@
-package org.modelcatalogue.core.remoteTesting
+package org.modelcatalogue.core.finalized
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
 import spock.lang.Stepwise
 
 @Stepwise
-class CannotAddBusinessRulesToFinalizedDataModelSpec extends GebSpec {
+class CannotAddMeasurementUnitToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:
         LoginPage loginPage = to LoginPage
@@ -24,20 +24,20 @@ class CannotAddBusinessRulesToFinalizedDataModelSpec extends GebSpec {
         at DataModelPage
     }
 
-    def "Navigate to tree view and click on the Business Rules"() {
+    def "Navigate to tree view and click on the Measurement Units"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
-        dataModelPage.treeView.select('Business Rules')
+        dataModelPage.treeView.select('Measurement Units')
 
         then:
-        at BusinessRulesPage
+        at MeasurementUnitsPage
     }
 
-    def "Verify that you can not create a new Business Rules"() {
+    def "Verify that you can not create a new Measurement Unit"() {
         when:
-        BusinessRulesPage businessRulesPage = browser.page BusinessRulesPage
+        MeasurementUnitsPage measurementUnitsPage = browser.page MeasurementUnitsPage
 
         then:
-        !businessRulesPage.isAddItemIconVisible()
+        !measurementUnitsPage.isAddItemIconVisible()
     }
 }

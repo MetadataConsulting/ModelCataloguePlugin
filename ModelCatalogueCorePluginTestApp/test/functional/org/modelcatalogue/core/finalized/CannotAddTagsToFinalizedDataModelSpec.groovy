@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.remoteTesting
+package org.modelcatalogue.core.finalized
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.DashboardPage

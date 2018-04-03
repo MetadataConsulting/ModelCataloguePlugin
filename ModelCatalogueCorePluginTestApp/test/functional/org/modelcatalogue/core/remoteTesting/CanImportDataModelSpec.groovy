@@ -2,6 +2,7 @@ package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
@@ -16,6 +17,7 @@ import spock.lang.Title
 - Select a data model and import
 - Check that data model is imported
 ''')
+@Ignore
 class CanImportDataModelSpec extends GebSpec {
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
 

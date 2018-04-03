@@ -1,6 +1,7 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.suiteA
 
 import org.modelcatalogue.core.geb.BusinessRulesPage
+import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -39,31 +40,31 @@ class ValidationRuleWizardSpec extends AbstractModelCatalogueGebSpec {
         at BusinessRulesPage
 
         and:
-        check rightSideTitle is 'Active Business Rules'
+        check Common.rightSideTitle is 'Active Business Rules'
     }
 
     def "create new validation rule"() {
         when:
-        click create
+        click Common.create
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
         fill 'name' with 'Test Validation Rule'
 
-        click save
+        click Common.save
 
         then:
         check { infTableCell(1, 1) } contains 'Test Validation Rule'
     }
 
     def "check the unit shows up with own detail page"() {
-        check closeGrowlMessage gone
+        check Common.closeGrowlMessage gone
         click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
 
         expect:
-        check rightSideTitle contains 'Test Validation Rule'
+        check Common.rightSideTitle contains 'Test Validation Rule'
     }
 
 }

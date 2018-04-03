@@ -30,6 +30,11 @@ class DataModelPage extends Page {
         exportLink(required: false) { $('a#role_item_export-menu-item-link') }
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
+        rows { $('div.inf-table-body table tbody tr td') }
+    }
+
+    String getRowsText() {
+        rows.collect { it.text() }.join(' ')
     }
 
     void isExportVisible() {
@@ -60,9 +65,8 @@ class DataModelPage extends Page {
         dataModelButton.click()
     }
 
-    boolean titleContains(String query) {
-        String text = h3CeName.text()
-        text.contains(query)
+    String getDataModelTitle() {
+        h3CeName.text()
     }
 
     String getRightSideTitle() {
