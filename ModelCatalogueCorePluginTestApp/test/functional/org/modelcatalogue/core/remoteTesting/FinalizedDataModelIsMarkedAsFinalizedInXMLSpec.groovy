@@ -54,26 +54,37 @@ class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
         when:
         List<String> files = []
         String downloadPath = System.getProperty("downloadFilepath")
-
         File file = new File(downloadPath)
-        File cancelFile = new File(downloadPath + "Cancer_Model.mc.xml")
-
-        if (cancelFile.exists()) {
-            cancelFile.delete()
-        }
-
-        dataModelPage.export()
-        dataModelPage.exportXml()
-        Thread.sleep(2000)
-
-        file.eachFile(FileType.FILES) {
-            files.add(it.name)
-        }
 
         then:
-        files.contains("Cancer_Model.mc.xml")
-        cancelFile.text.contains(dataModelName)
-        String compareString = 'status="FINALIZED"'
-        cancelFile.text.toLowerCase().contains(compareString.toLowerCase())
+        file.exists()
+
+        and:
+        file.isDirectory()
+
+        when:
+        String path = downloadPath + File.separator + "Cancer_Model.mc.xml"
+        File dataModelFile = new File(path)
+
+        then:
+        !dataModelFile.exists()
+
+        when:
+        dataModelPage.export()
+        dataModelPage.exportXml()
+        sleep(2_000)
+        dataModelFile = new File(path)
+
+        then:
+        dataModelFile.exists()
+
+        and:
+        dataModelFile.text.contains(dataModelName)
+
+        and:
+        dataModelFile.text.toLowerCase().contains('status="FINALIZED"'.toLowerCase())
+
+        cleanup:
+        dataModelFile.delete()
     }
 }
