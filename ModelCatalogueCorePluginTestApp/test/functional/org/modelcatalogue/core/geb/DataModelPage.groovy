@@ -28,10 +28,15 @@ class DataModelPage extends Page {
         dropdownLink(required: false) { $('a#role_item_catalogue-element-menu-item-link', 0) }
         dropdown(required: false) { $('li#role_item_catalogue-element-menu-item').module(DataModelNavModule) }
         exportLink(required: false) { $('a#role_item_export-menu-item-link') }
+        exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
     }
 
     void isExportVisible() {
         !exportLink.empty
+    }
+
+    void exportXml() {
+        exportXMLLink.click()
     }
 
     void export() {
