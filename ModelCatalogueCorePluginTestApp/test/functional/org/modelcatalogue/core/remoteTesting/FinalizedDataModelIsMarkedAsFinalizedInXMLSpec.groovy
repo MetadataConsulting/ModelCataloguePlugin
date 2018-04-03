@@ -45,7 +45,6 @@ class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
         dataModelPage.isExportVisible()
 
         when:
-        List<String> files = []
         String downloadPath = System.getProperty("downloadFilepath")
         File file = new File(downloadPath)
 
