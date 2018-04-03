@@ -22,40 +22,18 @@ import spock.lang.Title
 class MET1469Spec extends GebSpec {
     @Shared
     String nameLabel = "NEW_TESTING_MODEL"
-
-    private static final myModel = "#my-models"
-    private static final String modelHeaderName = 'h3.ce-name'
-    private static final String metadataStep = "button#step-metadata"
-    private static final String label = "textarea#section-label"
-    private static final String section_title = "textarea#section-title"
-    private static final String instruction = "textarea#section-instructions"
-    private static final String page_number = 'input#form-page-number'
-    private static final String occurrence = 'ul.nav-pills>li:nth-child(3)>a'
-    private static final String finishButton = "button#step-finish"
-    private static final String appearance = 'ul.nav-pills>li:nth-child(4)>a'
-    private static final String name = "input#local-name"
-    private static final String elementStep = "button#step-elements"
-    private static final String dataElement = "input#data-element"
-    private static final String plusButton = "span.input-group-btn>button"
-    private static final String raw = "ul.nav-pills>li:nth-child(4)>a"
-    private static final String wizardSummary = 'td.col-md-4'
-    private static final String parentStep = "button#step-parents"
-    private static final String formSection = 'ul.nav-pills>li:nth-child(1)>a'
-    private static final long TIME_TO_REFRESH_SEARCH_RESULTS = 4000L
-    private static final String exitButton = 'button#exit-wizard'
-    private static final String saveElement = "a#role_modal_modal-save-elementBtn"
-    private static final String tagElement = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(2)"
-    private static final String search = "input#dataType"
-
+    @Shared
+    String wizardSummary = 'td.col-md-4'
+    @Shared
+    String saveElement = "a#role_modal_modal-save-elementBtn"
+    @Shared
+    String search = "input#dataType"
     @Shared
     String myName = " testing data element "
-
     @Shared
     String myCatalogue = UUID.randomUUID().toString()
-
     @Shared
     String myDescription = "This a test element"
-
     @Shared
     String tagName = "myTag"
 
@@ -123,8 +101,6 @@ class MET1469Spec extends GebSpec {
         createDataClassPage.dataElement = 'TEST_ELEMENT'
         createDataClassPage.clickPlus()
         createDataClassPage.raw()
-        createDataClassPage.addMetadata()
-        createDataClassPage.fillMetadata foo: 'five'
         createDataClassPage.finish()
         createDataClassPage.exit()
 
@@ -135,6 +111,7 @@ class MET1469Spec extends GebSpec {
     def "Create Data Element"() {
         when:
         DataClassesPage dataClassesPage = browser.page(DataClassesPage)
+        Thread.sleep(1000)
         dataClassesPage.treeView.select('Data Elements')
 
         then:
@@ -156,18 +133,26 @@ class MET1469Spec extends GebSpec {
         createDataElementPage.name = myName
         createDataElementPage.modelCatalogueId = myCatalogue
         createDataElementPage.description = myDescription
+        createDataElementPage.search('boolean')
+        createDataElementPage.selectFirstItem()
 
-        and: 'select a data type'
+        then:
+        at CloneOrImportPage
 
-        fill search with 'boolean'
-        Thread.sleep(2000l)
+        when:
+        CloneOrImportPage cloneOrImportPage = browser.page(CloneOrImportPage)
+        cloneOrImportPage.allowClone()
 
-        and: 'click on the save button'
-        println("////////////////////111111111111/////////////////")
-        click saveElement
+        then:
+        Thread.sleep(2000)
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage1 = browser.page(CreateDataElementPage)
+        createDataElementPage1.finish()
 
         then: 'verify that data is created'
-        check wizardSummary contains 'testing data element'
+        at DataElementsPage
     }
 
     def "create tag"() {
@@ -178,7 +163,6 @@ class MET1469Spec extends GebSpec {
         then:
         at TagsPage
     }
-
 
     def "navigate to tag creation page"() {
         when:

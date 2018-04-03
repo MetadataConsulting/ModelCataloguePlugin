@@ -18,20 +18,20 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
         formSectionLink { $('ul.nav-pills>li:nth-child(1)>a', 0) }
         ocurrenceLink { $('ul.nav-pills>li:nth-child(3)>a', 0) }
-        appearanceLink { $('ul.nav-pills>li:nth-child(4)>a', 0) }
-        labelTextArea { $( "textarea#section-label") }
-        sectionTextArea { $( "textarea#section-title") }
-        sectionInstructionsTextArea { $( "textarea#section-instructions") }
-        formPageNumberTextArea { $( "input#form-page-number") }
+        appearanceLink(wait: true) { $('ul.nav-pills>li:nth-child(4)>a', 0) }
+        labelTextArea { $("textarea#section-label") }
+        sectionTextArea { $("textarea#section-title") }
+        sectionInstructionsTextArea { $("textarea#section-instructions") }
+        formPageNumberTextArea { $("input#form-page-number") }
         minOccursInput { $('input#minOccurs') }
         maxOccursInput { $('input#maxOccurs') }
 
         localNameInput { $('#local-name') }
 
         dataElementInput { $('#data-element') }
-        buttonPlus { $('button.btn-success', 0) }
-        rawLink { $('a', text: 'Raw') }
-        addMetadataButton { $('div.modal button.btn-success', text: 'Add Metadata') }
+        buttonPlus { $('span.input-group-btn button.btn-success', 0) }
+        rawLink(wait: true) { $('a', text: 'Raw') }
+        addMetadataButton(wait: true) { $('div.modal button.btn-success', text: 'Add Metadata') }
     }
 
     void addMetadata() {
@@ -73,12 +73,15 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
     void setLabel(String value) {
         fillInput(labelTextArea, value)
     }
+
     void setSection(String value) {
         fillInput(sectionTextArea, value)
     }
+
     void setSectionInstructions(String value) {
         fillInput(sectionInstructionsTextArea, value)
     }
+
     void setFormPageNumber(String value) {
         fillInput(formPageNumberTextArea, value)
     }
@@ -119,6 +122,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
     void setModelCatalogueId(String value) {
         fillInput(modelCatalogueIdInput, value)
     }
+
     void setDescription(String value) {
         fillInput(descriptionInput, value)
     }

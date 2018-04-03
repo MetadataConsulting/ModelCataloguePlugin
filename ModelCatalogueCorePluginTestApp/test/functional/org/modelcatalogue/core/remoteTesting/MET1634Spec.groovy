@@ -25,7 +25,6 @@ import spock.lang.Title
 class MET1634Spec extends GebSpec {
     @Shared
     String uuid = UUID.randomUUID().toString()
-    private static final String table = 'tbody.ng-scope>tr:nth-child(1)>td:nth-child(4)'
 
     def "Login to model catalogue"() {
         when: "Login to Model Catalogue as curator"

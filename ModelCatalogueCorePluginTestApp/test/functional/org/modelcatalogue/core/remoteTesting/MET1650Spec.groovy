@@ -2,13 +2,10 @@ package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.Common
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Shared
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 import spock.lang.Title
 
@@ -24,42 +21,12 @@ import spock.lang.Title
 - Remove the imported data model
 ''')
 class MET1650Spec extends GebSpec {
-    private static final myModel = "#my-models"
-    private static final String modelHeaderName = 'h3.ce-name'
-    private static final String tableImported = "td.col-md-5"
-    private static final String removeButton = "a#role_item_remove-relationshipBtn"
-    private static final String plusButton = "span.fa-plus-square-o"
-    private static final String modelCatalogue = "span.mc-name"
-    private static final String  importedDataModel= "td.col-md-5"
-    public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
-
     @Shared
     String selectModelToEdit = "Test 1"
+    @Shared
+    String tagName = 'Clinical Tags'
 
-//    def "Login to model catalogue (gel)"() {
-//
-//    }
-//
-//    def "select a draft model"() {
-//
-//    }
-//    def "Navigate to Import By tag"() {
-//
-//    }
-//    def "Import a data model"() {
-//
-//    }
-//    def "Check that the imported data model appears on the list of activity"() {
-//
-//    }
-//    def "Remove the imported data model"() {
-//
-//    }
-//    def "Check that Remove the imported data model appears on the list of Activity"() {
-//
-//    }
-
-    def "Login to Model Catalouge"() {
+    def "Login to Model Catalogue"() {
         when: "Login to Model Catalogue as curator"
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
@@ -75,51 +42,75 @@ class MET1650Spec extends GebSpec {
 
         then:
         at DataModelPage
-
-        and: "Data Model Page Should Open"
-        check modelHeaderName displayed
-        check modelHeaderName contains selectModelToEdit
     }
 
     def "Select Imported Data Models"() {
         when:
-        selectInTree 'Imported Data Models'
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Imported Data Models')
 
         then:
-        check Common.rightSideTitle contains "$selectModelToEdit Imports"
+        at DataImportsPage
     }
-
 
     def "import model "() {
         when:
-        addDataModelImport 'Clinical Tags'
+        DataImportsPage dataImportsPage = browser.page DataImportsPage
+        dataImportsPage.addItem()
 
         then:
-        check importedDataModel contains 'Clinical Tags'
+        at DataImportPage
+
+        when:
+        DataImportPage dataImportPage = browser.page DataImportPage
+        dataImportPage.fillSearchBox(tagName)
+        dataImportPage.searchMore()
+
+        then:
+        at SearchTagPage
+
+        when:
+        SearchTagPage searchTagPage = browser.page SearchTagPage
+        println $("h4.list-group-item-heading")*.text()
+        println $("h4.list-group-item-heading", text: tagName).text()
+        println $("h4.list-group-item-heading", text: tagName).size()
+        searchTagPage.searchTag(tagName)
+
+        then:
+        at DataImportPage
+
+        when:
+        Thread.sleep(2000)
+        DataImportPage dataImportPage1 = browser.page DataImportPage
+        dataImportPage1.finish()
+
+        then:
+        Thread.sleep(2000)
+        at DataImportsPage
     }
 
     def "delete the imported data model"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Imported Data Models')
 
-        when: 'navigate back to the main page'
-        click modelCatalogue
-        
-        and:
-        select selectModelToEdit
-        selectInTree 'Imported Data Models'
+        then:
+        at DataImportsPage
 
-        then: 'verify the title'
-        check Common.rightSideTitle contains "$selectModelToEdit Imports"
+        when: 'remove the imported data models'
+        DataImportsPage dataImportsPage = browser.page DataImportsPage
+        dataImportsPage.expand()
+        dataImportsPage.remove()
 
-        when: 'click on the plus button'
-        click plusButton
+        then: 'click on the ok button'
+        at RemoteImportPage
 
-        and: 'remove the imported data models'
-        click removeButton
+        when: 'verify that imported is removed'
+        RemoteImportPage remoteImportPage = browser.page RemoteImportPage
+        remoteImportPage.finish()
 
-        and: 'click on the ok button'
-        click Common.modalPrimaryButton
-
-        then: 'verify that imported is removed'
-        check tableImported gone
+        then:
+        at DataImportsPage
+        !dataImportsPage.checkImport?.contains(tagName)
     }
 }

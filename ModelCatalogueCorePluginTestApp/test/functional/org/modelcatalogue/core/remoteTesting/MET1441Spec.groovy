@@ -122,7 +122,7 @@ class MET1441Spec extends GebSpec {
         when: "Click on the Main Menu"
         dataModelPage.dropdown()
 
-        then:  "No Option for the delete. Delte is disabled"
+        then:  "No Option for the delete. Delete is disabled"
         !dataModelPage.dropdown.existsDelete()
     }
 }

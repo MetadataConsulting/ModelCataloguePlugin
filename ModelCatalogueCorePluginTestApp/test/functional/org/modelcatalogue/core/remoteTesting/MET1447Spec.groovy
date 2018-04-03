@@ -2,20 +2,13 @@ package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.Common
-import org.modelcatalogue.core.geb.CreateDataModelPage
-import org.modelcatalogue.core.geb.CreateDataTypePage
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.DataTypesPage
-import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Shared
 import spock.lang.Title
 
 import static org.modelcatalogue.core.geb.Common.*
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.Stepwise
 
 @Issue('https://metadata.atlassian.net/browse/MET-1447')
@@ -36,28 +29,16 @@ class MET1447Spec extends GebSpec {
 
     @Shared
     String uuid = UUID.randomUUID().toString()
-
     @Shared
     String dataTypeName = 'TypeMET1447'
-
-    private static final myModel = "#my-models"
-    private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
-    private static final String name = "input#name"
-    private static final String policies = "input#dataModelPolicy"
-    private static final String finishButton = "#step-finish"
-    private static final long TIME_TO_REFRESH_SEARCH_RESULTS = 5000L
-
-    private static final String modelHeaderName = 'h3.ce-name'
-    private static final String first_row = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)"
-
-
-
-    private static final String search = "input#dataType"
-    private static final String saveElement = "a#role_modal_modal-save-elementBtn"
-    static String myName = " testing data element"
-    static String myCatalogue = UUID.randomUUID().toString()
-    static String myDescription = "This a test element"
-    private static final String dataTypeCreated = 'tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a'
+    @Shared
+    String myName = " testing data element"
+    @Shared
+    String myCatalogue = UUID.randomUUID().toString()
+    @Shared
+    String myDescription = "This a test element"
+    @Shared
+    String dataTypeCreated = 'tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a'
 
     def "Login to Model Catalogue as curator"() {
         when:
@@ -109,47 +90,48 @@ class MET1447Spec extends GebSpec {
         when:
         CreateDataTypePage createDataTypePage = browser.page(CreateDataTypePage)
         createDataTypePage.name = dataTypeName
-        createDataTypePage.description = "my description of data type"
+        createDataTypePage.description = "my description of data type -1"
         createDataTypePage.buttons.save()
+        Thread.sleep(5000)
 
         then:
-        check first_row contains dataTypeName
+        at DataTypesPage
     }
 
     def "Create Data Element"() {
         when:
-        selectInTree 'Data Elements'
+        Thread.sleep(5000)
+        DataModelPage dataModelPage = browser.page DataModelPage
+        Thread.sleep(5000)
+        dataModelPage.treeView.select('Data Elements')
 
         then:
-        check Common.rightSideTitle is 'Active Data Elements'
+        at DataElementsPage
     }
 
     def "navigate to data element creation page"() {
         when:
-        click Common.create
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.createDataElement()
         then:
-        check Common.modalHeader contains 'Create Data Element'
+        at CreateDataElementPage
     }
 
     def "fill the create data element form"() {
         when:
-        fill Common.nameLabel with myName
-        fill Common.modelCatalogueId with myCatalogue
-        fill Common.description with myDescription
-
-        and: 'select a data type'
-        fill search with dataTypeName and pick first item
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.name = myName
+        createDataElementPage.modelCatalogueId = myCatalogue
+        createDataElementPage.description = myDescription
+        createDataElementPage.search(dataTypeName)
+        $("a.cep-item", text: dataTypeName).text()
+        $("a.cep-item", text: dataTypeName).size()
+        createDataElementPage.selectFirstItem(dataTypeName)
+        createDataElementPage.finish()
+        Thread.sleep(5000)
 
         then:
-        check saveElement displayed
-
-        and: 'click on the save button'
-        click saveElement
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        selectInTree 'Data Elements'
-
-        then: 'verify that data is created'
+        at DataElementsPage
         $(dataTypeCreated).text()?.trim() == myName.trim()
     }
 }

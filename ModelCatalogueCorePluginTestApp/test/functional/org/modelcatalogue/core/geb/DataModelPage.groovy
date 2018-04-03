@@ -16,6 +16,9 @@ class DataModelPage extends Page {
     }
 
     static content = {
+        activity {
+            $("#activity-changes>div.inf-table-body>table>tbody>tr:nth-child(1)>td.inf-table-item-cell.ng-scope.col-md-7> span>span>code")
+        }
         h3CeName { $('h3.ce-name', 0) }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         rightSideTitleH3 { $("h3:not(.ng-hide):not(.data-model-heading)", 0) }

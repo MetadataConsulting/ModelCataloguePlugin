@@ -2,12 +2,8 @@ package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.Common
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.LoginPage
-import spock.lang.Ignore
+import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Narrative
 import spock.lang.Shared
 import spock.lang.Stepwise
@@ -25,14 +21,12 @@ import spock.lang.Title
 - Check that data model is imported
 ''')
 class MET1626Spec extends GebSpec {
-    private static final String search = "input#elements"
-    private static
-    final String table = "#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-7 > span > span > code"
-    private static final String modelHeader = "div.modal-header>h4"
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
 
     @Shared
     String dataModelName = 'Test 1'
+    @Shared
+    String tagName = 'Clinical Tags'
 
     def "Login to model catalogue"() {
         when: "Login to Model Catalogue as curator"
@@ -59,20 +53,41 @@ class MET1626Spec extends GebSpec {
         dataModelPage.dropdown.addImport()
 
         then: 'verify that the text Destination is displayed'
-        check modelHeader displayed
+        at DropDownImportPage
     }
 
-    @Ignore
     def "select a data model"() {
         when: 'select a model'
-        fill search with "Clinical Tags " and Common.pick first Common.item
-        click Common.modalPrimaryButton
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+        DropDownImportPage dropDownImportPage = browser.page DropDownImportPage
+        dropDownImportPage.fillSearchBox(tagName)
+        dropDownImportPage.searchMore()
 
-        DashboardPage dashboardPage = browser.page DashboardPage
-        dashboardPage.select(dataModelName)
+        then:
+        at SearchTagPage
 
-        then: 'verify that  imports is displayed inside table'
-        check table contains "imports"
+        when:
+        SearchTagPage searchTagPage = browser.page SearchTagPage
+        println $("h4.list-group-item-heading", text: tagName).text()
+        println $("h4.list-group-item-heading", text: tagName).size()
+        searchTagPage.searchTag(tagName)
+
+        then:
+        at DropDownImportPage
+
+        when:
+        Thread.sleep(2000)
+        DropDownImportPage dropDownImportPage1 = browser.page DropDownImportPage
+        dropDownImportPage1.finish()
+
+        then:
+        Thread.sleep(2000)
+        at DataModelPage
+
+        when:
+        DataModelPage dashboardPage = browser.page DataModelPage
+        dashboardPage.treeView.select("Imported Data Models")
+
+        then:
+        at DataImportsPage
     }
 }
