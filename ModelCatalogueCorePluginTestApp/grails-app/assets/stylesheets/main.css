@@ -639,3 +639,7 @@ form ol.filter {
 form {
     clear: both;
 }
+
+hr {
+    margin: 20px 0;
+}
