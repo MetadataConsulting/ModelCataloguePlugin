@@ -7,9 +7,14 @@ class LoginModalPage extends Page {
     static at = { $("a.btn-block").text() == "Login with Google" }
 
     static content = {
+        loginButton { $("button.btn-success", 0) }
         cancelButton { $("button.btn-warning", 0) }
         usernameInput { $("input#username", 0) }
         passwordInput { $("input#password", 0) }
+    }
+
+    void login() {
+        loginButton.click()
     }
 
     void setUsername(String value) {

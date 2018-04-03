@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.Regression
+package org.modelcatalogue.core.regression
 
 import geb.spock.GebSpec
 import org.openqa.selenium.By

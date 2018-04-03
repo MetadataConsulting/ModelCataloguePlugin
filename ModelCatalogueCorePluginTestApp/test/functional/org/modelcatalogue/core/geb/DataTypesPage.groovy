@@ -15,5 +15,33 @@ class DataTypesPage extends Page {
 
     static content = {
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+        createDateTypeLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
+        rows { $('div.inf-table-body tbody tr') }
+        addItemIcon(required: false) { $("tfoot span.fa-plus-circle") }
+    }
+
+    boolean isAddItemIconVisible() {
+        if ( addItemIcon.empty ) {
+            return false
+        }
+        true
+    }
+
+    boolean areCreateButtonsVisible() {
+        if ( createDateTypeLink.empty ) {
+            return false
+        }
+        if ( addItemIcon.empty ) {
+            return false
+        }
+        true
+    }
+
+    int count() {
+        rows.size()
+    }
+
+    void createDataTypeFromNavigation() {
+        createDateTypeLink.click()
     }
 }

@@ -2,13 +2,12 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<g:set var="security" bean="modelCatalogueSecurityService"/>
 		<title><g:if env="development">Grails Runtime Exception</g:if><g:else>Error</g:else></title>
 		<meta name="layout" content="register">
-		<g:if test="${Environment.DEVELOPMENT == Environment.current || security.hasRole('STACKTRACE')}"><asset:stylesheet src="errors.css"/></g:if>
+		<g:if test="${Environment.DEVELOPMENT == Environment.current}"><asset:stylesheet src="errors.css"/></g:if>
 	</head>
 	<body>
-		<g:if test="${Environment.DEVELOPMENT == Environment.current || security.hasRole('STACKTRACE')}">
+		<g:if test="${Environment.DEVELOPMENT == Environment.current}">
 			<g:renderException exception="${exception}" />
 		</g:if>
 		<g:else>

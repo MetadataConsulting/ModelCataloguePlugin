@@ -10,8 +10,8 @@ class DashboardPage extends Page {
 
     static content = {
         searchInputField { $('#search', 0) }
-        filterButton { $('#filter-btn')}
-        dataModelLinks { $('a.data-model-link') }
+        filterButton { $('#search-btn')}
+        dataModelLinks(required: false) { $('a.data-model-link') }
         dataModelLink { $('a.data-model-link', text: it) }
         nav { $('#topmenu', 0) .module(NavModule) }
     }
@@ -29,5 +29,12 @@ class DashboardPage extends Page {
 
     void selectFirst() {
         dataModelLinks.first().click()
+    }
+
+    int count() {
+        if ( dataModelLinks.empty ) {
+            return 0
+        }
+        dataModelLinks.size()
     }
 }
