@@ -26,7 +26,7 @@ class DataImportsPage extends Page {
         addItemIcon.click()
     }
 
-    void expand() {
+    void expandTag() {
         expandButton.click()
     }
 

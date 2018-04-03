@@ -5,7 +5,7 @@ import geb.Page
 class FinalizeDataModelPage extends Page implements InputUtils {
     static atCheckWaiting = true
 
-    static at = { $('.modal-dialog').text()?.contains('Finalize Data Model') }
+    static at = { $("div.modal-header>h4").text()?.contains('Finalize Data Model') }
 
     static content = {
         versionNoteTextarea { $('textarea#revisionNotes') }

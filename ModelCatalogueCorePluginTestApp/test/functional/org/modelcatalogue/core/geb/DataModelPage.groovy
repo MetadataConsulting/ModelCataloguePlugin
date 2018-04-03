@@ -26,9 +26,10 @@ class DataModelPage extends Page {
         deleteButton(required: false) { $('#delete-menu-item-link', 0) }
         modalDialog(required: false) { $('.modal-dialog', 0).module(ModalDialogModule) }
         dropdownLink(required: false) { $('a#role_item_catalogue-element-menu-item-link', 0) }
-        dropdown(required: false) { $('li#role_item_catalogue-element-menu-item').module(DataModelNavModule) }
+        dropdownMenu(required: false) { $('#role_item_catalogue-element-menu-item-link').module(DataModelNavModule) }
         exportLink(required: false) { $('a#role_item_export-menu-item-link') }
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
+        finalizedLink(required: false) { $("a#finalize-menu-item-link") }
     }
 
     void isExportVisible() {
@@ -41,6 +42,10 @@ class DataModelPage extends Page {
 
     void export() {
         exportLink.click()
+    }
+
+    void finalizedDataModel() {
+        finalizedLink.click()
     }
 
     void dropdown() {
