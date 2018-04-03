@@ -5,7 +5,7 @@ import geb.Module
 class DataModelNavModule extends Module {
 
     static content = {
-        finalizeLink(required: false, wait: true) { $('a#finalize-menu-item-link') }
+        finalizeLink(required: false, wait: true) { $('li#finalize-menu-item a') }
         creteNewVersionLink(required: false, wait: true) { $('li#create-new-version-menu-item a') }
         archiveLink(required: false, wait: true) { $('li#archive-menu-item a') }
         deleteLink(required: false, wait: true) { $('li#delete-menu-item a') }
@@ -27,7 +27,6 @@ class DataModelNavModule extends Module {
     }
     void finalize() {
         finalizeLink.click()
-        sleep(3000)
     }
 
     void createNewVersion() {

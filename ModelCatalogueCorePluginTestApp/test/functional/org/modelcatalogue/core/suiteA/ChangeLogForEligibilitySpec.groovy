@@ -1,4 +1,4 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.suiteA
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
@@ -40,7 +40,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
         DataModelPage dataModelPage = browser.page DataModelPage
 
         then:
-        dataModelPage.titleContains 'Rare Disease Conditions'
+        dataModelPage.dataModelTitle.contains 'Rare Disease Conditions'
     }
 
     @Ignore

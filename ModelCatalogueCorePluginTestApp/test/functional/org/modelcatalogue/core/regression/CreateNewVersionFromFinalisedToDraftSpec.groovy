@@ -52,7 +52,7 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
 
     @Ignore
     def "login to model catalogue and create data model"() {
-        when:HEAD
+        when:
         LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 

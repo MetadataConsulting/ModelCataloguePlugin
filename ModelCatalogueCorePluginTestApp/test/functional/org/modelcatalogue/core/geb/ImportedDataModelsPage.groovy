@@ -16,5 +16,4 @@ class ImportedDataModelsPage extends Page {
         }
         true
     }
-
 }
