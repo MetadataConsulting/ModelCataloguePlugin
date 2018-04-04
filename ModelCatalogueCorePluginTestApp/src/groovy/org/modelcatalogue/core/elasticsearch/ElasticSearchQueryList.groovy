@@ -175,7 +175,7 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
             if (e.cause instanceof IndexNotFoundException) {
                 log.error("Search index not found: ${e.cause.index}")
             } else {
-                log.error("Exception searching query: ${searchRequest.toString()}")
+                log.error("Exception searching query:")// ${searchRequest.toString()}
             }
             throw e
         }
@@ -195,7 +195,7 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
             try {
                 response = initializeResponse()
             } catch (Exception ignored) {
-                return []
+                return [:]
             }
         }
         def maxScore = response.hits.maxScore()
