@@ -57,10 +57,14 @@ class MappingSuggestionsService implements MappingsSuggestionsGateway {
         if ( actionList ) {
             Action firstAction = actionList.first()
             CatalogueElement source = sourceCatalogueElementOfAction(firstAction)
-            sourceIdName = dataModelIdName(source)
+            if ( source ) {
+                sourceIdName = dataModelIdName(source)
+            }
 
             CatalogueElement destination = destinationCatalogueElementOfAction(firstAction)
-            destinationIdName = dataModelIdName(destination)
+            if ( destination ) {
+                destinationIdName = dataModelIdName(destination)
+            }
         }
 
         List<MappingSuggestion> suggestionList = actionList.collect { Action actionInstance ->
