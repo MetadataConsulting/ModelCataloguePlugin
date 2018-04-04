@@ -13,7 +13,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('dataModel')
     return undefined if not security.hasRole('CURATOR')
-
+    return undefined if $scope.element.isInstanceOf('dataModel') && !security.hasRole('SUPERVISOR') && $scope.element.status == 'FINALIZED'
     {
       position:   -1000
       label:      'Add Data Model Import'
@@ -45,6 +45,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         return undefined unless messages.hasPromptFactory('create-' + resource) or messages.hasPromptFactory('edit-' + resource)
         return undefined unless angular.isFunction($scope.element.isInstanceOf)
         return undefined unless $scope.element.isInstanceOf('dataModel') or resource is 'dataClass' and $scope.element.isInstanceOf('dataClass')
+        return undefined if $scope.element.isInstanceOf('dataModel') && !security.hasRole('SUPERVISOR') && $scope.element.status == 'FINALIZED'
 
         {
           label: "New #{names.getNaturalName(resource)}"

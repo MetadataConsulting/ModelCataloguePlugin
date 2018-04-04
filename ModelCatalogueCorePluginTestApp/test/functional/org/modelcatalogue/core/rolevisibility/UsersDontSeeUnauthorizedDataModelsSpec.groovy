@@ -1,4 +1,4 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.DashboardPage
