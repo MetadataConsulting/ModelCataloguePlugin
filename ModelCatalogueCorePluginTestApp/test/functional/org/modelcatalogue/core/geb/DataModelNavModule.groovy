@@ -5,7 +5,7 @@ import geb.Module
 class DataModelNavModule extends Module {
 
     static content = {
-        finalizeLink(required: false, wait: true) { $('a#finalize-menu-item-link') }
+        finalizeLink(required: false, wait: true) { $('li#finalize-menu-item a') }
         creteNewVersionLink(required: false, wait: true) { $('li#create-new-version-menu-item a') }
         archiveLink(required: false, wait: true) { $('li#archive-menu-item a') }
         deleteLink(required: false, wait: true) { $('li#delete-menu-item a') }
@@ -20,14 +20,59 @@ class DataModelNavModule extends Module {
         mergeLink(required: false, wait: true) { $('li#merge-menu-item a') }
         cloneAnotherIntoCurrentLink(required: false, wait: true) { $('li#clone-from-menu-item a') }
         cloneCurrentIntoAnotherLink(required: false, wait: true) { $('li#clone-menu-item a') }
+
     }
 
     boolean existsDelete() {
         !deleteLink.empty
     }
+
+    boolean existsAddImport() {
+        !addImportLink.empty
+    }
+
+    boolean existsCreateNewRelationship() {
+        !createNewRelationshipLink.empty
+    }
+
+    boolean existsCreateDataClass() {
+        !createDataClassLink.empty
+    }
+
+    boolean existsCreateDataElement() {
+        !createDataElementLink.empty
+    }
+
+    boolean existsCreateDataType() {
+        !createDataTypeLink.empty
+    }
+
+    boolean existsCreateMeasurementUnit() {
+        !createMeasurementUnitLink.empty
+    }
+
+    boolean existsCreateAsset() {
+        !createAssetLink.empty
+    }
+
+    boolean existsValidationRule() {
+        !createValidationRuleLink.empty
+    }
+
+    boolean existsMerge() {
+        !mergeLink.empty
+    }
+
+    boolean existsCloneAnotherIntoCurrent() {
+        !cloneAnotherIntoCurrentLink.empty
+    }
+
+    boolean existsCloneCurrentIntoAnother() {
+        !cloneCurrentIntoAnotherLink.empty
+    }
+
     void finalize() {
         finalizeLink.click()
-        sleep(3000)
     }
 
     void createNewVersion() {

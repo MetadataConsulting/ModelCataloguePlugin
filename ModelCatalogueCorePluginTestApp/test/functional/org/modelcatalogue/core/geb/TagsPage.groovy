@@ -16,7 +16,7 @@ class TagsPage extends Page {
     static content = {
         createTagLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
         addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
-        rows { $('div.inf-table-body tbody tr') }
+        rows { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center") }
     }
 
     int count() {

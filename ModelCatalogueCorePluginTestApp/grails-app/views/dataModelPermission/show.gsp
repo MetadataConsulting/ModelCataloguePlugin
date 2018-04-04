@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title><g:message code="dataModel.permissions" default="Data Model Permissions"/></title>
+    <title><g:message code="dataModel.permissions.show" default="Show Data Model Permissions"/></title>
     <meta name='layout' content='main'/>
 </head>
 <body>
@@ -44,7 +44,7 @@
     </g:each>
     </tbody>
 </table>
-<g:form action="grant" controller="dataModelPermission" method="post">
+<g:form elementId="grantForm" action="grant" controller="dataModelPermission" method="post">
     <g:select name="username" from="${usernameList}"/>
     <g:select name="permission" from="${['administration', 'read']}"/>
     <g:hiddenField name="id" value="${dataModel.id}" />

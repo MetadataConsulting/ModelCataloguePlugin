@@ -7,6 +7,10 @@ import org.modelcatalogue.core.AbstractRestfulController
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.dataarchitect.DataArchitectService
 import org.modelcatalogue.core.mappingsuggestions.MapppingSuggestionsConfigurationService
+import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionRequest
+import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionRequestImpl
+import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionResponse
+import org.modelcatalogue.core.mappingsuggestions.MappingsSuggestionsGateway
 import org.modelcatalogue.core.mappingsuggestions.MatchAgainst
 import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.persistence.DataModelGormService
@@ -14,6 +18,7 @@ import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.context.MessageSource
 import org.springframework.validation.ObjectError
+import javax.annotation.PostConstruct
 
 import javax.annotation.PostConstruct
 
@@ -28,6 +33,23 @@ class BatchController extends AbstractRestfulController<Batch> {
     MessageSource messageSource
     def executorService
     MapppingSuggestionsConfigurationService mapppingSuggestionsConfigurationService
+
+    int defaultMax
+    int defaultScore
+
+    MappingsSuggestionsGateway mappingsSuggestionsGateway
+
+    @CompileDynamic
+    @PostConstruct
+    void setup() {
+        defaultMax = grailsApplication.config.mdx.mappingsuggestions.max ?: 20
+        defaultScore = grailsApplication.config.mdx.mappingsuggestions.score ?: 20
+    }
+
+    protected List<ActionState> defaultActionStates() {
+        ActionState.values()  as List<ActionState>
+    }
+
 
     static allowedMethods = [
             all: 'GET',
@@ -50,6 +72,33 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     def all() {
         List<BatchViewModel> batchList = batchService.findAllActive()
+
+
+        for ( BatchViewModel batch : batchList ) {
+            MappingSuggestionRequest mappingSuggestionRequest = new MappingSuggestionRequestImpl(
+                    batchId: batch.id,
+                    max: 1,
+                    offset: 0,
+                    scorePercentage: defaultScore,
+                    stateList: defaultActionStates(),
+                    term:  null
+            )
+            MappingSuggestionResponse rsp = mappingsSuggestionsGateway.findAll(mappingSuggestionRequest)
+            if ( rsp && rsp.sourceName && rsp.destinationName) {
+                String suffix = ''
+                if ( batch.name ) {
+                    if ( batch.name.contains('Fuzzy') ) {
+                        suffix = ' - Fuzzy'
+                    }
+                    if ( batch.name.contains('Exact Matches') ) {
+                        suffix = ' - Exact Matches'
+                    }
+                }
+                batch.name = "${rsp.sourceName} vs ${rsp.destinationName} ${suffix}"
+            }
+        }
+
+
         Number total = batchGormService.countActive()
         [
                 batchList: batchList,

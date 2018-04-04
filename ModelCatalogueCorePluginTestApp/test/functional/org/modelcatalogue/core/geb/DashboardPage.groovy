@@ -10,14 +10,14 @@ class DashboardPage extends Page {
 
     static content = {
         searchInputField { $('#search', 0) }
-        filterButton { $('#search-btn')}
         dataModelLinks(required: false) { $('a.data-model-link') }
-        dataModelLink { $('a.data-model-link', text: it) }
+        filterButton { $('#filter-btn') }
+        dataModelLink(wait: true) { $('a.data-model-link', text: it) }
         nav { $('#topmenu', 0) .module(NavModule) }
     }
 
     void search(String query) {
-        for ( char c : query.toCharArray() ) {
+        for (char c : query.toCharArray()) {
             searchInputField << "${c}"
         }
         filterButton.click()
