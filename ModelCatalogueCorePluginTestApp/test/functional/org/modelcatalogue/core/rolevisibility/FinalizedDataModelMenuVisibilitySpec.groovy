@@ -70,20 +70,19 @@ class FinalizedDataModelMenuVisibilitySpec extends GebSpec {
         dataModelPage.dropdown()
 
         then:
-        true // TODO Implement this
-//        dataModelPage.dropdownMenu.existsCreateNewVersion()
-//        dataModelPage.dropdownMenu.existsArchive()
-//        dataModelPage.dropdownMenu.existsAddImport()
-//        dataModelPage.dropdownMenu.existsCreateNewRelationship()
-//        dataModelPage.dropdownMenu.existsCreateDataClass()
-//        dataModelPage.dropdownMenu.existsCreateDataElement()
-//        dataModelPage.dropdownMenu.existsCreateDataType()
-//        dataModelPage.dropdownMenu.existsCreateMeasurementUnit()
-//        dataModelPage.dropdownMenu.existsCreateAsset()
-//        dataModelPage.dropdownMenu.existsValidationRule()
-//        dataModelPage.dropdownMenu.existsMerge()
-//        dataModelPage.dropdownMenu.existsCloneCurrentIntoAnother()
-//        dataModelPage.dropdownMenu.existsReindexDataModel()
+        dataModelPage.dropdownMenu.existsCreateNewVersion(browser)
+        dataModelPage.dropdownMenu.existsArchive(browser)
+        dataModelPage.dropdownMenu.existsAddImport(browser)
+        dataModelPage.dropdownMenu.existsCreateNewRelationship(browser)
+        dataModelPage.dropdownMenu.existsCreateDataClass(browser)
+        dataModelPage.dropdownMenu.existsCreateDataElement(browser)
+        dataModelPage.dropdownMenu.existsCreateDataType(browser)
+        dataModelPage.dropdownMenu.existsCreateMeasurementUnit(browser)
+        dataModelPage.dropdownMenu.existsCreateAsset(browser)
+        dataModelPage.dropdownMenu.existsValidationRule(browser)
+        dataModelPage.dropdownMenu.existsMerge(browser)
+        dataModelPage.dropdownMenu.existsCloneCurrentIntoAnother(browser)
+        dataModelPage.dropdownMenu.existsReindexDataModel(browser)
 
         when:
         dashboardPage = to DashboardPage
@@ -142,24 +141,23 @@ class FinalizedDataModelMenuVisibilitySpec extends GebSpec {
         dataModelPage.dropdown()
 
         then:
-        true // uncomment this
-//        dataModelPage.dropdownMenu.existsCreateNewVersion()
-//        dataModelPage.dropdownMenu.existsMerge()
-//        dataModelPage.dropdownMenu.existsCloneCurrentIntoAnother()
+        dataModelPage.dropdownMenu.existsCreateNewVersion(browser)
+        dataModelPage.dropdownMenu.existsMerge(browser)
+        dataModelPage.dropdownMenu.existsCloneCurrentIntoAnother(browser)
 
         and:
-        !dataModelPage.dropdownMenu.existsDelete()
-        !dataModelPage.dropdownMenu.existsFinalize()
-        !dataModelPage.dropdownMenu.existsArchive()
-        !dataModelPage.dropdownMenu.existsDelete()
-        !dataModelPage.dropdownMenu.existsAddImport()
-        !dataModelPage.dropdownMenu.existsCreateNewRelationship()
-        !dataModelPage.dropdownMenu.existsCreateDataClass()
-        !dataModelPage.dropdownMenu.existsCreateDataElement()
-        !dataModelPage.dropdownMenu.existsCreateDataType()
-        !dataModelPage.dropdownMenu.existsCreateMeasurementUnit()
-        !dataModelPage.dropdownMenu.existsCreateAsset()
-        !dataModelPage.dropdownMenu.existsValidationRule()
-        !dataModelPage.dropdownMenu.existsCloneAnotherIntoCurrent()
+        !dataModelPage.dropdownMenu.existsDelete(browser)
+        !dataModelPage.dropdownMenu.existsFinalize(browser)
+        !dataModelPage.dropdownMenu.existsArchive(browser)
+        !dataModelPage.dropdownMenu.existsDelete(browser)
+        !dataModelPage.dropdownMenu.existsAddImport(browser)
+        !dataModelPage.dropdownMenu.existsCreateNewRelationship(browser)
+        !dataModelPage.dropdownMenu.existsCreateDataClass(browser)
+        !dataModelPage.dropdownMenu.existsCreateDataElement(browser)
+        !dataModelPage.dropdownMenu.existsCreateDataType(browser)
+        !dataModelPage.dropdownMenu.existsCreateMeasurementUnit(browser)
+        !dataModelPage.dropdownMenu.existsCreateAsset(browser)
+        !dataModelPage.dropdownMenu.existsValidationRule(browser)
+        !dataModelPage.dropdownMenu.existsCloneAnotherIntoCurrent(browser)
     }
 }
