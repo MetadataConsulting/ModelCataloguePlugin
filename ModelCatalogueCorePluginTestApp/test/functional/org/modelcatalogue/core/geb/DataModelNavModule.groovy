@@ -20,11 +20,57 @@ class DataModelNavModule extends Module {
         mergeLink(required: false, wait: true) { $('li#merge-menu-item a') }
         cloneAnotherIntoCurrentLink(required: false, wait: true) { $('li#clone-from-menu-item a') }
         cloneCurrentIntoAnotherLink(required: false, wait: true) { $('li#clone-menu-item a') }
+
     }
 
     boolean existsDelete() {
         !deleteLink.empty
     }
+
+    boolean existsAddImport() {
+        !addImportLink.empty
+    }
+
+    boolean existsCreateNewRelationship() {
+        !createNewRelationshipLink.empty
+    }
+
+    boolean existsCreateDataClass() {
+        !createDataClassLink.empty
+    }
+
+    boolean existsCreateDataElement() {
+        !createDataElementLink.empty
+    }
+
+    boolean existsCreateDataType() {
+        !createDataTypeLink.empty
+    }
+
+    boolean existsCreateMeasurementUnit() {
+        !createMeasurementUnitLink.empty
+    }
+
+    boolean existsCreateAsset() {
+        !createAssetLink.empty
+    }
+
+    boolean existsValidationRule() {
+        !createValidationRuleLink.empty
+    }
+
+    boolean existsMerge() {
+        !mergeLink.empty
+    }
+
+    boolean existsCloneAnotherIntoCurrent() {
+        !cloneAnotherIntoCurrentLink.empty
+    }
+
+    boolean existsCloneCurrentIntoAnother() {
+        !cloneCurrentIntoAnotherLink.empty
+    }
+
     void finalize() {
         finalizeLink.click()
     }
