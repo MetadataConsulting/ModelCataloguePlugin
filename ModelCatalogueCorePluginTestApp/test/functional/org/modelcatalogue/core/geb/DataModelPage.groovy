@@ -25,7 +25,7 @@ class DataModelPage extends Page {
         dataModelButton(required: false) { $('#role_item_catalogue-element-menu-item-link', 0) }
         deleteButton(required: false) { $('#delete-menu-item-link', 0) }
         modalDialog(required: false) { $('.modal-dialog', 0).module(ModalDialogModule) }
-        dropdownLink(required: false) { $('a#role_item_catalogue-element-menu-item-link', 0) }
+        dropdownLink(wait: true, required: false) { $('a#role_item_catalogue-element-menu-item-link', 0) }
         dropdownMenu(required: false) { $('#role_item_catalogue-element-menu-item-link').module(DataModelNavModule) }
         exportLink(required: false) { $('a#role_item_export-menu-item-link') }
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
