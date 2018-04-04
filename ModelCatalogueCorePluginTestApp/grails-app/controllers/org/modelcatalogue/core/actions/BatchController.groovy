@@ -67,27 +67,29 @@ class BatchController extends AbstractRestfulController<Batch> {
     def all() {
         List<BatchViewModel> batchList = batchService.findAllActive()
 
-        for ( BatchViewModel batch : batchList ) {
-            MappingSuggestionRequest mappingSuggestionRequest = new MappingSuggestionRequestImpl(
-                    batchId: batch.id,
-                    max: 1,
-                    offset: 0,
-                    scorePercentage: defaultScore,
-                    stateList: defaultActionStates(),
-                    term:  null
-            )
-            MappingSuggestionResponse rsp = mappingsSuggestionsGateway.findAll(mappingSuggestionRequest)
-            if ( rsp && rsp.sourceName && rsp.destinationName) {
-                String suffix = ''
-                if ( batch.name ) {
-                    if ( batch.name.contains('Fuzzy') ) {
-                        suffix = ' - Fuzzy'
+        if ( batchList ) {
+            for ( BatchViewModel batch : batchList ) {
+                MappingSuggestionRequest mappingSuggestionRequest = new MappingSuggestionRequestImpl(
+                        batchId: batch.id,
+                        max: 1,
+                        offset: 0,
+                        scorePercentage: defaultScore,
+                        stateList: defaultActionStates(),
+                        term:  null
+                )
+                MappingSuggestionResponse rsp = mappingsSuggestionsGateway.findAll(mappingSuggestionRequest)
+                if ( rsp && rsp.sourceName && rsp.destinationName) {
+                    String suffix = ''
+                    if ( batch.name ) {
+                        if ( batch.name.contains('Fuzzy') ) {
+                            suffix = ' - Fuzzy'
+                        }
+                        if ( batch.name.contains('Exact Matches') ) {
+                            suffix = ' - Exact Matches'
+                        }
                     }
-                    if ( batch.name.contains('Exact Matches') ) {
-                        suffix = ' - Exact Matches'
-                    }
+                    batch.name = "${rsp.sourceName} vs ${rsp.destinationName} ${suffix}"
                 }
-                batch.name = "${rsp.sourceName} vs ${rsp.destinationName} ${suffix}"
             }
         }
 
