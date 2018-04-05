@@ -75,17 +75,6 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
     }
 
-//    @Override
-//    Map<String, Closure> sheetsAfterMainSheetExport() {
-//        Map<String, Closure> sheets =
-//            ['Analysis': {SheetDefinition sheet -> writeAnalysis(sheet)} as Closure] +
-//                systemsMap.collectEntries {name, v ->
-//                    [(name), {SheetDefinition sheet -> writeSystemSheet(sheet, name)} as Closure]
-//                }
-//        println "Sheets: ${sheets}"
-//        return sheets
-//    }
-    // export will do as it normally does, with new headers, and a different printDataElement, and then do sheetsAfterMainSheetExport at the end.
 
     static String noSourceMessage = 'No source identified'
     static String multipleSourcesMessage = 'Multiple sources identified, please see entries in the online catalogue'
@@ -120,7 +109,6 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
                 link to url "${getLoadURL(dataElement)}"
                 style TOP_LEFT_BORDER
             }
-            // Multiplicity -> BusinessRule
             [ "${getMultiplicity(dataElementRelationship)}",
               "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}",
               "${(dataElement?.dataType?.rule) ?: ""}",
