@@ -28,6 +28,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       return undefined if not $scope.element
       return undefined if not $scope.element.status
       return undefined if not security.hasRole('CURATOR')
+      return undefined if $scope.element.isInstanceOf('dataModel') && !security.hasRole('SUPERVISOR') && $scope.element.status == 'FINALIZED'
 
       action = {
         position: -1800
@@ -349,6 +350,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('catalogueElement')
     return undefined if not security.hasRole('CURATOR')
+    return undefined if $scope.element.isInstanceOf('dataModel') && !security.hasRole('SUPERVISOR') && $scope.element.status == 'FINALIZED'
 
     {
       position:   200

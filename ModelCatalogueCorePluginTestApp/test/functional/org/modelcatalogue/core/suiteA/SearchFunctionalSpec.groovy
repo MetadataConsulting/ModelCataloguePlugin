@@ -1,5 +1,6 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.suiteA
 
+import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
@@ -36,7 +37,7 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
         click search
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
         fill searchInput with NAME_LOWER_CASE

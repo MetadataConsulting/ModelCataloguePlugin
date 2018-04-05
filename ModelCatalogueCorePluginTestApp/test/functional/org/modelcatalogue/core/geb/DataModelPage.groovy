@@ -16,23 +16,41 @@ class DataModelPage extends Page {
     }
 
     static content = {
+        activity {
+            $("#activity-changes>div.inf-table-body>table>tbody>tr:nth-child(1)>td.inf-table-item-cell.ng-scope.col-md-7> span>span>code")
+        }
         h3CeName { $('h3.ce-name', 0) }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         rightSideTitleH3 { $("h3:not(.ng-hide):not(.data-model-heading)", 0) }
         dataModelButton(required: false) { $('#role_item_catalogue-element-menu-item-link', 0) }
         deleteButton(required: false) { $('#delete-menu-item-link', 0) }
         modalDialog(required: false) { $('.modal-dialog', 0).module(ModalDialogModule) }
-        dropdownLink(required: false) { $('a#role_item_catalogue-element-menu-item-link', 0) }
-        dropdown(required: false) { $('li#role_item_catalogue-element-menu-item').module(DataModelNavModule) }
+        dropdownLink(wait: true, required: false) { $('a#role_item_catalogue-element-menu-item-link', 0) }
+        dropdownMenu(required: false) { $('#role_item_catalogue-element-menu-item-link').module(DataModelNavModule) }
         exportLink(required: false) { $('a#role_item_export-menu-item-link') }
+        exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
+        finalizedLink(required: false) { $("a#finalize-menu-item-link") }
+        rows { $('div.inf-table-body table tbody tr td') }
+    }
+
+    String getRowsText() {
+        rows.collect { it.text() }.join(' ')
     }
 
     void isExportVisible() {
         !exportLink.empty
     }
 
+    void exportXml() {
+        exportXMLLink.click()
+    }
+
     void export() {
         exportLink.click()
+    }
+
+    void finalizedDataModel() {
+        finalizedLink.click()
     }
 
     void dropdown() {
@@ -47,9 +65,8 @@ class DataModelPage extends Page {
         dataModelButton.click()
     }
 
-    boolean titleContains(String query) {
-        String text = h3CeName.text()
-        text.contains(query)
+    String getDataModelTitle() {
+        h3CeName.text()
     }
 
     String getRightSideTitle() {

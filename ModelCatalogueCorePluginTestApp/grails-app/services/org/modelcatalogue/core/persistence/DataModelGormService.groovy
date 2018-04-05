@@ -42,8 +42,13 @@ class DataModelGormService implements WarnGormErrors {
 
     @Transactional(readOnly = true)
     @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
-    List<DataModel> findAllBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    List<DataModel> findAllBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery, List<String> joinProperties) {
         DetachedCriteria<DataModel> query = findQueryBySearchStatusQuery(searchStatusQuery, sortQuery)
+        if ( joinProperties ) {
+            for ( String propertyName : joinProperties ) {
+                query.join(propertyName)
+            }
+        }
         Map m = paginationQuery?.toMap() ?: Collections.emptyMap()
         query.list(m)
     }

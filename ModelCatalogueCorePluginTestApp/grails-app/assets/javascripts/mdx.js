@@ -12,10 +12,10 @@ $( document ).ready(function() {
 
         if (!is_visible) {
             $.getJSON(e.data('api'), function (d) {
-                var html = "<p><strong>" + d.name + "</strong></p>";
-                html = html + "<p>" + d.description + "</p>";
+                var html = "<p><strong>" + outputStr(d.name) + "</strong></p>";
+                html = html + "<p>" + outputStr(d.description) + "</p>";
                 d.ext.values.forEach(function (obj) {
-                    html = html + "<strong><em>" + obj.key + "</em></strong>" + " : " + obj.value + "</br>";
+                    html = html + "<strong><em>" + outputStr(obj.key) + "</em></strong>" + " : " + outputStr(obj.value) + "</br>";
                 });
                 e.popover({
                     content: html,
@@ -33,6 +33,9 @@ $( document ).ready(function() {
     });
 });
 
+function outputStr(value) {
+    return ( value != null && value !== 'null') ? value : '';
+}
 
 function selectAllCheckboxes(attName) {
     var elements = document.getElementsByTagName('input');

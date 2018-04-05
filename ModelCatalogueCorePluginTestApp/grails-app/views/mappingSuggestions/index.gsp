@@ -68,9 +68,21 @@
             <tr>
                 <td><g:checkBox name="mappingSuggestionIds" value="${mappingSuggestionInstance.mappingSuggestionId}" checked="false"  /></td>
                 <td>${mappingSuggestionInstance.source.code}</td>
-                <td><a class="target" data-api="${MetadataDomainEntity.linkAjax(destinationId, mappingSuggestionInstance.source.metadataDomainEntity)}" href="${MetadataDomainEntity.link(sourceId, mappingSuggestionInstance.source.metadataDomainEntity)}">${mappingSuggestionInstance.source.name}</a></td>
-                <td>${mappingSuggestionInstance.destination.code}</td>
-                <td><a class="target" data-api="${MetadataDomainEntity.linkAjax(destinationId, mappingSuggestionInstance.destination.metadataDomainEntity)}" href="${MetadataDomainEntity.link(destinationId, mappingSuggestionInstance.destination.metadataDomainEntity)}">${mappingSuggestionInstance.destination.name}</a></td>
+                <td>
+                    <g:if test="${mappingSuggestionInstance.source}">
+                        <a class="target"
+                           data-api="${MetadataDomainEntity.linkAjax(destinationId, mappingSuggestionInstance.source.metadataDomainEntity)}"
+                           href="${MetadataDomainEntity.link(sourceId, mappingSuggestionInstance.source.metadataDomainEntity)}">${mappingSuggestionInstance.source.name}</a>
+                    </g:if>
+                </td>
+                <td><g:if test="${mappingSuggestionInstance.destination}">${mappingSuggestionInstance.destination.code}</g:if></td>
+                <td>
+                    <g:if test="${mappingSuggestionInstance.destination}">
+                        <a class="target"
+                           data-api="${MetadataDomainEntity.linkAjax(destinationId, mappingSuggestionInstance.destination.metadataDomainEntity)}"
+                           href="${MetadataDomainEntity.link(destinationId, mappingSuggestionInstance.destination.metadataDomainEntity)}">${mappingSuggestionInstance.destination.name}</a>
+                    </g:if>
+                </td>
                 <td>${mappingSuggestionInstance.score}</td>
                 <td><g:render template="actionState" model="[actionState: mappingSuggestionInstance.state]"/></td>
             </tr>

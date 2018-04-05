@@ -10,6 +10,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.mappingsuggestions.MappingSuggestionsGeneratorService
+import org.modelcatalogue.core.mappingsuggestions.MapppingSuggestionsConfigurationService
 import org.modelcatalogue.core.mappingsuggestions.MatchAgainst
 import org.modelcatalogue.core.mappingsuggestions.MatchParamsService
 import org.modelcatalogue.core.persistence.BatchGormService
@@ -44,28 +45,7 @@ class DataArchitectService {
     BatchGormService batchGormService
     MatchParamsService matchParamsService
     MappingSuggestionsGeneratorService mappingSuggestionsGeneratorService
-    MatchAgainst matchAgainst = MatchAgainst.CONTAINS_STEMMED_KEYWORDS
-
-    Integer minSizeMatchAgainstContainsStemmedKeywords
-    GrailsApplication grailsApplication
-
-    @CompileDynamic
-    @PostConstruct
-    private void init() {
-        minSizeMatchAgainstContainsStemmedKeywords = grailsApplication.config.mc.mappingsuggestions.minSizeMatchAgainstContainsStemmedKeywords ?: 1000
-
-        String matchAgainstConfigValue = grailsApplication.config.mc.mappingsuggestions.matchAgainst
-
-        if ( matchAgainstConfigValue != null ) {
-            try {
-                matchAgainst = matchAgainstConfigValue as MatchAgainst
-            } catch(java.lang.IllegalArgumentException e) {
-            }
-        }
-
-        log.info("matchAgainst =" + matchAgainst )
-
-    }
+    MapppingSuggestionsConfigurationService mapppingSuggestionsConfigurationService
 
     //commented out the functions that are no longer relevant or don't work
     //TODO: finish these functions
@@ -574,26 +554,19 @@ class DataArchitectService {
             batchGormService.update([batch.id], Boolean.FALSE)
 
             Float score = minScore as Float ?: 10.0f
-            MatchAgainst matchAgainst = matchAgainstDependingOnDataModelSize(dataModelB)
+            MatchAgainst matchAgainst = mapppingSuggestionsConfigurationService.matchAgainstDependingOnDataModelSize(dataModelB)
 
             log.info 'Using match against: {}', matchAgainst.name()
 //  currently only need to match the data elements
 //  mappingSuggestionsGeneratorService.execute(batch.id, DataClass.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
             mappingSuggestionsGeneratorService.execute(batch.id, DataElement.class, dataModelA, DataElement.class, dataModelB, score, matchAgainst)
-s
-            batch.name = suggestedFuzzyMappingsName(dsataModelA, dataModelB)
+
+            batch.name = suggestedFuzzyMappingsName(dataModelA, dataModelB)
             batch.save()
 
         } catch(Exception ex){
             log.error(ex.message)
         }
-    }
-
-    MatchAgainst matchAgainstDependingOnDataModelSize(DataModel dataModel) {
-        if ( matchAgainst == MatchAgainst.CONTAINS_STEMMED_KEYWORDS && dataElementGormService.countByDataModel(dataModel) < minSizeMatchAgainstContainsStemmedKeywords) {
-            return MatchAgainst.ALL
-        }
-        return matchAgainst
     }
 
     void saveMatchResultsAsActions(Set<MatchResult> matchingElements,

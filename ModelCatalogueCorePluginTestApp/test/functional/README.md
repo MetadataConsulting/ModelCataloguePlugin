@@ -1,7 +1,13 @@
 To run all functional tests: 
 
-test-app functional: -Dgeb.env=chromeHeadless -Dwebdriver.chrome.driver=/Users/sdelamo/Applications/chromedriver -Dspock.ignore.suiteA=true -Dspock.ignore.secured=true
+grails test-app -DdownloadFilepath=/Users/sdelamo/Downloads -Djava.io.tmpdir=/Users/sdelamo/Downloads -Dgeb.env=chrome -Dwebdriver.chrome.driver=/Users/sdelamo/Applications/chromedriver functional: org.modelcatalogue.core.finalized.*
 
-test-app functional: -Dgeb.env=chromeHeadless -Dwebdriver.chrome.driver=/Users/sdelamo/Applications/chromedriver -Dspock.ignore.suiteB=true -Dspock.ignore.secured=true
+grails test-app -DdownloadFilepath=/Users/sdelamo/Downloads -Djava.io.tmpdir=/Users/sdelamo/Downloads -Dgeb.env=chrome -Dwebdriver.chrome.driver=/Users/sdelamo/Applications/chromedriver functional: org.modelcatalogue.core.regression.*
 
-test-app functional: -Dgeb.env=chromeHeadless -Dwebdriver.chrome.driver=/Users/sdelamo/Applications/chromedriver -Dspock.ignore.suiteB=true -Dspock.ignore.suiteA=true
+grails test-app -DdownloadFilepath=/Users/sdelamo/Downloads -Djava.io.tmpdir=/Users/sdelamo/Downloads -Dgeb.env=chrome -Dwebdriver.chrome.driver=/Users/sdelamo/Applications/chromedriver functional: org.modelcatalogue.core.remoteTesting.*
+
+grails test-app -DdownloadFilepath=/Users/sdelamo/Downloads -Djava.io.tmpdir=/Users/sdelamo/Downloads -Dgeb.env=chrome -Dwebdriver.chrome.driver=/Users/sdelamo/Applications/chromedriver functional: org.modelcatalogue.core.sanityTestSuite.*
+
+grails test-app -DdownloadFilepath=/Users/sdelamo/Downloads -Djava.io.tmpdir=/Users/sdelamo/Downloads -Dgeb.env=chrome -Dwebdriver.chrome.driver=/Users/sdelamo/Applications/chromedriver functional: org.modelcatalogue.core.secured.*
+
+grails test-app -DdownloadFilepath=/Users/sdelamo/Downloads -Djava.io.tmpdir=/Users/sdelamo/Downloads -Dgeb.env=chrome -Dwebdriver.chrome.driver=/Users/sdelamo/Applications/chromedriver functional: org.modelcatalogue.core.suiteA.*

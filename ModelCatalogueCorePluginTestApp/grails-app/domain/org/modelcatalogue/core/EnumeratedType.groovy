@@ -57,7 +57,11 @@ class EnumeratedType extends DataType {
      * @return the map containing the enum values
      */
     Map<String, String> getEnumerations() {
-        ImmutableMap.copyOf(Enumerations.from(enumAsString) as Map<String, String>)
+        try {
+            ImmutableMap.copyOf(Enumerations.from(enumAsString) as Map<String, String>)
+        }catch(e){
+            log.warn(this.id + " - " + e)
+        }
     }
 
     Enumerations getEnumerationsObject(){

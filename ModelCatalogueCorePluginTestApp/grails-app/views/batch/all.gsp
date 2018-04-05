@@ -1,4 +1,4 @@
-<%@ page import="org.modelcatalogue.core.actions.ActionState" %>
+<%@ page import="org.modelcatalogue.core.mappingsuggestions.MatchAgainst; org.modelcatalogue.core.actions.ActionState" %>
 <html>
 <head>
     <title><g:message code="batch.title" default="Mapping Batches"/></title>
@@ -11,19 +11,8 @@
         <h1><g:message code="batch.title" default="Mapping Batches"/></h1>
     </div>
 
-    <g:if test="${flash.message}">
-        <div class="alert alert-info">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <p>${flash.message}</p>
-        </div>
-    </g:if>
-
-    <g:if test="${flash.error}">
-        <div class="alert alert-danger">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <p>${flash.error}</p>
-        </div>
-    </g:if>
+    <g:render template="/templates/flashmessage" />
+    <g:render template="/templates/flasherror" />
 
     <g:if test="${batchList}">
 
@@ -65,6 +54,9 @@
         </g:form>
 
     </g:if>
+
+    <hr/>
+    <p><small><g:message code="mappingsuggestions.matchAgainst" args="[matchAgainst == MatchAgainst.ELASTIC_SEARCH ? 'Elastic Search' : 'Database']" default="Mapping Suggestion configured to use {0}"/></small></p>
 
 </div>
 </body>

@@ -1,5 +1,6 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.suiteA
 
+import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
@@ -51,18 +52,18 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check '#jserrors' gone
-        check rightSideTitle contains "Active Data Classes"
+        check Common.rightSideTitle contains "Active Data Classes"
     }
 
     def "Add new data class"() {
-        click create
+        click Common.create
         expect: 'the model dialog opens'
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when: 'the model details are filled in'
-        fill nameLabel with NEW_DATA_CLASS_NAME
-        fill modelCatalogueId with "http://www.example.com/${UUID.randomUUID().toString()}"
-        fill description with "Description"
+        fill Common.nameLabel with NEW_DATA_CLASS_NAME
+        fill Common.modelCatalogueId with "http://www.example.com/${UUID.randomUUID().toString()}"
+        fill Common.description with "Description"
 
         then: 'metadata step is not disabled'
         // check stepMetadata enabled
@@ -127,17 +128,17 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith(NEW_DATA_CLASS_NAME)) displayed
 
-        check modalDialog gone
+        check Common.modalDialog gone
     }
 
     def "Add another data class"() {
-        click create
+        click Common.create
 
         expect: 'the data class dialog opens'
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when: 'the data class details are filled in'
-        fill nameLabel with "Another New"
+        fill Common.nameLabel with "Another New"
 
         and: 'finish is clicked'
         click stepFinish
@@ -154,34 +155,34 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when: "click the footer action"
         click CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith("Another New"))
-        click detailSectionDataElement.find(detailSectionHeaderAddAction)
+        click detailSectionDataElement.find(Common.detailSectionHeaderAddAction)
 
         then: "modal is shown"
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
         fill 'type' with 'parent of'
         fill 'element' with 'demographics'
         selectCepItemIfExists()
 
-        click modalPrimaryButton
+        click Common.modalPrimaryButton
 
         then: 'the number of children of Another New must be 1'
         $('span.catalogue-element-treeview-name', text: startsWith("Another New")).parent().parent() displayed
     }
 
     def "edit child data class"() {
-        click inlineEdit
+        click Common.inlineEdit
 
         expect:
         check "input[name='name']" displayed
 
         when:
-        fill nameLabel with 'Changed Name'
+        fill Common.nameLabel with 'Changed Name'
         Thread.sleep(3000)
-        click inlineEditSubmit
+        click Common.inlineEditSubmit
         Thread.sleep(3000)
-        remove messages
+        remove Common.messages
 
         then: "same number of children are still shown"
 
