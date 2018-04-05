@@ -132,6 +132,6 @@ class CannotDeleteFinalizedDataModelSpec extends GebSpec {
         dataModelPage.dropdown()
 
         then: "No Option for the delete. Delete is disabled"
-        !dataModelPage.dropdownMenu.existsDelete()
+        !dataModelPage.dropdownMenu.existsDelete(browser)
     }
 }

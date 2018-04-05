@@ -140,6 +140,7 @@ class MappingSuggestionsGeneratorService implements MappingSuggestionsGenerator 
                         suggestion.source.name,
                         suggestion.destination.name,
                         suggestion.distance
+
         }
     }
 
@@ -181,17 +182,16 @@ class MappingSuggestionsGeneratorService implements MappingSuggestionsGenerator 
         SearchParams searchParams = new SearchParams()
         searchParams.dataModelId = destinationDataModel.id
         searchParams.search = source.name
-        searchParams.minScore = config.minDistance / 100.0f
-        ElasticSearchQueryList<DataElement> matches = elasticSearchService.fuzzySearch(destinationClazz, searchParams)
+        //searchParams.minScore = config.minDistance / 100.0f
+        searchParams.searchImports = 'false'
+        ElasticSearchQueryList<DataElement> matches = elasticSearchService.search(destinationClazz, searchParams)
         String message = checkRelatedTo(source, destinationDataModel)
         List<SourceDestinationMappingSuggestion> result = []
         matches.getItemsWithScore().each { item, score ->
-            if(!source.relatedTo.contains(item)) {
-                //if(score>minimumScore) {
+            if(item && !source.relatedTo.contains(item) && score>config.minDistance) {
                 result << new SourceDestinationMappingSuggestion(source: source,
                         destination: item,
                         distance: score.round(2) as Float)
-                // }
             }
         }
 
@@ -265,7 +265,7 @@ class MappingSuggestionsGeneratorService implements MappingSuggestionsGenerator 
     }
 
     void processSuggestions(Long batchId, List<SourceDestinationMappingSuggestion> suggestions) {
-        logSuggestions(suggestions)
+//        logSuggestions(suggestions)
 
         Batch.withNewTransaction {
             Batch.withNewSession {
