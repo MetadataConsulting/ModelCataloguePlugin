@@ -246,11 +246,15 @@ class DataImportController  {
             InputStream inputStream = file.inputStream
 
             executeInBackground(id, "Imported from Model Catalogue DSL")  {
-                try {
-                    Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream, false, defaultCatalogueBuilder)
-                    finalizeAsset(id, (DataModel) (created.find {it.instanceOf(DataModel)} ?: created.find{it.dataModel}?.dataModel), userId)
-                } catch (Exception e) {
-                    logError(id, e)
+                auditService.betterMute {
+                    try {
+                        Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream, false, defaultCatalogueBuilder)
+                        finalizeAsset(id, (DataModel) (created.find { it.instanceOf(DataModel) } ?: created.find {
+                            it.dataModel
+                        }?.dataModel), userId)
+                    } catch (Exception e) {
+                        logError(id, e)
+                    }
                 }
             }
 
