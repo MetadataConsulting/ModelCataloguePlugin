@@ -210,7 +210,8 @@ class CatalogueElementProxyRepository {
         watch.start('resolving elements')
         logInfo "(4/6) resolving elements"
         int elNumberOfPositions = Math.floor(Math.log10(elementProxiesToBeResolved.size())).intValue() + 2
-        elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
+        for ( int i = 0; i < elementProxiesToBeResolved.size(); i++ ) {
+            CatalogueElementProxy element = elementProxiesToBeResolved[i]
             logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
             try {
                 CatalogueElement resolved = element.resolve() as CatalogueElement
@@ -240,7 +241,9 @@ class CatalogueElementProxyRepository {
         Set<Long> resolvedRelationships = []
         logInfo "(5/6) resolving relationships"
         int relNumberOfPositions = Math.floor(Math.log10(relationshipProxiesToBeResolved.size())).intValue() + 2
-        relationshipProxiesToBeResolved.eachWithIndex { RelationshipProxy relationshipProxy, i ->
+
+        for ( int i = 0; i < relationshipProxiesToBeResolved.size(); i++ ) {
+            RelationshipProxy relationshipProxy = relationshipProxiesToBeResolved[i]
             logDebug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
             try {
                 if (relationshipProxy.source.resolve() == relationshipProxy.destination.resolve()) {
@@ -289,7 +292,8 @@ class CatalogueElementProxyRepository {
         // Step 6: resolve state changes
         watch.start('resolving state changes')
         logInfo "(6/6) resolving state changes"
-        elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
+        for ( int i = 0; i < elementProxiesToBeResolved.size(); i++ ) {
+            CatalogueElementProxy element = elementProxiesToBeResolved[i]
             logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving status changes for $element"
 
             ElementStatus status = element.getParameter('status') as ElementStatus
