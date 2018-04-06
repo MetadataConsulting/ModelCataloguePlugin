@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.importexport
 
 import geb.spock.GebSpec
-import groovy.transform.NotYetImplemented
 import org.modelcatalogue.core.geb.AssetPage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataTypesPage
@@ -10,7 +9,6 @@ import org.modelcatalogue.core.geb.ImportModelCatalogueDslPage
 
 class ImportMcSpec extends GebSpec {
 
-    @NotYetImplemented
     def "import mc file"() {
         when:
         URL url = ImportMcSpec.getResource('Java.mc')
@@ -55,13 +53,13 @@ class ImportMcSpec extends GebSpec {
 
 
         then:
-        dataTypesPage.count() == numberOfLinesContains('dataType name:')
+        dataTypesPage.count() == numberOfLinesContains(f, 'dataType name:')
     }
 
     int numberOfLinesContains(File f, String value) {
         int numberOfLinesContainsDataType = 0
         f.eachLine { String line ->
-            if ( line.contains() ) {
+            if ( line.contains(value) ) {
                 numberOfLinesContainsDataType++
             }
         }
