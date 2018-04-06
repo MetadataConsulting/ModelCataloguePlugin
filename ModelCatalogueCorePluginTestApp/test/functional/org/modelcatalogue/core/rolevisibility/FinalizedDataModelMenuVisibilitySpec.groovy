@@ -138,6 +138,7 @@ class FinalizedDataModelMenuVisibilitySpec extends GebSpec {
 
         when:
         dataModelPage = browser.page DataModelPage
+        sleep(2_000)
         dataModelPage.dropdown()
 
         then:
