@@ -23,7 +23,7 @@ class ImportMcSpec extends GebSpec {
 
         when:
         LoginPage loginPage = to LoginPage
-        loginPage.login('supervisor', 'supervisor')
+        loginPage.login('curator', 'curator')
 
         then:
         at DashboardPage

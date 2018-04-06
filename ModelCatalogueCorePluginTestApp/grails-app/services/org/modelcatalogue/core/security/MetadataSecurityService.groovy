@@ -382,7 +382,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/dataArchitect/generateSuggestions", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataArchitect/deleteSuggestions", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/dataArchitect/suggestionsNames", 'isAuthenticated()', HttpMethod.GET],
-            ["/api/modelCatalogue/core/dataArchitect/imports/upload", MetadataRoles.ROLE_SUPERVISOR, HttpMethod.POST],
+            ["/api/modelCatalogue/core/dataArchitect/imports/upload", MetadataRoles.ROLE_CURATOR, HttpMethod.POST],
             ["/api/modelCatalogue/core/dataArchitect/imports/excelImportTypes", MetadataRoles.ROLE_SUPERVISOR, HttpMethod.GET],
     ]
 
