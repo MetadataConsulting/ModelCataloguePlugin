@@ -1,4 +1,4 @@
-grails.servlet.version = "3.0" // Change depending on target container compliance (2.5 or 3.0)
+ grails.servlet.version = "3.0" // Change depending on target container compliance (2.5 or 3.0)
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
@@ -29,8 +29,8 @@ grails.project.fork = [
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
 
-    final String gebVersion = '1.1.1'
-    final String seleniumVersion = '2.52.0'
+    final String gebVersion = '1.0'
+    final String seleniumVersion = '2.51.0'
 
     // inherit Grails' default dependencies
     inherits("global") {
@@ -81,6 +81,10 @@ grails.project.dependency.resolution = {
         compile 'org.jsoup:jsoup:1.8.3'
 
         compile 'org.modelcatalogue:spreadsheet-builder-poi:0.3.0-rc4'
+
+        compile 'builders.dsl:spreadsheet-builder-poi:1.0.5'
+        // for groovy support
+        compile 'builders.dsl:spreadsheet-builder-groovy:1.0.5'
 
         compile 'org.apache.poi:poi:3.13'
         compile 'org.apache.poi:poi-ooxml:3.13'
@@ -141,7 +145,6 @@ grails.project.dependency.resolution = {
         // Testing modules
         test "org.gebish:geb-spock:$gebVersion"
         test "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
-        test "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 
         compile 'com.github.mpkorstanje:simmetrics-core:4.1.1'
@@ -161,7 +164,7 @@ grails.project.dependency.resolution = {
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
 
-        test ":geb:1.0"
+        test ":geb:$gebVersion"
         test ':build-test-data:2.1.2'
         test ':fixtures:1.3'
 
@@ -199,4 +202,5 @@ grails.project.dependency.resolution = {
         compile 'org.grails.plugins:rest-client-builder:2.1.1'
     }
 }
+
 
