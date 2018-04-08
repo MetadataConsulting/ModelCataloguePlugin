@@ -46,8 +46,13 @@ class ModelCatalogueStorageService implements StorageService {
         if (!file) {
             file = new AssetFile(path: getPath(directory, filename), content: sessionFactory.currentSession.lobHelper.createBlob(new byte[0]))
         }
+        try {
 
-        IOGroovyMethods.withStream(file.content.setBinaryStream(1), withOutputStream)
+            IOGroovyMethods.withStream(file.content.setBinaryStream(1), withOutputStream)
+
+        } catch (Exception e ) {
+            log.error 'error saving asset in Blob' + e.message
+        }
 
         FriendlyErrors.failFriendlySave(file)
     }

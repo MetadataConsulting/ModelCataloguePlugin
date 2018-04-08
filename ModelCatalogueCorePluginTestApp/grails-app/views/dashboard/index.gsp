@@ -19,7 +19,6 @@
                     <g:select name="dataModelId" noSelection="${['null':'Select One...']}" from="${dataModelList}" optionKey="id" optionValue="name" value="${dataModelId}"/>
                     <g:select name="metadataDomain" from="${metadataDomainList}" value="${metadataDomain}"/>
                     <g:select name="status" from="${DashboardDropdown.values()}" value="${status}"/>
-                    <input type="submit" id="filter-btn" class="btn btn-default" value="${g.message(code:'datamodel.filter', default: 'Filter')}" />
                 </div><!-- /input-group -->
 
             </div><!-- /input-group -->

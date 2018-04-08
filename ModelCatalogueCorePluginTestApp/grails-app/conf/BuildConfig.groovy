@@ -29,8 +29,8 @@ grails.project.fork = [
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
 
-    final String gebVersion = '1.0'
-    final String seleniumVersion = '2.51.0'
+    final String gebVersion = '1.1.1'
+    final String seleniumVersion = '2.52.0'
 
     // inherit Grails' default dependencies
     inherits("global") {
@@ -141,6 +141,7 @@ grails.project.dependency.resolution = {
         // Testing modules
         test "org.gebish:geb-spock:$gebVersion"
         test "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
+        test "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 
         compile 'com.github.mpkorstanje:simmetrics-core:4.1.1'
