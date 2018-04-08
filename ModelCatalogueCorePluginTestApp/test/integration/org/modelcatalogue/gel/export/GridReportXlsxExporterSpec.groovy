@@ -1,15 +1,14 @@
 package org.modelcatalogue.gel.export
 
+import builders.dsl.spreadsheet.query.api.SpreadsheetCriteria
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.export.inventory.DataModelToXlsxExporterSpec
-import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.IgnoreIf
 
@@ -18,6 +17,8 @@ import spock.lang.IgnoreIf
     System.getenv('JENKINS_IGNORE') ||
     System.getProperty('IGNORE_OFFICE')
 })
+
+
 class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
 
     public static final String ROOT_DATA_MODEL_NAME = 'Grid Report Data Model'
@@ -44,9 +45,10 @@ class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
     def "export model to excel"() {
         setup:
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
+        def outputStream = file.newOutputStream()
 
         when:
-        GridReportXlsxExporter.create(dataModel, dataClassService, grailsApplication, 5).export(file.newOutputStream())
+        GridReportXlsxExporter.create(dataModel, dataClassService, grailsApplication, 5).export(outputStream)
         FileOpener.open(file)
 
         SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(file)
@@ -55,3 +57,4 @@ class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
         noExceptionThrown()
     }
 }
+

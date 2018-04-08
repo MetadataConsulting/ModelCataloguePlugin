@@ -7,6 +7,8 @@ import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
+import org.modelcatalogue.gel.export.GridReportXlsxExporter
+
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import com.google.common.collect.ImmutableSet
@@ -35,7 +37,6 @@ import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import grails.plugin.springsecurity.acl.AclUtilService
-import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.springframework.http.HttpStatus
 import org.springframework.validation.Errors
 import grails.plugin.springsecurity.SpringSecurityService
@@ -85,10 +86,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     @Override
     protected DataModel findById(long id) {
         dataModelGormService.findById(id)
-    }
-
-    def showAssetInAngular() {
-        redirect(url: "/#/${params.id}/asset/${params.subResourceId}")
     }
 
     /**
@@ -478,7 +475,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         Long assetId = asset.id
 
         assetService.storeReportAsAsset(assetId, asset.contentType) { OutputStream outputStream ->
-            GMCGridReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            GridReportXlsxExporter.create(dataModelGormService.findById(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -739,14 +736,70 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
     @Override
     protected ListWrapper<DataModel> getAllEffectiveItems(Integer max) {
-        dataModelService.getAllEffectiveItems(max, params)
+        ListWrapper<DataModel> items = findUnfilteredEffectiveItems(max)
+        filterUnauthorized(items)
     }
 
+    protected ListWrapper<DataModel> findUnfilteredEffectiveItems(Integer max) {
+        //if you only want the active data models (draft and finalised)
+        if (params.status?.toLowerCase() == 'active') {
+            //if you have the role viewer you can see drafts
+            if (modelCatalogueSecurityService.hasRole('VIEWER')) {
+                return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                    'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
+                }), overridableDataModelFilter)
+            }
+            //if not you can only see finalised models
+            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                'eq' 'status', ElementStatus.FINALIZED
+            }), overridableDataModelFilter)
+        }
+
+        //if you want models with a specific status
+        //check that you can access drafts i.e. you have a viewer role
+        //then return the models by the status - providing you have the correct role
+        if (params.status) {
+            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))
+            }), overridableDataModelFilter)
+        }
+
+        return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
+    }
+
+
+    protected ListWrapper<DataModel> filterUnauthorized(ListWrapper<DataModel> items) {
+        if ( items instanceof ListWithTotalAndTypeWrapper ) {
+            ListWithTotalAndTypeWrapper listWithTotalAndTypeWrapperInstance = (ListWithTotalAndTypeWrapper) items
+            DetachedCriteria<DataModel> criteria = listWithTotalAndTypeWrapperInstance.list.criteria
+            Map<String, Object> params = listWithTotalAndTypeWrapperInstance.list.params
+            ListWithTotalAndType<DataModel> listWithTotalAndType = instantiateListWithTotalAndTypeWithCriteria(criteria, params)
+            return ListWithTotalAndTypeWrapper.create(listWithTotalAndTypeWrapperInstance.params, listWithTotalAndTypeWrapperInstance.base, listWithTotalAndType)
+        }
+        items
+    }
+
+    protected ListWithTotalAndType<DataModel> instantiateListWithTotalAndTypeWithCriteria(DetachedCriteria<DataModel> criteria, Map<String, Object> params) {
+        List<DataModel> dataModelList = dataModelGormService.findAllByCriteria(criteria)
+        if ( !dataModelList ) {
+            return new ListWithTotalAndTypeImpl<DataModel>(DataModel, [], 0L)
+        }
+        int total = dataModelList.size()
+        dataModelList = MaxOffsetSublistUtils.subList(SortParamsUtils.sort(dataModelList, params), params)
+        new ListWithTotalAndTypeImpl<DataModel>(DataModel, dataModelList, total as Long)
+    }
     @Override
     def search(Integer max) {
         String search = params.search
-        SearchParams searchParams = getSearchParams(max)
+        if ( !search ) {
+            respond errors: "No query string to search on"
+            return
+        }
+        ParamArgs paramArgs = instantiateParamArgs(max)
+        SearchParams searchParams = SearchParams.of(params, paramArgs)
         ListWithTotalAndType<T> results = modelCatalogueSearchService.search(searchParams)
+       // ListWithTotalAndType<T> results = getAllEffectiveItems(max)
+
         respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(search, 'UTF-8')}", results)
     }
 }
