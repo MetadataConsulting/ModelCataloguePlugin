@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.ParamArgs
@@ -86,6 +87,10 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     @Override
     protected DataModel findById(long id) {
         dataModelGormService.findById(id)
+    }
+
+    def showAssetInAngular() {
+        redirect(url: "/#/${params.id}/asset/${params.subResourceId}")
     }
 
     /**
@@ -743,12 +748,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     protected ListWrapper<DataModel> findUnfilteredEffectiveItems(Integer max) {
         //if you only want the active data models (draft and finalised)
         if (params.status?.toLowerCase() == 'active') {
-            //if you have the role viewer you can see drafts
-            if (modelCatalogueSecurityService.hasRole('VIEWER')) {
-                return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                    'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
-                }), overridableDataModelFilter)
-            }
             //if not you can only see finalised models
             return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                 'eq' 'status', ElementStatus.FINALIZED
@@ -760,13 +759,12 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         //then return the models by the status - providing you have the correct role
         if (params.status) {
             return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))
+                'in' 'status', ElementService.getStatusFromParams(params)
             }), overridableDataModelFilter)
         }
 
         return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
     }
-
 
     protected ListWrapper<DataModel> filterUnauthorized(ListWrapper<DataModel> items) {
         if ( items instanceof ListWithTotalAndTypeWrapper ) {
