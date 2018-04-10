@@ -173,6 +173,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
 
         then:
         userIndexed.get()
+
     }
 
 
