@@ -683,12 +683,15 @@ class ElasticSearchService implements SearchCatalogue {
 
         batch.eachWithIndex { element, i ->
             singleRequests.add(toSimpleIndexRequests(session, element))
+
             //split indexing into batches
             if ((i + 1) % ELEMENTS_PER_BATCH == 0 || (i + 1) == count) {
                 //TODO: can we get rid of placeholder for last
+                println "Index " + element.toString() + i
                 try {
                     indexSimpleIndexRequests(singleRequests).toBlocking().last()
                     singleRequests.clear()
+                    println "Clear" + i
                 }catch(Error e){
                     log.error e
                 }
