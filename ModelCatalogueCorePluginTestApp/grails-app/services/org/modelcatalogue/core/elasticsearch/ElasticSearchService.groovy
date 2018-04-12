@@ -221,34 +221,19 @@ class ElasticSearchService implements SearchCatalogue {
 
         //build query based on the relationship direction that you are searching on
         //i.e. are you searching parents of children
-        switch (direction) {
-            case RelationshipDirection.INCOMING:
-                boolQuery.should(QueryBuilders.prefixQuery('source.name', search))
-                boolQuery.should(QueryBuilders.matchQuery('source.name', search))
-                boolQuery.must(QueryBuilders.termsQuery('destination.entity_id', element.id?.toString()))
+        String sourceIfIncoming = (direction == RelationshipDirection.INCOMING) ? 'source' : 'destination'
+        String destinationIfIncoming = (direction == RelationshipDirection.INCOMING) ? 'destination' : 'source'
 
-                if (states) {
-                    boolQuery.must(QueryBuilders.termsQuery('source.status', states))
-                }
+        boolQuery.should(QueryBuilders.prefixQuery("${sourceIfIncoming}.name", search))
+        boolQuery.should(QueryBuilders.matchQuery("${sourceIfIncoming}.name", search))
+        boolQuery.must(QueryBuilders.termsQuery("${destinationIfIncoming}.entity_id", element.id?.toString()))
 
-                if (types) {
-                    boolQuery.must(QueryBuilders.termsQuery('source.fully_qualified_type', types))
-                }
-                break;
-            default:
-                boolQuery.should(QueryBuilders.prefixQuery('destination.name', search))
-                boolQuery.should(QueryBuilders.matchQuery('destination.name', search))
-                boolQuery.must(QueryBuilders.termsQuery('source.entity_id', element.id?.toString()))
+        if (states) {
+            boolQuery.must(QueryBuilders.termsQuery("${sourceIfIncoming}.status", states))
+        }
 
-                if (states) {
-                    boolQuery.must(QueryBuilders.termsQuery('destination.status', states))
-                }
-
-                if (types) {
-                    boolQuery.must(QueryBuilders.termsQuery('destination.fully_qualified_type', types))
-                }
-
-                break;
+        if (types) {
+            boolQuery.must(QueryBuilders.termsQuery("${sourceIfIncoming}.fully_qualified_type", types))
         }
 
         //collect indices that need to be searched based on params
@@ -268,10 +253,10 @@ class ElasticSearchService implements SearchCatalogue {
     public <T> ListWithTotalAndType<T> search(Class<T> resource, SearchParams params) {
         String search = params.search
         QueryBuilder qb
-        List<String> indicies
+        List<String> indices
 
         if (CatalogueElement.isAssignableFrom(resource)) {
-            indicies = resource == DataModel ? [getGlobalIndexName(DataModel)] : collectDataModelIndicies(params, elementService.collectSubclasses(resource))
+            indices = resource == DataModel ? [getGlobalIndexName(DataModel)] : collectDataModelIndicies(params, elementService.collectSubclasses(resource))
 
             QueryBuilder boolQuery = QueryBuilders.boolQuery()
 
@@ -287,62 +272,48 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
-            if(!search.contains("*")) {
+            boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
-                CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
-                    boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
-                }
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
 
-                boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
-                boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
-                boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
-            }else{
+
+            if(search.contains("*")) {
 
                 CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
                     boolQuery.should(QueryBuilders.wildcardQuery(property, search).boost(boost))
                 }
 
-                boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
                 boolQuery.should(QueryBuilders.wildcardQuery('name', search.toLowerCase()).boost(200))
-                boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.wildcardQuery('ext.value', search)).boost(10))
 
+            } else {
+                CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+                    boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
+                }
+                boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
             }
 
             qb = boolQuery
-        } else if (RelationshipType.isAssignableFrom(resource)) {
-            indicies = [getGlobalIndexName(resource)]
+        } else if (RelationshipType.isAssignableFrom(resource) || DataModelPolicy.isAssignableFrom(resource)) {
+            indices = [getGlobalIndexName(resource)]
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
+
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
 
             CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
-
-            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
-            boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
-
-            qb = boolQuery
-        } else if (DataModelPolicy.isAssignableFrom(resource)) {
-            indicies = [getGlobalIndexName(resource)]
-
-            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
-
-            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
-                boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
-            }
-
-            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
 
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
 
             qb = boolQuery
         } else {
-            indicies = [getGlobalIndexName(resource)]
+            indices = [getGlobalIndexName(resource)]
             qb = QueryBuilders.queryStringQuery(search).defaultField("name")
         }
 
         SearchRequestBuilder request = client
-                .prepareSearch(indicies as String[])
+                .prepareSearch(indices as String[])
                 .setFetchSource(true)
                 .setTypes(collectTypes(resource) as String[])
                 .setIndicesOptions(IndicesOptions.lenientExpandOpen())
@@ -357,10 +328,10 @@ class ElasticSearchService implements SearchCatalogue {
         String search = params.search
         Double minScore = params.minScore
         QueryBuilder qb
-        List<String> indicies
+        List<String> indices
 
         if (CatalogueElement.isAssignableFrom(resource)) {
-            indicies = resource == DataModel ? [getGlobalIndexName(DataModel)] : collectDataModelIndicies(params, elementService.collectSubclasses(resource))
+            indices = resource == DataModel ? [getGlobalIndexName(DataModel)] : collectDataModelIndicies(params, elementService.collectSubclasses(resource))
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
 
@@ -377,18 +348,21 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
-
-            boolQuery.should(QueryBuilders.matchQuery("name_not_analyzed", search).boost(200))
-            boolQuery.should(QueryBuilders.matchQuery("name", search).boost(200))
-            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(200))
-            boolQuery.should(QueryBuilders.matchQuery("description", search).boost(10))
-            boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
             boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
+            boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(200))
+
+            // almost subset of CATALOGUE_ELEMENT_BOOSTS
+            boolQuery.should(QueryBuilders.matchQuery("name_not_analyzed", search).boost(200))
+            boolQuery.should(QueryBuilders.matchQuery("name", search).boost(200))
+            boolQuery.should(QueryBuilders.matchQuery("description", search).boost(10))
+
+            boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
+
 
             qb = boolQuery
-        } else if (RelationshipType.isAssignableFrom(resource)) {
-            indicies = [getGlobalIndexName(resource)]
+        } else if (RelationshipType.isAssignableFrom(resource) || DataModelPolicy.isAssignableFrom(resource)) {
+            indices = [getGlobalIndexName(resource)]
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
 
@@ -399,25 +373,13 @@ class ElasticSearchService implements SearchCatalogue {
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
 
             qb = boolQuery
-        } else if (DataModelPolicy.isAssignableFrom(resource)) {
-            indicies = [getGlobalIndexName(resource)]
-
-            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
-
-            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
-                boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
-            }
-
-            boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
-
-            qb = boolQuery
-        } else {
-            indicies = [getGlobalIndexName(resource)]
+        }  else {
+            indices = [getGlobalIndexName(resource)]
             qb = QueryBuilders.queryStringQuery(search).defaultField("name")
         }
 
         SearchRequestBuilder request = client
-                .prepareSearch(indicies as String[])
+                .prepareSearch(indices as String[])
                 .setFetchSource(true)
                 .setTypes(collectTypes(resource) as String[])
                 .setIndicesOptions(IndicesOptions.lenientExpandOpen())
