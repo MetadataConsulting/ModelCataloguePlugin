@@ -6,7 +6,7 @@ import groovy.transform.CompileStatic
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.dashboard.SearchStatusQuery
+import org.modelcatalogue.core.dashboard.SearchQuery
 import org.modelcatalogue.core.datamodel.DataModelRow
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.SortQuery
@@ -19,7 +19,7 @@ class DataModelGormService implements WarnGormErrors {
     MessageSource messageSource
 
     @CompileStatic
-    DetachedCriteria<DataModel> findQueryBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
+    DetachedCriteria<DataModel> findQueryBySearchStatusQuery(SearchQuery searchStatusQuery) {
         DetachedCriteria<DataModel> query = DataModel.where {}
         if ( searchStatusQuery.statusList ) {
             query = query.where { status in searchStatusQuery.statusList }
@@ -32,7 +32,7 @@ class DataModelGormService implements WarnGormErrors {
     }
 
     @CompileStatic
-    DetachedCriteria<DataModel> findQueryBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery) {
+    DetachedCriteria<DataModel> findQueryBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery) {
         DetachedCriteria<DataModel> query = findQueryBySearchStatusQuery(searchStatusQuery)
         if ( sortQuery?.sort != null && sortQuery?.order != null) {
             query = query.sort(sortQuery.sort, sortQuery.order)
@@ -42,7 +42,7 @@ class DataModelGormService implements WarnGormErrors {
 
     @Transactional(readOnly = true)
     @PostFilter("hasPermission(filterObject, read) or hasPermission(filterObject, admin) or hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')")
-    List<DataModel> findAllBySearchStatusQuery(SearchStatusQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery, List<String> joinProperties) {
+    List<DataModel> findAllBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery, List<String> joinProperties) {
         DetachedCriteria<DataModel> query = findQueryBySearchStatusQuery(searchStatusQuery, sortQuery)
         if ( joinProperties ) {
             for ( String propertyName : joinProperties ) {

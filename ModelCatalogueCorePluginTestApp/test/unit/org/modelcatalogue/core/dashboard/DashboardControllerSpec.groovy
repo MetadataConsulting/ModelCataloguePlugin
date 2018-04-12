@@ -32,6 +32,17 @@ class DashboardControllerSpec extends Specification {
         model['paginationQuery'].offset == new DashboardIndexCommand().toPaginationQuery().offset
     }
 
+    def "dashboard.index model contains searchScope"() {
+        given:
+        controller.dashboardService = Mock(DashboardService)
+
+        when:
+        Map model = controller.index()
+
+        then:
+        model.keySet().contains('searchScope')
+    }
+
     def "dashboard.index model contains search"() {
         given:
         controller.dashboardService = Mock(DashboardService)
@@ -54,7 +65,7 @@ class DashboardControllerSpec extends Specification {
 
         then:
         model.keySet().contains('status')
-        model['status'] == DashboardDropdown.ACTIVE
+        model['status'] == DashboardStatusDropdown.ACTIVE
     }
 
     def "dashboard.index model contains models"() {
@@ -111,6 +122,6 @@ class DashboardControllerSpec extends Specification {
         controller.index()
 
         then:
-        1 * controller.dashboardService.findAllBySearchStatusQuery(_, _, _, _, _)
+        1 * controller.dashboardService.search(_, _, _)
     }
 }

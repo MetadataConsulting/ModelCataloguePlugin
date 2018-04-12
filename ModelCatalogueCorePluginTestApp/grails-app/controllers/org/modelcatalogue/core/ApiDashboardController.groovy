@@ -2,8 +2,9 @@ package org.modelcatalogue.core
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import org.modelcatalogue.core.dashboard.CatalogueElementSearchResult
 import org.modelcatalogue.core.dashboard.DashboardService
+import org.modelcatalogue.core.dashboard.SearchQuery
+import org.modelcatalogue.core.dashboard.SearchScope
 import org.modelcatalogue.core.util.GormUrlName
 import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.MetadataDomainEntity
@@ -21,29 +22,24 @@ class ApiDashboardController {
     }
 
     @CompileDynamic
+    private List<GormUrlName> findAllGormUrlName(Long dataModelId, MetadataDomain metadataDomain) {
+        SearchQuery query = new SearchQuery(metadataDomain: metadataDomain,
+                dataModelId: dataModelId,
+                searchScope: SearchScope.DATAMODEL_AND_IMPORTS)
+        dashboardService.search(query, null, null)?.viewModels?.collect {
+            final String gormUrl =  MetadataDomainEntity.stringRepresentation(new MetadataDomainEntity(domain: metadataDomain, id: it.id))
+            new GormUrlName(dataModelId: dataModelId, gormUrl: gormUrl, name: it.name)
+        } as List<GormUrlName>
+    }
+
     def catalogueElements(Long dataModelId) {
-        List<GormUrlName> dataElementList = dashboardService.findAllBySearchStatusQuery(dataModelId, MetadataDomain.DATA_ELEMENT, null, null, null)?.viewModels?.collect {
-            new GormUrlName(dataModelId: dataModelId, gormUrl: MetadataDomainEntity.stringRepresentation(new MetadataDomainEntity(domain: MetadataDomain.DATA_ELEMENT, id: it.id)), name: it.name)
-        } as List<GormUrlName>
-        List<GormUrlName> dataClassList = dashboardService.findAllBySearchStatusQuery(dataModelId, MetadataDomain.DATA_CLASS, null, null, null)?.viewModels?.collect {
-            new GormUrlName(dataModelId: dataModelId, gormUrl: MetadataDomainEntity.stringRepresentation(new MetadataDomainEntity(domain: MetadataDomain.DATA_CLASS, id: it.id)), name: it.name)
-        } as List<GormUrlName>
-        List<GormUrlName> enumeratedTypeList = dashboardService.findAllBySearchStatusQuery(dataModelId, MetadataDomain.ENUMERATED_TYPE, null, null, null)?.viewModels?.collect {
-            new GormUrlName(dataModelId: dataModelId, gormUrl: MetadataDomainEntity.stringRepresentation(new MetadataDomainEntity(domain: MetadataDomain.ENUMERATED_TYPE, id: it.id)), name: it.name)
-        } as List<GormUrlName>
-        List<GormUrlName> dataTypeList = dashboardService.findAllBySearchStatusQuery(dataModelId, MetadataDomain.DATA_TYPE, null, null, null)?.viewModels?.collect {
-            new GormUrlName(dataModelId: dataModelId, gormUrl: MetadataDomainEntity.stringRepresentation(new MetadataDomainEntity(domain: MetadataDomain.DATA_TYPE, id: it.id)), name: it.name)
-        }
-        List<GormUrlName> measurementUnitList = dashboardService.findAllBySearchStatusQuery(dataModelId, MetadataDomain.MEASUREMENT_UNIT, null, null, null)?.viewModels?.collect {
-            new GormUrlName(dataModelId: dataModelId, gormUrl: MetadataDomainEntity.stringRepresentation(new MetadataDomainEntity(domain: MetadataDomain.MEASUREMENT_UNIT, id: it.id)), name: it.name)
-        } as List<GormUrlName>
         render(contentType: "application/json") {
             [
-                dataElements    : dataElementList,
-                dataClasses     : dataClassList,
-                enumeratedTypes : enumeratedTypeList,
-                dataTypes       : dataTypeList,
-                measurementUnits: measurementUnitList,
+                dataElements    : findAllGormUrlName(dataModelId, MetadataDomain.DATA_ELEMENT),
+                dataClasses     : findAllGormUrlName(dataModelId, MetadataDomain.DATA_CLASS),
+                enumeratedTypes : findAllGormUrlName(dataModelId, MetadataDomain.ENUMERATED_TYPE),
+                dataTypes       : findAllGormUrlName(dataModelId, MetadataDomain.DATA_TYPE),
+                measurementUnits: findAllGormUrlName(dataModelId, MetadataDomain.MEASUREMENT_UNIT),
             ]
         }
     }

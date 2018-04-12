@@ -7,7 +7,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.dashboard.SearchStatusQuery
+import org.modelcatalogue.core.dashboard.SearchQuery
 import org.springframework.context.MessageSource
 
 class EnumeratedTypeGormService implements WarnGormErrors {
@@ -34,12 +34,12 @@ class EnumeratedTypeGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
-    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         findQueryByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery).count()
     }
 
     @CompileStatic
-    DetachedCriteria<EnumeratedType> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+    DetachedCriteria<EnumeratedType> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         DetachedCriteria<EnumeratedType> query = EnumeratedType.where {}
         if ( dataModelId ) {
             query = query.where { dataModel == DataModel.load(dataModelId) }

@@ -2,13 +2,10 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
-import groovy.transform.CompileStatic
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.Tag
-import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.WarnGormErrors
-import org.modelcatalogue.core.dashboard.SearchStatusQuery
+import org.modelcatalogue.core.dashboard.SearchQuery
 import org.springframework.context.MessageSource
 
 class TagGormService implements WarnGormErrors {
@@ -36,11 +33,11 @@ class TagGormService implements WarnGormErrors {
 
 
     @Transactional(readOnly = true)
-    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         findQueryByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery).count()
     }
 
-    DetachedCriteria<Tag> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+    DetachedCriteria<Tag> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         DetachedCriteria<Tag> query = Tag.where {}
         if ( dataModelId ) {
             query = query.where { dataModel == DataModel.load(dataModelId) }

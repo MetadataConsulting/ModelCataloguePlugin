@@ -175,61 +175,61 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
 
 
     static RelationshipType getContainmentType() {
-        readByName("containment")
+        readByName(RelationshipTypeName.CONTAINEMENT.name)
     }
 
 
     static RelationshipType getInvolvednessType() {
-        readByName("involvedness")
+        readByName(RelationshipTypeName.INVOLVEDNESS.name)
     }
 
 
     static RelationshipType getRuleContextType() {
-        readByName("ruleContext")
+        readByName(RelationshipTypeName.RULE_CONTEXT.name)
     }
 
     /**
      * @deprecated no longer used, set the data model directly to the CatalogueElement
      */
     static RelationshipType getDeclarationType() {
-        readByName("declaration")
+        readByName(RelationshipTypeName.DECLARATION.name)
     }
 
     static RelationshipType getFavouriteType() {
-        readByName("favourite")
+        readByName(RelationshipTypeName.FAVOURITE.name)
     }
 
     static RelationshipType getSynonymType() {
-        readByName("synonym")
+        readByName(RelationshipTypeName.SYNONYM.name)
     }
 
     static RelationshipType getRelatedToType() {
-        readByName("relatedTo")
+        readByName(RelationshipTypeName.RELATED_TO.name)
     }
 
     static RelationshipType getHierarchyType() {
-        readByName("hierarchy")
+        readByName(RelationshipTypeName.HIERARCHY.name)
     }
 
     static RelationshipType getSupersessionType() {
-        readByName("supersession")
+        readByName(RelationshipTypeName.SUPERSESSION.name)
     }
 
     static RelationshipType getOriginType() {
-        readByName("origin")
+        readByName(RelationshipTypeName.ORIGIN.name)
     }
 
     static RelationshipType getBaseType() {
-        readByName("base")
+        readByName(RelationshipTypeName.BASE.name)
     }
 
     static RelationshipType getImportType() {
-        readByName("import")
+        readByName(RelationshipTypeName.IMPORT.name)
     }
 
 
     static RelationshipType getTagType() {
-        readByName("tag")
+        readByName(RelationshipTypeName.TAG.name)
     }
 
     static RelationshipType readByName(String name) {

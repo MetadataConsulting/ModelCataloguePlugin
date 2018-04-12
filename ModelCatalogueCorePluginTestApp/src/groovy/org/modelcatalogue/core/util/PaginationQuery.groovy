@@ -6,11 +6,11 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 @CompileStatic
 class PaginationQuery {
     Integer max
-    Integer offset
+    Integer offset = 0
 
-    Map toMap() {
+    Map<String, Object> toMap() {
         if ( max  != null && offset != null ) {
-            return [max: max, offset: offset]
+            return [max: max, offset: offset] as Map<String, Object>
         }
         Collections.emptyMap()
     }

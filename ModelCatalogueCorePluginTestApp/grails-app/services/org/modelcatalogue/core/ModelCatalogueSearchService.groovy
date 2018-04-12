@@ -65,11 +65,9 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         List<DataModel> subscribedModels = subscribedModels()
 
-        boolean hasReadPermission = dataModelAclService.isAdminOrHasReadPermission(element)
-
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element,
                 type,
-                ElementService.findAllElementStatus(status, hasReadPermission),
+                ElementService.findAllElementStatus(status),
                 getOverridableDataModelFilter(dataModelId, subscribedModels)
         )
 
@@ -122,7 +120,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             criteria.'in'('id', subscribedModels.collect{it.id})
 
             if (status) {
-                criteria.'in'('status', ElementService.findAllElementStatus(status, false))
+                criteria.'in'('status', ElementService.findAllElementStatus(status))
             }
             return Lists.fromCriteria(paramArgs.toMap(), criteria).customize {
                 it.collect { item -> CatalogueElementMarshaller.minimalCatalogueElementJSON(item) }
@@ -266,6 +264,4 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     void deleteIndexes(){
         log.info "Using database search, reindexing not needed!"
     }
-
-
 }
