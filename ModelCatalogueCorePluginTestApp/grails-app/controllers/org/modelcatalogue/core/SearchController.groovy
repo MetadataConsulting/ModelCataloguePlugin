@@ -58,7 +58,7 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
 
         boolean soft = params.boolean('soft')
         executorService.submit {
-                modelCatalogueSearchService.reindex(soft).toBlocking().subscribe(LoggingSubscriber.create(log, "... reindexing finished", "Error reindexing the catalogue"))
+             modelCatalogueSearchService.reindex(soft).toBlocking().subscribe(LoggingSubscriber.create(log, "... reindexing finished", "Error reindexing the catalogue"))
         }
 
         if(request.getHeader('Accept')?.contains('application/json')) {

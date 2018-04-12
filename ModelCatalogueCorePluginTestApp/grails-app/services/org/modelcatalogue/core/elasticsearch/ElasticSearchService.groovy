@@ -564,44 +564,45 @@ class ElasticSearchService implements SearchCatalogue {
     @Override
     Observable<Boolean> reindex(boolean soft) {
 
+        log.info "Reindexing start"
         deleteIndexes()
-
+        log.info "Reindexing deleteIndexes"
         IndexingSession session = IndexingSession.create()
-
+        log.info "Reindexing IndexingSession.create"
         //index Data Models
         indexDomains(DataModel, session)
-
+        log.info "Reindexing starindexDomains(DataModel, session)t"
         //index DataClasses
         indexDomains(DataClass, session)
-
+        log.info "Reindexing indexDomains(DataClass, session)"
         //Index Data Element
         indexDomains(DataElement, session)
-
+        log.info "Reindexing  indexDomains(DataElement, session)"
         //Index Data Types
         indexDomains(DataType, session)
-
+        log.info "Reindexing indexDomains(DataType, session)"
         //Index Measurement Units
         indexDomains(MeasurementUnit, session)
-
+        log.info "Reindexing indexDomains(MeasurementUnit, session)"
         //Index Tags
         indexDomains(Tag, session)
-
+        log.info "Reindexing indexDomains(Tag, session)"
         //Index DataModelPolicy
         indexDomains(DataModelPolicy, session)
-
+        log.info "Reindexing indexDomains(DataModelPolicy, session)"
         //Index Asset
         indexDomains(Asset, session)
-
+        log.info "Reindexing indexDomains(Asset, session)"
         //Index RelationshipType
         indexDomains(RelationshipType, session)
-
+        log.info "Reindexing indexDomains(RelationshipType, session)"
         //Index Users
         indexDomains(User, session)
-
+        log.info "Reindexing indexDomains(User, session)"
         //index relationships that are searchable i.e. favourites
         def query = Relationship.where { (relationshipType.searchable == true) }
         indexSimpleIndexRequestsInBatches(session, query.list())
-
+        log.info "Reindexing indexSimpleIndexRequestsInBatches(session, query.list())"
         return Observable.just(true)
 
     }
@@ -644,12 +645,15 @@ class ElasticSearchService implements SearchCatalogue {
 
         batch.eachWithIndex { element, i ->
             singleRequests.add(toSimpleIndexRequests(session, element))
+
             //split indexing into batches
             if ((i + 1) % ELEMENTS_PER_BATCH == 0 || (i + 1) == count) {
                 //TODO: can we get rid of placeholder for last
+                println "Index " + element.toString() + i
                 try {
                     indexSimpleIndexRequests(singleRequests).toBlocking().last()
                     singleRequests.clear()
+                    println "Clear" + i
                 }catch(Error e){
                     log.error e
                 }
@@ -752,7 +756,7 @@ class ElasticSearchService implements SearchCatalogue {
                         // ignore and keep the latest
                         continue
                     }
-                    //return Observable.error(new RuntimeException("There were error indexing at least of one item from the batch: $response.type#$response.id@$response.index", response.failure.cause))
+                    return Observable.error(new RuntimeException("There were error indexing at least of one item from the batch: $response.type#$response.id@$response.index", response.failure.cause))
                 }
             }
             return just(it)
