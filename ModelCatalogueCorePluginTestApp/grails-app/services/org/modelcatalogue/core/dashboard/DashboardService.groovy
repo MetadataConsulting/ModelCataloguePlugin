@@ -185,17 +185,21 @@ class DashboardService {
         return items
     }
 
+    List<ElementStatus> findAllElementStatus() {
+        [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
+    }
+
     @CompileDynamic
     @Transactional(readOnly = true)
     List<IdName> findAllDataModel() {
-        DetachedCriteria<DataModel> query = DataModel.where {}
-        query.projections {
-            property('id')
-            property('name')
-            property('semanticVersion')
-            property('status')
-        }.list().collect { def row ->
-            new IdName(id: row[0], name: "${row[1]} ${row[2]} (${row[3]})".toString())
+        List<ElementStatus> statusList = findAllElementStatus()
+        SearchQuery searchStatusQuery = new SearchQuery(statusList: statusList,
+                    search: null,
+                    metadataDomain: MetadataDomain.DATA_MODEL)
+        dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, null, [])
+                .collect { DataModel dataModel ->
+            new IdName(id: dataModel.id,
+                    name: "${dataModel.name} ${dataModel.semanticVersion} (${dataModel.status})".toString())
         }
     }
 
@@ -246,15 +250,6 @@ class DashboardService {
         BuildableCriteria c = Tag.createCriteria()
         PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
         new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.TAG, results))
-    }
-
-    @CompileDynamic
-    @Transactional(readOnly = true)
-    List<Long> findAuthorizedDataModelIds() {
-        List<ElementStatus> statusList = [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
-        SearchQuery searchStatusQuery = new SearchQuery(statusList: statusList, search: null)
-        List<DataModel> dataModelList = dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, null, [])
-        dataModelList*.id ?: [] as List<Long>
     }
 
     @CompileDynamic
