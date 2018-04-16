@@ -196,7 +196,9 @@ class DashboardService {
         SearchQuery searchStatusQuery = new SearchQuery(statusList: statusList,
                     search: null,
                     metadataDomain: MetadataDomain.DATA_MODEL)
+
         dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, [])
+
                 .collect { DataModel dataModel ->
             new IdName(id: dataModel.id,
                     name: "${dataModel.name} ${dataModel.semanticVersion} (${dataModel.status})".toString())
@@ -250,15 +252,6 @@ class DashboardService {
         BuildableCriteria c = Tag.createCriteria()
         PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
         new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.TAG, results))
-    }
-
-    @CompileDynamic
-    @Transactional(readOnly = true)
-    List<Long> findAuthorizedDataModelIds() {
-        List<ElementStatus> statusList = [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
-        SearchQuery searchStatusQuery = new SearchQuery(statusList: statusList, search: null)
-        List<DataModel> dataModelList = dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, null, [])
-        dataModelList*.id ?: [] as List<Long>
     }
 
     @CompileDynamic
