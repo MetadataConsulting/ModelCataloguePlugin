@@ -8,7 +8,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.dashboard.SearchStatusQuery
+import org.modelcatalogue.core.dashboard.SearchQuery
 import org.springframework.context.MessageSource
 
 @Slf4j
@@ -80,12 +80,12 @@ class DataClassGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
-    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         findQueryByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery).count()
     }
 
     @CompileStatic
-    DetachedCriteria<DataClass> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+    DetachedCriteria<DataClass> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         DetachedCriteria<DataClass> query = DataClass.where {}
         if ( dataModelId ) {
             query = query.where { dataModel == DataModel.load(dataModelId) }

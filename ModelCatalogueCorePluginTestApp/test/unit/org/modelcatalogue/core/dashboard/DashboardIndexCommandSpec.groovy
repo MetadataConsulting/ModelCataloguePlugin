@@ -32,7 +32,7 @@ class DashboardIndexCommandSpec extends Specification {
     void 'toSearchStatusQuery for blank search returns null'() {
         when:
         DashboardIndexCommand cmd = new DashboardIndexCommand(search: '   ')
-        SearchStatusQuery query = cmd.toSearchStatusQuery()
+        SearchQuery query = cmd.toSearchQuery()
 
         then:
         query.search == null

@@ -3,15 +3,9 @@ package org.modelcatalogue.core.dashboard
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.IdName
-import org.modelcatalogue.core.util.Metadata
-import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.PaginationQuery
-import org.modelcatalogue.core.util.PublishedStatus
 import org.modelcatalogue.core.util.SortQuery
-import org.modelcatalogue.core.view.AssetViewModel
-import org.modelcatalogue.core.view.DataModelViewModel
 import org.springframework.context.MessageSource
 
 import javax.annotation.PostConstruct
@@ -35,26 +29,17 @@ class DashboardController {
     ]
 
     def index(DashboardIndexCommand cmd) {
-
-        String dataModelIdStr = cmd.dataModelId
-        if ( dataModelIdStr == 'null') {
-            dataModelIdStr = null
-        }
-        Long dataModelId = dataModelIdStr as Long
-
         if  ( cmd.hasErrors() ) {
             flash.error = messageSource.getMessage('dashboard.params.notvalid', [] as Object[], 'Invalid Parameters', request.locale)
             return
         }
 
-        SearchStatusQuery searchStatusQuery = cmd.toSearchStatusQuery()
+        SearchQuery query = cmd.toSearchQuery()
         SortQuery sortQuery = cmd.toSortQuery()
         PaginationQuery paginationQuery = cmd.toPaginationQuery()
 
-        CatalogueElementSearchResult catalogueElementSearchResult = dashboardService.findAllBySearchStatusQuery(dataModelId, cmd.metadataDomain,
-                searchStatusQuery,
-                sortQuery,
-                paginationQuery)
+        CatalogueElementSearchResult catalogueElementSearchResult =
+                dashboardService.search(query, sortQuery, paginationQuery)
         List catalogueElementList = catalogueElementSearchResult?.viewModels ?: []
         List<IdName> dataModelList = dashboardService.findAllDataModel()
         int total = catalogueElementSearchResult?.total ?: 0
@@ -65,11 +50,12 @@ class DashboardController {
                 sortQuery: sortQuery,
                 paginationQuery: paginationQuery,
                 search: cmd.search,
+                searchScope: cmd.searchScope,
                 status: cmd.status,
                 catalogueElementList: catalogueElementList,
                 total: total,
                 serverUrl: serverUrl,
-                dataModelId: dataModelId
+                dataModelId: query.dataModelId
         ]
     }
 

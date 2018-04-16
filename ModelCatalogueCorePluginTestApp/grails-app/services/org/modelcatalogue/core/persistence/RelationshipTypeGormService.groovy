@@ -3,6 +3,7 @@ package org.modelcatalogue.core.persistence
 import grails.transaction.Transactional
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.RelationshipTypeName
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.security.User
 import org.springframework.context.MessageSource
@@ -14,6 +15,12 @@ class RelationshipTypeGormService implements WarnGormErrors {
     @Transactional(readOnly = true)
     RelationshipType findById(long id) {
         RelationshipType.get(id)
+    }
+
+    @Transactional(readOnly = true)
+    RelationshipType findByRelationshipTypeName(RelationshipTypeName relationshipTypeName) {
+        final String nameParam = relationshipTypeName.name
+        findByName(nameParam)
     }
 
     @Transactional(readOnly = true)

@@ -7,7 +7,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.dashboard.SearchStatusQuery
+import org.modelcatalogue.core.dashboard.SearchQuery
 import org.modelcatalogue.core.util.SortQuery
 import org.springframework.context.MessageSource
 import grails.gorm.DetachedCriteria
@@ -144,7 +144,7 @@ class DataElementGormService implements WarnGormErrors {
     }
 
     @CompileStatic
-    DetachedCriteria<DataElement> findQueryBySearchStatusQuery(SearchStatusQuery searchStatusQuery) {
+    DetachedCriteria<DataElement> findQueryBySearchStatusQuery(SearchQuery searchStatusQuery) {
         DetachedCriteria<DataElement> query = DataElement.where {}
         if ( searchStatusQuery.statusList ) {
             query = query.where { status in searchStatusQuery.statusList }
@@ -157,7 +157,7 @@ class DataElementGormService implements WarnGormErrors {
     }
 
     @CompileDynamic
-    DetachedCriteria<DataElement> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery, SortQuery sortQuery) {
+    DetachedCriteria<DataElement> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery, SortQuery sortQuery) {
         DetachedCriteria<DataElement> query = findQueryBySearchStatusQuery(searchStatusQuery)
         if ( dataModelId ) {
             query = query.where { dataModel == DataModel.load(dataModelId) }
@@ -169,7 +169,7 @@ class DataElementGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
-    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         findQueryBySearchStatusQuery(searchStatusQuery).count()
     }
 }

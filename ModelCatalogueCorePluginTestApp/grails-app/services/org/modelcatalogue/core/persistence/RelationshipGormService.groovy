@@ -63,7 +63,7 @@ class RelationshipGormService implements WarnGormErrors {
         findQueryByRelationshipTypeAndSource(relationshipType, source).list() as List<Relationship>
     }
 
-    protected DetachedCriteria<Relationship> findQueryByRelationshipTypeAndSource(RelationshipType relationshipTypeParam, CatalogueElement sourceParam) {
+    DetachedCriteria<Relationship> findQueryByRelationshipTypeAndSource(RelationshipType relationshipTypeParam, CatalogueElement sourceParam) {
         Relationship.where { relationshipType == relationshipTypeParam && source == sourceParam }
     }
 }

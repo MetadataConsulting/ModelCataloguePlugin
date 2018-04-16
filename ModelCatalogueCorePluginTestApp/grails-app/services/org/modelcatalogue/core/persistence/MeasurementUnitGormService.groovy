@@ -7,7 +7,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.dashboard.SearchStatusQuery
+import org.modelcatalogue.core.dashboard.SearchQuery
 import org.springframework.context.MessageSource
 
 class MeasurementUnitGormService implements WarnGormErrors {
@@ -47,12 +47,12 @@ class MeasurementUnitGormService implements WarnGormErrors {
     }
 
     @Transactional(readOnly = true)
-    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+    Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         findQueryByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery).count()
     }
 
     @CompileStatic
-    DetachedCriteria<MeasurementUnit> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchStatusQuery searchStatusQuery) {
+    DetachedCriteria<MeasurementUnit> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         DetachedCriteria<MeasurementUnit> query = MeasurementUnit.where {}
         if ( dataModelId ) {
             query = query.where { dataModel == DataModel.load(dataModelId) }
