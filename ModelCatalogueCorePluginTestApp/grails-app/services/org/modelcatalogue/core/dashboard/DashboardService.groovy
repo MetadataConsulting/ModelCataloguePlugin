@@ -196,7 +196,9 @@ class DashboardService {
         SearchQuery searchStatusQuery = new SearchQuery(statusList: statusList,
                     search: null,
                     metadataDomain: MetadataDomain.DATA_MODEL)
-        dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, null, [])
+
+        dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, [])
+
                 .collect { DataModel dataModel ->
             new IdName(id: dataModel.id,
                     name: "${dataModel.name} ${dataModel.semanticVersion} (${dataModel.status})".toString())
@@ -255,7 +257,8 @@ class DashboardService {
     @CompileDynamic
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllDataModelViewBySearchStatusQuery(SearchQuery searchQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        List<DataModel> dataModelList = dataModelGormService.findAllBySearchStatusQuery(searchQuery, sortQuery, paginationQuery, ['asset'])
+        List dataModelList = dataModelGormService.findAllBySearchStatusQuery(searchQuery, sortQuery, ['asset'])
+        dataModelList = MaxOffsetSublistUtils.subList(dataModelList, paginationQuery.toMap())
 
         List<Long> dataModelIds = dataModelList*.id ?: [] as List<Long>
         Map<Long, List<AssetViewModel>> dataModelToAssets = findAllAssetViewModelByPublishedStatus(dataModelIds, [PublishedStatus.PUBLISHED])
@@ -323,7 +326,7 @@ class DashboardService {
 
     @Transactional(readOnly = true)
     int countAllDataModelBySearchStatusQuery(SearchQuery searchStatusQuery) {
-        (dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, null, []) ?: [] ).size()
+        (dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, []) ?: [] ).size()
     }
 
     List<MetadataDomain> metadataDomainList() {
