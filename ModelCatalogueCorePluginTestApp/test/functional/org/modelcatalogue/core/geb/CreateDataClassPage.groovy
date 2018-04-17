@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.geb
 
 import geb.Page
+import geb.navigator.Navigator
 
 class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
     static at = { $('.modal-dialog').text().contains('Data Class Wizard') }
@@ -17,21 +18,34 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         exitButton(required: false, wait: true) { $('#exit-wizard') }
 
         formSectionLink { $('ul.nav-pills>li:nth-child(1)>a', 0) }
+        formGridLink { $('ul.nav-pills>li:nth-child(2)>a', 0) }
         ocurrenceLink { $('ul.nav-pills>li:nth-child(3)>a', 0) }
         appearanceLink(wait: true) { $('ul.nav-pills>li:nth-child(4)>a', 0) }
         labelTextArea { $("textarea#section-label") }
         sectionTextArea { $("textarea#section-title") }
+        sectionSubtitleArea { $('textarea#section-subtitle') }
         sectionInstructionsTextArea { $("textarea#section-instructions") }
         formPageNumberTextArea { $("input#form-page-number") }
-        minOccursInput { $('input#minOccurs') }
-        maxOccursInput { $('input#maxOccurs') }
+        minOccursInput(required: false, wait: true, cache: false) { $('input#minOccurs') }
+        maxOccursInput(required: false, wait: true, cache: false) { $('input#maxOccurs') }
 
-        localNameInput { $('#local-name') }
+        localNameInput(required: false, wait: true, cache: false) { $('#local-name') }
 
         dataElementInput { $('#data-element') }
         buttonPlus { $('span.input-group-btn button.btn-success', 0) }
         rawLink(wait: true) { $('a', text: 'Raw') }
         addMetadataButton(wait: true) { $('div.modal button.btn-success', text: 'Add Metadata') }
+        gridCheckbox { $("input[type='checkbox']") }
+        headerInput { $('input#group-header') }
+        initialNumberOfRowsInput { $('input#repeat-num') }
+        maxNoOfRowsInput { $('input#repeat-max') }
+        createAnotherButton(wait: true) { $('button.btn.btn-success', 1) }
+        exitButton(wait: true) { $('button#exit-wizard') }
+
+        excludeDataElementCheckbox(required: true) { $('input', type: "checkbox", 2) }
+        mergeToSingleSectionCheckbox(required: true) { $('input', type: "checkbox", 1) }
+        excludeCheckbox(required: true) { $('input.ng-pristine.ng-untouched.ng-valid', 0) }
+        formItemLink(required: true) { $('a', text: 'Form (Item)') }
     }
 
     void addMetadata() {
@@ -90,6 +104,10 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         formSectionLink.click()
     }
 
+    void formGrid() {
+        formGridLink.click()
+    }
+
     void elements() {
         elementsButton.click()
     }
@@ -126,4 +144,48 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
     void setDescription(String value) {
         fillInput(descriptionInput, value)
     }
+
+    void selectGrid() {
+        gridCheckbox.click()
+    }
+
+    void setMaxNumberOfRows(String value) {
+        maxNoOfRowsInput.value(value)
+    }
+
+    void createAnother() {
+        createAnotherButton.click()
+    }
+
+    void setSectionSubtitle(String value) {
+        fillInput(sectionSubtitleArea, value)
+    }
+
+    void checkExclude() {
+        excludeCheckbox.click()
+    }
+
+    void checkExcludeDataElement() {
+        excludeDataElementCheckbox.click()
+    }
+
+    void checkMergeToSingleSection() {
+        mergeToSingleSectionCheckbox.click()
+    }
+
+    void formItem() {
+        formItemLink.click()
+    }
+
+    void exitWizard() {
+        exitButton.click()
+    }
+
+    boolean isEnabled(Navigator parent) {
+        if (parent.@disabled == "disabled") {
+            return false
+        }
+        return true
+    }
+
 }

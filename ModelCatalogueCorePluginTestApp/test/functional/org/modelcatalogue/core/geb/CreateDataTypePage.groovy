@@ -3,7 +3,7 @@ package org.modelcatalogue.core.geb
 import geb.Page
 import geb.module.RadioButtons
 
-class CreateDataTypePage extends Page {
+class CreateDataTypePage extends Page implements MetadataUtils {
 
     static at = { $('.modal-dialog').text().contains('Create Data Type') }
 
@@ -18,6 +18,9 @@ class CreateDataTypePage extends Page {
         pickReferenceTypeRadio { $('input#pickReferenceType', type: 'radio', 0) }
         pickSubsetTypeRadio { $('input#pickSubsetType', type: 'radio', 0) }
         buttons { $('.modal-footer', 0).module(ModalFooterModule) }
+        enumeratinKey { $('') }
+        enumerationValue { $('') }
+        addNewEnumrationPair {$('table tbody tr')[it].$('td',3)}
     }
 
     void simple() {
@@ -53,7 +56,7 @@ class CreateDataTypePage extends Page {
     }
 
     void fill(def element, String value) {
-        for ( char c : value.toCharArray() ) {
+        for (char c : value.toCharArray()) {
             element << "${c}".toString()
         }
     }
