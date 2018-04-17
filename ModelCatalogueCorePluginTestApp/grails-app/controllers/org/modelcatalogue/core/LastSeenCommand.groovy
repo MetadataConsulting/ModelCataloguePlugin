@@ -2,8 +2,8 @@ package org.modelcatalogue.core
 
 import grails.validation.Validateable
 import org.modelcatalogue.core.api.ElementStatusUtils
-import org.modelcatalogue.core.dashboard.DashboardDropdown
-import org.modelcatalogue.core.dashboard.SearchStatusQuery
+import org.modelcatalogue.core.dashboard.DashboardStatusDropdown
+import org.modelcatalogue.core.dashboard.SearchQuery
 import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.SortQuery
