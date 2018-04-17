@@ -33,4 +33,16 @@ class RegistrationCodeGormService implements WarnGormErrors {
     protected DetachedCriteria<RegistrationCode> findQueryByToken(String tokenParam) {
         RegistrationCode.where { token == tokenParam }
     }
+
+    DetachedCriteria<RegistrationCode> queryByIds(List<Long> ids) {
+        RegistrationCode.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<RegistrationCode> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<RegistrationCode>
+        }
+        queryByIds(ids).list()
+    }
 }

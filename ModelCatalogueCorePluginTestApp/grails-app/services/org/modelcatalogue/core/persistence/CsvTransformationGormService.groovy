@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
@@ -22,5 +23,17 @@ class CsvTransformationGormService implements WarnGormErrors {
             transactionStatus.setRollbackOnly()
         }
         transformation
+    }
+
+    DetachedCriteria<CsvTransformation> queryByIds(List<Long> ids) {
+        CsvTransformation.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<CsvTransformation> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<CsvTransformation>
+        }
+        queryByIds(ids).list()
     }
 }

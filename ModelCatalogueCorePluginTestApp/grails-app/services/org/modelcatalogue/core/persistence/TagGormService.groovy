@@ -31,7 +31,6 @@ class TagGormService implements WarnGormErrors {
         tag
     }
 
-
     @Transactional(readOnly = true)
     Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         findQueryByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery).count()
@@ -50,5 +49,17 @@ class TagGormService implements WarnGormErrors {
             query = query.where { name =~ term }
         }
         query
+    }
+
+    DetachedCriteria<Tag> queryByIds(List<Long> ids) {
+        Tag.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<Tag> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<Tag>
+        }
+        queryByIds(ids).list()
     }
 }

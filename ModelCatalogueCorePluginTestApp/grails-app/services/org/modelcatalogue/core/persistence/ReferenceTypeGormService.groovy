@@ -47,4 +47,16 @@ class ReferenceTypeGormService implements WarnGormErrors {
             dataClass == dataClassParam
         }
     }
+
+    DetachedCriteria<ReferenceType> queryByIds(List<Long> ids) {
+        ReferenceType.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<ReferenceType> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<ReferenceType>
+        }
+        queryByIds(ids).list()
+    }
 }

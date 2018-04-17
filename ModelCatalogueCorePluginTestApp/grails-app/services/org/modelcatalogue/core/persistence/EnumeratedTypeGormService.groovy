@@ -53,5 +53,17 @@ class EnumeratedTypeGormService implements WarnGormErrors {
         }
         query
     }
+
+    DetachedCriteria<EnumeratedType> queryByIds(List<Long> ids) {
+        EnumeratedType.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<EnumeratedType> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<EnumeratedType>
+        }
+        queryByIds(ids).list()
+    }
 }
 

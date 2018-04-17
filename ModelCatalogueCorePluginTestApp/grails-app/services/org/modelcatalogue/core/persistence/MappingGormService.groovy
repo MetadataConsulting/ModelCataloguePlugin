@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Mapping
@@ -27,5 +28,17 @@ class MappingGormService implements WarnGormErrors {
     @Transactional(readOnly = true)
     Mapping findById(Long id) {
         Mapping.get(id)
+    }
+
+    DetachedCriteria<Mapping> queryByIds(List<Long> ids) {
+        Mapping.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<Mapping> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<Mapping>
+        }
+        queryByIds(ids).list()
     }
 }

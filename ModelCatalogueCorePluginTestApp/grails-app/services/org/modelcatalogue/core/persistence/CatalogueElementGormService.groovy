@@ -100,5 +100,18 @@ class CatalogueElementGormService {
     void updateCatalogueElementStatus(CatalogueElement catalogueElement, ElementStatus status) {
             catalogueElement.status = status
             catalogueElement.save(flush: true)
+
+    }
+
+    @Transactional(readOnly = true)
+    List<CatalogueElement> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return []
+        }
+        queryByIds(ids).list()
+    }
+    
+    DetachedCriteria<CatalogueElement> queryByIds(List<Long> ids) {
+        CatalogueElement.where { id in ids }
     }
 }
