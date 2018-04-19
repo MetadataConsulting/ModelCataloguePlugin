@@ -9,16 +9,6 @@ import spock.lang.Shared
 import spock.lang.Stepwise
 import spock.lang.Title
 
-@Issue('https://metadata.atlassian.net/browse/MET-1469')
-@Title('Verify that the history is populated according to activity made on a model')
-@Narrative('''
-- Login as curator
-- Select any Data Model
-- Create a data class
-- Create a data element
-- Edit the created data class and save
-- Create a new Tag
-''')
 @Stepwise
 class MET1623Spec extends GebSpec {
     @Shared

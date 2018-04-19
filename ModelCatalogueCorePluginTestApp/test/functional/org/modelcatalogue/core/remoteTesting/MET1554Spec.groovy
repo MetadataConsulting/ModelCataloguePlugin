@@ -28,7 +28,7 @@ class MET1554Spec extends GebSpec {
         at DashboardPage
     }
 
-    /*def "create new data model"() {
+    def "create new data model"() {
         when:
         DashboardPage dashboardPage = to DashboardPage
         dashboardPage.nav.createDataModel()
@@ -43,16 +43,10 @@ class MET1554Spec extends GebSpec {
 
         then:
         at DataModelPage
-    }*/
+    }
 
     def "import data model"() {
-        when: "delete this one"
-        DashboardPage dashboardPage = to DashboardPage
-        dashboardPage.select(dataModelName)
-        then:
-        at DataModelPage
-
-        /*when:
+        when:
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select("Imported Data Models")
         then:
@@ -62,20 +56,19 @@ class MET1554Spec extends GebSpec {
         ImportedDataModelsPage importedDataModelsPage = browser.page ImportedDataModelsPage
         importedDataModelsPage.importDataModel()
         then:
-        at ImportedDataModelsPage*/
+        at ImportedDataModelsPage
     }
 
-   /* def "search a data model"() {
+    def "search a data model"() {
         when:
         ImportedDataModelsPage importedDataModelsPage = browser.page ImportedDataModelsPage
         importedDataModelsPage.searchMore()
         importedDataModelsPage.selectDataModel(1)
-//        importedDataModelsPage = browser.page ImportedDataModelsPage
         importedDataModelsPage.createRelationship()
 
         then:
         at ImportedDataModelsPage
-    }*/
+    }
 
     def "create new data class"() {
         when:
@@ -87,7 +80,7 @@ class MET1554Spec extends GebSpec {
         then:
         at DataClassesPage
 
-        /*when:
+        when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         dataClassesPage.createDataClass()
 
@@ -102,7 +95,7 @@ class MET1554Spec extends GebSpec {
         createDataClassPage.exit()
 
         then:
-        at DataClassesPage*/
+        at DataClassesPage
 
     }
 

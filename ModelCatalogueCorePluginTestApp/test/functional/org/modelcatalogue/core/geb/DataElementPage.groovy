@@ -5,7 +5,7 @@ import geb.Page
 class DataElementPage extends Page {
 
     static url = '/#'
-    static at = { title.contains('of data element') }
+    static at = { title.contains('History of') }
 
     @Override
     String convertToPath(Object[] args) {

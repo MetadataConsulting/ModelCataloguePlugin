@@ -9,11 +9,10 @@ class DataModelPermissionListPage extends Page {
     static at = { title == "Data Model Permissions" }
 
     static content = {
-        modalList { $('table tbody a', text: it) }
+        modalList { $('table tbody a', text: contains(it)) }
     }
 
     void selectDataModal(String dataModalName) {
-        dataModalName = dataModalName + " DRAFT 0.0.1"
         modalList(dataModalName).click()
     }
 

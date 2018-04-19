@@ -19,7 +19,7 @@ class DataClassesPage extends Page implements InputUtils, MetadataUtils {
             $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
         }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
-        rows(required: false, wait: true) { $('div.inf-table-body tbody tr') }
+        rows(required: true, wait: true) { $('div.inf-table-body>tbody>tr') }
 
     }
 
@@ -40,6 +40,13 @@ class DataClassesPage extends Page implements InputUtils, MetadataUtils {
 
     void selectDataClassByName(String value) {
         rows.$('a', text: value).click()
+    }
+
+    boolean containsDataClass(String value) {
+        if ($('a', text: value)) {
+            return true
+        }
+        false
     }
 
 }

@@ -271,6 +271,12 @@ class MET2026Spec extends GebSpec {
         dataModelPage = browser.page DataModelPage
         dataModelPage.selectDataType(dataTypeTwoName)
         then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.cloneModal()
+        then:
         at DataTypePage
     }
 

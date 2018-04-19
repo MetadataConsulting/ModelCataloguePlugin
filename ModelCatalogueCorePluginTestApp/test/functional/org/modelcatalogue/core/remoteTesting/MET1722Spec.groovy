@@ -43,31 +43,31 @@ class MET1722Spec extends GebSpec {
         at DataModelPage
     }
 
-   def "create data type"() {
-       when:
-       DataModelPage dataModelPage = browser.page DataModelPage
-       dataModelPage.treeView.select('Data Types')
-       then:
-       at DataTypesPage
+    def "create data type"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Types')
+        then:
+        at DataTypesPage
 
-       when:
-       DataTypesPage dataTypesPage = browser.page DataTypesPage
-       dataTypesPage.createDataTypeFromNavigation()
-       then:
-       at CreateDataTypePage
-   }
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.createDataTypeFromNavigation()
+        then:
+        at CreateDataTypePage
+    }
 
-   def "fill data type values"() {
-       when:
-       CreateDataTypePage createDataTypePage = browser.page(CreateDataTypePage)
-       createDataTypePage.name = dataTypeName
-       createDataTypePage.enumerated()
-       createDataTypePage.fillMetadata(one: 1)
-       createDataTypePage.buttons.save()
+    def "fill data type values"() {
+        when:
+        CreateDataTypePage createDataTypePage = browser.page(CreateDataTypePage)
+        createDataTypePage.name = dataTypeName
+        createDataTypePage.enumerated()
+        createDataTypePage.fillMetadata(one: 1)
+        createDataTypePage.buttons.save()
 
-       then:
-       at DataTypesPage
-   }
+        then:
+        at DataTypesPage
+    }
 
     def "select newly created data type"() {
         when:
@@ -97,5 +97,14 @@ class MET1722Spec extends GebSpec {
         dataTypePage = browser.page DataTypePage
         then:
         dataTypePage.outputIsValid()
+
+        when:
+        dataTypePage = browser.page DataTypePage
+        dataTypePage.validateKeyField = "none"
+        Thread.sleep(2000)
+        dataTypePage = browser.page DataTypePage
+
+        then:
+        !dataTypePage.outputIsValid()
     }
 }

@@ -34,6 +34,7 @@ class DataModelPage extends Page {
         }
         searchMore(wait: true) { $('span.ng-isolate-scope.fa.fa-fw.fa-file-o') }
         searchMoreModalsList(required: false, wait: true) { $('h4.list-group-item-heading') }
+        cloneModalButton(required: false,wait: true) {$('button.btn.btn-primary',text:'OK')}
     }
 
     void isExportVisible() {
@@ -79,5 +80,9 @@ class DataModelPage extends Page {
 
     void selectDataType(String value) {
         searchMoreModalsList.$(text: contains(value)).click()
+    }
+
+    void cloneModal() {
+        cloneModalButton.click()
     }
 }

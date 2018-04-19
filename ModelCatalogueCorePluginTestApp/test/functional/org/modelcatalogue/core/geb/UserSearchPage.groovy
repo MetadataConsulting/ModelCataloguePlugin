@@ -9,9 +9,9 @@ class UserSearchPage extends Page implements InputUtils {
     static at = { title == 'User Search' }
 
     static content = {
-        username(required: true) { $('input#username') }
-        searchButton(required: true) { $('a#search') }
-        usersList { $('.list tbody tr') }
+        username(wait: true) { $('input#username', 0) }
+        searchButton(wait: true) { $('a#search') }
+        usersList(required: false, wait: true) { $('.list tbody tr') }
     }
 
     void fillUser(String value) {

@@ -20,7 +20,9 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         formSectionLink { $('ul.nav-pills>li:nth-child(1)>a', 0) }
         formGridLink { $('ul.nav-pills>li:nth-child(2)>a', 0) }
         ocurrenceLink { $('ul.nav-pills>li:nth-child(3)>a', 0) }
+        ocurrenceLinkElements { $('a', text: 'Occurrence') }
         appearanceLink(wait: true) { $('ul.nav-pills>li:nth-child(4)>a', 0) }
+        appearanceLinkElements(wait: true) { $('a', text: 'Appearance') }
         labelTextArea { $("textarea#section-label") }
         sectionTextArea { $("textarea#section-title") }
         sectionSubtitleArea { $('textarea#section-subtitle') }
@@ -186,6 +188,14 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
             return false
         }
         return true
+    }
+
+    void occurrenceElement() {
+        ocurrenceLinkElements.click()
+    }
+
+    void appearanceElement() {
+        appearanceLinkElements.click()
     }
 
 }

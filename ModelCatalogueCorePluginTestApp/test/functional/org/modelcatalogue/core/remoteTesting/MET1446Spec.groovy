@@ -192,7 +192,7 @@ class MET1446Spec extends GebSpec {
 
         when: "min occurance does not accept string"
         createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.ocurrence()
+        createDataClassPage.occurrenceElement()
         createDataClassPage.minOccurs = '1'
         createDataClassPage.maxOccurs = '10'
 
@@ -201,7 +201,7 @@ class MET1446Spec extends GebSpec {
 
         when:
         createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.appearance()
+        createDataClassPage.appearanceElement()
         createDataClassPage.appearanceName = "appearance name"
         createDataClassPage.raw()
 
@@ -350,7 +350,7 @@ class MET1446Spec extends GebSpec {
 
         when: "min occurance does not accept string"
         createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.ocurrence()
+        createDataClassPage.occurrenceElement()
         createDataClassPage.minOccurs = '1'
         createDataClassPage.maxOccurs = '10'
 
@@ -359,7 +359,7 @@ class MET1446Spec extends GebSpec {
 
         when:
         createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.appearance()
+        createDataClassPage.appearanceElement()
         createDataClassPage.appearanceName = "appearance name"
         createDataClassPage.raw()
 
@@ -381,8 +381,8 @@ class MET1446Spec extends GebSpec {
     def "verify new data class has been created"() {
         when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
-        dataClassesPage.selectDataClassByName(dataClassTwoName)
+        Thread.sleep(2000)
         then:
-        at DataClassPage
+        dataClassesPage.containsDataClass(dataClassTwoName)
     }
 }

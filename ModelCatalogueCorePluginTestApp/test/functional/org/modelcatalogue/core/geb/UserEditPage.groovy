@@ -13,9 +13,9 @@ class UserEditPage extends Page {
         Roles { $('div#tabs ul li a', text: "Roles") }
         updateButton { $('a#update') }
         deleteButton { $('a#deleteButton') }
-        roleUser(required: false, cache: false) { $('input#ROLE_USER') }
-        roleSupervisor(required: true) { $('input#ROLE_SUPERVISOR') }
-        roleMetadataCurator(required: true) { $('input#ROLE_METADATA_CURATOR', type: "checkbox") }
+        roleUser { $('span.jquery-safari-checkbox', 4) }
+        roleSupervisor { $('span.jquery-safari-checkbox', 6) }
+        roleMetadataCurator(wait: true) { $('span.jquery-safari-checkbox', 5) }
         logoutLink { $('div#loginLinkContainer a') }
     }
 
@@ -24,7 +24,7 @@ class UserEditPage extends Page {
     }
 
     void assignMetadataCuratorRole() {
-        roleMetadataCurator.click()   //input tag is hidden
+        roleMetadataCurator.click()
     }
 
     void update() {

@@ -27,7 +27,7 @@ class MET2014Spec extends GebSpec {
     @Shared
     String dataElementName = "DATA_ELEMENT"
 
-    /*def "Login as supervisor"() {
+    def "Login as supervisor"() {
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
@@ -201,7 +201,7 @@ class MET2014Spec extends GebSpec {
         dataModelPermissionGrantPage.nav.logout()
         then:
         at HomePage
-    }*/
+    }
 
     def "login as curator"() {
         when:
@@ -240,11 +240,49 @@ class MET2014Spec extends GebSpec {
         createDataElementPage.name = dataElementName
         createDataElementPage.searchMore()
         createDataElementPage.showAllDataType()
-        createDataElementPage.selectDataType(dataTypeThreeName)
         then:
-        CreateDataElementPage
+        at SearchAllModalPage
     }
 
-    def "verify data element from first model is clonable"() {}
+    def "verify data element from third model is not clonable"() {
+        when:
+        SearchAllModalPage searchAllModalPage = browser.page SearchAllModalPage
+        searchAllModalPage.searchDataType(dataTypeThreeName)
+        Thread.sleep(1000)
+        then:
+        searchAllModalPage.noResultFound()
+    }
+
+    def "verify data element from second model is clonable"() {
+        when:
+        SearchAllModalPage searchAllModalPage = browser.page SearchAllModalPage
+        searchAllModalPage.clearSearchField()
+        searchAllModalPage.searchDataType(dataTypeTwoName)
+        Thread.sleep(1000)
+        then:
+        !searchAllModalPage.noResultFound()
+    }
+
+    def "clone data element of second model"() {
+        when:
+        SearchAllModalPage searchAllModalPage = browser.page SearchAllModalPage
+        searchAllModalPage.selectDataType()
+        Thread.sleep(1000)
+        then:
+        at ImportOrCloneModalPage
+
+        when:
+        ImportOrCloneModalPage importOrCloneModalPage = browser.page ImportOrCloneModalPage
+        importOrCloneModalPage.cloneElement()
+        Thread.sleep(1000)
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.finish()
+        then:
+        at DataElementsPage
+    }
 
 }

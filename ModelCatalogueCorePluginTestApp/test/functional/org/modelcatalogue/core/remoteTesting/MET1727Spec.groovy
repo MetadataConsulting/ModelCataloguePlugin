@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
+import org.codehaus.groovy.transform.stc.SharedVariableCollector
 import org.junit.Ignore
 import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
@@ -9,18 +10,11 @@ import spock.lang.Shared
 import spock.lang.Stepwise
 import spock.lang.Title
 
-@Issue('https://metadata.atlassian.net/browse/MET-1469')
-@Title('Verify that the history is populated according to activity made on a model')
-@Narrative('''
-- Login as curator
-- Select any Data Model
-- Create a data class
-- Create a data element
-- Edit the created data class and save
-- Create a new Tag
-''')
 @Stepwise
 class MET1727Spec extends GebSpec {
+
+    @Shared
+    String username = "user"
 
     def "Login as supervisor"() {
         when:
@@ -43,7 +37,8 @@ class MET1727Spec extends GebSpec {
     def "search user"() {
         when:
         UserSearchPage userSearchPage = browser.page UserSearchPage
-//        userSearchPage.fillUser("user") giving error due to autocomplete
+        userSearchPage.fillUser(username)
+        Thread.sleep(5000)
         userSearchPage.search()
         then:
         at UserSearchPage
