@@ -31,6 +31,11 @@ class DataModelPage extends Page {
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
+        cloneAnotherElementLink {
+            $('span.action-label.ng-binding.ng-scope', text: contains('Clone Another Element into Current Data Model'))
+        }
+        searchMore(wait: true) { $('span.ng-isolate-scope.fa.fa-fw.fa-file-o') }
+        searchMoreModalsList(required: false, wait: true) { $('h4.list-group-item-heading') }
     }
 
     String getRowsText() {
@@ -71,5 +76,14 @@ class DataModelPage extends Page {
 
     String getRightSideTitle() {
         rightSideTitleH3.text()
+    }
+    void cloneAnotherElement() {
+        cloneAnotherElementLink.click()
+    }
+    void listAllDataModels() {
+        searchMore.click()
+    }
+    void selectDataType(String value) {
+        searchMoreModalsList.$(text: contains(value)).click()
     }
 }
