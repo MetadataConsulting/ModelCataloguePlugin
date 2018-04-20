@@ -38,19 +38,10 @@ class DataTypeService {
                         when dt.id is not null then :dataTypeDiscriminator
                         end as clazz_
                         from
-                        data_type dt
-                        inner join
-                        catalogue_element ce
-                        on dt.id = ce.id
-                        left outer join
-                        primitive_type pt
-                        on pt.id = ce.id
-                        left outer join
-                        reference_type rt
-                        on rt.id = ce.id
-                        left outer join
-                        enumerated_type et
-                        on et.id=ce.id
+                        data_type dt inner join catalogue_element ce on dt.id = ce.id
+                        left outer join primitive_type pt on pt.id = ce.id
+                        left outer join reference_type rt on rt.id = ce.id
+                        left outer join enumerated_type et on et.id=ce.id 
                         WHERE
                                     ce.data_model_id = :modelId
                                     or dt.id in (
