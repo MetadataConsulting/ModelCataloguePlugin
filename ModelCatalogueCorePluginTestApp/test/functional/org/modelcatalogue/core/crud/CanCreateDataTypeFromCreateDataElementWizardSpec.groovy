@@ -31,7 +31,7 @@ import spock.lang.Title
 - Verify that Data Element is related to the Data Type (visiting the data element detail page shows a link to the data type)
 ''')
 @Stepwise
-class CanCreateDataTypeFromCreateDataElementWizard extends GebSpec {
+class CanCreateDataTypeFromCreateDataElementWizardSpec extends GebSpec {
     @Shared
     String dataModelName = "TESTING_MODEL"
     @Shared
