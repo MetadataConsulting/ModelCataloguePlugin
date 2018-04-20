@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.elasticsearch
 
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.api.ElementStatusUtils
 import org.modelcatalogue.core.security.DataModelAclService
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
@@ -265,7 +266,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.findAllElementStatus(params.status).collect { ElementStatus status -> status as String } as List<String>))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementStatusUtils.findAllElementStatus(params.status).collect { ElementStatus status -> status as String } as List<String>))
             }
 
             if (params.contentType) {
@@ -341,7 +342,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.findAllElementStatus(params.status).collect { ElementStatus status -> status as String } as List<String>))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementStatusUtils.findAllElementStatus(params.status).collect { ElementStatus status -> status as String } as List<String>))
             }
 
             if (params.contentType) {
