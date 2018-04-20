@@ -62,6 +62,8 @@ class CuratorCanCreateANewDataClassSpec extends GebSpec {
     String dataClassTwoName = "TESTING_CLASS_TWO"
     @Shared
     String description = 'THIS IS MY DATA CLASS'
+    @Shared
+    String dataModelDescription = 'TESTING MODEL DESCRIPTION'
 
     def "Login as curator"() {
         when:
@@ -83,26 +85,26 @@ class CuratorCanCreateANewDataClassSpec extends GebSpec {
         when:
         CreateDataModelPage createDataModelPage = to CreateDataModelPage
         createDataModelPage.name = dataModelName
-        // TODO fill catalogue ID and description
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueId = "${UUID.randomUUID()}"
         createDataModelPage.submit()
 
         then:
         at DataModelPage
     }
 
-    // TODO Click on Data Model menu button from the top Menu Bar |  A drop down list is displayed
-    // TODO. Navigate to drop down list and select New Data Class
+
     def "Create a data class"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
-        dataModelPage.treeView.select('Data Classes')
+        dataModelPage.dropdown()
 
         then:
-        at DataClassesPage
+        at DataModelPage
 
         when:
-        DataClassesPage dataClassesPage = browser.page DataClassesPage
-        dataClassesPage.createDataClass()
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdownMenu.createDataClass()
 
         then:
         at CreateDataClassPage
