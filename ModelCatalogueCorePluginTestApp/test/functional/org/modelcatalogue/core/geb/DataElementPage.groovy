@@ -18,6 +18,7 @@ class DataElementPage extends Page {
         descriptionTextarea(required: false)  { $("#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > div > div.split-view-right.data-model-detail-pane > ui-view > ui-view > div > div > div > div > form > div:nth-child(4) > div > ng-include > div > div > span > div > textarea", 0)}
         dataTypeInput(required: false)  { $("input#dataType", 0) }
         unitNameSpan(required: false) { $('span.unit-name', 0) }
+        dataTypeList(required: false, wait: true) { $('a.small.with-pointer.ng-scope') }
     }
 
     String getUnitName() {
@@ -47,5 +48,12 @@ class DataElementPage extends Page {
         if ( submitButton.isDisplayed() ) {
             submitButton.click()
         }
+    }
+
+    boolean containsDataType(String name) {
+        if (dataTypeList.text().contains(name)) {
+            return true
+        }
+        false
     }
 }

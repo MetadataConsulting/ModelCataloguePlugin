@@ -13,6 +13,7 @@ class CreateDataElementPage extends Page implements InputUtils {
         searchLink(wait: true) { $("", 0) }
         searchDataType(wait: true) { $("input#dataType") }
         selectItem(wait: true) { $("a.cep-item", 0) }
+        createNewDataType(wait: true) { $("a.cep-item.ng-scope.create-new-cep-item") }
     }
 
     void setName(String value) {
@@ -37,5 +38,9 @@ class CreateDataElementPage extends Page implements InputUtils {
 
     void finish() {
         submitButton.click()
+    }
+
+    void createDataType() {
+        createNewDataType.click()
     }
 }

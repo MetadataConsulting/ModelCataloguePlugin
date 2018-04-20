@@ -18,6 +18,7 @@ class DataTypesPage extends Page {
         createDateTypeLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
         rows { $('div.inf-table-body tbody tr') }
         addItemIcon(required: false) { $("tfoot span.fa-plus-circle") }
+        dataTypeByName(required: false, wait: true) { $('a', text: it) }
     }
 
     boolean isAddItemIconVisible() {
@@ -43,5 +44,11 @@ class DataTypesPage extends Page {
 
     void createDataTypeFromNavigation() {
         createDateTypeLink.click()
+    }
+    boolean hasDataType(String name) {
+        if (dataTypeByName(name)) {
+            return true
+        }
+        false
     }
 }
