@@ -2,7 +2,7 @@ package org.modelcatalogue.core.geb
 
 import geb.Page
 
-class DataClassesPage extends Page {
+class DataClassesPage extends Page implements InputUtils, MetadataUtils {
 
     static url = '/#'
 
@@ -14,10 +14,13 @@ class DataClassesPage extends Page {
     }
 
     static content = {
-        createDateClassLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
-        addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
+        createDateClassLink(required: false, wait: true) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
+        addItemIcon(required: false) {
+            $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
+        }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
-        rows { $('div.inf-table-body tbody tr') }
+        rows(required: true, wait: true) { $('div.inf-table-body>tbody>tr') }
+
     }
 
     int count() {
@@ -25,7 +28,7 @@ class DataClassesPage extends Page {
     }
 
     boolean isAddItemIconVisible() {
-        if ( addItemIcon.empty ) {
+        if (addItemIcon.empty) {
             return false
         }
         true
@@ -34,4 +37,16 @@ class DataClassesPage extends Page {
     void createDataClass() {
         createDateClassLink.click()
     }
+
+    void selectDataClassByName(String value) {
+        rows.$('a', text: value).click()
+    }
+
+    boolean containsDataClass(String value) {
+        if ($('a', text: value)) {
+            return true
+        }
+        false
+    }
+
 }

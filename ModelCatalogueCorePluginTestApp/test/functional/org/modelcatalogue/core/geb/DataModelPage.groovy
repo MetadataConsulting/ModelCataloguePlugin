@@ -28,6 +28,13 @@ class DataModelPage extends Page {
         dropdownLink(required: false) { $('a#role_item_catalogue-element-menu-item-link', 0) }
         dropdown(required: false) { $('li#role_item_catalogue-element-menu-item').module(DataModelNavModule) }
         exportLink(required: false) { $('a#role_item_export-menu-item-link') }
+        exportToCatalogXml { $('a#catalogue-element-export-specific-reports_4-menu-item-link') }
+        cloneAnotherElementLink {
+            $('span.action-label.ng-binding.ng-scope', text: contains('Clone Another Element into Current Data Model'))
+        }
+        searchMore(wait: true) { $('span.ng-isolate-scope.fa.fa-fw.fa-file-o') }
+        searchMoreModalsList(required: false, wait: true) { $('h4.list-group-item-heading') }
+        cloneModalButton(required: false,wait: true) {$('button.btn.btn-primary',text:'OK')}
     }
 
     void isExportVisible() {
@@ -57,5 +64,25 @@ class DataModelPage extends Page {
 
     String getRightSideTitle() {
         rightSideTitleH3.text()
+    }
+
+    void exportCatalogXml() {
+        exportToCatalogXml.click()
+    }
+
+    void cloneAnotherElement() {
+        cloneAnotherElementLink.click()
+    }
+
+    void listAllDataModels() {
+        searchMore.click()
+    }
+
+    void selectDataType(String value) {
+        searchMoreModalsList.$(text: contains(value)).click()
+    }
+
+    void cloneModal() {
+        cloneModalButton.click()
     }
 }

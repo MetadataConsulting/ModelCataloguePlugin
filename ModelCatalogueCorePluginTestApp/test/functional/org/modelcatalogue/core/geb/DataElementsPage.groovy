@@ -17,7 +17,10 @@ class DataElementsPage extends Page {
         createDateElementLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
         anchorElements { $("td.col-md-4>span>span>a") }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
-        addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
+        addItemIcon(required: false) {
+            $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
+        }
+        elementByName(required: false, wait: true) { $('a', text: it) }
     }
 
     void createDataElement() {
@@ -33,5 +36,12 @@ class DataElementsPage extends Page {
 
     void selectRow(int row) {
         anchorElements[row].click()
+    }
+
+    boolean hasDataElement(String name) {
+        if (elementByName(name)) {
+            return true
+        }
+        false
     }
 }
