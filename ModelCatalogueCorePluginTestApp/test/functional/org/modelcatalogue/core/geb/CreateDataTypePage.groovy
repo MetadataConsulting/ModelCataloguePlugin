@@ -3,7 +3,7 @@ package org.modelcatalogue.core.geb
 import geb.Page
 import geb.module.RadioButtons
 
-class CreateDataTypePage extends Page {
+class CreateDataTypePage extends Page implements MetadataUtils {
 
     static at = { $('.modal-dialog').text().contains('Create Data Type') }
 
@@ -53,7 +53,7 @@ class CreateDataTypePage extends Page {
     }
 
     void fill(def element, String value) {
-        for ( char c : value.toCharArray() ) {
+        for (char c : value.toCharArray()) {
             element << "${c}".toString()
         }
     }

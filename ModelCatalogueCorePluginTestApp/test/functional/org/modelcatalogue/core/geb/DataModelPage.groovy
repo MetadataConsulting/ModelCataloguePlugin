@@ -31,6 +31,7 @@ class DataModelPage extends Page {
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
+        exportToCatalogXml { $('a#catalogue-element-export-specific-reports_4-menu-item-link') }
     }
 
     String getRowsText() {
@@ -71,5 +72,9 @@ class DataModelPage extends Page {
 
     String getRightSideTitle() {
         rightSideTitleH3.text()
+    }
+
+    void exportCatalogXml() {
+        exportToCatalogXml.click()
     }
 }
