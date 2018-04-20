@@ -1,8 +1,19 @@
 package org.modelcatalogue.core.rolevisibility
 
+import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.CreateDataModelPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataClassPage
+import org.modelcatalogue.core.geb.DataClassesPage
+import org.modelcatalogue.core.geb.DataModelAclPermissionsPage
+import org.modelcatalogue.core.geb.DataModelAclPermissionsShowPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.HomePage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Specification
+import spock.lang.Shared
+import spock.lang.Stepwise
 import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-1495')
@@ -32,6 +43,108 @@ import spock.lang.Title
 - Click on the edit button and fill the form
 - Check that Metadata is edited     
 ''')
-class UserCanEditDataClassesForAdminDataModelSpec extends Specification {
+@Stepwise
+class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
+    @Shared
+    String dataModelName = "NEW_TESTING_MODEL"
+
+    def "Login as supervisor"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
+        then:
+        at DashboardPage
+    }
+
+    def "create new data model"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = to CreateDataModelPage
+        createDataModelPage.name = dataModelName
+        createDataModelPage.submit()
+
+        then:
+        at DataModelPage
+    }
+
+    def "select data model acl"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.cogMenu()
+        dashboardPage.nav.dataModelPermission()
+        then:
+        at DataModelAclPermissionsPage
+    }
+
+    def "grant admin right to user for draft data model"() {
+        when:
+        DataModelAclPermissionsPage dataModelPermissionListPage = browser.page DataModelAclPermissionsPage
+        dataModelPermissionListPage.select(dataModelName)
+        then:
+        at DataModelAclPermissionsShowPage
+
+        when:
+        DataModelAclPermissionsShowPage dataModelPermissionGrantPage = browser.page DataModelAclPermissionsShowPage
+        dataModelPermissionGrantPage.grant("user", "administration")
+
+        then:
+        at DataModelAclPermissionsShowPage
+    }
+
+    def "logout as supervisor"() {
+        when:
+        DataModelAclPermissionsShowPage dataModelPermissionGrantPage = browser.page DataModelAclPermissionsShowPage
+        dataModelPermissionGrantPage.nav.userMenu()
+        dataModelPermissionGrantPage.nav.logout()
+        then:
+        at HomePage
+    }
+
+    def "login as user"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('user', 'user')
+
+        then:
+        at DashboardPage
+    }
+
+    def "select a draft model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select(dataModelName)
+        then:
+        at DataModelPage
+    }
+
+    def "open a data class"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Classes')
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page(DataClassesPage)
+        dataClassesPage.openDataClass(0)
+
+        then:
+        at DataClassPage
+    }
+
+    def "edit form metadata"() {
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+        dataClassPage.formMetadata()
+        then:
+        at DataClassPage
+    }
 
 }
