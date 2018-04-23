@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.api
 
+import com.google.common.collect.ImmutableList
 import groovy.transform.CompileStatic
 import org.modelcatalogue.core.dashboard.DashboardStatusDropdown
 
@@ -19,5 +20,15 @@ class ElementStatusUtils {
             case DashboardStatusDropdown.DEPRECATED:
                 return [ElementStatus.DEPRECATED]
         }
+    }
+
+    static List<ElementStatus> findAllElementStatus(String status) {
+        if (!status) {
+            return ImmutableList.copyOf(ElementStatus.values().toList())
+        }
+        if (status.toLowerCase() == 'active') {
+            return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
+        }
+        ImmutableList.of(ElementStatus.valueOf(status.toUpperCase()))
     }
 }
