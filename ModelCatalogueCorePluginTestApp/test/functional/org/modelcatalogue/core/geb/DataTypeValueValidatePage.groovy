@@ -18,10 +18,7 @@ class DataTypeValueValidatePage extends Page implements InputUtils {
     }
 
     boolean outputIsValid() {
-        if (outputField.text().contains("VALID")) {
-            return true
-        }
-        return false
+        outputField.text().contains("VALID")
     }
 
 }
