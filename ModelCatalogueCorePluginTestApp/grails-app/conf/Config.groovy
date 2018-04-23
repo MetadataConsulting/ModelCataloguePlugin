@@ -8,7 +8,7 @@ import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.security.User
 import groovy.json.JsonSlurper
-
+import org.apache.log4j.DailyRollingFileAppender
 
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
@@ -308,6 +308,16 @@ hibernate {
 
 // log4j configuration
 log4j.main = {
+    appenders {
+        def logPattern = '%d{dd-MM-yyyy HH:mm:ss,SSS} %5p %c{2} - %m%n'
+        appender new DailyRollingFileAppender(
+            name: 'myAppender', datePattern: "'.'yyyy-MM-dd",
+            layout: pattern(conversionPattern: logPattern),
+            file: 'MdxLogFile.log'
+        )
+    }
+    info additivity: false, myAppender: ["org.modelcatalogue.core.audit.AuditService"]
+
     info 'grails.app.services.org.modelcatalogue'
     info 'grails.app.controllers.org.modelcatalogue'
 
