@@ -49,7 +49,8 @@ class GrantRoleCuratorSpec extends GebSpec {
     def "search user"() {
         when:
         UserSearchPage userSearchPage = browser.page UserSearchPage
-//        userSearchPage.fillUser("user") giving error due to autocomplete
+        userSearchPage.fillUser("user")
+        Thread.sleep(5000)
         userSearchPage.search()
         then:
         at UserSearchPage
