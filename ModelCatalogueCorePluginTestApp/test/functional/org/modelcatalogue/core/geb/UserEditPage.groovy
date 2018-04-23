@@ -10,7 +10,7 @@ class UserEditPage extends Page {
 
     static content = {
         userDetails { $('div#tabs ul li a', text: "User Details") }
-        Roles { $('div#tabs ul li a', text: "Roles") }
+        rolesTabLink { $('div#tabs ul li a', text: "Roles") }
         updateButton { $('a#update') }
         deleteButton { $('a#deleteButton') }
         roleUser { $('div a', text: "ROLE_USER").siblings("span.jquery-safari-checkbox") }
@@ -22,7 +22,7 @@ class UserEditPage extends Page {
     }
 
     void clickRoles() {
-        Roles.click()
+        rolesTabLink.click()
     }
 
     void assignMetadataCuratorRole() {
