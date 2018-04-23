@@ -13,9 +13,11 @@ class UserEditPage extends Page {
         Roles { $('div#tabs ul li a', text: "Roles") }
         updateButton { $('a#update') }
         deleteButton { $('a#deleteButton') }
-        roleUser { $('span.jquery-safari-checkbox', 4) }
-        roleSupervisor { $('span.jquery-safari-checkbox', 6) }
-        roleMetadataCurator(wait: true) { $('span.jquery-safari-checkbox', 5) }
+        roleUser { $('div a', text: "ROLE_USER").siblings("span.jquery-safari-checkbox") }
+        roleSupervisor { $('div a', text: "ROLE_SUPERVISOR").siblings("span.jquery-safari-checkbox") }
+        roleMetadataCurator(wait: true) {
+            $('div a', text: "ROLE_METADATA_CURATOR").siblings("span.jquery-safari-checkbox")
+        }
         logoutLink { $('div#loginLinkContainer a') }
     }
 
