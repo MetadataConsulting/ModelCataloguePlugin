@@ -96,7 +96,6 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
     def "select newly created data type"() {
         when:
         DataTypesPage dataTypesPage = browser.page DataTypesPage
-        Thread.sleep(1000)
         dataTypesPage.selectDataType(dataTypeName)
 
         then:
@@ -106,7 +105,6 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
     def "select validate value"() {
         when:
         DataTypePage dataTypePage = browser.page DataTypePage
-        Thread.sleep(2000)
         dataTypePage.enumeratedType()
         dataTypePage.validateValue()
         then:
@@ -117,14 +115,13 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
         when:
         DataTypeValueValidatePage dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
         dataTypeValueValidatePage.validateKeyField = "one"
-        Thread.sleep(2000)
+
         then:
         dataTypeValueValidatePage.outputIsValid()
 
         when:
         dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
         dataTypeValueValidatePage.validateKeyField = "none"
-        Thread.sleep(2000)
 
         then:
         !dataTypeValueValidatePage.outputIsValid()
