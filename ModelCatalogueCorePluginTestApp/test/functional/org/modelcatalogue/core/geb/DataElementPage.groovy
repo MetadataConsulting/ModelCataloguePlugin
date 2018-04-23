@@ -5,7 +5,7 @@ import geb.Page
 class DataElementPage extends Page {
 
     static url = '/#'
-    static at = { title.contains('of data element') }
+    static at = { title.contains('History of') }
 
     @Override
     String convertToPath(Object[] args) {
@@ -51,9 +51,6 @@ class DataElementPage extends Page {
     }
 
     boolean containsDataType(String name) {
-        if (dataTypeList.text().contains(name)) {
-            return true
-        }
-        false
+        dataTypeList.text().contains(name)
     }
 }

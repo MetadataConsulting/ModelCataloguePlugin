@@ -17,9 +17,11 @@ class DataElementsPage extends Page {
         createDateElementLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
         anchorElements { $("td.col-md-4>span>span>a") }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
-        addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
+        addItemIcon(required: false) {
+            $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
+        }
         firstRowLink { $('tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a') }
-        elementByName(required: false, wait: true) { $('a', text: it) }
+        elementByName(wait: true) { $('a', text: contains(it)) }
     }
 
     void createDataElement() {
@@ -42,9 +44,6 @@ class DataElementsPage extends Page {
     }
 
     boolean hasDataElement(String name) {
-        if (elementByName(name)) {
-            return true
-        }
-        false
+        elementByName(name).displayed
     }
 }

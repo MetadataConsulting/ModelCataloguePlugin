@@ -10,7 +10,6 @@ import org.modelcatalogue.core.geb.DataElementsPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.LoginPage
-import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Shared
@@ -118,7 +117,7 @@ class CanCreateDataTypeFromCreateDataElementWizardSpec extends GebSpec {
         when:
         DataElementsPage dataElementsPage = browser.page DataElementsPage
         then:
-        dataElementsPage.hasDataElement(dataElementName)
+        waitFor(10) { dataElementsPage.hasDataElement(dataElementName) }
 
         when:
         dataElementsPage = browser.page DataElementsPage
