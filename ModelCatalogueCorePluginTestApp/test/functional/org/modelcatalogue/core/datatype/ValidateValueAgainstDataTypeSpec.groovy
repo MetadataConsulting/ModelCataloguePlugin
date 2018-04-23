@@ -118,7 +118,6 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
         DataTypeValueValidatePage dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
         dataTypeValueValidatePage.validateKeyField = "one"
         Thread.sleep(2000)
-        dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
         then:
         dataTypeValueValidatePage.outputIsValid()
 
@@ -126,7 +125,6 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
         dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
         dataTypeValueValidatePage.validateKeyField = "none"
         Thread.sleep(2000)
-        dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
 
         then:
         !dataTypeValueValidatePage.outputIsValid()
