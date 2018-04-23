@@ -19,7 +19,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
       header = $element.find('.inf-table-header')
       body   = $element.find('.inf-table-body')
-      spacer = $element.find('.inf-table-spacer')
+#      spacer = $element.find('.inf-table-spacer')
 
 
       windowEl = angular.element($window)
