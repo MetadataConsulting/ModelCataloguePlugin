@@ -7,6 +7,7 @@ import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypePage
 import org.modelcatalogue.core.geb.DataTypesPage
+import org.modelcatalogue.core.geb.DataTypeValueValidatePage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
 import spock.lang.Narrative
@@ -95,7 +96,7 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
     def "select newly created data type"() {
         when:
         DataTypesPage dataTypesPage = browser.page DataTypesPage
-        Thread.sleep(2000)
+        Thread.sleep(1000)
         dataTypesPage.selectDataType(dataTypeName)
 
         then:
@@ -109,19 +110,25 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
         dataTypePage.enumeratedType()
         dataTypePage.validateValue()
         then:
-        at DataTypePage
+        at DataTypeValueValidatePage
     }
 
     def "validate values"() {
         when:
-        DataTypePage dataTypePage = browser.page DataTypePage
+        DataTypeValueValidatePage dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
+        dataTypeValueValidatePage.validateKeyField = "one"
         Thread.sleep(2000)
-        dataTypePage.validateKeyField = "one"
-        dataTypePage = browser.page DataTypePage
+        dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
+        then:
+        dataTypeValueValidatePage.outputIsValid()
 
+        when:
+        dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
+        dataTypeValueValidatePage.validateKeyField = "none"
         Thread.sleep(2000)
+        dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
 
         then:
-        dataTypePage.outputIsValid()
+        !dataTypeValueValidatePage.outputIsValid()
     }
 }

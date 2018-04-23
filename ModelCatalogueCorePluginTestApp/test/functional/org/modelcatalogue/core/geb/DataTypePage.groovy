@@ -13,8 +13,6 @@ class DataTypePage extends Page implements InputUtils {
             $('a#role_item_catalogue-element-menu-item-link')
         }
         validateValueLink { $('a#validate-value-menu-item-link') }
-        validateKeyField { $('input#value') }
-        outputField(required: true) { $('div.alert.alert-success') }
     }
 
     void enumeratedType() {
@@ -23,17 +21,6 @@ class DataTypePage extends Page implements InputUtils {
 
     void validateValue() {
         validateValueLink.click()
-    }
-
-    void setValidateKeyField(String key) {
-        fillInput(validateKeyField, key)
-    }
-
-    boolean outputIsValid() {
-        if (outputField.text().contains("VALID")) {
-            return true
-        }
-        return false
     }
 
 }
