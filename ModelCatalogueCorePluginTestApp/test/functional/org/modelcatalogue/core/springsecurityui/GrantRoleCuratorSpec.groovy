@@ -6,6 +6,7 @@ import org.modelcatalogue.core.geb.HomePage
 import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.UserEditPage
 import org.modelcatalogue.core.geb.UserSearchPage
+import org.modelcatalogue.core.security.MetadataRoles
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Stepwise
@@ -77,7 +78,7 @@ class GrantRoleCuratorSpec extends GebSpec {
     def "assign user roles"() {
         when:
         UserEditPage userEditPage = browser.page UserEditPage
-        userEditPage.assignMetadataCuratorRole()
+        userEditPage.grant(MetadataRoles.ROLE_CURATOR)
         userEditPage.update()
         then:
         at UserEditPage

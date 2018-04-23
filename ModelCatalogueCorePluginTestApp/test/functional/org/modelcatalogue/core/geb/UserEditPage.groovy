@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.geb
 
 import geb.Page
+import org.modelcatalogue.core.security.MetadataRoles
 
 class UserEditPage extends Page {
 
@@ -23,8 +24,16 @@ class UserEditPage extends Page {
         rolesTabLink.click()
     }
 
-    void assignMetadataCuratorRole() {
+    private void grantMetadataCuratorRole() {
         roleMetadataCurator.click()
+    }
+
+    private void grantSupervisorRole() {
+        roleSupervisor.click()
+    }
+
+    private void grantUserRole() {
+        roleUser.click()
     }
 
     void update() {
@@ -39,4 +48,15 @@ class UserEditPage extends Page {
         logoutLink.click()
     }
 
+    void grant(String role) {
+        if ( role == MetadataRoles.ROLE_SUPERVISOR ) {
+            grantSupervisorRole()
+
+        } else if ( role == MetadataRoles.ROLE_CURATOR ) {
+            grantMetadataCuratorRole()
+
+        } else if ( role == MetadataRoles.ROLE_USER ) {
+            grantUserRole()
+        }
+    }
 }
