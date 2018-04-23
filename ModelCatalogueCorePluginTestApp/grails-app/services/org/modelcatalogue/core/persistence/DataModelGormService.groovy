@@ -8,7 +8,6 @@ import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dashboard.SearchQuery
 import org.modelcatalogue.core.datamodel.DataModelRow
-import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.SortQuery
 import org.springframework.context.MessageSource
 import org.springframework.security.access.prepost.PostFilter
@@ -116,5 +115,17 @@ class DataModelGormService implements WarnGormErrors {
             transactionStatus.setRollbackOnly()
         }
         dataModelInstance
+    }
+
+    DetachedCriteria<DataModel> queryByIds(List<Long> ids) {
+        DataModel.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<DataModel> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<DataModel>
+        }
+        queryByIds(ids).list()
     }
 }

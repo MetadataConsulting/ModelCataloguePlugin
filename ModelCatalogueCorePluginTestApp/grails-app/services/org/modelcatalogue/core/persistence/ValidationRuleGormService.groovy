@@ -49,4 +49,16 @@ class ValidationRuleGormService implements WarnGormErrors {
         }
         query
     }
+
+    DetachedCriteria<ValidationRule> queryByIds(List<Long> ids) {
+        ValidationRule.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<ValidationRule> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<ValidationRule>
+        }
+        queryByIds(ids).list()
+    }
 }

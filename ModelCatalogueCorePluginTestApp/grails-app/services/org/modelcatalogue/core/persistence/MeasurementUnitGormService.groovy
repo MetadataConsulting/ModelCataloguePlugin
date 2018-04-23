@@ -66,4 +66,16 @@ class MeasurementUnitGormService implements WarnGormErrors {
         }
         query
     }
+
+    DetachedCriteria<MeasurementUnit> queryByIds(List<Long> ids) {
+        MeasurementUnit.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<MeasurementUnit> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<MeasurementUnit>
+        }
+        queryByIds(ids).list()
+    }
 }
