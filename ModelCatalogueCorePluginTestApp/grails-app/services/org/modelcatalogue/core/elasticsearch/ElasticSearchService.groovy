@@ -195,7 +195,8 @@ class ElasticSearchService implements SearchCatalogue {
         List<String> states = []
 
         if (params.status) {
-            states = ElementService.findAllElementStatus(params.status).collect { ElementStatus status -> status as String } as List<String>
+
+            states = ElementStatusUtils.findAllElementStatus(params.status).collect { ElementStatus status -> status as String } as List<String>
         }
 
         List<String> types = []
