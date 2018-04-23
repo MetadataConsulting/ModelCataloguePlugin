@@ -14,6 +14,7 @@ class DashboardIndexCommand {
     MetadataDomain metadataDomain = MetadataDomain.DATA_MODEL
     DashboardStatusDropdown status = DashboardStatusDropdown.ACTIVE
     SearchScope searchScope = SearchScope.DATAMODEL
+    List<SearchCatalogueElementScope> searchCatalogueElementScopes = [SearchCatalogueElementScope.ALL]
     String order = 'asc'
     String sort = 'name'
     String search
@@ -26,6 +27,7 @@ class DashboardIndexCommand {
         searchScope nullable: false
         search nullable: true, blank: true
         offset nullable: true, min: 0
+        searchCatalogueElementScopes nullable: false, minSize: 1
         sort nullable: true, inList: ['name', 'status', 'semanticVersion', 'lastUpdated']
         order nullable: true, inList: ['asc', 'desc']
     }
@@ -43,7 +45,8 @@ class DashboardIndexCommand {
                 searchScope: searchScope,
                 search: search,
                 statusList: ElementStatusUtils.of(status),
-                metadataDomain: metadataDomain
+                metadataDomain: metadataDomain,
+                searchCatalogueElementScopeList: searchCatalogueElementScopes
         )
     }
 

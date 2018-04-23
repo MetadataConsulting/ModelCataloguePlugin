@@ -55,7 +55,8 @@ class DashboardController {
                 catalogueElementList: catalogueElementList,
                 total: total,
                 serverUrl: serverUrl,
-                dataModelId: query.dataModelId
+                dataModelId: query.dataModelId,
+                searchCatalogueElementScopes: query.searchCatalogueElementScopeList
         ]
     }
 

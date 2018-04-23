@@ -65,7 +65,7 @@ class DashboardService {
         RelationshipType relationshipType = relationshipTypeGormService.findByRelationshipTypeName(typeName)
         if (!relationshipType) {
             log.error('Unable to find {} relationship type', typeName.name)
-            return
+            return [] as List<Long>
         }
 
         DetachedCriteria<Relationship> relationshipQuery = relationshipGormService.findQueryByRelationshipTypeAndSource(relationshipType, CatalogueElement.get(dataModelId))
@@ -75,6 +75,9 @@ class DashboardService {
         }
         def results = relationshipQuery.list()
 
+        if ( !results ) {
+            return [] as List<Long>
+        }
         DataModel.where {
             id in results*.id
         }.id().list()
@@ -156,7 +159,29 @@ class DashboardService {
                 }
                 if ( query ) {
                     if (query.search) {
-                        ilike("name", "%${query.search}%")
+                        or {
+                            if ( shouldSearchProperty('name', query.searchCatalogueElementScopeList) ) {
+                                ilike("name", "%${query.search}%")
+                            }
+                            if ( shouldSearchProperty('modelCatalogueId', query.searchCatalogueElementScopeList) ) {
+                                ilike("modelCatalogueId", "%${query.search}%")
+                            }
+                            if ( shouldSearchProperty('description', query.searchCatalogueElementScopeList) ) {
+                                ilike("description", "%${query.search}%")
+                            }
+                            if ( shouldSearchProperty('extensions.name', query.searchCatalogueElementScopeList) || shouldSearchProperty('extensions.extensionValue', query.searchCatalogueElementScopeList) ) {
+                                extensions {
+                                    or {
+                                        if (shouldSearchProperty('extensions.name', query.searchCatalogueElementScopeList)) {
+                                            ilike("name", "%${query.search}%")
+                                        }
+                                        if (shouldSearchProperty('extensions.extensionValue', query.searchCatalogueElementScopeList)) {
+                                            ilike("extensionValue", "%${query.search}%")
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     if (query.statusList) {
                         inList("status", query.statusList)
@@ -185,6 +210,37 @@ class DashboardService {
         return items
     }
 
+    boolean shouldSearchProperty(String propertyName, List<SearchCatalogueElementScope> searchCatalogueElementScopeList) {
+        List<String> allowedProperties = [
+                'name',
+                'description',
+                'modelCatalogueId',
+                'extensions.name',
+                'extensions.extensionValue'
+        ]
+        if ( allowedProperties.contains(propertyName) ) {
+            if ( searchCatalogueElementScopeList.contains(SearchCatalogueElementScope.ALL) ) {
+                return true
+            }
+            if ( propertyName == 'name' && searchCatalogueElementScopeList.contains(SearchCatalogueElementScope.NAME) ) {
+                return true
+
+            } else if ( propertyName == 'description' && searchCatalogueElementScopeList.contains(SearchCatalogueElementScope.DESCRIPTION) ) {
+                return true
+
+            } else if ( propertyName == 'modelCatalogueId' && searchCatalogueElementScopeList.contains(SearchCatalogueElementScope.MODELCATALOGUEID) ) {
+                return true
+
+            } else if ( propertyName == 'extensions.name' && searchCatalogueElementScopeList.contains(SearchCatalogueElementScope.EXTENSIONNAME) ) {
+                return true
+
+            } else if ( propertyName == 'extensions.extensionValue' && searchCatalogueElementScopeList.contains(SearchCatalogueElementScope.EXTENSIONVALUE) ) {
+                return true
+            }
+        }
+        return false
+    }
+
     List<ElementStatus> findAllElementStatus() {
         [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
     }
@@ -197,12 +253,17 @@ class DashboardService {
                     search: null,
                     metadataDomain: MetadataDomain.DATA_MODEL)
 
-        dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, [])
-
-                .collect { DataModel dataModel ->
+        dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, []).sort { DataModel a, DataModel b ->
+            a.name <=> b.name
+        }collect { DataModel dataModel ->
             new IdName(id: dataModel.id,
-                    name: "${dataModel.name} ${dataModel.semanticVersion} (${dataModel.status})".toString())
+                    name: nameForDataModel(dataModel).toString())
         }
+    }
+
+    String nameForDataModel(DataModel dataModel) {
+        final String dataModelName = dataModel.name ? (dataModel.name.length() > 30 ? dataModel.name.substring(0,29) + '...' : dataModel.name ) : ''
+        "${dataModelName} ${dataModel.semanticVersion} (${dataModel.status})".toString()
     }
 
     @Transactional(readOnly = true)

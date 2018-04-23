@@ -11,4 +11,5 @@ class SearchQuery {
     MetadataDomain metadataDomain
     List<ElementStatus> statusList
     String search
+    List<SearchCatalogueElementScope> searchCatalogueElementScopeList = [SearchCatalogueElementScope.ALL]
 }

@@ -1,4 +1,4 @@
-<%@ page import="org.modelcatalogue.core.dashboard.SearchScope; org.modelcatalogue.core.dashboard.DashboardStatusDropdown; org.modelcatalogue.core.view.CatalogueElementViewModel; org.modelcatalogue.core.view.DataModelViewModel; org.modelcatalogue.core.util.MetadataDomain; org.modelcatalogue.core.util.PublishedStatus;" %>
+<%@ page import="org.modelcatalogue.core.dashboard.SearchCatalogueElementScope; org.modelcatalogue.core.dashboard.SearchScope; org.modelcatalogue.core.dashboard.DashboardStatusDropdown; org.modelcatalogue.core.view.CatalogueElementViewModel; org.modelcatalogue.core.view.DataModelViewModel; org.modelcatalogue.core.util.MetadataDomain; org.modelcatalogue.core.util.PublishedStatus;" %>
 <html>
 <head>
     <title><g:message code="dashboard.title" default="Dashboard"/></title>
@@ -39,8 +39,7 @@
                         } else {
                             return it.name()
                         }
-
-        }}"/>
+                    }}"/>
                     <g:select name="status" from="${DashboardStatusDropdown.values()}" value="${status}"/>
                     <g:select name="searchScope" from="${SearchScope.values()}" value="${searchScope}" optionValue="${{
                         if ( it == SearchScope.DATAMODEL ) {
@@ -49,6 +48,39 @@
                             return "Search within Data Model and Imports"
                         }
                     }}"/>
+
+                    <br/><b>For every element search: </b>
+                    <span style="margin-right: 15px;">
+                        <g:message code="searchCatalogueElementScope.all" default="Everything"/>
+                        <g:checkBox name="searchCatalogueElementScopes"
+                                           value="${SearchCatalogueElementScope.ALL}"
+                                           checked="${searchCatalogueElementScopes.contains(SearchCatalogueElementScope.ALL)}"/>
+                    </span>
+                    <span style="margin-right: 15px;">
+                    <g:message code="searchCatalogueElementScope.name" default="Name"/> <g:checkBox name="searchCatalogueElementScopes"
+                                     value="${SearchCatalogueElementScope.NAME}"
+                                     checked="${searchCatalogueElementScopes.contains(SearchCatalogueElementScope.NAME)}"/>
+                    </span>
+                    <span style="margin-right: 15px;">
+                    <g:message code="searchCatalogueElementScope.modelCatalogueId" default="Model Catalogue ID"/> <g:checkBox name="searchCatalogueElementScopes"
+                                                   value="${SearchCatalogueElementScope.MODELCATALOGUEID}"
+                                                   checked="${searchCatalogueElementScopes.contains(SearchCatalogueElementScope.MODELCATALOGUEID)}"/>
+                    </span>
+                    <span style="margin-right: 15px;">
+                    <g:message code="searchCatalogueElementScope.description" default="Description"/> <g:checkBox name="searchCatalogueElementScopes"
+                                            value="${SearchCatalogueElementScope.DESCRIPTION}"
+                                            checked="${searchCatalogueElementScopes.contains(SearchCatalogueElementScope.DESCRIPTION)}"/>
+                    </span>
+                    <span style="margin-right: 15px;">
+                    <g:message code="searchCatalogueElementScope.extensionName" default="Extension Name"/> <g:checkBox name="searchCatalogueElementScopes"
+                                               value="${SearchCatalogueElementScope.EXTENSIONNAME}"
+                                               checked="${searchCatalogueElementScopes.contains(SearchCatalogueElementScope.EXTENSIONNAME)}"/>
+                    </span>
+                    <span style="margin-right: 15px;">
+                    <g:message code="searchCatalogueElementScope.extensionValue" default="Extension Value"/> <g:checkBox name="searchCatalogueElementScopes"
+                                                value="${SearchCatalogueElementScope.EXTENSIONVALUE}"
+                                                checked="${searchCatalogueElementScopes.contains(SearchCatalogueElementScope.EXTENSIONVALUE)}"/>
+                    </span>
 <g:javascript>
 refreshFormView();
 function onDataModelIdChange() {
