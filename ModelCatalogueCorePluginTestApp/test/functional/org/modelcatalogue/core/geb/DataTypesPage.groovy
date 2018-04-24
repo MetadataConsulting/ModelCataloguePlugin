@@ -44,4 +44,8 @@ class DataTypesPage extends Page {
     void createDataTypeFromNavigation() {
         createDateTypeLink.click()
     }
+
+    boolean containsDataTypeByName(String value) {
+        $('a', text: value).displayed
+    }
 }
