@@ -10,11 +10,15 @@ class DataTypeValueValidatePage extends Page implements InputUtils {
 
     static content = {
         validateKeyField { $('input#value') }
-        outputField(required: true) { $('div.alert.alert-success') }
+        outputField(wait: true) { $('div.alert.alert-success') }
     }
 
     void setValidateKeyField(String key) {
-        validateKeyField.value(key)
+        fillInput(validateKeyField, key)
+    }
+
+    void clearKeyField() {
+        validateKeyField.value("")
     }
 
     boolean outputIsValid() {

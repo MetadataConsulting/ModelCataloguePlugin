@@ -117,13 +117,14 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
         dataTypeValueValidatePage.validateKeyField = "one"
 
         then:
-        dataTypeValueValidatePage.outputIsValid()
+        waitFor { dataTypeValueValidatePage.outputIsValid() }
 
         when:
         dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
+        dataTypeValueValidatePage.clearKeyField()
         dataTypeValueValidatePage.validateKeyField = "none"
 
         then:
-        !dataTypeValueValidatePage.outputIsValid()
+        waitFor { !dataTypeValueValidatePage.outputIsValid() }
     }
 }
