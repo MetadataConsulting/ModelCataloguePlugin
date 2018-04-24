@@ -2,10 +2,18 @@ package org.modelcatalogue.core.datatype
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.CreateDataElementPage
+import org.modelcatalogue.core.geb.CreateDataTypePage
+import org.modelcatalogue.core.geb.CreateDataModelPage
 import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.DataElementsPage
+import org.modelcatalogue.core.geb.DataModelAclPermissionsShowPage
+import org.modelcatalogue.core.geb.DataModelAclPermissionsPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.CloneOrImportPage
+import org.modelcatalogue.core.geb.SearchAllModalPage
+import org.modelcatalogue.core.geb.HomePage
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Shared
@@ -59,7 +67,7 @@ class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
     @Shared
     String dataElementName = "DATA_ELEMENT"
 
-    /*def "Login as supervisor"() {
+    def "Login as supervisor"() {
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
@@ -99,7 +107,7 @@ class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
         at CreateDataTypePage
 
         when:
-        CreateDataTypePage createDataTypePage = browser.page(CreateDataTypePage)
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
         createDataTypePage.name = dataTypeOneName
         createDataTypePage.buttons.save()
 
@@ -191,49 +199,45 @@ class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
         dashboardPage.nav.cogMenu()
         dashboardPage.nav.dataModelPermission()
         then:
-        at DataModelPermissionListPage
+        at DataModelAclPermissionsPage
     }
 
     def "grant admin right to curator for first data model"() {
         when:
-        DataModelPermissionListPage dataModelPermissionListPage = browser.page DataModelPermissionListPage
-        dataModelPermissionListPage.selectDataModal(dataModelOneName)
+        DataModelAclPermissionsPage dataModelAclPermissionsPage = browser.page DataModelAclPermissionsPage
+        dataModelAclPermissionsPage.select(dataModelOneName)
         then:
-        at DataModelPermissionGrantPage
+        at DataModelAclPermissionsShowPage
 
         when:
-        DataModelPermissionGrantPage dataModelPermissionGrantPage = browser.page DataModelPermissionGrantPage
-        dataModelPermissionGrantPage.selectUsername("curator")
-        dataModelPermissionGrantPage.selectPermission("administration")
-        dataModelPermissionGrantPage.grantPermission()
+        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
+        dataModelAclPermissionsShowPage.grant("curator", "administration")
         then:
-        at DataModelPermissionGrantPage
+        at DataModelAclPermissionsShowPage
     }
 
     def "grant admin right to curator for second data model"() {
         when:
-        DataModelPermissionListPage dataModelPermissionListPage = to DataModelPermissionListPage
-        dataModelPermissionListPage.selectDataModal(dataModelTwoName)
+        DataModelAclPermissionsPage dataModelAclPermissionsPage = to DataModelAclPermissionsPage
+        dataModelAclPermissionsPage.select(dataModelTwoName)
         then:
-        at DataModelPermissionGrantPage
+        at DataModelAclPermissionsShowPage
 
         when:
-        DataModelPermissionGrantPage dataModelPermissionGrantPage = browser.page DataModelPermissionGrantPage
-        dataModelPermissionGrantPage.selectUsername("curator")
-        dataModelPermissionGrantPage.selectPermission("administration")
-        dataModelPermissionGrantPage.grantPermission()
+        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
+        dataModelAclPermissionsShowPage.grant("curator", "administration")
         then:
-        at DataModelPermissionGrantPage
+        at DataModelAclPermissionsShowPage
     }
 
     def "logout as supervisor"() {
         when:
-        DataModelPermissionGrantPage dataModelPermissionGrantPage = browser.page DataModelPermissionGrantPage
+        DataModelAclPermissionsShowPage dataModelPermissionGrantPage = browser.page DataModelAclPermissionsShowPage
         dataModelPermissionGrantPage.nav.userMenu()
         dataModelPermissionGrantPage.nav.logout()
         then:
         at HomePage
-    }*/
+    }
 
     def "login as curator"() {
         when:
@@ -272,10 +276,45 @@ class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
         createDataElementPage.name = dataElementName
         createDataElementPage.searchMore()
         createDataElementPage.showAllDataType()
-        createDataElementPage.selectDataType(dataTypeThreeName)
         then:
-        CreateDataElementPage
+        at SearchAllModalPage
     }
 
-    def "verify data element from first model is clonable"() {}
+    def "verify data element from third model is not clonable"() {
+        when:
+        SearchAllModalPage searchAllModalPage = browser.page SearchAllModalPage
+        searchAllModalPage.searchDataType(dataTypeThreeName)
+        then:
+        waitFor(5) { searchAllModalPage.noResultFound() }
+    }
+
+    def "verify data element from second model is clonable"() {
+        when:
+        SearchAllModalPage searchAllModalPage = browser.page SearchAllModalPage
+        searchAllModalPage.clearSearchField()
+        searchAllModalPage.searchDataType(dataTypeTwoName)
+        then:
+        waitFor(5) { !searchAllModalPage.noResultFound() }
+    }
+
+    def "clone data element of second model"() {
+        when:
+        SearchAllModalPage searchAllModalPage = browser.page SearchAllModalPage
+        searchAllModalPage.selectDataType()
+        then:
+        at CloneOrImportPage
+
+        when:
+        CloneOrImportPage cloneOrImportPage = browser.page CloneOrImportPage
+        cloneOrImportPage.allowClone()
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.finish()
+        then:
+        at DataElementsPage
+    }
+
 }
