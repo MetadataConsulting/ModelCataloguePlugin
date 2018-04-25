@@ -135,10 +135,7 @@ class CreateDataClassParentsPage extends Page implements InputUtils, MetadataUti
     }
 
     boolean isEnabled(Navigator parent) {
-        if (parent.@disabled == "disabled") {
-            return false
-        }
-        return true
+        !(parent.@disabled == "disabled")
     }
 
 }

@@ -7,7 +7,7 @@ class CreateDataClassFinishedPage extends Page implements InputUtils, MetadataUt
     static at = { $('.modal-dialog').text().contains('Data Class Wizard') }
 
     static content = {
-        createAnotherButton(wait: true) { $('button.btn.btn-success', 1) }
+        createAnotherButton(wait: true) { $('button.btn-success', 1) }
         exitButton(wait: true) { $('button#exit-wizard') }
     }
 

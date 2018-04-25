@@ -18,7 +18,7 @@ class CreateDataClassChildrenPage extends Page implements InputUtils, MetadataUt
 
         excludeDataElementCheckbox(required: true) { $('input', type: "checkbox", 2) }
         mergeToSingleSectionCheckbox(required: true) { $('input', type: "checkbox", 1) }
-        excludeCheckbox(required: true) { $('input.ng-pristine.ng-untouched.ng-valid', 0) }
+        excludeCheckbox(required: true) { $('input', type: "checkbox", 0) }
         labelTextArea { $("textarea#section-label") }
         sectionTextArea { $("textarea#section-title") }
         sectionSubtitleArea { $('textarea#section-subtitle') }
@@ -136,10 +136,7 @@ class CreateDataClassChildrenPage extends Page implements InputUtils, MetadataUt
     }
 
     boolean isEnabled(Navigator parent) {
-        if (parent.@disabled == "disabled") {
-            return false
-        }
-        return true
+        !(parent.@disabled == "disabled")
     }
 
 }
