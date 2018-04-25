@@ -1,12 +1,7 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import org.modelcatalogue.core.geb.CreateDataClassPage
-import org.modelcatalogue.core.geb.CreateDataModelPage
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataClassesPage
-import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Shared
@@ -55,7 +50,7 @@ import spock.lang.Title
 class CuratorCanCreateANewDataClassSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "NEW_TESTING_MODELS"
+    String dataModelName = "NEW_TESTING_MODEL"
     @Shared
     String dataClassOneName = "TESTING_CLASS_ONE"
     @Shared
@@ -115,316 +110,347 @@ class CuratorCanCreateANewDataClassSpec extends GebSpec {
         CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
         createDataClassPage.name = dataClassOneName
         createDataClassPage.description = description
-        createDataClassPage.metadata()
-        createDataClassPage.fillMetadata one: '1'
-        createDataClassPage.parents()
+        createDataClassPage.topNavigator.metadata()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassMetadataPage
+    }
+
+    def "verification for metadata section"() {
+        when:
+        CreateDataClassMetadataPage createDataClassMetadataPage = browser.page CreateDataClassMetadataPage
+        createDataClassMetadataPage.fillMetadata one: '1'
+        createDataClassMetadataPage.topNavigator.parentz()
+        then:
+        at CreateDataClassParentsPage
     }
 
     def "verification for parents section"() {
 
         when: 'verification of form (section) for parents'
-        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.formSection()
-        createDataClassPage.label = "label"
-        createDataClassPage.section = "title"
-        createDataClassPage.sectionSubtitle = "subtitle"
-        createDataClassPage.formPageNumber = 12
-        createDataClassPage.checkMergeToSingleSection()
-        createDataClassPage.checkExclude()
-        createDataClassPage.checkExcludeDataElement()
+        CreateDataClassParentsPage createDataClassParentsPage = browser.page CreateDataClassParentsPage
+        createDataClassParentsPage.formSection()
+        createDataClassParentsPage.label = "label"
+        createDataClassParentsPage.section = "title"
+        createDataClassParentsPage.sectionSubtitle = "subtitle"
+        createDataClassParentsPage.formPageNumber = 12
+        createDataClassParentsPage.checkExclude()
+        createDataClassParentsPage.checkExclude()
+        createDataClassParentsPage.checkExcludeDataElement()
+        createDataClassParentsPage.checkMergeToSingleSection()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassParentsPage
 
         when: 'verification of form (grid) for parents'
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.formGrid()
-        createDataClassPage.selectGrid()
+        createDataClassParentsPage = browser.page CreateDataClassParentsPage
+        createDataClassParentsPage.formGrid()
+        createDataClassParentsPage.selectGrid()
 
         then:
-        createDataClassPage.isEnabled(createDataClassPage.headerInput)
-        createDataClassPage.isEnabled(createDataClassPage.initialNumberOfRowsInput)
-        createDataClassPage.isEnabled(createDataClassPage.maxNoOfRowsInput)
+        createDataClassParentsPage.headerInputIsEnabled()
+        createDataClassParentsPage.initialNumberOfRowsIsEnabled()
+        createDataClassParentsPage.maxNumberOfRowsIsEnabled()
 
         when: "min occurance does not accept string"
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.ocurrence()
-        createDataClassPage.minOccurs = 1
-        createDataClassPage.maxOccurs = '10'
+        createDataClassParentsPage = browser.page CreateDataClassParentsPage
+        createDataClassParentsPage.ocurrence()
+        createDataClassParentsPage.minOccurs = '1'
+        createDataClassParentsPage.maxOccurs = '10'
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassParentsPage
 
         when:
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.appearance()
-        createDataClassPage.appearanceName = "appearance name"
-        createDataClassPage.raw()
+        createDataClassParentsPage = browser.page CreateDataClassParentsPage
+        createDataClassParentsPage.appearance()
+        createDataClassParentsPage.appearanceName = "appearance name"
+        createDataClassParentsPage.raw()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassParentsPage
 
     }
 
     def "verification for children section"() {
         when:
-        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.children()
+        CreateDataClassParentsPage createDataClassParentsPage = browser.page CreateDataClassParentsPage
+        createDataClassParentsPage.topNavigator.childrens()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassChildrenPage
 
         when: 'verification of form (section) for children'
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.formSection()
-        createDataClassPage.label = "label"
-        createDataClassPage.section = "title"
-        createDataClassPage.sectionSubtitle = "subtitle"
-        createDataClassPage.formPageNumber = 12
-        createDataClassPage.checkExclude()
-        createDataClassPage.checkExclude()
-        createDataClassPage.checkExcludeDataElement()
-        createDataClassPage.checkMergeToSingleSection()
+        CreateDataClassChildrenPage createDataClassChildrenPage = browser.page CreateDataClassChildrenPage
+        createDataClassChildrenPage.formSection()
+        createDataClassChildrenPage.label = "label"
+        createDataClassChildrenPage.section = "title"
+        createDataClassChildrenPage.sectionSubtitle = "subtitle"
+        createDataClassChildrenPage.formPageNumber = 12
+        createDataClassChildrenPage.checkExclude()
+        createDataClassChildrenPage.checkExclude()
+        createDataClassChildrenPage.checkExcludeDataElement()
+        createDataClassChildrenPage.checkMergeToSingleSection()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassChildrenPage
 
         when: 'verification of form (grid) for children'
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.formGrid()
-        createDataClassPage.selectGrid()
+        createDataClassChildrenPage = browser.page CreateDataClassChildrenPage
+        createDataClassChildrenPage.formGrid()
+        createDataClassChildrenPage.selectGrid()
 
         then:
-        createDataClassPage.isEnabled(createDataClassPage.headerInput)
-        createDataClassPage.isEnabled(createDataClassPage.initialNumberOfRowsInput)
-        createDataClassPage.isEnabled(createDataClassPage.maxNoOfRowsInput)
+        createDataClassChildrenPage.headerInputIsEnabled()
+        createDataClassChildrenPage.initialNumberOfRowsIsEnabled()
+        createDataClassChildrenPage.maxNumberOfRowsIsEnabled()
         true
 
         when: "min occurance does not accept string"
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.ocurrence()
-        createDataClassPage.minOccurs = 1
-        createDataClassPage.maxOccurs = '10'
+        createDataClassChildrenPage = browser.page CreateDataClassChildrenPage
+        createDataClassChildrenPage.ocurrence()
+        createDataClassChildrenPage.minOccurs = 1
+        createDataClassChildrenPage.maxOccurs = '10'
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassChildrenPage
 
         when:
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.appearance()
-        createDataClassPage.appearanceName = "appearance name"
-        createDataClassPage.raw()
+        createDataClassChildrenPage = browser.page CreateDataClassChildrenPage
+        createDataClassChildrenPage.appearance()
+        createDataClassChildrenPage.appearanceName = "appearance name"
+        createDataClassChildrenPage.raw()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassChildrenPage
     }
 
     def "verification for elements section"() {
         when:
-        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.elements()
+        CreateDataClassChildrenPage createDataClassChildrenPage = browser.page CreateDataClassChildrenPage
+        createDataClassChildrenPage.topNavigator.elements()
         then:
-        at CreateDataClassPage
+        at CreateDataClassElementsPage
 
         when: 'verification of form (Item) for elements'
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.formItem()
+        CreateDataClassElementsPage createDataClassElementsPage = browser.page CreateDataClassElementsPage
+        createDataClassElementsPage.formItem()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassElementsPage
 
         when: "min occurance does not accept string"
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.ocurrence()
-        createDataClassPage.minOccurs = '1'
-        createDataClassPage.maxOccurs = '10'
+        createDataClassElementsPage = browser.page CreateDataClassElementsPage
+        createDataClassElementsPage.ocurrence()
+        createDataClassElementsPage.minOccurs = '1'
+        createDataClassElementsPage.maxOccurs = '10'
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassElementsPage
 
         when:
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.appearance()
-        createDataClassPage.appearanceName = "appearance name"
-        createDataClassPage.raw()
+        createDataClassElementsPage = browser.page CreateDataClassElementsPage
+        createDataClassElementsPage.appearance()
+        createDataClassElementsPage.appearanceName = "appearance name"
+        createDataClassElementsPage.raw()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassElementsPage
 
     }
 
     def "save and create another data class"() {
         when:
-        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.finish()
-        createDataClassPage.createAnother()
+        CreateDataClassElementsPage createDataClassElementsPage = browser.page CreateDataClassElementsPage
+        createDataClassElementsPage.topNavigator.finish()
+        then:
+        at CreateDataClassFinishedPage
 
+        when:
+        CreateDataClassFinishedPage createDataClassFinishedPage = browser.page CreateDataClassFinishedPage
+        createDataClassFinishedPage.createAnother()
         then:
         at CreateDataClassPage
     }
 
 
-    def "re- Create a Data Class and select the created data class"() {
+    def "re - Create a Data Class and select the created data class"() {
         when: ' fill data class step'
         CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
         createDataClassPage.name = dataClassTwoName
         createDataClassPage.description = description
-        createDataClassPage.metadata()
-        createDataClassPage.fillMetadata one: '1'
-        createDataClassPage.parents()
+        createDataClassPage.topNavigator.metadata()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassMetadataPage
     }
 
-    def "re- verification for parents section"() {
+    def "re - verification for metadata section"() {
+        when:
+        CreateDataClassMetadataPage createDataClassMetadataPage = browser.page CreateDataClassMetadataPage
+        createDataClassMetadataPage.fillMetadata one: '1'
+        createDataClassMetadataPage.topNavigator.parentz()
+        then:
+        at CreateDataClassParentsPage
+    }
+
+    def "re - verification for parents section"() {
 
         when: 'verification of form (section) for parents'
-        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.formSection()
-        createDataClassPage.label = "label"
-        createDataClassPage.section = "title"
-        createDataClassPage.sectionSubtitle = "subtitle"
-        createDataClassPage.formPageNumber = 12
-        createDataClassPage.checkMergeToSingleSection()
-        createDataClassPage.checkExclude()
-        createDataClassPage.checkExcludeDataElement()
+        CreateDataClassParentsPage createDataClassParentsPage = browser.page CreateDataClassParentsPage
+        createDataClassParentsPage.formSection()
+        createDataClassParentsPage.label = "label"
+        createDataClassParentsPage.section = "title"
+        createDataClassParentsPage.sectionSubtitle = "subtitle"
+        createDataClassParentsPage.formPageNumber = 12
+        createDataClassParentsPage.checkExclude()
+        createDataClassParentsPage.checkExclude()
+        createDataClassParentsPage.checkExcludeDataElement()
+        createDataClassParentsPage.checkMergeToSingleSection()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassParentsPage
 
         when: 'verification of form (grid) for parents'
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.formGrid()
-        createDataClassPage.selectGrid()
+        createDataClassParentsPage = browser.page CreateDataClassParentsPage
+        createDataClassParentsPage.formGrid()
+        createDataClassParentsPage.selectGrid()
 
         then:
-        createDataClassPage.isEnabled(createDataClassPage.headerInput)
-        createDataClassPage.isEnabled(createDataClassPage.initialNumberOfRowsInput)
-        createDataClassPage.isEnabled(createDataClassPage.maxNoOfRowsInput)
-        true
+        createDataClassParentsPage.headerInputIsEnabled()
+        createDataClassParentsPage.initialNumberOfRowsIsEnabled()
+        createDataClassParentsPage.maxNumberOfRowsIsEnabled()
 
         when: "min occurance does not accept string"
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.ocurrence()
-        createDataClassPage.minOccurs = '1'
-        createDataClassPage.maxOccurs = '10'
+        createDataClassParentsPage = browser.page CreateDataClassParentsPage
+        createDataClassParentsPage.ocurrence()
+        createDataClassParentsPage.minOccurs = '1'
+        createDataClassParentsPage.maxOccurs = '10'
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassParentsPage
 
         when:
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.appearance()
-        createDataClassPage.appearanceName = "appearance name"
-        createDataClassPage.raw()
+        createDataClassParentsPage = browser.page CreateDataClassParentsPage
+        createDataClassParentsPage.appearance()
+        createDataClassParentsPage.appearanceName = "appearance name"
+        createDataClassParentsPage.raw()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassParentsPage
 
     }
 
-    def "re- verification for children section"() {
+    def "re - verification for children section"() {
         when:
-        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.children()
+        CreateDataClassParentsPage createDataClassParentsPage = browser.page CreateDataClassParentsPage
+        createDataClassParentsPage.topNavigator.childrens()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassChildrenPage
 
         when: 'verification of form (section) for children'
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.formSection()
-        createDataClassPage.label = "label"
-        createDataClassPage.section = "title"
-        createDataClassPage.sectionSubtitle = "subtitle"
-        createDataClassPage.formPageNumber = 12
-        createDataClassPage.checkExclude()
-        createDataClassPage.checkExclude()
-        createDataClassPage.checkExcludeDataElement()
-        createDataClassPage.checkMergeToSingleSection()
+        CreateDataClassChildrenPage createDataClassChildrenPage = browser.page CreateDataClassChildrenPage
+        createDataClassChildrenPage.formSection()
+        createDataClassChildrenPage.label = "label"
+        createDataClassChildrenPage.section = "title"
+        createDataClassChildrenPage.sectionSubtitle = "subtitle"
+        createDataClassChildrenPage.formPageNumber = 12
+        createDataClassChildrenPage.checkExclude()
+        createDataClassChildrenPage.checkExclude()
+        createDataClassChildrenPage.checkExcludeDataElement()
+        createDataClassChildrenPage.checkMergeToSingleSection()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassChildrenPage
 
         when: 'verification of form (grid) for children'
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.formGrid()
-        createDataClassPage.selectGrid()
+        createDataClassChildrenPage = browser.page CreateDataClassChildrenPage
+        createDataClassChildrenPage.formGrid()
+        createDataClassChildrenPage.selectGrid()
 
         then:
-        createDataClassPage.isEnabled(createDataClassPage.headerInput)
-        createDataClassPage.isEnabled(createDataClassPage.initialNumberOfRowsInput)
-        createDataClassPage.isEnabled(createDataClassPage.maxNoOfRowsInput)
+        createDataClassChildrenPage.headerInputIsEnabled()
+        createDataClassChildrenPage.initialNumberOfRowsIsEnabled()
+        createDataClassChildrenPage.maxNumberOfRowsIsEnabled()
         true
 
         when: "min occurance does not accept string"
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.ocurrence()
-        createDataClassPage.minOccurs = '1'
-        createDataClassPage.maxOccurs = '10'
+        createDataClassChildrenPage = browser.page CreateDataClassChildrenPage
+        createDataClassChildrenPage.ocurrence()
+        createDataClassChildrenPage.minOccurs = 1
+        createDataClassChildrenPage.maxOccurs = '10'
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassChildrenPage
 
         when:
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.appearance()
-        createDataClassPage.appearanceName = "appearance name"
-        createDataClassPage.raw()
+        createDataClassChildrenPage = browser.page CreateDataClassChildrenPage
+        createDataClassChildrenPage.appearance()
+        createDataClassChildrenPage.appearanceName = "appearance name"
+        createDataClassChildrenPage.raw()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassChildrenPage
     }
 
-    def "re- verification for elements section"() {
+    def "re - verification for elements section"() {
         when:
-        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.elements()
+        CreateDataClassChildrenPage createDataClassChildrenPage = browser.page CreateDataClassChildrenPage
+        createDataClassChildrenPage.topNavigator.elements()
         then:
-        at CreateDataClassPage
+        at CreateDataClassElementsPage
 
         when: 'verification of form (Item) for elements'
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.formItem()
+        CreateDataClassElementsPage createDataClassElementsPage = browser.page CreateDataClassElementsPage
+        createDataClassElementsPage.formItem()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassElementsPage
 
         when: "min occurance does not accept string"
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.ocurrence()
-        createDataClassPage.minOccurs = '1'
-        createDataClassPage.maxOccurs = '10'
+        createDataClassElementsPage = browser.page CreateDataClassElementsPage
+        createDataClassElementsPage.ocurrence()
+        createDataClassElementsPage.minOccurs = '1'
+        createDataClassElementsPage.maxOccurs = '10'
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassElementsPage
 
         when:
-        createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.appearance()
-        createDataClassPage.appearanceName = "appearance name"
-        createDataClassPage.raw()
+        createDataClassElementsPage = browser.page CreateDataClassElementsPage
+        createDataClassElementsPage.appearance()
+        createDataClassElementsPage.appearanceName = "appearance name"
+        createDataClassElementsPage.raw()
 
         then:
-        at CreateDataClassPage
+        at CreateDataClassElementsPage
 
     }
 
-    def "re- save and create another data class"() {
-        when:
-        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.finish()
-        createDataClassPage.exitWizard()
 
+    def "save and exit"() {
+        when:
+        CreateDataClassElementsPage createDataClassElementsPage = browser.page CreateDataClassElementsPage
+        createDataClassElementsPage.topNavigator.finish()
         then:
-        at DataClassesPage
+        waitFor { at CreateDataClassFinishedPage }
+
+        when:
+        CreateDataClassFinishedPage createDataClassFinishedPage = browser.page CreateDataClassFinishedPage
+        createDataClassFinishedPage.exitWizard()
+        then:
+        waitFor { at DraftDataModelListPage }
+
     }
 
     def "verify new data class has been created"() {
+        when:
+        DraftDataModelListPage draftDataModelListPage = browser.page DraftDataModelListPage
+        draftDataModelListPage.treeView.select("Data Classes")
+        then:
+        at DataClassesPage
+
         when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         then:

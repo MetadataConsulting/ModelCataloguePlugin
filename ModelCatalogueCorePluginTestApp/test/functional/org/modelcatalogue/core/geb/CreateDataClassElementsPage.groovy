@@ -4,16 +4,16 @@ import geb.Page
 import geb.navigator.Navigator
 
 class CreateDataClassElementsPage extends Page implements InputUtils, MetadataUtils {
-    static at = { $('.form-group').text().contains('Data Element') }
+    static at = { $('div#elements div.form-group label', 0).text().contains('Data Element') }
 
     static content = {
 
         topNavigator { $('ul.tutorial-steps').module(CreateDataClassTopNavigatorModule) }
 
         formItemLink(required: true) { $('a', text: 'Form (Item)') }
-        ocurrenceLink { $('ul.nav-pills>li:nth-child(3)>a', 0) }
-        appearanceLink(wait: true) { $('ul.nav-pills>li:nth-child(4)>a', 0) }
-        rawLink(wait: true) { $('ul.nav-pills>li:nth-child(5)>a', 0) }
+        ocurrenceLink { $('ul.nav-pills>li:nth-child(2)>a', 0) }
+        appearanceLink(wait: true) { $('ul.nav-pills>li:nth-child(3)>a', 0) }
+        rawLink(wait: true) { $('ul.nav-pills>li:nth-child(4)>a', 0) }
 
         excludeCheckbox { $('input', type: "checkbox", 0) }
         nameInput { $('input#item-name') }

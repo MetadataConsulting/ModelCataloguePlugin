@@ -7,9 +7,12 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
     static at = { $('.modal-dialog').text().contains('Data Class Wizard') }
 
     static content = {
+
+        topNavigator { $('ul.tutorial-steps').module(CreateDataClassTopNavigatorModule) }
+
         nameInput { $('#name', 0) }
         descriptionInput { $('#description', 0) }
-        modelCatalogueIdInput { $('#modelCatalogueId', 0) }
+        /*modelCatalogueIdInput { $('#modelCatalogueId', 0) }
         finishButton { $('#step-finish', 0) }
         metadataButton { $('#step-metadata', 0) }
         parentsButton { $('#step-parents', 0) }
@@ -54,10 +57,18 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         excludeDataElementCheckbox(required: true) { $('input', type: "checkbox", 2) }
         mergeToSingleSectionCheckbox(required: true) { $('input', type: "checkbox", 1) }
         excludeCheckbox(required: true) { $('input.ng-pristine.ng-untouched.ng-valid', 0) }
-        formItemLink(required: true) { $('a', text: 'Form (Item)') }
+        formItemLink(required: true) { $('a', text: 'Form (Item)') }*/
     }
 
-    void addMetadata() {
+    void setName(String value) {
+        fillInput(nameInput, value)
+    }
+
+    void setDescription(String value) {
+        fillInput(descriptionInput, value)
+    }
+
+    /*void addMetadata() {
         addMetadataButton.click()
     }
 
@@ -142,17 +153,11 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         exitButton.click()
     }
 
-    void setName(String value) {
-        fillInput(nameInput, value)
-    }
-
     void setModelCatalogueId(String value) {
         fillInput(modelCatalogueIdInput, value)
     }
 
-    void setDescription(String value) {
-        fillInput(descriptionInput, value)
-    }
+
 
     void selectGrid() {
         gridCheckbox.click()
@@ -195,6 +200,5 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
             return false
         }
         return true
-    }
-
+    }*/
 }

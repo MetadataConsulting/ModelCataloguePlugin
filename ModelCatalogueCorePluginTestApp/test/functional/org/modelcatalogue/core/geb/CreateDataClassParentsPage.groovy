@@ -4,7 +4,7 @@ import geb.Page
 import geb.navigator.Navigator
 
 class CreateDataClassParentsPage extends Page implements InputUtils, MetadataUtils {
-    static at = { $('.form-group').text().contains('Parent Data Class') }
+    static at = { $('div#parents div.form-group label', 0).text().contains('Parent Data Class') }
 
     static content = {
 
@@ -18,7 +18,7 @@ class CreateDataClassParentsPage extends Page implements InputUtils, MetadataUti
 
         excludeDataElementCheckbox(required: true) { $('input', type: "checkbox", 2) }
         mergeToSingleSectionCheckbox(required: true) { $('input', type: "checkbox", 1) }
-        excludeCheckbox(required: true) { $('input.ng-pristine.ng-untouched.ng-valid', 0) }
+        excludeCheckbox(required: true) { $('input', type: "checkbox", 0) }
         labelTextArea { $("textarea#section-label") }
         sectionTextArea { $("textarea#section-title") }
         sectionSubtitleArea { $('textarea#section-subtitle') }
@@ -98,12 +98,24 @@ class CreateDataClassParentsPage extends Page implements InputUtils, MetadataUti
         fillInput(headerInput, value)
     }
 
+    boolean headerInputIsEnabled() {
+        isEnabled(headerInput)
+    }
+
     void setinitialNumberOfRows(String value) {
         fillInput(initialNumberOfRowsInput, value)
     }
 
+    boolean initialNumberOfRowsIsEnabled() {
+        isEnabled(initialNumberOfRowsInput)
+    }
+
     void setMaxNumberOfRows(String value) {
         fillInput(maxNoOfRowsInput, value)
+    }
+
+    boolean maxNumberOfRowsIsEnabled() {
+        isEnabled(maxNoOfRowsInput)
     }
 
     void setMinOccurs(String value) {

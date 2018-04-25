@@ -4,7 +4,7 @@ import geb.Page
 import geb.navigator.Navigator
 
 class CreateDataClassChildrenPage extends Page implements InputUtils, MetadataUtils {
-    static at = { $('.form-group').text().contains('Child Data Class') }
+    static at = { $('div#children div.form-group label', 0).text().contains('Child Data Class') }
 
     static content = {
 
@@ -99,12 +99,24 @@ class CreateDataClassChildrenPage extends Page implements InputUtils, MetadataUt
         fillInput(headerInput, value)
     }
 
+    boolean headerInputIsEnabled() {
+        isEnabled(headerInput)
+    }
+
     void setinitialNumberOfRows(String value) {
         fillInput(initialNumberOfRowsInput, value)
     }
 
+    boolean initialNumberOfRowsIsEnabled() {
+        isEnabled(initialNumberOfRowsInput)
+    }
+
     void setMaxNumberOfRows(String value) {
         fillInput(maxNoOfRowsInput, value)
+    }
+
+    boolean maxNumberOfRowsIsEnabled() {
+        isEnabled(maxNoOfRowsInput)
     }
 
     void setMinOccurs(String value) {
