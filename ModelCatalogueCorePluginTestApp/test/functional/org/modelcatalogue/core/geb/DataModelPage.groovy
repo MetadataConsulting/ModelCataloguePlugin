@@ -32,6 +32,8 @@ class DataModelPage extends Page {
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
         exportToCatalogXml { $('a#catalogue-element-export-specific-reports_4-menu-item-link') }
+        importLink(wait: true) { $('a#role_navigation-right_curator-menu-menu-item-link') }
+        importCatalogXmlLink(wait: true) { $('li#import-xml-menu-item') }
     }
 
     String getRowsText() {
@@ -76,5 +78,13 @@ class DataModelPage extends Page {
 
     void exportCatalogXml() {
         exportToCatalogXml.click()
+    }
+
+    void importClick() {
+        importLink.click()
+    }
+
+    void importCatalogXml() {
+        importCatalogXmlLink.click()
     }
 }

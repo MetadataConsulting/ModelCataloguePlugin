@@ -7,11 +7,15 @@ import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.ImportModelCatalogueXMLPage
+import org.modelcatalogue.core.geb.AssetPage
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Shared
 import spock.lang.Stepwise
 import spock.lang.Title
+import groovy.util.*
+import groovy.xml.XmlUtil
 
 @Issue('https://metadata.atlassian.net/browse/MET-1461')
 @Title('Import Xml and Excel data')
@@ -46,6 +50,8 @@ class ImportXmlAndExcelDataSpec extends GebSpec {
     String dataModelName = "NEW_TESTING_MODEL"
     @Shared
     String dataTypeName = "NEW_DATATYPE"
+    @Shared
+    String downloadLocation = System.getProperty('downloadFilepath')
 
     def "Login as curator"() {
         when:
@@ -112,9 +118,57 @@ class ImportXmlAndExcelDataSpec extends GebSpec {
         at DataModelPage
     }
 
-    def "update the xml file"() {}
+    def "update the xml file and import"() {
+        when:
+        String filelocation = "file://${downloadLocation}/${dataModelName}.mc.xml"
+        URL url = new URL(filelocation)
+        then:
+        File f = new File(url.toURI())
+        then:
+        waitFor(10) { f.exists() }
 
-    def "import catalog xml"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.importClick()
+        dataModelPage.importCatalogXml()
+        // Switch to new window opened
+        for (String winHandle : driver.getWindowHandles()) {
+            driver.switchTo().window(winHandle);
+        }
+        then:
+        at ImportModelCatalogueXMLPage
 
+        when:
+        updateFile()
+        then:
+        true
+
+        when:
+        ImportModelCatalogueXMLPage importModelCatalogueXMLPage = browser.page ImportModelCatalogueXMLPage
+        importModelCatalogueXMLPage.upload(f.absolutePath)
+        then:
+        waitFor(10) { at AssetPage }
+
+    }
+
+    def "download uploaded xml file"() {
+        when:
+        AssetPage assetPage = browser.page AssetPage
+        assetPage.showMore()
+        assetPage.downloadAsset()
+        then:
+        at AssetPage
+    }
+
+
+    def updateFile() {
+        def xmlFromFile = new File("${downloadLocation}/${dataModelName}.mc.xml")
+        def xml = new XmlSlurper().parseText(xmlFromFile.getText())
+        def toadd = "<tag0:enumeration id='3' value='three'>3</tag0:enumeration>"
+        def fragmentToAdd = new XmlSlurper(false, false).parseText(toadd)
+        xml.dataModel.dataType.enumerations.appendNode(fragmentToAdd)
+
+        XmlUtil xmlUtil = new XmlUtil()
+        xmlUtil.serialize(xml, new FileWriter(xmlFromFile))
     }
 }
