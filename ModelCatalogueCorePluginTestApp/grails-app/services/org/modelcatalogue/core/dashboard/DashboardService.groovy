@@ -1,13 +1,12 @@
 package org.modelcatalogue.core.dashboard
 
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import grails.gorm.DetachedCriteria
-import grails.orm.PagedResultList
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.grails.datastore.mapping.query.api.BuildableCriteria
-import org.grails.datastore.mapping.transactions.Transaction
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
@@ -16,7 +15,6 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MaxOffsetSublistUtils
-import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeName
@@ -34,12 +32,16 @@ import org.modelcatalogue.core.persistence.RelationshipGormService
 import org.modelcatalogue.core.persistence.RelationshipTypeGormService
 import org.modelcatalogue.core.persistence.TagGormService
 import org.modelcatalogue.core.persistence.ValidationRuleGormService
+import org.modelcatalogue.core.search.KeywordMatchType
+import org.modelcatalogue.core.search.KeywordsService
+import org.modelcatalogue.core.search.PagedResultList
 import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.PublishedStatus
 import org.modelcatalogue.core.util.SortQuery
 import org.modelcatalogue.core.view.AssetViewModel
+import org.modelcatalogue.core.view.CatalogueElementViewModel
 import org.modelcatalogue.core.view.CatalogueElementViewModelUtils
 import org.modelcatalogue.core.view.DataModelViewModelUtils
 
@@ -58,6 +60,7 @@ class DashboardService {
     TagGormService tagGormService
     RelationshipTypeGormService relationshipTypeGormService
     RelationshipGormService relationshipGormService
+    KeywordsService keywordsService
 
     @Transactional(readOnly = true)
     @CompileDynamic
@@ -99,23 +102,7 @@ class DashboardService {
             return findAllDataModelViewBySearchStatusQuery(query, sortQuery, paginationQuery)
 
         } else if ( query.metadataDomain == MetadataDomain.CATALOGUE_ELEMENT ) {
-            CatalogueElementSearchResult searchResult = new CatalogueElementSearchResult(viewModels: [], total: 0)
-            PaginationQuery defaultPaginationQuery = new PaginationQuery(offset: 0)
-            for ( CatalogueElementSearchResult result : [
-                findAllDataElementViewBySearchStatusQuery(query, sortQuery, defaultPaginationQuery),
-                findAllDataClassViewBySearchStatusQuery(query, sortQuery, defaultPaginationQuery),
-                findAllEnumeratedTypeViewBySearchStatusQuery(query, sortQuery, defaultPaginationQuery),
-                findAllDataTypeViewBySearchStatusQuery(query, sortQuery, defaultPaginationQuery),
-                findAllMeasurementUnitViewBySearchStatusQuery(query, sortQuery, defaultPaginationQuery),
-                findAllBusinessRuleViewBySearchStatusQuery(query, sortQuery, defaultPaginationQuery),
-                findAllTagViewBySearchStatusQuery(query, sortQuery, defaultPaginationQuery),
-            ]) {
-                searchResult.total += result.total
-                searchResult.viewModels.addAll(result.viewModels)
-            }
-
-            searchResult.viewModels = MaxOffsetSublistUtils.subList(searchResult.viewModels, paginationQuery.toMap())
-            return searchResult
+            return findAllCatalogueElementViewBySearchStatusQuery(query, sortQuery, paginationQuery)
 
         } else if ( query.metadataDomain == MetadataDomain.DATA_ELEMENT ) {
             return findAllDataElementViewBySearchStatusQuery(query, sortQuery, paginationQuery)
@@ -142,63 +129,180 @@ class DashboardService {
     }
 
     @CompileDynamic
-    PagedResultList resultsOfBuildableCriteriaBySearchStatusQuery(BuildableCriteria criteria, SearchQuery query, SortQuery sortQuery, PaginationQuery paginationQuery) {
+    PagedResultList resultsOfBuildableCriteriaBySearchStatusQuery(Class clazz,
+                                                                  SearchQuery query,
+                                                                  SortQuery sortQuery,
+                                                                  PaginationQuery paginationQuery) {
         List<Long> dataModelIds = dataModelIdsBySearchQuery(query)
-        Map params = [:]
-        if ( paginationQuery ) {
-            if ( paginationQuery.max ) {
-                params.max = paginationQuery.max
-            }
-            params.offset = paginationQuery.offset ?: 0
+        Map params = paginationQuery?.toMap() ?: [:]
+
+        List<String> keywords = keywordsService.keywords(query.search)
+        log.debug('searching keywords: {}', keywords.join(','))
+        KeywordMatchType keywordMatchType = query.keywordMatchType
+        if ( keywords.size() == 1) {
+            keywordMatchType = KeywordMatchType.EXACT_MATCH
         }
-        def items = criteria.list(params) {
-            createAlias('dataModel', 'dataModel')
-            and {
-                if (dataModelIds) {
-                    inList("dataModel.id", dataModelIds)
-                }
-                if ( query ) {
-                    if (query.search) {
-                        or {
-                            if ( shouldSearchProperty('name', query.searchCatalogueElementScopeList) ) {
-                                ilike("name", "%${query.search}%")
+
+        Closure searchQuery = {
+            if (query?.search) {
+                if (keywordMatchType == KeywordMatchType.EXACT_MATCH) {
+                    or {
+                        if ( shouldSearchProperty('name', query.searchCatalogueElementScopeList) ) {
+                            ilike("name", "%${query.search}%")
+                        }
+                        if ( shouldSearchProperty('modelCatalogueId', query.searchCatalogueElementScopeList) ) {
+                            ilike("modelCatalogueId", "%${query.search}%")
+                        }
+                        if ( shouldSearchProperty('description', query.searchCatalogueElementScopeList) ) {
+                            ilike("description", "%${query.search}%")
+                        }
+                        if ( shouldSearchProperty('extensions.name', query.searchCatalogueElementScopeList) || shouldSearchProperty('extensions.extensionValue', query.searchCatalogueElementScopeList) ) {
+                            extensions {
+                                or {
+                                    if (shouldSearchProperty('extensions.name', query.searchCatalogueElementScopeList)) {
+                                        ilike("name", "%${query.search}%")
+                                    }
+                                    if (shouldSearchProperty('extensions.extensionValue', query.searchCatalogueElementScopeList)) {
+                                        ilike("extensionValue", "%${query.search}%")
+                                    }
+                                }
                             }
-                            if ( shouldSearchProperty('modelCatalogueId', query.searchCatalogueElementScopeList) ) {
-                                ilike("modelCatalogueId", "%${query.search}%")
+                        }
+                    }
+                } else if (keywordMatchType == KeywordMatchType.KEYWORDS_MATCH) {
+                    or {
+                        if (shouldSearchProperty('name', query.searchCatalogueElementScopeList)) {
+                            and {
+                                for ( String keyword : keywords ) {
+                                    ilike("name", "%${keyword}%")
+                                }
                             }
-                            if ( shouldSearchProperty('description', query.searchCatalogueElementScopeList) ) {
-                                ilike("description", "%${query.search}%")
+                        }
+                        if (shouldSearchProperty('modelCatalogueId', query.searchCatalogueElementScopeList)) {
+                            and {
+                                for ( String keyword : keywords ) {
+                                    ilike("modelCatalogueId", "%${keyword}%")
+                                }
                             }
-                            if ( shouldSearchProperty('extensions.name', query.searchCatalogueElementScopeList) || shouldSearchProperty('extensions.extensionValue', query.searchCatalogueElementScopeList) ) {
-                                extensions {
-                                    or {
-                                        if (shouldSearchProperty('extensions.name', query.searchCatalogueElementScopeList)) {
-                                            ilike("name", "%${query.search}%")
+                        }
+                        if (shouldSearchProperty('description', query.searchCatalogueElementScopeList)) {
+                            and {
+                                for ( String keyword : keywords ) {
+                                    ilike("description", "%${keyword}%")
+                                }
+                            }
+                        }
+                        if (shouldSearchProperty('extensions.name', query.searchCatalogueElementScopeList) || shouldSearchProperty('extensions.extensionValue', query.searchCatalogueElementScopeList)) {
+                            extensions {
+                                or {
+                                    if (shouldSearchProperty('extensions.name', query.searchCatalogueElementScopeList)) {
+                                        and {
+                                            for ( String keyword : keywords ) {
+                                                ilike("name", "%${keyword}%")
+                                            }
                                         }
-                                        if (shouldSearchProperty('extensions.extensionValue', query.searchCatalogueElementScopeList)) {
-                                            ilike("extensionValue", "%${query.search}%")
+                                    }
+                                    if (shouldSearchProperty('extensions.extensionValue', query.searchCatalogueElementScopeList)) {
+                                        and {
+                                            for ( String keyword : keywords ) {
+                                                ilike("extensionValue", "%${keyword}%")
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    if (query.statusList) {
-                        inList("status", query.statusList)
+                } else if (keywordMatchType == KeywordMatchType.BROAD_MATCH) {
+                    or {
+                        if (shouldSearchProperty('name', query.searchCatalogueElementScopeList)) {
+                            or {
+                                for ( String keyword : keywords ) {
+                                    ilike("name", "%${keyword}%")
+                                }
+                            }
+                        }
+                        if (shouldSearchProperty('modelCatalogueId', query.searchCatalogueElementScopeList)) {
+                            or {
+                                for ( String keyword : keywords ) {
+                                    ilike("modelCatalogueId", "%${keyword}%")
+                                }
+                            }
+                        }
+                        if (shouldSearchProperty('description', query.searchCatalogueElementScopeList)) {
+                            or {
+                                for ( String keyword : keywords ) {
+                                    ilike("description", "%${keyword}%")
+                                }
+                            }
+                        }
+                        if (shouldSearchProperty('extensions.name', query.searchCatalogueElementScopeList) || shouldSearchProperty('extensions.extensionValue', query.searchCatalogueElementScopeList)) {
+                            extensions {
+                                or {
+                                    if (shouldSearchProperty('extensions.name', query.searchCatalogueElementScopeList)) {
+                                        or {
+                                            for ( String keyword : keywords ) {
+                                                ilike("name", "%${keyword}%")
+                                            }
+                                        }
+                                    }
+                                    if (shouldSearchProperty('extensions.extensionValue', query.searchCatalogueElementScopeList)) {
+                                        or {
+                                            for ( String keyword : keywords ) {
+                                                ilike("extensionValue", "%${keyword}%")
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-            if ( paginationQuery?.max ) {
-                maxResults(paginationQuery.max)
+        }
+
+        Closure statusQuery = {
+            if (query?.statusList) {
+                inList("status", query.statusList)
             }
-            if ( paginationQuery?.offset ) {
-                firstResult(paginationQuery.offset)
+        }
+
+        Closure dataModelQuery = {
+            createAlias('dataModel', 'dataModel')
+            if (dataModelIds) {
+                inList("dataModel.id", dataModelIds)
+            }
+        }
+
+        def countItems = clazz.createCriteria().get {
+            and {
+                dataModelQuery.delegate = delegate
+                dataModelQuery()
+                searchQuery.delegate = delegate
+                searchQuery()
+                statusQuery.delegate = delegate
+                statusQuery()
+            }
+            projections {
+                countDistinct('id')
+            }
+        }
+
+        Date start = new Date()
+        def items = clazz.createCriteria().list(params) {
+            and {
+                dataModelQuery.delegate = delegate
+                dataModelQuery()
+                searchQuery.delegate = delegate
+                searchQuery()
+                statusQuery.delegate = delegate
+                statusQuery()
             }
             if ( sortQuery ) {
                 order(sortQuery.sort, sortQuery.order)
             }
             projections {
-                property('id', 'id')
+                distinct('id', 'id')
                 property('name', 'name')
                 property('lastUpdated', 'lastUpdated')
                 property('status', 'status')
@@ -207,8 +311,23 @@ class DashboardService {
                 property('dataModel.name', 'dataModel.name')
             }
         }
-        return items
+        Date stop = new Date()
+        TimeDuration td = TimeCategory.minus( stop, start )
+        log.info 'Query took: {}', td.toString()
+
+        new PagedResultList(items: items, total: countItems as int)
     }
+
+    @CompileDynamic
+    def runCriteria(Class clazz, List<Closure> criterias, Map paginateParams) {
+        clazz.createCriteria().list(paginateParams) {
+            for (Closure criteria in criterias) {
+                criteria.delegate = delegate
+                criteria()
+            }
+        }
+    }
+
 
     boolean shouldSearchProperty(String propertyName, List<SearchCatalogueElementScope> searchCatalogueElementScopeList) {
         List<String> allowedProperties = [
@@ -250,8 +369,8 @@ class DashboardService {
     List<IdName> findAllDataModel() {
         List<ElementStatus> statusList = findAllElementStatus()
         SearchQuery searchStatusQuery = new SearchQuery(statusList: statusList,
-                    search: null,
-                    metadataDomain: MetadataDomain.DATA_MODEL)
+                search: null,
+                metadataDomain: MetadataDomain.DATA_MODEL)
 
         dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, []).sort { DataModel a, DataModel b ->
             a.name <=> b.name
@@ -266,53 +385,50 @@ class DashboardService {
         "${dataModelName} ${dataModel.semanticVersion} (${dataModel.status})".toString()
     }
 
+    CatalogueElementSearchResult searchResult(Class clazz, MetadataDomain domain, SearchQuery searchQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(clazz, searchQuery, sortQuery, paginationQuery)
+        List<CatalogueElementViewModel> catalogueElementList = CatalogueElementViewModelUtils.ofProjections(domain, results.items)
+        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: catalogueElementList)
+    }
+
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllBusinessRuleViewBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        BuildableCriteria c = ValidationRule.createCriteria()
-        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
-        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.BUSINESS_RULE, results))
+        searchResult(ValidationRule.class, MetadataDomain.BUSINESS_RULE, searchStatusQuery, sortQuery, paginationQuery)
     }
 
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllMeasurementUnitViewBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        BuildableCriteria c = MeasurementUnit.createCriteria()
-        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
-        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.MEASUREMENT_UNIT, results))
+        searchResult(ValidationRule.class, MetadataDomain.MEASUREMENT_UNIT, searchStatusQuery, sortQuery, paginationQuery)
     }
 
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllDataTypeViewBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        BuildableCriteria c = DataType.createCriteria()
-        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
-        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_TYPE, results))
+        searchResult(DataType.class, MetadataDomain.DATA_TYPE, searchStatusQuery, sortQuery, paginationQuery)
     }
 
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllEnumeratedTypeViewBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        BuildableCriteria c = EnumeratedType.createCriteria()
-        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
-        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.ENUMERATED_TYPE, results))
+        searchResult(EnumeratedType.class, MetadataDomain.ENUMERATED_TYPE, searchStatusQuery, sortQuery, paginationQuery)
     }
 
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllDataClassViewBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        BuildableCriteria c = DataClass.createCriteria()
-        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
-        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_CLASS, results))
+        searchResult(DataClass.class, MetadataDomain.DATA_CLASS, searchStatusQuery, sortQuery, paginationQuery)
+    }
+
+    @Transactional(readOnly = true)
+    CatalogueElementSearchResult findAllCatalogueElementViewBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
+        searchResult(CatalogueElement.class, MetadataDomain.CATALOGUE_ELEMENT, searchStatusQuery, sortQuery, paginationQuery)
     }
 
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllDataElementViewBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        BuildableCriteria c = DataElement.createCriteria()
-        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
-        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.DATA_ELEMENT, results))
+        searchResult(DataElement.class, MetadataDomain.DATA_ELEMENT, searchStatusQuery, sortQuery, paginationQuery)
     }
 
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllTagViewBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        BuildableCriteria c = Tag.createCriteria()
-        PagedResultList results = resultsOfBuildableCriteriaBySearchStatusQuery(c, searchStatusQuery, sortQuery, paginationQuery)
-        new CatalogueElementSearchResult(total: results.getTotalCount(), viewModels: CatalogueElementViewModelUtils.ofProjections(MetadataDomain.TAG, results))
+        searchResult(Tag.class, MetadataDomain.TAG, searchStatusQuery, sortQuery, paginationQuery)
     }
 
     @CompileDynamic

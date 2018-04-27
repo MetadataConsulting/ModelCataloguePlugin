@@ -2,6 +2,7 @@ package org.modelcatalogue.core.dashboard
 
 import grails.validation.Validateable
 import org.modelcatalogue.core.api.ElementStatusUtils
+import org.modelcatalogue.core.search.KeywordMatchType
 import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.SortQuery
@@ -10,11 +11,12 @@ import org.modelcatalogue.core.util.SortQuery
 class DashboardIndexCommand {
 
     String dataModelId
-    Integer max = 10
+    Integer max = PaginationQuery.DEFAULT_MAX
     MetadataDomain metadataDomain = MetadataDomain.DATA_MODEL
     DashboardStatusDropdown status = DashboardStatusDropdown.ACTIVE
     SearchScope searchScope = SearchScope.DATAMODEL
-    List<SearchCatalogueElementScope> searchCatalogueElementScopes = [SearchCatalogueElementScope.ALL]
+    KeywordMatchType keywordMatchType = KeywordMatchType.KEYWORDS_MATCH
+    List<SearchCatalogueElementScope> searchCatalogueElementScopes = [SearchCatalogueElementScope.NAME]
     String order = 'asc'
     String sort = 'name'
     String search
@@ -46,6 +48,7 @@ class DashboardIndexCommand {
                 search: search,
                 statusList: ElementStatusUtils.of(status),
                 metadataDomain: metadataDomain,
+                keywordMatchType: keywordMatchType,
                 searchCatalogueElementScopeList: searchCatalogueElementScopes
         )
     }
