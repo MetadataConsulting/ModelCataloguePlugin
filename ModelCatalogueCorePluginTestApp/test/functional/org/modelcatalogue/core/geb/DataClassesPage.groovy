@@ -17,7 +17,7 @@ class DataClassesPage extends Page {
         createDateClassLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
         addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
-        rows { $('div.inf-table-body tbody tr') }
+        rows(required: false,wait:true) { $('div.inf-table-body tbody tr') }
     }
 
     int count() {
@@ -34,4 +34,16 @@ class DataClassesPage extends Page {
     void createDataClass() {
         createDateClassLink.click()
     }
+
+    void selectDataClassByName(String value) {
+        rows.$('a', text: value).click()
+    }
+
+    boolean containsDataClass(String value) {
+        if ($('a', text: value)) {
+            return true
+        }
+        false
+    }
+
 }

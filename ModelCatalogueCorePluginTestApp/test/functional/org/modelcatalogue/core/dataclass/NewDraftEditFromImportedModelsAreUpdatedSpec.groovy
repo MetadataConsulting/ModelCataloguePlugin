@@ -1,12 +1,7 @@
 package org.modelcatalogue.core.dataclass
 
 import geb.spock.GebSpec
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataClassPage
-import org.modelcatalogue.core.geb.DataClassesPage
-import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.LoginPage
-import org.modelcatalogue.core.geb.ParentClassModalPage
+import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Shared
@@ -48,9 +43,17 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
     @Shared
     String dataModelName = "NEW_TESTING_MODEL"
     @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
     String dataClassName = "NEW_TESTING_CLASS"
     @Shared
-    String dataClassDescription = "NEW_TESTING_CLASS"
+    String dataClassDescription = "NEW_TESTING_DESCRIPTION"
+    @Shared
+    String importDataModelName = "IMPORT_MODEL"
+    @Shared
+    String importDataClassName = "IMPORT_CLASS"
+    @Shared
+    String importDataClassNewName = "IMPORT_CLASS_NEW"
 
 
     def "Login as curator"() {
@@ -62,7 +65,43 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         at DashboardPage
     }
 
-    /*def "create new data model"() {
+
+    def "create data model and class to import"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = to CreateDataModelPage
+        createDataModelPage.name = importDataModelName
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Classes")
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = importDataClassName
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+    }
+
+    def "create new data model"() {
         when:
         DashboardPage dashboardPage = to DashboardPage
         dashboardPage.nav.createDataModel()
@@ -73,20 +112,16 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         when:
         CreateDataModelPage createDataModelPage = to CreateDataModelPage
         createDataModelPage.name = dataModelName
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueId = "${UUID.randomUUID()}"
         createDataModelPage.submit()
 
         then:
         at DataModelPage
-    }*/
+    }
 
     def "import data model"() {
-        when: "delete this one"
-        DashboardPage dashboardPage = to DashboardPage
-        dashboardPage.select(dataModelName)
-        then:
-        at DataModelPage
-
-        /*when:
+        when:
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select("Imported Data Models")
         then:
@@ -96,32 +131,38 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         ImportedDataModelsPage importedDataModelsPage = browser.page ImportedDataModelsPage
         importedDataModelsPage.importDataModel()
         then:
-        at ImportedDataModelsPage*/
+        at ImportDataModelPage
     }
 
-    /* def "search a data model"() {
-         when:
-         ImportedDataModelsPage importedDataModelsPage = browser.page ImportedDataModelsPage
-         importedDataModelsPage.searchMore()
-         importedDataModelsPage.selectDataModel(1)
- //        importedDataModelsPage = browser.page ImportedDataModelsPage
-         importedDataModelsPage.createRelationship()
+    def "search a data model"() {
+        when:
+        ImportDataModelPage importDataModelPage = browser.page ImportDataModelPage
+        importDataModelPage.searchMore()
+        then:
+        at SearchModelPage
 
-         then:
-         at ImportedDataModelsPage
-     }*/
+        when:
+        SearchModelPage searchModelPage = browser.page SearchModelPage
+        searchModelPage.searchModelByName(importDataModelName)
+        then:
+        at ImportDataModelPage
+
+        when:
+        importDataModelPage = browser.page ImportDataModelPage
+        importDataModelPage.createRelationship()
+        then:
+        at ImportedDataModelsPage
+    }
 
     def "create new data class"() {
         when:
-        DashboardPage dashboardPage = to DashboardPage
-        dashboardPage.select(dataModelName)
-        DataModelPage dataModelPage = browser.page DataModelPage
-        dataModelPage.treeView.select("Data Classes")
+        ImportedDataModelsPage importedDataModelsPage = browser.page ImportedDataModelsPage
+        importedDataModelsPage.treeView.select("Data Classes")
 
         then:
         at DataClassesPage
 
-        /*when:
+        when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         dataClassesPage.createDataClass()
 
@@ -136,7 +177,7 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         createDataClassPage.exit()
 
         then:
-        at DataClassesPage*/
+        at DataClassesPage
 
     }
 
@@ -159,9 +200,133 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         when:
         ParentClassModalPage parentClassModalPage = browser.page ParentClassModalPage
         parentClassModalPage.searchMore()
-        parentClassModalPage.importDataClass()
+        then:
+        at SearchClassPage
+
+        when:
+        SearchClassPage searchClassPage = browser.page SearchClassPage
+        searchClassPage.search(importDataClassName)
+        then:
+        at ParentClassModalPage
+
+        when:
+        parentClassModalPage = browser.page ParentClassModalPage
         parentClassModalPage.createRelationship()
+        then:
+        at ParentClassModalPage
+    }
+
+    def "finalize the data model"() {
+        when:
+        ParentClassModalPage parentClassModalPage = browser.page ParentClassModalPage
+        parentClassModalPage.openModelHome(dataModelName)
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.finalizedDataModel()
+        then:
+        waitFor(10) { at FinalizeDataModelPage }
+
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.versionNote = "version information"
+        finalizeDataModelPage.submit()
+        then:
+        at DataModelFinalizeConfirmPage
+
+        when:
+        DataModelFinalizeConfirmPage dataModelFinalizeConfirmPage = browser.page DataModelFinalizeConfirmPage
+        dataModelFinalizeConfirmPage.hide()
+        then:
+        at DataModelPage
+    }
+
+    def "create new version"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dataModel()
+        dataModelPage.dropdownMenu.createNewVersion()
+        then:
+        at DataModelAssignNewVersionPage
+
+        when:
+        DataModelAssignNewVersionPage dataModelAssignNewVersionPage = browser.page DataModelAssignNewVersionPage
+        dataModelAssignNewVersionPage.semanticVersion = "0.0.2"
+        dataModelAssignNewVersionPage.createNewVersion()
+        then:
+        at DataModelAssignNewVersionConfirmPage
+
+        when:
+        DataModelAssignNewVersionConfirmPage dataModelAssignNewVersionConfirmPage = browser.page DataModelAssignNewVersionConfirmPage
+        dataModelAssignNewVersionConfirmPage.hide()
+        then:
+        at DataModelPage
+    }
+
+    def "update name of data class of imported data model"() {
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.select(importDataModelName)
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Classes")
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.selectDataClassByName(importDataClassName)
+        then:
+        at DataClassPage
+
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+        dataClassPage.edit()
+        dataClassPage.editClassName(importDataClassNewName)
+        dataClassPage.save()
         then:
         at DataClassPage
     }
+
+    def "open new version of data model"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.selectModelByNameAndIndex(dataModelName, 1)
+        then:
+        at DataModelPage
+
+    }
+
+    def "check imported data class name is changed here also"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Imported Data Models")
+        then:
+        at ImportedDataModelsPage
+
+        when:
+        ImportedDataModelsPage importedDataModelsPage = browser.page ImportedDataModelsPage
+        importedDataModelsPage.selectModelByName(importDataModelName)
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Classes")
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        then:
+        dataClassesPage.containsDataClass(importDataClassNewName)
+    }
+
 }
