@@ -23,5 +23,5 @@ import spock.lang.Title
  - Login to Metadata Exchange as curator | 'Sorry your account is disabled' appears in the login dialogue box and curator cannot login
 ''')
 
-class DisableUser extends GebSpec {
+class DisableUserSpec extends GebSpec {
 }
