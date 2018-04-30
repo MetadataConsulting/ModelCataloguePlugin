@@ -5,6 +5,10 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.CreateDataModelPage
+import org.modelcatalogue.core.geb.DataModelPage
 
 @Issue('https://metadata.atlassian.net/browse/MET-1728')
 @Title('Disable a user')
@@ -24,4 +28,66 @@ import spock.lang.Title
 ''')
 
 class DisableUser extends GebSpec {
+
+    def "login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("curator", "curator")
+        then:
+        at DashboardPage
+    }
+
+    def "create new data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = "TEST_DATAMODEL_FOUR"
+        createDataModelPage.description = "TEST_MODEL_DESCRIPTION"
+        createDataModelPage.modelCatalogueId = "123abc"
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "logout as curator"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.clickUserDropdown()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.logout()
+        then:
+        at HomePage
+    }
+
+    def "login as suprevisor"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("supervisor", "supervisor")
+        then:
+        at DashboardPage
+    }
+
+    def "select created data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select("TEST_DATAMODEL_FOUR")
+        then:
+        at DataModelPage
+    }
+
+    def "select activity tab"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        then:
+        true
+    }
 }
