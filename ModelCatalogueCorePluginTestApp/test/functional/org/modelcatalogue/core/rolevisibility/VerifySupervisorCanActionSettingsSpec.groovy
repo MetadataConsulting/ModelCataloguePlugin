@@ -5,6 +5,8 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1485')
 @Title('Verify that user ( role Supervisor) can click on settings menu button and navigate')
@@ -32,6 +34,156 @@ import spock.lang.Title
  - Navigate to top menu and click on the Settings menu button from the top-right menu | Settings menu drop-down appears
  - Select 'Feedbacks' option from the drop down menu | Redirected to Feedbacks page. 'Feedbacks' is displayed as title
 ''')
-
+@Stepwise
 class VerifySupervisorCanActionSettingsSpec extends GebSpec {
+
+    def "Login as supervisor"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("supervisor", "supervisor")
+        then:
+        at DashboardPage
+    }
+
+    def "navigate to DataModelAcl"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.cogMenu()
+        then:
+        at DashboardPage
+
+        when:
+        dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.dataModelPermission()
+        then:
+        at DataModelAclPermissionsPage
+    }
+
+    def "navigate to codeversion"() {
+        when:
+        DataModelAclPermissionsPage dataModelAclPermissionsPage = browser.page DataModelAclPermissionsPage
+        dataModelAclPermissionsPage.nav.cogMenu()
+        then:
+        at DataModelAclPermissionsPage
+
+        when:
+        dataModelAclPermissionsPage = browser.page DataModelAclPermissionsPage
+        dataModelAclPermissionsPage.nav.codeversion()
+        then:
+        at CodeVersionPage
+    }
+
+    /*def "navigate to mappingutility"() {
+        when:
+        CodeVersionPage codeVersionPage = browser.page CodeVersionPage
+        codeVersionPage.nav.cogMenu()
+        then:
+        at CodeVersionPage
+
+        when:
+        codeVersionPage = browser.page CodeVersionPage
+        codeVersionPage.nav.mappingUtility()
+        then:
+        at MappingUtilityPage
+    }*/
+
+    def "navigate to useractivity"() {
+        when:
+        CodeVersionPage codeVersionPage = browser.page CodeVersionPage
+        codeVersionPage.nav.cogMenu()
+        then:
+        at CodeVersionPage
+
+        when:
+        codeVersionPage = browser.page CodeVersionPage
+        codeVersionPage.nav.activity()
+        then:
+        at LastSeenPage
+    }
+
+    def "navigate to reindex catalogue"() {
+        when:
+        LastSeenPage lastSeenPage = browser.page LastSeenPage
+        lastSeenPage.nav.cogMenu()
+        then:
+        at LastSeenPage
+
+        when:
+        lastSeenPage = browser.page LastSeenPage
+        lastSeenPage.nav.reindexCatalogue()
+        then:
+        at ReindexCataloguePage
+    }
+
+    def "navigate to relationshiptypes"() {
+        when:
+        ReindexCataloguePage reindexCataloguePage = browser.page ReindexCataloguePage
+        reindexCataloguePage.nav.cogMenu()
+        then:
+        at ReindexCataloguePage
+
+        when:
+        reindexCataloguePage = browser.page ReindexCataloguePage
+        reindexCataloguePage.nav.relationshipTypes()
+        then:
+        at RelationshipTypesPage
+    }
+
+    def "navigate to datamodelpolicy"() {
+        when:
+        RelationshipTypesPage relationshipTypesPage = browser.page RelationshipTypesPage
+        relationshipTypesPage.nav.cogMenu()
+        then:
+        at RelationshipTypesPage //this page nav is with different name
+
+        when:
+        relationshipTypesPage = browser.page RelationshipTypesPage
+        relationshipTypesPage.nav.dataModelPolicies()
+        then:
+        at DataModelPolicyListPage
+    }
+
+    def "navigate to monitoring"() {
+        when:
+        DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
+        dataModelPolicyListPage.nav.cogMenu()
+        then:
+        at DataModelPolicyListPage
+
+        when:
+        dataModelPolicyListPage = browser.page DataModelPolicyListPage
+        dataModelPolicyListPage.nav.monitoring()
+        then:
+        true
+        //new browser window should open
+    }
+
+    def "navigate to logs"() {
+        when:
+        DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
+        dataModelPolicyListPage.nav.cogMenu()
+        then:
+        at DataModelPolicyListPage
+
+        when:
+        dataModelPolicyListPage = browser.page DataModelPolicyListPage
+        dataModelPolicyListPage.nav.logs()
+        then:
+        at LogsPage
+        //new browser window should open
+    }
+
+    def "navigate to feedback"() {
+        when:
+        DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
+        dataModelPolicyListPage.nav.cogMenu()
+        then:
+        at DataModelPolicyListPage
+
+        when:
+        dataModelPolicyListPage = browser.page DataModelPolicyListPage
+        dataModelPolicyListPage.nav.feedbacks()
+        then:
+        at FeedbackPage
+    }
 }

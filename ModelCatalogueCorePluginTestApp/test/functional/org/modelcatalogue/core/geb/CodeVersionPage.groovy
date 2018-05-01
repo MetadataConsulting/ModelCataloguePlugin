@@ -10,6 +10,7 @@ class CodeVersionPage extends Page {
 
     static content = {
         links { $('.panel-body a') }
+        nav { $('#topmenu', 0).module(NavModule) }
     }
 
     boolean isGithubLinkDisplayed() {
