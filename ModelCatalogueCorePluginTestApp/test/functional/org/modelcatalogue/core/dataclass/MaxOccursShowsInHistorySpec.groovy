@@ -5,6 +5,8 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1475')
 @Title('Max Occurs is showing in History')
@@ -42,6 +44,132 @@ import spock.lang.Title
  - Check that new relationship created is referenced within history. | History is populated with details of new relationship
  - Verify that included in the history is mention of Max occurs created. like the following: Relationship testclass (AA_test 0.0.2) parent of HAEMATOLOGY - LABORATORY RESULTS - AML, ALL, HODGKIN (Cancer Outcomes and Services Dataset 6.0.0) metadata Max Occurs created | Max Occurs is showing in history
 ''')
-
+@Stepwise
 class MaxOccursShowsInHistorySpec extends GebSpec {
+
+    def "Login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("curator", "curator")
+        then:
+        at DashboardPage
+
+        /*when: "delete this one"
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select("TESTING_MODEL")
+        then:
+        at DataModelPage*/
+    }
+
+    def "create a data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = "TESTING_MODEL"
+        createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
+        createDataModelPage.modelCatalogueIdInput = "KDJFKD9349"
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "create data type"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Types")
+        then:
+        at DataTypesPage
+
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.createDataTypeFromPlusButton()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.name = "TESTING_DATATYPE_TWO"
+        createDataTypePage.description = "TESTING_DESCRIPTION"
+        createDataTypePage.buttons.save()
+        then:
+        at DataTypesPage
+    }
+
+    def "create data element"() {
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.treeView.select("Data Elements")
+        then:
+        at DataElementsPage
+
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.createDataElement()
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.name = "TESTING_ELEMENT"
+        createDataElementPage.description = "TESTING_DESCRIPTION"
+        createDataElementPage.searchMore()
+        then:
+        at SearchDataTypePage
+
+        when:
+        SearchDataTypePage searchDataTypePage = browser.page SearchDataTypePage
+        searchDataTypePage.searchDataType("TESTING_DATATYPE")
+        then:
+        at CreateDataElementPage
+
+        when:
+        createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.finish()
+        then:
+        at DataElementsPage
+    }
+
+    def "create data class"() {
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.treeView.select("Data Classes")
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = "TESTING_CLASS"
+        createDataClassPage.description = "TESTING_DESCRIPTION"
+        createDataClassPage.elements()
+        then:
+        at CreateDataClassPage
+
+        when:
+        createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.searchDataElement("TESTING_ELEMENT")
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+    }
+
+    def "select newly created data class"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.findByName("TESTING_CLASS")
+        then:
+        true
+    }
+
 }
