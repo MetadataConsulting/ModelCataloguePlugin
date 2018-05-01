@@ -5,6 +5,8 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1441')
 @Title('Verify that a curator is not able to delete a finalized Data Model after creation')
@@ -19,6 +21,74 @@ import spock.lang.Title
  - If present, Click on the delete option to delete data model. | The delete option is disabled or absent
  - The data model is not deleted
 ''')
-
+@Stepwise
 class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends GebSpec {
+
+    def "Login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("curator", "curator")
+        then:
+        at DashboardPage
+    }
+
+    def "create a data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = "TESTING_MODES"
+        createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
+        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+
+    }
+
+    def "finalize the data model"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.version = "0.0.2"
+        finalizeDataModelPage.versionNote = "Version finalized"
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+
+    def "is delete button present"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        then:
+        !dataModelPage.dropdownMenu.existsDelete(browser)
+    }
 }
