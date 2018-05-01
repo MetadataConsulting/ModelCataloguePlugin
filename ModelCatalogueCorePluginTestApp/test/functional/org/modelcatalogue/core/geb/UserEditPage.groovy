@@ -59,4 +59,16 @@ class UserEditPage extends Page {
             grantUserRole()
         }
     }
+
+    boolean userRoleGranted() {
+        roleUser.@('class').contains("jquery-safari-checkbox-checked")
+    }
+
+    boolean metadatacuratorRoleGranted() {
+        roleMetadataCurator.@('class').contains("jquery-safari-checkbox-checked")
+    }
+
+    boolean supervisorRoleGranted() {
+        roleSupervisor.@('class').contains("jquery-safari-checkbox-checked")
+    }
 }
