@@ -5,6 +5,8 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1507')
 @Title('New Version - Check new data Type added')
@@ -33,6 +35,137 @@ import spock.lang.Title
  - Enter Name, Catalogue ID, Description and select type of data type. Click Save | New Data Type is created.
  - Check that new data type appears under list in Data Types main page ( 'Active Data types as title) | Data Type has been created
 ''')
-
+@Stepwise
 class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
+
+    def "Login as admin"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("curator", "curator")
+        then:
+        at DashboardPage
+    }
+
+    def "create a data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = "TESTING_MODEL_B"
+        createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
+        createDataModelPage.modelCatalogueIdInput = "KDJFKD9349"
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "create a data type"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataTypes()
+        then:
+        at DataTypesPage
+
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.createDataTypeFromGreenPlusButton()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.name = "TESTING_DATATYPE"
+        createDataTypePage.description = "TESTING_DATATYPE_DESCRIPTION"
+        createDataTypePage.buttons.save()
+        then:
+        at DataTypesPage
+    }
+
+    def "navigate back to data model main page"() {
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.treeView.dataModel()
+        then:
+        at DataModelPage
+    }
+
+    def "finalize the data model"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.version = "0.0.2"
+        finalizeDataModelPage.versionNote = "Version finalized"
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+    def "verify data model is finalized"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        then:
+        dataModelPage.isModelFinalized()
+    }
+
+    def "create new version"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdownMenu.createNewVersion()
+        then:
+        at CreateDataModelNewVersionPage
+
+        when:
+        CreateDataModelNewVersionPage createDataModelNewVersionPage = browser.page CreateDataModelNewVersionPage
+        createDataModelNewVersionPage.newVersion = '0.0.3'
+        createDataModelNewVersionPage.createNewVersion()
+        then:
+        at CreatedDataModelNewVersionPage
+
+        when:
+        CreatedDataModelNewVersionPage createdDataModelNewVersionPage = browser.page CreatedDataModelNewVersionPage
+        createdDataModelNewVersionPage.hide()
+        then:
+        at DataModelPage
+    }
+
+    def "navigate to new version created"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.versions()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.selectModelByVersion("0.0.3")
+        then:
+        at DataModelPage
+    }
 }

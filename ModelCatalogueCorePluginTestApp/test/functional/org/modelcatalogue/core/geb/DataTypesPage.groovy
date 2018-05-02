@@ -28,10 +28,10 @@ class DataTypesPage extends Page {
     }
 
     boolean areCreateButtonsVisible() {
-        if ( createDateTypeLink.empty ) {
+        if (createDateTypeLink.empty) {
             return false
         }
-        if ( addItemIcon.empty ) {
+        if (addItemIcon.empty) {
             return false
         }
         true
@@ -43,5 +43,9 @@ class DataTypesPage extends Page {
 
     void createDataTypeFromNavigation() {
         createDateTypeLink.click()
+    }
+
+    void createDataTypeFromGreenPlusButton() {
+        addItemIcon.click()
     }
 }

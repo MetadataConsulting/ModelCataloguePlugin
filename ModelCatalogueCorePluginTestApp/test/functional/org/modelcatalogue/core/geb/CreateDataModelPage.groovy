@@ -53,7 +53,7 @@ class CreateDataModelPage extends Page implements InputUtils {
     }
 
     void setDescription(String value) {
-        fillInput(modelCatalogueIdInput, value)
+        fillInput(descriptionTextArea, value)
     }
 
     void removeTag() {

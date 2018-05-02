@@ -5,12 +5,12 @@ import geb.Module
 class DataModelTreeViewModule extends Module {
 
     static content = {
-        dataModelLink { $('a.catalogue-element-treeview-icon') }
+        dataModelLink { $('span.catalogue-element-treeview-name', 0) }
         item { $('ul .catalogue-element-treeview-name', text: it) }
     }
 
     void dataModel() {
-        dataModelLink.click()
+        dataModelLink.siblings('a.catalogue-element-treeview-icon').click()
     }
 
     void dataClasses() {
