@@ -3,7 +3,7 @@ angular.module('mc.core.ui.states.dataModels', ['mc.core.ui.states.controllers.P
   ($stateProvider) ->
 
     $stateProvider.state 'dataModels', {
-      url: '/dataModels?type&status&q'
+      url: '/dataModels?type&status&q&noRedirectToNewDashboard'
 
       views:
         "":
