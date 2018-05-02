@@ -31,7 +31,7 @@ import org.modelcatalogue.core.geb.*
  - On the API key page, Press the 'Regenerate API Key' button and check that the API key either changes or is generated | API changes
 ''')
 
-class VerifyRegularUserCanSeeApiKey extends GebSpec {
+class VerifyRegularUserCanSeeApiKeySpec extends GebSpec {
 
     def "login as supervisor"() {
         when:
