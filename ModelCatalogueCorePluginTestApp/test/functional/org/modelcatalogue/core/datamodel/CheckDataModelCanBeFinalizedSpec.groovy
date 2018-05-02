@@ -5,8 +5,10 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import org.modelcatalogue.core.geb.*
 
-@Issue('https://metadata.atlassian.net/browse/MET-1604')
+@Issue('https://metadata.atlassian.net/browse/MET-1634')
 @Title('Check that user is able to finalize a data model')
 @Narrative('''
  - Login to Metadata Exchange As curator | Login successful
@@ -19,6 +21,72 @@ import spock.lang.Title
  - Verify that data model is finalized by Selecting Data Classes from the tree navigation panel on the right | Taken to the 'Active Data Classes' page
  - Verify that you cannot add a new data class to the data model | No green plus button is present to add new data class
 ''')
-
+@Stepwise
 class CheckDataModelCanBeFinalizedSpec extends GebSpec {
+
+    def "Login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("curator", "curator")
+        then:
+        at DashboardPage
+    }
+
+    def "create a data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = "TESTING_MODEL_ONE"
+        createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
+        createDataModelPage.modelCatalogueIdInput = "KDJFKD9349"
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "finalize the data model"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.version = "0.0.2"
+        finalizeDataModelPage.versionNote = "Version finalized"
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+    def "verify user cannot add new class"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        then:
+        !dataClassesPage.isAddItemIconVisible()
+    }
 }
