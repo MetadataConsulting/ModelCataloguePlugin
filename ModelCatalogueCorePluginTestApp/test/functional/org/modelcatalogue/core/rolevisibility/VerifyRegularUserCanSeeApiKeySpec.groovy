@@ -6,6 +6,7 @@ import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
 import org.modelcatalogue.core.geb.*
+import spock.lang.Stepwise
 
 @Issue('https://metadata.atlassian.net/browse/MET-1563')
 @Title('Verify that regular user can see api key')
@@ -30,7 +31,7 @@ import org.modelcatalogue.core.geb.*
  - Select the 'API Key' option visible on the drop down list | Redirected to API key page. 'Api Key' is visible as title.
  - On the API key page, Press the 'Regenerate API Key' button and check that the API key either changes or is generated | API changes
 ''')
-
+@Stepwise
 class VerifyRegularUserCanSeeApiKeySpec extends GebSpec {
 
     def "login as supervisor"() {
