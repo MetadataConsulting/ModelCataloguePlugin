@@ -1,15 +1,69 @@
 <div class="row">
   <div class="col-md-12">
     <div class="row">
+      <div class="col-lg-12 col-sm-12 col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="input-group input-group-lg">
+              <span class="input-group-addon"><span class="fa fa-search"></span> </span>
+              <input type="text" placeholder="{{'Search ' + getCurrentType()}}" class="form-control"
+                     ng-model="q" ng-model-options="{debounce: 1500}" focus-me="true" ng-disabled="loading"id="data-model-search-box" id="data-model-search-box">
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false" id="status-selector">
+                  {{getCurrentStatus()}} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                  <li ng-class="{'active' : getCurrentStatus() == 'All'}">
+                    <a ng-click="changeStatus()" id="status-selector-all">All</a>
+                  </li>
+                  <li ng-class="{'active' : getCurrentStatus() == 'Draft'}">
+                    <a ng-click="changeStatus('draft')" id="status-selector-draft">Draft</a></li>
+                  <li ng-class="{'active' : getCurrentStatus() == 'Finalized'}">
+                    <a ng-click="changeStatus('finalized')" id="status-selector-finalized">Finalized</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
       <div class="col-md-12">
         <div class="pull-right data-model-create-buttons">
           <contextual-actions role="data-models" no-colors="true" size="sm"></contextual-actions>
         </div>
+        <ul class="nav nav-tabs" role="tablist">
+          <li id="my-models" ng-class="{'active' : getCurrentType() == 'My Models'}" role="presentation">
+            <a href ng-click="showMyModels()">
+              My Models
+            </a>
+          </li>
+          <li ng-class="{'active' : getCurrentType() == 'Catalogue Models'}" role="presentation">
+            <a href ng-click="showAllModels()">Catalogue Models</a>
+          </li>
+          <!--<li ng-class="{'active' : getCurrentType() == 'Catalogue Elements'}" role="presentation">-->
+          <!--<a href ng-click="showAllElements()">Catalogue Elements</a>-->
+          <!--</li>-->
+        </ul>
         <div class="leave-10-before"></div>
         <div ng-if="showPreload()">
           <div class="jumbotron">
-            <h2>Loading ...</h2>
-            <script type="text/javascript">window.location.href = '/dashboard/index';</script>
+            <h1>Welcome to Metadata Registry</h1>
+            <p>
+              There are no data models yet. Start experimenting with one of the sample data models, import your existing
+              model from one of the supported formats or create brand new data model from the scratch.
+            </p>
+            <p>
+              <button class="btn btn-primary btn-lg" ng-click="importSample()"><span class="fa fa-book"></span> Import
+                Sample
+              </button>
+              <button class="btn btn-success btn-lg" ng-click="createElement()"><span class="fa fa-plus-circle"></span>
+                Create New
+              </button>
+            </p>
           </div>
         </div>
 
