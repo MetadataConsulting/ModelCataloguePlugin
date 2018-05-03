@@ -23,6 +23,21 @@ class Lists {
     }
 
     /**
+     * Wraps a ListWithTotalAndType to ListWrapper using given params, base and name, and time taken
+     *
+     * @param params    url parameters used to determine pagination and sort settings
+     * @param base      base url of the list returned
+     * @param list      the list with count and type to be wrapped
+     * @param timeTaken the time taken for the list to be calculated
+     * @return given list as list wrapper
+     */
+    static <T> ListWrapper<T> wrapWithTime(Map params, String base, ListWithTotalAndType<T> list, String timeTaken){
+        if (list instanceof ListWrapper) return list
+        ListWrapper<T> result = ListWithTotalAndTypeWrapper.createWithTime(params, base, list, timeTaken)
+        result
+    }
+
+    /**
      * Wraps a ListWithTotal to ListWrapper using given params, base and name.
      *
      * @param params    url parameters used to determine pagination and sort settings

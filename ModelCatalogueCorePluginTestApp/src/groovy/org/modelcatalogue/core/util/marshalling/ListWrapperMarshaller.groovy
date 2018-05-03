@@ -25,6 +25,7 @@ abstract class ListWrapperMarshaller extends AbstractMarshaller {
         def next =  elements.next
         def sort =  elements.sort
         def order =  elements.order
+        def timeTaken = elements.timeTaken
         [
              base: base,
              itemType: itemType,
@@ -37,7 +38,8 @@ abstract class ListWrapperMarshaller extends AbstractMarshaller {
              previous: previous,
              next: next,
              sort: sort,
-             order: order
+             order: order,
+             timeTaken: timeTaken
         ]
     }
 

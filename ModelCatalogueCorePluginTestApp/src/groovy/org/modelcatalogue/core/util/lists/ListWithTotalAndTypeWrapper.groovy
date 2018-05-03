@@ -14,6 +14,8 @@ class ListWithTotalAndTypeWrapper<T> implements ListWrapper<T> {
     String next
     String previous
 
+    String timeTaken = ''
+
     @Delegate ListWithTotalAndType<T> list = null
 
     /**
@@ -28,6 +30,12 @@ class ListWithTotalAndTypeWrapper<T> implements ListWrapper<T> {
         new ListWithTotalAndTypeWrapper<T>(list, base, params)
     }
 
+    public static <T> ListWrapper<T> createWithTime(Map params, String base, ListWithTotalAndType<T> list, String timeTaken){
+        ListWrapper<T> result = new ListWithTotalAndTypeWrapper<T>(list, base, params)
+        result.timeTaken = timeTaken
+        return result
+
+    }
     private ListWithTotalAndTypeWrapper(ListWithTotalAndType<T> list, String base, Map<String, Object> params) {
         this.list = list
 

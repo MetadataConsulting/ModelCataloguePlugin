@@ -9,5 +9,10 @@ interface ListWrapper<T> extends ListWithTotalAndType<T> {
     String getOrder()
     int getPage() // max
     int getOffset()
+    /**
+     * String to print representing time taken for results to be calculated
+     * @return
+     */
+    String getTimeTaken()
 
 }

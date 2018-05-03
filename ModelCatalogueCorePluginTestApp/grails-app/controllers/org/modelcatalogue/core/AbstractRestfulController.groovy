@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import groovy.transform.CompileDynamic
 import org.modelcatalogue.core.security.MetadataRoles
 
@@ -60,8 +62,13 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
         ParamArgs paramArgs = instantiateParamArgs(max)
         SearchParams searchParams = SearchParams.of(params, paramArgs)
+
+        Date startSearchTime = new Date()
         ListWithTotalAndType<T> results = modelCatalogueSearchService.search(resource, searchParams)
-        respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(search, 'UTF-8')}", results)
+        Date endSearchTime = new Date()
+        TimeDuration td = TimeCategory.minus(endSearchTime, startSearchTime)
+
+        respond Lists.wrapWithTime(params, "/${resourceName}/search?search=${URLEncoder.encode(search, 'UTF-8')}", results, td.toString())
     }
 
     @Override
