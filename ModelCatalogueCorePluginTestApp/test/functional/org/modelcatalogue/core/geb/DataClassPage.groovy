@@ -16,6 +16,9 @@ class DataClassPage extends Page {
         formMetadataLink { $('span.btn.btn-link btn-sm ng-binding') }
         tabs { $('ul.nav.nav-tabs a', text: it) }
         parentAddButton { $('span.fa.fa-plus-circle') }
+        dataClassMenu { $('#role_item_catalogue-element-menu-item-link') }
+        dataClassMenuDropdown { $('#role_item_catalogue-element-menu-item ul.dropdown-menu li') }
+        historyList(required: false, wait: true) { $('div#history-changes tbody tr') }
     }
 
     void edit() {
@@ -40,6 +43,18 @@ class DataClassPage extends Page {
 
     void addParent() {
         parentAddButton[2].click()
+    }
+
+    void selectDataClassDropdown() {
+        dataClassMenu.click()
+    }
+
+    void selectCreateRelationship() {
+        $('a#create-new-relationship-menu-item-link').click()
+    }
+
+    String historyChange(int row) {
+        historyList[row].$('td', 3).text()
     }
 
 }

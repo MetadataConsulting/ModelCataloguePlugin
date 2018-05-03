@@ -53,12 +53,6 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
         loginPage.login("curator", "curator")
         then:
         at DashboardPage
-
-        /*when: "delete this one"
-        DashboardPage dashboardPage = browser.page DashboardPage
-        dashboardPage.select("TESTING_MODEL")
-        then:
-        at DataModelPage*/
     }
 
     def "create a data model"() {
@@ -70,7 +64,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         when:
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = "TESTING_MODEL"
+        createDataModelPage.name = "TESTING_MODEL_ONE"
         createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
         createDataModelPage.modelCatalogueIdInput = "KDJFKD9349"
         createDataModelPage.submit()
@@ -81,7 +75,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
     def "create data type"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
-        dataModelPage.treeView.select("Data Types")
+        dataModelPage.treeView.dataTypes()
         then:
         at DataTypesPage
 
@@ -93,7 +87,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         when:
         CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
-        createDataTypePage.name = "TESTING_DATATYPE_TWO"
+        createDataTypePage.name = "TESTING_DATATYPE"
         createDataTypePage.description = "TESTING_DESCRIPTION"
         createDataTypePage.buttons.save()
         then:
@@ -103,7 +97,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
     def "create data element"() {
         when:
         DataTypesPage dataTypesPage = browser.page DataTypesPage
-        dataTypesPage.treeView.select("Data Elements")
+        dataTypesPage.treeView.dataElements()
         then:
         at DataElementsPage
 
@@ -137,7 +131,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
     def "create data class"() {
         when:
         DataElementsPage dataElementsPage = browser.page DataElementsPage
-        dataElementsPage.treeView.select("Data Classes")
+        dataElementsPage.treeView.dataClasses()
         then:
         at DataClassesPage
 
@@ -169,7 +163,92 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         dataClassesPage.findByName("TESTING_CLASS")
         then:
-        true
+        at DataClassPage
+    }
+
+    def "select create relationship option"() {
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+        dataClassPage.selectDataClassDropdown()
+        then:
+        at DataClassPage
+
+        when:
+        dataClassPage = browser.page DataClassPage
+        dataClassPage.selectCreateRelationship()
+        then:
+        at CreateRelationshipPage
+
+        when:
+        CreateRelationshipPage createRelationshipPage = browser.page CreateRelationshipPage
+        createRelationshipPage.selectRelationshipType("parent of")
+        createRelationshipPage.searchMore()
+        then:
+        at SearchDataClassPage
+    }
+
+    def "create relationship"() {
+        when:
+        SearchDataClassPage searchDataClassPage = browser.page SearchDataClassPage
+        searchDataClassPage.addImport()
+        then:
+        at AddDataModelImportPage
+
+        when:
+        AddDataModelImportPage addDataModelImportPage = browser.page AddDataModelImportPage
+        addDataModelImportPage.searchMore()
+        then:
+        at SearchDataModelPage
+
+        when:
+        SearchDataModelPage searchDataModelPage = browser.page SearchDataModelPage
+        searchDataModelPage.searchDataModel("Cancer Model")
+        then:
+        at AddDataModelImportPage
+
+        when:
+        addDataModelImportPage = browser.page AddDataModelImportPage
+        addDataModelImportPage.importDataModel()
+        then:
+        at SearchDataClassPage
+
+        when:
+        searchDataClassPage = browser.page SearchDataClassPage
+        searchDataClassPage.searchDataClass("Cancer Model")
+        then:
+        at CreateRelationshipPage
+    }
+
+    def "finish creating relationship"() {
+        when:
+        CreateRelationshipPage createRelationshipPage = browser.page CreateRelationshipPage
+        createRelationshipPage.openMetadata()
+        then:
+        at CreateRelationshipPage
+
+        when:
+        createRelationshipPage = browser.page CreateRelationshipPage
+        createRelationshipPage.openOccuranceNavigator()
+        createRelationshipPage.maxOccurance = 10
+        then:
+        at CreateRelationshipPage
+
+        when:
+        createRelationshipPage = browser.page CreateRelationshipPage
+        createRelationshipPage.createRelationship()
+        driver.navigate().refresh()
+        then:
+        at DataClassPage
+    }
+
+    def "verify created relationship is show in history section"() {
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+
+        String text = dataClassPage.historyChange(0)
+        then:
+        assert text.contains("Cancer Model")
+        assert text.contains("Max Occurs")
     }
 
 }
