@@ -15,7 +15,9 @@ module.config ['messagesProvider', (messagesProvider)->
                 <span class="input-group-addon"><span class="fa fa-fw fa-search"></span></span>
                 <input id="value" class="form-control" ng-model="query" placeholder="Search for #{names.getNaturalName(names.getPropertyNameFromType(args.resource ? 'catalogueElement'))}" ng-model-options="{debounce: 500}" focus-me="true" autofocus='true'>
                 <div class="input-group-addon with-pointer" ng-click='$dismiss()'><span class='fa fa-fw fa-close'></span></div>
-              </div>
+              </div><p/>
+              <p ng-if="list.timeTaken"><i>Time taken for result: {{list.timeTaken}}</i></p>
+              <p ng-if="list.total"><i>Total results: {{list.total}}</i></p>
               <p class='help-block' ng-if='currentDataModel'>
                 <span ng-if="!searchOptions.globalSearch">
                   Search Imports? <input type="checkbox" ng-model="searchOptions.searchImports"/><br/>
