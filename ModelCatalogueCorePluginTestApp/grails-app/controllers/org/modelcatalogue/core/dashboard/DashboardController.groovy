@@ -1,11 +1,14 @@
 package org.modelcatalogue.core.dashboard
 
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.SortQuery
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.springframework.context.MessageSource
 
 import javax.annotation.PostConstruct
@@ -38,9 +41,16 @@ class DashboardController {
         SortQuery sortQuery = cmd.toSortQuery()
         PaginationQuery paginationQuery = cmd.toPaginationQuery()
 
+        Date startSearchTime = new Date()
+
         CatalogueElementSearchResult catalogueElementSearchResult =
-                dashboardService.search(query, sortQuery, paginationQuery)
+            dashboardService.search(query, sortQuery, paginationQuery)
+        Date endSearchTime = new Date()
+        TimeDuration td = TimeCategory.minus(endSearchTime, startSearchTime)
+
+
         List catalogueElementList = catalogueElementSearchResult?.viewModels ?: []
+
         List<IdName> dataModelList = dashboardService.findAllDataModel()
         int total = catalogueElementSearchResult?.total ?: 0
         [
@@ -57,7 +67,8 @@ class DashboardController {
                 total: total,
                 serverUrl: serverUrl,
                 dataModelId: query.dataModelId,
-                searchCatalogueElementScopes: query.searchCatalogueElementScopeList
+                searchCatalogueElementScopes: query.searchCatalogueElementScopeList,
+                timeTaken: td.toString()
         ]
     }
 

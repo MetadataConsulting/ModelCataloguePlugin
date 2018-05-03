@@ -127,6 +127,7 @@ function getSelectValue(selectId) {
         </g:form>
     </div><!-- /.panel-heading -->
 </div><!-- /.panel-default -->
+<p>Time taken for search: ${timeTaken}</p>
 
 <g:render template="/templates/flashmessage" />
 <g:render template="/templates/flasherror" />
