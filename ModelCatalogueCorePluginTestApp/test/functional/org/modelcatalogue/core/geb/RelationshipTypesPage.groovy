@@ -9,6 +9,6 @@ class RelationshipTypesPage extends Page {
     static at = { title == 'Relationship Types' }
 
     static content = {
-        nav { $('#topmenu', 0).module(NavModule) }
+        nav { $('div.navbar-collapse', 0).module(NavModuleAdmin) }
     }
 }

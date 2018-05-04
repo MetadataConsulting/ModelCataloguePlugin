@@ -132,9 +132,9 @@ class VerifySupervisorCanActionSettingsSpec extends GebSpec {
     def "navigate to datamodelpolicy"() {
         when:
         RelationshipTypesPage relationshipTypesPage = browser.page RelationshipTypesPage
-        relationshipTypesPage.nav.cogMenu()
+        relationshipTypesPage.nav.adminMenu()
         then:
-        at RelationshipTypesPage //this page nav is with different name
+        at RelationshipTypesPage
 
         when:
         relationshipTypesPage = browser.page RelationshipTypesPage
@@ -146,43 +146,50 @@ class VerifySupervisorCanActionSettingsSpec extends GebSpec {
     def "navigate to monitoring"() {
         when:
         DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
-        dataModelPolicyListPage.nav.cogMenu()
+        dataModelPolicyListPage.nav.adminMenu()
         then:
         at DataModelPolicyListPage
 
         when:
         dataModelPolicyListPage = browser.page DataModelPolicyListPage
+        String winHandleBefore = driver.getWindowHandle();
         dataModelPolicyListPage.nav.monitoring()
+        for (String winHandle : driver.getWindowHandles()) {
+            driver.switchTo().window(winHandle)
+        }
+        driver.close()
+        driver.switchTo().window(winHandleBefore);
         then:
-        true
-        //new browser window should open
+        at DataModelPolicyListPage
     }
 
     def "navigate to logs"() {
         when:
         DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
-        dataModelPolicyListPage.nav.cogMenu()
+        dataModelPolicyListPage.nav.adminMenu()
         then:
         at DataModelPolicyListPage
 
         when:
         dataModelPolicyListPage = browser.page DataModelPolicyListPage
         dataModelPolicyListPage.nav.logs()
+        for (String winHandle : driver.getWindowHandles()) {
+            driver.switchTo().window(winHandle)
+        }
         then:
         at LogsPage
-        //new browser window should open
     }
 
     def "navigate to feedback"() {
         when:
-        DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
-        dataModelPolicyListPage.nav.cogMenu()
+        LogsPage logsPage = browser.page LogsPage
+        logsPage.nav.cogMenu()
         then:
-        at DataModelPolicyListPage
+        at LogsPage
 
         when:
-        dataModelPolicyListPage = browser.page DataModelPolicyListPage
-        dataModelPolicyListPage.nav.feedbacks()
+        logsPage = browser.page LogsPage
+        logsPage.nav.feedbacks()
         then:
         at FeedbackPage
     }
