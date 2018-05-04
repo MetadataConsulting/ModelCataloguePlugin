@@ -7,6 +7,7 @@ import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
+import spock.lang.Shared
 
 @Issue('https://metadata.atlassian.net/browse/MET-1526')
 @Title('Examine Data Model Policy Tag')
@@ -26,6 +27,11 @@ import org.modelcatalogue.core.geb.*
 @Stepwise
 class CheckDataModelPolicyTagSpec extends GebSpec {
 
+    @Shared
+    String dataModelName = "NEW_TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+
     def "Login as admin"() {
         when:
         LoginPage loginPage = to LoginPage
@@ -43,9 +49,9 @@ class CheckDataModelPolicyTagSpec extends GebSpec {
 
         when:
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = "TESTING_MODEL_ON"
-        createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
-        createDataModelPage.modelCatalogueIdInput = "KDJFKD9349"
+        createDataModelPage.name = dataModelName
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
         createDataModelPage.submit()
         then:
         at DataModelPage
@@ -53,7 +59,6 @@ class CheckDataModelPolicyTagSpec extends GebSpec {
 
     def "verify policy text has no version number"() {
         given:
-        // Store the current window handle
         String winHandleBefore = driver.getWindowHandle();
 
         when:
