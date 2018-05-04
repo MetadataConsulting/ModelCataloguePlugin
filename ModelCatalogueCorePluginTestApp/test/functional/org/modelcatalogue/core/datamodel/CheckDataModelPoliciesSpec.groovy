@@ -7,6 +7,7 @@ import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
+import spock.lang.Shared
 
 @Issue('https://metadata.atlassian.net/browse/MET-1604')
 @Title('Data Model is created with selected policies')
@@ -18,6 +19,11 @@ import org.modelcatalogue.core.geb.*
 ''')
 @Stepwise
 class CheckDataModelPoliciesSpec extends GebSpec {
+
+    @Shared
+    String dataModelName = "NEW_TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
 
     def "Login as curator"() {
         when:
@@ -36,9 +42,9 @@ class CheckDataModelPoliciesSpec extends GebSpec {
 
         when:
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = "AESTING_MODEL"
-        createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
-        createDataModelPage.modelCatalogueIdInput = "KDJFKD9349"
+        createDataModelPage.name = dataModelName
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
         createDataModelPage.submit()
         then:
         at DataModelPage
