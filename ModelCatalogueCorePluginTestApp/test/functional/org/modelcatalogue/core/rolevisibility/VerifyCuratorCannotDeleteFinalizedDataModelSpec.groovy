@@ -6,6 +6,7 @@ import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Stepwise
+import spock.lang.Shared
 import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1441')
@@ -24,6 +25,15 @@ import org.modelcatalogue.core.geb.*
 @Stepwise
 class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends GebSpec {
 
+    @Shared
+    String dataModelName = "TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
+    String dataModelVersion = "0.0.2"
+    @Shared
+    String dataModelVersionNote = "Version finalized"
+
     def "Login as curator"() {
         when:
         LoginPage loginPage = to LoginPage
@@ -41,8 +51,8 @@ class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends GebSpec {
 
         when:
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = "TESTING_MODES"
-        createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
+        createDataModelPage.name = dataModelName
+        createDataModelPage.description = dataModelDescription
         createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
         createDataModelPage.submit()
         then:
@@ -65,8 +75,8 @@ class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends GebSpec {
 
         when:
         FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
-        finalizeDataModelPage.version = "0.0.2"
-        finalizeDataModelPage.versionNote = "Version finalized"
+        finalizeDataModelPage.version = dataModelVersion
+        finalizeDataModelPage.versionNote = dataModelVersionNote
         finalizeDataModelPage.submit()
         then:
         at FinalizedDataModelPage
