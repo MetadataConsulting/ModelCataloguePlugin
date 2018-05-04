@@ -10,10 +10,15 @@ class FinalizeDataModelPage extends Page implements InputUtils {
     static content = {
         versionNoteTextarea { $('textarea#revisionNotes') }
         finalizeButton { $('a#role_modal_modal-finalize-data-modalBtn', 0) }
+        version { $('#semanticVersion') }
     }
 
     void setVersionNote(String value) {
         fillInput(versionNoteTextarea, value)
+    }
+
+    void setVersion(String value) {
+        version.value(value)
     }
 
     void submit() {
