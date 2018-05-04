@@ -7,6 +7,7 @@ import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
+import spock.lang.Shared
 
 @Issue('https://metadata.atlassian.net/browse/MET-1507')
 @Title('New Version - Check new data Type added')
@@ -38,6 +39,21 @@ import org.modelcatalogue.core.geb.*
 @Stepwise
 class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
 
+    @Shared
+    String dataModelName = "TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
+    String dataTypeName = "TESTING_DATATYPE"
+    @Shared
+    String dataTypeDescription = "TESTING_DATATYPE_DESCRIPTION"
+    @Shared
+    String dataModelVersion = "0.0.2"
+    @Shared
+    String dataModelVersionNote = "FINALIZING_DATAMODEL"
+    @Shared
+    String dataModelNewVersion = "0.0.3"
+
     def "Login as admin"() {
         when:
         LoginPage loginPage = to LoginPage
@@ -55,9 +71,9 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
 
         when:
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = "TESTING_MODEL_B"
-        createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
-        createDataModelPage.modelCatalogueIdInput = "KDJFKD9349"
+        createDataModelPage.name = dataModelName
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
         createDataModelPage.submit()
         then:
         at DataModelPage
@@ -78,8 +94,8 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
 
         when:
         CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
-        createDataTypePage.name = "TESTING_DATATYPE"
-        createDataTypePage.description = "TESTING_DATATYPE_DESCRIPTION"
+        createDataTypePage.name = dataTypeName
+        createDataTypePage.description = dataTypeDescription
         createDataTypePage.buttons.save()
         then:
         at DataTypesPage
@@ -108,8 +124,8 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
 
         when:
         FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
-        finalizeDataModelPage.version = "0.0.2"
-        finalizeDataModelPage.versionNote = "Version finalized"
+        finalizeDataModelPage.version = dataModelVersion
+        finalizeDataModelPage.versionNote = dataModelVersionNote
         finalizeDataModelPage.submit()
         then:
         at FinalizedDataModelPage
@@ -125,7 +141,8 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         then:
-        dataModelPage.isModelFinalized()
+        true
+        //has to be done from activity tab
     }
 
     def "create new version"() {
@@ -143,7 +160,7 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
 
         when:
         CreateDataModelNewVersionPage createDataModelNewVersionPage = browser.page CreateDataModelNewVersionPage
-        createDataModelNewVersionPage.newVersion = '0.0.3'
+        createDataModelNewVersionPage.newVersion = dataModelNewVersion
         createDataModelNewVersionPage.createNewVersion()
         then:
         at CreatedDataModelNewVersionPage
@@ -164,7 +181,7 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
 
         when:
         dataModelPage = browser.page DataModelPage
-        dataModelPage.selectModelByVersion("0.0.3")
+        dataModelPage.selectModelByVersion(dataModelNewVersion)
         then:
         at DataModelPage
     }

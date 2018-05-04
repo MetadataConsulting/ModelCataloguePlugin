@@ -20,7 +20,7 @@ class FinalizeDataModelPage extends Page implements InputUtils {
     void setVersion(String value) {
         version.value(value)
     }
-    
+
     void submit() {
         finalizeButton.click()
         sleep(3_000)

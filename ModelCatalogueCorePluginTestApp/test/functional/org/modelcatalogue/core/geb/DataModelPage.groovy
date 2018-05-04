@@ -75,10 +75,6 @@ class DataModelPage extends Page {
         rightSideTitleH3.text()
     }
 
-    boolean isModelFinalized() {
-        $('small', text: contains('Version finalized')).displayed
-    }
-
     void selectModelByVersion(String version) {
         rows.$('a', text: version).click()
     }

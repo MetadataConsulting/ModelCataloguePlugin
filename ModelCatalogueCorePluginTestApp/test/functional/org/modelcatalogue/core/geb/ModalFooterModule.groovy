@@ -13,11 +13,13 @@ class ModalFooterModule extends Module {
     void cancel() {
         cancelLink.click()
     }
+
     void saveAndCreateAnother() {
         saveAndCreateAnotherLink.click()
     }
 
     void save() {
         saveLink.click()
+        sleep(2000)
     }
 }
