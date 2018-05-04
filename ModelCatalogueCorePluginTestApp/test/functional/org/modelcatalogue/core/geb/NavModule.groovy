@@ -126,4 +126,24 @@ class NavModule extends Module {
     void createDataModel() {
         createDataModelLink.click()
     }
+
+    Integer userdropdownLength() {
+        cogMenuLink.siblings('ul').$('li').size()
+    }
+
+    boolean codeVersionIsVisible() {
+        codeversionLink.displayed
+    }
+
+    boolean relationshiptypeIsVisible() {
+        relationshipTypesLink.displayed
+    }
+
+    boolean datamodelpolicyIsVisible() {
+        dataModelPolicyLink.displayed
+    }
+
+    boolean feedbacksIsVisible() {
+        feedbacksLink.displayed
+    }
 }
