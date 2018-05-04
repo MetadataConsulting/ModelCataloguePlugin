@@ -7,6 +7,7 @@ import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
+import spock.lang.Shared
 
 @Issue('https://metadata.atlassian.net/browse/MET-1475')
 @Title('Max Occurs is showing in History')
@@ -47,6 +48,25 @@ import org.modelcatalogue.core.geb.*
 @Stepwise
 class MaxOccursShowsInHistorySpec extends GebSpec {
 
+    @Shared
+    String dataModelName = "TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
+    String dataTypeName = "TESTING_DATATYPE"
+    @Shared
+    String dataTypeDescription = "TESTING_DATATYPE_DESCRIPTION"
+    @Shared
+    String dataElementName = "TESTING_DATAELEMENT"
+    @Shared
+    String dataElementDescription = "TESTING_DATAELEMENT_DESCRIPTION"
+    @Shared
+    String dataClassName = "TESTING_DATACLASS"
+    @Shared
+    String dataClassDescription = "TESTING_DATACLASS_DESCRIPTION"
+    @Shared
+    String dataModelSearchName = "Cancer Model"
+
     def "Login as curator"() {
         when:
         LoginPage loginPage = to LoginPage
@@ -64,9 +84,9 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         when:
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = "TESTING_MODEL_ONE"
-        createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
-        createDataModelPage.modelCatalogueIdInput = "KDJFKD9349"
+        createDataModelPage.name = dataModelName
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
         createDataModelPage.submit()
         then:
         at DataModelPage
@@ -87,8 +107,8 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         when:
         CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
-        createDataTypePage.name = "TESTING_DATATYPE"
-        createDataTypePage.description = "TESTING_DESCRIPTION"
+        createDataTypePage.name = dataTypeName
+        createDataTypePage.description = dataTypeDescription
         createDataTypePage.buttons.save()
         then:
         at DataTypesPage
@@ -109,15 +129,15 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         when:
         CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
-        createDataElementPage.name = "TESTING_ELEMENT"
-        createDataElementPage.description = "TESTING_DESCRIPTION"
+        createDataElementPage.name = dataElementName
+        createDataElementPage.description = dataElementDescription
         createDataElementPage.searchMore()
         then:
         at SearchDataTypePage
 
         when:
         SearchDataTypePage searchDataTypePage = browser.page SearchDataTypePage
-        searchDataTypePage.searchDataType("TESTING_DATATYPE")
+        searchDataTypePage.searchDataType(dataTypeName)
         then:
         at CreateDataElementPage
 
@@ -143,15 +163,15 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         when:
         CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.name = "TESTING_CLASS"
-        createDataClassPage.description = "TESTING_DESCRIPTION"
+        createDataClassPage.name = dataClassName
+        createDataClassPage.description = dataClassDescription
         createDataClassPage.elements()
         then:
         at CreateDataClassPage
 
         when:
         createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.searchDataElement("TESTING_ELEMENT")
+        createDataClassPage.searchDataElement(dataElementName)
         createDataClassPage.finish()
         createDataClassPage.exit()
         then:
@@ -161,7 +181,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
     def "select newly created data class"() {
         when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
-        dataClassesPage.findByName("TESTING_CLASS")
+        dataClassesPage.findByName(dataClassName)
         then:
         at DataClassPage
     }
@@ -202,7 +222,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         when:
         SearchDataModelPage searchDataModelPage = browser.page SearchDataModelPage
-        searchDataModelPage.searchDataModel("Cancer Model")
+        searchDataModelPage.searchDataModel(dataModelSearchName)
         then:
         at AddDataModelImportPage
 
@@ -214,7 +234,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         when:
         searchDataClassPage = browser.page SearchDataClassPage
-        searchDataClassPage.searchDataClass("Cancer Model")
+        searchDataClassPage.searchDataClass(dataModelSearchName)
         then:
         at CreateRelationshipPage
     }
@@ -247,7 +267,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         String text = dataClassPage.historyChange(0)
         then:
-        assert text.contains("Cancer Model")
+        assert text.contains(dataModelSearchName)
         assert text.contains("Max Occurs")
     }
 
