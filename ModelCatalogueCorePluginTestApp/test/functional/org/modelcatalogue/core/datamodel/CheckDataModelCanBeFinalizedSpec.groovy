@@ -7,6 +7,7 @@ import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
+import spock.lang.Shared
 
 @Issue('https://metadata.atlassian.net/browse/MET-1634')
 @Title('Check that user is able to finalize a data model')
@@ -23,6 +24,15 @@ import org.modelcatalogue.core.geb.*
 ''')
 @Stepwise
 class CheckDataModelCanBeFinalizedSpec extends GebSpec {
+
+    @Shared
+    String dataModelName = "NEW_TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
+    String dataModelVersion = "0.0.2"
+    @Shared
+    String dataModelVersionDescription = "DATAMODEL_FINALIZED"
 
     def "Login as curator"() {
         when:
@@ -41,9 +51,9 @@ class CheckDataModelCanBeFinalizedSpec extends GebSpec {
 
         when:
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = "TESTING_MODEL_ONE"
-        createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
-        createDataModelPage.modelCatalogueIdInput = "KDJFKD9349"
+        createDataModelPage.name = dataModelName
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
         createDataModelPage.submit()
         then:
         at DataModelPage
@@ -64,8 +74,8 @@ class CheckDataModelCanBeFinalizedSpec extends GebSpec {
 
         when:
         FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
-        finalizeDataModelPage.version = "0.0.2"
-        finalizeDataModelPage.versionNote = "Version finalized"
+        finalizeDataModelPage.version = dataModelVersion
+        finalizeDataModelPage.versionNote = dataModelVersionDescription
         finalizeDataModelPage.submit()
         then:
         at FinalizedDataModelPage
