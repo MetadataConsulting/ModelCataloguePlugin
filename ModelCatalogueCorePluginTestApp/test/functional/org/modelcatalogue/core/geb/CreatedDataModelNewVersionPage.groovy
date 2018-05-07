@@ -13,6 +13,7 @@ class CreatedDataModelNewVersionPage extends Page implements InputUtils {
 
     void hide() {
         hideButton.click()
+        sleep(2000)
     }
 
 }

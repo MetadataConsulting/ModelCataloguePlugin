@@ -53,11 +53,15 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
     String dataModelVersionNote = "FINALIZING_DATAMODEL"
     @Shared
     String dataModelNewVersion = "0.0.3"
+    @Shared
+    String dataTypeTwoName = "TESTING_DATATYPE_TWO"
+    @Shared
+    String dataTypeTwoDescription = "TESTING_DATATYPE_TWO_DESCRIPTION"
 
     def "Login as admin"() {
         when:
         LoginPage loginPage = to LoginPage
-        loginPage.login("curator", "curator")
+        loginPage.login("admin", "admin")
         then:
         at DashboardPage
     }
@@ -142,7 +146,7 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
         DataModelPage dataModelPage = browser.page DataModelPage
         then:
         true
-        //has to be done from activity tab
+        dataModelPage.isDataModelFinalized()
     }
 
     def "create new version"() {
@@ -177,12 +181,42 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.versions()
         then:
-        at DataModelPage
+        at VersionsPage
 
         when:
-        dataModelPage = browser.page DataModelPage
-        dataModelPage.selectModelByVersion(dataModelNewVersion)
+        VersionsPage versionsPage = browser.page VersionsPage
+        driver.navigate().refresh()
+        versionsPage.selectModelByVersion(dataModelNewVersion)
         then:
         at DataModelPage
+    }
+
+    def "create new data type"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataTypes()
+        then:
+        at DataTypesPage
+
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.createDataTypeFromGreenPlusButton()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.name = dataTypeTwoName
+        createDataTypePage.description = dataTypeTwoDescription
+        createDataTypePage.buttons.save()
+        then:
+        at DataTypesPage
+    }
+
+    def "verify new data type is created"() {
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        then:
+        dataTypesPage.hasDataType(dataTypeTwoName)
     }
 }

@@ -48,4 +48,8 @@ class DataTypesPage extends Page {
     void createDataTypeFromGreenPlusButton() {
         addItemIcon.click()
     }
+
+    boolean hasDataType(String name) {
+        rows.$('a', text: name).displayed
+    }
 }

@@ -33,6 +33,9 @@ class DataModelPage extends Page {
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
+        activityList {
+            $("#activity-changes>div.inf-table-body>table>tbody>tr")
+        }
     }
 
     String getRowsText() {
@@ -75,7 +78,7 @@ class DataModelPage extends Page {
         rightSideTitleH3.text()
     }
 
-    void selectModelByVersion(String version) {
-        rows.$('a', text: version).click()
+    boolean isDataModelFinalized() {
+        activityList.$('td:nth-child(4) span span')*.text().join(",").contains("finalized")
     }
 }
