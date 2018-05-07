@@ -5,10 +5,8 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
-import org.modelcatalogue.core.geb.LoginPage
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.CreateDataModelPage
-import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.*
+import spock.lang.Stepwise
 
 @Issue('https://metadata.atlassian.net/browse/MET-1728')
 @Title('Disable a user')
@@ -26,10 +24,10 @@ import org.modelcatalogue.core.geb.DataModelPage
  - Log out of Metadata Exchange | Logout successful
  - Login to Metadata Exchange as curator | 'Sorry your account is disabled' appears in the login dialogue box and curator cannot login
 ''')
+@Stepwise
+class DisableUserSpec extends GebSpec {
 
-class DisableUser extends GebSpec {
-
-    def "login as curator"() {
+    /*def "login as curator"() {
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login("curator", "curator")
@@ -46,7 +44,7 @@ class DisableUser extends GebSpec {
 
         when:
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = "TEST_DATAMODEL_FOUR"
+        createDataModelPage.name = "REST_DATAMODEL"
         createDataModelPage.description = "TEST_MODEL_DESCRIPTION"
         createDataModelPage.modelCatalogueId = "123abc"
         createDataModelPage.submit()
@@ -66,7 +64,7 @@ class DisableUser extends GebSpec {
         dataModelPage.logout()
         then:
         at HomePage
-    }
+    }*/
 
     def "login as suprevisor"() {
         when:
@@ -79,15 +77,32 @@ class DisableUser extends GebSpec {
     def "select created data model"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
-        dashboardPage.select("TEST_DATAMODEL_FOUR")
+        dashboardPage.select("REST_DATAMODEL")
         then:
         at DataModelPage
     }
 
-    def "select activity tab"() {
+    def "select user from activity tab"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.openActivityUser()
         then:
-        true
+        at UserProfilePage
     }
+
+    def "disable user"() {
+        when:
+        UserProfilePage userProfilePage = browser.page UserProfilePage
+        userProfilePage.disableUser()
+        then:
+        at ConfirmDisableUserPage
+
+        when:
+        ConfirmDisableUserPage confirmDisableUserPage = browser.page ConfirmDisableUserPage
+        confirmDisableUserPage.confirmDisableUser()
+        then:
+        at UserProfilePage
+    }
+
+    def "logout as supervisor"() {}
 }

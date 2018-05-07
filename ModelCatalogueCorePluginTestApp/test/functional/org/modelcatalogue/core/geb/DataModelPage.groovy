@@ -32,7 +32,10 @@ class DataModelPage extends Page {
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
         userLink { $('#role_navigation-right_user-menu-menu-item-link') }
-        logoutLink { $('#user-login-right-menu-item-link') }
+        logoutLink { $('a#user-login-right-menu-item-link') }
+        activityUser {
+            $("#activity-changes > div.inf-table-body > table > tbody > tr > td:nth-child(3) > span > span > a")
+        }
     }
 
     String getRowsText() {
@@ -81,5 +84,10 @@ class DataModelPage extends Page {
 
     void logout() {
         logoutLink.click()
+        sleep(2000)
+    }
+
+    void openActivityUser() {
+        activityUser.click()
     }
 }
