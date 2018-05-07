@@ -12,6 +12,7 @@ class UserProfilePage extends Page {
 
     static content = {
         disableUserButton { $('#role_item-detail_update-userBtn') }
+        nav { $('div.navbar-collapse', 0).module(NavModuleAdmin) }
     }
 
     void disableUser() {

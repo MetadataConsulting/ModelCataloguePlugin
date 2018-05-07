@@ -7,6 +7,7 @@ import spock.lang.Specification
 import spock.lang.Title
 import org.modelcatalogue.core.geb.*
 import spock.lang.Stepwise
+import spock.lang.Shared
 
 @Issue('https://metadata.atlassian.net/browse/MET-1728')
 @Title('Disable a user')
@@ -27,7 +28,12 @@ import spock.lang.Stepwise
 @Stepwise
 class DisableUserSpec extends GebSpec {
 
-    /*def "login as curator"() {
+    @Shared
+    String dataModelName = "TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+
+    def "login as curator"() {
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login("curator", "curator")
@@ -44,9 +50,9 @@ class DisableUserSpec extends GebSpec {
 
         when:
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = "REST_DATAMODEL"
-        createDataModelPage.description = "TEST_MODEL_DESCRIPTION"
-        createDataModelPage.modelCatalogueId = "123abc"
+        createDataModelPage.name = dataModelName
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueId = UUID.randomUUID().toString()
         createDataModelPage.submit()
         then:
         at DataModelPage
@@ -64,9 +70,9 @@ class DisableUserSpec extends GebSpec {
         dataModelPage.logout()
         then:
         at HomePage
-    }*/
+    }
 
-    def "login as suprevisor"() {
+    def "login as supervisor"() {
         when:
         LoginPage loginPage = to LoginPage
         loginPage.login("supervisor", "supervisor")
@@ -77,7 +83,7 @@ class DisableUserSpec extends GebSpec {
     def "select created data model"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
-        dashboardPage.select("REST_DATAMODEL")
+        dashboardPage.select(dataModelName)
         then:
         at DataModelPage
     }
@@ -104,5 +110,25 @@ class DisableUserSpec extends GebSpec {
         at UserProfilePage
     }
 
-    def "logout as supervisor"() {}
+    def "logout as supervisor"() {
+        when:
+        UserProfilePage userProfilePage = browser.page UserProfilePage
+        userProfilePage.nav.userMenu()
+        then:
+        at UserProfilePage
+
+        when:
+        userProfilePage = browser.page UserProfilePage
+        userProfilePage.nav.logout()
+        then:
+        at HomePage
+    }
+
+    def "login as curator again"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("curator", "curator")
+        then:
+        loginPage.isAccountDisabled()
+    }
 }

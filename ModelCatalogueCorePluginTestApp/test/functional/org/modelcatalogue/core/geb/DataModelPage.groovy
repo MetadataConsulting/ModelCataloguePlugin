@@ -80,11 +80,11 @@ class DataModelPage extends Page {
 
     void clickUserDropdown() {
         userLink.click()
+        sleep(1000)
     }
 
     void logout() {
         logoutLink.click()
-        sleep(2000)
     }
 
     void openActivityUser() {
