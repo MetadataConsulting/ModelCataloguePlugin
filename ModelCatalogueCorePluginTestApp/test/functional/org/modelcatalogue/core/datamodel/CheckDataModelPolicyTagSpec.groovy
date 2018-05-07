@@ -35,7 +35,7 @@ class CheckDataModelPolicyTagSpec extends GebSpec {
     def "Login as admin"() {
         when:
         LoginPage loginPage = to LoginPage
-        loginPage.login("supervisor", "supervisor")
+        loginPage.login("admin", "admin")
         then:
         at DashboardPage
     }
