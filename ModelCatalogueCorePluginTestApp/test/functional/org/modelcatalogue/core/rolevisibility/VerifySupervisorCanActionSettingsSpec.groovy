@@ -73,7 +73,7 @@ class VerifySupervisorCanActionSettingsSpec extends GebSpec {
         at CodeVersionPage
     }
 
-    /*def "navigate to mappingutility"() {
+    def "navigate to mappingutility"() {
         when:
         CodeVersionPage codeVersionPage = browser.page CodeVersionPage
         codeVersionPage.nav.cogMenu()
@@ -85,18 +85,18 @@ class VerifySupervisorCanActionSettingsSpec extends GebSpec {
         codeVersionPage.nav.mappingUtility()
         then:
         at MappingUtilityPage
-    }*/
+    }
 
     def "navigate to useractivity"() {
         when:
-        CodeVersionPage codeVersionPage = browser.page CodeVersionPage
-        codeVersionPage.nav.cogMenu()
+        MappingUtilityPage mappingUtilityPage = browser.page MappingUtilityPage
+        mappingUtilityPage.nav.cogMenu()
         then:
-        at CodeVersionPage
+        at MappingUtilityPage
 
         when:
-        codeVersionPage = browser.page CodeVersionPage
-        codeVersionPage.nav.activity()
+        mappingUtilityPage = browser.page MappingUtilityPage
+        mappingUtilityPage.nav.activity()
         then:
         at LastSeenPage
     }
