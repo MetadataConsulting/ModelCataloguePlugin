@@ -5,6 +5,9 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import spock.lang.Shared
+import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1496')
 @Title('Examine that user can create data elements on the fly from data class wizard')
@@ -30,5 +33,134 @@ import spock.lang.Title
  - Verify that in list under 'Active Data Elements' that the newly created data elements are displayed | Data Elements are displayed
 /$)
 
+@Stepwise
 class CheckCreateElementFromClassWizardSpec extends GebSpec {
+
+    @Shared
+    String dataModelName = "TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
+    String dataClassName = "TESTING_CLASS"
+    @Shared
+    String dataClassDescription = "TESTING_CLASS_DESCRIPTION"
+    @Shared
+    String dataElementName = "TESTING_ELEMENT_ONE"
+    @Shared
+    String dataElementDescription = "TESTING_ELEMENT_DESCRIPTION"
+    @Shared
+    String dataElementTwoName = "TESTING_ELEMENT_TWO"
+
+    def "login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("curator", "curator")
+        then:
+        at DashboardPage
+    }
+
+    def "create a data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = dataModelName
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "go to data classes"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+    }
+
+    def "create new data class"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = dataClassName
+        createDataClassPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataClassPage.description = dataClassDescription
+        createDataClassPage.elements()
+        then:
+        at CreateDataClassPage
+
+        when:
+        createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.dataElement = dataElementName
+        createDataClassPage.createNewElement()
+        then:
+        at CreateDataElementPage
+    }
+
+    def "create new data element"() {
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataElementPage.description = dataElementDescription
+        createDataElementPage.finish()
+        then:
+        at CreateDataClassPage
+    }
+
+    def "create another data element and save data class"() {
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.dataElement = dataElementTwoName
+        createDataClassPage.createNewElementFromPlusButton()
+        then:
+        at CreateDataClassPage
+
+        when:
+        createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+    }
+
+    def "verify newly created data class is present"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        then:
+        dataClassesPage.containsDataClass(dataClassName)
+    }
+
+    def "select newly creted data class"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.selectDataClass(dataClassName)
+        then:
+        at DataClassPage
+    }
+
+    def "verify newly created data elements are present in data class"() {
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+        dataClassPage.treeView.dataElements()
+        then:
+        at DataElementsPage
+
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        then:
+        dataElementsPage.containsElement(dataElementName)
+        dataElementsPage.containsElement(dataElementTwoName)
+    }
+
 }

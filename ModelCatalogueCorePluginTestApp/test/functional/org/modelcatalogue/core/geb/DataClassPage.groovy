@@ -16,6 +16,7 @@ class DataClassPage extends Page {
         formMetadataLink { $('span.btn.btn-link btn-sm ng-binding') }
         tabs { $('ul.nav.nav-tabs a', text: it) }
         parentAddButton { $('span.fa.fa-plus-circle') }
+        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
     }
 
     void edit() {

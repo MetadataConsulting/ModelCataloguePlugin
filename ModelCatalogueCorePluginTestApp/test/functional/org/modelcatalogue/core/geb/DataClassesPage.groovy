@@ -34,4 +34,12 @@ class DataClassesPage extends Page {
     void createDataClass() {
         createDateClassLink.click()
     }
+
+    boolean containsDataClass(String value) {
+        rows.$('a', text: value).displayed
+    }
+
+    void selectDataClass(String value) {
+        rows.$('a', text: value).click()
+    }
 }
