@@ -3,8 +3,10 @@ package org.modelcatalogue.core.datamodel
 import geb.spock.GebSpec
 import spock.lang.Issue
 import spock.lang.Narrative
+import org.modelcatalogue.core.geb.*
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
 
 @Issue('https://metadata.atlassian.net/browse/MET-1766')
 @Title('Check Model Policy - enumeratedType property')
@@ -18,5 +20,46 @@ import spock.lang.Title
 check enumeratedType property 'enumAsString' apply negativeRegex: /.*"key"\s*:\s*(?!"[a-z0-9]+").*/
 /$)
 
+@Stepwise
 class CheckDataModelPolicyEnumeratedTypeSpec extends GebSpec {
+
+    def "Login as supervisor"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
+        then:
+        at DashboardPage
+    }
+
+    def "open datamodel policies in settings dropdown"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.cogMenu()
+        then:
+        at DashboardPage
+
+        when:
+        dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.dataModelPolicies()
+        then:
+        at DataModelPolicyListPage
+
+    }
+
+    def "select enumeration check"() {
+        when:
+        DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
+        dataModelPolicyListPage.selectEnumeratedTypePolicy()
+        then:
+        at DataModelPolicyPage
+    }
+
+    def "check enumeration content"() {
+        when:
+        DataModelPolicyPage dataModelPolicyPage = browser.page DataModelPolicyPage
+        then:
+        assert "//key-value should be lowercase and underscore separated and no special characters \n" +
+                "check enumeratedType property 'enumAsString' apply negativeRegex: /.\"key\"\\s*:\\s*(?!\"[a-z0-9]+\")./" == dataModelPolicyPage.policyText()
+    }
 }
