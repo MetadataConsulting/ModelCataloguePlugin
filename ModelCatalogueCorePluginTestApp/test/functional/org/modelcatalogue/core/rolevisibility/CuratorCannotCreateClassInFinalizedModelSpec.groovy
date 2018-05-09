@@ -23,7 +23,8 @@ import spock.lang.Title
  - Wait until text in messages panel ends with 'COMPLETED SUCCESSFULLY'. Click 'Hide' on the 'Finalizing' process box | Data Model is finalized. Redirected to main page of Finalized data model in both display and tree navigation panel
  - Using tree navigation panel, select the Data Classes tag. | Redirected in display panel to Active Data Classes page. Title should be 'Active Data Classes'.
  - Verify that (In Active Data Classes) under the list of Data Classes, there is no 'Create new' green plus button . | No option to create new data class.
- - Verify that there is no left hand menu and no 'Data Class' menu button | No Data Class menu button present in Finalized version of the Data Model/$)
+ - Verify that there is no left hand menu and no 'Data Class' menu button | No Data Class menu button present in Finalized version of the Data Model
+/$)
 
 class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
 }
