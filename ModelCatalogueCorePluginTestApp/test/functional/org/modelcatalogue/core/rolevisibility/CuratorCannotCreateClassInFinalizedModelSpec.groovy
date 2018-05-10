@@ -5,6 +5,9 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1628')
 @Title('Check that a Curator is not able to create a data class in finalised model')
@@ -26,5 +29,135 @@ import spock.lang.Title
  - Verify that there is no left hand menu and no 'Data Class' menu button | No Data Class menu button present in Finalized version of the Data Model
 /$)
 
+@Stepwise
 class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
+
+    @Shared
+    String name="name30"+UUID.randomUUID().toString()
+    @Shared
+    String modelCatalogueId=UUID.randomUUID().toString()
+    @Shared
+    String description="description"
+    @Shared
+    String cwName="name"+UUID.randomUUID().toString()
+    @Shared
+    String cwModelCatalogueId=UUID.randomUUID().toString()
+    @Shared
+    String cwDescription="description"
+    @Shared
+    String version="1.1"
+    @Shared
+    String versionNote = "versionNote"
+
+
+    def "Login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
+
+        then:
+        at DashboardPage
+    }
+
+    def "Create data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+    }
+
+    def "Filling form"() {
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = name
+        createDataModelPage.modelCatalogueId = modelCatalogueId
+        createDataModelPage.description = description
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+
+
+    }
+
+    def "Select data class tag and fill data class wizard"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Classes")
+        then:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        print("dataClassesPage.titleText()" + dataClassesPage.titleText())
+        assert "Active Data Classes" == dataClassesPage.titleText().trim()
+
+        when:
+        dataClassesPage.addItemIcon.click()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = cwName
+        createDataClassPage.modelCatalogueId = cwModelCatalogueId
+        createDataClassPage.description = cwDescription
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+    }
+
+    def "Navigate to data Model main page "() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataModel()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+//        finalizeDataModelPage.version = version
+        finalizeDataModelPage.setVersionNote(versionNote)
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+
+    }
+
+    def "Redirect to data class"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Classes")
+        then:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        print("dataClassesPage.titleText()" + dataClassesPage.titleText())
+        assert "Active Data Classes" == dataClassesPage.titleText().trim()
+
+    }
+
+    def "Checking for create button"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        print"01"+dataClassesPage.isAddItemIconVisible()
+        then:
+        assert dataClassesPage.isAddItemIconVisible()==false
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        print"1"+dataModelPage.treeView.checkItemDisplay("Data Classes")
+        then:
+        assert dataModelPage.treeView.checkItemDisplay("Data Classes")==false
+    }
 }

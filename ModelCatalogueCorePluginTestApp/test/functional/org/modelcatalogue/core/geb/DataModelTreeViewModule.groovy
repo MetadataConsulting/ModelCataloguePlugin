@@ -5,12 +5,12 @@ import geb.Module
 class DataModelTreeViewModule extends Module {
 
     static content = {
-        dataModelLink { $('a.catalogue-element-treeview-icon') }
+        dataModelLink { int index -> $('a.catalogue-element-treeview-icon')[index] }
         item { $('ul .catalogue-element-treeview-name', text: it) }
     }
 
     void dataModel() {
-        dataModelLink.click()
+        dataModelLink(0).click()
     }
 
     void dataClasses() {
@@ -52,5 +52,9 @@ class DataModelTreeViewModule extends Module {
     void select(String name) {
         item(name).click()
         sleep(2000)
+    }
+
+    Boolean checkItemDisplay(String name) {
+        return item(name)?.displayed
     }
 }
