@@ -1,10 +1,14 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
+import jdk.nashorn.internal.runtime.SharedPropertyMap
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import spock.lang.Shared
+import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1620')
 @Title('Examine that admin can remove an imported model')
@@ -23,6 +27,103 @@ import spock.lang.Title
  - Select OK from the 'Remove Relationship' pop up box. | Imported Data Model is removed from list of imported data models (and no longer imported).
  - Check that data model is removed from imported Data Models List | Data Model has been removed from 'Imported Data Models' list
 /$)
-
+@Stepwise
 class CheckAdminCanDeleteImportedModelSpec extends GebSpec {
+
+    @Shared
+    String dataModelName = "TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
+    String importDataModelName = "Cancer Model"
+
+    def "login as supervisor"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
+        then:
+        at DashboardPage
+    }
+
+    def "create new data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = dataModelName
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "navigate to imported data model"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.importedDataModels()
+        then:
+        at DataImportsPage
+    }
+
+    def "import data model"() {
+        when:
+        DataImportsPage dataImportsPage = browser.page DataImportsPage
+        dataImportsPage.addItem()
+        then:
+        at DataImportPage
+
+        when:
+        DataImportPage dataImportPage = browser.page DataImportPage
+        dataImportPage.searchMore()
+        then:
+        at SearchTagPage
+
+        when:
+        SearchTagPage searchTagPage = browser.page SearchTagPage
+        searchTagPage.searchTag(importDataModelName)
+        then:
+        at DataImportPage
+
+        when:
+        dataImportPage = browser.page DataImportPage
+        dataImportPage.finish()
+        then:
+        at DataImportsPage
+    }
+
+    def "verify imported data model is shown in list"() {
+        when:
+        DataImportsPage dataImportsPage = browser.page DataImportsPage
+        then:
+        dataImportsPage.containsData(importDataModelName)
+    }
+
+    def "remove imported model"() {
+        when:
+        DataImportsPage dataImportsPage = browser.page DataImportsPage
+        dataImportsPage.expandTag()
+        dataImportsPage.remove()
+        then:
+        at RemoveImportPage
+
+        when:
+        RemoveImportPage removeImportPage = browser.page RemoveImportPage
+        removeImportPage.finish()
+        then:
+        at DataImportsPage
+    }
+
+    def "verify imported model is not shown in list"() {
+        when:
+        DataImportsPage dataImportsPage = browser.page DataImportsPage
+        driver.navigate().refresh()
+        then:
+        !dataImportsPage.containsData(importDataModelName)
+    }
 }

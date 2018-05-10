@@ -40,4 +40,8 @@ class DataImportsPage extends Page {
     void remove() {
         removeButton.click()
     }
+
+    boolean containsData(String value) {
+        $('a', text: value).displayed
+    }
 }
