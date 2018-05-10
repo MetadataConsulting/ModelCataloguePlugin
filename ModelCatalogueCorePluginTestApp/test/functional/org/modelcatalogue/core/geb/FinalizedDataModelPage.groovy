@@ -11,5 +11,6 @@ class FinalizedDataModelPage extends Page implements InputUtils {
 
     void hideConfirmation() {
         hideButton.click()
+        sleep(2000)
     }
 }
