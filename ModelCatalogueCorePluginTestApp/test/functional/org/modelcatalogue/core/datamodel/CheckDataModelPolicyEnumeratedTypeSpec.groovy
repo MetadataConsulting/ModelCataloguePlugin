@@ -52,12 +52,12 @@ class CheckDataModelPolicyEnumeratedTypeSpec extends GebSpec {
         DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
         dataModelPolicyListPage.selectEnumeratedTypePolicy()
         then:
-        at DataModelPolicyPage
+        at DataModelPolicyEnumerationPage
     }
 
     def "check enumeration content"() {
         when:
-        DataModelPolicyPage dataModelPolicyPage = browser.page DataModelPolicyPage
+        DataModelPolicyEnumerationPage dataModelPolicyPage = browser.page DataModelPolicyEnumerationPage
         then:
         assert "//key-value should be lowercase and underscore separated and no special characters \n" +
                 "check enumeratedType property 'enumAsString' apply negativeRegex: /.\"key\"\\s*:\\s*(?!\"[a-z0-9]+\")./" == dataModelPolicyPage.policyText()
