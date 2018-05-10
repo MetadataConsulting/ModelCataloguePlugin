@@ -181,6 +181,7 @@ img {
 
 /* Dropdown in dashboards*/
 
+/*
 .dropdown input {
     display: block;
     padding: 3px 20px;
@@ -191,11 +192,66 @@ img {
     white-space: nowrap;
     height: 26px;
 }
-
+*/
 .dropdown .btn-link:hover {
     text-decoration: none;
     background-color: #e8e8e8;
 }
+
+.dropdown-menu span {
+    padding: 5px;
+}
+
+.dropdown-menu select, .dropdown-menu .input-group, .dropdown-menu p {
+    /*display: inline-block;*/
+    float: left;
+    margin: 0.2em;
+}
+
+/*from Advanced Search example https://bootsnipp.com/snippets/featured/advanced-dropdown-search*/
+
+.dropdown.dropdown-lg .dropdown-menu {
+     margin-top: -1px;
+     padding: 6px 20px;
+ }
+.input-group-btn .btn-group {
+    display: flex !important;
+}
+.btn-group .btn {
+    border-radius: 0;
+    margin-left: -1px;
+}
+.btn-group .btn:last-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+.btn-group .form-horizontal .btn[type="submit"] {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+/*
+.form-horizontal .form-group {
+    margin-left: 0;
+    margin-right: 0;
+}
+.form-group .form-control:last-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}*/
+
+/*
+@media screen and (max-width: 768px) {
+    #adv-search {
+        width: 500px;
+        margin: 0 auto;
+    }
+    .dropdown.dropdown-lg {
+        position: static !important;
+    }
+    .dropdown.dropdown-lg .dropdown-menu {
+        max-width: 500px;
+    }
+}*/
 
 
 /* CREATE/EDIT FORMS AND SHOW PAGES */
@@ -642,4 +698,8 @@ form {
 
 hr {
     margin: 20px 0;
+}
+
+.hidden {
+    display: none;
 }
