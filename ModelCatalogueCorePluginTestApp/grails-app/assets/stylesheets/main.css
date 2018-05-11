@@ -202,7 +202,7 @@ img {
     padding: 5px;
 }
 
-.dropdown-menu select, .dropdown-menu .input-group, .dropdown-menu p {
+.dropdown-menu select, .dropdown-menu .input-group, .dropdown-menu p, .dropdown-menu a, .dropdown-menu div {
     /*display: inline-block;*/
     float: left;
     margin: 0.2em;
