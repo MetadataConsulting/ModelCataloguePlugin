@@ -26,7 +26,7 @@
                                 <div><a href="#" data-toggle="tooltip" title="Filter by the Status of the CatalogueElement.<br/>An element is Active if it is not Deprecated, which is the same as being either Draft or Finalized."> Status: </a>
                                   <g:select name="status" from="${DashboardStatusDropdown.values()}" value="${status}"/></div>
 
-                                <div><a href="#" data-toggle="tooltip" title="Filter by the Domain of the CatalogueElement.<br/>e.g. Search for just DataModels or just DataClasses."> Domain: </a>
+                                <div><a href="#" data-toggle="tooltip" title="Filter by the Type of the CatalogueElement.<br/>e.g. Search for just DataModels or just DataClasses."> Type: </a>
                                 <g:select name="metadataDomain" from="${metadataDomainList}" value="${metadataDomain}" optionValue="${{
                                   mdx.metadataMessage(metadataDomain: it)
                                 }}"/></div>
