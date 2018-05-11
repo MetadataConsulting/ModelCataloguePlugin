@@ -28,14 +28,14 @@ import spock.lang.Shared
 class CheckDataModelPolicyTagSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "NEW_TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
 
     def "Login as admin"() {
         when:
         LoginPage loginPage = to LoginPage
-        loginPage.login("admin", "admin")
+        loginPage.login("supervisor", "supervisor")
         then:
         at DashboardPage
     }
