@@ -20,7 +20,7 @@ class DataClassesPage extends Page {
         }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         rows { $('div.inf-table-body tbody tr') }
-        titlename { $('div.col-md-12 h3') }
+        titlename { $('div   h3') }
     }
 
     int count() {

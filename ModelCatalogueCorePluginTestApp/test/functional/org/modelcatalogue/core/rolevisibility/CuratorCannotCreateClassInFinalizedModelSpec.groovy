@@ -33,17 +33,17 @@ import spock.lang.*
 class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
 
     @Shared
-    String name = "name30" + UUID.randomUUID().toString()
+    String dataPageName = UUID.randomUUID().toString()
     @Shared
-    String modelCatalogueId = UUID.randomUUID().toString()
+    String dataPageId = UUID.randomUUID().toString()
     @Shared
-    String description = "description"
+    String dataPageDescription = "description"
     @Shared
-    String cwName = "name" + UUID.randomUUID().toString()
+    String dataClassName = UUID.randomUUID().toString()
     @Shared
-    String cwModelCatalogueId = UUID.randomUUID().toString()
+    String dataClassId = UUID.randomUUID().toString()
     @Shared
-    String cwDescription = "description"
+    String dataClassDescription = "description"
     @Shared
     String version = "1.1"
     @Shared
@@ -70,9 +70,9 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
     def "Filling form"() {
         when:
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = name
-        createDataModelPage.modelCatalogueId = modelCatalogueId
-        createDataModelPage.description = description
+        createDataModelPage.name = dataPageName
+        createDataModelPage.modelCatalogueId = dataPageId
+        createDataModelPage.description = dataPageDescription
         createDataModelPage.submit()
         then:
         at DataModelPage
@@ -93,9 +93,9 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
 
         when:
         CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.name = cwName
-        createDataClassPage.modelCatalogueId = cwModelCatalogueId
-        createDataClassPage.description = cwDescription
+        createDataClassPage.name = dataClassName
+        createDataClassPage.modelCatalogueId = dataClassId
+        createDataClassPage.description = dataClassDescription
         createDataClassPage.finish()
         createDataClassPage.exit()
         then:
@@ -144,6 +144,6 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
         when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         then:
-        assert dataClassesPage.isAddItemIconVisible() == false
+        assert !dataClassesPage.isAddItemIconVisible()
     }
 }
