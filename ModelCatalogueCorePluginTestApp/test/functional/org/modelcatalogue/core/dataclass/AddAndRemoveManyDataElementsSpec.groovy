@@ -5,6 +5,8 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1564')
 @Title('Examine that When remove more than one data element of a class the browser does not crash')
@@ -27,6 +29,268 @@ import spock.lang.Title
  - 16. Repeat steps 11-14 to Delete a Data Element | Data Element is deleted
  - 17. Repeat steps 15 and 16 five more times. | Check that Metadata Exchange does not crash when Data Elements are repeatedly created and deleted.
 /$)
-
+@Stepwise
 class AddAndRemoveManyDataElementsSpec extends GebSpec {
+
+    def "login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
+        then:
+        at DashboardPage
+    }
+
+    def "create new data model"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = to CreateDataModelPage
+        createDataModelPage.name = "TESTING_MODEL"
+        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
+        createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "create first data element and then delete it"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataElements()
+        then:
+        at DataElementsPage
+
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.createDataElement()
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.name = "TESTING_ELEMENT_ONE"
+        createDataElementPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataElementPage.description = "ELEMENT_ONE_DESCRIPTION"
+        createDataElementPage.search("TESTING_DATATYPE_ONE")
+        createDataElementPage.createNewDataType()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.description = "DATATYPE_ONE_DESCRIPTION"
+        createDataTypePage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataTypePage.buttons.save()
+        then:
+        at CreateDataElementPage
+
+        when:
+        createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.finish()
+        then:
+        at DataElementsPage
+
+        when:
+        dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.selectDataElement("TESTING_ELEMENT_ONE")
+        then:
+        at DataElementPage
+
+        when:
+        DataElementPage dataElementPage = browser.page DataElementPage
+        dataElementPage.dataElementDropdown()
+        dataElementPage.deleteDataElement()
+        dataElementPage.confirmDelete()
+        then:
+        at DataElementsPage
+    }
+
+    def "create second data element and then delete it"() {
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.createDataElement()
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.name = "TESTING_ELEMENT_TWO"
+        createDataElementPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataElementPage.description = "ELEMENT_TWO_DESCRIPTION"
+        createDataElementPage.search("TESTING_DATATYPE_TWO")
+        createDataElementPage.createNewDataType()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.description = "DATATYPE_TWO_DESCRIPTION"
+        createDataTypePage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataTypePage.buttons.save()
+        then:
+        at CreateDataElementPage
+
+        when:
+        createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.finish()
+        then:
+        at DataElementsPage
+
+        when:
+        dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.selectDataElement("TESTING_ELEMENT_TWO")
+        then:
+        at DataElementPage
+
+        when:
+        DataElementPage dataElementPage = browser.page DataElementPage
+        dataElementPage.dataElementDropdown()
+        dataElementPage.deleteDataElement()
+        dataElementPage.confirmDelete()
+        then:
+        at DataElementsPage
+    }
+
+    def "create third data element and then delete it"() {
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.createDataElement()
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.name = "TESTING_ELEMENT_THREE"
+        createDataElementPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataElementPage.description = "ELEMENT_THREE_DESCRIPTION"
+        createDataElementPage.search("TESTING_DATATYPE_THREE")
+        createDataElementPage.createNewDataType()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.description = "DATATYPE_THREE_DESCRIPTION"
+        createDataTypePage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataTypePage.buttons.save()
+        then:
+        at CreateDataElementPage
+
+        when:
+        createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.finish()
+        then:
+        at DataElementsPage
+
+        when:
+        dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.selectDataElement("TESTING_ELEMENT_THREE")
+        then:
+        at DataElementPage
+
+        when:
+        DataElementPage dataElementPage = browser.page DataElementPage
+        dataElementPage.dataElementDropdown()
+        dataElementPage.deleteDataElement()
+        dataElementPage.confirmDelete()
+        then:
+        at DataElementsPage
+    }
+
+    def "create fourth data element and then delete it"() {
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.createDataElement()
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.name = "TESTING_ELEMENT_FOUR"
+        createDataElementPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataElementPage.description = "ELEMENT_FOUR_DESCRIPTION"
+        createDataElementPage.search("TESTING_DATATYPE_FOUR")
+        createDataElementPage.createNewDataType()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.description = "DATATYPE_FOUR_DESCRIPTION"
+        createDataTypePage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataTypePage.buttons.save()
+        then:
+        at CreateDataElementPage
+
+        when:
+        createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.finish()
+        then:
+        at DataElementsPage
+
+        when:
+        dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.selectDataElement("TESTING_ELEMENT_FOUR")
+        then:
+        at DataElementPage
+
+        when:
+        DataElementPage dataElementPage = browser.page DataElementPage
+        dataElementPage.dataElementDropdown()
+        dataElementPage.deleteDataElement()
+        dataElementPage.confirmDelete()
+        then:
+        at DataElementsPage
+    }
+
+    def "create fifth data element and then delete it"() {
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.createDataElement()
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.name = "TESTING_ELEMENT_FIVE"
+        createDataElementPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataElementPage.description = "ELEMENT_FIVE_DESCRIPTION"
+        createDataElementPage.search("TESTING_DATATYPE_FIVE")
+        createDataElementPage.createNewDataType()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.description = "DATATYPE_FIVE_DESCRIPTION"
+        createDataTypePage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataTypePage.buttons.save()
+        then:
+        at CreateDataElementPage
+
+        when:
+        createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.finish()
+        then:
+        at DataElementsPage
+
+        when:
+        dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.selectDataElement("TESTING_ELEMENT_FIVE")
+        then:
+        at DataElementPage
+
+        when:
+        DataElementPage dataElementPage = browser.page DataElementPage
+        dataElementPage.dataElementDropdown()
+        dataElementPage.deleteDataElement()
+        dataElementPage.confirmDelete()
+        then:
+        at DataElementsPage
+    }
+
 }
