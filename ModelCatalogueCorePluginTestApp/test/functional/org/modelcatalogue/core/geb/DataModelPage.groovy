@@ -34,6 +34,9 @@ class DataModelPage extends Page {
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
         policiesList { $('div.row.detail-section', 0).$('div.ng-scope span') }
+
+        editModelButton(wait: true) { $('#role_item-detail_inline-editBtn') }
+        ModelEditSaveButton(required: false, wait: true) { $('#role_item-detail_inline-edit-submitBtn') }
     }
 
     String getRowsText() {
@@ -80,7 +83,25 @@ class DataModelPage extends Page {
         policiesList.$('a', text: 'Default Checks').displayed
     }
 
-    boolean UniqueOfKingPolicyAdded() {
+    boolean UniqueOfKindPolicyAdded() {
         policiesList.$('a', text: 'Unique of Kind').displayed
+    }
+
+    void selectUniqueOfKindPolicy() {
+        policiesList.$('a', text: 'Unique of Kind').click()
+    }
+
+    void editModel() {
+        editModelButton.click()
+    }
+
+    void save() {
+        ModelEditSaveButton.click()
+        sleep(2000)
+    }
+
+    void removeUniqueOfKindPolicy() {
+        $('a#remove-tag-0').click()
+        sleep(2000)
     }
 }

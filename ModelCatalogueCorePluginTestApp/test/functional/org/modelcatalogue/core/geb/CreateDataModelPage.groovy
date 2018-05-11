@@ -78,4 +78,3 @@ class CreateDataModelPage extends Page implements InputUtils {
         policiesCheckboxList.$('input#dataModelPolicies', 1).click()
     }
 }
-
