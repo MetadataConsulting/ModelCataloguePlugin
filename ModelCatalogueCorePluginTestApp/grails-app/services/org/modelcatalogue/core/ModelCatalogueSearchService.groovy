@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.api.ElementStatusUtils
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DataModelFilter
@@ -67,7 +68,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element,
                 type,
-                ElementService.findAllElementStatus(status),
+                ElementStatusUtils.findAllElementStatus(status),
                 getOverridableDataModelFilter(dataModelId, subscribedModels)
         )
 
@@ -120,7 +121,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             criteria.'in'('id', subscribedModels.collect{it.id})
 
             if (status) {
-                criteria.'in'('status', ElementService.findAllElementStatus(status))
+                criteria.'in'('status', ElementStatusUtils.findAllElementStatus(status))
             }
             return Lists.fromCriteria(paramArgs.toMap(), criteria).customize {
                 it.collect { item -> CatalogueElementMarshaller.minimalCatalogueElementJSON(item) }

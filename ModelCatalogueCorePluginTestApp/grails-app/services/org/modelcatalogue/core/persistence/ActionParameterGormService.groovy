@@ -21,6 +21,13 @@ class ActionParameterGormService implements WarnGormErrors {
         actionParameterInstance
     }
 
+    @Transactional(readOnly = true)
+    List<ActionParameter> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<ActionParameter>
+        }
+        ActionParameter.where { id in ids }.list()
+    }
 
     protected DetachedCriteria<ActionParameter> findQueryByNameAndExtensionValueAndBatch(String name, String extensionValue) {
 

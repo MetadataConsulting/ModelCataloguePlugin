@@ -45,4 +45,16 @@ class ColumnTransformationDefinitionGormService implements WarnGormErrors {
     DetachedCriteria<ColumnTransformationDefinition> findQueryBySourceOrDestination(DataElement sourceParam, DataElement destinationParam) {
         ColumnTransformationDefinition.where { source == sourceParam && destination == destinationParam }
     }
+
+    DetachedCriteria<ColumnTransformationDefinition> queryByIds(List<Long> ids) {
+        ColumnTransformationDefinition.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<ColumnTransformationDefinition> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<ColumnTransformationDefinition>
+        }
+        queryByIds(ids).list()
+    }
 }

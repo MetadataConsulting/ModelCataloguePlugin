@@ -1,11 +1,10 @@
 package org.modelcatalogue.core.persistence
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
-import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeName
 import org.modelcatalogue.core.WarnGormErrors
-import org.modelcatalogue.core.security.User
 import org.springframework.context.MessageSource
 
 class RelationshipTypeGormService implements WarnGormErrors {
@@ -79,5 +78,17 @@ class RelationshipTypeGormService implements WarnGormErrors {
                 rule: rule
         )
         save(relationshipTypeInstance)
+    }
+
+    DetachedCriteria<RelationshipType> queryByIds(List<Long> ids) {
+        RelationshipType.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<RelationshipType> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<RelationshipType>
+        }
+        queryByIds(ids).list()
     }
 }

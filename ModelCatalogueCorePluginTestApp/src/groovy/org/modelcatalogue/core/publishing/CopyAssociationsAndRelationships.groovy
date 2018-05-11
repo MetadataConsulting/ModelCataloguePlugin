@@ -69,6 +69,9 @@ class CopyAssociationsAndRelationships {
     void copyRelationshipsInternal(DataModel dataModel, RelationshipDirection direction, Set<String> createdRelationshipHashes) {
 
         relationshipService.eachRelationshipPartitioned(direction, element) { Relationship r ->
+            if (r.sourceId == r.destinationId) {
+                return
+            }
             if (r.relationshipType.system) {
                 return
             }

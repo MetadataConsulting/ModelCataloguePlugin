@@ -63,4 +63,16 @@ class DataTypeGormService implements WarnGormErrors {
         }
         query
     }
+
+    DetachedCriteria<DataType> queryByIds(List<Long> ids) {
+        DataType.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<DataType> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<DataType>
+        }
+        queryByIds(ids).list()
+    }
 }

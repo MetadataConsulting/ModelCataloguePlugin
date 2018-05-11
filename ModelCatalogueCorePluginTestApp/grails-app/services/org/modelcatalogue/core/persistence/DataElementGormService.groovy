@@ -172,4 +172,16 @@ class DataElementGormService implements WarnGormErrors {
     Number countByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         findQueryBySearchStatusQuery(searchStatusQuery).count()
     }
+
+    DetachedCriteria<DataElement> queryByIds(List<Long> ids) {
+        DataElement.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<DataElement> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<DataElement>
+        }
+        queryByIds(ids).list()
+    }
 }

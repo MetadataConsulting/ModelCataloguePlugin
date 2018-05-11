@@ -51,6 +51,6 @@ class DataModelTreeViewModule extends Module {
 
     void select(String name) {
         item(name).click()
-        sleep(2_000)
+        sleep(2000)
     }
 }

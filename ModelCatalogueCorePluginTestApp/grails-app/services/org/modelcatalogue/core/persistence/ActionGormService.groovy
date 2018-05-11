@@ -23,6 +23,7 @@ class ActionGormService implements WarnGormErrors {
         actionInstance
     }
 
+
     @Transactional(readOnly = true)
     Number countByBatch(Batch batch) {
         queryByBatch(batch).count()
@@ -58,6 +59,9 @@ class ActionGormService implements WarnGormErrors {
 
     @Transactional(readOnly = true)
     List<Action> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<Action>
+        }
         Action.where { id in ids }.list()
     }
 

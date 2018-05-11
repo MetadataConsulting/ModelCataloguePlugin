@@ -47,4 +47,16 @@ class PrimitiveTypeGormService implements WarnGormErrors {
             measurementUnit == measurementUnitParam
         }
     }
+
+    DetachedCriteria<PrimitiveType> queryByIds(List<Long> ids) {
+        PrimitiveType.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<PrimitiveType> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<PrimitiveType>
+        }
+        queryByIds(ids).list()
+    }
 }

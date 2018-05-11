@@ -69,32 +69,29 @@
                         // Create resizable
                         element.resizable(opts);
 
-
                         if (opts.mirror) {
                             breakIfNeeded(opts);
 
-                            element.on('resizestart', function () {
-                                // stores the width with padding as when setting back the padding is stripped out (setting with
-                                // outerWidth does not help at all)
-                                // this is probably bug in jQuery and there should be a mechanism to check if it isn't fix yet
-                                jQuery(opts.mirror).data('resizestartwidth', jQuery(opts.mirror).outerWidth())
-                            });
                             element.on('resize', function (event, ui) {
-                                var delta, newWidth;
-                                delta = ui.originalSize.width - ui.size.width;
-                                if (!delta) {
-                                    event.preventDefault();
-                                    event.stopPropagation();
-                                    return false;
-                                }
-                                newWidth = jQuery(opts.mirror).data('resizestartwidth') + delta - 1;
+                                var leftMargin = 30; // this should be picked up from the style sheet really
+                                var parent = ui.element.parent();
+                                var parentWidth = parent.width(); // ui.element.parent().width();
+                                var remainingSpace = parentWidth - ui.element.outerWidth();
+                                var minWidth = parent.innerWidth() * opts.minWidthPct / 100;
 
-                                jQuery(opts.mirror).width(newWidth);
-                                jQuery(opts.mirror).offset({left: ui.size.width});
+                                if (remainingSpace < minWidth){
+                                    ui.element.width((parentWidth - minWidth)/parentWidth * 100 + "%");
+                                    remainingSpace = minWidth;
+                                }
+                                var detailPane = jQuery(opts.mirror);
+                                var detailPaneWidth = (remainingSpace - (detailPane.outerWidth() - detailPane.width()) - leftMargin) / parentWidth * 100 + "%";
+                                var detailPaneLeft = ui.size.width + leftMargin;
+                                // console.log("parentWidth:" + parentWidth + " remainingSpace:" + remainingSpace + " minWidth:" + minWidth + " detailWidth:" + detailPaneWidth + " detailLeft:" + detailPaneLeft);
+                                detailPane.width(detailPaneWidth);
+                                detailPane.offset({left: detailPaneLeft});
 
                                 $rootScope.$broadcast('infiniteTableRedraw');
-
-                                event.stopPropagation();
+                                event.stopPropagation(); // not sure whether we need this?
                             });
                             jQuery($window).on('resize', function () {
                                 var parentWidth, elementWidth, newWidth;

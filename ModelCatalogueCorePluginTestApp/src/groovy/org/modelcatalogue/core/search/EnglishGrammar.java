@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.mappingsuggestions;
+package org.modelcatalogue.core.search;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -19,6 +19,17 @@ class DashboardControllerSpec extends Specification {
         model['sortQuery'].sort == 'name'
     }
 
+    def "dashboard.index model contains keywordMatchType"() {
+        given:
+        controller.dashboardService = Mock(DashboardService)
+
+        when:
+        Map model = controller.index()
+
+        then:
+        model.keySet().contains('keywordMatchType')
+    }
+
     def "dashboard.index model contains paginationQuery"() {
         given:
         controller.dashboardService = Mock(DashboardService)

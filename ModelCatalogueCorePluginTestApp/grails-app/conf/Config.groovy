@@ -8,7 +8,7 @@ import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.security.User
 import groovy.json.JsonSlurper
-
+import org.apache.log4j.DailyRollingFileAppender
 
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
@@ -98,19 +98,7 @@ environments {
     development {
         grails.logging.jul.usebridge = true
         grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}"
-//        discourse {
-//            url = "http://192.168.1.123/"
-//            api {
-//                key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
-//                user = "discourse"
-//            }
-//            users {
-//                fallbackEmail = 'vladimir.orany+:username@gmail.com'
-//            }
-//            sso {
-//                key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
-//            }
-//        }
+
         oauth {
             providers {
                 google {
@@ -142,6 +130,38 @@ environments {
                 [name: "Java Basic Types", url: "https://s3-eu-west-1.amazonaws.com/datamodels.metadata.org.uk/Java.mc.xml"]
         ]
         grails.mail.disabled=true
+        //language=HTML
+        mc.welcome.jumbo = """
+        <h1>Metadata Exchange</h1>
+        <p class="lead">
+            <b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b> and version new datasets <b><em>Generate</em></b> better software components
+        </p>
+        """
+
+        mc.welcome.info = """
+
+        <div class="panel panel-default">
+          <div class="panel-heading">Development Sandbox</div>
+          <div class="panel-body">
+            <p width=50% style="text-align: center" >This is a sandbox instance of the metadata exchange, in short we are aiming to demo the following: </p>
+                <li>Metadata Data Management</li>
+                <li>Modelling</li>
+                <li>Master Data Management</li>
+                <li>Rules Management</li>
+            </p>
+            <p>User documentation is available <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages">here</a>:
+
+            </p>
+            <p>...probably the best place to start is <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/32997386/Starting+Out+-+A+quick+look+around">here</a>
+
+            </p>
+            <p>and <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/45419911/Editing+Metadata">here</a>
+
+            </p>
+          </div>
+        </div>
+
+"""
     }
     local {
         grails.logging.jul.usebridge = true
@@ -187,6 +207,38 @@ environments {
             mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
             grails.mail.disabled=true
         }
+        //language=HTML
+        mc.welcome.jumbo = """
+<h1>Metadata Exchange</h1>
+<p class="lead">
+    <b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b> and version new datasets <b><em>Generate</em></b> better software components
+</p>
+"""
+
+        mc.welcome.info = """
+
+        <div class="panel panel-default">
+          <div class="panel-heading">Test Sandbox</div>
+          <div class="panel-body">
+            <p width=50% style="text-align: center" >This is a sandbox instance of the metadata exchange, in short we are aiming to demo the following: </p>
+                <li>Metadata Data Management</li>
+                <li>Modelling</li>
+                <li>Master Data Management</li>
+                <li>Rules Management</li>
+            </p>
+            <p>User documentation is available <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages">here</a>:
+
+            </p>
+            <p>...probably the best place to start is <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/32997386/Starting+Out+-+A+quick+look+around">here</a>
+
+            </p>
+            <p>and <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/45419911/Editing+Metadata">here</a>
+
+            </p>
+          </div>
+        </div>
+
+"""
     }
     production {
         //Pickup setting from environment variables
@@ -308,6 +360,16 @@ hibernate {
 
 // log4j configuration
 log4j.main = {
+    appenders {
+        def logPattern = '%d{dd-MM-yyyy HH:mm:ss,SSS} %5p %c{2} - %m%n'
+        appender new DailyRollingFileAppender(
+            name: 'myAppender', datePattern: "'.'yyyy-MM-dd",
+            layout: pattern(conversionPattern: logPattern),
+            file: 'MdxLogFile.log'
+        )
+    }
+    info additivity: false, myAppender: ["org.modelcatalogue.core.audit.AuditService"]
+
     info 'grails.app.services.org.modelcatalogue'
     info 'grails.app.controllers.org.modelcatalogue'
 
@@ -433,7 +495,7 @@ grails.assets.babel.enabled = true
 grails.assets.less.compiler = 'less4j'
 
 grails.plugin.springsecurity.useBasicAuth = true
-grails.plugin.springsecurity.basic.realmName = "Model Catalogue"
+grails.plugin.springsecurity.basic.realmName = "Metadata Exchange"
 grails.plugin.springsecurity.filterChain.chainMap = [
         '/api/dashboard/dataModels': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/api/dashboard/*/catalogueElements': 'JOINED_FILTERS,-exceptionTranslationFilter',
@@ -462,38 +524,7 @@ grails.plugin.springsecurity.ajaxCheckClosure = { request ->
     request.getHeader('accept')?.startsWith('application/json')
 }
 
-//language=HTML
-mc.welcome.jumbo = """
-<h1>Model Catalogue</h1>
-<p class="lead">
-    <b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b> and version new datasets <b><em>Generate</em></b> better software components
-</p>
-"""
 
-mc.welcome.info = """
-
-        <div class="panel panel-default">
-          <div class="panel-heading">NHS Digital Sandbox</div>
-          <div class="panel-body">
-            <p width=50% style="text-align: center" >This is a sandbox instance of the metadata exchange, in short we are aiming to demo the following: </p>
-                <li>Metadata Data Management</li>
-                <li>Modelling</li>
-                <li>Master Data Management</li>
-                <li>Rules Management</li>
-            </p>
-            <p>User documentation is available <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages">here</a>:
-
-            </p>
-            <p>...probably the best place to start is <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/32997386/Starting+Out+-+A+quick+look+around">here</a>
-
-            </p>
-            <p>and <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/45419911/Editing+Metadata">here</a>
-
-            </p>
-          </div>
-        </div>
-
-"""
 
 grails.plugin.springsecurity.ui.register.defaultRoleNames = [] // no roles
 

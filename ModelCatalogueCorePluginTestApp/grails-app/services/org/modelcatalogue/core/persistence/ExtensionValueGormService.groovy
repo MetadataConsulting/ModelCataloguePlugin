@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.persistence
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.ExtensionValue
@@ -27,5 +28,17 @@ class ExtensionValueGormService implements WarnGormErrors {
     @Transactional(readOnly = true)
     ExtensionValue findById(Long id) {
         ExtensionValue.get(id)
+    }
+
+    DetachedCriteria<ExtensionValue> queryByIds(List<Long> ids) {
+        ExtensionValue.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<ExtensionValue> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<ExtensionValue>
+        }
+        queryByIds(ids).list()
     }
 }
