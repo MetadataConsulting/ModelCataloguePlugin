@@ -33,19 +33,19 @@ import spock.lang.*
 class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
 
     @Shared
-    String name="name30"+UUID.randomUUID().toString()
+    String name = "name30" + UUID.randomUUID().toString()
     @Shared
-    String modelCatalogueId=UUID.randomUUID().toString()
+    String modelCatalogueId = UUID.randomUUID().toString()
     @Shared
-    String description="description"
+    String description = "description"
     @Shared
-    String cwName="name"+UUID.randomUUID().toString()
+    String cwName = "name" + UUID.randomUUID().toString()
     @Shared
-    String cwModelCatalogueId=UUID.randomUUID().toString()
+    String cwModelCatalogueId = UUID.randomUUID().toString()
     @Shared
-    String cwDescription="description"
+    String cwDescription = "description"
     @Shared
-    String version="1.1"
+    String version = "1.1"
     @Shared
     String versionNote = "versionNote"
 
@@ -65,7 +65,6 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
         dashboardPage.nav.createDataModel()
         then:
         at CreateDataModelPage
-
     }
 
     def "Filling form"() {
@@ -77,8 +76,6 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
         createDataModelPage.submit()
         then:
         at DataModelPage
-
-
     }
 
     def "Select data class tag and fill data class wizard"() {
@@ -87,7 +84,6 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
         dataModelPage.treeView.select("Data Classes")
         then:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
-        print("dataClassesPage.titleText()" + dataClassesPage.titleText())
         assert "Active Data Classes" == dataClassesPage.titleText().trim()
 
         when:
@@ -122,7 +118,7 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
 
         when:
         FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
-//        finalizeDataModelPage.version = version
+        finalizeDataModelPage.version = version
         finalizeDataModelPage.setVersionNote(versionNote)
         finalizeDataModelPage.submit()
         then:
@@ -133,7 +129,6 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
         finalizedDataModelPage.hideConfirmation()
         then:
         at DataModelPage
-
     }
 
     def "Redirect to data class"() {
@@ -142,22 +137,13 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
         dataModelPage.treeView.select("Data Classes")
         then:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
-        print("dataClassesPage.titleText()" + dataClassesPage.titleText())
         assert "Active Data Classes" == dataClassesPage.titleText().trim()
-
     }
 
     def "Checking for create button"() {
         when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
-        print"01"+dataClassesPage.isAddItemIconVisible()
         then:
-        assert dataClassesPage.isAddItemIconVisible()==false
-
-        when:
-        DataModelPage dataModelPage = browser.page DataModelPage
-        print"1"+dataModelPage.treeView.checkItemDisplay("Data Classes")
-        then:
-        assert dataModelPage.treeView.checkItemDisplay("Data Classes")==false
+        assert dataClassesPage.isAddItemIconVisible() == false
     }
 }

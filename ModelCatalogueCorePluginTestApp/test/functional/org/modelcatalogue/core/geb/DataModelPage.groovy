@@ -55,6 +55,10 @@ class DataModelPage extends Page {
         finalizedLink.click()
     }
 
+    Boolean isFinalizedDataModelVisible() {
+        return finalizedLink?.displayed
+    }
+
     void dropdown() {
         dropdownLink.click()
     }
