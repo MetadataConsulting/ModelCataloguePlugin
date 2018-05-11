@@ -202,10 +202,26 @@ img {
     padding: 5px;
 }
 
-.dropdown-menu select, .dropdown-menu .input-group, .dropdown-menu p, .dropdown-menu a, .dropdown-menu div {
+.dropdown-menu select, .dropdown-menu .input-group, .dropdown-menu p, .dropdown-menu a, .dropdown-menu div, .dropdown-menu button {
     /*display: inline-block;*/
     float: left;
     margin: 0.2em;
+}
+
+.dropdown-menu h2 {
+    padding-top: 1em;
+}
+
+.dropdown-menu .btn[type="submit"] {
+    margin-top: 1em;
+}
+
+.dropdown-menu .dropdown-border-box {
+    border-left: black 2px dotted;
+}
+
+.after-float {
+    clear: left;
 }
 
 /*from Advanced Search example https://bootsnipp.com/snippets/featured/advanced-dropdown-search*/
@@ -221,7 +237,9 @@ img {
     border-radius: 0;
     margin-left: -1px;
 }
-.btn-group .btn:last-child {
+
+/*was .btn-group .btn:last-child but used > to have a button in the menu that wasn't rounded */
+.btn-group > .btn:last-child {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
@@ -229,6 +247,7 @@ img {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
 }
+
 /*
 .form-horizontal .form-group {
     margin-left: 0;
