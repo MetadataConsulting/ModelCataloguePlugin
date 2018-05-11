@@ -33,6 +33,7 @@ class DataModelPage extends Page {
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
+        editDataModelButton(required: false, wait: true) { $('a#role_item-detail_inline-editBtn') }
     }
 
     String getRowsText() {
@@ -73,5 +74,12 @@ class DataModelPage extends Page {
 
     String getRightSideTitle() {
         rightSideTitleH3.text()
+    }
+
+    boolean editButtonVisible() {
+        if (editDataModelButton) {
+            return true
+        }
+        return false
     }
 }

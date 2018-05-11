@@ -9,10 +9,10 @@ class DataClassPage extends Page {
     static at = { title.startsWith('History of') }
 
     static content = {
-        editButton { $('a#role_item-detail_inline-editBtn') }
+        editButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
         saveButton(wait: false, required: false) { $('button#role_item-detail_inline-edit-submitBtn') }
 //        discription(wait: false, required: false) { $('textarea') }
-//        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         formMetadataLink { $('span.btn.btn-link btn-sm ng-binding') }
         tabs { $('ul.nav.nav-tabs a', text: it) }
         parentAddButton { $('span.fa.fa-plus-circle') }
@@ -40,6 +40,10 @@ class DataClassPage extends Page {
 
     void addParent() {
         parentAddButton[2].click()
+    }
+
+    boolean editDataClassDisabled() {
+        waitFor { editButton.@('disabled') }
     }
 
 }

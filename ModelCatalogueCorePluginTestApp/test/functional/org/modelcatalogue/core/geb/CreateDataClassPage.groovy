@@ -3,7 +3,7 @@ package org.modelcatalogue.core.geb
 import geb.Page
 
 class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
-    static at = { $('.modal-dialog').text().contains('Data Class Wizard') }
+    static at = { $('.modal-dialog', 0).text().contains('Data Class Wizard') }
 
     static content = {
         nameInput { $('#name', 0) }
@@ -35,6 +35,8 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         localNameInput { $('#local-name') }
 
         dataElementInput { $('#data-element') }
+        createNewDataElementLink(required: false, wait: true) { $('a.create-new-cep-item', 0) }
+        createNewDataElementPlusButton(required: false, wait: true) { $('span.input-group-btn button.btn-success') }
 
         buttonPlus { $('span.input-group-btn button.btn-success', 0) }
         rawLink(wait: true) { $('a', text: 'Raw') }
@@ -55,6 +57,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void setDataElement(String value) {
         fillInput(dataElementInput, value)
+        waitFor { createNewDataElementLink }
     }
 
     void setAppearanceName(String value) {
@@ -120,6 +123,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void exit() {
         exitButton.click()
+        sleep(2000)
     }
 
     void setName(String value) {
@@ -132,5 +136,13 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void setDescription(String value) {
         fillInput(descriptionInput, value)
+    }
+
+    void createNewElement() {
+        createNewDataElementLink.click()
+    }
+
+    void createNewElementFromPlusButton() {
+        createNewDataElementPlusButton.click()
     }
 }

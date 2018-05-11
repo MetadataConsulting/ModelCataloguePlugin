@@ -5,6 +5,9 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Shared
+import org.modelcatalogue.core.geb.*
+import spock.lang.Stepwise
 
 @Issue('https://metadata.atlassian.net/browse/MET-1625')
 @Title('Examine that a Curator is not able to edit finalized models')
@@ -56,6 +59,356 @@ import spock.lang.Title
  - 45. In one of the versions listed - click on the 'Show More' plus sign to the left of its name - to open up the 'Show more' panel underneath . | 'Show More' panel opens up underneath.
  - 46. Verify that in menu in the show more panel, there is no option to edit. | No option to edit.
 /$)
-
+@Stepwise
 class CuratorCannotEditFinalizedModelSpec extends GebSpec {
+
+    @Shared
+    String dataModelName = "TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
+    String dataClassName = "TESTING_CLASS"
+    @Shared
+    String dataClassDescription = "TESTING_CLASS_DESCRIPTION"
+    @Shared
+    String dataElementName = "TESTING_ELEMENT"
+    @Shared
+    String dataElementDescription = "TESTING_ELEMENT_DESCRIPTION"
+    @Shared
+    String dataTypeName = "TESTING_DATATYPE"
+    @Shared
+    String dataTypeDescription = "TESTING_DATATYPE_DESCRIPTION"
+
+    def "Login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
+        then:
+        at DashboardPage
+    }
+
+    def "create new data model"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = to CreateDataModelPage
+        createDataModelPage.name = dataModelName
+        createDataModelPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "create new data class"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = dataClassName
+        createDataClassPage.description = dataClassDescription
+        createDataClassPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataClassPage.elements()
+        then:
+        at CreateDataClassPage
+    }
+
+    def "search data element"() {
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.dataElement = dataElementName
+        createDataClassPage.createNewElement()
+        then:
+        at CreateDataElementPage
+    }
+
+    def "create new data element"() {
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.description = dataElementDescription
+        createDataElementPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataElementPage.search(dataTypeName)
+        createDataElementPage.createNewDataType()
+        then:
+        at CreateDataTypePage
+    }
+
+    def "create new data type"() {
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.description = dataTypeDescription
+        createDataTypePage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataTypePage.buttons.save()
+        then:
+        at CreateDataElementPage
+    }
+
+    def "save data element"() {
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.finish()
+        then:
+        at CreateDataClassPage
+    }
+
+    def "save data class"() {
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+    }
+
+    def "goto data model main page"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.treeView.dataModel()
+        then:
+        at DataModelPage
+    }
+
+    def "finalize data model"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.version = "0.0.2"
+        finalizeDataModelPage.versionNote = 'THIS IS THE VERSION NOTE'
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+    def "verify data model is not editable"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        then:
+        !dataModelPage.editButtonVisible()
+    }
+
+    def "verify new data class cannot be created"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        then:
+        !dataClassesPage.isAddItemIconVisible()
+    }
+
+    def "verify data class cannot be edited"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.showMore()
+        then:
+        dataClassesPage.editDataClassDisabled()
+    }
+
+    def "open data class and verify edit button is disabled"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.selectDataClass(dataClassName)
+        then:
+        at DataClassPage
+
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+        then:
+        dataClassPage.editDataClassDisabled()
+    }
+
+    def "goto data elements"() {
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+        dataClassPage.treeView.dataElements()
+        then:
+        at DataElementsPage
+
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        then:
+        !dataElementsPage.isAddItemIconVisible()
+    }
+
+    def "verify data element cannot be edited"() {
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.showMore()
+        then:
+        dataElementsPage.editDataElementDisabled()
+    }
+
+    def "open data element and verify edit button is disabled"() {
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.selectDataElement(dataElementName)
+        then:
+        at DataElementPage
+
+        when:
+        DataElementPage dataElementPage = browser.page DataElementPage
+        then:
+        dataElementsPage.editDataElementDisabled()
+    }
+
+    def "goto data types"() {
+        when:
+        DataElementPage dataElementPage = browser.page DataElementPage
+        dataElementPage.treeView.dataTypes()
+        then:
+        at DataTypesPage
+
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        then:
+        !dataTypesPage.isAddItemIconVisible()
+    }
+
+    def "verify data type cannot be edited"() {
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.showMore()
+        then:
+        dataTypesPage.editDataTypeDisabled()
+    }
+
+    def "open data type and verify edit button is disabled"() {
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.selectDataType(dataTypeName)
+        then:
+        at DataTypePage
+
+        when:
+        DataTypePage dataTypePage = browser.page DataTypePage
+        then:
+        dataTypePage.editDataTypeDisabled()
+    }
+
+    def "goto measurement units and verify there is no option to Create new Measurement unit"() {
+        when:
+        DataTypePage dataTypePage = browser.page DataTypePage
+        dataTypePage.treeView.measurementUnits()
+        then:
+        at MeasurementUnitsPage
+
+        when:
+        MeasurementUnitsPage measurementUnitsPage = browser.page MeasurementUnitsPage
+        then:
+        !measurementUnitsPage.isAddItemIconVisible()
+    }
+
+    def "goto business rules and verify there is no option to Create New Business Rule"() {
+        when:
+        MeasurementUnitsPage measurementUnitsPage = browser.page MeasurementUnitsPage
+        measurementUnitsPage.treeView.businessRules()
+        then:
+        at BusinessRulesPage
+
+        when:
+        BusinessRulesPage businessRulesPage = browser.page BusinessRulesPage
+        then:
+        !businessRulesPage.isAddItemIconVisible()
+    }
+
+    def "goto assests and verify there is no option to Import a new asset"() {
+        when:
+        BusinessRulesPage businessRulesPage = browser.page BusinessRulesPage
+        businessRulesPage.treeView.assets()
+        then:
+        at AssetsPage
+
+        when:
+        AssetsPage assetsPage = browser.page AssetsPage
+        then:
+        !assetsPage.isAddItemIconVisible()
+    }
+
+    def "goto tags verify there is no option to Create New Tag"() {
+        when:
+        AssetsPage assetsPage = browser.page AssetsPage
+        assetsPage.treeView.tags()
+        then:
+        at TagsPage
+
+        when:
+        TagsPage tagsPage = browser.page TagsPage
+        then:
+        !tagsPage.isAddItemIconVisible()
+    }
+
+    def "goto deprecated items and verify that there is no option to add another Deprecated Item"() {
+        when:
+        TagsPage tagsPage = browser.page TagsPage
+        tagsPage.treeView.deprecatedItems()
+        then:
+        at DepricatedItemsPage
+
+        when:
+        DepricatedItemsPage depricatedItemsPage = browser.page DepricatedItemsPage
+        then:
+        !depricatedItemsPage.isAddItemIconVisible()
+    }
+
+    def "goto imported data model and verify there is no option to Import a new Data Model"() {
+        when:
+        DepricatedItemsPage depricatedItemsPage = browser.page DepricatedItemsPage
+        depricatedItemsPage.treeView.importedDataModels()
+        then:
+        at ImportedDataModelsPage
+
+        when:
+        ImportedDataModelsPage importedDataModelsPage = browser.page ImportedDataModelsPage
+        then:
+        !importedDataModelsPage.areCreateButtonsVisible()
+    }
+
+    def "goto versions and verify there is no option to edit it"() {
+        when:
+        ImportedDataModelsPage importedDataModelsPage = browser.page ImportedDataModelsPage
+        importedDataModelsPage.treeView.versions()
+        then:
+        at VersionsPage
+
+        when:
+        VersionsPage versionsPage = browser.page VersionsPage
+        versionsPage.showMore()
+        then:
+        at VersionsPage
+
+        when:
+        versionsPage = browser.page VersionsPage
+        then:
+        !versionsPage.editButtonVisible()
+    }
+
 }

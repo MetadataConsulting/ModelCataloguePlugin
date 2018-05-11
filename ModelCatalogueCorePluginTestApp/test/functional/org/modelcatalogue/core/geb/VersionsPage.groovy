@@ -15,6 +15,9 @@ class VersionsPage extends Page {
 
     static content = {
         rows { $('#history-tab tbody tr') }
+        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+        showMoreButton { $('span.fa-plus-square-o') }
+        editButton(required: false) { $('#role_item-detail_edit-catalogue-elementBtn') }
     }
 
     boolean  rowsContainText(String text) {
@@ -24,6 +27,17 @@ class VersionsPage extends Page {
             }
         }
         false
+    }
+
+    void showMore() {
+        showMoreButton.click()
+    }
+
+    boolean editButtonVisible() {
+        if (editButton.empty) {
+            return false
+        }
+        true
     }
 
 }

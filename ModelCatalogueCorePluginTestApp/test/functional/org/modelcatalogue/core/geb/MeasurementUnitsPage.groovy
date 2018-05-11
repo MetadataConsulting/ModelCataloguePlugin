@@ -15,6 +15,7 @@ class MeasurementUnitsPage  extends Page {
 
     static content = {
         addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
+        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
     }
 
     boolean isAddItemIconVisible() {

@@ -18,6 +18,8 @@ class DataTypesPage extends Page {
         createDateTypeLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
         rows { $('div.inf-table-body tbody tr') }
         addItemIcon(required: false) { $("tfoot span.fa-plus-circle") }
+        showMoreButton { $('span.fa-plus-square-o') }
+        editDataTypeButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
     }
 
     boolean isAddItemIconVisible() {
@@ -43,5 +45,17 @@ class DataTypesPage extends Page {
 
     void createDataTypeFromNavigation() {
         createDateTypeLink.click()
+    }
+
+    void showMore() {
+        showMoreButton.click()
+    }
+
+    boolean editDataTypeDisabled() {
+        waitFor { editDataTypeButton.@('disabled') }
+    }
+
+    void selectDataType(String value) {
+        rows.$('a', text: value).click()
     }
 }
