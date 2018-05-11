@@ -32,6 +32,9 @@ class KeywordsService {
     }
 
     List<String> keywords(String term, boolean applyWordStem = false) {
+        if (!term) {
+            return []
+        }
         String[] arr = cleanup(term).split(' ')
         List<String> result = []
         for ( String word : arr ) {
