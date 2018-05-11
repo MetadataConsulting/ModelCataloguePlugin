@@ -5,7 +5,7 @@ import geb.Module
 class DataModelTreeViewModule extends Module {
 
     static content = {
-        dataModelLink { int index -> $('a.catalogue-element-treeview-icon', index) }
+        dataModelLink(wait: true) { int index -> $('a.catalogue-element-treeview-icon', index) }
         item { $('ul .catalogue-element-treeview-name', text: it) }
     }
 
