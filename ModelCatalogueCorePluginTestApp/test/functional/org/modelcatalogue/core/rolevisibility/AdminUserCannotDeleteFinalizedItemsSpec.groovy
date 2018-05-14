@@ -5,6 +5,8 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1769')
 @Title('Examine that a user with administration rights is not able to delete a finalised data class, data element, data type etc')
@@ -36,6 +38,7 @@ import spock.lang.Title
  - 25. Click on green plus sign button to create new tag. | Create Tag pop-up dialogue box appears.
  - 26. Fill 'Create Tag' form fields and click Save button. | New Tag is created.
  - 27. Navigate back to the main page of the data model by selecting the Data Model name in the tree-navigation panel. | Redirected to main Data Model page.
+ 
  - 28. Click on the 'Data Model' menu button in top left hand menu | 'Data Model' button menu drop-down appears.
  - 29. Select option to 'Finalize' data model from Data model button menu drop down. | Finalize Data Model drop-down appears.
  - 30. Fill in Semantic Version Number and Revision notes and click the 'Finalize' button. | 'Finalizing' process dialogue box appears
@@ -46,6 +49,8 @@ import spock.lang.Title
  - 35. From first drop-down list, select 'Curator' . From the second drop-down select 'Administration' and click the 'Grant' button to grant Curator Administration rights to the Data Model. | Curator is granted Administration rights to the Data Model. Their name and details appear in list of users with rights to view/administer the data model
  - 36. Logout as Supervisor | Logout successful
  - 37. Login as Curator | Login Successful
+
+
  - 38. Select the Data Model created by Supervisor. | Directed to Data Model main page.
  - 39. Using the tree-navigation panel, select the Data Classes tag. | Redirected to Data Classes page.
  - 40. Select Data Class from list. | Directed to Data Class main page in display panel.
@@ -64,5 +69,414 @@ import spock.lang.Title
  - 53. Repeat steps 45 - 48 with Tags. | Delete is disabled or absent for Tags in the finalised model.
 /$)
 
+@Stepwise
 class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
+
+    @Shared
+    String dataModelName = UUID.randomUUID().toString()
+    @Shared
+    String dataModelCatalogueId = UUID.randomUUID().toString()
+    @Shared
+    String dataModelDescription = "description"
+    @Shared
+    String dataClassName = "name" + UUID.randomUUID().toString()
+    @Shared
+    String dataClassCatalogueId = UUID.randomUUID().toString()
+    @Shared
+    String dataClassDescription = "description"
+    @Shared
+    String dataEleName = "name" + UUID.randomUUID().toString()
+    @Shared
+    String dataEleCatalogueId = UUID.randomUUID().toString()
+    @Shared
+    String dataEleDescription = "description"
+    @Shared
+    String dataTypeName = "name" + UUID.randomUUID().toString()
+    @Shared
+    String dataTypeCatalogueId = UUID.randomUUID().toString()
+    @Shared
+    String dataTypeDescription = "description"
+    @Shared
+    String measurementName = "name" + UUID.randomUUID().toString()
+    @Shared
+    String measurementCatalogueId = UUID.randomUUID().toString()
+    @Shared
+    String measurementDescription = "description"
+    @Shared
+    String businessName = UUID.randomUUID().toString()
+    @Shared
+    String businessCatalogueId = UUID.randomUUID().toString()
+    @Shared
+    String businessDescription = "description"
+    @Shared
+    String assetName = UUID.randomUUID().toString()
+    @Shared
+    String assetDescription = "description"
+    @Shared
+    String tagName = "name" + UUID.randomUUID().toString()
+    @Shared
+    String tagCatalogueId = UUID.randomUUID().toString()
+    @Shared
+    String tagDescription = "description"
+    @Shared
+    String symbolVal = "symbolVal"
+    @Shared
+    String version = "1.1"
+    @Shared
+    String versionNote = "versionNote"
+    @Shared
+    String enmKey = "1234"
+    @Shared
+    String enumValue = "value"
+
+    def "Login as supervisor"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
+        then:
+        at DashboardPage
+    }
+
+    def "Create data model and filling data model form"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = dataModelName
+        createDataModelPage.modelCatalogueId = dataModelCatalogueId
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "Select data class and create new data class"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Classes")
+        then:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        assert "Active Data Classes" == dataClassesPage.titleText().trim()
+        true
+
+        when:
+        DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
+        dataModelPolicyListPage.create()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = dataClassName
+        createDataClassPage.modelCatalogueId = dataClassCatalogueId
+        createDataClassPage.description = dataClassDescription
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+
+    }
+
+    def "Select and add data elements"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Elements")
+        then:
+        at DataElementsPage
+
+
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.addItemIcon.click()
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.name = dataEleName
+        createDataElementPage.modelCatalogueId = dataEleCatalogueId
+        createDataElementPage.description = dataEleDescription
+        createDataElementPage.finish()
+        then:
+        DataElementsPage
+    }
+
+    def "Select and add Data types"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Types")
+        then:
+        DataTypesPage
+
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.addItemIcon.click()
+        then:
+        CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataClassPage = browser.page CreateDataTypePage
+        createDataClassPage.name = dataTypeName
+        createDataClassPage.modelCatalogueId = dataTypeCatalogueId
+        createDataClassPage.description = dataTypeDescription
+        createDataClassPage.enumerated()
+        fillMetadata enmKey: enumValue
+        createDataClassPage.buttons.save()
+        then:
+        at DataTypesPage
+    }
+
+    def "Select and add data measurement"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Measurement Units")
+        then:
+        at MeasurementUnitsPage
+
+        when:
+        MeasurementUnitsPage measurementUnitsPage = browser.page MeasurementUnitsPage
+        measurementUnitsPage.addItemIcon.click()
+        then:
+        at CreateMeasurementUnitsPage
+
+        when:
+        CreateMeasurementUnitsPage createMeasurementUnitsPage = browser.page CreateMeasurementUnitsPage
+        createMeasurementUnitsPage.name = measurementName
+        createMeasurementUnitsPage.catalogueId = measurementCatalogueId
+        createMeasurementUnitsPage.description = measurementDescription
+        createMeasurementUnitsPage.symbol = symbolVal
+        createMeasurementUnitsPage.submit()
+        then:
+        MeasurementUnitsPage
+    }
+
+    def "Select and add buisness rule"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Business Rules")
+        then:
+        at BusinessRulesPage
+
+        when:
+        BusinessRulesPage businessRulesPage = browser.page BusinessRulesPage
+        businessRulesPage.addItemIcon.click()
+        then:
+        true
+        at CreateBusninessRulesPages
+
+        when:
+        CreateBusninessRulesPages createBusninessRulesPages = browser.page CreateBusninessRulesPages
+        createBusninessRulesPages.name = businessName
+        createBusninessRulesPages.focus = businessCatalogueId
+        createBusninessRulesPages.component = businessDescription
+        createBusninessRulesPages.submit()
+        then:
+        at BusinessRulesPage
+    }
+
+
+    def "Select, add assets tags "() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Assets")
+        then:
+        AssetsPage
+
+        when:
+        AssetsPage assetsPage = browser.page AssetsPage
+        assetsPage.addItemIcon.click()
+        then:
+        at CreateAssetsPage
+
+        when:
+        CreateAssetsPage createAssetsPage = browser.page CreateAssetsPage
+        createAssetsPage.name = assetName
+        createAssetsPage.upload(System.getProperty('downloadFilepath'))
+        createAssetsPage.description = assetDescription
+        createAssetsPage.submit()
+        then:
+        AssetsPage
+    }
+
+    def "Select and add tags entry"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Tags")
+        then:
+        at TagsPage
+
+        when:
+        TagsPage tagsPage = browser.page TagsPage
+        tagsPage.addItemIcon.click()
+        then:
+        at CreateTagPage
+
+        when:
+        CreateTagPage createTagPage = browser.page CreateTagPage
+        createTagPage.name = tagName
+        createTagPage.catalogueId = tagCatalogueId
+        createTagPage.description = tagDescription
+        createTagPage.save()
+        then:
+        at TagsPage
+
+    }
+
+    def "finalize data model"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Assets")
+        then:
+        AssetsPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataModel()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.version = version
+        finalizeDataModelPage.setVersionNote(versionNote)
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+    def "open setting page"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.cogMenu()
+        dashboardPage.nav.dataModelPermission()
+        then:
+        at DataModelAclPermissionsPage
+
+        when:
+        DataModelAclPermissionsPage dataModelAclPermissionsPage = browser.page DataModelAclPermissionsPage
+        dataModelAclPermissionsPage.select(dataModelName)
+        then:
+        DataModelAclPermissionsShowPage
+
+        when:
+        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
+        dataModelAclPermissionsShowPage.grant("curator", "administration")
+        then:
+        DataModelAclPermissionsShowPage
+    }
+
+    def "logout as supervisor and Login as curator"() {
+        when:
+        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
+        dataModelAclPermissionsShowPage.nav.userMenu()
+        dataModelAclPermissionsShowPage.nav.logout()
+        then:
+        at HomePage
+
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
+        then:
+        at DashboardPage
+    }
+
+    def "Select data model created by supervisor"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelName)
+        dashboardPage.select(dataModelName)
+        then:
+        DataModelPage
+    }
+
+    def "Check for delete disable in data class"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Classes")
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.expandLinkClick()
+        dataClassesPage.dataElementDropDown()
+        then:
+        dataClassesPage.isDeleteBttnDisable()
+    }
+
+    def "Check for delete disable in data elements"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Elements")
+        then:
+        at DataElementsPage
+
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.expandLinkClick()
+        dataElementsPage.dataElementDropDown()
+        then:
+        dataElementsPage.isDeleteBttnDisable()
+    }
+
+    def "Check for delete disable in data types"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Types")
+        then:
+        at DataTypesPage
+
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.expandLinkClick()
+        dataTypesPage.dataElementDropDown()
+        then:
+        dataTypesPage.isDeleteBttnDisable()
+    }
+
+    def "Check for delete disable in measurement"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Measurement Units")
+        then:
+        at MeasurementUnitsPage
+
+        when:
+        MeasurementUnitsPage measurementUnitsPage = browser.page MeasurementUnitsPage
+        measurementUnitsPage.expandLinkClick()
+        measurementUnitsPage.dataElementDropDown()
+        then:
+        measurementUnitsPage.isDeleteBttnDisable()
+    }
+
+    def "Check for delete disable in business"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Business Rules")
+        then:
+        at BusinessRulesPage
+
+        when:
+        BusinessRulesPage businessRulesPage = browser.page BusinessRulesPage
+        businessRulesPage.expandLinkClick()
+        businessRulesPage.dataElementDropDown()
+        then:
+        businessRulesPage.isDeleteBttnDisable()
+    }
 }

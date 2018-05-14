@@ -33,6 +33,8 @@ class DataModelPage extends Page {
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
+        setting { $('a#role_navigation-right_admin-menu-menu-item-link') }
+        dataModelAcl { $('a#datamodelpermission-admin-menu-item-link') }
     }
 
     String getRowsText() {
@@ -65,6 +67,14 @@ class DataModelPage extends Page {
 
     void dataModel() {
         dataModelButton.click()
+    }
+
+    void settiings() {
+        setting.click()
+    }
+
+    void dataModelAcl() {
+        dataModelAcl.click()
     }
 
     String getDataModelTitle() {
