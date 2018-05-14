@@ -16,6 +16,9 @@ class DataClassPage extends Page {
         formMetadataLink { $('span.btn.btn-link btn-sm ng-binding') }
         tabs { $('ul.nav.nav-tabs a', text: it) }
         parentAddButton { $('span.fa.fa-plus-circle') }
+        dataClassDropdownLink { $('#role_item_catalogue-element-menu-item-link') }
+        deleteDataClass { $('#delete-menu-item-link') }
+        confirmDataClassDelete(required: false, wait: true) { $('button.btn-primary', text: "OK") }
     }
 
     void edit() {
@@ -40,6 +43,19 @@ class DataClassPage extends Page {
 
     void addParent() {
         parentAddButton[2].click()
+    }
+
+    void dataClassDropdown() {
+        dataClassDropdownLink.click()
+    }
+
+    void deleteDataClass() {
+        deleteDataClass.click()
+    }
+
+    void confirmDelete() {
+        waitFor { confirmDataClassDelete }
+        confirmDataClassDelete.click()
     }
 
 }
