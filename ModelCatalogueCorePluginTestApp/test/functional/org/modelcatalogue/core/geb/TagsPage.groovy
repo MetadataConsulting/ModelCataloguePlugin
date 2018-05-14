@@ -21,7 +21,7 @@ class TagsPage extends Page {
         rows { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center") }
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
-        deleteBttn { $('a#deleteBtn') }
+        deleteBttn(required: false) { $('a#deleteBtn') }
     }
 
     void expandLinkClick() {
