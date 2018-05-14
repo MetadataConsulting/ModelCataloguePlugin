@@ -29,10 +29,10 @@ class TagsPage extends Page {
     }
 
     Boolean isDeleteBttnDissable() {
-        if (!deleteBttn || deleteBttn?.attr("class") == "disabled") {
+        if (!deleteBttn) {
             return true
         }
-        false
+        return deleteBttn?.attr("class") == "disabled"
     }
 
     void dataElementDropDown() {

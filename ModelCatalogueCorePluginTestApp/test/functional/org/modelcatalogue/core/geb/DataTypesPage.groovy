@@ -28,10 +28,7 @@ class DataTypesPage extends Page {
     }
 
     Boolean isDeleteBttnDisable() {
-        if (deleteBttn.attr("class") == "disabled")
-            return true
-        else
-            false
+        deleteBttn.attr("class") == "disabled"
     }
 
     void dataElementDropDown() {
