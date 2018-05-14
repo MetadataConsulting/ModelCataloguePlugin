@@ -28,11 +28,11 @@ class TagsPage extends Page {
         expandLink.click()
     }
 
-    Boolean isDeleteBttnVisible() {
-        if (deleteBttn.attr("class") == "disabled")
+    Boolean isDeleteBttnDissable() {
+        if (!deleteBttn || deleteBttn?.attr("class") == "disabled") {
             return true
-        else
-            false
+        }
+        false
     }
 
     void dataElementDropDown() {

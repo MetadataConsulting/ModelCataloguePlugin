@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
+import jdk.nashorn.internal.ir.annotations.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
@@ -417,6 +418,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         dataClassesPage.isDeleteBttnDisable()
     }
 
+
     def "Check for delete disable in data elements"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
@@ -432,6 +434,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         dataElementsPage.isDeleteBttnDisable()
     }
 
+
     def "Check for delete disable in data types"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
@@ -446,6 +449,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         then:
         dataTypesPage.isDeleteBttnDisable()
     }
+
 
     def "Check for delete disable in measurement"() {
         when:
@@ -475,5 +479,20 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         businessRulesPage.dataElementDropDown()
         then:
         businessRulesPage.isDeleteBttnDisable()
+    }
+
+    def "Check for delete disable in tags"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Tags")
+        then:
+        at TagsPage
+
+        when:
+        TagsPage tagsPage = browser.page TagsPage
+        tagsPage.expandLinkClick()
+        tagsPage.dataElementDropDown()
+        then:
+        tagsPage.isDeleteBttnDissable()
     }
 }
