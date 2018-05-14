@@ -38,7 +38,6 @@ import spock.lang.*
  - 25. Click on green plus sign button to create new tag. | Create Tag pop-up dialogue box appears.
  - 26. Fill 'Create Tag' form fields and click Save button. | New Tag is created.
  - 27. Navigate back to the main page of the data model by selecting the Data Model name in the tree-navigation panel. | Redirected to main Data Model page.
- 
  - 28. Click on the 'Data Model' menu button in top left hand menu | 'Data Model' button menu drop-down appears.
  - 29. Select option to 'Finalize' data model from Data model button menu drop down. | Finalize Data Model drop-down appears.
  - 30. Fill in Semantic Version Number and Revision notes and click the 'Finalize' button. | 'Finalizing' process dialogue box appears
@@ -49,8 +48,6 @@ import spock.lang.*
  - 35. From first drop-down list, select 'Curator' . From the second drop-down select 'Administration' and click the 'Grant' button to grant Curator Administration rights to the Data Model. | Curator is granted Administration rights to the Data Model. Their name and details appear in list of users with rights to view/administer the data model
  - 36. Logout as Supervisor | Logout successful
  - 37. Login as Curator | Login Successful
-
-
  - 38. Select the Data Model created by Supervisor. | Directed to Data Model main page.
  - 39. Using the tree-navigation panel, select the Data Classes tag. | Redirected to Data Classes page.
  - 40. Select Data Class from list. | Directed to Data Class main page in display panel.
