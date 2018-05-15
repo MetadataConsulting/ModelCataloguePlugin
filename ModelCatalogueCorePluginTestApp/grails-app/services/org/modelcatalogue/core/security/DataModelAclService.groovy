@@ -2,6 +2,7 @@ package org.modelcatalogue.core.security
 
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.acl.AclService
 import grails.plugin.springsecurity.acl.AclUtilService
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
@@ -16,10 +17,15 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.transaction.annotation.Propagation
+import org.springframework.security.acls.model.MutableAcl
+import org.springframework.security.acls.model.AccessControlEntry
+import org.springframework.security.acls.domain.PrincipalSid
 
 class DataModelAclService {
 
     AclUtilService aclUtilService
+
+    AclService aclService
 
     SpringSecurityService springSecurityService
 
@@ -220,4 +226,36 @@ class DataModelAclService {
             aclUtilService.deletePermission(dataModel, loggedUsername(), BasePermission.ADMINISTRATION)
         }
     }
+
+    @Transactional
+    void removeDuplicatedPermissions(DataModel dataModel) {
+        log.info "removing duplicate permissions for ${dataModel.name} ${dataModel.modelCatalogueId} ${dataModel.status}"
+        Set<String> readUsernames = []
+        Set<String> administrationUsernames = []
+        MutableAcl acl = (MutableAcl)aclUtilService.readAcl(DataModel, dataModel.id)
+        if(acl.entries) {
+            for ( int i = 0; i < acl.entries.size(); i++) {
+                AccessControlEntry entry = acl.entries[i]
+                if(entry.sid instanceof PrincipalSid) {
+                    String username = ((PrincipalSid)entry.sid).principal
+                    if ( entry.permission == BasePermission.READ ) {
+                        if (readUsernames.contains(username)) {
+                            acl.deleteAce i
+                        } else {
+                            readUsernames << username
+                        }
+
+                    } else if ( entry.permission == BasePermission.ADMINISTRATION ) {
+                        if (administrationUsernames.contains(username)) {
+                            acl.deleteAce i
+                        } else {
+                            administrationUsernames << username
+                        }
+                    }
+                }
+            }
+        }
+        aclService.updateAcl acl
+    }
+
 }
