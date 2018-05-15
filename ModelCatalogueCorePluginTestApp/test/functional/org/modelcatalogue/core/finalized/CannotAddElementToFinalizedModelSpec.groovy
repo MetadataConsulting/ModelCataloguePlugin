@@ -30,6 +30,7 @@ class CannotAddElementToFinalizedModelSpec extends GebSpec {
     String dataModelCatalogueId = UUID.randomUUID().toString()
     @Shared
     String dataModelDescription = "description"
+    @Shared
     String version = "1.1"
     @Shared
     String versionNote = "versionNote"

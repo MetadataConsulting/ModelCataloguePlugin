@@ -106,7 +106,6 @@ class DataModelPage extends Page {
     }
 
     Boolean checkFinalizedStatus() {
-        finalizedStatus.text().toLowerCase().equals("finalized")
-
+        finalizedStatus[0].text().toLowerCase().contains("finalized")
     }
 }
