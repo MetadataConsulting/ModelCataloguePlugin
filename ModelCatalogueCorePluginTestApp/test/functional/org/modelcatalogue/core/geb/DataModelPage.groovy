@@ -34,9 +34,9 @@ class DataModelPage extends Page {
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
         policiesList { $('div.row.detail-section', 0).$('div.ng-scope span') }
-
         editModelButton(wait: true) { $('#role_item-detail_inline-editBtn') }
         ModelEditSaveButton(required: false, wait: true) { $('#role_item-detail_inline-edit-submitBtn') }
+        finalizedStatus(required: false, wait: true) { $('div.col-md-6', text: 'Status').siblings() }
     }
 
     String getRowsText() {
@@ -103,5 +103,10 @@ class DataModelPage extends Page {
     void removeUniqueOfKindPolicy() {
         $('a#remove-tag-0').click()
         sleep(2000)
+    }
+
+    Boolean checkFinalizedStatus() {
+        finalizedStatus.text().toLowerCase().equals("finalized")
+
     }
 }

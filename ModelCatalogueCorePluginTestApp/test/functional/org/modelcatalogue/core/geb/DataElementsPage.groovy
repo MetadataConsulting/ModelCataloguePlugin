@@ -31,6 +31,12 @@ class DataElementsPage extends Page {
         }
         true
     }
+    boolean iscreateDateElementLinkVisible() {
+        if ( createDateElementLink.empty ) {
+            return false
+        }
+        true
+    }
 
     void selectRow(int row) {
         anchorElements[row].click()
