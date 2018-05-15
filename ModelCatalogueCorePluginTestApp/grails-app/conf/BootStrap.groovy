@@ -210,16 +210,28 @@ class BootStrap {
     }
 
     boolean skipReindex() {
-        System.getenv('SKIP_REINDEX') as boolean
+        String str = System.getenv('SKIP_REINDEX')
+        if (str) {
+            return Boolean.valueOf(str)
+        }
+        return false
     }
 
 
     boolean isBlankDev() {
-        System.getenv('MC_BLANK_DEV') as boolean
+        String str = System.getenv('MC_BLANK_DEV')
+        if (str) {
+            return Boolean.valueOf(str)
+        }
+        return false
     }
 
     boolean isDemo() {
-        System.getenv('METADATA_DEMO') as boolean
+        String str = System.getenv('METADATA_DEMO')
+        if (str) {
+            return Boolean.valueOf(str)
+        }
+        return false
     }
 
     def setupDevTestStuff(){
