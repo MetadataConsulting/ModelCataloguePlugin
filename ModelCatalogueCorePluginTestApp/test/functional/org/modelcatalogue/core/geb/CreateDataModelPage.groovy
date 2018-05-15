@@ -22,6 +22,7 @@ class CreateDataModelPage extends Page implements InputUtils {
         defaultTag { $("a.remove-tag") }
         policiesInput { $("input#dataModelPolicy") }
         policyTag { $("span.with-pointer.ng-binding") }
+        dataClasses { $('div.split-view-content').module(DataModelTreeViewModule) }
         policiesCheckboxList { $('label', text: "Policies").siblings('ul').$('li') }
     }
 
