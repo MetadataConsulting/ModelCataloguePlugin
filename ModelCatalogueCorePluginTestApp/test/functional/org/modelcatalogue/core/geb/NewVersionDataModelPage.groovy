@@ -15,7 +15,7 @@ class NewVersionDataModelPage extends Page implements InputUtils {
 
     void hideConfirmation() {
         hideButton.click()
-        sleep(2000)
+        sleep(2_000)
     }
 
     void semanticVersionText(String value) {
