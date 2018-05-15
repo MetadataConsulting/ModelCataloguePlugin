@@ -93,12 +93,9 @@ class CreateNewVersionOfDataModelSpec extends GebSpec {
     }
 
     def "Check data model status is diaplayimg as  finalized "() {
-        when:
-        DataModelPage dataModelPage = browser.page DataModelPage
-        then:
-        true
 
         when:
+        DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage = browser.page DataModelPage
         dataModelPage.dropdown()
         dataModelPage.dropdownMenu.createNewVersion()
