@@ -23,10 +23,12 @@ class CreateDataModelPage extends Page implements InputUtils {
         policiesInput { $("input#dataModelPolicy") }
         policyTag { $("span.with-pointer.ng-binding") }
         dataClasses { $('div.split-view-content').module(DataModelTreeViewModule) }
+        policiesCheckboxList { $('label', text: "Policies").siblings('ul').$('li') }
     }
 
     void submit() {
         submitButton.click()
+        sleep(2000)
     }
 
     void check(String name) {
@@ -68,5 +70,12 @@ class CreateDataModelPage extends Page implements InputUtils {
     String getPolicies() {
         policyTag.text()
     }
-}
 
+    void selectUniqueOfKindPolicy() {
+        policiesCheckboxList.$('input#dataModelPolicies', 0).click()
+    }
+
+    void selectDefaultsChecks() {
+        policiesCheckboxList.$('input#dataModelPolicies', 1).click()
+    }
+}
