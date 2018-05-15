@@ -77,25 +77,25 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
     @Shared
     String dataModelDescription = "description"
     @Shared
-    String dataClassName = "name" + UUID.randomUUID().toString()
+    String dataClassName =  UUID.randomUUID().toString()
     @Shared
     String dataClassCatalogueId = UUID.randomUUID().toString()
     @Shared
     String dataClassDescription = "description"
     @Shared
-    String dataEleName = "name" + UUID.randomUUID().toString()
+    String dataEleName =  UUID.randomUUID().toString()
     @Shared
     String dataEleCatalogueId = UUID.randomUUID().toString()
     @Shared
     String dataEleDescription = "description"
     @Shared
-    String dataTypeName = "name" + UUID.randomUUID().toString()
+    String dataTypeName = UUID.randomUUID().toString()
     @Shared
     String dataTypeCatalogueId = UUID.randomUUID().toString()
     @Shared
     String dataTypeDescription = "description"
     @Shared
-    String measurementName = "name" + UUID.randomUUID().toString()
+    String measurementName =  UUID.randomUUID().toString()
     @Shared
     String measurementCatalogueId = UUID.randomUUID().toString()
     @Shared
@@ -111,7 +111,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
     @Shared
     String assetDescription = "description"
     @Shared
-    String tagName = "name" + UUID.randomUUID().toString()
+    String tagName =  UUID.randomUUID().toString()
     @Shared
     String tagCatalogueId = UUID.randomUUID().toString()
     @Shared
@@ -123,7 +123,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
     @Shared
     String versionNote = "versionNote"
     @Shared
-    String enmKey = "1234"
+    Integer enmKey = 1234
     @Shared
     String enumValue = "value"
 
@@ -160,7 +160,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         then:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         assert "Active Data Classes" == dataClassesPage.titleText().trim()
-        true
+
 
         when:
         DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
@@ -223,7 +223,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         createDataClassPage.modelCatalogueId = dataTypeCatalogueId
         createDataClassPage.description = dataTypeDescription
         createDataClassPage.enumerated()
-        fillMetadata enmKey: enumValue
+        fillMetadata 1234: enumValue
         createDataClassPage.buttons.save()
         then:
         at DataTypesPage
