@@ -96,6 +96,11 @@ class CreateNewVersionOfDataModelSpec extends GebSpec {
 
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        then:
+        dataModelPage.finalizedStatus()
+
+        when:
+        dataModelPage = browser.page DataModelPage
         dataModelPage = browser.page DataModelPage
         dataModelPage.dropdown()
         dataModelPage.dropdownMenu.createNewVersion()
