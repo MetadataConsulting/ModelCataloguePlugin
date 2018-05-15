@@ -31,12 +31,12 @@ class DataModelPage extends Page {
         }
         exportLink(required: false) { $('a#role_item_export-menu-item-link') }
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
-        finalizedLink(required: false) { $("a#finalize-menu-item-link") }
+        finalizedLink(required: false, wait: true) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
         policiesList { $('div.row.detail-section', 0).$('div.ng-scope span') }
-
         editModelButton(wait: true) { $('#role_item-detail_inline-editBtn') }
         ModelEditSaveButton(required: false, wait: true) { $('#role_item-detail_inline-edit-submitBtn') }
+        finalizedStatus(required: false, wait: true) { $('div.col-md-6', text: 'Status').siblings() }
     }
 
     String getRowsText() {
@@ -49,6 +49,11 @@ class DataModelPage extends Page {
 
     void exportXml() {
         exportXMLLink.click()
+    }
+
+    Boolean finalizedStatus() {
+        finalizedStatus.text().toLowerCase().equals("finalized")
+
     }
 
     void export() {

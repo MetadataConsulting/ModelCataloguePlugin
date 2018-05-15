@@ -5,6 +5,8 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1756')
 @Title('Create a new version of a data model')
@@ -29,5 +31,118 @@ import spock.lang.Title
  - Verify that you can select the option 'New Version' | Option is selectable
 /$)
 
+@Stepwise
 class CreateNewVersionOfDataModelSpec extends GebSpec {
+
+    @Shared
+    String dataModelName = UUID.randomUUID().toString()
+    @Shared
+    String dataModelCatalogueId = UUID.randomUUID().toString()
+    @Shared
+    String dataModelDescription = "description"
+    @Shared
+    String semanticVersion = "1.2.6"
+    String version = "1.1"
+    @Shared
+    String versionNote = "versionNote"
+
+    def "Login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
+        then:
+        at DashboardPage
+    }
+
+    def "Create data model and filling data model form"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = dataModelName
+        createDataModelPage.modelCatalogueId = dataModelCatalogueId
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "Finalize data model"() {
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.version = version
+        finalizeDataModelPage.setVersionNote(versionNote)
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+    def "Check data model status is diaplayimg as  finalized "() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        then:
+        true
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.dropdownMenu.createNewVersion()
+        then:
+        NewVersionDataModelPage
+
+        when:
+        NewVersionDataModelPage newVersionDataModelPage = browser.page NewVersionDataModelPage
+        newVersionDataModelPage.semanticVersionText(semanticVersion)
+        newVersionDataModelPage.submit()
+        newVersionDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+    def "Open version tag  and delete newly created version"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Versions")
+        then:
+        at VersionsPage
+
+        when:
+        VersionsPage versionsPage = browser.page VersionsPage
+        versionsPage.selectVersion(semanticVersion)
+        versionsPage.dataElementDropDownClick()
+        versionsPage.deleteBttnClick()
+        versionsPage.deleteConfirmationBttnClick()
+        then:
+        at DashboardPage
+    }
+
+    def "Select data model from dashboard and check for new version link"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelName)
+        dashboardPage.select(dataModelName)
+        then:
+        DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        then:
+        dataModelPage.dropdownMenu.newLinkDisplay()
+    }
 }
