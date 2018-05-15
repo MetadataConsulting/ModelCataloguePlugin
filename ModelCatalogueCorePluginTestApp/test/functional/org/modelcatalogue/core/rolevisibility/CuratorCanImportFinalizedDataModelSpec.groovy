@@ -5,6 +5,10 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import spock.lang.Shared
+import org.modelcatalogue.core.geb.*
+
 
 @Issue('https://metadata.atlassian.net/browse/MET-1626')
 @Title('Check that a curator can Add Data Model Import from Data Model menu')
@@ -29,5 +33,156 @@ import spock.lang.Title
  - 18. Verify that imported Data model name is listed under '[Data model name] Imports' page. | Imported Data Model is listed.
 /$)
 
+@Stepwise
 class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
+
+    @Shared
+    String dataModelOneName = UUID.randomUUID().toString()
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
+    String dataModelTwoName = UUID.randomUUID().toString()
+
+    def "login to curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
+
+        then:
+        at DashboardPage
+    }
+
+    def "create new data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.with {
+            name = dataModelOneName
+            modelCatalogueId = "MT-234"
+            description = dataModelDescription
+            submit()
+        }
+        then:
+        at DataModelPage
+    }
+
+    def "navigate to data classes"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+    }
+
+    def "create new data class"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = "DATA_CLASS"
+        createDataClassPage.modelCatalogueId = "ID23254"
+        createDataClassPage.description = "Data class description"
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+    }
+
+    def "finalize data model"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.treeView.dataModel()
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.versionNote = "DATA MODEL FINALIZED"
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+    def "create another data model"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.with {
+            name = dataModelTwoName
+            modelCatalogueId = "MT-234567"
+            description = dataModelDescription
+            submit()
+        }
+        then:
+        at DataModelPage
+    }
+
+    def "import data model"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.dropdownMenu.addImport()
+        then:
+        at DropDownImportPage
+
+        when:
+        DropDownImportPage dropDownImportPage = browser.page DropDownImportPage
+        dropDownImportPage.fillSearchBox(dataModelOneName)
+        dropDownImportPage.searchMore()
+        then:
+        at SearchTagPage
+
+        when:
+        SearchTagPage searchTagPage = browser.page SearchTagPage
+        searchTagPage.searchTag(dataModelOneName)
+        then:
+        at DropDownImportPage
+
+        when:
+        dropDownImportPage = browser.page DropDownImportPage
+        dropDownImportPage.finish()
+        then:
+        at DataModelPage
+    }
+
+    def "verify data model is imported"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.importedDataModels()
+        then:
+        at DataImportsPage
+
+        when:
+        DataImportsPage dataImportsPage = browser.page DataImportsPage
+        driver.navigate().refresh()
+        then:
+        dataImportsPage.containsDataModel(dataModelOneName)
+    }
 }
