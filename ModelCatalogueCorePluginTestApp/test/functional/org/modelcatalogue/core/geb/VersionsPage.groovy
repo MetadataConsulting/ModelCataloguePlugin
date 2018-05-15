@@ -15,7 +15,7 @@ class VersionsPage extends Page {
 
     static content = {
         rows { $('#history-tab tbody tr') }
-        versionSelect (wait:true){ $('a.preserve-new-lines.ng-binding.ng-scope', text: it).siblings('a') }
+        versionSelect (wait:true){ $('a.preserve-new-lines.ng-binding', text: it).siblings('a') }
         expandLink (wait:true){ $('a.inf-cell-expand') }
         dataElementDropDown (wait:true){ $('button#role_item_catalogue-elementBtn') }
         deleteBttn(wait:true) { $('a#deleteBtn') }

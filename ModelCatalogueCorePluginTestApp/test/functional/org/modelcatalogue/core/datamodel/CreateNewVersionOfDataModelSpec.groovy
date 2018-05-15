@@ -42,6 +42,7 @@ class CreateNewVersionOfDataModelSpec extends GebSpec {
     String dataModelDescription = "description"
     @Shared
     String semanticVersion = "1.2.6"
+    @Shared
     String version = "1.1"
     @Shared
     String versionNote = "versionNote"
