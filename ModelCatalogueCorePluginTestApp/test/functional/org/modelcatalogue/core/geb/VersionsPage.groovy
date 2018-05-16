@@ -17,13 +17,17 @@ class VersionsPage extends Page {
         rows { $('#history-tab tbody tr') }
     }
 
-    boolean  rowsContainText(String text) {
-        for ( int i = 0; i < rows.size(); i++ ) {
-            if ( rows[i].text().contains(text) ) {
+    boolean rowsContainText(String text) {
+        for (int i = 0; i < rows.size(); i++) {
+            if (rows[i].text().contains(text)) {
                 return true
             }
         }
         false
+    }
+
+    void selectModelByVersion(String version) {
+        rows.$('td a', text: version).click()
     }
 
 }

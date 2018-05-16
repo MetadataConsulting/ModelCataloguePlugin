@@ -27,12 +27,19 @@ class DataModelPage extends Page {
         modalDialog(required: false) { $('.modal-dialog', 0).module(ModalDialogModule) }
         dropdownLink(wait: true, required: false) { $('a#role_item_catalogue-element-menu-item-link', 0) }
         dropdownMenu(required: false) {
-            $('#role_item_catalogue-element-menu-item-link').siblings('ul').module(DataModelNavModule)
+            $('#role_item_catalogue-element-menu-item-link').siblings('ul.dropdown-menu').module(DataModelNavModule)
+            // was: $('#role_item_catalogue-element-menu-item-link').siblings('ul').module(DataModelNavModule)
         }
         exportLink(required: false) { $('a#role_item_export-menu-item-link') }
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
+        activityList {
+            $("#activity-changes>div.inf-table-body>table>tbody>tr")
+        }
+        policiesList { $('div.row.detail-section', 0).$('div.ng-scope span') }
+        editModelButton(wait: true) { $('#role_item-detail_inline-editBtn') }
+        ModelEditSaveButton(required: false, wait: true) { $('#role_item-detail_inline-edit-submitBtn') }
     }
 
     String getRowsText() {
@@ -55,6 +62,10 @@ class DataModelPage extends Page {
         finalizedLink.click()
     }
 
+    Boolean isFinalizedDataModelVisible() {
+        return finalizedLink?.displayed
+    }
+
     void dropdown() {
         dropdownLink.click()
     }
@@ -73,5 +84,35 @@ class DataModelPage extends Page {
 
     String getRightSideTitle() {
         rightSideTitleH3.text()
+    }
+
+    boolean isDataModelFinalized() {
+        activityList.$('td:nth-child(4) span span')*.text().join(",").contains("finalized")
+    }
+  
+    boolean defaultChecksPolicyAdded() {
+        policiesList.$('a', text: 'Default Checks').displayed
+    }
+
+    boolean UniqueOfKindPolicyAdded() {
+        policiesList.$('a', text: 'Unique of Kind').displayed
+    }
+
+    void selectUniqueOfKindPolicy() {
+        policiesList.$('a', text: 'Unique of Kind').click()
+    }
+
+    void editModel() {
+        editModelButton.click()
+    }
+
+    void save() {
+        ModelEditSaveButton.click()
+        sleep(2000)
+    }
+
+    void removeUniqueOfKindPolicy() {
+        $('a#remove-tag-0').click()
+        sleep(2000)
     }
 }

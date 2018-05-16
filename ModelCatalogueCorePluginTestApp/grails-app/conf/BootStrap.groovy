@@ -114,11 +114,13 @@ class BootStrap {
         List<DataModel> dataModelList = DataModel.findAll()
         for ( DataModel dataModel : dataModelList ) {
             dataModelAclService.addAdministrationPermission(dataModel)
+            if (removeAclDuplicates()) {
+                dataModelAclService.removeDuplicatedPermissions(dataModel)
+            }
         }
     }
 
-
-    private void loginAs(String username, String authority = MetadataRoles.ROLE_CURATOR) {
+    private void loginAs(String username, String authority = MetadataRoles.ROLE_ADMIN) {
         User user = userGormService.findByUsername(username)
         if ( user ) {
             // have to be authenticated as an admin to create ACLs
@@ -210,16 +212,36 @@ class BootStrap {
     }
 
     boolean skipReindex() {
-        System.getenv('SKIP_REINDEX') as boolean
+        String str = System.getenv('SKIP_REINDEX')
+        if (str) {
+            return Boolean.valueOf(str)
+        }
+        return false
+    }
+
+    boolean removeAclDuplicates() {
+        String str = System.getenv('REMOVE_ACL_DUPLICATES')
+        if (str) {
+            return Boolean.valueOf(str)
+        }
+        return false
     }
 
 
     boolean isBlankDev() {
-        System.getenv('MC_BLANK_DEV') as boolean
+        String str = System.getenv('MC_BLANK_DEV')
+        if (str) {
+            return Boolean.valueOf(str)
+        }
+        return false
     }
 
     boolean isDemo() {
-        System.getenv('METADATA_DEMO') as boolean
+        String str = System.getenv('METADATA_DEMO')
+        if (str) {
+            return Boolean.valueOf(str)
+        }
+        return false
     }
 
     def setupDevTestStuff(){

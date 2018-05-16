@@ -406,6 +406,7 @@ log4j.main = {
 //        debug 'org.hibernate.SQL'
 //    }
 
+    info 'grails.app.services.org.modelcatalogue.core.security.DataModelAclService'
     info 'org.modelcatalogue'
     info 'grails.app.domain.org.modelcatalogue'
     warn 'org.modelcatalogue.core.persistence'
