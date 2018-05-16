@@ -51,25 +51,23 @@ environments {
     }
 
     phantomjs {
-        DesiredCapabilities caps = new DesiredCapabilities()
-        List<String> cliArgsCap = []
-        cliArgsCap.add("--web-security=no")
-        cliArgsCap.add("--ssl-protocol=any")
-        cliArgsCap.add("--ignore-ssl-errors=yes")
-        cliArgsCap.add("--webdriver-logfile=/tmp/phantomjsdriver.log")
-        cliArgsCap.add("--webdriver-loglevel=ERROR")
-        caps.setJavascriptEnabled(true)
-        caps.setCapability("takesScreenshot", true)
-        caps.setCapability(
-                PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY,
-                "/usr/local/share/phantomjs"
-        )
-        caps.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, cliArgsCap)
-        PhantomJSDriver driver = new PhantomJSDriver(caps)
-
-        driver.manage().window().maximize()
-        driver.switchTo().window(driver.getWindowHandle())
-        return driver
+        driver = {
+            DesiredCapabilities caps = new DesiredCapabilities()
+            List<String> cliArgsCap = []
+            cliArgsCap.add("--web-security=no")
+            cliArgsCap.add("--ssl-protocol=any")
+            cliArgsCap.add("--ignore-ssl-errors=yes")
+            cliArgsCap.add("--webdriver-logfile=/tmp/phantomjsdriver.log")
+            cliArgsCap.add("--webdriver-loglevel=ERROR")
+            caps.setJavascriptEnabled(true)
+            caps.setCapability("takesScreenshot", true)
+            caps.setCapability(
+                    PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY,
+                    "/usr/local/share/phantomjs"
+            )
+            caps.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, cliArgsCap)
+            new PhantomJSDriver(caps)
+        }
     }
 
 }
