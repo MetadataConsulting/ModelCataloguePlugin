@@ -19,6 +19,7 @@ class DataElementsPage extends Page {
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
         firstRowLink { $('tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a') }
+        elementsList { $('table.inf-table tbody tr') }
     }
 
     void createDataElement() {
@@ -38,5 +39,9 @@ class DataElementsPage extends Page {
 
     String dataElementCreated() {
         firstRowLink.text()
+    }
+
+    boolean containsElement(String value) {
+        elementsList.$('a', text: value).displayed
     }
 }

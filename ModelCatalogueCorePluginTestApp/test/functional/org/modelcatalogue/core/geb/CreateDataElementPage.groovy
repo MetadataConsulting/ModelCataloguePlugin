@@ -3,7 +3,7 @@ package org.modelcatalogue.core.geb
 import geb.Page
 
 class CreateDataElementPage extends Page implements InputUtils {
-    static at = { $('.modal-dialog').text().contains('Create Data Element') }
+    static at = { $('.modal-dialog', 0).text().contains('Create Data Element') }
 
     static content = {
         nameInput { $('#name', 0) }

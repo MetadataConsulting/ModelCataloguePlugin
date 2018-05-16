@@ -19,7 +19,7 @@ import java.sql.DatabaseMetaData
 
 @CompileStatic
 class ChangeSqlService {
-    final String changeTable = Environment.current == Environment.TEST ? 'change' : '`change`'
+    final String changeTable = Environment.current == Environment.TEST ? 'CHANGE' : '`change`'
     def dataSource
 
     @Transactional(readOnly = true)

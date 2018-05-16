@@ -35,6 +35,8 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         localNameInput { $('#local-name') }
 
         dataElementInput { $('#data-element') }
+        createNewDataElementLink(required: false, wait: true) { $('a.create-new-cep-item') }
+        createNewDataElementPlusButton(required: false, wait: true) { $('span.input-group-btn button.btn-success') }
 
         buttonPlus { $('span.input-group-btn button.btn-success', 0) }
         rawLink(wait: true) { $('a', text: 'Raw') }
@@ -55,6 +57,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void setDataElement(String value) {
         fillInput(dataElementInput, value)
+        sleep(2000)
     }
 
     void setAppearanceName(String value) {
@@ -121,7 +124,6 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
     void exit() {
         exitButton.click()
         sleep(2_000)
-
     }
 
     void setName(String value) {
@@ -134,5 +136,13 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void setDescription(String value) {
         fillInput(descriptionInput, value)
+    }
+
+    void createNewElement() {
+        createNewDataElementLink.click()
+    }
+
+    void createNewElementFromPlusButton() {
+        createNewDataElementPlusButton.click()
     }
 }
