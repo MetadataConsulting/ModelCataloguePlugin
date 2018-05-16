@@ -40,11 +40,11 @@ import spock.lang.Shared
 class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString() // "TESTING_MODEL"
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared
-    String dataTypeName = "TESTING_DATATYPE"
+    String dataTypeName = UUID.randomUUID().toString() // "TESTING_DATATYPE"
     @Shared
     String dataTypeDescription = "TESTING_DATATYPE_DESCRIPTION"
     @Shared
@@ -54,7 +54,7 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
     @Shared
     String dataModelNewVersion = "0.0.3"
     @Shared
-    String dataTypeTwoName = "TESTING_DATATYPE_TWO"
+    String dataTypeTwoName = UUID.randomUUID().toString() // "TESTING_DATATYPE_TWO"
     @Shared
     String dataTypeTwoDescription = "TESTING_DATATYPE_TWO_DESCRIPTION"
 
