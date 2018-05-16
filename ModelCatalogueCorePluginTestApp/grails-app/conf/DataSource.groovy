@@ -50,7 +50,7 @@ environments {
                 if ( System.getenv('MC_JDBC_DRIVER') == 'com.mysql.jdbc.Driver' ) {
                     dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
                 }
-                url = System.getenv('MDX_DB_URL') ?: "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+                url = System.getenv('MDX_DB_URL') ?: "jdbc:h2:mem:jenkinsTest4;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
                 username = System.getenv('MDX_DB_USERNAME') ?: 'sa'
                 password = System.getenv('MDX_DB_PASSWORD') ?: ''
                 dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
