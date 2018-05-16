@@ -39,6 +39,9 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         buttonPlus { $('span.input-group-btn button.btn-success', 0) }
         rawLink(wait: true) { $('a', text: 'Raw') }
         addMetadataButton(wait: true) { $('div.modal button.btn-success', text: 'Add Metadata') }
+        cloneDataClassButton(wait: true) { $('span.input-group-btn a') }
+        closeButton { $('button.close') }
+        confirmCloseButton { $('form button.btn-primary') }
     }
 
     void addMetadata() {
@@ -120,6 +123,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void exit() {
         exitButton.click()
+        sleep(2000)
     }
 
     void setName(String value) {
@@ -132,5 +136,17 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void setDescription(String value) {
         fillInput(descriptionInput, value)
+    }
+
+    void cloneDataClass() {
+        cloneDataClassButton.click()
+    }
+
+    void close() {
+        closeButton.click()
+    }
+
+    void confirmClose() {
+        confirmCloseButton.click()
     }
 }

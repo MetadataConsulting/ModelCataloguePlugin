@@ -37,6 +37,7 @@ class DataModelPage extends Page {
 
         editModelButton(wait: true) { $('#role_item-detail_inline-editBtn') }
         ModelEditSaveButton(required: false, wait: true) { $('#role_item-detail_inline-edit-submitBtn') }
+        nav { $('div.navbar-collapse', 0).module(NavModuleAdmin) }
     }
 
     String getRowsText() {

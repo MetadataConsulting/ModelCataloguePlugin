@@ -5,6 +5,9 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import spock.lang.Shared
+import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-2023')
 @Title('Check that while cloning a data class, user is not able to view unauthorized data class')
@@ -42,5 +45,335 @@ import spock.lang.Title
  - 31. Click the Close button to close the Data Class Wizard pop-up box and click OK when the Close Data Class Wizard pop-up appears | 'Data Class Wizard' pop-up is closed
 /$)
 
+@Stepwise
 class CannotViewUnauthorizedItemsWhenCloningSpec extends GebSpec {
+
+    def "login as supervisor"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+        then:
+        at DashboardPage
+    }
+
+    def "create first data model and data class"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = "FIRST_TESTING_MODEL"
+        createDataModelPage.description = "new description"
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = "FIRST_TESTING_CLASS"
+        createDataClassPage.modelCatalogueId = "${UUID.randomUUID()}"
+        createDataClassPage.description = 'THIS IS MY DATA CLASS'
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+    }
+
+    def "create second data model and data class"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = "SECOND_TESTING_MODEL"
+        createDataModelPage.description = "new description"
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = "SECOND_TESTING_CLASS"
+        createDataClassPage.modelCatalogueId = "${UUID.randomUUID()}"
+        createDataClassPage.description = 'THIS IS MY DATA CLASS'
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+    }
+
+    def "finalize second data model"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.treeView.dataModel()
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.versionNote = "data model is finalized"
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+    def "create third data model and data class"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = "THIRD_TESTING_MODEL"
+        createDataModelPage.description = "new description"
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = "THIRD_TESTING_CLASS"
+        createDataClassPage.modelCatalogueId = "${UUID.randomUUID()}"
+        createDataClassPage.description = 'THIS IS MY DATA CLASS'
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+    }
+
+    def "finalize third data model"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.treeView.dataModel()
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.versionNote = "data model is finalized"
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+    def "go to data model acl"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.nav.adminMenu()
+        dataModelPage.nav.dataModelAcl()
+        for (String winHandle : driver.getWindowHandles()) {
+            driver.switchTo().window(winHandle);
+        }
+        then:
+        at DataModelAclPermissionsPage
+    }
+
+    def "select first created data model and grant curator admin right for it"() {
+        when:
+        DataModelAclPermissionsPage dataModelAclPermissionsPage = browser.page DataModelAclPermissionsPage
+        dataModelAclPermissionsPage.select("FIRST_TESTING_MODEL")
+        then:
+        at DataModelAclPermissionsShowPage
+
+        when:
+        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
+        dataModelAclPermissionsShowPage.grant("curator", "administration")
+        then:
+        at DataModelAclPermissionsShowPage
+
+    }
+
+    def "select second created data model and grant curator admin right for it"() {
+        when:
+        DataModelAclPermissionsPage dataModelAclPermissionsPage = to DataModelAclPermissionsPage
+        dataModelAclPermissionsPage.select("SECOND_TESTING_MODEL")
+        then:
+        at DataModelAclPermissionsShowPage
+
+        when:
+        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
+        dataModelAclPermissionsShowPage.grant("curator", "administration")
+        then:
+        at DataModelAclPermissionsShowPage
+    }
+
+    def "logout as supervisor"() {
+        when:
+        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
+        dataModelAclPermissionsShowPage.nav.userMenu()
+        dataModelAclPermissionsShowPage.nav.logout()
+        then:
+        at HomePage
+    }
+
+    def "login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
+        then:
+        at DashboardPage
+    }
+
+    def "select first data model create"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select("FIRST_TESTING_MODEL")
+        then:
+        at DataModelPage
+    }
+
+    def "go to data classes page and click create new data class"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+        then:
+        at CreateDataClassPage
+    }
+
+    def "clone data class"() {
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.cloneDataClass()
+        then:
+        at CloneDataModelPage
+
+        when:
+        CloneDataModelPage cloneDataModelPage = browser.page CloneDataModelPage
+        cloneDataModelPage.searchMore()
+        then:
+        at SearchTagPage
+
+        when:
+        SearchTagPage searchTagPage = browser.page SearchTagPage
+        searchTagPage.enterSearchBar("THIRD_TESTING_CLASS")
+        then: "verfiy name of third  does not appears"
+        searchTagPage.noResultFound()
+
+        when:
+        searchTagPage = browser.page SearchTagPage
+        searchTagPage.addImport()
+        then:
+        at ImportDataModelPage
+
+        when:
+        ImportDataModelPage importDataModelPage = browser.page ImportDataModelPage
+        importDataModelPage.searchMore()
+        then:
+        at SearchTagPage
+
+        when:
+        searchTagPage = browser.page SearchTagPage
+        then: "verify data class for third model is not in list"
+        !searchTagPage.tagPresent("THIRD_TESTING_CLASS")
+    }
+
+    def "close the models"() {
+        when:
+        SearchTagPage searchTagPage = browser.page SearchTagPage
+        searchTagPage.close()
+        then:
+        at ImportDataModelPage
+
+        when:
+        ImportDataModelPage importDataModelPage = browser.page ImportDataModelPage
+        importDataModelPage.close()
+        then:
+        at SearchTagPage
+
+        when:
+        searchTagPage = browser.page SearchTagPage
+        searchTagPage.close()
+        then:
+        at CloneDataModelPage
+
+        when:
+        CloneDataModelPage cloneDataModelPage = browser.page CloneDataModelPage
+        cloneDataModelPage.close()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.close()
+        createDataClassPage.confirmClose()
+        then:
+        at DataClassesPage
+    }
+
 }
