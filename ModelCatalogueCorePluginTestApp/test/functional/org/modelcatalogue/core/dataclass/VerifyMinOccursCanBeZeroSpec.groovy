@@ -63,9 +63,9 @@ class VerifyMinOccursCanBeZeroSpec extends GebSpec {
     @Shared
     String dataClassDescription = "description"
     @Shared
-    String minOccur = 0
+    String minOccur = "0"
     @Shared
-    String maxOccur = 10
+    String maxOccur = "10"
 
     def "Login as supervisor"() {
         when:
