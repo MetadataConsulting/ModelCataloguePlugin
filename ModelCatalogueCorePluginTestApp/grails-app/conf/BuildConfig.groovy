@@ -145,6 +145,9 @@ grails.project.dependency.resolution = {
         // Testing modules
         test "org.gebish:geb-spock:$gebVersion"
         test "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
+        compile("com.codeborne:phantomjsdriver:1.4.3") {
+            transitive = false
+        }
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 
         compile 'com.github.mpkorstanje:simmetrics-core:4.1.1'
