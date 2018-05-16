@@ -38,6 +38,10 @@ class DataClassesPage extends Page {
         createDateClassLink.click()
     }
 
+    Boolean isCreateDataClassLinkVisible() {
+        createDateClassLink.displayed
+    }
+
     String titleText() {
         return titlename.text()
     }

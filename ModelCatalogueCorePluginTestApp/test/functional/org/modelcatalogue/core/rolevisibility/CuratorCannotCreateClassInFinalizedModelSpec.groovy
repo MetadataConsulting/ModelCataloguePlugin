@@ -145,5 +145,10 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         then:
         assert !dataClassesPage.isAddItemIconVisible()
+
+        when:
+        dataClassesPage = browser.page DataClassesPage
+        then:
+        assert !dataClassesPage.isCreateDataClassLinkVisible()
     }
 }

@@ -27,6 +27,7 @@ class CreateDataModelPage extends Page implements InputUtils {
 
     void submit() {
         submitButton.click()
+        sleep(2_000)
     }
 
     void check(String name) {
