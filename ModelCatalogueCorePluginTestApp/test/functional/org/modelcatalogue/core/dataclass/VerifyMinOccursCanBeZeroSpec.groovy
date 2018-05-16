@@ -5,6 +5,8 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1562')
 @Title('Verify that min occurs - can enter 0 in the relationship editor')
@@ -35,5 +37,194 @@ import spock.lang.Title
  - Verify that in the Data Element row, under the Occurs column, the Max and Min Occurrence data is listed. | Max and Min Occurs are listed in line with Data Element data in Data Class main page
 /$)
 
+@Stepwise
 class VerifyMinOccursCanBeZeroSpec extends GebSpec {
+
+    @Shared
+    String dataModelName = UUID.randomUUID().toString()
+    @Shared
+    String dataModelCatalogueId = UUID.randomUUID().toString()
+    @Shared
+    String dataModelDescription = "description"
+    @Shared
+    String dataEleName = UUID.randomUUID().toString()
+    @Shared
+    String dataEleCatalogueId = UUID.randomUUID().toString()
+    @Shared
+    String dataTypeElement = UUID.randomUUID().toString()
+    @Shared
+    String dataTypeName = UUID.randomUUID().toString()
+    @Shared
+    String dataTypeId = UUID.randomUUID().toString()
+    @Shared
+    String dataClassName = UUID.randomUUID().toString()
+    @Shared
+    String dataClassCatalogueId = UUID.randomUUID().toString()
+    @Shared
+    String dataClassDescription = "description"
+    @Shared
+    String minOccur = 0
+    @Shared
+    String maxOccur = 10
+
+    def "Login as supervisor"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+        then:
+        at DashboardPage
+    }
+
+    def "Create data model and filling data model form"() {
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = dataModelName
+        createDataModelPage.modelCatalogueId = dataModelCatalogueId
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "Select and add data elements"() {
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Elements")
+        then:
+        at DataElementsPage
+
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.addItemIcon.click()
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.name = dataEleName
+        createDataElementPage.modelCatalogueId = dataEleCatalogueId
+        createDataElementPage.search(dataTypeElement)
+        createDataElementPage.createNewItemClick()
+        then:
+        CreateDataTypePage
+    }
+
+    def "Create new data type"() {
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.modelCatalogueId = dataTypeId
+        createDataTypePage.simple()
+        createDataTypePage.buttons.save()
+        then:
+        at CreateDataElementPage
+    }
+
+    def "Check for new data type created"() {
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        then:
+        createDataElementPage.matchSearch(dataTypeElement)
+
+        when:
+        createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.finish()
+        then:
+        at DataElementsPage
+    }
+
+    def "Select data class and create new data class"() {
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Classes")
+        then:
+        at DataClassesPage
+
+        when:
+        DataModelPolicyListPage dataModelPolicyListPage = browser.page DataModelPolicyListPage
+        dataModelPolicyListPage.create()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = dataClassName
+        createDataClassPage.modelCatalogueId = dataClassCatalogueId
+        createDataClassPage.description = dataClassDescription
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+    }
+
+
+    def "Open new data class and relationship pop up box"() {
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.selectDataClassLink(dataClassName)
+        then:
+        at DataClassPage
+
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+        dataClassPage.dataClassDropDownClick()
+        dataClassPage.createRelationshipClick()
+        then:
+        CreateRelationshipPage createRelationshipPage = browser.page CreateRelationshipPage
+        createRelationshipPage.matchPageHeading(dataClassName)
+
+    }
+
+    def "Create relationship"() {
+
+        when:
+        CreateRelationshipPage createRelationshipPage = browser.page CreateRelationshipPage
+        createRelationshipPage.slectRelationDropdown("contains")
+        createRelationshipPage.destinationalue(dataEleName)
+        createRelationshipPage.destinationDropdownFirst()
+        createRelationshipPage.metadataExpandBttn()
+        createRelationshipPage.slectMetadataTab("Occurrence")
+        createRelationshipPage.minOccurValue(minOccur)
+        createRelationshipPage.maxOccurValue(maxOccur)
+        createRelationshipPage.createRelationshipBttn()
+        then:
+        at DataClassPage
+    }
+
+    def "verfy for min and max occur in data element row"() {
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Classes")
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.selectDataClassLink(dataClassName)
+        then:
+        at DataClassPage
+
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+        then:
+        dataClassPage.occuranceStatus().contains("Min Occurs: 0")
+
+        when:
+        dataClassPage = browser.page DataClassPage
+        then:
+        dataClassPage.occuranceStatus().contains("Max Occurs: 10")
+    }
+
 }

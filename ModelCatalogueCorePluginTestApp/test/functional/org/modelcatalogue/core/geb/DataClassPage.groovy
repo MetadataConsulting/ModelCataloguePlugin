@@ -16,10 +16,26 @@ class DataClassPage extends Page {
         formMetadataLink { $('span.btn.btn-link btn-sm ng-binding') }
         tabs { $('ul.nav.nav-tabs a', text: it) }
         parentAddButton { $('span.fa.fa-plus-circle') }
+        dataClassDropDown { $('#role_item_catalogue-element-menu-item-link') }
+        createRelationship { $('#create-new-relationship-menu-item-link') }
+        checkMinMaxOccur { $('tr.inf-table-item-row.warning td.inf-table-item-cell.ng-scope.col-md-2') }
     }
 
     void edit() {
         editButton.click()
+    }
+
+    String occuranceStatus() {
+        return checkMinMaxOccur.text()
+
+    }
+
+    void dataClassDropDownClick() {
+        dataClassDropDown.click()
+    }
+
+    void createRelationshipClick() {
+        createRelationship.click()
     }
 
     void save() {

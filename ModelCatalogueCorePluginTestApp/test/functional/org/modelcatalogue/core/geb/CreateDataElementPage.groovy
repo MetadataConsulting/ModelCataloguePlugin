@@ -13,6 +13,7 @@ class CreateDataElementPage extends Page implements InputUtils {
         searchLink(wait: true) { $("", 0) }
         searchDataType(wait: true) { $("input#dataType") }
         selectItem(wait: true) { $("a.cep-item", 0) }
+        createNewItem(wait: true) { $("a.cep-item", 1) }
     }
 
     void setName(String value) {
@@ -21,6 +22,11 @@ class CreateDataElementPage extends Page implements InputUtils {
 
     void search(String value) {
         fillInput(searchDataType, value)
+        sleep(3_000)
+    }
+
+    Boolean matchSearch(String value) {
+        return true
     }
 
     void setDescription(String value) {
@@ -31,8 +37,12 @@ class CreateDataElementPage extends Page implements InputUtils {
         fillInput(modelCatalogueIdInput, value)
     }
 
-    void selectFirstItem(String item) {
+    void selectFirstItem() {
         selectItem().click()
+    }
+
+    void createNewItemClick() {
+        createNewItem().click()
     }
 
     void finish() {
