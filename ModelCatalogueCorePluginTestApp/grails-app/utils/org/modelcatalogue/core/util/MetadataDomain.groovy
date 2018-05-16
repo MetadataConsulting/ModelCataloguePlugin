@@ -11,6 +11,7 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
+import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 
 @CompileStatic
@@ -36,6 +37,43 @@ enum MetadataDomain {
     BUSINESS_RULE,
     TAG
 
+    static MetadataDomain ofClass(Class clazz) {
+
+        if ( clazz == Asset.class ) {
+            return ASSET
+
+        } else if ( clazz == DataClass.class ) {
+            return DATA_CLASS
+
+        } else if ( clazz == DataElement.class ) {
+            return DATA_ELEMENT
+
+        } else if ( clazz == DataModel.class ) {
+            return DATA_MODEL
+
+        } else if ( clazz == EnumeratedType.class ) {
+            return ENUMERATED_TYPE
+
+        } else if ( clazz == MeasurementUnit.class ) {
+            return MEASUREMENT_UNIT
+
+        } else if ( clazz == PrimitiveType.class ) {
+            return PRIMITIVE_TYPE
+
+        } else if ( clazz == ReferenceType.class ) {
+            return REFERENCE_TYPE
+
+        } else if ( clazz == DataType.class ) {
+            return DATA_TYPE
+
+        } else if ( clazz == ValidationRule.class ) {
+            return BUSINESS_RULE
+
+        } else if ( clazz == Tag.class ) {
+            return TAG
+        }
+        CATALOGUE_ELEMENT
+    }
     static MetadataDomain of(CatalogueElement catalogueElement) {
 
         if ( catalogueElement instanceof Asset ) {

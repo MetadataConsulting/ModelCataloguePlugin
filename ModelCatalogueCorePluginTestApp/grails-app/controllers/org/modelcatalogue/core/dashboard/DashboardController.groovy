@@ -51,11 +51,13 @@ class DashboardController {
                 paginationQuery: paginationQuery,
                 search: cmd.search,
                 searchScope: cmd.searchScope,
+                keywordMatchType: cmd.keywordMatchType,
                 status: cmd.status,
                 catalogueElementList: catalogueElementList,
                 total: total,
                 serverUrl: serverUrl,
-                dataModelId: query.dataModelId
+                dataModelId: query.dataModelId,
+                searchCatalogueElementScopes: query.searchCatalogueElementScopeList
         ]
     }
 

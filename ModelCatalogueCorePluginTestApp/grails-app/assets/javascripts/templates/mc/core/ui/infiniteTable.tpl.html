@@ -1,9 +1,9 @@
 <div>
-  <div class="inf-table-header">
-    <table class="inf-table table">
+  <div class="inf-table-header inf-table-body">
+    <table class="inf-table table" ng-class="{'table-expand': manualLoad && total != elements.length && elements.length > 0}">
       <thead>
       <tr>
-        <td colspan="2" class="col-md-12">
+        <td colspan="2">
           <span class="pull-right text-muted" ng-if="total != 0"><em>{{elements.length}} of {{total}}</em></span>
           <span class="pull-right text-muted" ng-if="total == 0"><em>Empty</em></span>
         </td>
@@ -23,13 +23,6 @@
         </th>
       </tr>
       </thead>
-    </table>
-  </div>
-  <div class="inf-table-spacer">
-  </div>
-  <div class="inf-table-body">
-    <table class="inf-table table"
-           ng-class="{'table-expand': manualLoad && total != elements.length && elements.length > 0}">
       <tbody ng-if="rows" sortable="sortableOptions">
       <tr class="inf-table-item-row" ng-repeat-start="row in rows" ng-class="row.classesForStatus">
         <td class="inf-table-item-cell" ng-class="row.head.classes" ng-switch="row.head.type">

@@ -41,40 +41,5 @@ class MappingSuggestionsGeneratorServiceSpec extends Specification  {
         results*.distance == [0.95f, 0.8f, 0.75f]
 
     }
-
-    @Unroll()
-    def 'stem #term into #expected'(String term, String expected) {
-        expect:
-        expected == service.stemTerm(term)
-
-        where:
-        term        || expected
-        'PHA'       || 'pha'
-        'controler' || 'control'
-        'Background'|| 'background'
-        'Stimulated'|| 'stimul'
-    }
-
-
-    @Unroll()
-    def '#term cleanup => #expected'(String term, String expected) {
-        expect:
-        expected == service.cleanup(term)
-
-        where:
-        term                           || expected
-        'Blood lactate/pyruvate ratio' || 'Blood lactate pyruvate ratio'
-    }
-
-    @Unroll()
-    def '#term keywords => #keywords'(String term, List<String> keywords) {
-        expect:
-        keywords == service.keywords(term)
-
-        where:
-        term                         || keywords
-        'PHA Stimulated Lymphocytes' || ['pha', 'stimul', 'lymphocyt']
-        '% of CD19+ B Cells'         || ['cd19+', 'cell']
-    }
 }
 

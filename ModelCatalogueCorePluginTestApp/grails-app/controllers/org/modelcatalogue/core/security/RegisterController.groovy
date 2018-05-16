@@ -151,8 +151,8 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             for (String roleName in roles) {
                 userRoleGormService.saveUserRoleByUsernameAndAuthority(user.username, roleName)
             }
-            registrationCodeGormService.delete()
-            registrationCode.delete()
+            registrationCodeGormService.delete(registrationCode)
+
         }
 
        if (user.accountLocked) {

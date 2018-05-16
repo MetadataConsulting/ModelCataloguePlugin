@@ -42,6 +42,14 @@ class BatchGormService implements WarnGormErrors {
         Batch.get(id)
     }
 
+    @Transactional(readOnly = true)
+    List<Batch> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<Batch>
+        }
+        Batch.where { id in ids }.list()
+    }
+
     @Transactional
     Batch saveWithName(String name) {
         save(new Batch(name: name))

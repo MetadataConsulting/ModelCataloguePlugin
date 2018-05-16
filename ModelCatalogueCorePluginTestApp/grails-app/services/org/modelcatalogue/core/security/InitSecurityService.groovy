@@ -41,14 +41,14 @@ class InitSecurityService {
     void initRoleHierarchyEntry() {
         boolean reload = false
         for ( String entry : [
-                    "${MetadataRoles.ROLE_ADMIN} > ${MetadataRoles.ROLE_SUPERVISOR}".toString(),
-                    "${MetadataRoles.ROLE_SUPERVISOR} > ${MetadataRoles.ROLE_CURATOR}".toString(),
-                    "${MetadataRoles.ROLE_CURATOR} > ${MetadataRoles.ROLE_USER}".toString(),
-            ]) {
-                if ( !roleHierarchyEntryGormService.findByEntry(entry) ) {
-                    roleHierarchyEntryGormService.save(entry)
-                    reload = true
-                }
+                "${MetadataRoles.ROLE_ADMIN} > ${MetadataRoles.ROLE_SUPERVISOR}".toString(),
+                "${MetadataRoles.ROLE_SUPERVISOR} > ${MetadataRoles.ROLE_CURATOR}".toString(),
+                "${MetadataRoles.ROLE_CURATOR} > ${MetadataRoles.ROLE_USER}".toString(),
+        ]) {
+            if ( !roleHierarchyEntryGormService.findByEntry(entry) ) {
+                roleHierarchyEntryGormService.save(entry)
+                reload = true
+            }
         }
         if ( reload ) {
             springSecurityService.reloadDBRoleHierarchy()
@@ -85,8 +85,8 @@ class InitSecurityService {
                 [username: 'supervisor', authority: MetadataRoles.ROLE_SUPERVISOR],
                 [username: 'curator', authority: MetadataRoles.ROLE_CURATOR],
                 [username: 'user', authority: MetadataRoles.ROLE_USER],
-                [username: 'admin', authority: MetadataRoles.ROLE_ADMIN],] as List< Map<String, String> >) {
-            userRoleGormService.saveUserRoleByUsernameAndAuthority(m.username , m.authority)
+                [username: 'admin', authority: MetadataRoles.ROLE_ADMIN],] as List<Map<String, String>>) {
+            userRoleGormService.saveUserRoleByUsernameAndAuthority(m.username, m.authority)
         }
     }
 }

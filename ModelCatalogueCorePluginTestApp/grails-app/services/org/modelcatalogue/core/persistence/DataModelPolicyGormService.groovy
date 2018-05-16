@@ -7,7 +7,6 @@ import org.hibernate.transform.Transformers
 import org.modelcatalogue.core.DataModelPolicy
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.WarnGormErrors
-import org.modelcatalogue.core.util.IdName
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.SortQuery
 import org.springframework.context.MessageSource
@@ -28,6 +27,9 @@ class DataModelPolicyGormService implements WarnGormErrors {
 
     @Transactional(readOnly = true)
     List<DataModelPolicy> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<DataModelPolicy>
+        }
         DataModelPolicy.where {
             id in ids
         }.list()

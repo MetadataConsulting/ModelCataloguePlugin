@@ -11,6 +11,18 @@
     <link href="https://use.fontawesome.com/releases/v5.0.3/css/all.css" rel="stylesheet">
 
 
+
+
+    <%--bootstrap --%>
+    <%--<asset:stylesheet href="bootstrap/dist/css/bootstrap.css"/>--%>
+
+    <asset:javascript src="bootstrap/dist/js/bootstrap.js"/>
+
+    %{--Strangely, the dashboard advanced search dropdown won't work if jquery is before bootstrap,
+    and it's fine if it's after,
+    although the console complains that bootstrap needs jquery...--}%
+    <asset:javascript src="jquery/dist/jquery.js"/>
+
     <asset:stylesheet src="application.css"/>
 
     <g:layoutHead/>

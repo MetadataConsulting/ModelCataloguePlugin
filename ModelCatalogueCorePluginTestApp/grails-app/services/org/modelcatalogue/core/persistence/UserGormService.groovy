@@ -150,4 +150,16 @@ class UserGormService implements WarnGormErrors {
         DetachedCriteria<User> query = queryByEnabled(enabled)
         query.where { user.username in usernameList }
     }
+
+    DetachedCriteria<User> queryByIds(List<Long> ids) {
+        User.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<User> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<User>
+        }
+        queryByIds(ids).list()
+    }
 }

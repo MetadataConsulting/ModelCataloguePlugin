@@ -99,4 +99,16 @@ class DataClassGormService implements WarnGormErrors {
         }
         query
     }
+
+    DetachedCriteria<DataClass> queryByIds(List<Long> ids) {
+        DataClass.where { id in ids }
+    }
+
+    @Transactional(readOnly = true)
+    List<DataClass> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<DataClass>
+        }
+        queryByIds(ids).list()
+    }
 }

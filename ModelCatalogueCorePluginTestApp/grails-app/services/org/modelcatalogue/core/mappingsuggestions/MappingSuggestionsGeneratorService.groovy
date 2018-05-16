@@ -19,6 +19,7 @@ import org.modelcatalogue.core.persistence.BatchGormService
 import org.modelcatalogue.core.persistence.DataClassGormService
 import org.modelcatalogue.core.persistence.DataElementGormService
 import org.modelcatalogue.core.persistence.RelationshipGormService
+import org.modelcatalogue.core.search.KeywordsService
 import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.ElasticMatchResultAdapter
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -46,6 +47,8 @@ class MappingSuggestionsGeneratorService implements MappingSuggestionsGenerator 
     RelationshipGormService relationshipGormService
 
     ElasticSearchService elasticSearchService
+
+    KeywordsService keywordsService
 
     def sessionFactory
 
@@ -167,9 +170,10 @@ class MappingSuggestionsGeneratorService implements MappingSuggestionsGenerator 
         }
         0
     }
+
     List<String> keywordsDependingOnMatchAgainst(MatchAgainst matchAgainst, CatalogueElement el) {
         if ( matchAgainst == MatchAgainst.CONTAINS_STEMMED_KEYWORDS ) {
-            return keywords(el.name)
+            return keywordsService.keywords(el.name)
         }
         []
     }
@@ -283,39 +287,5 @@ class MappingSuggestionsGeneratorService implements MappingSuggestionsGenerator 
                 }
             }
         }
-    }
-
-    String stemTerm (String term) {
-        if ( !term ) {
-            return term
-        }
-        term = term.toLowerCase()
-        Stemmer stemmer = new Stemmer()
-        term.toCharArray().each { char c ->
-            stemmer.add(c)
-        }
-        stemmer.stem()
-        stemmer.toString()
-    }
-
-    String cleanup(String term) {
-        if ( !term ) {
-            return term
-        }
-
-        term.replaceAll('/', ' ')
-            .replaceAll('\\(', ' ')
-            .replaceAll(']', ' ')
-            .replaceAll('\\[', ' ')
-            .trim().replaceAll(" +", " ");
-    }
-
-    List<String> keywords(String term) {
-        String[] arr = cleanup(term).split(' ')
-        List<String> result = []
-        for ( String word : arr ) {
-            result.add(stemTerm(word))
-        }
-        result.findAll { !EnglishGrammar.ALL.contains(it) && it.length() > 1 }
     }
 }

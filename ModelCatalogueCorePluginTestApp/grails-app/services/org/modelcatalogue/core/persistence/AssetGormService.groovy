@@ -21,6 +21,14 @@ class AssetGormService implements WarnGormErrors {
         Asset.get(id)
     }
 
+    @Transactional(readOnly = true)
+    List<Asset> findAllByIds(List<Long> ids) {
+        if ( !ids ) {
+            return [] as List<Asset>
+        }
+        Asset.where { id in ids }.list()
+    }
+
     @Transactional
     Asset saveWithNameAndDescription(String name, String description) {
         save(new Asset(name: name, description: description))
