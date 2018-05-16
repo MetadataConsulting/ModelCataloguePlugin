@@ -5,6 +5,9 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import org.modelcatalogue.core.geb.*
+import spock.lang.Shared
 
 @Issue('https://metadata.atlassian.net/browse/MET-1507')
 @Title('New Version - Check new data Type added')
@@ -33,6 +36,187 @@ import spock.lang.Title
  - Enter Name, Catalogue ID, Description and select type of data type. Click Save | New Data Type is created.
  - Check that new data type appears under list in Data Types main page ( 'Active Data types as title) | Data Type has been created
 ''')
-
+@Stepwise
 class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
+
+    @Shared
+    String dataModelName = UUID.randomUUID().toString() // "TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
+    String dataTypeName = UUID.randomUUID().toString() // "TESTING_DATATYPE"
+    @Shared
+    String dataTypeDescription = "TESTING_DATATYPE_DESCRIPTION"
+    @Shared
+    String dataModelVersion = "0.0.2"
+    @Shared
+    String dataModelVersionNote = "FINALIZING_DATAMODEL"
+    @Shared
+    String dataModelNewVersion = "0.0.3"
+    @Shared
+    String dataTypeTwoName = UUID.randomUUID().toString() // "TESTING_DATATYPE_TWO"
+    @Shared
+    String dataTypeTwoDescription = "TESTING_DATATYPE_TWO_DESCRIPTION"
+
+    def "Login as admin"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("admin", "admin")
+        then:
+        at DashboardPage
+    }
+
+    def "create a data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = dataModelName
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+    def "create a data type"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataTypes()
+        then:
+        at DataTypesPage
+
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.createDataTypeFromGreenPlusButton()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.name = dataTypeName
+        createDataTypePage.description = dataTypeDescription
+        createDataTypePage.buttons.save()
+        then:
+        at DataTypesPage
+    }
+
+    def "navigate back to data model main page"() {
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.treeView.dataModel()
+        then:
+        at DataModelPage
+    }
+
+    def "finalize the data model"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.version = dataModelVersion
+        finalizeDataModelPage.versionNote = dataModelVersionNote
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+    def "verify data model is finalized"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        then:
+        true
+        dataModelPage.isDataModelFinalized()
+    }
+
+    def "create new version"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdownMenu.createNewVersion()
+        then:
+        at CreateDataModelNewVersionPage
+
+        when:
+        CreateDataModelNewVersionPage createDataModelNewVersionPage = browser.page CreateDataModelNewVersionPage
+        createDataModelNewVersionPage.newVersion = dataModelNewVersion
+        createDataModelNewVersionPage.createNewVersion()
+        then:
+        at CreatedDataModelNewVersionPage
+
+        when:
+        CreatedDataModelNewVersionPage createdDataModelNewVersionPage = browser.page CreatedDataModelNewVersionPage
+        createdDataModelNewVersionPage.hide()
+        then:
+        at DataModelPage
+    }
+
+    def "navigate to new version created"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.versions()
+        then:
+        at VersionsPage
+
+        when:
+        VersionsPage versionsPage = browser.page VersionsPage
+        driver.navigate().refresh()
+        versionsPage.selectModelByVersion(dataModelNewVersion)
+        then:
+        at DataModelPage
+    }
+
+    def "create new data type"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataTypes()
+        then:
+        at DataTypesPage
+
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.createDataTypeFromGreenPlusButton()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.name = dataTypeTwoName
+        createDataTypePage.description = dataTypeTwoDescription
+        createDataTypePage.buttons.save()
+        then:
+        at DataTypesPage
+    }
+
+    def "verify new data type is created"() {
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        then:
+        dataTypesPage.hasDataType(dataTypeTwoName)
+    }
 }
