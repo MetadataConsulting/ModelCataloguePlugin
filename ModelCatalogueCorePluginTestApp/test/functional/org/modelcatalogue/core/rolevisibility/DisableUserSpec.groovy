@@ -60,14 +60,9 @@ class DisableUserSpec extends GebSpec {
 
     def "logout as curator"() {
         when:
-        DataModelPage dataModelPage = browser.page DataModelPage
-        dataModelPage.clickUserDropdown()
-        then:
-        at DataModelPage
-
-        when:
-        dataModelPage = browser.page DataModelPage
-        dataModelPage.logout()
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
         then:
         at HomePage
     }
