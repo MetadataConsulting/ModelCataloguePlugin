@@ -31,9 +31,9 @@ class DataModelPage extends Page {
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
-        userLink { $('#role_navigation-right_user-menu-menu-item-link') }
-        logoutLink { $('a#user-login-right-menu-item-link') }
-        activityUser {
+        userLink(wait: true) { $('#role_navigation-right_user-menu-menu-item-link') }
+        logoutLink(wait: true) { $('#user-login-right-menu-item-link') }
+        activityUser(wait: true) {
             $("#activity-changes > div.inf-table-body > table > tbody > tr > td:nth-child(3) > span > span > a")
         }
     }
@@ -84,6 +84,7 @@ class DataModelPage extends Page {
     }
 
     void logout() {
+        waitFor { logoutLink }
         logoutLink.click()
     }
 
