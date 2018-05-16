@@ -37,19 +37,19 @@ import org.modelcatalogue.core.geb.*
 class CheckCreateElementFromClassWizardSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString() // "TESTING_MODEL"
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared
-    String dataClassName = "TESTING_CLASS"
+    String dataClassName = UUID.randomUUID().toString() // "TESTING_CLASS"
     @Shared
     String dataClassDescription = "TESTING_CLASS_DESCRIPTION"
     @Shared
-    String dataElementName = "TESTING_ELEMENT_ONE"
+    String dataElementName = UUID.randomUUID().toString() // "TESTING_ELEMENT_ONE"
     @Shared
     String dataElementDescription = "TESTING_ELEMENT_DESCRIPTION"
     @Shared
-    String dataElementTwoName = "TESTING_ELEMENT_TWO"
+    String dataElementTwoName = UUID.randomUUID().toString() // "TESTING_ELEMENT_TWO"
 
     def "login as curator"() {
         when:
