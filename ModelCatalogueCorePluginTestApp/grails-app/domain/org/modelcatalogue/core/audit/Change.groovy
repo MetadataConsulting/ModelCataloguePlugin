@@ -48,7 +48,7 @@ class Change {
     }
 
     static mapping = {
-        table  (Environment.current == Environment.TEST ? '`CHANGE`' : '`change`')
+        table  (Environment.current == Environment.TEST ? 'CHANGE' : '`change`')
         version false
         newValue type: 'text'
         oldValue type: 'text'
