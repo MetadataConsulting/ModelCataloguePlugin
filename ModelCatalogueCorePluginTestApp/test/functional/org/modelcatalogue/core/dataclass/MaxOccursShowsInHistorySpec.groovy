@@ -65,7 +65,9 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
     @Shared
     String dataClassDescription = "TESTING_DATACLASS_DESCRIPTION"
     @Shared
-    String dataModelSearchName = "Cancer Model"
+    String searchDataModelName = "IMPORT_MODEL"
+    @Shared
+    String searchDataClassName = "IMPORT_CLASS"
 
     def "Login as curator"() {
         when:
@@ -75,9 +77,72 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
         at DashboardPage
     }
 
-    def "create a data model"() {
+    def "create import data model and finalize it"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = searchDataModelName
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = searchDataClassName
+        createDataClassPage.description = dataClassDescription
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+
+
+        when:
+        dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.treeView.dataModel()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
+        dataModelPage.finalizedDataModel()
+        then:
+        at FinalizeDataModelPage
+        when:
+        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
+        finalizeDataModelPage.setVersionNote("finalizing data model")
+        finalizeDataModelPage.submit()
+        then:
+        at FinalizedDataModelPage
+        when:
+        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
+        finalizedDataModelPage.hideConfirmation()
+        then:
+        at DataModelPage
+    }
+
+    def "create a data model"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
         dashboardPage.nav.createDataModel()
         then:
         at CreateDataModelPage
@@ -222,7 +287,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         when:
         SearchDataModelPage searchDataModelPage = browser.page SearchDataModelPage
-        searchDataModelPage.searchDataModel(dataModelSearchName)
+        searchDataModelPage.searchDataModel(searchDataModelName)
         then:
         at AddDataModelImportPage
 
@@ -234,7 +299,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         when:
         searchDataClassPage = browser.page SearchDataClassPage
-        searchDataClassPage.searchDataClass(dataModelSearchName)
+        searchDataClassPage.searchDataClass(searchDataClassName)
         then:
         at CreateRelationshipPage
     }
@@ -267,7 +332,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
 
         String text = dataClassPage.historyChange(0)
         then:
-        assert text.contains(dataModelSearchName)
+        assert text.contains(searchDataModelName)
         assert text.contains("Max Occurs")
     }
 
