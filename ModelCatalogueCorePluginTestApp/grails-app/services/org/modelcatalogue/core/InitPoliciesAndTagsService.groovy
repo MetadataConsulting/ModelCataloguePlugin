@@ -33,6 +33,10 @@ class InitPoliciesAndTagsService {
                 check dataType property 'name' is 'unique' otherwise 'Data type\'s name is not unique for {2}'
                 check dataType property 'name' apply regex: /[^_ -]+/ otherwise 'Name of {2} contains illegal characters ("_", "-" or " ")'
             }
+            dataModelPolicy(name: 'Enumeration Checks') {
+                $///key-value should be lowercase and underscore separated and no special characters /$
+                check enumeratedType property 'enumAsString' apply negativeRegex: /.*"key"\\s*:\\s*(?!"[a-z0-9]+").*/
+            }
             dataModel(name: 'Clinical Tags') {
                 tag(name: 'Highly Sensitive PI data')
                 tag(name: 'Sensitive PI data')
