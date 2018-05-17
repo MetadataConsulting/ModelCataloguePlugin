@@ -29,7 +29,7 @@ import spock.lang.Shared
 class DisableUserSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
 
@@ -52,7 +52,7 @@ class DisableUserSpec extends GebSpec {
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
         createDataModelPage.name = dataModelName
         createDataModelPage.description = dataModelDescription
-        createDataModelPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataModelPage.modelCatalogueId = "ABCD1234"
         createDataModelPage.submit()
         then:
         at DataModelPage
@@ -78,6 +78,7 @@ class DisableUserSpec extends GebSpec {
     def "select created data model"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelName)
         dashboardPage.select(dataModelName)
         then:
         at DataModelPage

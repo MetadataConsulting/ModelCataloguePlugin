@@ -13,7 +13,7 @@ class DashboardPage extends Page {
         dataModelLinks(required: false) { $('a.data-model-link') }
         searchButton { $('#search-btn') }
         dataModelLink(wait: true) { $('a.data-model-link', text: it) }
-        nav { $('#topmenu', 0) .module(NavModule) }
+        nav { $('#topmenu', 0).module(NavModule) }
     }
 
     void search(String query) {
@@ -21,6 +21,7 @@ class DashboardPage extends Page {
             searchInputField << "${c}"
         }
         searchButton.click()
+        waitFor(5) { dataModelLink(query) }
     }
 
     void select(String dataModelName) {
