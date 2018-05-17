@@ -8,6 +8,7 @@ class ImportedDataModelsPage extends Page {
 
     static content = {
         footerGreenPlusButton(required: false) { $ ('tfoot span.fa-plus-circle', 0) }
+        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
     }
 
     boolean areCreateButtonsVisible() {

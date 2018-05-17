@@ -5,7 +5,7 @@ import geb.module.RadioButtons
 
 class CreateDataTypePage extends Page {
 
-    static at = { $('.modal-dialog').text().contains('Create Data Type') }
+    static at = { $('.modal-dialog', 0).text().contains('Create Data Type') }
 
     static content = {
         nameInput { $('input#name', 0) }

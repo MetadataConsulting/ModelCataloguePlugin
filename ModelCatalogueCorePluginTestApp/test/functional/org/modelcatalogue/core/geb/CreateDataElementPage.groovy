@@ -13,6 +13,7 @@ class CreateDataElementPage extends Page implements InputUtils {
         searchLink(wait: true) { $("", 0) }
         searchDataType(wait: true) { $("input#dataType") }
         selectItem(wait: true) { $("a.cep-item", 0) }
+        createNewDataTypeLink(required: false, wait: true) { $('a.create-new-cep-item', 0) }
     }
 
     void setName(String value) {
@@ -21,6 +22,7 @@ class CreateDataElementPage extends Page implements InputUtils {
 
     void search(String value) {
         fillInput(searchDataType, value)
+        waitFor { createNewDataTypeLink }
     }
 
     void setDescription(String value) {
@@ -37,5 +39,9 @@ class CreateDataElementPage extends Page implements InputUtils {
 
     void finish() {
         submitButton.click()
+    }
+
+    void createNewDataType() {
+        createNewDataTypeLink.click()
     }
 }

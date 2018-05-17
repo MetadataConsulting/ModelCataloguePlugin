@@ -17,8 +17,13 @@ class DataElementsPage extends Page {
         createDateElementLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
         anchorElements { $("td.col-md-4>span>span>a") }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
-        addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
+        addItemIcon(required: false) {
+            $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
+        }
         firstRowLink { $('tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a') }
+        rows { $('div.inf-table-body tbody tr') }
+        showMoreButton { $('span.fa-plus-square-o') }
+        editDataElementButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
         elementsList { $('table.inf-table tbody tr') }
     }
 
@@ -39,6 +44,18 @@ class DataElementsPage extends Page {
 
     String dataElementCreated() {
         firstRowLink.text()
+    }
+
+    void showMore() {
+        showMoreButton.click()
+    }
+
+    boolean editDataElementDisabled() {
+        waitFor { editDataElementButton.@('disabled') }
+    }
+
+    void selectDataElement(String value) {
+        rows.$('a', text: value).click()
     }
 
     boolean containsElement(String value) {

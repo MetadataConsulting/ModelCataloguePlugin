@@ -5,7 +5,9 @@ import geb.Module
 class DataModelTreeViewModule extends Module {
 
     static content = {
-        dataModelLink { $('span.catalogue-element-treeview-name', 0) }
+        // this may need sorting out!!
+        dataModelLink { $('a.catalogue-element-treeview-icon', 0) }
+        // dataModelLink { $('span.catalogue-element-treeview-name', 0) }
         // dataModelLink(wait: true) { int index -> $('a.catalogue-element-treeview-icon', index) }
         item { $('ul .catalogue-element-treeview-name', text: it) }
     }
@@ -49,6 +51,10 @@ class DataModelTreeViewModule extends Module {
 
     void versions() {
         select('Versions')
+    }
+
+    void assets() {
+        select("Assets")
     }
 
     void select(String name) {

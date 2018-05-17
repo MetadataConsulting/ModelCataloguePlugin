@@ -20,6 +20,8 @@ class DataClassesPage extends Page {
         }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         rows { $('div.inf-table-body tbody tr') }
+        showMoreButton { $('span.fa-plus-square-o') }
+        editDataClassButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
         titlename { $('div   h3') }
     }
 
@@ -36,6 +38,14 @@ class DataClassesPage extends Page {
 
     void createDataClass() {
         createDateClassLink.click()
+    }
+
+    void showMore() {
+        showMoreButton.click()
+    }
+
+    boolean editDataClassDisabled() {
+        waitFor { editDataClassButton.@('disabled') }
     }
 
     boolean containsDataClass(String value) {

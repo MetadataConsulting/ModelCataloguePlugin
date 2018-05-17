@@ -3,7 +3,7 @@ package org.modelcatalogue.core.geb
 import geb.Page
 
 class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
-    static at = { $('.modal-dialog').text().contains('Data Class Wizard') }
+    static at = { $('.modal-dialog', 0).text().contains('Data Class Wizard') }
 
     static content = {
         nameInput { $('#name', 0) }
@@ -35,7 +35,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         localNameInput { $('#local-name') }
 
         dataElementInput { $('#data-element') }
-        createNewDataElementLink(required: false, wait: true) { $('a.create-new-cep-item') }
+        createNewDataElementLink(required: false, wait: true) { $('a.create-new-cep-item', 0) }
         createNewDataElementPlusButton(required: false, wait: true) { $('span.input-group-btn button.btn-success') }
 
         buttonPlus { $('span.input-group-btn button.btn-success', 0) }
@@ -57,7 +57,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void setDataElement(String value) {
         fillInput(dataElementInput, value)
-        sleep(2000)
+        waitFor { createNewDataElementLink } // was sleep(2000)  
     }
 
     void setAppearanceName(String value) {

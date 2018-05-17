@@ -2,11 +2,11 @@ package org.modelcatalogue.core.geb
 
 import geb.Page
 
-class TagsPage extends Page {
+class DepricatedItemsPage extends Page {
 
     static url = '/#'
 
-    static at = { title == 'Tags' }
+    static at = { title == 'Catalogue Elements' }
 
     @Override
     String convertToPath(Object[] args) {
@@ -14,18 +14,8 @@ class TagsPage extends Page {
     }
 
     static content = {
-        createTagLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
         addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
-        rows { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center") }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
-    }
-
-    int count() {
-        rows.size()
-    }
-
-    void createTag() {
-        createTagLink.click()
     }
 
     boolean isAddItemIconVisible() {
