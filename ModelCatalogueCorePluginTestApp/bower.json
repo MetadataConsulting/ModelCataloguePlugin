@@ -47,7 +47,8 @@
     "angular-file-saver": "1.1.1",
     "vkbeautify": "master",
     "sly-repeat": "https://github.com/scalyr/angular.git#v1.0.3",
-    "core.js": "~2.3.0"
+    "core.js": "~2.3.0",
+    "validator-js": "^10.2.0"
   },
   "resolutions": {
     "angular": "1.4.10"

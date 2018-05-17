@@ -1,3 +1,5 @@
+//= require validator-js/validator.min.js
+//= require_self
 
 var m = [20, 120, 20, 120],
   w = 1280 + 6000 - m[1] - m[3],
@@ -20,6 +22,7 @@ var vis = d3.select("#body").append("svg:svg")
 function parseModelToJS(jsonString) {
   jsonString=jsonString.replace(/\"/g,'"');
   jsonString=jsonString.replace(/&quot;/g, '"');
+  jsonString=validator.unescape(jsonString);
   var jsonObject=$.parseJSON(jsonString);
   return jsonObject
 }
