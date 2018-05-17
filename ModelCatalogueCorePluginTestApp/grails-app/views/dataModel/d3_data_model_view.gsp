@@ -37,12 +37,15 @@
   <meta name="layout" content="main"/>
 </head>
 <body>
-<div id="body">
+<div><div id="body" class="column column-left">
   <!--<div id="footer">
     d3.layout.tree
     <div class="hint">click or option-click to expand or collapse</div>
   </div>-->
-</div>
+</div><div id="d3-info" class="column column-right"">
+X Y Z
+</div></div>
+
 <asset:javascript  src="d3_data_model_view/init.js"></asset:javascript>
 <script type="text/javascript">
   initD3(parseModelToJS("${dataModelJson as JSON}"));

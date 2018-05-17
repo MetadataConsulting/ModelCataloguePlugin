@@ -22,6 +22,7 @@ var vis = d3.select("#body").append("svg:svg")
 function parseModelToJS(jsonString) {
   jsonString=jsonString.replace(/\"/g,'"');
   jsonString=jsonString.replace(/&quot;/g, '"');
+  jsonString=jsonString.replace(/&#92;n/g, ' ');
   jsonString=validator.unescape(jsonString);
   var jsonObject=$.parseJSON(jsonString);
   return jsonObject
@@ -80,12 +81,15 @@ function update(source) {
   var nodeEnter = svgNodes.enter().append("svg:g")
     .attr("class", "node")
     .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-    .on("click", function(d) { toggle(d); update(d); });
+    .on("click", function(d) {
+      toggle(d);
+      $('#d3-info').html("Name: " + d.name);
+      update(d); });
 
   nodeEnter.append("svg:circle")
     .attr("r", 1e-6)
     .style("fill", function(d) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; });
-
+  var maxStringLength = 10;
   nodeEnter.append("svg:a")
     .attr("xlink:href", function(d) {return d.angularLink})
     .attr("target", "_blank")
@@ -93,7 +97,8 @@ function update(source) {
     .attr("x", function(d) { return d.children || d._children ? -(radius + 5): radius + 5; })
     .attr("dy", ".35em")
     .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
-    .text(function(d) { return d.name; })
+    .text(function(d) {
+      return (d.name.length >= maxStringLength && (d.children || d._children)) ? d.name.substring(0,maxStringLength) + "..." : d.name;  })
     .style("fill-opacity", 1e-6)
     .style("font", "15px sans-serif");
     // .append("rect")
