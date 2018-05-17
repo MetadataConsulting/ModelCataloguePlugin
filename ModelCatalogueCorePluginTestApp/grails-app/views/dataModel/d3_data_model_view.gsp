@@ -38,10 +38,10 @@
 </head>
 <body>
 <div id="body">
-  <div id="footer">
+  <!--<div id="footer">
     d3.layout.tree
     <div class="hint">click or option-click to expand or collapse</div>
-  </div>
+  </div>-->
 </div>
 <asset:javascript  src="d3_data_model_view/init.js"></asset:javascript>
 <script type="text/javascript">
