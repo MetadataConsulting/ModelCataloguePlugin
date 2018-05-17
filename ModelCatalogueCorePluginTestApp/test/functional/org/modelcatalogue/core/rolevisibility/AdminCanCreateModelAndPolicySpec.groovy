@@ -35,6 +35,8 @@ class AdminCanCreateModelAndPolicySpec extends GebSpec {
     @Shared
     String datamodelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared
+    String defaultPolicy = "Default Checks"
+    @Shared
     List<String> policies = ["Unique of Kind",]
 
     def "login as supervisor"() {
@@ -80,7 +82,7 @@ class AdminCanCreateModelAndPolicySpec extends GebSpec {
 
         when:
         dataModelPage = browser.page DataModelPage
-        dataModelPage.searchPolicy("Default Checks")
+        dataModelPage.searchPolicy(defaultPolicy)
         then:
         at DataModelPage
     }
@@ -89,7 +91,7 @@ class AdminCanCreateModelAndPolicySpec extends GebSpec {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         then:
-        dataModelPage.policyAdded("Default Checks")
+        dataModelPage.policyAdded(defaultPolicy)
     }
 
     def "save data model"() {
@@ -103,7 +105,7 @@ class AdminCanCreateModelAndPolicySpec extends GebSpec {
     def "select policy"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
-        withNewWindow(dataModelPage.selectPolicy("Default Checks"))
+        withNewWindow(dataModelPage.selectPolicy(defaultPolicy))
         then:
         at DataModelPolicyPage
     }
