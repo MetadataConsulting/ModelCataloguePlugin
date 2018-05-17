@@ -13,7 +13,7 @@ import org.openqa.selenium.phantomjs.PhantomJSDriverService
 import org.openqa.selenium.remote.DesiredCapabilities
 
 waiting {
-    timeout = 10
+    timeout = 20
 }
 
 environments {
