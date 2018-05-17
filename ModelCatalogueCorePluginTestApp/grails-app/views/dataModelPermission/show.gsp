@@ -1,3 +1,4 @@
+<%@ page import="org.springframework.security.acls.domain.BasePermission" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <html>
 <head>
     <title><g:message code="dataModel.permissions.show" default="Show Data Model Permissions"/></title>
@@ -6,7 +7,9 @@
 <body>
 <ol class="breadcrumb">
     <li class="breadcrumb-item"><g:link controller="dataModelPermission" action="index"><g:message code="dataModel.permissions" default="Data Model Permissions"/></g:link></li>
-    <li class="breadcrumb-item active">${dataModel.name} ${dataModel.status} ${dataModel.semanticVersion}</li>
+    <li class="breadcrumb-item active">
+        <g:link controller="dataModelPermission" action="show" id="${dataModel.id}">${dataModel.name} ${dataModel.status} ${dataModel.semanticVersion}</g:link>
+    </li>
 </ol>
 <div class="panel-body">
     <div class="page-header">
@@ -21,25 +24,27 @@
     <thead>
     <tr>
         <th><g:message code="dataModel.permissions.username" default="Username"/></th>
-        <th><g:message code="dataModel.permissions.permission" default="ACL Permission"/></th>
-        <th><g:message code="dataModel.permissions.actions" default="Actions"/></th>
+        <th><g:message code="dataModel.permissions.permission.read" default="Read ACL Permission"/></th>
+        <th><g:message code="dataModel.permissions.permission.administration" default="Administration ACL Permission"/></th>
     </tr>
     </thead>
     <tbody>
-    <g:each var="userAndPermissionList" in="${userAndPermissionListList}">
+    <g:each var="userAndPermissionList" in="${userAndPermissionListList.sort { a, b -> a.username <=> b.username }}">
         <tr>
-          <td><b>${userAndPermissionList.username}</b></td>
-            <g:each var="permission" in="${userAndPermissionList.permissionList}">
-                <td><sec:permissionAsString permission="${permission}"/></td>
-                <td>
-                    <g:form action="revoke" controller="dataModelPermission" method="post">
-                        <g:hiddenField name="username" value="${userAndPermissionList.username}" />
-                        <g:hiddenField name="id" value="${dataModel.id}" />
-                        <g:hiddenField name="permission" value="${sec.permissionAsString(permission: permission).toLowerCase()}" />
-                        <g:actionSubmit name="revoke" action="revoke" class="btn btn-danger" value="${message(code: 'delete', default: 'Delete')}"/>
-                    </g:form>
-                </td>
-            </g:each>
+          <td>
+              <b>${userAndPermissionList.username}</b>
+          </td>
+            <td>
+                <g:render template="deletePermission" model="[dataModel: dataModel,
+                                                              username: userAndPermissionList.username,
+                                                              permissionList: userAndPermissionList.permissionList.findAll { it == BasePermission.READ }]"/>
+            </td>
+            <td>
+                <g:render template="deletePermission" model="[dataModel: dataModel,
+                                                              username: userAndPermissionList.username,
+                                                              permissionList: userAndPermissionList.permissionList.findAll { it == BasePermission.ADMINISTRATION }]"/>
+            </td>
+
         </tr>
     </g:each>
     </tbody>

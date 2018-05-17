@@ -24,6 +24,7 @@ class DataElementsPage extends Page {
         rows { $('div.inf-table-body tbody tr') }
         showMoreButton { $('span.fa-plus-square-o') }
         editDataElementButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
+        elementsList { $('table.inf-table tbody tr') }
     }
 
     void createDataElement() {
@@ -55,5 +56,9 @@ class DataElementsPage extends Page {
 
     void selectDataElement(String value) {
         rows.$('a', text: value).click()
+    }
+
+    boolean containsElement(String value) {
+        elementsList.$('a', text: value).displayed
     }
 }

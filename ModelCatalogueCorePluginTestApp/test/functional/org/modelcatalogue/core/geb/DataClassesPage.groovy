@@ -22,6 +22,7 @@ class DataClassesPage extends Page {
         rows { $('div.inf-table-body tbody tr') }
         showMoreButton { $('span.fa-plus-square-o') }
         editDataClassButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
+        titlename { $('div   h3') }
     }
 
     int count() {
@@ -29,7 +30,7 @@ class DataClassesPage extends Page {
     }
 
     boolean isAddItemIconVisible() {
-        if ( addItemIcon.empty ) {
+        if (addItemIcon.empty) {
             return false
         }
         true
@@ -47,7 +48,15 @@ class DataClassesPage extends Page {
         waitFor { editDataClassButton.@('disabled') }
     }
 
+    boolean containsDataClass(String value) {
+        rows.$('a', text: value).displayed
+    }
+
     void selectDataClass(String value) {
         rows.$('a', text: value).click()
+    }
+  
+    String titleText() {
+        return titlename.text()
     }
 }

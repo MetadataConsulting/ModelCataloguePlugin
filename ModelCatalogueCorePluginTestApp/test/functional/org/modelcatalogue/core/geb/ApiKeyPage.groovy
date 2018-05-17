@@ -6,11 +6,12 @@ class ApiKeyPage extends Page {
 
     static url = '/apiKey/index'
 
-    static at = { title == 'Api Key'}
+    static at = { title == 'Api Key' }
 
     static content = {
         inputSubmit { $('input#regenerateKey', 0) }
         apiKeyElement { $('#apiKey', 0) }
+        nav { $('#topmenu', 0).module(NavModule) }
     }
 
     String getApiKey() {

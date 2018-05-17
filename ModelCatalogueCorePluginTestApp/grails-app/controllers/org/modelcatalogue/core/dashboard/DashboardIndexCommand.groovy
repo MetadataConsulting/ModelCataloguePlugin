@@ -16,7 +16,7 @@ class DashboardIndexCommand {
     DashboardStatusDropdown status = DashboardStatusDropdown.ACTIVE
     SearchScope searchScope = SearchScope.DATAMODEL
     KeywordMatchType keywordMatchType = KeywordMatchType.KEYWORDS_MATCH
-    List<SearchCatalogueElementScope> searchCatalogueElementScopes = [SearchCatalogueElementScope.NAME]
+    List<SearchCatalogueElementScope> searchCatalogueElementScopes = [SearchCatalogueElementScope.NAME, SearchCatalogueElementScope.MODELCATALOGUEID, SearchCatalogueElementScope.DESCRIPTION]
     String order = 'asc'
     String sort = 'name'
     String search

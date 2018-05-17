@@ -57,7 +57,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void setDataElement(String value) {
         fillInput(dataElementInput, value)
-        waitFor { createNewDataElementLink }
+        waitFor { createNewDataElementLink } // was sleep(2000)  
     }
 
     void setAppearanceName(String value) {
@@ -123,7 +123,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void exit() {
         exitButton.click()
-        sleep(2000)
+        sleep(2_000)
     }
 
     void setName(String value) {

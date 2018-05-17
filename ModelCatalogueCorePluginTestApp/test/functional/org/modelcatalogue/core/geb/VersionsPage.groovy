@@ -20,9 +20,9 @@ class VersionsPage extends Page {
         editButton(required: false) { $('#role_item-detail_edit-catalogue-elementBtn') }
     }
 
-    boolean  rowsContainText(String text) {
-        for ( int i = 0; i < rows.size(); i++ ) {
-            if ( rows[i].text().contains(text) ) {
+    boolean rowsContainText(String text) {
+        for (int i = 0; i < rows.size(); i++) {
+            if (rows[i].text().contains(text)) {
                 return true
             }
         }
@@ -40,4 +40,7 @@ class VersionsPage extends Page {
         true
     }
 
+    void selectModelByVersion(String version) {
+        rows.$('td a', text: version).click()
+    }
 }
