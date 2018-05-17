@@ -2,7 +2,7 @@ package org.modelcatalogue.core.geb
 
 import geb.Page
 
-class DataModelPage extends Page {
+class DataModelPage extends Page implements InputUtils {
 
     static at = {
         title.startsWith('Activity of')
@@ -33,6 +33,11 @@ class DataModelPage extends Page {
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
         finalizedLink(required: false) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
+        editButton(wait: true) { $('#role_item-detail_inline-editBtn') }
+        dataModelSearchBar(wait: true) { $('input#dataModelPolicy') }
+        policiesDropdown(wait: true) { $('input#dataModelPolicy').siblings('ul') }
+        addedPoliciesInEditDataModel(wait: true) { $('div.tags>span') }
+        saveButton(required: false, wait: true) { $('button#role_item-detail_inline-edit-submitBtn') }
     }
 
     String getRowsText() {
@@ -73,5 +78,45 @@ class DataModelPage extends Page {
 
     String getRightSideTitle() {
         rightSideTitleH3.text()
+    }
+
+    Boolean containsPolicies(List<String> policies) {
+        Boolean result = true
+        policies.each { it ->
+            if (!($('a', text: it).displayed)) {
+                result = false
+            }
+        }
+        return result
+    }
+
+    void editDataModel() {
+        editButton.click()
+    }
+
+    void searchPolicy(String value) {
+        fillInput(dataModelSearchBar, value)
+        sleep(2000)
+        policiesDropdown.$('li', 0).click()
+    }
+
+    void saveModel() {
+        waitFor { saveButton }
+        saveButton.click()
+    }
+
+    Boolean policyAdded(String value) {
+        Boolean contains = false
+        addedPoliciesInEditDataModel.each { it ->
+            if (it.children('span').text() == value) {
+                contains = true
+            }
+        }
+        return contains
+    }
+
+    void selectPolicy(String value) {
+        waitFor { editButton }
+        $('a', text: contains(value)).click()
     }
 }

@@ -5,6 +5,9 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Stepwise
+import spock.lang.Shared
+import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1443')
 @Title('Test that Admin user can create a new policy when creating a data model')
@@ -24,6 +27,85 @@ import spock.lang.Title
  - Select the new data policy. | Redirected to individual data policy page
  - Verify that name and policy text are correct. | Name and policy text are correct
 /$)
-
+@Stepwise
 class AdminCanCreateModelAndPolicySpec extends GebSpec {
+
+    @Shared
+    String datamodelName = "TESTING_MODEL"
+    @Shared
+    String datamodelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
+    List<String> policies = ["Unique of Kind",]
+
+    def "login as supervisor"() {
+        when: 'login as a curator'
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+        then:
+        at DashboardPage
+    }
+
+     def "create data model"() {
+         when:
+         DashboardPage dashboardPage = browser.page DashboardPage
+         dashboardPage.nav.createDataModel()
+         then:
+         at CreateDataModelPage
+
+         when:
+         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+         createDataModelPage.name = datamodelName
+         createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
+         createDataModelPage.description = datamodelDescription
+         println(policies = createDataModelPage.selectedPolicyName())
+         createDataModelPage.submit()
+         then:
+         at DataModelPage
+     }
+
+
+    def "selected data model policy is shown"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        then:
+        dataModelPage.containsPolicies(policies)
+    }
+
+    def "edit the data model"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.editDataModel()
+        then:
+        at DataModelPage
+
+        when:
+        dataModelPage = browser.page DataModelPage
+        dataModelPage.searchPolicy("Default Checks")
+        then:
+        at DataModelPage
+    }
+
+    def "verify new policy is added"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        then:
+        dataModelPage.policyAdded("Default Checks")
+    }
+
+    def "save data model"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.saveModel()
+        then:
+        at DataModelPage
+    }
+
+    def "select policy"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        withNewWindow(dataModelPage.selectPolicy("Default Checks"))
+        then:
+        at DataModelPolicyPage
+    }
+
 }
