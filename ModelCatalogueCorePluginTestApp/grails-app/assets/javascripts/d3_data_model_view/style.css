@@ -1,6 +1,6 @@
 body {
     background: url(texture-noise.png);
-    overflow: hidden;
+    overflow: scroll;
     margin: 0;
     font-size: 14px;
     font-family: "Helvetica Neue", Helvetica;
@@ -71,13 +71,15 @@ line {
     color: #1181B8;
 }
 
-a:link, a:visited {
-    color: #000;
-    text-decoration: none;
+text a {
+    fill: navy;
 }
-
-a:hover {
-    color: #666;
+text a:visited {
+    fill:darkpurple;
+}
+text a:hover, text a:active {
+    text-decoration: underline;
+    fill:darkred;
 }
 
 .hint {

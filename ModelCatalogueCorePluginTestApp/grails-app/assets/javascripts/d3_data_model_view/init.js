@@ -1,6 +1,6 @@
 
 var m = [20, 120, 20, 120],
-  w = 1280 - m[1] - m[3],
+  w = 1280 + 6000 - m[1] - m[3],
   h = 800 - m[0] - m[2],
   i = 0,
   root;
@@ -15,7 +15,7 @@ var vis = d3.select("#body").append("svg:svg")
   .attr("width", w + m[1] + m[3])
   .attr("height", h + m[0] + m[2])
   .append("svg:g")
-  .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+  .attr("transform", "translate(" + (m[3] + 20) + "," + m[0] + ")");
 
 function parseModelToJS(jsonString) {
   jsonString=jsonString.replace(/\"/g,'"');
@@ -83,12 +83,26 @@ function update(source) {
     .attr("r", 1e-6)
     .style("fill", function(d) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; });
 
-  nodeEnter.append("svg:text")
+  nodeEnter.append("svg:a")
+    .attr("xlink:href", function(d) {return d.angularLink})
+    .attr("target", "_blank")
+    .append("svg:text")
     .attr("x", function(d) { return d.children || d._children ? -(radius + 5): radius + 5; })
     .attr("dy", ".35em")
     .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
     .text(function(d) { return d.name; })
-    .style("fill-opacity", 1e-6);
+    .style("fill-opacity", 1e-6)
+    .style("font", "15px sans-serif");
+    // .append("rect")
+    // .attr("x", 0)
+    // .attr("y", 0)
+    // .attr("height", 100)
+    // .attr("width", 200)
+    // .style("fill", "lightgreen")
+    // .attr("rx", 10)
+    // .attr("ry", 10);
+
+  // nodeEnter
 
   // Transition nodes to their new position.
   var nodeUpdate = svgNodes.transition()

@@ -257,19 +257,9 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         if (dataModel) {
 
-            DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
-            Map<String, Integer> stats = dataModelService.getStatistics(filter)
 
-            ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''])
             try {
-                dataModelJson = [
-                    "name": dataModel.name,
-                    "type": MetadataDomain.lowerCamelCaseDomainName(MetadataDomain.ofClass(DataModel)),
-                    "children": dataClasses.items.collect {dataClass ->
-                        d3ViewUtilsService.dataClassD3Json(dataClass)
-
-                    }
-                ]
+                dataModelJson = d3ViewUtilsService.dataModelD3Json(dataModel)
             }
             catch (StackOverflowError e) {
                 // TODO: handle stack overflow (data model too large)
