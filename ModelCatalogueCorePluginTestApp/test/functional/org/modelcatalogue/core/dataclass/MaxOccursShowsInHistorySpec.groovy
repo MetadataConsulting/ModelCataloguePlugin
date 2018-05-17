@@ -49,19 +49,19 @@ import spock.lang.Shared
 class MaxOccursShowsInHistorySpec extends GebSpec {
 
     @Shared
-    String dataModelName = "TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared
-    String dataTypeName = "TESTING_DATATYPE"
+    String dataTypeName = UUID.randomUUID().toString()
     @Shared
     String dataTypeDescription = "TESTING_DATATYPE_DESCRIPTION"
     @Shared
-    String dataElementName = "TESTING_DATAELEMENT"
+    String dataElementName = UUID.randomUUID().toString()
     @Shared
     String dataElementDescription = "TESTING_DATAELEMENT_DESCRIPTION"
     @Shared
-    String dataClassName = "TESTING_DATACLASS"
+    String dataClassName = UUID.randomUUID().toString()
     @Shared
     String dataClassDescription = "TESTING_DATACLASS_DESCRIPTION"
     @Shared
