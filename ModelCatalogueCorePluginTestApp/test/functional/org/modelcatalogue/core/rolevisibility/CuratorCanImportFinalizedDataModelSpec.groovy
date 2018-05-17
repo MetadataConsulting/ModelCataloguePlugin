@@ -42,6 +42,16 @@ class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared
     String dataModelTwoName = UUID.randomUUID().toString()
+    @Shared
+    String dataClassName = "DATA_CLASS"
+    @Shared
+    String dataClassId = "ID23254"
+    @Shared
+    String dataClassDescription = "Data class description"
+    @Shared
+    String versionNote = "DATA MODEL FINALIZED"
+    @Shared
+    String dataModelId = "MT-234567"
 
     def "login to curator"() {
         when:
@@ -88,9 +98,9 @@ class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
 
         when:
         CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
-        createDataClassPage.name = "DATA_CLASS"
-        createDataClassPage.modelCatalogueId = "ID23254"
-        createDataClassPage.description = "Data class description"
+        createDataClassPage.name = dataClassName
+        createDataClassPage.modelCatalogueId = dataClassId
+        createDataClassPage.description = dataClassDescription
         createDataClassPage.finish()
         createDataClassPage.exit()
         then:
@@ -113,7 +123,7 @@ class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
 
         when:
         FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
-        finalizeDataModelPage.versionNote = "DATA MODEL FINALIZED"
+        finalizeDataModelPage.versionNote = versionNote
         finalizeDataModelPage.submit()
         then:
         at FinalizedDataModelPage
@@ -136,7 +146,7 @@ class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
         createDataModelPage.with {
             name = dataModelTwoName
-            modelCatalogueId = "MT-234567"
+            modelCatalogueId = dataModelId
             description = dataModelDescription
             submit()
         }
