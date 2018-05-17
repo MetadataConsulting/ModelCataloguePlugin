@@ -63,19 +63,19 @@ import spock.lang.Stepwise
 class CuratorCannotEditFinalizedModelSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString() // "TESTING_MODEL"
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared
-    String dataClassName = "TESTING_CLASS"
+    String dataClassName = UUID.randomUUID().toString() // "TESTING_CLASS"
     @Shared
     String dataClassDescription = "TESTING_CLASS_DESCRIPTION"
     @Shared
-    String dataElementName = "TESTING_ELEMENT"
+    String dataElementName = UUID.randomUUID().toString() // "TESTING_ELEMENT"
     @Shared
     String dataElementDescription = "TESTING_ELEMENT_DESCRIPTION"
     @Shared
-    String dataTypeName = "TESTING_DATATYPE"
+    String dataTypeName = UUID.randomUUID().toString() // "TESTING_DATATYPE"
     @Shared
     String dataTypeDescription = "TESTING_DATATYPE_DESCRIPTION"
 
