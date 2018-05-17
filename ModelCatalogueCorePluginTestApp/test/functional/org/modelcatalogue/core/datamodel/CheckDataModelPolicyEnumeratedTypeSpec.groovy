@@ -58,8 +58,13 @@ class CheckDataModelPolicyEnumeratedTypeSpec extends GebSpec {
     def "check enumeration content"() {
         when:
         DataModelPolicyEnumerationPage dataModelPolicyPage = browser.page DataModelPolicyEnumerationPage
+        // there are two possible values here: the first if it was inserted in InitPoliciesAndTagsService, the second if it was already in the database
+        // this is a bit of a hack but it works with the existing data JC
+        String enumCheckText1 = $/check enumeratedType property 'enumAsString' apply negativeRegex: '.*"key"\\s*:\\s*(?!"[a-z0-9]+").*'/$
+        String enumCheckTest2 = "//key-value should be lowercase and underscore separated and no special characters \n" +
+            "check enumeratedType property 'enumAsString' apply negativeRegex: /.\"key\"\\s*:\\s*(?!\"[a-z0-9]+\")./"
+        String policyText = dataModelPolicyPage.policyText()
         then:
-        assert "//key-value should be lowercase and underscore separated and no special characters \n" +
-                "check enumeratedType property 'enumAsString' apply negativeRegex: /.\"key\"\\s*:\\s*(?!\"[a-z0-9]+\")./" == dataModelPolicyPage.policyText()
+        assert policyText == enumCheckText1 || policyText == enumCheckTest2
     }
 }
