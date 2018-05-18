@@ -296,7 +296,9 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
 
         // TODO: request and render JSON
-        render(view: 'd3_data_model_view', model: [dataModelJson: dataModelJson, modelTooLarge: modelTooLarge, modelFound: modelFound, dataModelId: dataModelId])
+        render(contentType: 'text/json') {
+            [dataModelJson: dataModelJson, modelTooLarge: modelTooLarge, modelFound: modelFound, dataModelId: dataModelId]
+        }
     }
 
 

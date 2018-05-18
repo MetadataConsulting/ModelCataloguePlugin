@@ -35,7 +35,7 @@ function parseModelToJS(jsonString) {
  * @param str
  * @returns {string}
  */
-function ucFirst(str) {
+function ucFirst(str /*: string */) {
   return str.charAt(0) .toUpperCase() + str.substr(1)
 }
 
