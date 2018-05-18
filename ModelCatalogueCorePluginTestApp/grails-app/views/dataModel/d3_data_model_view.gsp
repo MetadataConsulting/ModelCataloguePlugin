@@ -43,6 +43,8 @@
     <div class="hint">click or option-click to expand or collapse</div>
   </div>-->
 </div><div id="d3-info" class="column column-right">
+  <div id="d3-info-general"></div>
+  <div id="d3-info-element"></div>
 
 </div></div>
 
@@ -51,14 +53,14 @@
 
   if (${modelFound}) {
     if (${modelTooLarge}) {
-      $('#d3-info').html("Model ${dataModelId} too large to load fully. Click on the link to see the full view.")
+      $('#d3-info-general').html("Model ${dataModelId} too large to load fully. Click on the link to see the full view.")
     }
 
     initD3(parseModelToJS("${dataModelJson as JSON}")); // do this anyways even if model is too large; it will just load the one node.
 
   }
   else {
-    $('#d3-info').html("Model ${dataModelId} not found. Perhaps you are not authorized to view it.")
+    $('#d3-info-general').html("Model ${dataModelId} not found. Perhaps you are not authorized to view it.")
   }
 </script>
 </body>

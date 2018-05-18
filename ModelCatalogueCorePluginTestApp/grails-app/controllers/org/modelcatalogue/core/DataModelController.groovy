@@ -259,7 +259,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
 
             try {
-//                throw new StackOverflowError("Hi")
+//                throw new StackOverflowError("Test too large")
                 dataModelJson = d3ViewUtilsService.dataModelD3Json(dataModel, -1) // -1: infinite depth
             }
             catch (StackOverflowError e) {
