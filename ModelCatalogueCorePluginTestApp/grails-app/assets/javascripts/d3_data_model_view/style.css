@@ -50,6 +50,12 @@
     padding: 3em;
 }
 
+.border-bottom {
+    padding-bottom: 1.5em;
+    border-bottom-style: solid;
+    border-bottom-width: medium;
+}
+
 rect {
     fill: none;
     pointer-events: all;
