@@ -97,10 +97,10 @@ mc.mappingsuggestions.matchAgainst = System.getenv('MATCH_AGAINST') ?: 'ELASTIC_
 environments {
     development {
 
-        mc.storage.s3.bucket = System.getenv('MDX_S3_BUCKET') //="nt.assets.metadataexchange.org.uk"
-        mc.storage.s3.key = System.getenv('MDX_S3_KEY') //"AKIAJR5COCVSMNZ3JUAA"
-        mc.storage.s3.secret = System.getenv('MDX_S3_SECRET') //"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"
-        mc.storage.s3.region = System.getenv('MDX_S3_REGION') // eu-west-1 or eu-west-2
+        mc.storage.s3.bucket = System.getenv('MDX_S3_BUCKET')  
+        mc.storage.s3.key = System.getenv('MDX_S3_KEY')  
+        mc.storage.s3.secret = System.getenv('MDX_S3_SECRET')  
+        mc.storage.s3.region = System.getenv('MDX_S3_REGION') 
 
         grails.logging.jul.usebridge = true
         grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}"
