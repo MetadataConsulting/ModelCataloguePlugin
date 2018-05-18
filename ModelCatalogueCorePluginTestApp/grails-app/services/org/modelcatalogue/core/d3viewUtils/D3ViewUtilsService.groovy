@@ -34,7 +34,14 @@ class D3ViewUtilsService {
         return "${grailsApplication.config.grails.serverURL}/#/$dataModelId/${lowerCamelCaseDomainName(clazz)}/$id"
     }
 
-    def dataModelD3Json(DataModel dataModel) {
+    /**
+     * depth -1 means go as far as possible
+     * depth 0 means don't have any children
+     * depth 1 means have one layer of children
+     * @param dataModel
+     * @param depth
+     */
+    def dataModelD3Json(DataModel dataModel, int depth) {
         DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
         Map<String, Integer> stats = dataModelService.getStatistics(filter)
 
@@ -43,22 +50,39 @@ class D3ViewUtilsService {
             "name": dataModel.name,
             "angularLink": angularLink(dataModel.id, dataModel.id, DataModel),
             "type": lowerCamelCaseDomainName(DataModel),
-            "children": dataClasses.items.collect {dataClass ->
-                dataClassD3Json(dataClass)
+            "children": (depth == 0) ? [] : dataClasses.items.collect {dataClass ->
+                dataClassD3Json(dataClass, depth-1)
 
             } // TODO: If Data Model has Data Elements not in any Data Class add them
         ]
     }
 
-    def dataClassD3Json(DataClass dataClass) {
-        def dataElementsJson = dataClassService.getDataElementsIn(dataClass).collect{[
-            "name": it.name,
-            "angularLink": angularLink(it.dataModel.id, it.id, DataElement),
-            "type": lowerCamelCaseDomainName(DataElement),
-        ]}
-        def childDataClassesJson = dataClassService.getChildDataClasses(dataClass).collect{
-            dataClassD3Json(it) // recursive
-        }
+    /**
+     * depth -1 means go as far as possible
+     * depth 0 means don't have any children
+     * depth 1 means have one layer of children
+     * @param dataClass
+     * @param depth
+     * @return
+     */
+    def dataClassD3Json(DataClass dataClass, int depth) {
+
+        def dataElementsJson = []
+        def childDataClassesJson = []
+
+        if (depth != 0) {
+
+            dataElementsJson = dataClassService.getDataElementsIn(dataClass).collect{[
+                "name": it.name,
+                "angularLink": angularLink(it.dataModel.id, it.id, DataElement),
+                "type": lowerCamelCaseDomainName(DataElement),
+            ]}
+
+            childDataClassesJson = dataClassService.getChildDataClasses(dataClass).collect{
+                dataClassD3Json(it, depth - 1) // recursive
+            }
+
+        } // otherwise depth == 0, no children
 
         def ret = ["name": dataClass.name,
                     "angularLink": angularLink(dataClass.dataModel.id, dataClass.id, DataClass),

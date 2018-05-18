@@ -255,21 +255,23 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         boolean modelTooLarge = false
         boolean modelFound = dataModel
 
-        if (dataModel) {
+        if (modelFound) {
 
 
             try {
-                dataModelJson = d3ViewUtilsService.dataModelD3Json(dataModel)
+//                throw new StackOverflowError("Hi")
+                dataModelJson = d3ViewUtilsService.dataModelD3Json(dataModel, -1) // -1: infinite depth
             }
             catch (StackOverflowError e) {
                 // TODO: handle stack overflow (data model too large)
                 modelTooLarge = true
+                dataModelJson = d3ViewUtilsService.dataModelD3Json(dataModel, 0) // 0: no children
             }
 
         }
 
 
-        render(view: 'd3_data_model_view', model: [dataModelJson: dataModelJson, modelTooLarge: modelTooLarge, modelFound: modelFound])
+        render(view: 'd3_data_model_view', model: [dataModelJson: dataModelJson, modelTooLarge: modelTooLarge, modelFound: modelFound, dataModelId: dataModelId])
     }
 
 
