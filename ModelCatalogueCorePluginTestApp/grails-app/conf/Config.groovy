@@ -96,6 +96,12 @@ grails.hibernate.cache.queries = false
 mc.mappingsuggestions.matchAgainst = System.getenv('MATCH_AGAINST') ?: 'ELASTIC_SEARCH'
 environments {
     development {
+
+        mc.storage.s3.bucket = System.getenv('MDX_S3_BUCKET') //="nt.assets.metadataexchange.org.uk"
+        mc.storage.s3.key = System.getenv('MDX_S3_KEY') //"AKIAJR5COCVSMNZ3JUAA"
+        mc.storage.s3.secret = System.getenv('MDX_S3_SECRET') //"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"
+        mc.storage.s3.region = System.getenv('MDX_S3_REGION') // eu-west-1 or eu-west-2
+
         grails.logging.jul.usebridge = true
         grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}"
 
@@ -241,36 +247,25 @@ environments {
 """
     }
     production {
-        //Pickup setting from environment variables
-        grails.logging.jul.usebridge = false
 
+        grails.logging.jul.usebridge = false
+        grails.plugin.console.enabled=true
+        mc.legacy.dataModels=true
         mc.sync.relationshipTypes=true
         grails.assets.minifyJs = true
         // configure the default storage
         mc.storage.directory = "/tmp/mc/storage"
         mc.storage.maxSize = 50 * 1024 * 1024
-        // ---
-        grails.logging.jul.usebridge = false
+        // S3 Storage
+        mc.storage.s3.bucket = System.getenv('MDX_S3_BUCKET') //="nt.assets.metadataexchange.org.uk"
+        mc.storage.s3.key = System.getenv('MDX_S3_KEY') //"AKIAJR5COCVSMNZ3JUAA"
+        mc.storage.s3.secret = System.getenv('MDX_S3_SECRET') //"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"
+        mc.storage.s3.region = System.getenv('MDX_S3_REGION') // eu-west-1 or eu-west-2
+        //Server details
         println "ServerURL:" + grails.serverURL
         println "MDX_SERVER_URL:" + System.getenv('MDX_SERVER_URL')
-        grails.serverURL = System.getenv('MDX_SERVER_URL')//"https://localhost:8899/mc"
-        //println "ServerURL:" + grails.serverURL
-        println "ServerURL:${grails.serverURL} END"
-        //System.getenv('MDX_DB_URL')
-        println "MDX_DB_URL:" + System.getenv('MDX_DB_URL')
-        println "MDX_DB_USERNAME:" + System.getenv('MDX_DB_USERNAME')
-        println "MDX_DB_PASSWORD:" + System.getenv('MDX_DB_PASSWORD')
-        println "MDX_ELASTIC_HOST:" + System.getenv('MDX_ELASTIC_HOST')
-        println "MDX_ELASTIC_PORT:" + System.getenv('MDX_ELASTIC_PORT')
-        println "MDX_MAIL_FROM:" + System.getenv('MC_MAIL_FROM')
-        println "MDX_MAIL_HOST:" + System.getenv('MDX_MAIL_HOST')
-        println "MDX_MAIL_PORT:" + System.getenv('MDX_MAIL_PORT')
-        println "MDX_MAIL_USERNAME:" + System.getenv('MDX_MAIL_USERNAME')
-        println "MDX_MAIL_PASSWORD:" + System.getenv('MDX_MAIL_PASSWORD')
-        println "MDX_NAME:" + System.getenv('MDX_NAME')
-        println "MDX_WELCOME:" + System.getenv('MDX_WELCOME')
-        println "MDX_INFO:" + System.getenv('MDX_INFO')
-        println "MDX_ALLOW_SIGNUP:" + System.getenv('MDX_ALLOW_SIGNUP')
+        grails.serverURL = System.getenv('MDX_SERVER_URL')//e.g. "https://localhost:8899/mc"
+        println "ServerURL:${grails.serverURL}:"
 
         grails.plugin.springsecurity.auth.loginFormUrl = grails.serverURL + "/login/auth"
         println grails.serverURL + "/login/ajaxSuccess"
@@ -278,16 +273,29 @@ environments {
         grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl = grails.serverURL + "/login/authfail"
         grails.plugin.springsecurity.logout.afterLogoutUrl = grails.serverURL
         grails.plugin.springsecurity.successHandler.defaultTargetUrl = grails.serverURL
-        //println "ServerURL" + grails.serverURL
+        //DB Details
+        println "MDX_DB_URL:" + System.getenv('MDX_DB_URL')
+        println "MDX_DB_USERNAME:" + System.getenv('MDX_DB_USERNAME')
+        println "MDX_DB_PASSWORD:" + System.getenv('MDX_DB_PASSWORD')
+        //Elastic Details
+        println "MDX_ELASTIC_HOST:" + System.getenv('MDX_ELASTIC_HOST')
+        println "MDX_ELASTIC_PORT:" + System.getenv('MDX_ELASTIC_PORT')
+
         mc.search.elasticsearch.host=System.getenv('MDX_ELASTIC_HOST')
         mc.search.elasticsearch.port=System.getenv('MDX_ELASTIC_PORT')
+        //Email Details for signup
+        println "MDX_MAIL_FROM:" + System.getenv('MC_MAIL_FROM')
+        println "MDX_MAIL_HOST:" + System.getenv('MDX_MAIL_HOST')
+        println "MDX_MAIL_PORT:" + System.getenv('MDX_MAIL_PORT')
+        println "MDX_MAIL_USERNAME:" + System.getenv('MDX_MAIL_USERNAME')
+        println "MDX_MAIL_PASSWORD:" + System.getenv('MDX_MAIL_PASSWORD')
 
-        grails.plugin.console.enabled=true
-        mc.legacy.dataModels=true
         grails.mail.default.from = System.getenv("MDX_MAIL_FROM")//"admin@datalink.org.uk"//System.getenv("MC_MAIL_FROM")
         grails.plugin.springsecurity.ui.register.emailFrom = System.getenv("MDX_MAIL_FROM")//"david@metadataconsulting.co.uk"//System.getenv("MC_MAIL_FROM")
         grails.plugin.springsecurity.ui.forgotPassword.emailFrom = System.getenv("MDX_MAIL_FROM")//"david@metadataconsulting.co.uk"//System.getenv("MC_MAIL_FROM")
 
+        //Signup and email details
+        mc.allow.signup = System.getenv('MDX_ALLOW_SIGNUP')//true
         grails {
             mail {
                 host = System.getenv('MDX_MAIL_HOST')//"vps.beenleigh.com"
@@ -299,27 +307,30 @@ environments {
                 }
             }
         }
-
-
+        //General Instance Text
+        println "MDX_NAME:" + System.getenv('MDX_NAME')
+        println "MDX_WELCOME:" + System.getenv('MDX_WELCOME')
+        println "MDX_INFO:" + System.getenv('MDX_INFO')
+        println "MDX_ALLOW_SIGNUP:" + System.getenv('MDX_ALLOW_SIGNUP')
+        println "MDX_CSS_CUSTOM:" + System.getenv("MDX_CSS_CUSTOM")
+        println "MDX_MAX_ACTIVE_USERS:" + System.getenv('MDX_MAX_ACTIVE_USERS')
+        println "MDX_PRELOAD:" + System.getenv('MDX_PRELOAD')
 
         mc.name = System.getenv('MDX_NAME')//"Metadata Exchange"
         mc.welcome.jumbo = System.getenv('MDX_WELCOME')//"The Metadata Exchange is loaded with some test data"
         mc.welcome.info = System.getenv('MDX_INFO')//"Welcome to the Metadata Exchange"
-        mc.allow.signup = System.getenv('MDX_ALLOW_SIGNUP')//true
 
-
-
-        if (System.getenv("MC_CSS_CUSTOM")) {
-            mc.css.custom = System.getenv("MC_CSS_CUSTOM")
+        if (System.getenv("MDX_CSS_CUSTOM")) {
+            mc.css.custom = System.getenv("MDX_CSS_CUSTOM")
         }
 
-        if (System.getenv('MC_MAX_ACTIVE_USERS')) {
-            mc.max.active.users = System.getenv('MC_MAX_ACTIVE_USERS')
+        if (System.getenv('MDX_MAX_ACTIVE_USERS')) {
+            mc.max.active.users = System.getenv('MDX_MAX_ACTIVE_USERS')
         }
 
-        if (System.getenv('MC_PRELOAD')) {
+        if (System.getenv('MDX_PRELOAD')) {
             try {
-                mc.preload = new JsonSlurper().parseText(System.getenv('MC_PRELOAD'))
+                mc.preload = new JsonSlurper().parseText(System.getenv('MDX_PRELOAD'))
             } catch (ignored) {}
         }
 
@@ -330,20 +341,10 @@ environments {
                 genOptions: [indent_start:0, indent_level:4, quote_keys: false, space_colon: false, beautify: false, ascii_only: false, inline_script:false]
         ]
 
-
-//        if (System.properties["mc.config.location"]) {
-//            // for running
-//            // grails prod run-war -Dmc.config.location=my-conf.groovy
-//            grails.config.locations = ["file:" + System.properties["mc.config.location"]]
-//        } else {
-//            grails.config.locations = [ "classpath:mc-config.properties",
-//                                        "classpath:mc-config.groovy",
-//                                        "file:${userHome}/.grails/mc-config.properties",
-//                                        "file:${userHome}/.grails/mc-config.groovy"]
-//        }
         if (System.properties['catalina.base']) {
             def tomcatConfDir = new File("${System.properties['catalina.base']}/conf")
             if (tomcatConfDir.isDirectory()) {
+                //mc-config.groovy still available if needed
                 grails.config.locations = ["file:${tomcatConfDir.canonicalPath}/mc-config.groovy"]
 
             }
@@ -383,18 +384,6 @@ log4j.main = {
     info 'org.modelcatalogue.core.rx.BatchOperator'
     info 'org.modelcatalogue.core.rx.DetachedCriteriaOnSubscribe'
 
-//    debug 'org.codehaus.groovy.grails.web.mapping'
-//    debug 'org.springframework.security'
-//    debug 'org.grails.plugins.elasticsearch'
-
-
-
-
-//    if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
-//        trace 'org.hibernate.type'
-//        trace 'org.hibernate.stat'
-//        debug 'org.hibernate.SQL'
-//    }
 
     info 'org.modelcatalogue'
     info 'grails.app.domain.org.modelcatalogue'
