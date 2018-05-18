@@ -153,7 +153,14 @@ class DataElementService {
             return sqlQuery.list()[0]
         }
     }
+    static List<DataClass> getDataClassesOf(DataElement dataElement) {
+        List<CatalogueElement> deDCs = dataElement.getIncomingRelationshipsByType(RelationshipType.containmentType)*.source
+        deDCs.collect{it as DataClass}
+    }
 
+    static int countDataClassesOf(DataElement dataElement) {
+        dataElement.getIncomingRelationshipsByType(RelationshipType.containmentType).size()
+    }
     private ListWithTotalAndType<DataElement>  buildDataElementsList(Map params, String selectElements, String selectCount, String fromQuery, @DelegatesTo(SQLQuery) Closure closure) {
         QuerySetupListMethods querySetupListMethods = new QuerySetupListMethods(selectElements, selectCount, fromQuery, closure)
         return Lists.methodNotClosureLazy(params, DataElement, querySetupListMethods)

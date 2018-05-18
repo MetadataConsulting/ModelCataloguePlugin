@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataElementService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.api.ElementStatus
@@ -24,6 +25,7 @@ class D3ViewUtilsService {
 
     DataModelService dataModelService
     DataClassService dataClassService
+    DataElementService dataElementService
     GrailsApplication grailsApplication
 
     static String lowerCamelCaseDomainName(Class clazz) {
@@ -45,15 +47,39 @@ class D3ViewUtilsService {
         DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
         Map<String, Integer> stats = dataModelService.getStatistics(filter)
 
+
         ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''])
+        List<DataElement> unDataClassedDataElements = DataElement.findAllByDataModel(dataModel).findAll{
+            dataElementService.countDataClassesOf(it) == 0
+        }
+
+        def dataClassChildrenJson = []
+        def dataElementChildrenJson = []
+
+        if (depth != 0) {
+            dataClassChildrenJson = dataClasses.items.collect {dataClass ->
+                dataClassD3Json(dataClass, depth-1)
+
+            }
+            dataElementChildrenJson = unDataClassedDataElements.collect {
+                dataElementD3Json(it)
+            }
+        }
+
         def dataModelJson = [
             "name": dataModel.name,
             "angularLink": angularLink(dataModel.id, dataModel.id, DataModel),
             "type": lowerCamelCaseDomainName(DataModel),
-            "children": (depth == 0) ? [] : dataClasses.items.collect {dataClass ->
-                dataClassD3Json(dataClass, depth-1)
+            "children": dataClassChildrenJson + dataElementChildrenJson
+            // TODO: Handle case where there are just DataTypes listed not connected to any DataElements
+        ]
+    }
 
-            } // TODO: If Data Model has Data Elements not in any Data Class add them
+    def dataElementD3Json(DataElement dataElement) {
+        [
+            "name": dataElement.name,
+            "angularLink": angularLink(dataElement.dataModel.id, dataElement.id, DataElement),
+            "type": lowerCamelCaseDomainName(DataElement),
         ]
     }
 
@@ -72,11 +98,9 @@ class D3ViewUtilsService {
 
         if (depth != 0) {
 
-            dataElementsJson = dataClassService.getDataElementsIn(dataClass).collect{[
-                "name": it.name,
-                "angularLink": angularLink(it.dataModel.id, it.id, DataElement),
-                "type": lowerCamelCaseDomainName(DataElement),
-            ]}
+            dataElementsJson = dataClassService.getDataElementsIn(dataClass).collect{
+                dataElementD3Json(it)
+            }
 
             childDataClassesJson = dataClassService.getChildDataClasses(dataClass).collect{
                 dataClassD3Json(it, depth - 1) // recursive
