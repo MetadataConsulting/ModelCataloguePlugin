@@ -18,7 +18,7 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 
 @Transactional
 /**
- *  Produces D3 view json.
+ *  Produces D3 hierarchical layout json augmented with model catalogue specific fields.
  *  D3 view json is of the recursive format
  *
  *  D3JSON ::=
@@ -30,7 +30,7 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
  *
  *  TYPE is from MetadataDomain.lowerCamelCaseDomainName e.g. 'dataClass'
  *  ANGULARLINK is a string of format e.g. "http://localhost:8080/#/82467/dataClass/82470/", which is a link to the angular application view for data model 82467, data class 82470
- *  ENUMERATIONS is a map of strings to strings.
+ *  ENUMERATIONS is a map of strings to strings for enumerated types.
  *
  *
  */
