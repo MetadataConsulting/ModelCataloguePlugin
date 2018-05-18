@@ -87,7 +87,7 @@
       */
 
       function writeMessage(text) {
-        $('#d3-info-messages').append("<li>" + text + "</li>")
+        $('#d3-info-messages').append("<li>" + (new Date().toLocaleString()) + ": " + text + "</li>")
       }
 
       /**
