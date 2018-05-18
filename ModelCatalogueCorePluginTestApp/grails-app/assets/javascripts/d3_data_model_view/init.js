@@ -51,7 +51,8 @@ function ucFirst(str /*: string */) {
  * @returns {string}
  */
 function info(d) { // d is data with fields name, type, angularLink, etc.
-  return "Name: "  + "<a href='" + d.angularLink +  "' target='_blank'>" + d.name + "</a>" +"<br/>" +
+  return "<b>Name: "  + "<a href='" + d.angularLink +  "' target='_blank'>" + d.name + "</a>" + "<br/>" +
+    " <i>(Click to see Advanced View)</i>" + "</b>" + "<br/>" +
     "Type: " + ucFirst(d.type)
 
 
