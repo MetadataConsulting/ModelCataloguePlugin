@@ -53,9 +53,19 @@ function ucFirst(str /*: string */) {
 function info(d) { // d is data with fields name, type, angularLink, etc.
   return "<b>Name: "  + "<a href='" + d.angularLink +  "' target='_blank'>" + d.name + "</a>" + "<br/>" +
     " <i>(Click to see Advanced View)</i>" + "</b>" + "<br/>" +
-    "Type: " + ucFirst(d.type)
+    "Type: " + ucFirst(d.type) + "<br/>" +
+    (d.enumerations ? enumerate(d.enumerations): "")
 
 
+}
+
+function enumerate(map) {
+  var ret = "Enumerations: <br/> <ul>"
+  Object.keys(map).forEach(function(key) {
+    ret = ret + "<li>" + key + ": " + map[key] + "</li>"
+    console.log(key, map[key]);
+  });
+  return ret = ret + "</ul>"
 }
 
 /**
@@ -88,7 +98,8 @@ function initD3(json) {
 var coloursMap = {
   "dataModel": "blueviolet",
   "dataClass": "blue",
-  "dataElement": "gold"
+  "dataElement": "gold",
+  "dataType": "green"
 }
 
 

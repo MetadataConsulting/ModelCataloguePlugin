@@ -9,6 +9,8 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataElementService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
+import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.MetadataDomain
@@ -17,9 +19,20 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 @Transactional
 /**
  *  Produces D3 view json.
- *  D3 view json is of the format D3JSON = ["name": NAME, "angularLink": ANGULARLINK, "type": TYPE, "children": List<D3JSON>]
+ *  D3 view json is of the recursive format
+ *
+ *  D3JSON ::=
+ *  ["name": string,
+ *  "angularLink": ANGULARLINK,
+ *  "type": TYPE,
+ *  "enumerations": ENUMERATIONS
+ *  "children": List<D3JSON>]
+ *
  *  TYPE is from MetadataDomain.lowerCamelCaseDomainName e.g. 'dataClass'
- *  angularLink is e.g. http://localhost:8080/#/82467/dataClass/82470/, which is data model 82467, data class 82470
+ *  ANGULARLINK is a string of format e.g. "http://localhost:8080/#/82467/dataClass/82470/", which is a link to the angular application view for data model 82467, data class 82470
+ *  ENUMERATIONS is a map of strings to strings.
+ *
+ *
  */
 class D3ViewUtilsService {
 
@@ -76,11 +89,31 @@ class D3ViewUtilsService {
     }
 
     def dataElementD3Json(DataElement dataElement) {
-        [
+        def ret = [
             "name": dataElement.name,
             "angularLink": angularLink(dataElement.dataModel.id, dataElement.id, DataElement),
             "type": lowerCamelCaseDomainName(DataElement),
+
         ]
+
+        if (dataElement.dataType) {
+            ret['children'] = [dataTypeD3Json(dataElement.dataType)]
+        }
+
+        return ret
+    }
+
+    def dataTypeD3Json(DataType dataType) {
+        def ret = [
+            "name": dataType.name,
+            "angularLink": angularLink(dataType.dataModel.id, dataType.id, DataType),
+            "type": lowerCamelCaseDomainName(DataType),
+        ]
+
+        if (dataType instanceof EnumeratedType) {
+            ret['enumerations'] = ((EnumeratedType) dataType).enumerations
+        }
+        return ret
     }
 
     /**
@@ -108,10 +141,18 @@ class D3ViewUtilsService {
 
         } // otherwise depth == 0, no children
 
+
         def ret = ["name": dataClass.name,
                     "angularLink": angularLink(dataClass.dataModel.id, dataClass.id, DataClass),
                    "type": lowerCamelCaseDomainName(DataClass),
-                   "children": dataElementsJson + childDataClassesJson]
+                   ]
+
+
+        def children = dataElementsJson + childDataClassesJson
+        if (children) {
+            ret['children'] = children
+        }
+
         return ret
     }
 }
