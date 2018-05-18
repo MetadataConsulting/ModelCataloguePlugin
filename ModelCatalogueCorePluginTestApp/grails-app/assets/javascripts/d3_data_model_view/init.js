@@ -22,6 +22,12 @@ var vis = d3.select("#body").append("svg:svg")
   .append("svg:g")
   .attr("transform", "translate(" + (m[3] + 20) + "," + m[0] + ")");
 
+// Define the div for the tooltip
+var div = d3.select("#body").append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+
+
 function parseModelToJS(jsonString) {
   jsonString=jsonString.replace(/\"/g,'"');
   //jsonString=jsonString.replace(/&quot;/g, '"');
@@ -115,10 +121,28 @@ function update(source) {
       $('#d3-info-element').html(info(d));
       update(d); });
 
+  // add circles for each node
   nodeEnter.append("svg:circle")
     .attr("r", 1e-6)
-    .style("fill", function(d) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; });
+    .style("fill", function(d) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; })
+    // Tooltip:
+    .on("mouseover", function(d) {
+        div.transition()
+          .duration(0)
+          .style("opacity", .9);
+        div	.html(d.name)
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+    })
+    .on("mouseout", function(d) {
+          div.transition()
+            .duration(500)
+            .style("opacity", 0);
+    });
+
   var maxStringLength = 10;
+
+  // Text/link for each node
   nodeEnter.append("svg:a")
     .attr("xlink:href", function(d) {return d.angularLink})
     .attr("target", "_blank")
@@ -153,7 +177,8 @@ function update(source) {
     .attr("r", radius)
     .style("stroke", function(d) { return d._children ? unopenedNodeBorderColour: coloursMap[d.type]; })
     .style("stroke-width", 3)
-    .style("fill", function(d) { return coloursMap[d.type]});
+    .style("fill", function(d) { return coloursMap[d.type]})
+    ;
 
   nodeUpdate.select("text")
     .style("fill-opacity", 1);

@@ -55,18 +55,18 @@
 
       <div id="d3-info" class="column column-right">
 
-        <div class="border-bottom">
+        <div class="info-box">
           <h1><u>Data Model:</u></h1><br/>
           <div id="d3-info-data-model"></div>
         </div>
 
-        <div class="border-bottom">
-          <h1><u>Element:</u></h1><br/>
+        <div class="info-box">
+          <h2><u>Element:</u></h2><br/>
           <div id="d3-info-element"></div>
         </div>
 
-      <div >
-        <h1><u>Messages:</u></h1><br/>
+      <div class="info-box">
+        <h2><u>Messages:</u></h2><br/>
         <ul id="d3-info-messages">
 
         </ul>
