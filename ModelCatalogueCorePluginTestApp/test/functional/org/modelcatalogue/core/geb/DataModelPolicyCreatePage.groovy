@@ -4,6 +4,8 @@ import geb.Page
 
 class DataModelPolicyCreatePage extends Page {
 
+    static at = { $('.modal-dialog').text().contains('Create Data Policy') }
+
     static content = {
         inputName { $('#name', 0) }
         inputPolicyText { $('#policyText', 0) }
@@ -12,6 +14,7 @@ class DataModelPolicyCreatePage extends Page {
 
     void save() {
         saveButton.click()
+        sleep(2000)
     }
 
     void setName(String value) {

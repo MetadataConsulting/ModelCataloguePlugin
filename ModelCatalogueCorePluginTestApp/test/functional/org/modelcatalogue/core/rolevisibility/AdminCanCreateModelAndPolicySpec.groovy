@@ -35,9 +35,11 @@ class AdminCanCreateModelAndPolicySpec extends GebSpec {
     @Shared
     String datamodelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared
-    String defaultPolicy = "Default Checks"
+    List<String> policies = []
     @Shared
-    List<String> policies = ["Unique of Kind",]
+    String newPolicyName = "New Policy"
+    @Shared
+    String newPolicyText = "check dataElement property 'name' is 'unique'"
 
     def "login as supervisor"() {
         when: 'login as a curator'
@@ -47,23 +49,23 @@ class AdminCanCreateModelAndPolicySpec extends GebSpec {
         at DashboardPage
     }
 
-     def "create data model"() {
-         when:
-         DashboardPage dashboardPage = browser.page DashboardPage
-         dashboardPage.nav.createDataModel()
-         then:
-         at CreateDataModelPage
+    def "create data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
 
-         when:
-         CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-         createDataModelPage.name = datamodelName
-         createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
-         createDataModelPage.description = datamodelDescription
-         println(policies = createDataModelPage.selectedPolicyName())
-         createDataModelPage.submit()
-         then:
-         at DataModelPage
-     }
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = datamodelName
+        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
+        createDataModelPage.description = datamodelDescription
+        println(policies = createDataModelPage.selectedPolicyName())
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
 
 
     def "selected data model policy is shown"() {
@@ -82,16 +84,28 @@ class AdminCanCreateModelAndPolicySpec extends GebSpec {
 
         when:
         dataModelPage = browser.page DataModelPage
-        dataModelPage.searchPolicy(defaultPolicy)
+        dataModelPage.searchPolicy(newPolicyName)
+        dataModelPage.selectCreateNew()
+        then:
+        at DataModelPolicyCreatePage
+    }
+
+    def "create new data model policy"() {
+        when:
+        DataModelPolicyCreatePage dataModelPolicyCreatePage = browser.page DataModelPolicyCreatePage
+        dataModelPolicyCreatePage.name = newPolicyName
+        dataModelPolicyCreatePage.policyText = newPolicyText
+        dataModelPolicyCreatePage.save()
         then:
         at DataModelPage
     }
+
 
     def "verify new policy is added"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         then:
-        dataModelPage.policyAdded(defaultPolicy)
+        dataModelPage.policyAdded(newPolicyName)
     }
 
     def "save data model"() {
@@ -105,9 +119,20 @@ class AdminCanCreateModelAndPolicySpec extends GebSpec {
     def "select policy"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
-        withNewWindow(dataModelPage.selectPolicy(defaultPolicy))
+        dataModelPage.selectPolicy(newPolicyName)
+        for (String winHandle : driver.getWindowHandles()) {
+            driver.switchTo().window(winHandle);
+        }
         then:
         at DataModelPolicyPage
+    }
+
+    def "compare the policy text"() {
+        when:
+        DataModelPolicyPage dataModelPolicyPage = browser.page DataModelPolicyPage
+        then:
+        dataModelPolicyPage.policyTextIs(newPolicyText)
+        dataModelPolicyPage.titleIs(newPolicyName)
     }
 
 }

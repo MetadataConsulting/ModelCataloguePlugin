@@ -96,13 +96,18 @@ class DataModelPage extends Page implements InputUtils {
 
     void searchPolicy(String value) {
         fillInput(dataModelSearchBar, value)
-        sleep(2000)
-        policiesDropdown.$('li', 0).click()
+        waitFor(5) { policiesDropdown.$('li', 0) }
+    }
+
+    void selectCreateNew() {
+        int size = policiesDropdown.$('li').size()
+        policiesDropdown.$('li', size - 1).click()
     }
 
     void saveModel() {
         waitFor { saveButton }
         saveButton.click()
+        sleep(2000)
     }
 
     Boolean policyAdded(String value) {
