@@ -247,10 +247,35 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         respond instance, [status: OK]
     }
 
-    def d3View() {
+    /**
+     * Initialize Basic View (D3 view) with just one node (the Data Model itself, no children)
+     * @return
+     */
+    def basicView() {
 
         long dataModelId = params.long('id')
         DataModel dataModel = dataModelGormService.findById(dataModelId)
+
+        def dataModelJson = [:]
+        boolean modelFound = dataModel
+
+        if (modelFound) {
+                dataModelJson = d3ViewUtilsService.dataModelD3Json(dataModel, 0) // 0: no children
+        }
+
+
+        render(view: 'd3_data_model_view', model: [dataModelJson: dataModelJson, modelFound: modelFound, dataModelId: dataModelId])
+    }
+
+    /**
+     * Return JSON data of full data model
+     * @return
+     */
+    def basicViewData() {
+
+        long dataModelId = params.long('id')
+        DataModel dataModel = dataModelGormService.findById(dataModelId)
+
         def dataModelJson = [:]
         boolean modelTooLarge = false
         boolean modelFound = dataModel
@@ -270,7 +295,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         }
 
-
+        // TODO: request and render JSON
         render(view: 'd3_data_model_view', model: [dataModelJson: dataModelJson, modelTooLarge: modelTooLarge, modelFound: modelFound, dataModelId: dataModelId])
     }
 

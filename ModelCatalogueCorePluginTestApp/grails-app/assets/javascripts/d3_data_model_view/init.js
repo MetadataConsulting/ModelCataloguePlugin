@@ -1,18 +1,21 @@
 //= require validator-js/validator.min.js
 //= require_self
 
+// dimensions of page
 var m = [20, 120, 20, 120],
   w = 1280 + 6000 - m[1] - m[3],
   h = 800 - m[0] - m[2],
-  i = 0,
+  i = 0, // node ids
   root;
 
+// layout generator
 var tree = d3.layout.tree()
   .size([h, w]);
 
 var diagonal = d3.svg.diagonal()
   .projection(function(d) { return [d.y, d.x]; });
 
+// visualization pane
 var vis = d3.select("#body").append("svg:svg")
   .attr("width", w + m[1] + m[3])
   .attr("height", h + m[0] + m[2])
@@ -21,27 +24,42 @@ var vis = d3.select("#body").append("svg:svg")
 
 function parseModelToJS(jsonString) {
   jsonString=jsonString.replace(/\"/g,'"');
-  jsonString=jsonString.replace(/&quot;/g, '"');
-  jsonString=jsonString.replace(/&#92;n/g, ' ');
-  jsonString=validator.unescape(jsonString);
+  //jsonString=jsonString.replace(/&quot;/g, '"');
+  jsonString=jsonString.replace(/&#92;n/g, ' '); // i.e. \n
+  jsonString=validator.unescape(jsonString);h // unescape e.g. &amp;
   var jsonObject=$.parseJSON(jsonString);
   return jsonObject
 }
 
-// For info panel on the right
+/** return Upper Case first letter
+ * @param str
+ * @returns {string}
+ */
+function ucFirst(str) {
+  return str.charAt(0) .toUpperCase() + str.substr(1)
+}
+
+/**
+ * Return HTML for info panel on the right from node data
+ * @param d node data
+ * @returns {string}
+ */
 function info(d) { // d is data with fields name, type, angularLink, etc.
   return "Name: "  + "<a href='" + d.angularLink +  "' target='_blank'>" + d.name + "</a>" +"<br/>" +
-    "Type: " + d.type
+    "Type: " + ucFirst(d.type)
 
 
 }
 
-// d3.json("flare.json",
+/**
+ * Initialize
+ * @param json
+ */
 function initD3(json) {
   root = json;
   root.x0 = h / 2;
   root.y0 = 0;
-  $('#d3-info-element').html(info(root));
+  $('#d3-info-data-model').html(info(root));
 
   function toggleAll(d) {
     if (d.children) {

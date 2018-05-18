@@ -663,7 +663,8 @@ class MetadataSecurityService {
     ]
 
     public static final List DATA_MODEL_MAPPINGS = [
-            ["/dataModel/d3View/*", MetadataRoles.ROLE_CURATOR, HttpMethod.GET],
+            ["/dataModel/basicView/*", 'isAuthenticated()', HttpMethod.GET],
+            ["/dataModel/basicViewData/*", 'isAuthenticated()', HttpMethod.GET],
             ["/dataModel/create", MetadataRoles.ROLE_CURATOR, HttpMethod.GET],
             ["/dataModel/save", MetadataRoles.ROLE_CURATOR, HttpMethod.POST],
             ["/dataModel/showAssetInAngular/*", 'isAuthenticated()', HttpMethod.GET],
