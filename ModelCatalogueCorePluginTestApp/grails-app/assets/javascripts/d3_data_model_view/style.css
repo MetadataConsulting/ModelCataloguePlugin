@@ -47,6 +47,8 @@
 
 .column-right {
     width: 25%;
+    overflow: scroll;
+    height: 800px;
 }
 
 .info-box {
