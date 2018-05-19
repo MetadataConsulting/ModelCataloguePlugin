@@ -208,7 +208,9 @@ var initFunctions = (function() {
 
             if (data.canAccessDataModel && data.caseHandled) {
               d.children = null
-              d._children = data.children;
+              if (data.children.length > 0) {
+                d._children = data.children;
+              }
               writeMessage("Loading children for " + typeAndName(d) + " succeeded!")
               toggle(d);
               update(d);
