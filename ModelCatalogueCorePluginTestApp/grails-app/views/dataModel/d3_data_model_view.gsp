@@ -14,10 +14,12 @@
   <head>
 
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <asset:stylesheet href="d3_data_model_view/style.css"/>
+    %{--D3--}%
     <asset:javascript  src="d3_data_model_view/d3.js"/>
     <asset:javascript  src="d3_data_model_view/d3.layout.js"/>
 
+    %{--Style--}%
+    <asset:stylesheet href="d3_data_model_view/style.css"/>
     <style type="text/css">
 
 
@@ -75,10 +77,14 @@
       </div>
     </div>
 
+
+    %{--Inititalize D3--}%
     <asset:javascript  src="d3_data_model_view/init.js"/>
+
     <script type="text/javascript">
 
       /** methods from init.js:
+       * parseModelToJS
        * initD3
        * writeMessage
       */
