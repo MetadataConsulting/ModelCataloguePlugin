@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
+import org.modelcatalogue.core.d3viewUtils.ChildrenData
 import org.modelcatalogue.core.d3viewUtils.D3ViewUtilsService
 import org.modelcatalogue.core.persistence.AssetGormService
 import org.modelcatalogue.core.util.MetadataDomain
@@ -283,12 +284,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     }
 
     /**
-     * Returns
-     * type ChildrenData = {
-     *     children: List<D3JSON>,
-     *     canAccessDataModel: boolean
-     * }
-     * @return
+     *
+     * @return ChildrenData
      */
     def basicViewChildrenData() {
 
@@ -312,10 +309,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
 
 
-
-        // TODO: request and render JSON
         render(contentType: 'text/json') {
-            [children: children, canAccessDataModel: canAccessDataModel]
+            new ChildrenData(children: children, canAccessDataModel: canAccessDataModel)
         }
     }
 
