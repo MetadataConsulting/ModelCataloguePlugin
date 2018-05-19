@@ -67,9 +67,9 @@
           <div id="d3-info-element"></div>
         </div>
 
-      <div class="info-box">
-        <h2><u>Messages:</u></h2>
-        <ul id="d3-info-messages">
+        <div class="info-box">
+          <h2><u>Messages:</u></h2>
+          <ul id="d3-info-messages">
 
         </ul>
       </div>

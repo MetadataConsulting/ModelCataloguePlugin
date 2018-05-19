@@ -53,8 +53,11 @@
 }
 
 .info-box {
-    padding: 1em;
+    padding: 0.8em;
 
+}
+h1, h2 {
+    margin-top: 0.2em;
 }
 
 .info-box-limited {
