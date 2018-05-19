@@ -1,6 +1,8 @@
 //= require validator-js/validator.min.js
 //= require_self
+// @flow
 
+//// D3 Setup stuff
 // dimensions of page
 var m = [20, 120, 20, 120],
   w = 1280 + 6000 - m[1] - m[3],
@@ -12,6 +14,7 @@ var m = [20, 120, 20, 120],
 var tree = d3.layout.tree()
   .size([h, w]);
 
+// transition stuff
 var diagonal = d3.svg.diagonal()
   .projection(function(d) { return [d.y, d.x]; });
 
@@ -28,7 +31,11 @@ var div = d3.select("#body").append("div")
   .style("opacity", 0);
 
 
-function parseModelToJS(jsonString) {
+//// Link with Grails GSP
+var serverUrl = ""
+
+// Parse jsonString to jsonObject
+function parseModelToJS(jsonString /*: string */) /*: Object */ {
   jsonString=jsonString.replace(/\"/g,'"');
   //jsonString=jsonString.replace(/&quot;/g, '"');
   jsonString=jsonString.replace(/&#92;n/g, ' '); // i.e. \n
@@ -37,6 +44,30 @@ function parseModelToJS(jsonString) {
   return jsonObject
 }
 
+/*::
+  type D3JSON = {
+    name: string,
+    id: number,
+    angularLink: string,
+    type: string,
+
+    loadedChildren: boolean,
+    loading: boolean,
+
+    enumerations: ?Object,
+
+    children: ?Array<D3JSON>,
+    _children: ?Array<D3JSON>,
+
+    x: number,
+    y: number,
+    x0: number,
+    y0: number
+  }
+ */
+
+
+//// naming functions
 /** return Upper Case first letter
  * @param str
  * @returns {string}
@@ -45,20 +76,30 @@ function ucFirst(str /*: string */) {
   return str.charAt(0) .toUpperCase() + str.substr(1)
 }
 
+
+function typeAndName(d /*: D3JSON */) {
+  return ucFirst(d.type) + " " + d.name
+}
+
+//// Info functions
+
 /**
  * Return HTML for info panel on the right from node data
  * @param d node data
  * @returns {string}
  */
-function info(d) { // d is data with fields name, type, angularLink, etc.
+function info(d /*: D3JSON */) { // d is data with fields name, type, angularLink, etc.
   return "<b>Name: "  + "<a href='" + d.angularLink +  "' target='_blank'>" + d.name + "</a>" + "<br/>" +
     " <i>(Click to see Advanced View)</i>" + "</b>" + "<br/>" +
     "Type: " + ucFirst(d.type) + "<br/>" +
     (d.enumerations ? enumerate(d.enumerations): "")
-
-
 }
 
+/**
+ * Return HTML for enumeration from Map<String, String>
+ * @param map
+ * @returns {string}
+ */
 function enumerate(map) {
   var ret = "Enumerations: <br/> <ul>"
   Object.keys(map).forEach(function(key) {
@@ -68,14 +109,16 @@ function enumerate(map) {
   return ret = ret + "</ul>"
 }
 
+function writeMessage(text) {
+  $('#d3-info-messages').append("<li>" + (new Date().toLocaleString()) + ": " + text + "</li>")
+}
 
-var serverUrl = ""
 
 /**
  * Initialize
  * @param json
  */
-function initD3(json) {
+function initD3(json /*: D3JSON */) {
   root = json;
   root.x0 = h / 2;
   root.y0 = 0;
@@ -97,6 +140,7 @@ function initD3(json) {
   update(root);
 };
 
+// node colours
 var coloursMap = {
   "dataModel": "blueviolet",
   "dataClass": "blue",
@@ -104,11 +148,10 @@ var coloursMap = {
   "dataType": "green"
 }
 
-
-function writeMessage(text) {
-  $('#d3-info-messages').append("<li>" + (new Date().toLocaleString()) + ": " + text + "</li>")
-}
-
+/**
+ * Update a node (source)
+ * @param source
+ */
 function update(source) {
 
   var duration = d3.event && d3.event.altKey ? 5000 : 500;
@@ -125,58 +168,71 @@ function update(source) {
 
   // Update the nodes…
   var svgNodes = vis.selectAll("g.node")
-    .data(nodeLayoutData, function(d) { return d.id || (d.id = ++i); });
+    .data(nodeLayoutData, function(d) { return d.nodeId || (d.nodeId = ++i); });
 
   /*::
     type ChildrenData = {
         children: Array<D3JSON>,
-        canAccessDataModel: boolean
+        canAccessDataModel: boolean,
+        caseHandled: boolean
     }
   */
+  function onNodeClick(d) {
+
+    $('#d3-info-element').html(info(d)); // display info
+
+    if (d.loadedChildren && !d.loading) {
+      toggle(d);
+      update(d);
+    }
+
+    else {
+
+      if (!d.loading) { // i.e. !d.loadedChildren
+
+        writeMessage("Loading children for " + typeAndName(d))
+        d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough.
+        $.ajax({
+          url: serverUrl + "/dataModel/basicViewChildrenData/" + d.type + "/" + d.id
+        }).then(function(data /*: ChildrenData */) {
+
+          if (data.canAccessDataModel && data.caseHandled) {
+            d.children = null
+            d._children = data.children;
+            writeMessage("Loading children of " + typeAndName(d) + " succeeded!")
+            toggle(d);
+            update(d);
+          }
+
+          else {
+            if (!data.canAccessDataModel) {
+              writeMessage("You do not have access to the data model of " + typeAndName(d))
+            }
+            else { // !data.caseHandled
+              writeMessage("Loading children is not handled for this case.")
+            }
+
+          }
+
+          d.loadedChildren = true;
+          d.loading = false;
+          // end loading
+
+        }, function(jqXHR, textStatus, errorThrown) { // request failure
+          writeMessage("Loading children for " + typeAndName(d) + " failed with error message: " + errorThrown)
+          d.loading = false
+          // end loading
+        })
+      }
+
+    }
+  }
 
   // ENTER any new nodes at the parent's previous position.
   var nodeEnter = svgNodes.enter().append("svg:g")
     .attr("class", "node")
     .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-    .on("click", function(d) {
-
-      $('#d3-info-element').html(info(d));
-
-      if (d.loadedChildren) {
-        if (!d.loading) {
-          toggle(d);
-          update(d);
-        }
-      }
-
-      else {
-        if (!d.loading) {
-          d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough.
-          $.ajax({
-            url: serverUrl + "/dataModel/basicViewChildrenData/" + d.type + "/" + d.id
-          }).then(function(data /*: ChildrenData */) {
-
-            if (data.canAccessDataModel) {
-              d._children = data.children;
-              toggle(d);
-              update(d);
-            }
-
-            else {
-              writeMessage("You do not have access to the data model of " + ucFirst(d.type) + " " + d.name)
-            }
-
-            d.loadedChildren = true;
-            d.loading = false;
-
-          }, function(jqXHR, textStatus, errorThrown) { // request failure
-            d.loading = false
-          })
-        }
-
-
-      }
-    });
+    .on("click", onNodeClick);
 
   // add circles for each node
   nodeEnter.append("svg:circle")
@@ -199,28 +255,27 @@ function update(source) {
 
   var maxStringLength = 10;
 
+
+  function textShortLeftOfNode(d /*: D3JSON */) /*: boolean */ {
+    // return d.children || d._children
+    return (d.type == 'dataClass' || d.type == 'dataModel' || d.type == 'dataElement')
+  }
+
   // Text/link for each node
   nodeEnter.append("svg:a")
     .attr("xlink:href", function(d) {return d.angularLink})
     .attr("target", "_blank")
     .append("svg:text")
-    .attr("x", function(d) { return d.children || d._children ? -(radius + 5): radius + 5; })
     .attr("dy", ".35em")
-    .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+
+    .attr("x", function(d) { return textShortLeftOfNode(d) ? -(radius + 5): radius + 5; })
+    .attr("text-anchor", function(d) {
+      return textShortLeftOfNode(d) ? "end" : "start";
+    })
     .text(function(d) {
-      return (d.name.length >= maxStringLength && (d.children || d._children)) ? d.name.substring(0,maxStringLength) + "..." : d.name;  })
+      return (d.name.length >= maxStringLength && textShortLeftOfNode(d)) ? d.name.substring(0,maxStringLength) + "..." : d.name;  })
     .style("fill-opacity", 1e-6)
     .style("font", "15px sans-serif");
-    // .append("rect")
-    // .attr("x", 0)
-    // .attr("y", 0)
-    // .attr("height", 100)
-    // .attr("width", 200)
-    // .style("fill", "lightgreen")
-    // .attr("rx", 10)
-    // .attr("ry", 10);
-
-  // nodeEnter
 
 
 
@@ -232,7 +287,7 @@ function update(source) {
 
   nodeUpdate.select("circle")
     .attr("r", radius)
-    .style("stroke", function(d) { return d._children ? unopenedNodeBorderColour: coloursMap[d.type]; })
+    .style("stroke", function(d) { return (d._children || !d.loadedChildren) ? unopenedNodeBorderColour: coloursMap[d.type]; })
     .style("stroke-width", 3)
     .style("fill", function(d) { return coloursMap[d.type]})
     ;

@@ -62,21 +62,24 @@ class D3ViewUtilsService {
 
 
         ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''])
-        List<DataElement> unDataClassedDataElements = DataElement.findAllByDataModel(dataModel).findAll{
-            dataElementService.countDataClassesOf(it) == 0
-        }
+
 
         def dataClassChildrenJson = dataClasses.items.collect {dataClass ->
-            dataClassD3Json(dataClass, 0)
+            dataClassD3Json(dataClass)
 
         }
-        def dataElementChildrenJson = unDataClassedDataElements.collect {
-            dataElementD3Json(it)
-        }
+//        List<DataElement> unDataClassedDataElements = DataElement.findAllByDataModel(dataModel).findAll{
+//            dataElementService.countDataClassesOf(it) == 0
+//        }
+//        def dataElementChildrenJson = unDataClassedDataElements.collect {
+//            dataElementD3Json(it)
+//        }
 
 
 
-        return dataClassChildrenJson + dataElementChildrenJson
+        return dataClassChildrenJson //+ dataElementChildrenJson
+
+        // the dataElementChildrenJson seems to take a long time
         // TODO: Handle case where there are just DataTypes listed not connected to any DataElements
 
     }
@@ -85,7 +88,9 @@ class D3ViewUtilsService {
         D3JSON ret = new D3JSON(
 
             name: dataElement.name,
+            id: dataElement.id,
             angularLink: angularLink(dataElement.dataModel.id, dataElement.id, DataElement),
+            loadedChildren: true, // Just load data type, no laziness
             type: lowerCamelCaseDomainName(DataElement)
         )
 
@@ -99,6 +104,7 @@ class D3ViewUtilsService {
     D3JSON dataTypeD3Json(DataType dataType) {
         D3JSON ret = new D3JSON(
             name: dataType.name,
+            id: dataType.id,
             angularLink: angularLink(dataType.dataModel.id, dataType.id, DataType),
             loadedChildren: true, // No children, so "already loaded children."
             type: lowerCamelCaseDomainName(DataType),
@@ -111,45 +117,37 @@ class D3ViewUtilsService {
     }
 
     /**
-     * depth -1 means go as far as possible
-     * depth 0 means don't have any children
-     * depth 1 means have one layer of children
-     * @param dataClass
-     * @param depth
-     * @return
+     * @return DataClass D3JSON (children will be loaded later)
      */
-    D3JSON dataClassD3Json(DataClass dataClass, int depth) {
-
-        List<D3JSON> dataElementsJson = []
-        List<D3JSON> childDataClassesJson = []
-
-        if (depth != 0) {
-
-            dataElementsJson = dataClassService.getDataElementsIn(dataClass).collect{
-                dataElementD3Json(it)
-            }
-
-            childDataClassesJson = dataClassService.getChildDataClasses(dataClass).collect{
-                dataClassD3Json(it, depth - 1) // recursive
-            }
-
-        } // otherwise depth == 0, no children
+    D3JSON dataClassD3Json(DataClass dataClass) {
 
 
         D3JSON ret = new D3JSON(
             name: dataClass.name,
+            id: dataClass.id,
             angularLink: angularLink(dataClass.dataModel.id, dataClass.id, DataClass),
             type: lowerCamelCaseDomainName(DataClass),
         )
 
 
-        List<D3JSON> children = dataElementsJson + childDataClassesJson
-
-        if (children) {
-            ret.children = children
-        }
 
         return ret
+    }
+
+    List<D3JSON> dataClassD3JsonChildren(DataClass dataClass) {
+
+        List<D3JSON> dataElementsJson = dataClassService.getDataElementsIn(dataClass).collect{
+                dataElementD3Json(it)
+        }
+
+        List<D3JSON> childDataClassesJson = dataClassService.getChildDataClasses(dataClass).collect{
+                dataClassD3Json(it) // recursive
+        }
+
+
+        List<D3JSON> children = dataElementsJson + childDataClassesJson
+
+        return children
     }
 }
 /**
@@ -164,7 +162,7 @@ class D3JSON {
     String name
     long id
 
-    boolean loadedChildren = false
+    boolean loadedChildren = false // false by default; children will be loaded later.
     boolean loading = false
 
     String angularLink
@@ -177,4 +175,5 @@ class D3JSON {
 class ChildrenData {
     List<D3JSON> children
     boolean canAccessDataModel
+    boolean caseHandled
 }

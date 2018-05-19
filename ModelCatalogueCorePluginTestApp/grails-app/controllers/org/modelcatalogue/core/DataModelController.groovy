@@ -6,6 +6,7 @@ import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
 import org.modelcatalogue.core.d3viewUtils.ChildrenData
 import org.modelcatalogue.core.d3viewUtils.D3ViewUtilsService
 import org.modelcatalogue.core.persistence.AssetGormService
+import org.modelcatalogue.core.persistence.DataClassGormService
 import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
@@ -69,6 +70,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     AssetMetadataService assetMetadataService
 
     D3ViewUtilsService d3ViewUtilsService
+
+    DataClassGormService dataClassGormService
 
     DataModelController() {
         super(DataModel, false)
@@ -293,12 +296,12 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         long id = params.long('id')
 
         boolean canAccessDataModel = false
+        boolean caseHandled = true
         def children = []
 
         if (type == 'dataModel') {
 
             DataModel dataModel = dataModelGormService.findById(id)
-
             canAccessDataModel = dataModel
 
             if (canAccessDataModel) {
@@ -308,9 +311,23 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             }
         }
 
+        else if (type == 'dataClass') {
+            DataClass dataClass = dataClassGormService.findById(id)
+            canAccessDataModel = dataModelAclService.hasReadPermission(dataClass)
+
+            if (canAccessDataModel) {
+                children = d3ViewUtilsService.dataClassD3JsonChildren(dataClass)
+            }
+
+        }
+
+        else {
+            caseHandled = false
+        }
+
 
         render(contentType: 'text/json') {
-            new ChildrenData(children: children, canAccessDataModel: canAccessDataModel)
+            new ChildrenData(children: children, canAccessDataModel: canAccessDataModel, caseHandled: caseHandled)
         }
     }
 
