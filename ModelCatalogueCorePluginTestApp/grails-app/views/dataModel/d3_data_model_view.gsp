@@ -78,76 +78,21 @@
     <asset:javascript  src="d3_data_model_view/init.js"/>
     <script type="text/javascript">
 
-      /*::
-        type DataModelDisplayData = {
-          dataModelJson: object,
-          modelFound: boolean,
-          modelTooLarge: boolean
-        };
+      /** methods from init.js:
+       * initD3
+       * writeMessage
       */
 
-      function writeMessage(text) {
-        $('#d3-info-messages').append("<li>" + (new Date().toLocaleString()) + ": " + text + "</li>")
+      serverUrl = "${grailsApplication.config.grails.serverURL}" // for init.js to access
+
+
+      if (${modelFound}) {
+        initD3(parseModelToJS("${dataModelJson as JSON}"));
       }
-
-      /**
-       * load data
-       * @param data: DataModelDisplayData
-       * @param checks
-       */
-      function loadData(data /*: DataModelDisplayData */,
-                        checks /*: (DataModelDisplayData) => boolean */)
-              /*: undefined */ {
-        checks = checks || function (data) {return true};
-
-        if (data.modelFound) {
-
-          if (checks(data)) {
-            initD3(data.dataModelJson);
-          }
-
-        }
-        else {
-          writeMessage("Model ${dataModelId} not found.<br/>"  +
+      else {
+        writeMessage("Model ${dataModelId} not found.<br/>"  +
           "Either it doesn't exist or you are not authorized to view it.")
-
-        }
-
       }
-
-      /**
-       * check data
-       * @param data: DataModelDisplayData
-       */
-      function checkModelTooLarge(data /*: DataModelDisplayData */) /*: boolean */ {
-        if (data.modelTooLarge) {
-          writeMessage("Model ${dataModelId} too large to load fully. Click on the link to see the full view.")
-
-        }
-        return true // If the model is too large it will be returned as just one node, so continue rendering.
-
-      }
-
-      // initial load
-      loadData(
-        {"dataModelJson": parseModelToJS("${dataModelJson as JSON}"),
-          "modelFound": ${modelFound}
-        },
-        null)
-
-      writeMessage("Loading full data model from server")
-
-      // load more
-      $.ajax({
-
-        url:  "${grailsApplication.config.grails.serverURL}/dataModel/basicViewData/${dataModelId}"
-
-      }).then(function(data /*: DataModelDisplayData */) {
-
-        writeMessage("Response received from server")
-        loadData(data, checkModelTooLarge)
-
-      })
 
 
     </script>

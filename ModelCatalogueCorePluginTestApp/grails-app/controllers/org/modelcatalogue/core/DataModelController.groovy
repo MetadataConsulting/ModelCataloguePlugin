@@ -46,6 +46,11 @@ import grails.plugin.springsecurity.SpringSecurityService
 
 class DataModelController<T extends CatalogueElement> extends AbstractCatalogueElementController<DataModel> {
 
+    static allowedMethods = [
+        basicView: "GET",
+        basicViewChildrenData: "GET",
+    ]
+
     SessionFactory sessionFactory
 
     SpringSecurityService springSecurityService
@@ -249,6 +254,13 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
     /**
      * Initialize Basic View (D3 view) with just one node (the Data Model itself, no children)
+     * Returns
+     *
+         type DataModelDisplayData = {
+         dataModelJson: D3JSON,
+         modelFound: boolean,
+         dataModelId: long
+         };
      * @return
      */
     def basicView() {
@@ -260,44 +272,50 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         boolean modelFound = dataModel
 
         if (modelFound) {
-                dataModelJson = d3ViewUtilsService.dataModelD3Json(dataModel, 0) // 0: no children
+                dataModelJson = d3ViewUtilsService.dataModelD3Json(dataModel) // no children
         }
 
 
-        render(view: 'd3_data_model_view', model: [dataModelJson: dataModelJson, modelFound: modelFound, dataModelId: dataModelId])
+        render(view: 'd3_data_model_view', model: [
+            dataModelJson: dataModelJson,
+            modelFound: modelFound,
+            dataModelId: dataModelId])
     }
 
     /**
-     * Return JSON data of full data model
+     * Returns
+     * type ChildrenData = {
+     *     children: List<D3JSON>,
+     *     canAccessDataModel: boolean
+     * }
      * @return
      */
-    def basicViewData() {
+    def basicViewChildrenData() {
 
-        long dataModelId = params.long('id')
-        DataModel dataModel = dataModelGormService.findById(dataModelId)
+        String type = params.get('type').toString()
+        long id = params.long('id')
 
-        def dataModelJson = [:]
-        boolean modelTooLarge = false
-        boolean modelFound = dataModel
+        boolean canAccessDataModel = false
+        def children = []
 
-        if (modelFound) {
+        if (type == 'dataModel') {
 
+            DataModel dataModel = dataModelGormService.findById(id)
 
-            try {
-//                throw new StackOverflowError("Test too large")
-                dataModelJson = d3ViewUtilsService.dataModelD3Json(dataModel, -1) // -1: infinite depth
+            canAccessDataModel = dataModel
+
+            if (canAccessDataModel) {
+
+                children = d3ViewUtilsService.dataModelD3JsonChildren(dataModel)
+
             }
-            catch (StackOverflowError e) {
-                // TODO: handle stack overflow (data model too large)
-                modelTooLarge = true
-                dataModelJson = d3ViewUtilsService.dataModelD3Json(dataModel, 0) // 0: no children
-            }
-
         }
+
+
 
         // TODO: request and render JSON
         render(contentType: 'text/json') {
-            [dataModelJson: dataModelJson, modelTooLarge: modelTooLarge, modelFound: modelFound, dataModelId: dataModelId]
+            [children: children, canAccessDataModel: canAccessDataModel]
         }
     }
 

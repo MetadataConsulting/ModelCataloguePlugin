@@ -68,6 +68,9 @@ function enumerate(map) {
   return ret = ret + "</ul>"
 }
 
+
+var serverUrl = ""
+
 /**
  * Initialize
  * @param json
@@ -86,7 +89,6 @@ function initD3(json) {
   }
 
   // Initialize the display to show a few nodes.
-  root.children.forEach(toggleAll);
   // toggle(root.children[1]);
   // toggle(root.children[1].children[2]);
   // toggle(root.children[9]);
@@ -103,6 +105,9 @@ var coloursMap = {
 }
 
 
+function writeMessage(text) {
+  $('#d3-info-messages').append("<li>" + (new Date().toLocaleString()) + ": " + text + "</li>")
+}
 
 function update(source) {
 
@@ -122,16 +127,56 @@ function update(source) {
   var svgNodes = vis.selectAll("g.node")
     .data(nodeLayoutData, function(d) { return d.id || (d.id = ++i); });
 
-
+  /*::
+    type ChildrenData = {
+        children: Array<D3JSON>,
+        canAccessDataModel: boolean
+    }
+  */
 
   // ENTER any new nodes at the parent's previous position.
   var nodeEnter = svgNodes.enter().append("svg:g")
     .attr("class", "node")
     .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
     .on("click", function(d) {
-      toggle(d);
+
       $('#d3-info-element').html(info(d));
-      update(d); });
+
+      if (d.loadedChildren) {
+        if (!d.loading) {
+          toggle(d);
+          update(d);
+        }
+      }
+
+      else {
+        if (!d.loading) {
+          d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough.
+          $.ajax({
+            url: serverUrl + "/dataModel/basicViewChildrenData/" + d.type + "/" + d.id
+          }).then(function(data /*: ChildrenData */) {
+
+            if (data.canAccessDataModel) {
+              d._children = data.children;
+              toggle(d);
+              update(d);
+            }
+
+            else {
+              writeMessage("You do not have access to the data model of " + ucFirst(d.type) + " " + d.name)
+            }
+
+            d.loadedChildren = true;
+            d.loading = false;
+
+          }, function(jqXHR, textStatus, errorThrown) { // request failure
+            d.loading = false
+          })
+        }
+
+
+      }
+    });
 
   // add circles for each node
   nodeEnter.append("svg:circle")

@@ -22,16 +22,19 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
  *  D3 view json is of the recursive format
  *
  *  D3JSON ::=
- *  ["name": string,
+ *  ["name": String,
+ *  "id": Long,
+ *  "loadedChildren": Boolean,
  *  "angularLink": ANGULARLINK,
  *  "type": TYPE,
  *  "enumerations": ENUMERATIONS
  *  "children": List<D3JSON>]
  *
- *  TYPE is from MetadataDomain.lowerCamelCaseDomainName e.g. 'dataClass'
- *  ANGULARLINK is a string of format e.g. "http://localhost:8080/#/82467/dataClass/82470/", which is a link to the angular application view for data model 82467, data class 82470
- *  ENUMERATIONS is a map of strings to strings for enumerated types.
+ *  TYPE is a String from MetadataDomain.lowerCamelCaseDomainName e.g. 'dataClass'
+ *  ANGULARLINK is a String of format e.g. "http://localhost:8080/#/82467/dataClass/82470/", which is a link to the angular application view for data model 82467, data class 82470
+ *  ENUMERATIONS is a Map of Strings to Strings for enumerated types.
  *
+ * TODO: Make this an actual class with a marshaller
  *
  */
 class D3ViewUtilsService {
@@ -50,13 +53,28 @@ class D3ViewUtilsService {
     }
 
     /**
-     * depth -1 means go as far as possible
-     * depth 0 means don't have any children
-     * depth 1 means have one layer of children
+     * No children; load them later
      * @param dataModel
-     * @param depth
+     * @return D3JSON
      */
-    def dataModelD3Json(DataModel dataModel, int depth) {
+    def dataModelD3Json(DataModel dataModel) {
+
+        def dataModelJson = [
+            "name": dataModel.name,
+            "id": dataModel.id,
+            "loadedChildren": false,
+            "loading": false,
+            "angularLink": angularLink(dataModel.id, dataModel.id, DataModel),
+            "type": lowerCamelCaseDomainName(DataModel)
+        ]
+    }
+
+    /**
+     * Get "children" of data model for display (top level data classes and data elements
+     * @param dataModel
+     * @return List<D3JSON>
+     */
+    def dataModelD3JsonChildren(DataModel dataModel) {
         DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
         Map<String, Integer> stats = dataModelService.getStatistics(filter)
 
@@ -66,26 +84,19 @@ class D3ViewUtilsService {
             dataElementService.countDataClassesOf(it) == 0
         }
 
-        def dataClassChildrenJson = []
-        def dataElementChildrenJson = []
+        def dataClassChildrenJson = dataClasses.items.collect {dataClass ->
+            dataClassD3Json(dataClass, 0)
 
-        if (depth != 0) {
-            dataClassChildrenJson = dataClasses.items.collect {dataClass ->
-                dataClassD3Json(dataClass, depth-1)
-
-            }
-            dataElementChildrenJson = unDataClassedDataElements.collect {
-                dataElementD3Json(it)
-            }
+        }
+        def dataElementChildrenJson = unDataClassedDataElements.collect {
+            dataElementD3Json(it)
         }
 
-        def dataModelJson = [
-            "name": dataModel.name,
-            "angularLink": angularLink(dataModel.id, dataModel.id, DataModel),
-            "type": lowerCamelCaseDomainName(DataModel),
-            "children": dataClassChildrenJson + dataElementChildrenJson
-            // TODO: Handle case where there are just DataTypes listed not connected to any DataElements
-        ]
+
+
+        return dataClassChildrenJson + dataElementChildrenJson
+        // TODO: Handle case where there are just DataTypes listed not connected to any DataElements
+
     }
 
     def dataElementD3Json(DataElement dataElement) {

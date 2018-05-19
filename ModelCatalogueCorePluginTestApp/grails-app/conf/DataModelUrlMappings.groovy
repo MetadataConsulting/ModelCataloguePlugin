@@ -4,7 +4,7 @@ class DataModelUrlMappings {
 
     static mappings = {
         "/dataModel/basicView/$id"(controller: 'dataModel', action: 'basicView')
-        "/dataModel/basicViewData/$id"(controller: 'dataModel', action: 'basicViewData')
+        "/dataModel/basicViewChildrenData/$type/$id"(controller: 'dataModel', action: 'basicViewChildrenData')
         "/dataModel/showAssetInAngular/$id"(controller: 'dataModel', action: 'showAssetInAngular', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataModel"(controller: 'dataModel', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataModel"(controller: 'dataModel', action: 'save', method: HttpMethod.POST)
