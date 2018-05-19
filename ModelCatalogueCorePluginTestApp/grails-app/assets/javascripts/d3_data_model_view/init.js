@@ -236,6 +236,22 @@ var initFunctions = (function() {
       }
     }
 
+    function mouseOverNode(d) {
+      div.transition()
+        .duration(0)
+        .style("opacity", 1);
+      div	.html("<b><h2>" + d.name + "</h2></b>")
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY - 28) + "px");
+      $('#d3-info-element-last-mouseover').html(info(d)); // display info
+    }
+
+    function mouseOutNode(d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
+    }
+
     // ENTER any new nodes at the parent's previous position.
     var nodeEnter = svgNodes.enter().append("svg:g")
       .attr("class", "node")
@@ -247,20 +263,8 @@ var initFunctions = (function() {
       .attr("r", 1e-6)
       .style("fill", function(d) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; })
       // Tooltip:
-      .on("mouseover", function(d) {
-        div.transition()
-          .duration(0)
-          .style("opacity", .9);
-        div	.html(d.name)
-          .style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY - 28) + "px");
-        $('#d3-info-element-last-mouseover').html(info(d)); // display info
-      })
-      .on("mouseout", function(d) {
-        div.transition()
-          .duration(500)
-          .style("opacity", 0);
-      });
+      .on("mouseover", mouseOverNode)
+      .on("mouseout", mouseOutNode);
 
     var maxStringLength = 10;
 
@@ -284,7 +288,10 @@ var initFunctions = (function() {
       .text(function(d) {
         return (d.name.length >= maxStringLength && textShortLeftOfNode(d)) ? d.name.substring(0,maxStringLength) + "..." : d.name;  })
       .style("fill-opacity", 1e-6)
-      .style("font", "15px sans-serif");
+      .style("font", "15px sans-serif")
+
+      .on("mouseover", mouseOverNode)
+      .on("mouseout", mouseOutNode);;
 
 
 
