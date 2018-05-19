@@ -52,6 +52,8 @@ var initFunctions = (function() {
     type D3JSON = {
       name: string,
       id: number,
+      description: string,
+
       angularLink: string,
       type: string,
 
@@ -61,6 +63,7 @@ var initFunctions = (function() {
       enumerations: ?Object,
 
       children: ?Array<D3JSON>,
+
       _children: ?Array<D3JSON>,
 
       x: number,
@@ -82,7 +85,7 @@ var initFunctions = (function() {
 
 
   function typeAndName(d /*: D3JSON */) {
-    return ucFirst(d.type) + " " + d.name
+    return "<b>" + ucFirst(d.type) + " \"" + d.name + "\"</b>"
   }
 
   //// Info functions
@@ -92,10 +95,11 @@ var initFunctions = (function() {
    * @param d node data
    * @returns {string}
    */
-  function info(d /*: D3JSON */) { // d is data with fields name, type, angularLink, etc.
+  function info(d /*: D3JSON */) {
     return "<b>Name: "  + "<a href='" + d.angularLink +  "' target='_blank'>" + d.name + "</a>" + "<br/>" +
       " <i>(Click to see Advanced View)</i>" + "</b>" + "<br/>" +
-      "Type: " + ucFirst(d.type) + "<br/>" +
+      "<u>Type:</u> " + ucFirst(d.type) + "<br/>" +
+      (d.description? "<u>Description:</u> " + d.description + "<br/>" : "") +
       (d.enumerations ? enumerate(d.enumerations): "")
   }
 
@@ -105,7 +109,7 @@ var initFunctions = (function() {
    * @returns {string}
    */
   function enumerate(map) {
-    var ret = "Enumerations: <br/> <ul>"
+    var ret = "<u>Enumerations:</u> <br/> <ul>"
     Object.keys(map).forEach(function(key) {
       ret = ret + "<li>" + key + ": " + map[key] + "</li>"
       console.log(key, map[key]);
@@ -194,7 +198,7 @@ var initFunctions = (function() {
 
         if (!d.loading) { // i.e. !d.loadedChildren
 
-          writeMessage("Loading children for " + typeAndName(d))
+          writeMessage("Loading children for " + typeAndName(d) + "...")
           d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough.
           $.ajax({
             url: serverUrl + "/dataModel/basicViewChildrenData/" + d.type + "/" + d.id
@@ -203,14 +207,14 @@ var initFunctions = (function() {
             if (data.canAccessDataModel && data.caseHandled) {
               d.children = null
               d._children = data.children;
-              writeMessage("Loading children of " + typeAndName(d) + " succeeded!")
+              writeMessage("Loading children for " + typeAndName(d) + " succeeded!")
               toggle(d);
               update(d);
             }
 
             else {
               if (!data.canAccessDataModel) {
-                writeMessage("You do not have access to the data model of " + typeAndName(d))
+                writeMessage("You do not have access to the data model of " + typeAndName(d) + " or it does not exist.")
               }
               else { // !data.caseHandled
                 writeMessage("Loading children is not handled for this case.")

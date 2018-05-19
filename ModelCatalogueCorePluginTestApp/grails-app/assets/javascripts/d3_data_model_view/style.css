@@ -49,14 +49,26 @@
     width: 25%;
     overflow: scroll;
     height: 800px;
+    border: solid 3px;
 }
 
 .info-box {
+    padding: 1em;
+
+}
+
+.info-box-limited {
+
+    overflow: scroll;
+    height: 30%;
+
     padding-bottom: 1.5em;
     border-bottom-style: solid;
     border-bottom-width: medium;
-    padding: 3em;
+}
 
+#d3-info-messages {
+    padding: 1em;
 }
 
 div.tooltip {

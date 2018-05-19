@@ -300,17 +300,13 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         def children = []
 
         if (type == 'dataModel') {
-
             DataModel dataModel = dataModelGormService.findById(id)
             canAccessDataModel = dataModel
 
             if (canAccessDataModel) {
-
                 children = d3ViewUtilsService.dataModelD3JsonChildren(dataModel)
-
             }
         }
-
         else if (type == 'dataClass') {
             DataClass dataClass = dataClassGormService.findById(id)
             canAccessDataModel = dataModelAclService.hasReadPermission(dataClass)
@@ -318,9 +314,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             if (canAccessDataModel) {
                 children = d3ViewUtilsService.dataClassD3JsonChildren(dataClass)
             }
-
         }
-
         else {
             caseHandled = false
         }

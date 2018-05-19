@@ -57,18 +57,18 @@
 
       <div id="d3-info" class="column column-right">
 
-        <div class="info-box">
-          <h1><u>Data Model:</u></h1><br/>
+        <div class="info-box info-box-limited">
+          <h1><u>Data Model:</u></h1>
           <div id="d3-info-data-model"></div>
         </div>
 
-        <div class="info-box">
-          <h2><u>Element:</u></h2><br/>
+        <div class="info-box info-box-limited">
+          <h2><u>Element:</u></h2>
           <div id="d3-info-element"></div>
         </div>
 
       <div class="info-box">
-        <h2><u>Messages:</u></h2><br/>
+        <h2><u>Messages:</u></h2>
         <ul id="d3-info-messages">
 
         </ul>
@@ -91,7 +91,7 @@
 
       serverUrl = "${grailsApplication.config.grails.serverURL}" // for init.js to access
 
-
+      writeMessage("Welcome to the Data Model Basic View. Click on the node on the left to explore.")
       if (${modelFound}) {
         initD3(parseModelToJS("${dataModelJson as JSON}"));
       }

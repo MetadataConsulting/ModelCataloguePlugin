@@ -28,6 +28,8 @@ class D3ViewUtilsService {
     DataElementService dataElementService
     GrailsApplication grailsApplication
 
+    //// Utilities:
+
     static String lowerCamelCaseDomainName(Class clazz) {
         MetadataDomain.lowerCamelCaseDomainName(MetadataDomain.ofClass(clazz))
     }
@@ -35,6 +37,9 @@ class D3ViewUtilsService {
     String angularLink(Long dataModelId, Long id, Class clazz) {
         return "${grailsApplication.config.grails.serverURL}/#/$dataModelId/${lowerCamelCaseDomainName(clazz)}/$id"
     }
+
+
+    //// Data Models:
 
     /**
      * No children; load them later
@@ -45,6 +50,7 @@ class D3ViewUtilsService {
 
         D3JSON dataModelJson = new D3JSON(
             name: dataModel.name,
+            description: dataModel.description,
             id: dataModel.id,
             angularLink: angularLink(dataModel.id, dataModel.id, DataModel),
             type: lowerCamelCaseDomainName(DataModel)
@@ -84,37 +90,8 @@ class D3ViewUtilsService {
 
     }
 
-    D3JSON dataElementD3Json(DataElement dataElement) {
-        D3JSON ret = new D3JSON(
+    //// Data Classes:
 
-            name: dataElement.name,
-            id: dataElement.id,
-            angularLink: angularLink(dataElement.dataModel.id, dataElement.id, DataElement),
-            loadedChildren: true, // Just load data type, no laziness
-            type: lowerCamelCaseDomainName(DataElement)
-        )
-
-        if (dataElement.dataType) {
-            ret.children = [dataTypeD3Json(dataElement.dataType)]
-        }
-
-        return ret
-    }
-
-    D3JSON dataTypeD3Json(DataType dataType) {
-        D3JSON ret = new D3JSON(
-            name: dataType.name,
-            id: dataType.id,
-            angularLink: angularLink(dataType.dataModel.id, dataType.id, DataType),
-            loadedChildren: true, // No children, so "already loaded children."
-            type: lowerCamelCaseDomainName(DataType),
-        )
-
-        if (dataType instanceof EnumeratedType) {
-            ret.enumerations = ((EnumeratedType) dataType).enumerations
-        }
-        return ret
-    }
 
     /**
      * @return DataClass D3JSON (children will be loaded later)
@@ -125,6 +102,7 @@ class D3ViewUtilsService {
         D3JSON ret = new D3JSON(
             name: dataClass.name,
             id: dataClass.id,
+            description: dataClass.description,
             angularLink: angularLink(dataClass.dataModel.id, dataClass.id, DataClass),
             type: lowerCamelCaseDomainName(DataClass),
         )
@@ -149,6 +127,43 @@ class D3ViewUtilsService {
 
         return children
     }
+
+    //// Data Elements and Data Types:
+
+
+    D3JSON dataElementD3Json(DataElement dataElement) {
+        D3JSON ret = new D3JSON(
+
+            name: dataElement.name,
+            id: dataElement.id,
+            description: dataElement.description,
+            angularLink: angularLink(dataElement.dataModel.id, dataElement.id, DataElement),
+            loadedChildren: true, // Just load data type, no laziness
+            type: lowerCamelCaseDomainName(DataElement)
+        )
+
+        if (dataElement.dataType) {
+            ret.children = [dataTypeD3Json(dataElement.dataType)]
+        }
+
+        return ret
+    }
+
+    D3JSON dataTypeD3Json(DataType dataType) {
+        D3JSON ret = new D3JSON(
+            name: dataType.name,
+            id: dataType.id,
+            description: dataType.description,
+            angularLink: angularLink(dataType.dataModel.id, dataType.id, DataType),
+            loadedChildren: true, // No children, so "already loaded children."
+            type: lowerCamelCaseDomainName(DataType),
+        )
+
+        if (dataType instanceof EnumeratedType) {
+            ret.enumerations = ((EnumeratedType) dataType).enumerations
+        }
+        return ret
+    }
 }
 /**
  *  D3 view json recursive format
@@ -161,6 +176,7 @@ class D3ViewUtilsService {
 class D3JSON {
     String name
     long id
+    String description
 
     boolean loadedChildren = false // false by default; children will be loaded later.
     boolean loading = false
