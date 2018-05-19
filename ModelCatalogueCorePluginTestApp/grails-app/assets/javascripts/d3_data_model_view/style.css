@@ -42,11 +42,17 @@
 }
 
 .column-left {
-    width: 75%;
+    width: 60%;
 }
 
 .column-right {
-    width: 25%;
+    width: 20%;
+    overflow: scroll;
+    height: 800px;
+    border: solid 3px;
+}
+.column-right-2 {
+    width: 20%;
     overflow: scroll;
     height: 800px;
     border: solid 3px;
@@ -55,9 +61,6 @@
 .info-box {
     padding: 0.8em;
 
-}
-h1, h2 {
-    margin-top: 0.2em;
 }
 
 .info-box-limited {
@@ -68,10 +71,17 @@ h1, h2 {
     padding-bottom: 1.5em;
     border-bottom-style: solid;
     border-bottom-width: medium;
+
 }
+
 
 #d3-info-messages {
     padding: 1em;
+}
+
+
+h1, h2 {
+    margin-top: 0.2em;
 }
 
 div.tooltip {

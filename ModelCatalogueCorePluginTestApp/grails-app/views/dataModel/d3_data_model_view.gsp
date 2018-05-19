@@ -63,17 +63,26 @@
         </div>
 
         <div class="info-box info-box-limited">
-          <h2><u>Element:</u></h2>
+          <h2><u>Element (Last Click):</u></h2>
           <div id="d3-info-element"></div>
         </div>
 
         <div class="info-box">
+          <h2><u>Element (Last Mouse-Over):</u></h2>
+          <div id="d3-info-element-last-mouseover"></div>
+        </div>
+
+
+
+      </div>
+
+      <div id="d3-messages" class="column column-right-2">
+        <div class="info-box">
           <h2><u>Messages:</u></h2>
           <ul id="d3-info-messages">
 
-        </ul>
-      </div>
-
+          </ul>
+        </div>
       </div>
     </div>
 
