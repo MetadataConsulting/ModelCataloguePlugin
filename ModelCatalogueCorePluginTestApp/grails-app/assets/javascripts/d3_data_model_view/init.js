@@ -185,6 +185,8 @@ var initFunctions = (function() {
           caseHandled: boolean
       }
     */
+
+    // load children if not loaded
     function onNodeClick(d) {
 
       $('#d3-info-element').html(info(d)); // display info
@@ -236,20 +238,26 @@ var initFunctions = (function() {
       }
     }
 
-    function mouseOverNode(d) {
+    function tooltipMouseover(d) {
       div.transition()
         .duration(0)
         .style("opacity", 1);
       div	.html("<b><h2>" + d.name + "</h2></b>")
         .style("left", (d3.event.pageX) + "px")
         .style("top", (d3.event.pageY - 28) + "px");
-      $('#d3-info-element-last-mouseover').html(info(d)); // display info
+      infoMouseover(d)
+
     }
 
-    function mouseOutNode(d) {
+    function tooltipMouseout(d) {
       div.transition()
         .duration(500)
         .style("opacity", 0);
+    }
+
+    // display info on mouseover
+    function infoMouseover(d){
+      $('#d3-info-element-last-mouseover').html(info(d)); // display info
     }
 
     // ENTER any new nodes at the parent's previous position.
@@ -262,36 +270,46 @@ var initFunctions = (function() {
     nodeEnter.append("svg:circle")
       .attr("r", 1e-6)
       .style("fill", function(d) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; })
-      // Tooltip:
-      .on("mouseover", mouseOverNode)
-      .on("mouseout", mouseOutNode);
+      // Tooltip on mouseover
+      .on("mouseover", tooltipMouseover)
+      .on("mouseout", tooltipMouseout);
 
     var maxStringLength = 10;
 
-
-    function textShortLeftOfNode(d /*: D3JSON */) /*: boolean */ {
+    function shouldNameBeShortened(d /*: D3JSON */) /*: boolean */ {
       // return d.children || d._children
       return (d.type == 'dataClass' || d.type == 'dataModel' || d.type == 'dataElement')
     }
+
+    function shortenedNodeText(d) {
+      return (d.name.length >= maxStringLength && shouldNameBeShortened(d)) ? d.name.substring(0,maxStringLength) + "..." : d.name;  }
 
     // Text/link for each node
     nodeEnter.append("svg:a")
       .attr("xlink:href", function(d) {return d.angularLink})
       .attr("target", "_blank")
+
       .append("svg:text")
       .attr("dy", ".35em")
+        // text with possibly shortened name
 
-      .attr("x", function(d) { return textShortLeftOfNode(d) ? -(radius + 5): radius + 5; })
+      .attr("x", function(d) { return shouldNameBeShortened(d) ? -(radius + 5): radius + 5; })
       .attr("text-anchor", function(d) {
-        return textShortLeftOfNode(d) ? "end" : "start";
+        return shouldNameBeShortened(d) ? "end" : "start";
       })
-      .text(function(d) {
-        return (d.name.length >= maxStringLength && textShortLeftOfNode(d)) ? d.name.substring(0,maxStringLength) + "..." : d.name;  })
+      .text(shortenedNodeText)
+
       .style("fill-opacity", 1e-6)
       .style("font", "15px sans-serif")
 
-      .on("mouseover", mouseOverNode)
-      .on("mouseout", mouseOutNode);;
+      // mouseover to expand the name
+      .on("mouseover", function(d) {
+        d3.select(this).text(d.name)
+        infoMouseover(d)
+      })
+      .on("mouseout", function(d) {
+        d3.select(this).text(shortenedNodeText)
+      });
 
 
 
