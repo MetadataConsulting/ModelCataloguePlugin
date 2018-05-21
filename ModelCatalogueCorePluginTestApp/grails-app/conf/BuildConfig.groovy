@@ -62,7 +62,7 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
-        compile 'com.google.guava:guava:19.0'
+        compile 'com.google.guava:guava:21.0'
         compile 'io.reactivex:rxjava:1.1.5'
 
         // does not work in tests
@@ -144,8 +144,8 @@ grails.project.dependency.resolution = {
 
         // Testing modules
         test "org.gebish:geb-spock:$gebVersion"
-        test "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
-        compile("com.codeborne:phantomjsdriver:1.4.3") {
+        test "org.seleniumhq.selenium:selenium-java:3.4.0"
+        test("com.codeborne:phantomjsdriver:1.4.3") {
             transitive = false
         }
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
