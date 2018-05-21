@@ -12,18 +12,9 @@
 
 
 
-
-    <%--bootstrap --%>
-    <%--<asset:stylesheet href="bootstrap/dist/css/bootstrap.css"/>--%>
-
-    <asset:javascript src="bootstrap/dist/js/bootstrap.js"/>
-
-    %{--Strangely, the dashboard advanced search dropdown won't work if jquery is before bootstrap,
-    and it's fine if it's after,
-    although the console complains that bootstrap needs jquery...--}%
-    <asset:javascript src="jquery/dist/jquery.js"/>
-
     <asset:stylesheet src="application.css"/>
+
+    <asset:javascript src="application.js"/>
 
     <g:layoutHead/>
 </head>
@@ -111,7 +102,6 @@
 <div id="spinner" class="spinner" style="display:none;">
     <g:message code="spinner.alt" default="Loading&hellip;"/>
 </div>
-<asset:javascript src="application.js"/>
 
 </body>
 </html>
