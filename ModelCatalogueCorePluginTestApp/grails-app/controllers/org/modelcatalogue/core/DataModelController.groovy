@@ -309,7 +309,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         }
         else if (type == 'dataClass') {
             DataClass dataClass = dataClassGormService.findById(id)
-            canAccessDataModel = dataModelAclService.hasReadPermission(dataClass)
+            canAccessDataModel = dataModelAclService.isAdminOrHasReadPermission(dataClass)
 
             if (canAccessDataModel) {
                 children = d3ViewUtilsService.dataClassD3JsonChildren(dataClass)
