@@ -14,10 +14,7 @@
   <head>
 
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    %{--D3--}%
-    <asset:javascript  src="d3_data_model_view/d3.js"/>
-    <asset:javascript  src="d3_data_model_view/d3.layout.js"/>
-
+    %{--Javascript at bottom of body--}%
     %{--Style--}%
     <asset:stylesheet href="d3_data_model_view/style.css"/>
     <style type="text/css">
