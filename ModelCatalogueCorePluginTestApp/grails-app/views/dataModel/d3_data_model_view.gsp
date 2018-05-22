@@ -100,12 +100,12 @@
 
       serverUrl = "${grailsApplication.config.grails.serverURL}" // for init.js to access
 
-      writeMessage("Welcome to the Data Model Basic View. Click on the node on the left to explore.")
+      initD3.writeMessage("Welcome to the Data Model Basic View. Click on the node on the left to explore.")
       if (${modelFound}) {
-        initD3(parseModelToJS("${dataModelJson as JSON}"));
+        initD3.initD3(initD3.parseModelToJS("${dataModelJson as JSON}"));
       }
       else {
-        writeMessage("Model ${dataModelId} not found.<br/>"  +
+        initD3.writeMessage("Model ${dataModelId} not found.<br/>"  +
           "Either it doesn't exist or you are not authorized to view it.")
       }
 

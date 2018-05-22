@@ -5,7 +5,7 @@
 // exposed variable
 var serverUrl = ""
 
-var initFunctions = (function() {
+var initD3 = (function() {
 
   //// D3 Setup stuff
   // dimensions of page
@@ -401,8 +401,3 @@ var initFunctions = (function() {
     "initD3": initD3,
     "writeMessage": writeMessage}
 })()
-
-// exposed functions:
-var parseModelToJS = initFunctions.parseModelToJS
-var initD3 = initFunctions.initD3
-var writeMessage = initFunctions.writeMessage
