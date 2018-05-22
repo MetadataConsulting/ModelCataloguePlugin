@@ -1,5 +1,4 @@
-//= require d3_data_model_view/d3.js
-//= require d3_data_model_view/d3.layout.js
+//= require d3/d3.min.js
 //= require validator-js/validator.min.js
 //= require_self
 // @flow
@@ -30,7 +29,7 @@ var initD3 = (function() {
     .attr("width", w + m[1] + m[3])
     .attr("height", h + m[0] + m[2])
     .call(d3.behavior.zoom().on("zoom", function () {
-      svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+      vis.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
     }))
     .append("svg:g")
     .attr("transform", "translate(" + (m[3] + 20) + "," + m[0] + ")");
