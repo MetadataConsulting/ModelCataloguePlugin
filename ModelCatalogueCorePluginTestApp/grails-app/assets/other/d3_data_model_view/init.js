@@ -242,6 +242,7 @@ var initD3 = (function() {
         }
 
       }
+
     }
 
     function tooltipMouseover(d) {
@@ -270,7 +271,13 @@ var initD3 = (function() {
     var nodeEnter = svgNodes.enter().append("svg:g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-      .on("click", onNodeClick);
+      .on("click", onNodeClick)
+      .on('mousedown', function(d) {
+
+        d3.event.stopImmediatePropagation(); // to stop panning
+      });
+
+
 
     // add circles for each node
     nodeEnter.append("svg:circle")
