@@ -7,7 +7,7 @@ pipeline {
           wrap(delegate: [$class: 'Xvfb', screen: '1440x900x24']) {
             sh 'npm install'
             sh 'bower install'
-            sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome org.modelcatalogue.core.finalized.*'
+            sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver  org.modelcatalogue.core.finalized.*'
           }
 
         }
