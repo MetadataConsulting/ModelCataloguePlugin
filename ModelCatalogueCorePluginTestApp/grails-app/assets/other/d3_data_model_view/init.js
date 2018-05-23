@@ -1,5 +1,6 @@
 //= require d3/d3.min.js
 //= require validator-js/validator.min.js
+//= require underscore/underscore-min.js
 //= require_self
 // @flow
 
@@ -160,6 +161,33 @@ var initD3 = (function() {
     "dataType": "green"
   }
 
+
+  //// path functions
+
+  function pathFromRoot(d) {
+    var currentNode = d
+    var pathToRoot = []
+
+    while (d.parent) {
+      pathToRoot.push(d)
+      d = d.parent
+    }
+    // !d.parent, so d is root
+    pathToRoot.push(d)
+
+    return pathToRoot.reverse()
+  }
+
+  function namesFromPath(path) {
+    return _.pluck(path, "name")
+  }
+
+  function angularTreeviewPathString(path) {
+    var ids = _.pluck(path, "id")
+    ids.splice(1,0, 'all')
+    return ids.join('-')
+  }
+
   /**
    * Update a node (source)
    * @param source
@@ -192,6 +220,9 @@ var initD3 = (function() {
 
     // load children if not loaded
     function onNodeClick(d) {
+      var path = pathFromRoot(d)
+      console.log("Path from root: " + namesFromPath(path))
+      console.log("Angular pathstring: " + angularTreeviewPathString(path))
 
       $('#d3-info-element').html(info(d)); // display info
 
@@ -415,5 +446,6 @@ var initD3 = (function() {
   return {
     "parseModelToJS": parseModelToJS,
     "initD3": initD3,
-    "writeMessage": writeMessage}
+    "writeMessage": writeMessage
+  }
 })()
