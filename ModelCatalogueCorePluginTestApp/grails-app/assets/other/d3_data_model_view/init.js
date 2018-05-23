@@ -288,7 +288,7 @@ var initD3 = (function() {
       .on("mouseover", tooltipMouseover)
       .on("mouseout", tooltipMouseout);
 
-    var maxStringLength = 10;
+    var maxStringLength = 20;
 
     function shouldNameBeShortened(d /*: D3JSON */) /*: boolean */ {
       // return d.children || d._children
