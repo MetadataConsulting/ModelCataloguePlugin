@@ -3,6 +3,11 @@
        resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidthPct': 60, 'minWidthPct': 20,
           'windowWidthCorrection': 91, 'parentWidthCorrection': 31, 'breakWidth': 768}">
     <div class="split-view-content">
+
+      <!-- link to basic view -->
+      <a href="/dataModel/basicView/{{currentDataModel.id}}" target="_blank" class="btn btn-default"><i class="fa fa-arrow-left"></i>   Basic Data Model View</a>
+      <br/><br/>
+
       <catalogue-element-treeview list="elementAsList" descend="content" on-select="onTreeviewSelected($element, $descendPath)"
                                   prefetch="true"></catalogue-element-treeview>
     </div>

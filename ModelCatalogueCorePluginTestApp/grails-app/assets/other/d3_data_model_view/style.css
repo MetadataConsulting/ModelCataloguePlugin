@@ -1,0 +1,215 @@
+#body {
+    background: url(texture-noise.png);
+    overflow: scroll;
+    margin: 0;
+    font-size: 14px;
+    font-family: "Helvetica Neue", Helvetica;
+}
+/*
+#chart, #header, #footer {
+    position: absolute;
+    top: 0;
+}
+
+#header, #footer {
+    z-index: 1;
+    display: block;
+    font-size: 36px;
+    font-weight: 300;
+    text-shadow: 0 1px 0 #fff;
+}
+
+#header.inverted, #footer.inverted {
+    color: #fff;
+    text-shadow: 0 1px 4px #000;
+}
+
+#header {
+    top: 80px;
+    left: 140px;
+    width: 1000px;
+}
+
+#footer {
+    top: 680px;
+    right: 140px;
+    text-align: right;
+}
+*/
+
+.column {
+    float: left;
+
+    height: 1200px;
+}
+
+.column-left {
+    width: 60%;
+}
+
+.column-right {
+    width: 20%;
+    overflow: scroll;
+    border: solid 3px;
+}
+.column-right-2 {
+    width: 20%;
+    overflow: scroll;
+    border: solid 3px;
+}
+
+.info-box {
+    padding: 0.8em;
+
+}
+
+.info-box-limited {
+
+    overflow: scroll;
+    height: 30%;
+
+    padding-bottom: 1.5em;
+    border-bottom-style: solid;
+    border-bottom-width: medium;
+
+}
+
+
+#d3-info-messages {
+    padding: 1em;
+}
+
+
+h1, h2 {
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    /*width: 60px;*/
+    height: 40px;
+    padding: 5px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+
+rect {
+    fill: none;
+    pointer-events: all;
+}
+
+pre {
+    font-size: 18px;
+}
+
+line {
+    stroke: #000;
+    stroke-width: 1.5px;
+}
+
+.string, .regexp {
+    color: #f39;
+}
+
+.keyword {
+    color: #00c;
+}
+
+.comment {
+    color: #777;
+    font-style: oblique;
+}
+
+.number {
+    color: #369;
+}
+
+.class, .special {
+    color: #1181B8;
+}
+
+text a {
+    fill: navy;
+}
+text a:visited {
+    fill:darkpurple;
+}
+text a:hover, text a:active {
+    text-decoration: underline;
+    fill:darkred;
+}
+
+.hint {
+    position: absolute;
+    right: 0;
+    width: 1280px;
+    font-size: 12px;
+    color: #999;
+}
+
+
+@media only screen and (max-height: 1100px) {
+    .column {
+        height: 1100px;
+    }
+}
+
+@media only screen and (max-height: 1000px) {
+    .column {
+        height: 1000px;
+    }
+}
+
+@media only screen and (max-height: 900px) {
+    .column {
+        height: 900px;
+    }
+}
+
+@media only screen and (max-height: 800px) {
+    .column {
+        height: 800px;
+    }
+}
+
+@media only screen and (max-height: 700px) {
+    .column {
+        height: 700px;
+    }
+}
+
+@media only screen and (max-height: 600px) {
+    .column {
+        height: 600px;
+    }
+}
+
+@media only screen and (max-height: 500px) {
+    .column {
+        height: 500px;
+    }
+}
+
+@media only screen and (max-height: 400px) {
+    .column {
+        height: 400px;
+    }
+}
+
+@media only screen and (max-height: 300px) {
+    .column {
+        height: 300px;
+    }
+}
+
+@media only screen and (max-height: 200px) {
+    .column {
+        height: 200px;
+    }
+}

@@ -3,7 +3,11 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
+import org.modelcatalogue.core.d3viewUtils.ChildrenData
+import org.modelcatalogue.core.d3viewUtils.D3ViewUtilsService
 import org.modelcatalogue.core.persistence.AssetGormService
+import org.modelcatalogue.core.persistence.DataClassGormService
+import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.ParamArgs
 import org.modelcatalogue.core.util.SearchParams
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
@@ -44,6 +48,11 @@ import grails.plugin.springsecurity.SpringSecurityService
 
 class DataModelController<T extends CatalogueElement> extends AbstractCatalogueElementController<DataModel> {
 
+    static allowedMethods = [
+        basicView: "GET",
+        basicViewChildrenData: "GET",
+    ]
+
     SessionFactory sessionFactory
 
     SpringSecurityService springSecurityService
@@ -59,6 +68,10 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     AssetGormService assetGormService
 
     AssetMetadataService assetMetadataService
+
+    D3ViewUtilsService d3ViewUtilsService
+
+    DataClassGormService dataClassGormService
 
     DataModelController() {
         super(DataModel, false)
@@ -242,6 +255,77 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         respond instance, [status: OK]
     }
+
+    /**
+     * Initialize Basic View (D3 view) with just one node (the Data Model itself, no children)
+     * Returns
+     *
+         type DataModelDisplayData = {
+         dataModelJson: D3JSON,
+         modelFound: boolean,
+         dataModelId: long
+         };
+     * @return
+     */
+    def basicView() {
+
+        long dataModelId = params.long('id')
+        DataModel dataModel = dataModelGormService.findById(dataModelId)
+
+        def dataModelJson = [:]
+        boolean modelFound = dataModel
+
+        if (modelFound) {
+                dataModelJson = d3ViewUtilsService.dataModelD3Json(dataModel) // no children
+        }
+
+
+        render(view: 'd3_data_model_view', model: [
+            dataModelJson: dataModelJson,
+            modelFound: modelFound,
+            dataModelId: dataModelId])
+    }
+
+    /**
+     *
+     * @return ChildrenData
+     */
+    def basicViewChildrenData() {
+
+        String type = params.get('type').toString()
+        long id = params.long('id')
+
+        boolean canAccessDataModel = false
+        boolean caseHandled = true
+        def children = []
+
+        if (type == 'dataModel') {
+            DataModel dataModel = dataModelGormService.findById(id)
+            canAccessDataModel = dataModel
+
+            if (canAccessDataModel) {
+                children = d3ViewUtilsService.dataModelD3JsonChildren(dataModel)
+            }
+        }
+        else if (type == 'dataClass') {
+            DataClass dataClass = dataClassGormService.findById(id)
+            canAccessDataModel = dataModelAclService.isAdminOrHasReadPermission(dataClass)
+
+            if (canAccessDataModel) {
+                children = d3ViewUtilsService.dataClassD3JsonChildren(dataClass)
+            }
+        }
+        else {
+            caseHandled = false
+        }
+
+
+        render(contentType: 'text/json') {
+            new ChildrenData(children: children, canAccessDataModel: canAccessDataModel, caseHandled: caseHandled)
+        }
+    }
+
+
 
     /**
      * Check if a data model contains or imports another catalogue element

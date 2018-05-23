@@ -530,7 +530,7 @@ grails.doc.copyright = ''// The copyright message to display
 grails.doc.footer = ''// The footer to use
 
 
-grails.assets.minifyJs = false
+grails.assets.minifyJs = false  // placing this here would seem to undo the settings in the production block...
 
 modelcatalogue.defaults.relationshiptypes =  [
     [name: "containment",
