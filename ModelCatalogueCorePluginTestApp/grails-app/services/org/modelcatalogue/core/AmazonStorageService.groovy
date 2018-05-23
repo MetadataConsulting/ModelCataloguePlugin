@@ -17,7 +17,9 @@ class AmazonStorageService implements StorageService {
     @PostConstruct
     private void init() {
         maxSize = grailsApplication.config.mc.storage.maxSize ?: (20 * 1024 * 1024)
+        println "*******************STORAGE" + grailsApplication.config.mc.storage.s3.bucket + "**************************"
         if (grailsApplication.config.mc.storage.s3.bucket) {
+            println "*******************STORAGE : AMAZON**************************"
             provider = StorageProvider.create(
                 provider: 's3',
                 accessKey: grailsApplication.config.mc.storage.s3.key,
@@ -26,6 +28,7 @@ class AmazonStorageService implements StorageService {
             )
             bucket = grailsApplication.config.mc.storage.s3.bucket
         } else {
+            println "*******************STORAGE : LOCAL**************************"
             provider = new LocalStorageProvider(basePath: grailsApplication.config.mc.storage.directory ?: 'storage')
             bucket = 'modelcatalogue'
         }
