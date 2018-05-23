@@ -223,6 +223,7 @@ var initD3 = (function() {
             else {
               if (!data.canAccessDataModel) {
                 writeMessage("You do not have access to the data model of " + typeAndName(d) + " or it does not exist.")
+                // TODO: If you can't access the data model because you've been logged out, it's more appropriate that d.loadedChildren = false, so the user can try to load the children again once logged in. But we need a more fine-grained response from the controller to differentiate the reason for inability to access.
               }
               else { // !data.caseHandled
                 writeMessage("Loading children is not handled for this case.")
