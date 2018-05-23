@@ -205,10 +205,14 @@ var initD3 = (function() {
         if (!d.loading) { // i.e. !d.loadedChildren
 
           writeMessage("Loading children for " + typeAndName(d) + "...")
-          d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough.
+          d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough. Not really a completely well-thought-out concurrency thing.
           $.ajax({
             url: serverUrl + "/dataModel/basicViewChildrenData/" + d.type + "/" + d.id
           }).then(function(data /*: ChildrenData */) {
+
+            d.loadedChildren = true;
+            d.loading = false;
+            // end loading
 
             if (data.canAccessDataModel && data.caseHandled) {
               d.children = null
@@ -223,7 +227,7 @@ var initD3 = (function() {
             else {
               if (!data.canAccessDataModel) {
                 writeMessage("You do not have access to the data model of " + typeAndName(d) + " or it does not exist.")
-                // TODO: If you can't access the data model because you've been logged out, it's more appropriate that d.loadedChildren = false, so the user can try to load the children again once logged in. But we need a more fine-grained response from the controller to differentiate the reason for inability to access.
+                // TODO: If you can't access the data model because you've been logged out, it's more appropriate that d.loadedChildren remains false, so the user can try to load the children again once logged in. But we need a more fine-grained response from the controller to differentiate the reason for inability to access.
               }
               else { // !data.caseHandled
                 writeMessage("Loading children is not handled for this case.")
@@ -231,9 +235,6 @@ var initD3 = (function() {
 
             }
 
-            d.loadedChildren = true;
-            d.loading = false;
-            // end loading
 
           }, function(jqXHR, textStatus, errorThrown) { // request failure
             writeMessage("Loading children for " + typeAndName(d) + " failed with error message: " + errorThrown)
@@ -337,7 +338,8 @@ var initD3 = (function() {
 
     nodeUpdate.select("circle")
       .attr("r", radius)
-      .style("stroke", function(d) { return (d._children || !d.loadedChildren) ? unopenedNodeBorderColour: coloursMap[d.type]; })
+      .style("stroke", function(d) {
+        return (d._children || !d.loadedChildren) ? unopenedNodeBorderColour: coloursMap[d.type]; })
       .style("stroke-width", 3)
       .style("fill", function(d) { return coloursMap[d.type]})
     ;
