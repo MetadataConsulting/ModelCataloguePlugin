@@ -269,6 +269,7 @@ var initD3 = (function() {
     }
 
     // ENTER any new nodes at the parent's previous position.
+    // the g element includes the circle AND the text next to it (the name). So event listeners registered here will apply to both circle and text.
     var nodeEnter = svgNodes.enter().append("svg:g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
@@ -276,6 +277,16 @@ var initD3 = (function() {
       .on('mousedown', function(d) {
 
         d3.event.stopImmediatePropagation(); // to stop panning
+      })
+
+
+      // mouseover to expand the name
+      .on("mouseover", function(d) {
+        d3.select(this).select("a").select("text").text(d.name)
+        infoMouseover(d)
+      })
+      .on("mouseout", function(d) {
+        d3.select(this).select("a").select("text").text(shortenedNodeText)
       });
 
 
@@ -285,8 +296,8 @@ var initD3 = (function() {
       .attr("r", 1e-6)
       .style("fill", function(d) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; })
       // Tooltip on mouseover
-      .on("mouseover", tooltipMouseover)
-      .on("mouseout", tooltipMouseout);
+      // .on("mouseover", tooltipMouseover)
+      // .on("mouseout", tooltipMouseout);
 
     var maxStringLength = 20;
 
@@ -314,16 +325,7 @@ var initD3 = (function() {
       .text(shortenedNodeText)
 
       .style("fill-opacity", 1e-6)
-      .style("font", "15px sans-serif")
-
-      // mouseover to expand the name
-      .on("mouseover", function(d) {
-        d3.select(this).text(d.name)
-        infoMouseover(d)
-      })
-      .on("mouseout", function(d) {
-        d3.select(this).text(shortenedNodeText)
-      });
+      .style("font", "15px sans-serif");
 
 
 
