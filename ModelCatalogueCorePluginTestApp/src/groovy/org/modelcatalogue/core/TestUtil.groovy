@@ -18,10 +18,20 @@ class TestUtil {
         if (subsetOfTestCase.size() > 5) {
             subsetOfTestCase[4].addAll(subsetOfTestCase[5])
         }
+
+        String parentFolder = new File(testPath).parent
+        FileTreeBuilder treeBuilder = new FileTreeBuilder(new File(parentFolder))
+        File jenkinsFile = null
         subsetOfTestCase.eachWithIndex { List<String> tests, Integer index ->
             if (index < 5) {
-                println "JenkinsFile${index + 1}"
-                println getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'")
+                String newJenkinsFileName = "Jenkinsfile${index + 1}"
+                jenkinsFile = new File("$parentFolder/$newJenkinsFileName")
+                if (jenkinsFile.exists()) {
+                    jenkinsFile.delete()
+                }
+                treeBuilder.file(newJenkinsFileName) {
+                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'")
+                }
             }
         }
     }
