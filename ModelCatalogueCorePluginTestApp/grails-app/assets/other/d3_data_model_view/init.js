@@ -3,6 +3,9 @@
 //= require underscore/underscore-min.js
 //= require_self
 // @flow
+/**
+ * D3 basicView/basic data model view
+ */
 
 // exposed variable
 var serverUrl = ""
@@ -123,7 +126,9 @@ var initD3 = (function() {
   }
 
   function writeMessage(text) {
-    $('#d3-info-messages').append("<li>" + (new Date().toLocaleString()) + ":<br/>" + text + "</li>")
+    console.log((new Date().toLocaleString()))
+    console.log(text)
+
   }
 
 
