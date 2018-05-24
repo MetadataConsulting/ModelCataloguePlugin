@@ -44,13 +44,18 @@
   </head>
 
   <body>
-    <div>
+    <div id="container">
+      <div id="column-left" class="column column-left">
 
-      <div id="body" class="column column-left">
-      <!--<div id="footer">
+        <div id="svg-body">
+          <!--<div id="footer">
         d3.layout.tree
         <div class="hint">click or option-click to expand or collapse</div>
       </div>-->
+        </div>
+      </div>
+
+      <div class="splitter column">
       </div>
 
       <div id="d3-info" class="column column-right">

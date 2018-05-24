@@ -2,6 +2,7 @@
 //= require validator-js/validator.min.js
 //= require underscore/underscore-min.js
 //= require remarkable-bootstrap-notify/dist/bootstrap-notify.min.js
+//= require jquery-resizable/dist/jquery-resizable.js
 //= require_self
 // @flow
 /**
@@ -12,6 +13,11 @@
 var serverUrl = ""
 
 var initD3 = (function() {
+
+  $('#column-left').resizable({
+    handleSelector: ".splitter",
+    resizeHeight: false
+  })
 
   //// D3 Setup stuff
   // dimensions of page
@@ -30,7 +36,7 @@ var initD3 = (function() {
     .projection(function(d) { return [d.y, d.x]; });
 
   // visualization pane
-  var vis = d3.select("#body").append("svg:svg")
+  var vis = d3.select("#svg-body").append("svg:svg")
     .attr("width", w + m[1] + m[3])
     .attr("height", h + m[0] + m[2])
     .call(d3.behavior.zoom().on("zoom", function () {
@@ -40,7 +46,7 @@ var initD3 = (function() {
     .attr("transform", "translate(" + (m[3] + 20) + "," + m[0] + ")");
 
   // Define the div for the tooltip
-  var div = d3.select("#body").append("div")
+  var div = d3.select("#svg-body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
