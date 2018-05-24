@@ -8,8 +8,10 @@ import org.modelcatalogue.core.geb.DataModelPolicyCreatePage
 import org.modelcatalogue.core.geb.DataModelPolicyListPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.IgnoreIf
+import spock.lang.Requires
 
 @IgnoreIf({ !System.getProperty('geb.env') })
+//@Requires({ sys.testSuite == "TestSuiteA" })
 class CreateDataModelAndCreatePolicesSpec extends GebSpec {
 
     void "create a data model policy and use it in the creation of a data model"() {
@@ -42,7 +44,7 @@ class CreateDataModelAndCreatePolicesSpec extends GebSpec {
         dataModelPolicyListPage = browser.page DataModelPolicyListPage
 
         then:
-        waitFor {(numberOfDataModelPolicyListPage + 1) == dataModelPolicyListPage.countDataModelPolicyLinks()}
+        waitFor { (numberOfDataModelPolicyListPage + 1) == dataModelPolicyListPage.countDataModelPolicyLinks() }
 
         when:
         dashboardPage = to DashboardPage
