@@ -1,5 +1,6 @@
 // @flow
 <%--
+  Basic Data Model View, using D3.js (basicView)
   Created by IntelliJ IDEA.
   User: james
   Date: 16/05/2018
@@ -70,17 +71,18 @@
         </div>
 
 
-
       </div>
 
-      <div id="d3-messages" class="column column-right-2">
-        <div class="info-box">
-          <h2><u>Messages:</u></h2>
-          <ul id="d3-info-messages">
+      %{--<div id="d3-messages" class="column column-right-2">--}%
+        %{--<div class="info-box">--}%
+          %{--<h2><u>Messages:</u></h2>--}%
+          %{--<ul id="d3-info-messages">--}%
 
-          </ul>
-        </div>
-      </div>
+          %{--</ul>--}%
+        %{--</div>--}%
+      %{--</div>--}%
+
+
     </div>
 
 

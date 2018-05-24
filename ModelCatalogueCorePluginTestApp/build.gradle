@@ -39,7 +39,7 @@ task npmCacheConfig(type: NpmTask, dependsOn: nodeSetup) {
 task npmPackages(type: NpmTask, dependsOn: npmCacheConfig) {
     description = "Install Node.js packages"
     args = [ 'install' ]
-    // inputs.files file('package.json')
+    inputs.files file('package.json')
     outputs.files file('node_modules')
 }
 
@@ -50,7 +50,7 @@ task bowerInstall(type: NodeTask) {
             "--config.storage.packages=${gradle.getGradleUserHomeDir()}/caches/bower/packages",
             "--config.storage.registry=${gradle.getGradleUserHomeDir()}/caches/bower/registry",
             'install']
-    // inputs.files file('bower.json')
+    inputs.files file('bower.json')
     outputs.files file('grails-app/assets/bower_components')
     dependsOn npmPackages
 }
@@ -483,8 +483,10 @@ task stop(type: Exec) {
 bowerInstall.finalizedBy cleanUpBowerDependencies
 stop.finalizedBy stopContainers
 
-
-task war(type: Exec, dependsOn: bowerInstall) {
+task deleteUnnecessaryJavascript(type: Delete) {
+    delete 'grails-app/assets/bower_components/d3/test', 'grails-app/assets/bower_components/validator-js/src', 'grails-app/assets/bower_components/validator-js/lib'
+}
+task war(type: Exec, dependsOn: [bowerInstall, deleteUnnecessaryJavascript]) {
     description = "Build production war of MX application"
     commandLine grailsw, 'war', '--non-interactive', '--stacktrace'
 }
