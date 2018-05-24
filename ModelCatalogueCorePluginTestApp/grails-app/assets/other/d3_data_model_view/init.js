@@ -1,6 +1,7 @@
 //= require d3/d3.min.js
 //= require validator-js/validator.min.js
 //= require underscore/underscore-min.js
+//= require remarkable-bootstrap-notify/dist/bootstrap-notify.min.js
 //= require_self
 // @flow
 /**
@@ -125,12 +126,20 @@ var initD3 = (function() {
     return ret = ret + "</ul>"
   }
 
-  function writeMessage(text) {
-    console.log((new Date().toLocaleString()))
-    console.log(text)
 
+  function writeMessage(text, type) {
+    type = type || 'info' // info by default
+    return $.notify({
+      'message': (new Date().toLocaleString()) + " " + text
+    }, {
+      'delay': 200,
+      'type': type,
+        'placement': {
+          'from': "bottom",
+          'align': "left"
+      }
+    })
   }
-
 
   /**
    * Initialize
@@ -255,25 +264,25 @@ var initD3 = (function() {
               if (data.children.length > 0) {
                 d._children = data.children;
               }
-              writeMessage("Loading children for " + typeAndName(d) + " succeeded!")
+              writeMessage("Loading children for " + typeAndName(d) + " succeeded!", 'success')
               toggle(d);
               update(d);
             }
 
             else {
               if (!data.canAccessDataModel) {
-                writeMessage("You do not have access to the data model of " + typeAndName(d) + " or it does not exist.")
+                writeMessage("You do not have access to the data model of " + typeAndName(d) + " (you may have been logged out) or it does not exist.", 'danger')
                 // TODO: If you can't access the data model because you've been logged out, it's more appropriate that d.loadedChildren remains false, so the user can try to load the children again once logged in. But we need a more fine-grained response from the controller to differentiate the reason for inability to access.
               }
               else { // !data.caseHandled
-                writeMessage("Loading children is not handled for this case.")
+                writeMessage("Loading children is not handled for this case.", 'danger')
               }
 
             }
 
 
           }, function(jqXHR, textStatus, errorThrown) { // request failure
-            writeMessage("Loading children for " + typeAndName(d) + " failed with error message: " + errorThrown)
+            writeMessage("Loading children for " + typeAndName(d) + " failed with error message: " + errorThrown, 'danger')
             d.loading = false
             // end loading
           })
