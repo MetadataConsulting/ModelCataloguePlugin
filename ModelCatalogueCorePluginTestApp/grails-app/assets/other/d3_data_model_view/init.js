@@ -182,6 +182,7 @@ var initD3 = (function() {
     root.x0 = h / 2;
     root.y0 = 0;
     info(root)
+    $('#advanced-view-link').attr('href', root.angularLink)
 
 
     function toggleAll(d) {
