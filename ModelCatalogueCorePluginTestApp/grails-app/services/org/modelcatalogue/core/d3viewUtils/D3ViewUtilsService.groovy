@@ -16,6 +16,7 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipConfiguration
 import org.modelcatalogue.core.RelationshipInfo
+import org.modelcatalogue.core.RelationshipTypeName
 import org.modelcatalogue.core.RelationshipTypeService
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.DataModelAclService
@@ -211,6 +212,11 @@ class D3ViewUtilsService {
      */
     D3JSON addRelationships(CatalogueElement catalogueElement, D3JSON d3JSON) {
         RelationshipConfiguration relationshipConfiguration = relationshipTypeService.getRelationshipConfiguration(catalogueElement.getClass())
+        relationshipConfiguration.each {
+            Map<String, String> directionMap ->
+                directionMap.remove RelationshipTypeName.HIERARCHY.name // relationship type names
+                directionMap.remove RelationshipTypeName.CONTAINMENT.name
+        }
         List<RelationshipInfo> relationshipInfos = relationshipTypeService.relationshipInfoOf(catalogueElement, relationshipConfiguration)
         Map<String, List<RelationJson>> relationshipsJson = [:]
 
