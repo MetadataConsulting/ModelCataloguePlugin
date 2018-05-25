@@ -44,6 +44,25 @@ class RelationshipTypeService {
         typesForDomainClassCache.clear()
     }
 
+    Map<String, Map<String,String>> getRelationshipConfigurationRec(Class type) {
+
+        Map<String, Map<String, String>> relationships  = [incoming: [:], outgoing: [:], bidirectional: [:]]
+
+        if (type.superclass && CatalogueElement.isAssignableFrom(type.superclass)) { // recursively get relationships from superclasses
+            Map<String, Map<String, String>> fromSuperclass = getRelationshipConfigurationRec(type.superclass)
+            relationships.incoming.putAll(fromSuperclass.incoming ?: [:])
+            relationships.outgoing.putAll(fromSuperclass.outgoing ?: [:])
+            relationships.bidirectional.putAll(fromSuperclass.bidirectional ?: [:])
+        }
+
+        // get relationships from this class
+        Map<String, Map<String, String>> fromType = GrailsClassUtils.getStaticFieldValue(type, 'relationships') ?: [incoming: [:], outgoing: [:], bidirectional: [:]]
+        relationships.incoming.putAll(fromType.incoming ?: [:])
+        relationships.outgoing.putAll(fromType.outgoing ?: [:])
+        relationships.bidirectional.putAll(fromType.bidirectional ?: [:])
+
+        return relationships
+    }
     /**
      * e.g. relationships = {
      *     "incoming": {
@@ -60,22 +79,9 @@ class RelationshipTypeService {
      * @return
      */
     Map<String, Map<String, String>> getRelationshipConfiguration(Class type) {
+        Map<String, Map<String, String>> relationships  = getRelationshipConfigurationRec(type)
 
-        Map<String, Map<String, String>> relationships  = [incoming: [:], outgoing: [:], bidirectional: [:]]
-
-        if (type.superclass && CatalogueElement.isAssignableFrom(type.superclass)) { // recursively get relationships from superclasses
-            Map<String, Map<String, String>> fromSuperclass = getRelationshipConfiguration(type.superclass)
-            relationships.incoming.putAll(fromSuperclass.incoming ?: [:])
-            relationships.outgoing.putAll(fromSuperclass.outgoing ?: [:])
-            relationships.bidirectional.putAll(fromSuperclass.bidirectional ?: [:])
-        }
-
-        // get relationships from this class
-        Map<String, Map<String, String>> fromType = GrailsClassUtils.getStaticFieldValue(type, 'relationships') ?: [incoming: [:], outgoing: [:], bidirectional: [:]]
-        relationships.incoming.putAll(fromType.incoming ?: [:])
-        relationships.outgoing.putAll(fromType.outgoing ?: [:])
-        relationships.bidirectional.putAll(fromType.bidirectional ?: [:])
-
+        // filter by database stuff
         getRelationshipTypesFor(type).each { String name, RelationshipType relationshipType ->
             if (relationshipType.system) {
                 relationships.each { String direction, Map config ->
@@ -113,6 +119,7 @@ class RelationshipTypeService {
 
         relationships
     }
+
 
 
 }
