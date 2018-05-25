@@ -44,82 +44,119 @@ class RelationshipTypeService {
         typesForDomainClassCache.clear()
     }
 
-    Map<String, Map<String,String>> getRelationshipConfigurationRec(Class type) {
+    RelationshipConfiguration getRelationshipConfigurationRec(Class type) {
 
-        Map<String, Map<String, String>> relationships  = [incoming: [:], outgoing: [:], bidirectional: [:]]
+        RelationshipConfiguration relationshipConfiguration = new RelationshipConfiguration()
 
         if (type.superclass && CatalogueElement.isAssignableFrom(type.superclass)) { // recursively get relationships from superclasses
-            Map<String, Map<String, String>> fromSuperclass = getRelationshipConfigurationRec(type.superclass)
-            relationships.incoming.putAll(fromSuperclass.incoming ?: [:])
-            relationships.outgoing.putAll(fromSuperclass.outgoing ?: [:])
-            relationships.bidirectional.putAll(fromSuperclass.bidirectional ?: [:])
+            RelationshipConfiguration fromSuperclass = getRelationshipConfigurationRec(type.superclass)
+            relationshipConfiguration.add(fromSuperclass)
         }
 
         // get relationships from this class
         Map<String, Map<String, String>> fromType = GrailsClassUtils.getStaticFieldValue(type, 'relationships') ?: [incoming: [:], outgoing: [:], bidirectional: [:]]
-        relationships.incoming.putAll(fromType.incoming ?: [:])
-        relationships.outgoing.putAll(fromType.outgoing ?: [:])
-        relationships.bidirectional.putAll(fromType.bidirectional ?: [:])
+        relationshipConfiguration.add(fromType)
 
-        return relationships
+        return relationshipConfiguration
     }
     /**
-     * e.g. relationships = {
-     *     "incoming": {
-     *         "hierarchy": "childOf"
-     *     }
-     *     "outgoing": {
-     *         "hierarchy": "parentOf"
-     *     }
-     *     "bidirectional": {
-     *         "relatedTo": "relatedTo"
-     *     }
-     *  }
+     *
      * @param type
      * @return
      */
-    Map<String, Map<String, String>> getRelationshipConfiguration(Class type) {
-        Map<String, Map<String, String>> relationships  = getRelationshipConfigurationRec(type)
+    RelationshipConfiguration getRelationshipConfiguration(Class type) {
+        RelationshipConfiguration relationshipConfiguration  = getRelationshipConfigurationRec(type)
 
         // filter by database stuff
         getRelationshipTypesFor(type).each { String name, RelationshipType relationshipType ->
             if (relationshipType.system) {
-                relationships.each { String direction, Map config ->
-                    config.remove name
-                }
-                return
+                relationshipConfiguration.each {it.remove name}
+
+                return // go to next part of each loop
             }
 
             if (relationshipType.bidirectional) {
-                if (!relationships.bidirectional.containsKey(name)) {
-                    relationships.incoming.remove(name)
-                    relationships.outgoing.remove(name)
+                if (!relationshipConfiguration.bidirectional.containsKey(name)) {
+                    relationshipConfiguration.incoming.remove(name)
+                    relationshipConfiguration.outgoing.remove(name)
 
-                    relationships.bidirectional[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
+                    relationshipConfiguration.bidirectional[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
                 }
             } else {
                 if (relationshipType.sourceClass.isAssignableFrom(type)) {
-                    if (!relationships.outgoing.containsKey(name)){
-                        relationships.bidirectional.remove(name)
+                    if (!relationshipConfiguration.outgoing.containsKey(name)){
+                        relationshipConfiguration.bidirectional.remove(name)
 
-                        relationships.outgoing[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
+                        relationshipConfiguration.outgoing[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
                     }
                 }
                 if (relationshipType.destinationClass.isAssignableFrom(type)) {
-                    if (!relationships.incoming.containsKey(name)) {
+                    if (!relationshipConfiguration.incoming.containsKey(name)) {
 
-                        relationships.bidirectional.remove(name)
+                        relationshipConfiguration.bidirectional.remove(name)
 
-                        relationships.incoming[name] = RelationshipType.toCamelCase(relationshipType.destinationToSource)
+                        relationshipConfiguration.incoming[name] = RelationshipType.toCamelCase(relationshipType.destinationToSource)
                     }
                 }
             }
         }
 
 
-        relationships
+        relationshipConfiguration
     }
 
 
 
+}
+/**
+ * e.g. relationships = {
+ *     "incoming": {
+ *         "hierarchy": "childOf"
+ *     }
+ *     "outgoing": {
+ *         "hierarchy": "parentOf"
+ *     }
+ *     "bidirectional": {
+ *         "relatedTo": "relatedTo"
+ *     }
+ *  }
+ */
+class RelationshipConfiguration {
+    Map<String, String> incoming = [:]
+    Map<String, String> outgoing = [:]
+    Map<String, String> bidirectional = [:]
+
+    /**
+     * Mutates state
+     * @param relationshipConfiguration
+     * @return
+     */
+    RelationshipConfiguration add(RelationshipConfiguration relationshipConfiguration) {
+        this.incoming << relationshipConfiguration.incoming ?: [:]
+        this.outgoing << relationshipConfiguration.outgoing ?: [:]
+        this.bidirectional << relationshipConfiguration.bidirectional ?: [:]
+        return this
+    }
+    /**
+     * Mutates state
+     * @param fromType
+     * @return
+     */
+    RelationshipConfiguration add(Map<String, Map<String, String>> fromType) {
+
+        this.incoming.putAll(fromType.incoming ?: [:])
+        this.outgoing.putAll(fromType.outgoing ?: [:])
+        this.bidirectional.putAll(fromType.bidirectional ?: [:])
+        return this
+    }
+
+    /**
+     * Closure c applies to Map<String,String>
+     * @param c
+     */
+    void each(Closure c) {
+        c(incoming)
+        c(outgoing)
+        c(bidirectional)
+    }
 }

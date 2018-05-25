@@ -49,7 +49,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 typeHierarchy        : [count: Integer.MAX_VALUE, itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/typeHierarchy".toString()]
         ]
 
-        Map<String, Map<String, String>> relationships = relationshipTypeService.getRelationshipConfiguration(el.getClass())
+        RelationshipConfiguration relationships = relationshipTypeService.getRelationshipConfiguration(el.getClass())
 
         Map<String, RelationshipType> types = getRelationshipTypesFor(el.getClass())
 
