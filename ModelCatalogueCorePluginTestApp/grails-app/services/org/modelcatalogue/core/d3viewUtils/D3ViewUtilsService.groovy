@@ -54,6 +54,19 @@ class D3ViewUtilsService {
                             catalogueElement.getClass())
     }
 
+    D3JSON basicD3JSON(CatalogueElement catalogueElement) {
+        D3JSON ret = new D3JSON(
+            name: catalogueElement.name,
+            description: catalogueElement.description,
+            id: catalogueElement.id,
+            angularLink: angularLink(catalogueElement),
+            type: lowerCamelCaseDomainName(catalogueElement.getClass())
+        )
+        ret = addRelationships(catalogueElement, ret)
+        
+        return ret
+    }
+
     //// Data Models:
 
     /**
@@ -63,15 +76,8 @@ class D3ViewUtilsService {
      */
     D3JSON dataModelD3Json(DataModel dataModel) {
 
-        D3JSON ret = new D3JSON(
-            name: dataModel.name,
-            description: dataModel.description,
-            id: dataModel.id,
-            angularLink: angularLink(dataModel.id, dataModel.id, DataModel),
-            type: lowerCamelCaseDomainName(DataModel)
-        )
+        D3JSON ret = basicD3JSON(dataModel)
 
-        ret = addRelationships(dataModel, ret)
 
         return ret
     }
@@ -117,15 +123,8 @@ class D3ViewUtilsService {
      */
     D3JSON dataClassD3Json(DataClass dataClass) {
 
-        D3JSON ret = new D3JSON(
-            name: dataClass.name,
-            id: dataClass.id,
-            description: dataClass.description,
-            angularLink: angularLink(dataClass.dataModel.id, dataClass.id, DataClass),
-            type: lowerCamelCaseDomainName(DataClass),
-        )
+        D3JSON ret = basicD3JSON(dataClass)
 
-        ret = addRelationships(dataClass, ret)
 
         return ret
     }
@@ -150,22 +149,15 @@ class D3ViewUtilsService {
 
 
     D3JSON dataElementD3Json(DataElement dataElement) {
-        D3JSON ret = new D3JSON(
-
-            name: dataElement.name,
-            id: dataElement.id,
-            description: dataElement.description,
-            angularLink: angularLink(dataElement.dataModel.id, dataElement.id, DataElement),
-            loadedChildren: true, // Just load data type, no laziness
-            type: lowerCamelCaseDomainName(DataElement)
-        )
+        D3JSON ret = basicD3JSON(dataElement)
+        
+        ret.loadedChildren= true // Just load data type, no laziness
 
         if (dataElement.dataType) {
             ret.children = [dataTypeD3Json(dataElement.dataType)]
         }
 
 
-        ret = addRelationships(dataElement, ret)
 
         return ret
     }
@@ -176,15 +168,15 @@ class D3ViewUtilsService {
             id: dataType.id,
             description: dataType.description,
             angularLink: angularLink(dataType.dataModel.id, dataType.id, DataType),
-            loadedChildren: true, // No children, so "already loaded children."
+            
             type: lowerCamelCaseDomainName(DataType),
         )
-
+        ret.loadedChildren = true // No children, so "already loaded children."
+        
         if (dataType instanceof EnumeratedType) {
             ret.enumerations = ((EnumeratedType) dataType).enumerations
         }
 
-        ret = addRelationships(dataType, ret)
         return ret
     }
 
