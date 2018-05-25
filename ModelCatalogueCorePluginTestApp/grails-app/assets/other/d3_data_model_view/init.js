@@ -57,8 +57,9 @@ var initD3 = (function() {
   function parseModelToJS(jsonString /*: string */) /*: Object */ {
     jsonString=jsonString.replace(/\"/g,'"');
     //jsonString=jsonString.replace(/&quot;/g, '"');
-    jsonString=jsonString.replace(/&#92;n/g, ' '); // i.e. \n
-    jsonString=validator.unescape(jsonString);h // unescape e.g. &amp;
+    jsonString=jsonString.replace(/&#92;n/g, '<br/>'); // i.e. \n
+    jsonString=jsonString.replace(/&#92;t/g, '   '); // i.e. \t
+    jsonString=validator.unescape(jsonString); // unescape e.g. &amp;
     var jsonObject=$.parseJSON(jsonString);
     return jsonObject
   }
