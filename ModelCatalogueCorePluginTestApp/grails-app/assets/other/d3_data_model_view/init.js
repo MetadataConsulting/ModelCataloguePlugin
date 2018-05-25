@@ -118,13 +118,17 @@ var initD3 = (function() {
    * @param d node data
    * @returns {string}
    */
-  function info(d /*: D3JSON */) {
-    return "<b>Name: "  + "<a href='" + d.angularLink +  "' target='_blank'>" + d.name + "</a>" + "<br/>" +
+  function info(d /*: D3JSON */) /*: void */ {
+     $("#d3-info-name-description").html(
+       "<b>Name: "  + "<a href='" + d.angularLink +  "' target='_blank'>" + d.name + "</a>" + "<br/>" +
       " <i>(Click to see Advanced View)</i>" + "</b>" + "<br/>" +
       "<u>Type:</u> " + ucFirst(d.type) + "<br/>" +
       (d.description? "<u>Description:</u> " + d.description + "<br/>" : "") +
-      (d.enumerations ? enumerate(d.enumerations): "") +
-      (d.relationships ? displayRelationships(d.relationships): "")
+       (d.enumerations ? enumerate(d.enumerations): ""))
+
+      $("#d3-info-metadata").html("No metadata")
+
+      $("#d3-info-relationships").html((d.relationships ? displayRelationships(d.relationships): "No Relationships"))
   }
 
   /**
@@ -142,12 +146,12 @@ var initD3 = (function() {
   }
 
   function displayRelationships(relationships /*:{[string]: Relation[]} */) /*: string */ {
-    var ret = "<u>Relationships:</u> <br/> <ul>"
+    var ret = ""
     Object.keys(relationships).forEach(function(relationshipName /*: string */){
       var relations /*: Relation[]*/= relationships[relationshipName]
       if (relations.length > 0) {
         relations.forEach(function(relation) {
-          ret = ret + "<br/>" + relationshipName + ": " + "<a href='" + relation.angularLink + "' target='_blank'>" + relation.name + "</a>"
+          ret = ret + relationshipName + ": " + "<a href='" + relation.angularLink + "' target='_blank'>" + relation.name + "</a>" + "<br/>"
         })
       }
     })
@@ -177,7 +181,8 @@ var initD3 = (function() {
     root = json;
     root.x0 = h / 2;
     root.y0 = 0;
-    $('#d3-info-data-model').html(info(root));
+    info(root)
+
 
     function toggleAll(d) {
       if (d.children) {
@@ -266,7 +271,7 @@ var initD3 = (function() {
       console.log("Path from root: " + namesFromPath(path))
       console.log("Angular pathstring: " + angularTreeviewPathString(path))
 
-      $('#d3-info-element').html(info(d)); // display info
+      info(d); // display info
 
       if (d.loadedChildren && !d.loading) {
         toggle(d);
@@ -339,7 +344,7 @@ var initD3 = (function() {
 
     // display info on mouseover
     function infoMouseover(d){
-      $('#d3-info-element-last-mouseover').html(info(d)); // display info
+      // don't do anything anymore. Maybe this would be useful another time.
     }
 
     // ENTER any new nodes at the parent's previous position.
