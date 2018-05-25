@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.persistence.RelationshipTypeGormService
+import org.modelcatalogue.core.util.RelationshipDirection
 
 class RelationshipTypeService {
 
@@ -105,9 +106,70 @@ class RelationshipTypeService {
         relationshipConfiguration
     }
 
+    /**
+    * e.g. ["parentOf": [R1, R2...], "childOf": [R3, R4...]]
+    * @param element
+    * @param relationshipConfiguration
+    * @return
+    */
+    List<RelationshipInfo> relationshipInfoOf(CatalogueElement element, RelationshipConfiguration relationshipConfiguration) {
+        List<RelationshipInfo> result = []
+
+        // incoming
+        Map<String,String> incoming = relationshipConfiguration.incoming
+        incoming.each {relationshipName, directionalRelationshipName ->
+            result.add(new RelationshipInfo(
+                directionalRelationshipName: directionalRelationshipName,
+                relationships: element.getIncomingRelationshipsByType(RelationshipType.readByName(relationshipName)), // initialize empty list
+                relationshipDirection: RelationshipDirection.INCOMING
+
+
+            ))
+        }
+
+        // outgoing
+
+        Map<String, String> outgoing = relationshipConfiguration.outgoing
+        outgoing.each {relationshipName, directionalRelationshipName ->
+            result.add(new RelationshipInfo(
+                directionalRelationshipName: directionalRelationshipName,
+                relationships: element.getOutgoingRelationshipsByType(RelationshipType.readByName(relationshipName)), // initialize empty list
+                relationshipDirection: RelationshipDirection.OUTGOING
+
+
+            ))
+
+        }
+
+
+        // bidirectional
+        Map<String, String> bidirectional = relationshipConfiguration.bidirectional
+        bidirectional.each {relationshipName, directionalRelationshipName ->
+            result.add(new RelationshipInfo(
+                directionalRelationshipName: directionalRelationshipName,
+                relationships: element.getOutgoingRelationshipsByType(RelationshipType.readByName(relationshipName)), // initialize empty list
+                relationshipDirection: RelationshipDirection.OUTGOING
+
+
+            ))
+            // as if outgoing, for bidirectional
+        }
+
+        return result
+    }
+
+
 
 
 }
+
+class RelationshipInfo {
+    String directionalRelationshipName
+    List<Relationship> relationships
+    RelationshipDirection relationshipDirection
+
+}
+
 /**
  * e.g. relationships = {
  *     "incoming": {

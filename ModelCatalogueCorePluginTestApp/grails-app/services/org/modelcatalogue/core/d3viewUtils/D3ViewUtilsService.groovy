@@ -3,6 +3,8 @@ package org.modelcatalogue.core.d3viewUtils
 import com.google.common.collect.ImmutableSet
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataElement
@@ -11,9 +13,15 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipConfiguration
+import org.modelcatalogue.core.RelationshipInfo
+import org.modelcatalogue.core.RelationshipTypeService
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.MetadataDomain
+import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 
 @Transactional
@@ -27,6 +35,8 @@ class D3ViewUtilsService {
     DataClassService dataClassService
     DataElementService dataElementService
     GrailsApplication grailsApplication
+    RelationshipTypeService relationshipTypeService
+    DataModelAclService dataModelAclService
 
     //// Utilities:
 
@@ -37,7 +47,11 @@ class D3ViewUtilsService {
     String angularLink(Long dataModelId, Long id, Class clazz) {
         return "${grailsApplication.config.grails.serverURL}/#/$dataModelId/${lowerCamelCaseDomainName(clazz)}/$id"
     }
-
+    String angularLink(CatalogueElement catalogueElement) {
+        return angularLink(dataModelAclService.dataModelFromInstance(catalogueElement).dataModelId,
+                            catalogueElement.id,
+                            catalogueElement.getClass())
+    }
 
     //// Data Models:
 
@@ -48,13 +62,17 @@ class D3ViewUtilsService {
      */
     D3JSON dataModelD3Json(DataModel dataModel) {
 
-        D3JSON dataModelJson = new D3JSON(
+        D3JSON ret = new D3JSON(
             name: dataModel.name,
             description: dataModel.description,
             id: dataModel.id,
             angularLink: angularLink(dataModel.id, dataModel.id, DataModel),
             type: lowerCamelCaseDomainName(DataModel)
         )
+
+        ret = addRelationships(dataModel, ret)
+
+        return ret
     }
 
     /**
@@ -98,7 +116,6 @@ class D3ViewUtilsService {
      */
     D3JSON dataClassD3Json(DataClass dataClass) {
 
-
         D3JSON ret = new D3JSON(
             name: dataClass.name,
             id: dataClass.id,
@@ -107,7 +124,7 @@ class D3ViewUtilsService {
             type: lowerCamelCaseDomainName(DataClass),
         )
 
-
+        ret = addRelationships(dataClass, ret)
 
         return ret
     }
@@ -146,6 +163,9 @@ class D3ViewUtilsService {
             ret.children = [dataTypeD3Json(dataElement.dataType)]
         }
 
+
+        ret = addRelationships(dataElement, ret)
+
         return ret
     }
 
@@ -162,7 +182,65 @@ class D3ViewUtilsService {
         if (dataType instanceof EnumeratedType) {
             ret.enumerations = ((EnumeratedType) dataType).enumerations
         }
+
+        ret = addRelationships(dataType, ret)
         return ret
+    }
+
+    static Map<String, Map<String, String>> relationshipTypes(Class type) {
+        Map<String, Map<String, String>> relationships  = [incoming: [:], outgoing: [:], bidirectional: [:]]
+
+        if (type.superclass && CatalogueElement.isAssignableFrom(type.superclass)) {
+            Map<String, Map<String,String>> fromSuperclass = relationshipTypes(type.superclass)
+            relationships.incoming.putAll(fromSuperclass.incoming ?: [:])
+            relationships.outgoing.putAll(fromSuperclass.outgoing ?: [:])
+            relationships.bidirectional.putAll(fromSuperclass.bidirectional ?: [:])
+        }
+
+        Map<String, Map<String, String>> fromType = GrailsClassUtils.getStaticFieldValue(type, 'relationships') ?: [incoming: [:], outgoing: [:], bidirectional: [:]]
+        relationships.incoming.putAll(fromType.incoming ?: [:])
+        relationships.outgoing.putAll(fromType.outgoing ?: [:])
+        relationships.bidirectional.putAll(fromType.bidirectional ?: [:])
+    }
+
+    /**
+     * add relationships to D3JSON, modifying and returning the D3JSON.
+     * @param catalogueElement
+     * @param d3JSON
+     * @return
+     */
+    D3JSON addRelationships(CatalogueElement catalogueElement, D3JSON d3JSON) {
+        RelationshipConfiguration relationshipConfiguration = relationshipTypeService.getRelationshipConfiguration(catalogueElement.getClass())
+        List<RelationshipInfo> relationshipInfos = relationshipTypeService.relationshipInfoOf(catalogueElement, relationshipConfiguration)
+        Map<String, List<RelationJson>> relationshipsJson = [:]
+
+        relationshipInfos.each {RelationshipInfo relationshipInfo ->
+
+            String capitalizedSpacedName = lowerCamelCaseToSeparated(relationshipInfo.directionalRelationshipName, ' ').capitalize()
+
+            relationshipsJson[capitalizedSpacedName] = relationshipInfo.relationships.collect {
+                Relationship relationship ->
+                    CatalogueElement otherElement = (relationshipInfo.relationshipDirection == RelationshipDirection.INCOMING) ? relationship.source : relationship.destination
+                    new RelationJson(name: otherElement.name,
+                        angularLink: angularLink(otherElement)
+                    )
+            }
+        }
+
+        if (relationshipsJson) {
+            d3JSON.relationships = relationshipsJson
+        }
+
+        return d3JSON
+
+    }
+    /**
+     * lower-camel-case to sep-separated
+     * @param s
+     * @return
+     */
+    String lowerCamelCaseToSeparated (String s, String sep) {
+        return s.replaceAll(/\B[A-Z]/) { sep + it }
     }
 }
 /**
@@ -186,8 +264,21 @@ class D3JSON {
     Map<String,String> enumerations
     List<D3JSON> children
 
+    Map<String, List<RelationJson>> relationships
+
+
+
+
 }
 
+class RelationJson {
+    String name
+    String angularLink
+}
+
+/**
+ * Returned from DataModelController's basicViewChildrenData action
+ */
 class ChildrenData {
     List<D3JSON> children
     boolean canAccessDataModel

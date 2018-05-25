@@ -77,6 +77,8 @@ var initD3 = (function() {
 
       enumerations: ?Object,
 
+      relationships: {[string]: Relation[]},
+
       children: ?Array<D3JSON>,
 
       _children: ?Array<D3JSON>,
@@ -85,6 +87,11 @@ var initD3 = (function() {
       y: number,
       x0: number,
       y0: number
+    }
+
+    type Relation = {
+      name: string,
+      angularLink: string
     }
    */
 
@@ -115,7 +122,8 @@ var initD3 = (function() {
       " <i>(Click to see Advanced View)</i>" + "</b>" + "<br/>" +
       "<u>Type:</u> " + ucFirst(d.type) + "<br/>" +
       (d.description? "<u>Description:</u> " + d.description + "<br/>" : "") +
-      (d.enumerations ? enumerate(d.enumerations): "")
+      (d.enumerations ? enumerate(d.enumerations): "") +
+      (d.relationships ? displayRelationships(d.relationships): "")
   }
 
   /**
@@ -130,6 +138,19 @@ var initD3 = (function() {
       console.log(key, map[key]);
     });
     return ret = ret + "</ul>"
+  }
+
+  function displayRelationships(relationships /*:{[string]: Relation[]} */) /*: string */ {
+    var ret = "<u>Relationships:</u> <br/> <ul>"
+    Object.keys(relationships).forEach(function(relationshipName /*: string */){
+      var relations /*: Relation[]*/= relationships[relationshipName]
+      if (relations.length > 0) {
+        relations.forEach(function(relation) {
+          ret = ret + "<br/>" + relationshipName + ": " + "<a href='" + relation.angularLink + "' target='_blank'>" + relation.name + "</a>"
+        })
+      }
+    })
+    return ret
   }
 
 
@@ -239,7 +260,7 @@ var initD3 = (function() {
     */
 
     // load children if not loaded
-    function onNodeClick(d) {
+    function onNodeClick(d /*: D3JSON */) {
       var path = pathFromRoot(d)
       console.log("Path from root: " + namesFromPath(path))
       console.log("Angular pathstring: " + angularTreeviewPathString(path))
