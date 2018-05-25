@@ -49,7 +49,7 @@ class D3ViewUtilsService {
         return "${grailsApplication.config.grails.serverURL}/#/$dataModelId/${lowerCamelCaseDomainName(clazz)}/$id"
     }
     String angularLink(CatalogueElement catalogueElement) {
-        return angularLink(dataModelAclService.dataModelFromInstance(catalogueElement).dataModelId,
+        return angularLink(dataModelAclService.dataModelFromInstance(catalogueElement).id,
                             catalogueElement.id,
                             catalogueElement.getClass())
     }
