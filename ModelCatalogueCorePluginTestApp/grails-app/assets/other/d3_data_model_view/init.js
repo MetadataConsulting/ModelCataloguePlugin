@@ -73,6 +73,11 @@ var initD3 = (function() {
       angularLink: string,
       type: string,
 
+      status: string,
+      dateCreated: string,
+      lastUpdated: string,
+      metadata: {[string]: string},
+
       loadedChildren: boolean,
       loading: boolean,
 
@@ -133,9 +138,15 @@ var initD3 = (function() {
        (d.rule ? "<u>Rule:</u> " + d.rule + "<br/>" : "") +
        (d.measurementUnitName ? "<u>Measurement Unit:</u> " + d.measurementUnitName + " (" + d.measurementUnitSymbol + ")<br/>" : "") +
        (d.referenceName ? "<u>References:</u> " + "<a href='" + d.referenceAngularLink +  "' target='_blank'>" + d.referenceName + "</a>" + "<br/>" : "") +
-       (d.enumerations ? enumerate(d.enumerations): ""))
+       (d.enumerations ? "<u>Enumerations:</u> <br/>" + displayMap(d.enumerations): ""))
 
-      $("#d3-info-metadata").html("No metadata")
+      $("#d3-info-metadata").html(
+        "<u>Status:</u> " + d.status + "<br/>" +
+        "<u>Date Created:</u> " + d.dateCreated + "<br/>" +
+        "<u>Date Updated:</u> " + d.lastUpdated + "<br/>" +
+        (d.metadata ? "<u>Metadata:</u> <br/>" + displayMap(d.metadata) + "<br/>" : "")
+
+      )
 
       $("#d3-info-relationships").html((d.relationships ? displayRelationships(d.relationships): "No Relationships"))
   }
@@ -145,8 +156,8 @@ var initD3 = (function() {
    * @param map
    * @returns {string}
    */
-  function enumerate(map) {
-    var ret = "<u>Enumerations:</u> <br/> <ul>"
+  function displayMap(map) {
+    var ret = "<ul>"
     Object.keys(map).forEach(function(key) {
       ret = ret + "<li>" + key + ": " + map[key] + "</li>"
       console.log(key, map[key]);

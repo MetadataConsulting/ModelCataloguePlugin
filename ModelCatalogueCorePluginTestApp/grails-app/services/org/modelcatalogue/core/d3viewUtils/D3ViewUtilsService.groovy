@@ -62,8 +62,16 @@ class D3ViewUtilsService {
             description: catalogueElement.description,
             id: catalogueElement.id,
             angularLink: angularLink(catalogueElement),
-            type: lowerCamelCaseDomainName(catalogueElement.getClass())
+            type: lowerCamelCaseDomainName(catalogueElement.getClass()),
+
+            status: catalogueElement.status.toString(),
+            dateCreated: catalogueElement.dateCreated,
+            lastUpdated: catalogueElement.lastUpdated
         )
+
+        if (catalogueElement.ext.size() > 0) {
+            ret.metadata = catalogueElement.ext
+        }
         ret = addRelationships(catalogueElement, ret)
 
         return ret
@@ -264,6 +272,11 @@ class D3JSON {
 
     String angularLink
     String type
+
+    String status
+    String dateCreated
+    String lastUpdated
+    Map<String, String> metadata
 
     boolean loadedChildren = false // false by default; children will be loaded later.
     boolean loading = false
