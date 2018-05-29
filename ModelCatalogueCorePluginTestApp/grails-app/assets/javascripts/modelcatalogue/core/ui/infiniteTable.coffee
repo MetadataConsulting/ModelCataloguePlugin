@@ -21,11 +21,16 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       body   = $element.find('.inf-table-body')
 #      spacer = $element.find('.inf-table-spacer')
 
-
+      $scope.pageSizeInit = 10
+      $scope.pageSize = $scope.pageSizeInit
+      $scope.pageSizeDelta = $scope.pageSizeInit
+      $scope.pageOffset = 0
+      $scope.manualLoad = true
+      manualLoad = $scope.manualLoad
       windowEl = angular.element($window)
       handler = ($scope) -> $scope.scroll = windowEl.scrollTop()
 
-      unless $scope.manualLoad == true
+      unless manualLoad # $scope.manualLoad == true
         windowEl.on 'scroll', ->
           $timeout -> handler($scope)
 
@@ -46,7 +51,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       checkLoadingPromise = $q.when true
 
       loadMoreIfNeeded = ->
-        unless $scope.manualLoad == true
+        unless manualLoad # $scope.manualLoad == true
           checkLoadingPromise = checkLoadingPromise.then ->
             windowBottom = $scope.scroll + windowEl.height()
             tableBodyBottom = body.offset().top + body.height()
@@ -62,19 +67,35 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       $scope.$watch 'loading', (loading) ->
         loadMoreIfNeeded() unless loading
 
-      $scope.doManualLoad = ->
-        # $scope.manualLoad = false
-        $scope.loadMore(100)
+      $scope.doLoadLess = ->
+        $scope.pageSize -= $scope.pageSizeDelta
+        $scope.incSize(-$scope.pageSizeDelta)
 
+      $scope.doLoadMore = ->
+        # $scope.manualLoad = false
+        $scope.pageSize += $scope.pageSizeDelta
+        $scope.incSize($scope.pageSizeDelta)
+
+      $scope.doLoadPrevious = ->
+        if ($scope.pageOffset > 0)
+          $scope.pageOffset -= $scope.pageSize
+          if ($scope.pageOffset < 0)
+            $scope.pageSize += $scope.pageOffset
+            $scope.pageOffset = 0
+          $scope.loadPrevious($scope.pageSize)
+
+      $scope.doLoadNext = ->
+        if (($scope.pageOffset + $scope.pageSize) < $scope.list.total)
+          $scope.pageOffset += $scope.pageSize
+#          if ($scope.pageOffset )
+          $scope.loadNext($scope.pageSize)
 
       getRowAndIndexBefore = (tableRowIndex, originalRowAndIndex) ->
         return {row: null, index: -1} unless $scope.rows
         return {row: null, index: -1} unless $scope.rows.length > 0
-
         return {index: -1, row: null} if tableRowIndex == 0
 
         counter = tableRowIndex
-
         for row, i in $scope.rows
           counter++ if i == originalRowAndIndex.index
           counter--
@@ -82,7 +103,6 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
           if counter <= 0
             return {index: i, row: row}
         return { index: $scope.rows.length - 1, row: $scope.rows[-1] }
-
 
       $scope.sortableOptions =
         cursor: 'move'
@@ -98,8 +118,6 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
               break
 
           rowAndIndex = getRowAndIndexBefore $ui.item.index(), original
-
-
 
           return if original.index is rowAndIndex.index
 

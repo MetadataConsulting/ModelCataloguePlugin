@@ -4,7 +4,7 @@
       <thead>
       <tr>
         <td colspan="2">
-          <span class="pull-right text-muted" ng-if="total != 0"><em>{{elements.length}} of {{total}}</em></span>
+          <span class="pull-right text-muted" ng-if="total != 0"><em>{{pageOffset + 1}} - {{pageOffset + elements.length}} of {{total}}</em></span>
           <span class="pull-right text-muted" ng-if="total == 0"><em>Empty</em></span>
         </td>
       </tr>
@@ -73,37 +73,38 @@
       </tr>
       </tbody>
       <tfoot class="table-footer">
-      <tr>
-        <td colspan="{{columns.length}}">
-          <table class="table">
-            <tfoot>
-            <tr class="active" ng-if="loading">
-              <td class="text-center">
-                <span class="fa fa-fw fa-refresh fa-spin"></span>
-              </td>
-              <td class="col-md-1"></td>
-            </tr>
-            <tr class="active cursor-pointer"
-                ng-if="!loading && manualLoad && total != elements.length && elements.length > 0"
-                ng-click="doManualLoad()">
-              <td class="text-center">
-                <span class="fa fa-angle-double-down"></span>
-              </td>
-              <td class="col-md-1"></td>
-            </tr>
-            <tr class="active inf-table-footer-action cursor-pointer" ng-click="footerAction.run()">
-              <td class="text-center">
-                <span class="fa" ng-class="getFooterCentralIconClass()"></span>
-              </td>
-              <td class="col-md-1">
-                <span class="pull-right text-muted" ng-if="total != 0"><em>{{elements.length}} of {{total}}</em></span>
-                <span class="pull-right text-muted" ng-if="total == 0"><em>Empty</em></span>
-              </td>
-            </tr>
-            </tfoot>
-          </table>
-        </td>
-      </tr>
+        <tr>
+          <td colspan="{{columns.length}}">
+            <table class="table">
+              <tfoot>
+                <tr class="active" ng-if="loading">
+                  <td class="text-center" colspan="3">
+                    <span class="fa fa-fw fa-refresh fa-spin"></span>
+                  </td>
+                </tr>
+                <tr class="active cursor-pointer" ng-if="!loading && manualLoad && total != elements.length && elements.length > 0">
+                  <td class="text-center">
+                    <span class="fa fa-angle-double-left" ng-if="previous && previous.url" ng-click="doLoadPrevious()"></span>
+                  </td>
+                  <td class="text-center">
+                    <span class="fa fa-angle-double-up" ng-if="pageSize > pageSizeInit" ng-click="doLoadLess()"></span><br></span>
+                    <span class="fa fa-angle-double-down" ng-click="doLoadMore()"></span>
+                  </td>
+                  <td class="text-center" ng-if="next && next.url && next.size > 0" ng-click="doLoadNext()">
+                    <span class="fa fa-angle-double-right"></span>
+                  </td>
+                  <!--<td class="col-md-1"></td>-->
+                </tr>
+                <tr class="active">
+                  <td class="text-center" colspan="3">
+                    <span class="text-muted" ng-if="total != 0"><em>{{pageOffset + 1}} - {{pageOffset + elements.length}} of {{total}}</em></span>
+                    <span class="text-muted" ng-if="total == 0"><em>Empty</em></span>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </td>
+        </tr>
       </tfoot>
     </table>
   </div>

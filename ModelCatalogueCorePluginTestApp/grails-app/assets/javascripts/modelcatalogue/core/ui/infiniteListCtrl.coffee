@@ -14,9 +14,6 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       enumerations.push "#{enumeration.key}: #{enumeration.value}"
     enumerations.join('\n')
 
-
-
-
   getCellForColumn = (element, column) ->
     cell =
       value:        $scope.evaluateValue(column.value, element)
@@ -109,7 +106,11 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       $scope.elements.push element
       $scope.rows.push getRowForElement($scope.transform $element: element)
 
-
+  replaceElements = (list) ->
+    $scope.elements = []
+    $scope.rows = []
+    $scope.selected = -1
+    addElements(list)
 
   onListUpdate = (newList) ->
     if newList
@@ -120,12 +121,14 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       $scope.elements = []
       addElements(newList.list)
       $scope.next     = newList.next
+      $scope.previous = newList.previous
       $scope.total    = newList.total
       $scope.reports  = newList.availableReportDescriptors
     else
       $scope.rows     = []
       $scope.elements = []
       $scope.next     = undefined
+      $scope.previous = undefined
       $scope.total    = 0
       $scope.reports  = []
       $scope.loading  = false
@@ -150,25 +153,87 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
   $scope.loadMore = (max) ->
     if $scope.total > $scope.elements.length
       $scope.loading = true
-
       currentTime = new Date().getTime()
-
       if $scope.next
         if max
           $scope.next.url = URI($scope.next.url).removeSearch('max').addSearch('max', max).toString()
-
         $timeout($scope.next, Math.max(1, $scope.lastLoadTime + $scope.timeBetweenLoading - currentTime)).then (result) ->
           $scope.lastLoadTime = new Date().getTime()
           $scope.loading = false
           if not result?.list?
             $scope.next = undefined
+            $scope.previous = undefined
           else
             addElements(result.list)
             $scope.next = result.next
+            $scope.previous = result.previous
+            $scope.page = result.page
     else
       $scope.loading = false
 
+  $scope.incSize = (increment) ->
+    if $scope.total > $scope.elements.length && $scope.next && $scope.next.url
+      url = URI.parse($scope.next.url)
+      next = URI.parseQuery(url.query)
+      newMax = parseInt(next.max, 10)
+      $scope.next.url = URI($scope.next.url).removeSearch('offset').addSearch('offset', parseInt(next.offset, 10) - newMax).removeSearch('max').addSearch('max', newMax + increment).toString()
+      $scope.loading = true
+      currentTime = new Date().getTime()
+      $timeout($scope.next, Math.max(1, $scope.lastLoadTime + $scope.timeBetweenLoading - currentTime)).then (result) ->
+        $scope.lastLoadTime = new Date().getTime()
+        $scope.loading = false
+        if not result?.list?
+          $scope.next = undefined
+          $scope.previous = undefined
+        else
+          replaceElements(result.list)  # addElements(result.list)
+          $scope.next = result.next
+          $scope.previous = result.previous
+          $scope.page = result.page
+    else
+      $scope.loading = false
 
+  $scope.loadNext = (max) ->
+    if $scope.total > $scope.elements.length
+      $scope.loading = true
+      currentTime = new Date().getTime()
+      if $scope.next
+        if max
+          $scope.next.url = URI($scope.next.url).removeSearch('max').addSearch('max', max).toString()
+        $timeout($scope.next, Math.max(1, $scope.lastLoadTime + $scope.timeBetweenLoading - currentTime)).then (result) ->
+          $scope.lastLoadTime = new Date().getTime()
+          $scope.loading = false
+          if not result?.list?
+            $scope.next = undefined
+            $scope.previous = undefined
+          else
+            replaceElements(result.list)  # addElements(result.list)
+            $scope.next = result.next
+            $scope.previous = result.previous
+            $scope.page = result.page
+    else
+      $scope.loading = false
+
+  $scope.loadPrevious = (max) ->
+    if $scope.total > $scope.elements.length
+      $scope.loading = true
+      currentTime = new Date().getTime()
+      if $scope.previous
+        if max
+          $scope.previous.url = URI($scope.previous.url).removeSearch('max').addSearch('max', max).toString()
+        $timeout($scope.previous, Math.max(1, $scope.lastLoadTime + $scope.timeBetweenLoading - currentTime)).then (result) ->
+          $scope.lastLoadTime = new Date().getTime()
+          $scope.loading = false
+          if not result?.list?
+            $scope.next = undefined
+            $scope.previous = undefined
+          else
+            replaceElements(result.list)  # addElements(result.list)
+            $scope.next = result.next
+            $scope.previous = result.previous
+            $scope.page = result.page
+    else
+      $scope.loading = false
 
   $scope.$watch 'list', onListUpdate
 
