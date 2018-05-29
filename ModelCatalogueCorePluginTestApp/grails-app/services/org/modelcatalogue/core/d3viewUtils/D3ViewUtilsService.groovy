@@ -13,6 +13,8 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.PrimitiveType
+import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipConfiguration
 import org.modelcatalogue.core.RelationshipInfo
@@ -63,7 +65,7 @@ class D3ViewUtilsService {
             type: lowerCamelCaseDomainName(catalogueElement.getClass())
         )
         ret = addRelationships(catalogueElement, ret)
-        
+
         return ret
     }
 
@@ -149,8 +151,9 @@ class D3ViewUtilsService {
 
 
     D3JSON dataElementD3Json(DataElement dataElement) {
+
         D3JSON ret = basicD3JSON(dataElement)
-        
+
         ret.loadedChildren= true // Just load data type, no laziness
 
         if (dataElement.dataType) {
@@ -163,18 +166,23 @@ class D3ViewUtilsService {
     }
 
     D3JSON dataTypeD3Json(DataType dataType) {
-        D3JSON ret = new D3JSON(
-            name: dataType.name,
-            id: dataType.id,
-            description: dataType.description,
-            angularLink: angularLink(dataType.dataModel.id, dataType.id, DataType),
-            
-            type: lowerCamelCaseDomainName(DataType),
-        )
+        D3JSON ret = basicD3JSON(dataType)
         ret.loadedChildren = true // No children, so "already loaded children."
-        
+
+
+        if (dataType.rule) {
+            ret.rule = dataType.rule
+        }
         if (dataType instanceof EnumeratedType) {
             ret.enumerations = ((EnumeratedType) dataType).enumerations
+        }
+        if (dataType instanceof PrimitiveType) {
+            ret.measurementUnitName = dataType.measurementUnit.name
+            ret.measurementUnitSymbol = dataType.measurementUnit.symbol
+        }
+        if (dataType instanceof ReferenceType) {
+            ret.referenceName = dataType.dataClass.name
+            ret.referenceAngularLink = angularLink(dataType.dataClass)
         }
 
         return ret
@@ -254,15 +262,23 @@ class D3JSON {
     long id
     String description
 
+    String angularLink
+    String type
+
     boolean loadedChildren = false // false by default; children will be loaded later.
     boolean loading = false
 
-    String angularLink
-    String type
-    Map<String,String> enumerations
     List<D3JSON> children
 
     Map<String, List<RelationJson>> relationships
+
+
+    Map<String,String> enumerations
+    String rule
+    String measurementUnitName
+    String measurementUnitSymbol
+    String referenceName
+    String referenceAngularLink
 
 
 

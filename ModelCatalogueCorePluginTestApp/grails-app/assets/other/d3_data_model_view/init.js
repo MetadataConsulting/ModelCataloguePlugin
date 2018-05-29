@@ -76,13 +76,19 @@ var initD3 = (function() {
       loadedChildren: boolean,
       loading: boolean,
 
-      enumerations: ?Object,
-
-      relationships: {[string]: Relation[]},
 
       children: ?Array<D3JSON>,
 
       _children: ?Array<D3JSON>,
+
+      relationships: {[string]: Relation[]},
+
+      enumerations: ?{[string]: string},
+      rule: string,
+      measurementUnitName: string,
+      measurementUnitSymbol: string,
+      referenceName: string,
+      referenceAngularLink: string,
 
       x: number,
       y: number,
@@ -124,6 +130,9 @@ var initD3 = (function() {
       " <i>(Click to see Advanced View)</i>" + "</b>" + "<br/>" +
       "<u>Type:</u> " + ucFirst(d.type) + "<br/>" +
       (d.description? "<u>Description:</u> " + d.description + "<br/>" : "") +
+       (d.rule ? "<u>Rule:</u> " + d.rule + "<br/>" : "") +
+       (d.measurementUnitName ? "<u>Measurement Unit:</u> " + d.measurementUnitName + " (" + d.measurementUnitSymbol + ")<br/>" : "") +
+       (d.referenceName ? "<u>References:</u> " + "<a href='" + d.referenceAngularLink +  "' target='_blank'>" + d.referenceName + "</a>" + "<br/>" : "") +
        (d.enumerations ? enumerate(d.enumerations): ""))
 
       $("#d3-info-metadata").html("No metadata")
@@ -160,17 +169,18 @@ var initD3 = (function() {
 
 
   function writeMessage(text, type) {
-    type = type || 'info' // info by default
-    return $.notify({
-      'message': (new Date().toLocaleString()) + " " + text
-    }, {
-      'delay': 200,
-      'type': type,
-        'placement': {
-          'from': "bottom",
-          'align': "left"
-      }
-    })
+    console.log(text)
+    // type = type || 'info' // info by default
+    // return $.notify({
+    //   'message': (new Date().toLocaleString()) + " " + text
+    // }, {
+    //   'delay': 200,
+    //   'type': type,
+    //     'placement': {
+    //       'from': "bottom",
+    //       'align': "left"
+    //   }
+    // })
   }
 
   /**
@@ -287,7 +297,7 @@ var initD3 = (function() {
 
         if (!d.loading) { // i.e. !d.loadedChildren
 
-          var notify = writeMessage("Loading children for " + typeAndName(d) + "...")
+          writeMessage("Loading children for " + typeAndName(d) + "...")
           d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough. Not really a completely well-thought-out concurrency thing.
           $.ajax({
             url: serverUrl + "/dataModel/basicViewChildrenData/" + d.type + "/" + d.id
@@ -302,14 +312,12 @@ var initD3 = (function() {
               if (data.children.length > 0) {
                 d._children = data.children;
               }
-              notify.close()
               writeMessage("Loading children for " + typeAndName(d) + " succeeded!", 'success')
               toggle(d);
               update(d);
             }
 
             else {
-              notify.close()
               if (!data.canAccessDataModel) {
                 writeMessage("You do not have access to the data model of " + typeAndName(d) + " (you may have been logged out) or it does not exist.", 'danger')
                 // TODO: If you can't access the data model because you've been logged out, it's more appropriate that d.loadedChildren remains false, so the user can try to load the children again once logged in. But we need a more fine-grained response from the controller to differentiate the reason for inability to access.
