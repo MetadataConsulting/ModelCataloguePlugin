@@ -201,12 +201,16 @@ var initD3 = (function() {
     update(root);
   };
 
+  var dataTypeColour = "green"
   // node colours
   var coloursMap = {
     "dataModel": "blueviolet",
     "dataClass": "blue",
     "dataElement": "gold",
-    "dataType": "green"
+    "dataType": dataTypeColour,
+    "enumeratedType": "lawngreen",
+    "primitiveType": "olive",
+    "referenceType": "mediumseagreen"
   }
 
 
@@ -283,7 +287,7 @@ var initD3 = (function() {
 
         if (!d.loading) { // i.e. !d.loadedChildren
 
-          writeMessage("Loading children for " + typeAndName(d) + "...")
+          var notify = writeMessage("Loading children for " + typeAndName(d) + "...")
           d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough. Not really a completely well-thought-out concurrency thing.
           $.ajax({
             url: serverUrl + "/dataModel/basicViewChildrenData/" + d.type + "/" + d.id
@@ -298,12 +302,14 @@ var initD3 = (function() {
               if (data.children.length > 0) {
                 d._children = data.children;
               }
+              notify.close()
               writeMessage("Loading children for " + typeAndName(d) + " succeeded!", 'success')
               toggle(d);
               update(d);
             }
 
             else {
+              notify.close()
               if (!data.canAccessDataModel) {
                 writeMessage("You do not have access to the data model of " + typeAndName(d) + " (you may have been logged out) or it does not exist.", 'danger')
                 // TODO: If you can't access the data model because you've been logged out, it's more appropriate that d.loadedChildren remains false, so the user can try to load the children again once logged in. But we need a more fine-grained response from the controller to differentiate the reason for inability to access.
