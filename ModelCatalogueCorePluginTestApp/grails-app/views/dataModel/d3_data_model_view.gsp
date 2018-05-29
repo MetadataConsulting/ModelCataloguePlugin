@@ -44,30 +44,36 @@
   </head>
 
   <body>
-    <div>
+    <div id="container">
+      <div id="column-left" class="column column-left">
+        &emsp;<b>Basic View</b> | <a id="advanced-view-link" href="" target="_blank">Advanced View</a>
 
-      <div id="body" class="column column-left">
-      <!--<div id="footer">
+        <div id="svg-body">
+          <!--<div id="footer">
         d3.layout.tree
         <div class="hint">click or option-click to expand or collapse</div>
       </div>-->
+        </div>
+      </div>
+
+      <div class="splitter column">
       </div>
 
       <div id="d3-info" class="column column-right">
 
         <div class="info-box info-box-limited">
-          <h1><u>Data Model:</u></h1>
-          <div id="d3-info-data-model"></div>
+
+          <div id="d3-info-name-description"></div>
         </div>
 
         <div class="info-box info-box-limited">
-          <h2><u>Element (Last Click):</u></h2>
-          <div id="d3-info-element"></div>
+          <h2><u>Metadata:</u></h2>
+          <div id="d3-info-metadata"></div>
         </div>
 
         <div class="info-box">
-          <h2><u>Element (Last Mouse-Over):</u></h2>
-          <div id="d3-info-element-last-mouseover"></div>
+          <h2><u>Relationships:</u></h2>
+          <div id="d3-info-relationships"></div>
         </div>
 
 

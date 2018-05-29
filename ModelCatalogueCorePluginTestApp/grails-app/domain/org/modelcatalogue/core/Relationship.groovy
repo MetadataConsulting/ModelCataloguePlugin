@@ -12,8 +12,8 @@ import org.modelcatalogue.core.util.*
         * ----------------- ------------------ ------------- -----------------------  ----------------------
         | Source           | Relationship     | Destination | Source->Destination    |  Destination<-Source |
         | ---------------- | -----------------| ----------- | ---------------------- | -------------------- |
-        | Model            | [containment]    | DataElement |  "contains"            |  "contained in"      |
-        | Model            | [heirachical]    | Model       | "parentOf"             | "ChildOf"            |
+        | Model            | [containment]    | DataElement | "contains"             | "contained in"       |
+        | Model            | [hierarchical]   | Model       | "parentOf"             | "ChildOf"            |
         | DataElement      | [supersession]   | DataElement | "supercedes"           | "supercededBy"       |
 
 *

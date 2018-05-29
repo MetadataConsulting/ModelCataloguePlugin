@@ -112,7 +112,7 @@ class DataModelAclService {
         hasAdministratorPermission(dataModel)
     }
 
-    protected DataModel dataModelFromInstance(Object instance) {
+    DataModel dataModelFromInstance(Object instance) {
         if ( instance instanceof DataModel ) {
             return instance
         } else if ( instance instanceof CatalogueElement ) {
