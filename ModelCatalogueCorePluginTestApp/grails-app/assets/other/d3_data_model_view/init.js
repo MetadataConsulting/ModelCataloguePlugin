@@ -1,6 +1,8 @@
 //= require d3/d3.min.js
 //= require validator-js/validator.min.js
 //= require underscore/underscore-min.js
+//= require remarkable-bootstrap-notify/dist/bootstrap-notify.min.js
+//= require jquery-resizable/dist/jquery-resizable.js
 //= require_self
 // @flow
 /**
@@ -11,6 +13,11 @@
 var serverUrl = ""
 
 var initD3 = (function() {
+
+  $('#column-left').resizable({
+    handleSelector: ".splitter",
+    resizeHeight: false
+  })
 
   //// D3 Setup stuff
   // dimensions of page
@@ -29,7 +36,7 @@ var initD3 = (function() {
     .projection(function(d) { return [d.y, d.x]; });
 
   // visualization pane
-  var vis = d3.select("#body").append("svg:svg")
+  var vis = d3.select("#svg-body").append("svg:svg")
     .attr("width", w + m[1] + m[3])
     .attr("height", h + m[0] + m[2])
     .call(d3.behavior.zoom().on("zoom", function () {
@@ -39,7 +46,7 @@ var initD3 = (function() {
     .attr("transform", "translate(" + (m[3] + 20) + "," + m[0] + ")");
 
   // Define the div for the tooltip
-  var div = d3.select("#body").append("div")
+  var div = d3.select("#svg-body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
@@ -50,8 +57,9 @@ var initD3 = (function() {
   function parseModelToJS(jsonString /*: string */) /*: Object */ {
     jsonString=jsonString.replace(/\"/g,'"');
     //jsonString=jsonString.replace(/&quot;/g, '"');
-    jsonString=jsonString.replace(/&#92;n/g, ' '); // i.e. \n
-    jsonString=validator.unescape(jsonString);h // unescape e.g. &amp;
+    jsonString=jsonString.replace(/&#92;n/g, '<br/>'); // i.e. \n
+    jsonString=jsonString.replace(/&#92;t/g, '   '); // i.e. \t
+    jsonString=validator.unescape(jsonString); // unescape e.g. &amp;
     var jsonObject=$.parseJSON(jsonString);
     return jsonObject
   }
@@ -65,19 +73,37 @@ var initD3 = (function() {
       angularLink: string,
       type: string,
 
+      status: string,
+      dateCreated: string,
+      lastUpdated: string,
+      metadata: {[string]: string},
+
       loadedChildren: boolean,
       loading: boolean,
 
-      enumerations: ?Object,
 
       children: ?Array<D3JSON>,
 
       _children: ?Array<D3JSON>,
 
+      relationships: {[string]: Relation[]},
+
+      enumerations: ?{[string]: string},
+      rule: string,
+      measurementUnitName: string,
+      measurementUnitSymbol: string,
+      referenceName: string,
+      referenceAngularLink: string,
+
       x: number,
       y: number,
       x0: number,
       y0: number
+    }
+
+    type Relation = {
+      name: string,
+      angularLink: string
     }
    */
 
@@ -103,12 +129,26 @@ var initD3 = (function() {
    * @param d node data
    * @returns {string}
    */
-  function info(d /*: D3JSON */) {
-    return "<b>Name: "  + "<a href='" + d.angularLink +  "' target='_blank'>" + d.name + "</a>" + "<br/>" +
+  function info(d /*: D3JSON */) /*: void */ {
+     $("#d3-info-name-description").html(
+       "<b>Name: "  + "<a href='" + d.angularLink +  "' target='_blank'>" + d.name + "</a>" + "<br/>" +
       " <i>(Click to see Advanced View)</i>" + "</b>" + "<br/>" +
       "<u>Type:</u> " + ucFirst(d.type) + "<br/>" +
       (d.description? "<u>Description:</u> " + d.description + "<br/>" : "") +
-      (d.enumerations ? enumerate(d.enumerations): "")
+       (d.rule ? "<u>Rule:</u> " + d.rule + "<br/>" : "") +
+       (d.measurementUnitName ? "<u>Measurement Unit:</u> " + d.measurementUnitName + " (" + d.measurementUnitSymbol + ")<br/>" : "") +
+       (d.referenceName ? "<u>References:</u> " + "<a href='" + d.referenceAngularLink +  "' target='_blank'>" + d.referenceName + "</a>" + "<br/>" : "") +
+       (d.enumerations ? "<u>Enumerations:</u> <br/>" + displayMap(d.enumerations): ""))
+
+      $("#d3-info-metadata").html(
+        "<u>Status:</u> " + d.status + "<br/>" +
+        "<u>Date Created:</u> " + d.dateCreated + "<br/>" +
+        "<u>Date Updated:</u> " + d.lastUpdated + "<br/>" +
+        (d.metadata ? "<u>Metadata:</u> <br/>" + displayMap(d.metadata) + "<br/>" : "")
+
+      )
+
+      $("#d3-info-relationships").html((d.relationships ? displayRelationships(d.relationships): "No Relationships"))
   }
 
   /**
@@ -116,8 +156,8 @@ var initD3 = (function() {
    * @param map
    * @returns {string}
    */
-  function enumerate(map) {
-    var ret = "<u>Enumerations:</u> <br/> <ul>"
+  function displayMap(map) {
+    var ret = "<ul>"
     Object.keys(map).forEach(function(key) {
       ret = ret + "<li>" + key + ": " + map[key] + "</li>"
       console.log(key, map[key]);
@@ -125,12 +165,34 @@ var initD3 = (function() {
     return ret = ret + "</ul>"
   }
 
-  function writeMessage(text) {
-    console.log((new Date().toLocaleString()))
-    console.log(text)
-
+  function displayRelationships(relationships /*:{[string]: Relation[]} */) /*: string */ {
+    var ret = ""
+    Object.keys(relationships).forEach(function(relationshipName /*: string */){
+      var relations /*: Relation[]*/= relationships[relationshipName]
+      if (relations.length > 0) {
+        relations.forEach(function(relation) {
+          ret = ret + relationshipName + ": " + "<a href='" + relation.angularLink + "' target='_blank'>" + relation.name + "</a>" + "<br/>"
+        })
+      }
+    })
+    return ret
   }
 
+
+  function writeMessage(text, type) {
+    console.log(text)
+    // type = type || 'info' // info by default
+    // return $.notify({
+    //   'message': (new Date().toLocaleString()) + " " + text
+    // }, {
+    //   'delay': 200,
+    //   'type': type,
+    //     'placement': {
+    //       'from': "bottom",
+    //       'align': "left"
+    //   }
+    // })
+  }
 
   /**
    * Initialize
@@ -140,7 +202,9 @@ var initD3 = (function() {
     root = json;
     root.x0 = h / 2;
     root.y0 = 0;
-    $('#d3-info-data-model').html(info(root));
+    info(root)
+    $('#advanced-view-link').attr('href', root.angularLink)
+
 
     function toggleAll(d) {
       if (d.children) {
@@ -158,12 +222,16 @@ var initD3 = (function() {
     update(root);
   };
 
+  var dataTypeColour = "green"
   // node colours
   var coloursMap = {
     "dataModel": "blueviolet",
     "dataClass": "blue",
     "dataElement": "gold",
-    "dataType": "green"
+    "dataType": dataTypeColour,
+    "enumeratedType": "lawngreen",
+    "primitiveType": "olive",
+    "referenceType": "mediumseagreen"
   }
 
 
@@ -224,12 +292,12 @@ var initD3 = (function() {
     */
 
     // load children if not loaded
-    function onNodeClick(d) {
+    function onNodeClick(d /*: D3JSON */) {
       var path = pathFromRoot(d)
       console.log("Path from root: " + namesFromPath(path))
       console.log("Angular pathstring: " + angularTreeviewPathString(path))
 
-      $('#d3-info-element').html(info(d)); // display info
+      info(d); // display info
 
       if (d.loadedChildren && !d.loading) {
         toggle(d);
@@ -255,25 +323,25 @@ var initD3 = (function() {
               if (data.children.length > 0) {
                 d._children = data.children;
               }
-              writeMessage("Loading children for " + typeAndName(d) + " succeeded!")
+              writeMessage("Loading children for " + typeAndName(d) + " succeeded!", 'success')
               toggle(d);
               update(d);
             }
 
             else {
               if (!data.canAccessDataModel) {
-                writeMessage("You do not have access to the data model of " + typeAndName(d) + " or it does not exist.")
+                writeMessage("You do not have access to the data model of " + typeAndName(d) + " (you may have been logged out) or it does not exist.", 'danger')
                 // TODO: If you can't access the data model because you've been logged out, it's more appropriate that d.loadedChildren remains false, so the user can try to load the children again once logged in. But we need a more fine-grained response from the controller to differentiate the reason for inability to access.
               }
               else { // !data.caseHandled
-                writeMessage("Loading children is not handled for this case.")
+                writeMessage("Loading children is not handled for this case.", 'danger')
               }
 
             }
 
 
           }, function(jqXHR, textStatus, errorThrown) { // request failure
-            writeMessage("Loading children for " + typeAndName(d) + " failed with error message: " + errorThrown)
+            writeMessage("Loading children for " + typeAndName(d) + " failed with error message: " + errorThrown, 'danger')
             d.loading = false
             // end loading
           })
@@ -302,7 +370,7 @@ var initD3 = (function() {
 
     // display info on mouseover
     function infoMouseover(d){
-      $('#d3-info-element-last-mouseover').html(info(d)); // display info
+      // don't do anything anymore. Maybe this would be useful another time.
     }
 
     // ENTER any new nodes at the parent's previous position.

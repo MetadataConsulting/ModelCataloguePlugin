@@ -1,10 +1,4 @@
-#body {
-    background: url(texture-noise.png);
-    overflow: scroll;
-    margin: 0;
-    font-size: 14px;
-    font-family: "Helvetica Neue", Helvetica;
-}
+
 /*
 #chart, #header, #footer {
     position: absolute;
@@ -36,22 +30,42 @@
     text-align: right;
 }
 */
-
+#container {
+    display: flex;
+    flex-direction: row;
+}
 .column {
-    float: left;
 
+    overflow: scroll;
     height: 1200px;
 }
 
 .column-left {
+    flex: 0 0 auto;
     width: 75%;
 }
 
+#column-left {
+    background: url(texture-noise.png);
+    margin: 0;
+    font-size: 14px;
+    font-family: "Helvetica Neue", Helvetica;
+}
+
+.splitter {
+    flex: 0 0 auto;
+    width: 18px;
+    background: url(vsizegrip.png) center center no-repeat #535353;
+    min-height: 200px;
+    cursor: col-resize;
+}
+
 .column-right {
+    flex: 1 1 auto;
     width: 25%;
-    overflow: scroll;
     border: solid 3px;
 }
+
 
 /*.column-right-2 {*/
     /*width: 20%;*/
