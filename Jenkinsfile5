@@ -1,0 +1,20 @@
+pipeline {
+  agent any
+  options {
+    disableConcurrentBuilds()
+  }
+  stages {
+    stage('Test Execute') {
+      steps {
+        dir(path: 'ModelCatalogueCorePluginTestApp') {
+            sh 'npm install'
+            sh 'bower install'
+            wrap([$class: 'Xvfb']) {
+              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: AddDataModelImportSpec EditDataElementSpec AddUsernameToFavouriteSpec QuickSearchSpec RelationshipIsBaseForSpec RelationshipIsImportedBySpec RelationshipImportsSpec CreateDataTypeAndSelectPrimitiveSpec ChangeLogForEligibilitySpec DataClassWizardSpec ChangesSpec DataTypeWizardSpec DataElementWizardSpec AssetWizardSpec BatchAndActionsSpec SearchFunctionalSpec ValidationRuleWizardSpec RegisterSpec MeasurementUnitWizardSpec DataModelWizardSpec UserIsAbleToDownloadAnAssetSpec CloneUnauthorizedElementSpec CuratorCanGenerateSuggestionsUsingMappingUtilitySpec ValidateValueAgainstDataTypeSpec CannotCreateDataElementWithUnauthorizedDataTypeSpec'
+            }
+
+        }
+      }
+    }
+  }
+}
