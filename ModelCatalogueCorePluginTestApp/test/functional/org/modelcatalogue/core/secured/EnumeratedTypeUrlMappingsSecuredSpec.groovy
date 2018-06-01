@@ -9,7 +9,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
 @Ignore
-@IgnoreIf({ System.getProperty('spock.ignore.secured') })
+//@IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class EnumeratedTypeUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {

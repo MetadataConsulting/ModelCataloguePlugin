@@ -9,7 +9,7 @@ import spock.lang.Unroll
 import spock.lang.IgnoreIf
 
 @Ignore
-@IgnoreIf({ System.getProperty('spock.ignore.secured') })
+//@IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class ModelCatalogueCorePluginUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {

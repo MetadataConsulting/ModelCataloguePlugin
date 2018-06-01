@@ -7,8 +7,9 @@ import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Ignore
 import spock.lang.Unroll
 import spock.lang.IgnoreIf
+
 @Ignore
-@IgnoreIf({ System.getProperty('spock.ignore.secured') })
+//@IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class DataElementUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {

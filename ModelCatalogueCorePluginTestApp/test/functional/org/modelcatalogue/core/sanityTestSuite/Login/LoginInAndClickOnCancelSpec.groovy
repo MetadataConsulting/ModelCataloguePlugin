@@ -7,7 +7,7 @@ import spock.lang.IgnoreIf
 import spock.lang.Ignore
 
 @Ignore
-@IgnoreIf({ !System.getProperty('geb.env') })
+//@IgnoreIf({ !System.getProperty('geb.env') })
 class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
 
     void clickOnCancel() {

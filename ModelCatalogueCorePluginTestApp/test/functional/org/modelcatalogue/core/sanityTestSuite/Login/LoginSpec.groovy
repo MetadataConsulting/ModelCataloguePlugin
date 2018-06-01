@@ -8,7 +8,7 @@ import spock.lang.Ignore
 import spock.lang.Unroll
 
 @Ignore
-@IgnoreIf({ !System.getProperty('geb.env') })
+//@IgnoreIf({ !System.getProperty('geb.env') })
 class LoginSpec extends AbstractModelCatalogueGebSpec {
 
     @Unroll

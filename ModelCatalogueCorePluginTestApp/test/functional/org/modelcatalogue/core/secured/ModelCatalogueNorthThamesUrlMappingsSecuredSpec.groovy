@@ -7,7 +7,7 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
 @Ignore
-@IgnoreIf({ System.getProperty('spock.ignore.secured') })
+//@IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class ModelCatalogueNorthThamesUrlMappingsSecuredSpec extends GebSpec {
 
     @Unroll
