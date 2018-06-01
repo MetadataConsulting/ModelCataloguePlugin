@@ -598,6 +598,9 @@ class ElasticSearchService implements SearchCatalogue {
         //Index RelationshipType
         indexDomains(RelationshipType, session)
         log.info "Reindexing indexDomains(RelationshipType, session)"
+        //Index ValidationRule
+        indexDomains(ValidationRule, session)
+        log.info "Reindexing indexDomains(ValidationRule, session)"
         //Index Users
         indexDomains(User, session)
         log.info "Reindexing indexDomains(User, session)"
