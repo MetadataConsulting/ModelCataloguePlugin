@@ -17,6 +17,7 @@ import spock.lang.Title
 - Edit the created data class and save
 - Create a new Tag
 ''')
+@Ignore
 class HistoryIsPopulatedAccordingToModelActivitySpec extends GebSpec {
     def "Verify that the history is populated according to activity made on a model"() {
         given:

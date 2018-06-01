@@ -5,8 +5,10 @@ import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Unroll
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
+@Ignore
 @IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class DataModelPolicyUrlMappingsSecuredSpec extends GebSpec {
 
@@ -28,10 +30,10 @@ class DataModelPolicyUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataModelPolicy',
-        '/api/modelCatalogue/core/dataModelPolicy/$id/validate',
-        '/api/modelCatalogue/core/dataModelPolicy/validate',
-                ]
+                '/api/modelCatalogue/core/dataModelPolicy',
+                '/api/modelCatalogue/core/dataModelPolicy/$id/validate',
+                '/api/modelCatalogue/core/dataModelPolicy/validate',
+        ]
     }
 
     @Unroll
@@ -44,10 +46,10 @@ class DataModelPolicyUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataModelPolicy',
-        '/api/modelCatalogue/core/dataModelPolicy/search/$search',
-        '/api/modelCatalogue/core/dataModelPolicy/$id',
-                ]
+                '/api/modelCatalogue/core/dataModelPolicy',
+                '/api/modelCatalogue/core/dataModelPolicy/search/$search',
+                '/api/modelCatalogue/core/dataModelPolicy/$id',
+        ]
     }
 
     @Unroll
@@ -64,8 +66,8 @@ class DataModelPolicyUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataModelPolicy/$id',
-                ]
+                '/api/modelCatalogue/core/dataModelPolicy/$id',
+        ]
     }
 
     @Unroll
@@ -82,7 +84,7 @@ class DataModelPolicyUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataModelPolicy/$id',
+                '/api/modelCatalogue/core/dataModelPolicy/$id',
         ]
     }
 }

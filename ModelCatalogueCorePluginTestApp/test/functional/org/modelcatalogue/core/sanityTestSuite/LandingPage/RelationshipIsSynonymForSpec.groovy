@@ -16,16 +16,19 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String dataModel ="a#role_item_catalogue-element-menu-item-link"
-    private static final String createRelationship ="a#create-new-relationship-menu-item-link>span:nth-child(3)"
-    private static final String  destination ="h3.panel-title"
-    private static final String  plusButton="#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.col-md-1 > a > span"
-    private static final String  undo="#role_item_undo-changeBtn"
-    private static final String   isSynonymFor ="#type > option:nth-child(6)"
-    private static final String  search ="input#element"
-    private static final String  table ="#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-7 > span > span > code"
+    private static final String dataModel = "a#role_item_catalogue-element-menu-item-link"
+    private static final String createRelationship = "a#create-new-relationship-menu-item-link>span:nth-child(3)"
+    private static final String destination = "h3.panel-title"
+    private static
+    final String plusButton = "#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.col-md-1 > a > span"
+    private static final String undo = "#role_item_undo-changeBtn"
+    private static final String isSynonymFor = "#type > option:nth-child(6)"
+    private static final String search = "input#element"
+    private static
+    final String table = "#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-7 > span > span > code"
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
 
     @Ignore
@@ -44,19 +47,19 @@ class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
         then:
         at DataModelPage
 
-        and:'verify title of the page '
+        and: 'verify title of the page '
         check rightSideTitle contains 'Test 3'
     }
 
     @Ignore
     def "navigate to the top menu and select create relationship "() {
 
-        when:'navigate to createRelationship page'
+        when: 'navigate to createRelationship page'
         click dataModel
         and:
         click createRelationship
 
-        then:'verify that the text Destination is displayed'
+        then: 'verify that the text Destination is displayed'
         check destination displayed
     }
 
@@ -82,16 +85,16 @@ class RelationshipIsSynonymForSpec extends AbstractModelCatalogueGebSpec {
         click plusButton
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
-        and:'click on the undo button'
+        and: 'click on the undo button'
         click undo
 
-        and:' confirm your action'
+        and: ' confirm your action'
         click modalPrimaryButton
 
         and:
         click plusButton
 
-        then:'check that undo button is disabled'
+        then: 'check that undo button is disabled'
         check undo isDisabled()
     }
 }

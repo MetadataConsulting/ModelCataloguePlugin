@@ -4,7 +4,9 @@ import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.IgnoreIf
 import spock.lang.Unroll
+import spock.lang.Ignore
 
+@Ignore
 @IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class ReindexCatalogueUrlMappingsSecuredSpec extends GebSpec {
 

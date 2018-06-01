@@ -3,7 +3,7 @@ package org.modelcatalogue.core.rolevisibility
 import geb.spock.GebSpec
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Specification
+import spock.lang.Ignore
 import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-1463')
@@ -29,6 +29,6 @@ import spock.lang.Title
  - Select option 'Delete' to delete Data Class. | Delete pop-up appears asking 'Do you really want to delete Data Class [data class]?'.
  - Select the OK button to continue deleting Data Class. | Data Class is deleted. Redirected to 'Data Classes' page.
 /$)
-
+@Ignore
 class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
 }

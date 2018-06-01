@@ -19,12 +19,14 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
-class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
+@Ignore
+class QuickSearchSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String quickSearch="#role_navigation-right_search-menu-menu-item-link > span.ng-scope.fa.fa-search"
+    private static
+    final String quickSearch = "#role_navigation-right_search-menu-menu-item-link > span.ng-scope.fa.fa-search"
     private static final String modelCatalogue = "span.mc-name"
-    private static final String   search = "input#value"
-    private static final String   createButton = "span.text-success"
+    private static final String search = "input#value"
+    private static final String createButton = "span.text-success"
     public static final String infiniteTableRow = '.inf-table tbody .inf-table-item-row'
     public static final String asset = 'asset'
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 2000
@@ -53,7 +55,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         at BusinessRulesPage
 
         and:
-        check rightSideTitle contains  'Active Business Rules'
+        check rightSideTitle contains 'Active Business Rules'
     }
 
     @Ignore
@@ -123,7 +125,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         click modelCatalogue
         click quickSearch
 
-        and:'select cancer'
+        and: 'select cancer'
         fill search with 'Cancer Model' and pick first item
 
         then:
@@ -167,7 +169,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         fill search with "xs:string" and pick first item
 
         then:
-        check rightSideTitle contains'xs:strin'
+        check rightSideTitle contains 'xs:strin'
     }
 
     @Ignore

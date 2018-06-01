@@ -3,8 +3,10 @@ package org.modelcatalogue.core.finalized
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
 import spock.lang.Stepwise
+import spock.lang.Ignore
 
 @Stepwise
+@Ignore
 class CannotAddDataTypesToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:

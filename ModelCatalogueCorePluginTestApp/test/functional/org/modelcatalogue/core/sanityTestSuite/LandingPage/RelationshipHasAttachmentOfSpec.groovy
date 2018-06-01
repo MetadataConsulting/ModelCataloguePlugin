@@ -19,18 +19,20 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
-class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
+@Ignore
+class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String dataModel ="a#role_item_catalogue-element-menu-item-link"
-    private static final String createRelationship ="a#create-new-relationship-menu-item-link>span:nth-child(3)"
-    private static final String  destination ="h3.panel-title"
-    private static final String  destinationIcon="span.input-group-addon"
-    private static final String   hasAttachmentOf ="#type > option:nth-child(4)"
-    private static final String  search ="input#value"
-    private static final String  table ="#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-7 > span > span > code"
+    private static final String dataModel = "a#role_item_catalogue-element-menu-item-link"
+    private static final String createRelationship = "a#create-new-relationship-menu-item-link>span:nth-child(3)"
+    private static final String destination = "h3.panel-title"
+    private static final String destinationIcon = "span.input-group-addon"
+    private static final String hasAttachmentOf = "#type > option:nth-child(4)"
+    private static final String search = "input#value"
+    private static
+    final String table = "#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-7 > span > span > code"
     public static final String infiniteTableRow = '.inf-table tbody .inf-table-item-row'
     public static final String asset = 'asset'
-    public static final String  modelCatalogue = 'span.mc-name'
+    public static final String modelCatalogue = 'span.mc-name'
 
     @Ignore
     def "login to model catalogue and select a data model"() {
@@ -95,11 +97,11 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
     @Ignore
     def "navigate to the top menu and select create relationship"() {
 
-        when:'navigate to createRelationship page'
+        when: 'navigate to createRelationship page'
         click dataModel
         click createRelationship
 
-        then:'verify that the text Destination is displayed'
+        then: 'verify that the text Destination is displayed'
         check destination displayed
     }
 
@@ -113,7 +115,7 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         click ModalPrimaryButton
 
 
-        then:'verify that attachment is displayed inside table'
+        then: 'verify that attachment is displayed inside table'
         check table contains "has attachment of"
     }
 

@@ -12,18 +12,18 @@ import spock.lang.IgnoreIf
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Ignore
-class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec{
+class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String create="a#role_data-models_create-data-modelBtn>span:nth-child(2)"
-    private static final String name="input#name"
-    private static final String policies="input#dataModelPolicy"
-    private static final String  searchForData="input#value"
-    private static final String button_x="div.input-group-addon"
-    private static final String exit="button#exit-wizard>span:nth-child(1)"
-    private static final String modelCatalogue="span.mc-name"
-    private static String my_name ="first test"
-    private static String policyText="tester"
-    private static String  searchData="TESTING_POLICY"
+    private static final String create = "a#role_data-models_create-data-modelBtn>span:nth-child(2)"
+    private static final String name = "input#name"
+    private static final String policies = "input#dataModelPolicy"
+    private static final String searchForData = "input#value"
+    private static final String button_x = "div.input-group-addon"
+    private static final String exit = "button#exit-wizard>span:nth-child(1)"
+    private static final String modelCatalogue = "span.mc-name"
+    private static String my_name = "first test"
+    private static String policyText = "tester"
+    private static String searchData = "TESTING_POLICY"
 
     @Unroll
     def "search option"() {
@@ -37,15 +37,15 @@ class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec{
         and:
         check modelCatalogue displayed
 
-        when:'click on create and fill the form'
+        when: 'click on create and fill the form'
         click create
         fill name with my_name
-        fill policies  with policyText and pick first item
+        fill policies with policyText and pick first item
 
-        and:'search for a policy'
-        fill searchForData  with searchData and pick first item
+        and: 'search for a policy'
+        fill searchForData with searchData and pick first item
 
-        and:''
+        and: ''
         click button_x
         click exit
         click modalCloseButton

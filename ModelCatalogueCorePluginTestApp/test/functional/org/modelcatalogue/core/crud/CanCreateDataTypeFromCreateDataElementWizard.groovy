@@ -19,5 +19,6 @@ import spock.lang.Title
 - Verify the data model has a data element and a data type
 - Verify that Data Element is related to the Data Type (visiting the data element detail page shows a link to the data type)
 ''')
+@Ignore
 class CanCreateDataTypeFromCreateDataElementWizard extends GebSpec {
 }

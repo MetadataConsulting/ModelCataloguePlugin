@@ -4,7 +4,9 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.HomePage
 import org.modelcatalogue.core.geb.LoginModalPage
 import spock.lang.IgnoreIf
+import spock.lang.Ignore
 
+@Ignore
 @IgnoreIf({ !System.getProperty('geb.env') })
 class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
 
@@ -16,12 +18,12 @@ class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
         then:
         at LoginModalPage
 
-        when:'enter the username and password'
+        when: 'enter the username and password'
         LoginModalPage loginModalPage = browser.page LoginModalPage
         loginModalPage.username = 'viewer'
         loginModalPage.password = 'viewer'
 
-        and:'click on cancel'
+        and: 'click on cancel'
         loginModalPage.cancel()
 
         then:

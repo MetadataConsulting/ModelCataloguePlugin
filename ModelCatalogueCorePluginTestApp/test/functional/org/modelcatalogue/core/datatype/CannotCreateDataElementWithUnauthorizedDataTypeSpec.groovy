@@ -2,6 +2,7 @@ package org.modelcatalogue.core.datatype
 
 import spock.lang.Issue
 import spock.lang.Narrative
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Title
 
@@ -34,5 +35,6 @@ import spock.lang.Title
 - Press save | Data type is saved
 -  Confirm that new data type has been added to the data model | Data type appears in list under data types. tag
 ''')
+@Ignore
 class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends Specification {
 }

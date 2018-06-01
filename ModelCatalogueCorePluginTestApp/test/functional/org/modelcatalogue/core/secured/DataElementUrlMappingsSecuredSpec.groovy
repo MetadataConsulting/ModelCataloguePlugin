@@ -4,9 +4,10 @@ import geb.spock.GebSpec
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
 import spock.lang.Unroll
 import spock.lang.IgnoreIf
-
+@Ignore
 @IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class DataElementUrlMappingsSecuredSpec extends GebSpec {
 
@@ -28,17 +29,17 @@ class DataElementUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataElement',
-        '/api/modelCatalogue/core/dataElement/$id/validate',
-        '/api/modelCatalogue/core/dataElement/validate',
-        '/api/modelCatalogue/core/dataElement/$id/restore',
-        '/api/modelCatalogue/core/dataElement/$id/clone/$destinationDataModelId',
-        '/api/modelCatalogue/core/dataElement/$source/merge/$destination',
-        '/api/modelCatalogue/core/dataElement/$id/archive',
-        '/api/modelCatalogue/core/dataElement/$id/outgoing/$type',
-        '/api/modelCatalogue/core/dataElement/$id/incoming/$type',
-        '/api/modelCatalogue/core/dataElement/$id/mapping/$destination',
-                ]
+                '/api/modelCatalogue/core/dataElement',
+                '/api/modelCatalogue/core/dataElement/$id/validate',
+                '/api/modelCatalogue/core/dataElement/validate',
+                '/api/modelCatalogue/core/dataElement/$id/restore',
+                '/api/modelCatalogue/core/dataElement/$id/clone/$destinationDataModelId',
+                '/api/modelCatalogue/core/dataElement/$source/merge/$destination',
+                '/api/modelCatalogue/core/dataElement/$id/archive',
+                '/api/modelCatalogue/core/dataElement/$id/outgoing/$type',
+                '/api/modelCatalogue/core/dataElement/$id/incoming/$type',
+                '/api/modelCatalogue/core/dataElement/$id/mapping/$destination',
+        ]
     }
 
     @Unroll
@@ -51,23 +52,23 @@ class DataElementUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataElement',
-        '/api/modelCatalogue/core/dataElement/search/$search',
-        '/api/modelCatalogue/core/dataElement/$id',
-        '/api/modelCatalogue/core/dataElement/$id/outgoing/search',
-        '/api/modelCatalogue/core/dataElement/$id/outgoing/$type/search',
-        '/api/modelCatalogue/core/dataElement/$id/outgoing/$type',
-        '/api/modelCatalogue/core/dataElement/$id/incoming/search',
-        '/api/modelCatalogue/core/dataElement/$id/incoming/$type/search',
-        '/api/modelCatalogue/core/dataElement/$id/incoming/$type',
-        '/api/modelCatalogue/core/dataElement/$id/incoming',
-        '/api/modelCatalogue/core/dataElement/$id/outgoing',
-        '/api/modelCatalogue/core/dataElement/$id/mapping',
-        '/api/modelCatalogue/core/dataElement/$id/typeHierarchy',
-        '/api/modelCatalogue/core/dataElement/$id/history',
-        '/api/modelCatalogue/core/dataElement/$id/path',
-        '/api/modelCatalogue/core/dataElement/$id/content',
-                ]
+                '/api/modelCatalogue/core/dataElement',
+                '/api/modelCatalogue/core/dataElement/search/$search',
+                '/api/modelCatalogue/core/dataElement/$id',
+                '/api/modelCatalogue/core/dataElement/$id/outgoing/search',
+                '/api/modelCatalogue/core/dataElement/$id/outgoing/$type/search',
+                '/api/modelCatalogue/core/dataElement/$id/outgoing/$type',
+                '/api/modelCatalogue/core/dataElement/$id/incoming/search',
+                '/api/modelCatalogue/core/dataElement/$id/incoming/$type/search',
+                '/api/modelCatalogue/core/dataElement/$id/incoming/$type',
+                '/api/modelCatalogue/core/dataElement/$id/incoming',
+                '/api/modelCatalogue/core/dataElement/$id/outgoing',
+                '/api/modelCatalogue/core/dataElement/$id/mapping',
+                '/api/modelCatalogue/core/dataElement/$id/typeHierarchy',
+                '/api/modelCatalogue/core/dataElement/$id/history',
+                '/api/modelCatalogue/core/dataElement/$id/path',
+                '/api/modelCatalogue/core/dataElement/$id/content',
+        ]
     }
 
     @Unroll
@@ -84,9 +85,9 @@ class DataElementUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataElement/$id',
-        '/api/modelCatalogue/core/dataElement/$id/incoming/$type',
-        '/api/modelCatalogue/core/dataElement/$id/outgoing/$type',
+                '/api/modelCatalogue/core/dataElement/$id',
+                '/api/modelCatalogue/core/dataElement/$id/incoming/$type',
+                '/api/modelCatalogue/core/dataElement/$id/outgoing/$type',
         ]
 
     }
@@ -105,11 +106,11 @@ class DataElementUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataElement/$id/incoming/$type',
-        '/api/modelCatalogue/core/dataElement/$id',
-        '/api/modelCatalogue/core/dataElement/$id/mapping/$destination',
-        '/api/modelCatalogue/core/dataElement/$id/outgoing/$type',
-                ]
+                '/api/modelCatalogue/core/dataElement/$id/incoming/$type',
+                '/api/modelCatalogue/core/dataElement/$id',
+                '/api/modelCatalogue/core/dataElement/$id/mapping/$destination',
+                '/api/modelCatalogue/core/dataElement/$id/outgoing/$type',
+        ]
 
     }
 }

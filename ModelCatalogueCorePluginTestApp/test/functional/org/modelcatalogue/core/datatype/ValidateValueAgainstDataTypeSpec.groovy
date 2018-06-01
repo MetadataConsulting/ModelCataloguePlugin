@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.datatype
 
 import spock.lang.Issue
+import spock.lang.Ignore
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
@@ -23,5 +24,6 @@ import spock.lang.Title
 - In the Value form-box type a value that is incorrect | confirm that it shows as invalid
 - check that incorrect value shows INVALID and | correct value shows VALID
 ''')
+@Ignore
 class ValidateValueAgainstDataTypeSpec extends Specification {
 }

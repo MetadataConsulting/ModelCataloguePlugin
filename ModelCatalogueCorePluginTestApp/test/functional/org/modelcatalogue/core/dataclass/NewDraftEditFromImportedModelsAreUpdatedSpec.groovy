@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.dataclass
 
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
@@ -34,5 +35,6 @@ import spock.lang.Title
 - Navigate back to your Data Model and to the data class.
 - Check that when you search in the parents tab, edits made to the data class in the imported model are carried through to your data model. | Edits are present from imported data model.
 ''')
+@Ignore
 class NewDraftEditFromImportedModelsAreUpdatedSpec extends Specification {
 }

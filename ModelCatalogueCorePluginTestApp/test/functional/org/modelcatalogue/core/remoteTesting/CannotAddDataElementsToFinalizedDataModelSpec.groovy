@@ -6,6 +6,7 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Stepwise
 import spock.lang.Title
+import spock.lang.Ignore
 
 @Issue('https://metadata.atlassian.net/browse/MET-1566')
 @Title('Check that When Data Model is finalized,you are not able to add new elements')
@@ -15,6 +16,7 @@ import spock.lang.Title
 - Navigate to tree view and click on the Data Element
 - Verify that you can not create a new data element
 ''')
+@Ignore
 @Stepwise
 class CannotAddDataElementsToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {

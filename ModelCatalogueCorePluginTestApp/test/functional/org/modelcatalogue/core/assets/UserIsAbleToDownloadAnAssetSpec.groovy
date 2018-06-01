@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.assets
 
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
@@ -24,5 +25,6 @@ import spock.lang.Title
 - Navigate to the right side and click on the download button | Browser Download pop - up appears.
 - Check that the file has downloaded
 ''')
+@Ignore
 class UserIsAbleToDownloadAnAssetSpec extends Specification {
 }

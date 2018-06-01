@@ -5,6 +5,7 @@ import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Shared
 import spock.lang.Title
+import spock.lang.Ignore
 import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1495')
@@ -34,6 +35,7 @@ import org.modelcatalogue.core.geb.*
 - Click on the edit button and fill the form
 - Check that Metadata is edited     
 ''')
+@Ignore
 class UserCanEditDataClassesForAdminDataModelSpec extends Specification {
 
     @Shared

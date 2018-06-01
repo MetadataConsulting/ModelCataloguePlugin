@@ -3,8 +3,10 @@ package org.modelcatalogue.core.secured
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.IgnoreIf
+import spock.lang.Ignore
 import spock.lang.Unroll
 
+@Ignore
 @IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class LogsUrlMappingsSecuredSpec extends GebSpec {
 

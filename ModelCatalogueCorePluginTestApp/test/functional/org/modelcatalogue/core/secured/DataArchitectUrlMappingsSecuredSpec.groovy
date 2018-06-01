@@ -5,8 +5,10 @@ import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Unroll
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
+//@Ignore
 @IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class DataArchitectUrlMappingsSecuredSpec extends GebSpec {
 
@@ -28,12 +30,12 @@ class DataArchitectUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataArchitect/elementsFromCSV',
-        '/api/modelCatalogue/core/dataArchitect/modelsFromCSV',
-        '/api/modelCatalogue/core/dataArchitect/generateSuggestions',
-        '/api/modelCatalogue/core/dataArchitect/deleteSuggestions',
-        '/api/modelCatalogue/core/dataArchitect/imports/upload',
-                ]
+                '/api/modelCatalogue/core/dataArchitect/elementsFromCSV',
+                '/api/modelCatalogue/core/dataArchitect/modelsFromCSV',
+                '/api/modelCatalogue/core/dataArchitect/generateSuggestions',
+                '/api/modelCatalogue/core/dataArchitect/deleteSuggestions',
+                '/api/modelCatalogue/core/dataArchitect/imports/upload',
+        ]
     }
 
     @Unroll
@@ -46,10 +48,10 @@ class DataArchitectUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataArchitect/metadataKeyCheck/$key',
-        '/api/modelCatalogue/core/dataArchitect/getSubModelElements/$modelId',
-        '/api/modelCatalogue/core/dataArchitect/findRelationsByMetadataKeys/$key',
-        '/api/modelCatalogue/core/dataArchitect/suggestionsNames',
+                '/api/modelCatalogue/core/dataArchitect/metadataKeyCheck/$key',
+                '/api/modelCatalogue/core/dataArchitect/getSubModelElements/$modelId',
+                '/api/modelCatalogue/core/dataArchitect/findRelationsByMetadataKeys/$key',
+                '/api/modelCatalogue/core/dataArchitect/suggestionsNames',
         ]
     }
 }

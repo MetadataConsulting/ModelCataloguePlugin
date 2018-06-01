@@ -6,8 +6,10 @@ import grails.plugins.rest.client.RestResponse
 import org.modelcatalogue.core.geb.LoginPage
 import org.springframework.http.HttpMethod
 import spock.lang.IgnoreIf
+import spock.lang.Ignore
 import spock.lang.Unroll
 
+@Ignore
 @IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class DataImportCreateUrlMappingsSecuredSpec extends GebSpec {
 

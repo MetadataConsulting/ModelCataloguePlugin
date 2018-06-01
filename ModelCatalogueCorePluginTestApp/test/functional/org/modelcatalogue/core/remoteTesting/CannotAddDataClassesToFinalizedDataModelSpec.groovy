@@ -5,6 +5,7 @@ import org.modelcatalogue.core.geb.*
 import spock.lang.*
 
 @Stepwise
+@Ignore
 class CannotAddDataClassesToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:

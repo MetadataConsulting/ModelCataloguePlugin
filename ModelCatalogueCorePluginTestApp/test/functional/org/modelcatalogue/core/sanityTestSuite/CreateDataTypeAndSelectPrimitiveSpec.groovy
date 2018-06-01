@@ -21,13 +21,14 @@ import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
+@Ignore
 class CreateDataTypeAndSelectPrimitiveSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String primitive = "input#pickPrimitiveType"
     private static final String measurementUnit = "input#measurementUnit"
-    private static final String deleteButton= "a#delete-menu-item-link>span:nth-child(3)"
-    private static final String  createMeasurement = "a.create-new-cep-item>span>span:nth-child(2"
-    private static final String  primitiveTypeButton = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
+    private static final String deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
+    private static final String createMeasurement = "a.create-new-cep-item>span>span:nth-child(2"
+    private static final String primitiveTypeButton = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
     private static final String dataTypeCreated = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a"
     private static final String firstRow = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)"
 

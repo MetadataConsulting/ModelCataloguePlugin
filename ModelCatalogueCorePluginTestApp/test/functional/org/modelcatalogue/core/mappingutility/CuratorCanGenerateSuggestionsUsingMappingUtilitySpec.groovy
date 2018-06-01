@@ -4,6 +4,7 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Ignore
 
 @Issue('https://metadata.atlassian.net/browse/MET-1662')
 @Title('Examine that user can generate Suggestion using Mapping Utility')
@@ -16,5 +17,6 @@ import spock.lang.Title
 - Refresh the page to see Mapping suggestions | Mapping suggestions appear
 - Verify that suggestion are created once page is refreshed 
 ''')
+@Ignore
 class CuratorCanGenerateSuggestionsUsingMappingUtilitySpec extends Specification {
 }

@@ -12,6 +12,7 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String favourite = "a#role_item-detail_favorite-elementBtn"
@@ -24,14 +25,14 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
     public static final String measurement_button = "a#catalogue-element-create-measurementUnitBtn>span:nth-child(2)"
     private static final String name = "input#name"
     private static final String symbol = "input#symbol"
-    private static final String icon="span.input-group-addon"
-    public static final String  search ="input#value"
-    private static final String  model_link="tr.inf-table-item-row>td:nth-child(2)>a"
-    private static final String  modelCatalogue="span.mc-name"
-    private static final String  table="td.col-md-4"
-    private static final String  createdMeasurement="td.col-md-4>a"
-    private static final String  measurementUnitButton="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
-    private static final String  deleteButton="a#delete-menu-item-link>span:nth-child(3)"
+    private static final String icon = "span.input-group-addon"
+    public static final String search = "input#value"
+    private static final String model_link = "tr.inf-table-item-row>td:nth-child(2)>a"
+    private static final String modelCatalogue = "span.mc-name"
+    private static final String table = "td.col-md-4"
+    private static final String createdMeasurement = "td.col-md-4>a"
+    private static final String measurementUnitButton = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
+    private static final String deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
 
     @Ignore
     def "Login to model catalogue and select a data model"() {
@@ -90,7 +91,7 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
         Thread.sleep(3000L)
         fill search with("Test 3")
         Thread.sleep(1000L)
-         selectInSearch(2)
+        selectInSearch(2)
         Thread.sleep(2000L)
         fill name with("MEASUREMENT FROM FAVOURITE ")
         fill symbol with("kilogram")
@@ -98,8 +99,8 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
         fill description with(" this is my measurement ${System.currentTimeSeconds()}")
         click save
 
-         then:
-         check model_link displayed
+        then:
+        check model_link displayed
     }
 
     @Ignore

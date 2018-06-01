@@ -19,16 +19,17 @@ import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
-class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
-    private static final String asset ="input#asset"
-    private static final String  modelCatalogue = "span.mc-name"
-    private static final String  createdAsset = "a.preserve-new-lines"
-    private static final String  assetButton = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
-    private static final String  deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
-    private static final String  table = "tr.inf-table-item-row>td:nth-child(2)"
-    private static final String  plusButton= "span.fa-plus-square-o"
-    private static final String  removeButton= "a#role_item_remove-relationshipBtn"
-    private static final String  importedDataModel= "td.col-md-5"
+@Ignore
+class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec {
+    private static final String asset = "input#asset"
+    private static final String modelCatalogue = "span.mc-name"
+    private static final String createdAsset = "a.preserve-new-lines"
+    private static final String assetButton = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
+    private static final String deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
+    private static final String table = "tr.inf-table-item-row>td:nth-child(2)"
+    private static final String plusButton = "span.fa-plus-square-o"
+    private static final String removeButton = "a#role_item_remove-relationshipBtn"
+    private static final String importedDataModel = "td.col-md-5"
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
 
     @Ignore
@@ -69,7 +70,7 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
     def "create a new asset"() {
         when:
         fill nameLabel with " Sample excel${System.currentTimeMillis()}"
-        fill asset with file ('example.xml')
+        fill asset with file('example.xml')
         fill description with 'This is my asset'
         click save
 
@@ -139,14 +140,14 @@ class CreateAssetsAndImportDataSpec extends AbstractModelCatalogueGebSpec{
         then:
         check rightSideTitle contains 'Imports'
 
-        when:'click on the plus button'
+        when: 'click on the plus button'
         click plusButton
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
-        and:'select the remove button'
+        and: 'select the remove button'
         click removeButton
 
-        and:'confirm your action'
+        and: 'confirm your action'
         click modalPrimaryButton
 
         then:

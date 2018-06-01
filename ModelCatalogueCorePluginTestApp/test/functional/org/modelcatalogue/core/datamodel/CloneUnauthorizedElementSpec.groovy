@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.datamodel
 
 import spock.lang.Issue
+import spock.lang.Ignore
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
@@ -32,5 +33,6 @@ import spock.lang.Title
 - Select a Data Element from the second data model created . Click Save. | Data Element populates form. Data Element is cloned into this model
 - Check that Data Element from second data model now exists in first data model
 ''')
+@Ignore
 class CloneUnauthorizedElementSpec extends Specification {
 }

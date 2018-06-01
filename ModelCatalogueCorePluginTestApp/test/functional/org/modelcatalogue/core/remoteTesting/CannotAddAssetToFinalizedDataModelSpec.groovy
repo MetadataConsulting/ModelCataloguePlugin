@@ -7,8 +7,10 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.MeasurementUnitsPage
 import spock.lang.Stepwise
+import spock.lang.Ignore
 
 @Stepwise
+@Ignore
 class CannotAddAssetToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:

@@ -6,7 +6,9 @@ import grails.plugins.rest.client.RestResponse
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Unroll
 import spock.lang.IgnoreIf
+import spock.lang.Ignore
 
+@Ignore
 @IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class DataTypeUrlMappingsSecuredSpec extends GebSpec {
 
@@ -28,17 +30,17 @@ class DataTypeUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataType',
-        '/api/modelCatalogue/core/dataType/$id/validate',
-        '/api/modelCatalogue/core/dataType/validate',
-        '/api/modelCatalogue/core/dataType/$id/outgoing/$type',
-        '/api/modelCatalogue/core/dataType/$id/incoming/$type',
-        '/api/modelCatalogue/core/dataType/$id/mapping/$destination',
-        '/api/modelCatalogue/core/dataType/$id/archive',
-        '/api/modelCatalogue/core/dataType/$id/restore',
-        '/api/modelCatalogue/core/dataType/$id/clone/$destinationDataModelId',
-        '/api/modelCatalogue/core/dataType/$source/merge/$destination',
-                ]
+                '/api/modelCatalogue/core/dataType',
+                '/api/modelCatalogue/core/dataType/$id/validate',
+                '/api/modelCatalogue/core/dataType/validate',
+                '/api/modelCatalogue/core/dataType/$id/outgoing/$type',
+                '/api/modelCatalogue/core/dataType/$id/incoming/$type',
+                '/api/modelCatalogue/core/dataType/$id/mapping/$destination',
+                '/api/modelCatalogue/core/dataType/$id/archive',
+                '/api/modelCatalogue/core/dataType/$id/restore',
+                '/api/modelCatalogue/core/dataType/$id/clone/$destinationDataModelId',
+                '/api/modelCatalogue/core/dataType/$source/merge/$destination',
+        ]
     }
 
     @Unroll
@@ -51,25 +53,25 @@ class DataTypeUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataType',
-        '/api/modelCatalogue/core/dataType/search/$search',
-        '/api/modelCatalogue/core/dataType/$id',
-        '/api/modelCatalogue/core/dataType/$id/outgoing/search',
-        '/api/modelCatalogue/core/dataType/$id/outgoing/$type/search',
-        '/api/modelCatalogue/core/dataType/$id/outgoing/$type',
-        '/api/modelCatalogue/core/dataType/$id/incoming/search',
-        '/api/modelCatalogue/core/dataType/$id/incoming/$type/search',
-        '/api/modelCatalogue/core/dataType/$id/incoming/$type',
-        '/api/modelCatalogue/core/dataType/$id/incoming',
-        '/api/modelCatalogue/core/dataType/$id/outgoing',
-        '/api/modelCatalogue/core/dataType/$id/mapping',
-        '/api/modelCatalogue/core/dataType/$id/typeHierarchy',
-        '/api/modelCatalogue/core/dataType/$id/history',
-        '/api/modelCatalogue/core/dataType/$id/path',
-        '/api/modelCatalogue/core/dataType/$id/dataElement',
-        '/api/modelCatalogue/core/dataType/$id/convert/$destination',
-        '/api/modelCatalogue/core/dataType/$id/validateValue',
-                ]
+                '/api/modelCatalogue/core/dataType',
+                '/api/modelCatalogue/core/dataType/search/$search',
+                '/api/modelCatalogue/core/dataType/$id',
+                '/api/modelCatalogue/core/dataType/$id/outgoing/search',
+                '/api/modelCatalogue/core/dataType/$id/outgoing/$type/search',
+                '/api/modelCatalogue/core/dataType/$id/outgoing/$type',
+                '/api/modelCatalogue/core/dataType/$id/incoming/search',
+                '/api/modelCatalogue/core/dataType/$id/incoming/$type/search',
+                '/api/modelCatalogue/core/dataType/$id/incoming/$type',
+                '/api/modelCatalogue/core/dataType/$id/incoming',
+                '/api/modelCatalogue/core/dataType/$id/outgoing',
+                '/api/modelCatalogue/core/dataType/$id/mapping',
+                '/api/modelCatalogue/core/dataType/$id/typeHierarchy',
+                '/api/modelCatalogue/core/dataType/$id/history',
+                '/api/modelCatalogue/core/dataType/$id/path',
+                '/api/modelCatalogue/core/dataType/$id/dataElement',
+                '/api/modelCatalogue/core/dataType/$id/convert/$destination',
+                '/api/modelCatalogue/core/dataType/$id/validateValue',
+        ]
     }
 
     @Unroll
@@ -86,10 +88,10 @@ class DataTypeUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataType/$id',
-        '/api/modelCatalogue/core/dataType/$id/outgoing/$type',
-        '/api/modelCatalogue/core/dataType/$id/incoming/$type',
-                ]
+                '/api/modelCatalogue/core/dataType/$id',
+                '/api/modelCatalogue/core/dataType/$id/outgoing/$type',
+                '/api/modelCatalogue/core/dataType/$id/incoming/$type',
+        ]
     }
 
     @Unroll
@@ -106,11 +108,11 @@ class DataTypeUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/dataType/$id',
-        '/api/modelCatalogue/core/dataType/$id/outgoing/$type',
-        '/api/modelCatalogue/core/dataType/$id/incoming/$type',
-        '/api/modelCatalogue/core/dataType/$id/mapping/$destination',
-                ]
+                '/api/modelCatalogue/core/dataType/$id',
+                '/api/modelCatalogue/core/dataType/$id/outgoing/$type',
+                '/api/modelCatalogue/core/dataType/$id/incoming/$type',
+                '/api/modelCatalogue/core/dataType/$id/mapping/$destination',
+        ]
     }
 }
 

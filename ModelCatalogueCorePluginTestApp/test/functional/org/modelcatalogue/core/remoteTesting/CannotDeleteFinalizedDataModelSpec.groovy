@@ -11,6 +11,7 @@ import org.modelcatalogue.core.geb.FinalizedDataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
 import spock.lang.Narrative
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Title
 
@@ -25,6 +26,7 @@ import spock.lang.Title
 - On the top menu, click on the data model link
 - Click on the delete link
 ''')
+@Ignore
 class CannotDeleteFinalizedDataModelSpec extends GebSpec {
 
     @Shared

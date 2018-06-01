@@ -4,6 +4,7 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Ignore
 
 @Issue('https://metadata.atlassian.net/browse/MET-1512')
 @Title('Check that User should not be able to edit when logged as a viewer with read only rights for current Data Model')
@@ -19,5 +20,6 @@ import spock.lang.Title
 - Select Data Model that User has been granted read-only rights for  | Take to Data Model Page
 - Check the inline edit button ( top right corner of data model homepage)  for the data model is disabled | User cannot edit the data model
 ''')
+@Ignore
 class UserCannotEditReadOnlyDataModelSpec extends Specification {
 }

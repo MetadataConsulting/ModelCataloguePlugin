@@ -2,9 +2,11 @@ package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
+import spock.lang.Ignore
 import spock.lang.Stepwise
 
 @Stepwise
+@Ignore
 class CannotAddDataTypesToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:

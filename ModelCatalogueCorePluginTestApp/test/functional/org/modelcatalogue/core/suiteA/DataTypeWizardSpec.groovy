@@ -17,14 +17,18 @@ import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf
 
 @Stepwise
+@Ignore
 @IgnoreIf({ !System.getProperty('geb.env') })
 class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     public static final String expandTableHeader = '.inf-table thead .inf-cell-expand'
-    public static final CatalogueContent nameFilter = CatalogueContent.create('input.form-control', placeholder: 'Filter Name')
-    public static final CatalogueContent enumerationsTableEditor = CatalogueContent.create('table', title: 'Enumerations')
-    public static final CatalogueContent removeEnumerationOne = CatalogueContent.create('.soe-remove-row', 'data-for-property': '01')
-    public static final CatalogueContent enumerationsDetail = CatalogueContent.create('data-view-name':"Enumerations")
+    public static
+    final CatalogueContent nameFilter = CatalogueContent.create('input.form-control', placeholder: 'Filter Name')
+    public static
+    final CatalogueContent enumerationsTableEditor = CatalogueContent.create('table', title: 'Enumerations')
+    public static
+    final CatalogueContent removeEnumerationOne = CatalogueContent.create('.soe-remove-row', 'data-for-property': '01')
+    public static final CatalogueContent enumerationsDetail = CatalogueContent.create('data-view-name': "Enumerations")
     public static final String tableRows = '.inf-table tbody .inf-table-item-row'
     public static final String pickReferenceType = '#pickReferenceType'
     public static final String pickPrimitiveType = '#pickPrimitiveType'
@@ -34,8 +38,10 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String updateMetadataButton = '.tab-pane button.btn-primary.update-object'
     public static final String addMetadataButton = '.tab-pane .btn.add-metadata'
     public static final String removeMetadataRow = '[data-view-content-name="Custom Metadata"] a.soe-remove-row'
-    public static final CatalogueAction createMapping = CatalogueAction.runFirst('item', 'catalogue-element', 'create-new-mapping')
-    public static final CatalogueAction createRelationship = CatalogueAction.runLast('item', 'catalogue-element', 'create-new-relationship')
+    public static
+    final CatalogueAction createMapping = CatalogueAction.runFirst('item', 'catalogue-element', 'create-new-mapping')
+    public static
+    final CatalogueAction createRelationship = CatalogueAction.runLast('item', 'catalogue-element', 'create-new-relationship')
     public static final CatalogueAction convert = CatalogueAction.runLast('item', 'catalogue-element', 'convert')
     public static final CatalogueAction removeRelationship = CatalogueAction.runLast('item', 'remove-relationship')
     public static final CatalogueAction removeMapping = CatalogueAction.runLast('item', 'remove-mapping')
@@ -549,19 +555,19 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "change type"() {
         given:
-            scroll Common.up
+        scroll Common.up
         expect:
-            check Common.backdrop gone
-            remove Common.messages
+        check Common.backdrop gone
+        remove Common.messages
         when:
-            click changeType
+        click changeType
         then:
-            check Common.modalDialog displayed
+        check Common.modalDialog displayed
         when:
-            fill dataTypeSelector with primitiveTypeValue
-            click modalPrimaryButton
+        fill dataTypeSelector with primitiveTypeValue
+        click modalPrimaryButton
         then:
-            check Common.backdrop gone
-            check primitiveTypeIcon displayed
+        check Common.backdrop gone
+        check primitiveTypeIcon displayed
     }
 }
