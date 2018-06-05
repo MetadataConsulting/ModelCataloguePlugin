@@ -6,10 +6,11 @@ class TestUtil {
 
     /**
      * Create Jenkins Files relative to project root, which should end in ModelCatalogueCorePluginTestApp
+     * Create 5 files, splitting functional test cases into 5 groups.
      * @param projectRootPath
      */
     public static void createJenkinsFiles(String projectRootPath) {
-        Set<String> testCases = getTestCaseNames(projectRootPath)
+        Set<String> testCases = getFunctionalTestCaseNames(projectRootPath)
         Integer testSize = testCases.size()
         Integer remainder = testSize % 5
         Integer quotient = testSize / 5
@@ -68,11 +69,11 @@ class TestUtil {
     }
 
     /**
-     * Get names of test cases. These are names of files *Spec.groovy.
+     * Get names of functional test cases. These are names of files *Spec.groovy.
      * @param projectRootPath
      * @return
      */
-    private static Set<String> getTestCaseNames(String projectRootPath) {
+    private static Set<String> getFunctionalTestCaseNames(String projectRootPath) {
         String functionalTestRootPath = projectRootPath + "/test/functional/"
         Set<String> files = []
         new File(functionalTestRootPath).eachFileRecurse {
@@ -86,7 +87,7 @@ class TestUtil {
     }
 
     static void main(String... args) {
-        println "in TestUtil Main"
+        println "in TestUtil main"
         String projectRootAbsolutePath = args[0]
         TestUtil.createJenkinsFiles(projectRootAbsolutePath)
     }
