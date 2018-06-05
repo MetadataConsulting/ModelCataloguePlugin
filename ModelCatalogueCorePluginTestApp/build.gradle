@@ -551,6 +551,8 @@ task createAndAddJenkinsFiles(type: Exec, dependsOn: [createJenkinsFiles]) {
     standardOutput = new ByteArrayOutputStream()
 }
 
+task beforePullRequest(dependsOn: [createAndAddJenkinsFiles])
+
 war.finalizedBy copyWar
 
 private static String getGrailsw()  {
