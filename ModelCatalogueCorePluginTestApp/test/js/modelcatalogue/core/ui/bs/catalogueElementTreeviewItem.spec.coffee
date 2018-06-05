@@ -3,6 +3,8 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
   beforeEach module 'mc.core.ui.states.bs'
   beforeEach module 'sly'
 
+  beforeEach module 'karmaTestingTemplates'
+
   return unless window.fixtures
 
   it "element get compiled",  inject ($compile, $rootScope, enhance, modelCatalogueApiRoot, $httpBackend) ->

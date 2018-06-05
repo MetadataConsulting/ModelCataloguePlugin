@@ -2,6 +2,8 @@ describe "mc.core.ui.elementsAsTags", ->
 
   beforeEach module 'mc.core.ui'
 
+  beforeEach module 'karmaTestingTemplates'
+
   return unless window.fixtures
 
   it "element get compiled",  inject ($compile, $rootScope) ->

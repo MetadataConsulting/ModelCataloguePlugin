@@ -3,6 +3,8 @@ describe "mc.core.ui.catalogueElementTreeview", ->
   beforeEach module 'mc.core.ui'
   beforeEach module 'sly'
 
+  beforeEach module 'karmaTestingTemplates'
+
   return unless window.fixtures
 
   it "treeview with single element",  inject ($compile, $rootScope, enhance) ->
