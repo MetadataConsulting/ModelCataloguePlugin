@@ -101,10 +101,13 @@ task refreshGrailsDependencies(type: Exec) {
 }
 
 task cleanAll(type: Delete, dependsOn: [cleanData, cleanGrails, refreshGrailsDependencies]) {
+    group = "ZZZ MC Custom Developer"
+    description = "Clean Data, Clean Grails Folders, Clean Grails, Refresh Grails Dependencies"
     delete '../build'
 }
 
 task runDev(type: Exec, dependsOn: bowerInstall) {
+    group = "ZZZ MC Custom Developer"
     description = "Run MX in development environment"
 
     assertJava8()
@@ -454,7 +457,9 @@ task runFunctionalTests(type: Exec, dependsOn: [bowerInstall]) {
 
 
 task runKarmaTests(type: NodeTask) {
-    description = "Runs Karma tests"
+    group = "ZZZ MC Custom Developer"
+    description = "Runs Karma tests for Angular"
+
     script = file('node_modules/karma/bin/karma')
     args = [ 'start', '--single-run', '--browsers', 'Firefox']
     inputs.files file('karma.conf.json')
@@ -465,7 +470,8 @@ task runKarmaTests(type: NodeTask) {
 }
 
 task collectTestReports(type: Copy) {
-    description = "Collects reports from Grails tests"
+    group = "ZZZ MC Custom Developer"
+    description = "Collects reports from Grails tests (geb-reports, test-reports, test-reports-js)"
     from('target') {
         include 'geb-reports/**'
         include 'test-reports/**'
@@ -476,6 +482,7 @@ task collectTestReports(type: Copy) {
 }
 
 task stop(type: Exec) {
+    group = "ZZZ MC Custom Developer"
     description = "Stops running MX application"
     commandLine grailsw, 'stop-app','--non-interactive', '--stacktrace'
 }
@@ -487,7 +494,8 @@ task deleteUnnecessaryJavascript(type: Delete) {
     delete 'grails-app/assets/bower_components/d3/test', 'grails-app/assets/bower_components/validator-js/src', 'grails-app/assets/bower_components/validator-js/lib'
 }
 task war(type: Exec, dependsOn: [bowerInstall, deleteUnnecessaryJavascript]) {
-    description = "Build production war of MX application"
+    group = "ZZZ MC Custom Developer"
+    description = "Build production war of MX application. Deletes unnecessary Javascript."
     commandLine grailsw, 'war', '--non-interactive', '--stacktrace'
 }
 
