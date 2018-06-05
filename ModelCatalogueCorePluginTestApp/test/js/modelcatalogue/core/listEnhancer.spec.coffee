@@ -76,7 +76,7 @@ if window.fixtures
       nextList.previous = "/dataType/?max=10&offset=0"
 
       $httpBackend
-      .when("GET", "#{modelCatalogueApiRoot}/dataType/?max=1&offset=1")
+      .when("GET", "#{modelCatalogueApiRoot}/dataType/?max=1&total=48&offset=1")
       .respond(nextList)
 
       rest.cleanCache()
