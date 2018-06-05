@@ -1,84 +1,90 @@
-describe("mc.util.MessagingClient module", function() {
+(function() {
+  var ignore = false
+  if (!ignore) {
+    describe("mc.util.MessagingClient module", function() {
 
-    var StompClient;
+      var StompClient;
 
-    beforeEach(angular.mock.module('mc.util.MessagingClient', function() {
+      beforeEach(angular.mock.module('mc.util.MessagingClient', function() {
 
-    }));
+      }));
 
-    describe('MessagingClient', function() {
+      describe('MessagingClient', function() {
         var MessagingClient, $rootScope;
 
         beforeEach(angular.mock.inject(function(_MessagingClient_, _$rootScope_) {
-            MessagingClient = _MessagingClient_;
-            $rootScope = _$rootScope_;
-            StompClient = MessagingClient._getStompClient()
+          MessagingClient = _MessagingClient_;
+          $rootScope = _$rootScope_;
+          StompClient = MessagingClient._getStompClient()
         }));
 
         it("client is defined", function() {
-            expect(MessagingClient).toBeDefined();
+          expect(MessagingClient).toBeDefined();
         });
 
         it("connect and disconnect", function() {
-            var frame = undefined;
+          var frame = undefined;
 
-            MessagingClient.connect().then(function(_frame_){
-                frame = _frame_
-            });
+          MessagingClient.connect().then(function(_frame_){
+            frame = _frame_
+          });
 
-            expect(frame).toBeUndefined();
+          expect(frame).toBeUndefined();
 
-            $rootScope.$apply();
+          $rootScope.$apply();
 
-            expect(MessagingClient.isConnected()).toBeTruthy();
-            expect(frame).toBeDefined();
+          expect(MessagingClient.isConnected()).toBeTruthy();
+          expect(frame).toBeDefined();
 
-            MessagingClient.disconnect();
+          MessagingClient.disconnect();
 
-            $rootScope.$apply();
+          $rootScope.$apply();
 
-            expect(MessagingClient.isConnected()).toBeFalsy();
+          expect(MessagingClient.isConnected()).toBeFalsy();
 
 
         });
 
         it("subscribe and unsubscribe", function() {
-            var subscription = undefined, unsubscribed = false;
+          var subscription = undefined, unsubscribed = false;
 
-            MessagingClient.subscribe('/foo/bar', function(_subscription_){
-                subscription = _subscription_;
-            }, {foo: 'bar'});
+          MessagingClient.subscribe('/foo/bar', function(_subscription_){
+            subscription = _subscription_;
+          }, {foo: 'bar'});
 
-            $rootScope.$apply();
+          $rootScope.$apply();
 
-            expect(subscription).toBeDefined();
-            expect(subscription.destination).toBe('/foo/bar');
-            expect(subscription.headers).toBeDefined();
-            expect(subscription.headers.foo).toBe('bar');
+          expect(subscription).toBeDefined();
+          expect(subscription.destination).toBe('/foo/bar');
+          expect(subscription.headers).toBeDefined();
+          expect(subscription.headers.foo).toBe('bar');
 
-            subscription.unsubscribe = function () {
-              unsubscribed = true;
-            };
+          subscription.unsubscribe = function () {
+            unsubscribed = true;
+          };
 
-            MessagingClient.unsubscribe('/foo/bar');
+          MessagingClient.unsubscribe('/foo/bar');
 
-            $rootScope.$apply();
+          $rootScope.$apply();
 
-            expect(unsubscribed).toBeTruthy();
+          expect(unsubscribed).toBeTruthy();
         });
 
         it("send", function() {
-            MessagingClient.send('/foo/bar', {}, {foo: 'bar'});
+          MessagingClient.send('/foo/bar', {}, {foo: 'bar'});
 
-            $rootScope.$apply();
+          $rootScope.$apply();
 
-            expect(StompClient.getSendPayload()).toBeDefined();
-            expect(StompClient.getSendPayload().destination).toBe('/foo/bar');
-            expect(StompClient.getSendPayload().body).toBeDefined();
-            expect(StompClient.getSendPayload().body.foo).toBe('bar');
+          expect(StompClient.getSendPayload()).toBeDefined();
+          expect(StompClient.getSendPayload().destination).toBe('/foo/bar');
+          expect(StompClient.getSendPayload().body).toBeDefined();
+          expect(StompClient.getSendPayload().body.foo).toBe('bar');
 
         });
 
 
+      });
     });
-});
+  }
+})()
+

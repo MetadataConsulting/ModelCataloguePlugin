@@ -42,6 +42,8 @@ module.exports = function(config) {
             'grails-app/assets/bower_components/angular-ui-ace/ui-ace.js',
             'grails-app/assets/bower_components/angular-file-saver/dist/angular-file-saver.js',
             'grails-app/assets/bower_components/sly-repeat/scalyr.js',
+            'grails-app/assets/bower_components/sockjs-client/dist/sockjs.min.js',
+            'grails-app/assets/bower_components/stomp-websocket/src/stomp.coffee',
 
             'web-app/js/libs/google-diff-match-patch/javascript/diff_match_patch.js',
 
