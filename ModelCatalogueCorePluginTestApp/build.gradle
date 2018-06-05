@@ -531,18 +531,24 @@ task restartDev(dependsOn: [stop, runDev]) {
 }
 
 task printStuff {
-    println project.projectDir.toString()
-
+    println "Project root: ${project.projectDir.toString()}"
+    println "nonGrails runtimeClasspath:"
     sourceSets.nonGrails.runtimeClasspath.each {println it}
 }
 
 
-task createJenkinsFiles(type: JavaExec, dependsOn: [printStuff]) {
+task createJenkinsFiles(type: JavaExec) {
     main = 'org.modelcatalogue.core.TestUtil'
 
     classpath = sourceSets.nonGrails.runtimeClasspath
 
     args project.projectDir.toString()
+}
+
+task createAndAddJenkinsFiles(type: Exec, dependsOn: [createJenkinsFiles]) {
+
+    commandLine 'git', 'add', '../Jenkinsfile*'
+    standardOutput = new ByteArrayOutputStream()
 }
 
 war.finalizedBy copyWar
