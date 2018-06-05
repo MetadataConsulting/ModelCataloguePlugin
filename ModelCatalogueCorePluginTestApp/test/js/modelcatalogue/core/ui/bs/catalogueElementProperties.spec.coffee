@@ -54,3 +54,6 @@ describe "mc.core.ui.catalogueElementProperties", ->
     expect(something.hidden).toBeFunction()
     expect(something.hidden()).toBeFalsy()
 
+  it "converts names of relationship types from camel case to spaced capitalized", inject (catalogueElementProperties) ->
+    isBaseFor = catalogueElementProperties.getConfigurationFor("org.modelcatalogue.core.DataModel.isBaseFor")
+    expect(isBaseFor.label).toEqual('Is Base For')
