@@ -4,8 +4,12 @@ import java.util.regex.Pattern
 
 class TestUtil {
 
-    public static void createJenkinsFiles(String testPath) {
-        Set<String> testCases = getTestCases(testPath)
+    /**
+     * Create Jenkins Files relative to project root, which should end in ModelCatalogueCorePluginTestApp
+     * @param projectRootPath
+     */
+    public static void createJenkinsFiles(String projectRootPath) {
+        Set<String> testCases = getTestCaseNames(projectRootPath)
         Integer testSize = testCases.size()
         Integer remainder = testSize % 5
         Integer quotient = testSize / 5
@@ -14,14 +18,18 @@ class TestUtil {
             quotient += 1
         }
 
+        // split tests into groups of size 1/5 of the total number of tests:
         List<List<String>> subsetOfTestCase = testCases.collate(quotient)
         if (subsetOfTestCase.size() > 5) {
             subsetOfTestCase[4].addAll(subsetOfTestCase[5])
         }
 
-        String parentFolder = new File(testPath).parent
+        // jenkinsfiles will be created in parent of project root:
+        String parentFolder = new File(projectRootPath).parent
         FileTreeBuilder treeBuilder = new FileTreeBuilder(new File(parentFolder))
         File jenkinsFile = null
+
+        // write jenkins files:
         subsetOfTestCase.eachWithIndex { List<String> tests, Integer index ->
             if (index < 5) {
                 String newJenkinsFileName = "Jenkinsfile${index + 1}"
@@ -59,11 +67,15 @@ class TestUtil {
 }"""
     }
 
-
-    private static Set<String> getTestCases(String testPath) {
-        String pathTillFunctioal = testPath + "/test/functional/"
+    /**
+     * Get names of test cases. These are names of files *Spec.groovy.
+     * @param projectRootPath
+     * @return
+     */
+    private static Set<String> getTestCaseNames(String projectRootPath) {
+        String functionalTestRootPath = projectRootPath + "/test/functional/"
         Set<String> files = []
-        new File(pathTillFunctioal).eachFileRecurse {
+        new File(functionalTestRootPath).eachFileRecurse {
             String fileName = it.name
             Set<String> dataFiles = fileName.split(Pattern.quote("."))
             if (dataFiles[0].contains("Spec") && dataFiles[1] == "groovy")
@@ -71,5 +83,11 @@ class TestUtil {
         }
 
         return files
+    }
+
+    static void main(String... args) {
+        println "in TestUtil Main"
+        String projectRootAbsolutePath = args[0]
+        TestUtil.createJenkinsFiles(projectRootAbsolutePath)
     }
 }

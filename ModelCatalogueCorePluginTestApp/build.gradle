@@ -3,9 +3,35 @@ import com.bmuschko.gradle.docker.tasks.container.*
 import com.bmuschko.gradle.docker.tasks.image.*
 import com.bmuschko.gradle.docker.tasks.*
 
+
 plugins {
     id "com.moowork.node" version "1.1.1"
     id "com.bmuschko.docker-remote-api" version "3.2.0"
+    id "groovy"
+}
+
+sourceSets {
+    nonGrails {
+        groovy {
+            srcDirs = ['src/nonGrails/groovy']
+        }
+        compileClasspath += sourceSets.main.runtimeClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+
+// Using the groovy plugin lets Gradle manage a separate "Groovy project" in src/nonGrails/groovy.
+// This can be useful for separate utilities.
+// Meanwhile, Grails uses src/groovy as its source...
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.10'
+    // groovy 2.4.10 for grails 2.5.6
+    // groovy version 2.4.5 for grails 2.5.5.
 }
 
 node {
@@ -108,7 +134,7 @@ task runDev(type: Exec, dependsOn: bowerInstall) {
     description = "Run MX in development environment"
 
     assertJava8()
-    environment 'GRAILS_OPTS', "-Xmx1G -Xms512m -XX:MaxPermSize=512m -server"
+    environment 'GRAILS_OPTS', "-Xmx4G -Xms512m -XX:+UseG1GC -XX:MaxPermSize=512m -server"
 
     def cmds = [grailsw]
 
@@ -502,6 +528,21 @@ task copyWar(type: Copy) {
 
 task restartDev(dependsOn: [stop, runDev]) {
 
+}
+
+task printStuff {
+    println project.projectDir.toString()
+
+    sourceSets.nonGrails.runtimeClasspath.each {println it}
+}
+
+
+task createJenkinsFiles(type: JavaExec, dependsOn: [printStuff]) {
+    main = 'org.modelcatalogue.core.TestUtil'
+
+    classpath = sourceSets.nonGrails.runtimeClasspath
+
+    args project.projectDir.toString()
 }
 
 war.finalizedBy copyWar
