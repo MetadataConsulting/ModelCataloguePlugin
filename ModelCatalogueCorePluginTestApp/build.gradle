@@ -56,16 +56,42 @@ task bowerInstall(type: NodeTask) {
 }
 
 task cleanUpBowerDependencies(type: Delete) {
+
     delete 'grails-app/assets/bower_components/ace-builds/demo'
     delete 'grails-app/assets/bower_components/ace-builds/src'
     delete 'grails-app/assets/bower_components/ace-builds/src-min'
     delete 'grails-app/assets/bower_components/ace-builds/src-noconflict'
     delete 'grails-app/assets/bower_components/ace-builds/textarea'
+
     delete 'grails-app/assets/bower_components/angular-file-saver/gulpfile.babel.js'
     delete 'grails-app/assets/bower_components/angular-file-saver/src'
     delete 'grails-app/assets/bower_components/angular-file-saver/docs'
+
     delete 'grails-app/assets/bower_components/sly-repeat/scripts'
     delete 'grails-app/assets/bower_components/sly-repeat/src'
+
+    delete 'grails-app/assets/bower_components/d3/test'
+    delete 'grails-app/assets/bower_components/validator-js/src'
+    delete 'grails-app/assets/bower_components/validator-js/lib'
+}
+
+
+
+bowerInstall.finalizedBy cleanUpBowerDependencies // deletes unnecessary Javascript
+
+task war(type: Exec, dependsOn: [bowerInstall]) {
+    group = "ZZZ MC Custom Developer"
+    description = "Build production war of MX application. Deletes unnecessary Javascript."
+    commandLine grailsw, 'war', '--non-interactive', '--stacktrace'
+}
+
+
+task copyWar(type: Copy) {
+    from 'target', {
+        include '*.war'
+        rename '.*\\.war', 'mc.war'
+    }
+    into '../build'
 }
 
 task cleanIdeaFiles(type: Delete) {
@@ -487,26 +513,8 @@ task stop(type: Exec) {
     commandLine grailsw, 'stop-app','--non-interactive', '--stacktrace'
 }
 
-bowerInstall.finalizedBy cleanUpBowerDependencies
 stop.finalizedBy stopContainers
 
-task deleteUnnecessaryJavascript(type: Delete) {
-    delete 'grails-app/assets/bower_components/d3/test', 'grails-app/assets/bower_components/validator-js/src', 'grails-app/assets/bower_components/validator-js/lib'
-}
-task war(type: Exec, dependsOn: [bowerInstall, deleteUnnecessaryJavascript]) {
-    group = "ZZZ MC Custom Developer"
-    description = "Build production war of MX application. Deletes unnecessary Javascript."
-    commandLine grailsw, 'war', '--non-interactive', '--stacktrace'
-}
-
-
-task copyWar(type: Copy) {
-    from 'target', {
-        include '*.war'
-        rename '.*\\.war', 'mc.war'
-    }
-    into '../build'
-}
 
 task restartDev(dependsOn: [stop, runDev]) {
 
