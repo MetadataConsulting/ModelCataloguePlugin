@@ -65,10 +65,15 @@ class DataTypesPage extends Page {
     void createDataTypeFromPlusButton() {
         createDataTypePlusButton.click()
     }
+
     boolean hasDataType(String name) {
         if (dataTypeByName(name)) {
             return true
         }
         false
+    }
+
+    boolean containsDataTypeByName(String value) {
+        $('a', text: value).displayed
     }
 }

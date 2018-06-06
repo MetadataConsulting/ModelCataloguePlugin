@@ -18,8 +18,8 @@ class DataModelAclPermissionsShowPage extends Page {
         rows { $('.panel-body tbody tr') }
         row { $('.panel-body tr', it as int).module(DataModelAclPermissionRowModule) }
         grantForm { $('form#grantForm', 0) }
-        usernameSelect { $('select#username option', text: it) }
-        permissionSelect { $('select#permission option', text: it) }
+        usernameSelect { $('select#username option', value: it) }
+        permissionSelect { $('select#permission option', value: it) }
         inputSubmit { $('input', type: 'submit', value: 'Grant', 0) }
         nav { $('#topmenu', 0).module(NavModule) }
     }
