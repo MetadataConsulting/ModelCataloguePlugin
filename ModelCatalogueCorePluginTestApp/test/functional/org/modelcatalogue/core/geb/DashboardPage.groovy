@@ -21,6 +21,7 @@ class DashboardPage extends Page {
             searchInputField << "${c}"
         }
         searchButton.click()
+        waitFor(5) { dataModelLink(query) }
     }
 
     void select(String dataModelName) {

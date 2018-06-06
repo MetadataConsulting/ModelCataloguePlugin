@@ -44,6 +44,11 @@ class DataModelPage extends Page implements InputUtils {
         finalizedStatus(required: false, wait: true) { $('div.col-md-6', text: 'Status').siblings() }
         setting { $('a#role_navigation-right_admin-menu-menu-item-link') }
         dataModelAcl { $('a#datamodelpermission-admin-menu-item-link') }
+        userLink(wait: true) { $('#role_navigation-right_user-menu-menu-item-link') }
+        logoutLink(wait: true) { $('#user-login-right-menu-item-link') }
+        activityUser(wait: true) {
+            $("#activity-changes > div.inf-table-body > table > tbody > tr > td:nth-child(3) > span > span > a")
+        }
     }
 
     String getRowsText() {
@@ -171,5 +176,19 @@ class DataModelPage extends Page implements InputUtils {
 
     Boolean checkFinalizedStatus() {
         finalizedStatus[0].text().toLowerCase().contains("finalized")
+    }
+
+    void clickUserDropdown() {
+        userLink.click()
+        sleep(1000)
+    }
+
+    void logout() {
+        waitFor { logoutLink }
+        logoutLink.click()
+    }
+
+    void openActivityUser() {
+        activityUser.click()
     }
 }

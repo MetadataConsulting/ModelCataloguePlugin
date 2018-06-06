@@ -55,5 +55,13 @@ class NavModuleAdmin extends Module {
 
     void dataModelAcl() {
         dataModelPermissionLink.click()
+    void userMenu() {
+        userMenuDropdownLink.click()
+        sleep(1000)
+    }
+
+    void logout() {
+        logoutLink.click()
+        sleep(2000)
     }
 }
