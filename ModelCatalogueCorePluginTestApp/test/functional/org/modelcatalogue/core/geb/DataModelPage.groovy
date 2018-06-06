@@ -42,6 +42,8 @@ class DataModelPage extends Page implements InputUtils {
         editModelButton(wait: true) { $('#role_item-detail_inline-editBtn') }
         ModelEditSaveButton(required: false, wait: true) { $('#role_item-detail_inline-edit-submitBtn') }
         finalizedStatus(required: false, wait: true) { $('div.col-md-6', text: 'Status').siblings() }
+        setting { $('a#role_navigation-right_admin-menu-menu-item-link') }
+        dataModelAcl { $('a#datamodelpermission-admin-menu-item-link') }
     }
 
     String getRowsText() {
@@ -78,6 +80,14 @@ class DataModelPage extends Page implements InputUtils {
 
     void dataModel() {
         dataModelButton.click()
+    }
+
+    void settiings() {
+        setting.click()
+    }
+
+    void dataModelAcl() {
+        dataModelAcl.click()
     }
 
     String getDataModelTitle() {

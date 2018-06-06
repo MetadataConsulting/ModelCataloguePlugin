@@ -18,16 +18,33 @@ class DataElementsPage extends Page {
         anchorElements { $("td.col-md-4>span>span>a") }
         dataElements { $("td.col-md-4>span>span>a",text:it) }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
-        addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
+        addItemIcon(required: false) {
+            $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
+        }
         firstRowLink { $('tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a') }
+        expandLink { $('a.inf-cell-expand') }
+        dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
+        deleteBttn { $('a#deleteBtn') }
     }
 
     void createDataElement() {
         createDateElementLink.click()
     }
 
+    void expandLinkClick() {
+        expandLink.click()
+    }
+
+    Boolean isDeleteBttnDisable() {
+        deleteBttn.attr("class") == "disabled"
+    }
+
+    void dataElementDropDown() {
+        dataElementDropDown.click()
+    }
+
     boolean isAddItemIconVisible() {
-        if ( addItemIcon.empty ) {
+        if (addItemIcon.empty) {
             return false
         }
         true

@@ -18,20 +18,35 @@ class DataTypesPage extends Page {
         createDateTypeLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
         rows { $('div.inf-table-body tbody tr') }
         addItemIcon(required: false) { $("tfoot span.fa-plus-circle") }
+        expandLink { $('a.inf-cell-expand') }
+        dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
+        deleteBttn { $('a#deleteBtn') }
+    }
+
+    void expandLinkClick() {
+        expandLink.click()
+    }
+
+    Boolean isDeleteBttnDisable() {
+        deleteBttn.attr("class") == "disabled"
+    }
+
+    void dataElementDropDown() {
+        dataElementDropDown.click()
     }
 
     boolean isAddItemIconVisible() {
-        if ( addItemIcon.empty ) {
+        if (addItemIcon.empty) {
             return false
         }
         true
     }
 
     boolean areCreateButtonsVisible() {
-        if ( createDateTypeLink.empty ) {
+        if (createDateTypeLink.empty) {
             return false
         }
-        if ( addItemIcon.empty ) {
+        if (addItemIcon.empty) {
             return false
         }
         true

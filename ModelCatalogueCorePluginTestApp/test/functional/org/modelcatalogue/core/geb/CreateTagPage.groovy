@@ -8,7 +8,9 @@ class CreateTagPage extends Page implements InputUtils {
     static content = {
         nameInput { $('#name', 0) }
         descriptionInput { $('#description', 0) }
-        saveButton { $("a#role_modal_modal-save-elementBtn") }
+        saveButton(wait: true) { $("a#role_modal_modal-save-elementBtn") }
+        catalogueId(wait: true, required: false) { $('input#modelCatalogueId') }
+
     }
 
     void save() {
@@ -21,5 +23,9 @@ class CreateTagPage extends Page implements InputUtils {
 
     void setDescription(String value) {
         fillInput(descriptionInput, value)
+    }
+
+    void setCatalogueId(String value) {
+        fillInput(catalogueId, value)
     }
 }
