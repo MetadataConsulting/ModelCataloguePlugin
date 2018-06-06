@@ -49,6 +49,7 @@ class DataModelPage extends Page implements InputUtils {
         activityUser(wait: true) {
             $("#activity-changes > div.inf-table-body > table > tbody > tr > td:nth-child(3) > span > span > a")
         }
+        dataModelActions { $('div.contextual-actions.ng-isolate-scope.btn-toolbar') }
     }
 
     String getRowsText() {
@@ -190,5 +191,9 @@ class DataModelPage extends Page implements InputUtils {
 
     void openActivityUser() {
         activityUser.click()
+    }
+
+    boolean inlineEditButtonPresent() {
+        dataModelActions.$('a', title: 'Inline Edit')
     }
 }

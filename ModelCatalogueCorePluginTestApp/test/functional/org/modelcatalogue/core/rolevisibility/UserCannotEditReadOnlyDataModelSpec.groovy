@@ -1,8 +1,17 @@
 package org.modelcatalogue.core.rolevisibility
 
+import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.CreateDataModelPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataModelAclPermissionsPage
+import org.modelcatalogue.core.geb.DataModelAclPermissionsShowPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.HomePage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Specification
+import spock.lang.Shared
+import spock.lang.Stepwise
 import spock.lang.Title
 import spock.lang.Ignore
 
@@ -20,6 +29,92 @@ import spock.lang.Ignore
 - Select Data Model that User has been granted read-only rights for  | Take to Data Model Page
 - Check the inline edit button ( top right corner of data model homepage)  for the data model is disabled | User cannot edit the data model
 ''')
-@Ignore
-class UserCannotEditReadOnlyDataModelSpec extends Specification {
+@Stepwise
+class UserCannotEditReadOnlyDataModelSpec extends GebSpec {
+
+    @Shared
+    String dataModelName = "NEW_TESTING_MODEL"
+
+    def "Login as supervisor"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
+        then:
+        at DashboardPage
+    }
+
+    def "create new data model"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = to CreateDataModelPage
+        createDataModelPage.name = dataModelName
+        createDataModelPage.submit()
+
+        then:
+        at DataModelPage
+    }
+
+    def "select data model acl"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.cogMenu()
+        dashboardPage.nav.dataModelPermission()
+        then:
+        at DataModelAclPermissionsPage
+    }
+
+    def "grant user read only access to created data model"() {
+        when:
+        DataModelAclPermissionsPage dataModelPermissionListPage = browser.page DataModelAclPermissionsPage
+        dataModelPermissionListPage.select(dataModelName)
+        then:
+        at DataModelAclPermissionsShowPage
+
+        when:
+        DataModelAclPermissionsShowPage dataModelPermissionGrantPage = browser.page DataModelAclPermissionsShowPage
+        dataModelPermissionGrantPage.grant('user', 'read')
+
+        then:
+        at DataModelAclPermissionsShowPage
+    }
+
+    def "logout as supervisor"() {
+        when:
+        DataModelAclPermissionsShowPage dataModelPermissionGrantPage = browser.page DataModelAclPermissionsShowPage
+        dataModelPermissionGrantPage.nav.userMenu()
+        dataModelPermissionGrantPage.nav.logout()
+        then:
+        at HomePage
+    }
+
+    def "login as user"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('user', 'user')
+
+        then:
+        at DashboardPage
+    }
+
+    def "select data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select(dataModelName)
+        then:
+        at DataModelPage
+    }
+
+    def "check inline edit button is disabled"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        then:
+        !dataModelPage.inlineEditButtonPresent()
+    }
 }
