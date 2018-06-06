@@ -98,7 +98,7 @@ class CreateNewVersionOfDataModelSpec extends GebSpec {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         then:
-        dataModelPage.finalizedStatus()
+        dataModelPage.checkFinalizedStatus()
 
         when:
         dataModelPage = browser.page DataModelPage

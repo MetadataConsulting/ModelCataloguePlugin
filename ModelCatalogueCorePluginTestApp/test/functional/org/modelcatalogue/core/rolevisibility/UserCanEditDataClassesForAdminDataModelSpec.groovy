@@ -46,7 +46,7 @@ import spock.lang.Title
 @Stepwise
 class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
     @Shared
-    String dataModelName = "NEW_TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
 
     def "Login as supervisor"() {
         when:

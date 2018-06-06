@@ -77,13 +77,13 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
     @Shared
     String dataModelDescription = "description"
     @Shared
-    String dataClassName =  UUID.randomUUID().toString()
+    String dataClassName = UUID.randomUUID().toString()
     @Shared
     String dataClassCatalogueId = UUID.randomUUID().toString()
     @Shared
     String dataClassDescription = "description"
     @Shared
-    String dataEleName =  UUID.randomUUID().toString()
+    String dataEleName = UUID.randomUUID().toString()
     @Shared
     String dataEleCatalogueId = UUID.randomUUID().toString()
     @Shared
@@ -95,7 +95,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
     @Shared
     String dataTypeDescription = "description"
     @Shared
-    String measurementName =  UUID.randomUUID().toString()
+    String measurementName = UUID.randomUUID().toString()
     @Shared
     String measurementCatalogueId = UUID.randomUUID().toString()
     @Shared
@@ -111,7 +111,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
     @Shared
     String assetDescription = "description"
     @Shared
-    String tagName =  UUID.randomUUID().toString()
+    String tagName = UUID.randomUUID().toString()
     @Shared
     String tagCatalogueId = UUID.randomUUID().toString()
     @Shared

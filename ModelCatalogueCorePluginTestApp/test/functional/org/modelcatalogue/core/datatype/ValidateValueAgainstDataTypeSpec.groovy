@@ -37,7 +37,7 @@ import spock.lang.Title
 class ValidateValueAgainstDataTypeSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "NEW_TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
     @Shared
     String dataTypeName = "TESTING_DATATYPE"
 

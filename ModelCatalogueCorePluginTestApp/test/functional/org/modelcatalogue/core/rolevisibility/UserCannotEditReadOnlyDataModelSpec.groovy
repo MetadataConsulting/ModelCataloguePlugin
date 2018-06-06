@@ -33,7 +33,7 @@ import spock.lang.Ignore
 class UserCannotEditReadOnlyDataModelSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "NEW_TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
 
     def "Login as supervisor"() {
         when:

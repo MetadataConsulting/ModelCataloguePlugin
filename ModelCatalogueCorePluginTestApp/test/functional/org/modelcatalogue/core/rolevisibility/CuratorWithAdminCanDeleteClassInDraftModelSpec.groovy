@@ -37,7 +37,7 @@ import spock.lang.Shared
 class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared

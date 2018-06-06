@@ -31,7 +31,7 @@ import org.modelcatalogue.core.geb.*
 class AdminCanCreateModelAndPolicySpec extends GebSpec {
 
     @Shared
-    String datamodelName = "TESTING_MODEL"
+    String datamodelName = UUID.randomUUID().toString()
     @Shared
     String datamodelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared

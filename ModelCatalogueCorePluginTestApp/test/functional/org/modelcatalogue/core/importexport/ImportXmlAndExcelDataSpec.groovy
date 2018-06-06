@@ -47,7 +47,7 @@ import groovy.xml.XmlUtil
 class ImportXmlAndExcelDataSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "NEW_TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
     @Shared
     String dataTypeName = "NEW_DATATYPE"
     @Shared

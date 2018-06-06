@@ -50,7 +50,7 @@ import spock.lang.Title
 class CuratorCanCreateANewDataClassSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "NEW_TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
     @Shared
     String dataClassOneName = "TESTING_CLASS_ONE"
     @Shared

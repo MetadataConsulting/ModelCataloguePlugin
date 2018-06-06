@@ -32,7 +32,7 @@ import spock.lang.Title
 @Stepwise
 class CanCreateDataTypeFromCreateDataElementWizardSpec extends GebSpec {
     @Shared
-    String dataModelName = "TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
     @Shared
     String dataTypeName = "TESTING_DATATYPE"
     @Shared
@@ -61,6 +61,7 @@ class CanCreateDataTypeFromCreateDataElementWizardSpec extends GebSpec {
         createDataModelPage.submit()
 
         then:
+        Thread.sleep(3000)
         at DataModelPage
     }
 

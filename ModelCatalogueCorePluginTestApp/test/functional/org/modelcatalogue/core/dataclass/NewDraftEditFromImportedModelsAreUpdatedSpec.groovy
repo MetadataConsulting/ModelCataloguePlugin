@@ -41,7 +41,7 @@ import spock.lang.Title
 @Stepwise
 class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
     @Shared
-    String dataModelName = "NEW_TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared

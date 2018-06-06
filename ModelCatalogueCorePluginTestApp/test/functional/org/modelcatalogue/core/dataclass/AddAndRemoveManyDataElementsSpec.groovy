@@ -49,7 +49,7 @@ class AddAndRemoveManyDataElementsSpec extends GebSpec {
 
         when:
         CreateDataModelPage createDataModelPage = to CreateDataModelPage
-        createDataModelPage.name = "TESTING_MODEL"
+        createDataModelPage.name = UUID.randomUUID().toString()
         createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
         createDataModelPage.description = "TESTING_MODEL_DESCRIPTION"
         createDataModelPage.submit()
