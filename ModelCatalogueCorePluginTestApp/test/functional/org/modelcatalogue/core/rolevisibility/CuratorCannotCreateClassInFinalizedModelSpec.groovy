@@ -5,6 +5,7 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Ignore
 
 @Issue('https://metadata.atlassian.net/browse/MET-1628')
 @Title('Check that a Curator is not able to create a data class in finalised model')
@@ -26,5 +27,6 @@ import spock.lang.Title
  - Verify that there is no left hand menu and no 'Data Class' menu button | No Data Class menu button present in Finalized version of the Data Model
 /$)
 
+@Ignore
 class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
 }
