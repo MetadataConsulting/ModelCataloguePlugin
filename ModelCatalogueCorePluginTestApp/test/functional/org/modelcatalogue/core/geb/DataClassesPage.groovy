@@ -75,4 +75,16 @@ class DataClassesPage extends Page {
     void findByName(String value) {
         $('a', text: value).click()
     }
+
+    void selectDataClassByName(String value) {
+        rows.$('a', text: value).click()
+    }
+
+    boolean containsDataClass(String value) {
+        if ($('a', text: value)) {
+            return true
+        }
+        false
+    }
+
 }

@@ -38,4 +38,8 @@ class DashboardPage extends Page {
         }
         dataModelLinks.size()
     }
+
+    void selectModelByNameAndIndex(String name, Integer index) {
+        dataModelLink(name)[index].click()
+    }
 }

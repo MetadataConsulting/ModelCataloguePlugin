@@ -25,6 +25,7 @@ class DataClassPage extends Page {
         dataClassMenu { $('#role_item_catalogue-element-menu-item-link') }
         dataClassMenuDropdown { $('#role_item_catalogue-element-menu-item ul.dropdown-menu li') }
         historyList(required: false, wait: true) { $('div#history-changes tbody tr') }
+        className { $('h3.ce-name input', 0) }
     }
 
     void edit() {
@@ -87,6 +88,8 @@ class DataClassPage extends Page {
 
     String historyChange(int row) {
         historyList[row].$('td', 3).text()
+    void editClassName(String value) {
+        className.value(value)
     }
 
 }
