@@ -26,6 +26,7 @@ class DataElementsPage extends Page {
         dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
         rows { $('div.inf-table-body tbody tr') }
+        elementByName(wait: true) { $('a', text: contains(it)) }
     }
 
     void createDataElement() {
@@ -71,5 +72,9 @@ class DataElementsPage extends Page {
 
     void selectDataElement(String value) {
         rows.$('a', text: value).click()
+    }
+
+    boolean hasDataElement(String name) {
+        elementByName(name).displayed
     }
 }

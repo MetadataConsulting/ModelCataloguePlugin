@@ -5,7 +5,7 @@ import geb.Page
 class DataElementPage extends Page {
 
     static url = '/#'
-    static at = { dataElementDropdown.displayed }
+    static at = { title.contains('History of') }
 
     @Override
     String convertToPath(Object[] args) {
@@ -23,6 +23,7 @@ class DataElementPage extends Page {
         dataElementDropdown { $('#role_item_catalogue-element-menu-item-link') }
         deleteDataElementLink { $('#delete-menu-item-link') }
         confirmDeleteButton(wait: true, required: false) { $('form button.btn-primary', text: "OK") }
+        dataTypeList(required: false, wait: true) { $('a.small.with-pointer.ng-scope') }
     }
 
     String getUnitName() {
@@ -64,5 +65,9 @@ class DataElementPage extends Page {
 
     void confirmDelete() {
         waitFor { confirmDeleteButton.click() }
+    }
+
+    boolean containsDataType(String name) {
+        dataTypeList.text().contains(name)
     }
 }

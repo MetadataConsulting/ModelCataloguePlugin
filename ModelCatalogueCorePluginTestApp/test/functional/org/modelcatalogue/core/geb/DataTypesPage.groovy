@@ -18,6 +18,7 @@ class DataTypesPage extends Page {
         createDateTypeLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
         rows { $('div.inf-table-body tbody tr') }
         addItemIcon(required: false) { $("tfoot span.fa-plus-circle") }
+        dataTypeByName(required: false, wait: true) { $('a', text: it) }
         createDataTypePlusButton { $('table tr.inf-table-footer-action span.fa-plus-circle') }
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
@@ -63,5 +64,11 @@ class DataTypesPage extends Page {
 
     void createDataTypeFromPlusButton() {
         createDataTypePlusButton.click()
+    }
+    boolean hasDataType(String name) {
+        if (dataTypeByName(name)) {
+            return true
+        }
+        false
     }
 }
