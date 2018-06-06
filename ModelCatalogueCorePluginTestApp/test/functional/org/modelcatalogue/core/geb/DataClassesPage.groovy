@@ -20,6 +20,7 @@ class DataClassesPage extends Page {
         }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         rows { $('div.inf-table-body tbody tr') }
+        nav { $('div.navbar-collapse', 0).module(NavModuleAdmin) }
         selectDataClass(wait: true) { $('span.ng-binding a', text: it) }
         titlename { $('div.col-md-12 h3') }
         expandLink { $('a.inf-cell-expand') }
@@ -52,6 +53,15 @@ class DataClassesPage extends Page {
 
     void createDataClass() {
         createDateClassLink.click()
+    }
+
+    void selectDataClass(String value) {
+        rows.$('a', text: value).click()
+    }
+
+    Boolean dataClassPresent(String value) {
+        waitFor { createDateClassLink }
+        $('a', text: value).displayed
     }
 
     void selectDataClassLink(String value) {

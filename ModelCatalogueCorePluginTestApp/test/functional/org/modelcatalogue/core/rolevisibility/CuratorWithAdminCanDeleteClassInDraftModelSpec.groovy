@@ -5,6 +5,9 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Ignore
 import spock.lang.Title
+import spock.lang.Stepwise
+import org.modelcatalogue.core.geb.*
+import spock.lang.Shared
 
 @Issue('https://metadata.atlassian.net/browse/MET-1463')
 @Title('A curator is able to delete a data class on draft data model that they have administration rights to')
@@ -29,6 +32,155 @@ import spock.lang.Title
  - Select option 'Delete' to delete Data Class. | Delete pop-up appears asking 'Do you really want to delete Data Class [data class]?'.
  - Select the OK button to continue deleting Data Class. | Data Class is deleted. Redirected to 'Data Classes' page.
 /$)
-@Ignore
+
+@Stepwise
 class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
+
+    @Shared
+    String dataModelName = "TESTING_MODEL"
+    @Shared
+    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Shared
+    String dataClassName = "TESTING_CLASS"
+    @Shared
+    String dataClassDescription = "TESTING_CLASS_DESCRIPTION"
+
+    def "Login as supervisor"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
+        then:
+        at DashboardPage
+    }
+
+    def "create new data model"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.createDataModel()
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
+        createDataModelPage.name = dataModelName
+        createDataModelPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataModelPage.description = dataModelDescription
+        createDataModelPage.submit()
+        then:
+        at DataModelPage
+    }
+
+
+    def "create new data class"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = dataClassName
+        createDataClassPage.modelCatalogueId = UUID.randomUUID().toString()
+        createDataClassPage.description = dataClassDescription
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+        then:
+        at DataClassesPage
+    }
+
+    def "select data model acl option from settings dropdown"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.nav.adminMenu()
+        then:
+        at DataClassesPage
+
+        when:
+        dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.nav.dataModelAcl()
+        for (String winHandle : driver.getWindowHandles()) {
+            driver.switchTo().window(winHandle);
+        }
+        then:
+        at DataModelAclPermissionsPage
+    }
+
+    def "grant permission"() {
+        when:
+        DataModelAclPermissionsPage dataModelAclPermissionsPage = browser.page DataModelAclPermissionsPage
+        dataModelAclPermissionsPage.select(dataModelName)
+        then:
+        at DataModelAclPermissionsShowPage
+
+        when:
+        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
+        dataModelAclPermissionsShowPage.grant('curator', 'administration')
+        then:
+        at DataModelAclPermissionsShowPage
+
+    }
+
+    def "logout as supervisor"() {
+        when:
+        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
+        dataModelAclPermissionsShowPage.nav.userMenu()
+        dataModelAclPermissionsShowPage.nav.logout()
+        then:
+        at HomePage
+    }
+
+    def "Login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
+
+        then:
+        at DashboardPage
+    }
+
+    def "select data model created"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select(dataModelName)
+        then:
+        at DataModelPage
+    }
+
+    def "delete data class"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.dataClasses()
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.selectDataClass(dataClassName)
+        then:
+        at DataClassPage
+
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+        dataClassPage.dataClassDropdown()
+        dataClassPage.deleteDataClass()
+        dataClassPage.confirmDelete()
+        then:
+        at DataClassesPage
+    }
+
+    def "confirm data class is deleted"() {
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        then:
+        !dataClassesPage.dataClassPresent(dataClassName)
+    }
+
 }

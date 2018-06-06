@@ -19,6 +19,9 @@ class DataClassPage extends Page {
         dataClassDropDown { $('#role_item_catalogue-element-menu-item-link') }
         createRelationship { $('#create-new-relationship-menu-item-link') }
         checkMinMaxOccur { $('tr.inf-table-item-row.warning td.inf-table-item-cell.ng-scope.col-md-2') }
+        dataClassDropdownLink { $('#role_item_catalogue-element-menu-item-link') }
+        deleteDataClass { $('#delete-menu-item-link') }
+        confirmDataClassDelete(required: false, wait: true) { $('button.btn-primary', text: "OK") }
     }
 
     void edit() {
@@ -56,6 +59,19 @@ class DataClassPage extends Page {
 
     void addParent() {
         parentAddButton[2].click()
+    }
+
+    void dataClassDropdown() {
+        dataClassDropdownLink.click()
+    }
+
+    void deleteDataClass() {
+        deleteDataClass.click()
+    }
+
+    void confirmDelete() {
+        waitFor { confirmDataClassDelete }
+        confirmDataClassDelete.click()
     }
 
 }
