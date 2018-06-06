@@ -14,6 +14,7 @@ var serverUrl = ""
 
 var initD3 = (function() {
 
+
   $('#column-left').resizable({
     handleSelector: ".splitter",
     resizeHeight: false
@@ -270,7 +271,7 @@ var initD3 = (function() {
 
     var duration = d3.event && d3.event.altKey ? 5000 : 500;
 
-    var radius = 7
+    var radius = 7 // node circle radius
     var unopenedNodeBorderColour = "orangered"
 
 
@@ -426,21 +427,68 @@ var initD3 = (function() {
     }
 
     function shortenedNodeText(d) {
-      return (d.name.length >= maxStringLength && shouldNameBeShortened(d)) ? d.name.substring(0,maxStringLength) + "..." : d.name;  }
+      return (d.name.length >= maxStringLength && shouldNameBeShortened(d)) ? d.name.substring(0,maxStringLength) + "..." : d.name;
+    }
+
+    function myFirst(arr, n) {
+      if (arr.length == 0) {
+        return []
+      }
+      else {
+        return _.first(arr, n)
+      }
+    }
+
+    function splitName(d) {
+      var words = d.name.split(/\s+/)
+
+      var result = []
+      var n = 0
+      while (n < 3) { // 3 lines
+        // words is the remaining array of words
+        var wordsPerLine = 0
+        var line = myFirst(words, wordsPerLine).join(' ')
+        while (line.length < maxStringLength && wordsPerLine < words.length) {
+          wordsPerLine++
+          line = myFirst(words, wordsPerLine).join(' ')
+        }
+
+        if (line.length > maxStringLength) { // loop could terminate due to being over the max string length
+          wordsPerLine = wordsPerLine - 1
+        }
+
+
+        result.push(words.splice(0, wordsPerLine).join(' '))
+        n++
+      }
+      return result
+    }
 
     // Text/link for each node
     nodeEnter.append("svg:text")
       .attr("dy", ".35em")
         // text with possibly shortened name
 
-      .attr("x", function(d) { return shouldNameBeShortened(d) ? -(radius + 5): radius + 5; })
+      .attr("x", function(d) { var extra = 5; return shouldNameBeShortened(d) ? -(radius + extra): radius + extra; })
       .attr("text-anchor", function(d) {
         return shouldNameBeShortened(d) ? "end" : "start";
       })
-      .text(shortenedNodeText)
+      // .text(shortenedNodeText)
 
       .style("fill-opacity", 1e-6)
-      .style("font", "15px sans-serif");
+      .style("font", "15px sans-serif")
+      .append('svg:tspan')
+      .attr("x", function(d) { var extra = 5; return shouldNameBeShortened(d) ? -(radius + extra): radius + extra; })
+      .attr('dy', 5)
+      .text(function(d) { return splitName(d)[0]; })
+      .append('svg:tspan')
+      .attr("x", function(d) { var extra = 5; return shouldNameBeShortened(d) ? -(radius + extra): radius + extra; })
+      .attr('dy', 20)
+      .text(function(d) { return splitName(d)[1]; })
+      .append('svg:tspan')
+      .attr("x", function(d) { var extra = 5; return shouldNameBeShortened(d) ? -(radius + extra): radius + extra; })
+      .attr('dy', 20)
+      .text(function(d) { return splitName(d)[2]; });
 
 
 
