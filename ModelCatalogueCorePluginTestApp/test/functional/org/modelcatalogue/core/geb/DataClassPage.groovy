@@ -22,6 +22,9 @@ class DataClassPage extends Page {
         dataClassDropdownLink { $('#role_item_catalogue-element-menu-item-link') }
         deleteDataClass { $('#delete-menu-item-link') }
         confirmDataClassDelete(required: false, wait: true) { $('button.btn-primary', text: "OK") }
+        dataClassMenu { $('#role_item_catalogue-element-menu-item-link') }
+        dataClassMenuDropdown { $('#role_item_catalogue-element-menu-item ul.dropdown-menu li') }
+        historyList(required: false, wait: true) { $('div#history-changes tbody tr') }
     }
 
     void edit() {
@@ -72,6 +75,18 @@ class DataClassPage extends Page {
     void confirmDelete() {
         waitFor { confirmDataClassDelete }
         confirmDataClassDelete.click()
+    }
+
+    void selectDataClassDropdown() {
+        dataClassMenu.click()
+    }
+
+    void selectCreateRelationship() {
+        $('a#create-new-relationship-menu-item-link').click()
+    }
+
+    String historyChange(int row) {
+        historyList[row].$('td', 3).text()
     }
 
 }

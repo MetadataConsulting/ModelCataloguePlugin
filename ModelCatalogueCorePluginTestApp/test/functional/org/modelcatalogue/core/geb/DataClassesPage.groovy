@@ -71,4 +71,8 @@ class DataClassesPage extends Page {
     String titleText() {
         return titlename.text()
     }
+
+    void findByName(String value) {
+        $('a', text: value).click()
+    }
 }

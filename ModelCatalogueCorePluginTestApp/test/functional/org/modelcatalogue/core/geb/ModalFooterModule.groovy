@@ -20,5 +20,6 @@ class ModalFooterModule extends Module {
 
     void save() {
         saveLink.click()
+        sleep(2000)
     }
 }

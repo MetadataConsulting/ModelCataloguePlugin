@@ -10,11 +10,11 @@ class CreateDataElementPage extends Page implements InputUtils {
         descriptionInput { $('#description', 0) }
         modelCatalogueIdInput { $('#modelCatalogueId', 0) }
         submitButton(wait: true) { $("#role_modal_modal-save-elementBtn", 0) }
-        searchLink(wait: true) { $("", 0) }
         searchDataType(wait: true) { $("input#dataType") }
         selectItem(wait: true) { $("a.cep-item", 0) }
         createNewItem(wait: true) { $("a.cep-item", 1) }
         createNewDataTypeLink(required: false, wait: true) { $('a.create-new-cep-item', 0) }
+        searchMoreButton(wait: true) { $('span.search-for-more-icon') }
     }
 
     void setName(String value) {
@@ -53,5 +53,9 @@ class CreateDataElementPage extends Page implements InputUtils {
 
     void createNewDataType() {
         createNewDataTypeLink.click()
+    }
+
+    void searchMore() {
+        searchMoreButton.click()
     }
 }

@@ -47,17 +47,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         buttonPlus { $('span.input-group-btn button.btn-success', 0) }
         rawLink(wait: true) { $('a', text: 'Raw') }
         addMetadataButton(wait: true) { $('div.modal button.btn-success', text: 'Add Metadata') }
-        gridCheckbox { $("input[type='checkbox']") }
-        headerInput { $('input#group-header') }
-        initialNumberOfRowsInput { $('input#repeat-num') }
-        maxNoOfRowsInput { $('input#repeat-max') }
-        createAnotherButton(wait: true) { $('button.btn.btn-success', 1) }
-        exitButton(wait: true) { $('button#exit-wizard') }
-
-        excludeDataElementCheckbox(required: true) { $('input', type: "checkbox", 2) }
-        mergeToSingleSectionCheckbox(required: true) { $('input', type: "checkbox", 1) }
-        excludeCheckbox(required: true) { $('input.ng-pristine.ng-untouched.ng-valid', 0) }
-        formItemLink(required: true) { $('a', text: 'Form (Item)') }*/
+        elementsList(wait: true) { $('ul.dropdown-menu.ng-isolate-scope li') }
     }
 
     void setName(String value) {
@@ -151,7 +141,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void exit() {
         exitButton.click()
-        sleep(2000)
+        sleep(1000)
     }
 
     void setName(String value) {
@@ -172,38 +162,9 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         maxNoOfRowsInput.value(value)
     }
 
-    void createAnother() {
-        createAnotherButton.click()
+    void searchDataElement(String value) {
+        setDataElement(value)
+        sleep(2000)
+        elementsList.$('a', text: contains(value)).click()
     }
-
-    void setSectionSubtitle(String value) {
-        fillInput(sectionSubtitleArea, value)
-    }
-
-    void checkExclude() {
-        excludeCheckbox.click()
-    }
-
-    void checkExcludeDataElement() {
-        excludeDataElementCheckbox.click()
-    }
-
-    void checkMergeToSingleSection() {
-        mergeToSingleSectionCheckbox.click()
-    }
-
-    void formItem() {
-        formItemLink.click()
-    }
-
-    void exitWizard() {
-        exitButton.click()
-    }
-
-    boolean isEnabled(Navigator parent) {
-        if (parent.@disabled == "disabled") {
-            return false
-        }
-        return true
-    }*/
 }
