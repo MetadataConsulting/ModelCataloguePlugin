@@ -45,4 +45,8 @@ class DataImportsPage extends Page {
         waitFor { addItemIcon }
         $('a', text: value).displayed
     }
+
+    boolean containsData(String value) {
+        $('a', text: value).displayed
+    }
 }
