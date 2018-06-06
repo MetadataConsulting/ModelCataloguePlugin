@@ -49,7 +49,7 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
     @Shared
     String dataClassDescription = "NEW_TESTING_DESCRIPTION"
     @Shared
-    String importDataModelName = "IMPORT_MODEL"
+    String importDataModelName = UUID.randomUUID().toString()
     @Shared
     String importDataClassName = "IMPORT_CLASS"
     @Shared
@@ -139,6 +139,7 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         ImportDataModelPage importDataModelPage = browser.page ImportDataModelPage
         importDataModelPage.searchMore()
         then:
+        Thread.sleep(1000)
         at SearchModelPage
 
         when:

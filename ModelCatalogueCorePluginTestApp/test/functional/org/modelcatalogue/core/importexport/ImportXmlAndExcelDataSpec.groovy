@@ -10,6 +10,7 @@ import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.ImportModelCatalogueXMLPage
 import org.modelcatalogue.core.geb.AssetPage
 import spock.lang.Issue
+import spock.lang.Ignore
 import spock.lang.Narrative
 import spock.lang.Shared
 import spock.lang.Stepwise

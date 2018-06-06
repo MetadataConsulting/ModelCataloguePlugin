@@ -197,7 +197,7 @@ class VerifyMinOccursCanBeZeroSpec extends GebSpec {
         createRelationshipPage.slectMetadataTab("Occurrence")
         createRelationshipPage.minOccurValue(minOccur)
         createRelationshipPage.maxOccurValue(maxOccur)
-        createRelationshipPage.createRelationshipBttn()
+        createRelationshipPage.createRelationship()
         then:
         at DataClassPage
     }

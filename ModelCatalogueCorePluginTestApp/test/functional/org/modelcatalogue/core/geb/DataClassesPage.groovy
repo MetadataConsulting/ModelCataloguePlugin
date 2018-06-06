@@ -55,9 +55,9 @@ class DataClassesPage extends Page {
         createDateClassLink.click()
     }
 
-    void selectDataClass(String value) {
+    /*void selectDataClass(String value) {
         rows.$('a', text: value).click()
-    }
+    }*/
 
     Boolean dataClassPresent(String value) {
         waitFor { createDateClassLink }

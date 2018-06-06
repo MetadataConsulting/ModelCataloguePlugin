@@ -3,6 +3,7 @@ package org.modelcatalogue.core.datamodel
 import geb.spock.GebSpec
 import spock.lang.Issue
 import spock.lang.Narrative
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Stepwise

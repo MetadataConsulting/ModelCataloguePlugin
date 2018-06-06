@@ -17,6 +17,7 @@ class ImportDataModelPage extends Page {
     }
 
     void createRelationship() {
+        sleep(1000)
         createRelationshipButton.click()
     }
 

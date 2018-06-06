@@ -70,10 +70,6 @@ class DataModelPage extends Page implements InputUtils {
         exportXMLLink.click()
     }
 
-    Boolean finalizedStatus() {
-        finalizedStatus[0].text().toLowerCase().contains("finalized")
-    }
-
     void export() {
         exportLink.click()
     }

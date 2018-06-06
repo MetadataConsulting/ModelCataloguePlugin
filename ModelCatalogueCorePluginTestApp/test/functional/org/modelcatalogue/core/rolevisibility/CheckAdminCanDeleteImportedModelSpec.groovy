@@ -5,6 +5,7 @@ import jdk.nashorn.internal.runtime.SharedPropertyMap
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
+import spock.lang.Ignore
 import spock.lang.Title
 import spock.lang.Stepwise
 import spock.lang.Shared

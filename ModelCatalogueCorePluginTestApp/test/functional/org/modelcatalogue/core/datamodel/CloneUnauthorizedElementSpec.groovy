@@ -52,11 +52,11 @@ import spock.lang.Title
 class CloneUnauthorizedElementSpec extends GebSpec {
 
     @Shared
-    String dataModelOneName = "DATA_MODEL_ONE"
+    String dataModelOneName = UUID.randomUUID().toString()
     @Shared
-    String dataModelTwoName = "DATA_MODEL_TWO"
+    String dataModelTwoName = UUID.randomUUID().toString()
     @Shared
-    String dataModelThreeName = "DATA_MODEL_THREE"
+    String dataModelThreeName = UUID.randomUUID().toString()
     @Shared
     String dataTypeOneName = "DATATYPE_ONE"
     @Shared
@@ -248,6 +248,7 @@ class CloneUnauthorizedElementSpec extends GebSpec {
     def "select first data model created"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        Thread.sleep(1000)
         dashboardPage.select(dataModelOneName)
         then:
         at DataModelPage

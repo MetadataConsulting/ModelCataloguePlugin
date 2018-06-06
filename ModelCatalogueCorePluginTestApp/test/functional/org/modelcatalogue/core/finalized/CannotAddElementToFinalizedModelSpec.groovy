@@ -4,6 +4,7 @@ import geb.spock.GebSpec
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
+import spock.lang.Ignore
 import spock.lang.Title
 import org.modelcatalogue.core.geb.*
 import spock.lang.*

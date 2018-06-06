@@ -53,11 +53,11 @@ import spock.lang.Title
 class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
 
     @Shared
-    String dataModelOneName = "DATA_MODEL_ONE"
+    String dataModelOneName = UUID.randomUUID().toString()
     @Shared
-    String dataModelTwoName = "DATA_MODEL_TWO"
+    String dataModelTwoName = UUID.randomUUID().toString()
     @Shared
-    String dataModelThreeName = "DATA_MODEL_THREE"
+    String dataModelThreeName = UUID.randomUUID().toString()
     @Shared
     String dataTypeOneName = "DATATYPE_ONE"
     @Shared
@@ -90,6 +90,7 @@ class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
         createDataModelPage.submit()
 
         then:
+        Thread.sleep(1000)
         at DataModelPage
     }
 

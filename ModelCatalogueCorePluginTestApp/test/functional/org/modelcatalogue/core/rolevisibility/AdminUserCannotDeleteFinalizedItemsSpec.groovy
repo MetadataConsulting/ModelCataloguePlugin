@@ -413,7 +413,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         dataClassesPage.expandLinkClick()
-        dataClassesPage.dataElementDropDown()
+        dataClassesPage.selectDataElementDropDown()
         then:
         dataClassesPage.isDeleteBttnDisable()
     }
@@ -429,7 +429,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         when:
         DataElementsPage dataElementsPage = browser.page DataElementsPage
         dataElementsPage.expandLinkClick()
-        dataElementsPage.dataElementDropDown()
+        dataElementsPage.selectDataElementDropDown()
         then:
         dataElementsPage.isDeleteBttnDisable()
     }
@@ -445,7 +445,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         when:
         DataTypesPage dataTypesPage = browser.page DataTypesPage
         dataTypesPage.expandLinkClick()
-        dataTypesPage.dataElementDropDown()
+        dataTypesPage.selectDataElementDropDown()
         then:
         dataTypesPage.isDeleteBttnDisable()
     }
@@ -461,7 +461,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         when:
         MeasurementUnitsPage measurementUnitsPage = browser.page MeasurementUnitsPage
         measurementUnitsPage.expandLinkClick()
-        measurementUnitsPage.dataElementDropDown()
+        measurementUnitsPage.selectDataElementDropDown()
         then:
         measurementUnitsPage.isDeleteBttnDisable()
     }
@@ -476,7 +476,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         when:
         BusinessRulesPage businessRulesPage = browser.page BusinessRulesPage
         businessRulesPage.expandLinkClick()
-        businessRulesPage.dataElementDropDown()
+        businessRulesPage.selectDataElementDropDown()
         then:
         businessRulesPage.isDeleteBttnDisable()
     }
@@ -491,7 +491,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         when:
         TagsPage tagsPage = browser.page TagsPage
         tagsPage.expandLinkClick()
-        tagsPage.dataElementDropDown()
+        tagsPage.selectDataElementDropDown()
         then:
         tagsPage.isDeleteBttnDissable()
     }

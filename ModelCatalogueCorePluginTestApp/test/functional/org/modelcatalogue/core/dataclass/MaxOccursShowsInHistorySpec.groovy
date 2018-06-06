@@ -5,6 +5,7 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Ignore
 import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
 import spock.lang.Shared
@@ -65,7 +66,7 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
     @Shared
     String dataClassDescription = "TESTING_DATACLASS_DESCRIPTION"
     @Shared
-    String searchDataModelName = "IMPORT_MODEL"
+    String searchDataModelName = UUID.randomUUID().toString()
     @Shared
     String searchDataClassName = "IMPORT_CLASS"
 

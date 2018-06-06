@@ -29,6 +29,7 @@ class DataImportPage extends Page implements InputUtils {
 
     void finish() {
         waitFor(5) { $("#type") }
+        sleep(2000)
         submitButton.click()
         sleep(2000)
     }

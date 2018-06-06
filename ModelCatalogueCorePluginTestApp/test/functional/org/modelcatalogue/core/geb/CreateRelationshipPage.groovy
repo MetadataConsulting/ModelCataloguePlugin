@@ -3,7 +3,7 @@ package org.modelcatalogue.core.geb
 import geb.Page
 
 class CreateRelationshipPage extends Page implements InputUtils {
-    static at = { $('.modal-dialog').text().contains('Create Data Element') }
+    static at = { $("select#type", 0).displayed }
 
     static content = {
         chooseRelation(wait: true) { $("#type option", text: it) }
@@ -12,9 +12,9 @@ class CreateRelationshipPage extends Page implements InputUtils {
         destinationDropdown(wait: true) { $(".cep-item") }
         minOccur(wait: true) { $("#minOccurs") }
         maxOccur(wait: true) { $("#maxOccurs") }
-        createRelationship(wait: true) { $(".btn-primary") }
         metadataExpand(wait: true) { $(".fa-toggle-down") }
         pageHeading(wait: true) { $("h4.ng-binding") }
+
         relationshipTypeLink { $('select#type') }
         relationshipTypeDropdown { $('select#type option', text: it) }
         searchMoreButton { $('span.search-for-more-icon') }
@@ -51,10 +51,6 @@ class CreateRelationshipPage extends Page implements InputUtils {
         sleep(3_000)
     }
 
-    void createRelationshipBttn() {
-        createRelationship.click()
-    }
-
     void destinationDropdownFirst() {
         destinationDropdown[0].click()
     }
@@ -80,6 +76,7 @@ class CreateRelationshipPage extends Page implements InputUtils {
     }
 
     void openMetadata() {
+        sleep(1000)
         metadataDropdown.click()
     }
 

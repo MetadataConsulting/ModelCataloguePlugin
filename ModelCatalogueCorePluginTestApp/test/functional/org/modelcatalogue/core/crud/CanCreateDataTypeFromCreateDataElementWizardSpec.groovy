@@ -11,6 +11,7 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
+import spock.lang.Ignore
 import spock.lang.Narrative
 import spock.lang.Shared
 import spock.lang.Stepwise
