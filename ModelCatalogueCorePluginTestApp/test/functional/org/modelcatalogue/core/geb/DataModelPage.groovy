@@ -39,9 +39,9 @@ class DataModelPage extends Page implements InputUtils {
         addedPoliciesInEditDataModel(wait: true) { $('div.tags>span') }
         saveButton(required: false, wait: true) { $('button#role_item-detail_inline-edit-submitBtn') }
         policiesList { $('div.row.detail-section', 0).$('div.ng-scope span') }
-
         editModelButton(wait: true) { $('#role_item-detail_inline-editBtn') }
         ModelEditSaveButton(required: false, wait: true) { $('#role_item-detail_inline-edit-submitBtn') }
+        finalizedStatus(required: false, wait: true) { $('div.col-md-6', text: 'Status').siblings() }
     }
 
     String getRowsText() {
@@ -153,5 +153,9 @@ class DataModelPage extends Page implements InputUtils {
     void removeUniqueOfKindPolicy() {
         $('a#remove-tag-0').click()
         sleep(2000)
+    }
+
+    Boolean checkFinalizedStatus() {
+        finalizedStatus[0].text().toLowerCase().contains("finalized")
     }
 }
