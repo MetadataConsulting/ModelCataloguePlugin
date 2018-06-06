@@ -88,6 +88,8 @@ class DataClassPage extends Page {
 
     String historyChange(int row) {
         historyList[row].$('td', 3).text()
+    }
+
     void editClassName(String value) {
         className.value(value)
     }
