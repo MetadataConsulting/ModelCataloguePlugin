@@ -20,7 +20,7 @@ class DataModelPage extends Page implements InputUtils {
             $("#activity-changes>div.inf-table-body>table>tbody>tr:nth-child(1)>td.inf-table-item-cell.ng-scope.col-md-7> span>span>code")
         }
         h3CeName { $('h3.ce-name', 0) }
-        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+        treeView(wait: true) { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         rightSideTitleH3 { $("h3:not(.ng-hide):not(.data-model-heading)", 0) }
         dataModelButton(required: false) { $('#role_item_catalogue-element-menu-item-link', 0) }
         deleteButton(required: false) { $('#delete-menu-item-link', 0) }

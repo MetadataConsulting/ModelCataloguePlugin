@@ -19,6 +19,7 @@ class DataTypesPage extends Page {
         rows { $('div.inf-table-body tbody tr') }
         addItemIcon(required: false) { $("tfoot span.fa-plus-circle") }
         dataTypeByName(required: false, wait: true) { $('a', text: it) }
+        dataTypeByName(required: false, wait: true) { $('a', text: it) }
         createDataTypePlusButton { $('table tr.inf-table-footer-action span.fa-plus-circle') }
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
@@ -75,5 +76,9 @@ class DataTypesPage extends Page {
 
     boolean containsDataTypeByName(String value) {
         $('a', text: value).displayed
+    }
+
+    void selectDataType(String value) {
+        dataTypeByName(value).click()
     }
 }
