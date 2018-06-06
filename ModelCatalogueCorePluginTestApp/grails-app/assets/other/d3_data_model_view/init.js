@@ -81,6 +81,7 @@ var initD3 = (function() {
       loadedChildren: boolean,
       loading: boolean,
 
+      parent: ?D3JSON
 
       children: ?Array<D3JSON>,
 
@@ -291,6 +292,14 @@ var initD3 = (function() {
       }
     */
 
+    function collapseSiblings(d /*: D3JSON */) {
+      var parent = d.parent
+      if (parent) {
+        parent.children = [d]
+        parent.loadedChildren = false
+      }
+    }
+
     // load children if not loaded
     function onNodeClick(d /*: D3JSON */) {
       var path = pathFromRoot(d)
@@ -298,6 +307,10 @@ var initD3 = (function() {
       console.log("Angular pathstring: " + angularTreeviewPathString(path))
 
       info(d); // display info
+
+      if (d.children === [] || d.children === null) {
+        collapseSiblings(d)
+      }
 
       if (d.loadedChildren && !d.loading) {
         toggle(d);
@@ -320,6 +333,7 @@ var initD3 = (function() {
 
             if (data.canAccessDataModel && data.caseHandled) {
               d.children = null
+              d._children = null
               if (data.children.length > 0) {
                 d._children = data.children;
               }
