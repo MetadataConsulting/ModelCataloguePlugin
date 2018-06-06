@@ -429,11 +429,7 @@ var initD3 = (function() {
       return (d.name.length >= maxStringLength && shouldNameBeShortened(d)) ? d.name.substring(0,maxStringLength) + "..." : d.name;  }
 
     // Text/link for each node
-    nodeEnter.append("svg:a")
-      .attr("xlink:href", function(d) {return d.angularLink})
-      .attr("target", "_blank")
-
-      .append("svg:text")
+    nodeEnter.append("svg:text")
       .attr("dy", ".35em")
         // text with possibly shortened name
 
