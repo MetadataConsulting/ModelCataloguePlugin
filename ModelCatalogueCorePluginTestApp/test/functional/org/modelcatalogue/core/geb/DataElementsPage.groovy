@@ -25,6 +25,7 @@ class DataElementsPage extends Page {
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
+        rows { $('div.inf-table-body tbody tr') }
     }
 
     void createDataElement() {
@@ -66,5 +67,9 @@ class DataElementsPage extends Page {
 
     String dataElementCreated() {
         firstRowLink.text()
+    }
+
+    void selectDataElement(String value) {
+        rows.$('a', text: value).click()
     }
 }

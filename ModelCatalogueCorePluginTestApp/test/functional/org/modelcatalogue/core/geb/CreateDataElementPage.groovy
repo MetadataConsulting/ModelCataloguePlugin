@@ -3,7 +3,7 @@ package org.modelcatalogue.core.geb
 import geb.Page
 
 class CreateDataElementPage extends Page implements InputUtils {
-    static at = { $('.modal-dialog').text().contains('Create Data Element') }
+    static at = { $('.modal-dialog', 0).text().contains('Create Data Element') }
 
     static content = {
         nameInput { $('#name', 0) }
@@ -14,6 +14,7 @@ class CreateDataElementPage extends Page implements InputUtils {
         searchDataType(wait: true) { $("input#dataType") }
         selectItem(wait: true) { $("a.cep-item", 0) }
         createNewItem(wait: true) { $("a.cep-item", 1) }
+        createNewDataTypeLink(required: false, wait: true) { $('a.create-new-cep-item', 0) }
     }
 
     void setName(String value) {
@@ -22,7 +23,7 @@ class CreateDataElementPage extends Page implements InputUtils {
 
     void search(String value) {
         fillInput(searchDataType, value)
-        sleep(3_000)
+        waitFor { createNewDataTypeLink }
     }
 
     Boolean matchSearch(String value) {
@@ -47,5 +48,10 @@ class CreateDataElementPage extends Page implements InputUtils {
 
     void finish() {
         submitButton.click()
+        sleep(2000)
+    }
+
+    void createNewDataType() {
+        createNewDataTypeLink.click()
     }
 }

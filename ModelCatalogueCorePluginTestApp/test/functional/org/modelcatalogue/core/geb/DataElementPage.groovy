@@ -5,7 +5,7 @@ import geb.Page
 class DataElementPage extends Page {
 
     static url = '/#'
-    static at = { title.contains('of data element') }
+    static at = { dataElementDropdown.displayed }
 
     @Override
     String convertToPath(Object[] args) {
@@ -14,10 +14,15 @@ class DataElementPage extends Page {
 
     static content = {
         editButton(required: false) { $("a#role_item-detail_inline-editBtn", 0) }
-        submitButton(required: false)  {$("button#role_item-detail_inline-edit-submitBtn", 0) }
-        descriptionTextarea(required: false)  { $("#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > div > div.split-view-right.data-model-detail-pane > ui-view > ui-view > div > div > div > div > form > div:nth-child(4) > div > ng-include > div > div > span > div > textarea", 0)}
-        dataTypeInput(required: false)  { $("input#dataType", 0) }
+        submitButton(required: false) { $("button#role_item-detail_inline-edit-submitBtn", 0) }
+        descriptionTextarea(required: false) {
+            $("#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > div > div.split-view-right.data-model-detail-pane > ui-view > ui-view > div > div > div > div > form > div:nth-child(4) > div > ng-include > div > div > span > div > textarea", 0)
+        }
+        dataTypeInput(required: false) { $("input#dataType", 0) }
         unitNameSpan(required: false) { $('span.unit-name', 0) }
+        dataElementDropdown { $('#role_item_catalogue-element-menu-item-link') }
+        deleteDataElementLink { $('#delete-menu-item-link') }
+        confirmDeleteButton(wait: true, required: false) { $('form button.btn-primary', text: "OK") }
     }
 
     String getUnitName() {
@@ -47,5 +52,17 @@ class DataElementPage extends Page {
         if ( submitButton.isDisplayed() ) {
             submitButton.click()
         }
+    }
+
+    void dataElementDropdown() {
+        dataElementDropdown.click()
+    }
+
+    void deleteDataElement() {
+        deleteDataElementLink.click()
+    }
+
+    void confirmDelete() {
+        waitFor { confirmDeleteButton.click() }
     }
 }
