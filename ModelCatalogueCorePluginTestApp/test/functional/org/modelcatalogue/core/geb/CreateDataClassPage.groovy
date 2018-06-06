@@ -12,7 +12,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
         nameInput { $('#name', 0) }
         descriptionInput { $('#description', 0) }
-        /*modelCatalogueIdInput { $('#modelCatalogueId', 0) }
+        modelCatalogueIdInput { $('#modelCatalogueId', 0) }
         finishButton { $('#step-finish', 0) }
         metadataButton { $('#step-metadata', 0) }
         parentsButton { $('#step-parents', 0) }
@@ -58,7 +58,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         fillInput(descriptionInput, value)
     }
 
-    /*void addMetadata() {
+    void addMetadata() {
         addMetadataButton.click()
     }
 
@@ -144,15 +144,9 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         sleep(1000)
     }
 
-    void setName(String value) {
-        fillInput(nameInput, value)
-    }
-
     void setModelCatalogueId(String value) {
         fillInput(modelCatalogueIdInput, value)
     }
-
-
 
     void selectGrid() {
         gridCheckbox.click()

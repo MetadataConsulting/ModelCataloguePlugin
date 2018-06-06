@@ -67,7 +67,7 @@ class CreateRelationshipPage extends Page implements InputUtils {
         pageHeading.text().equals(value)
     }
 
-    oid relationship() {
+    void relationship() {
         relationshipTypeLink.click()
     }
 
