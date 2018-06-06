@@ -31,7 +31,7 @@ class DataModelPage extends Page implements InputUtils {
         }
         exportLink(required: false) { $('a#role_item_export-menu-item-link') }
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
-        finalizedLink(required: false) { $("a#finalize-menu-item-link") }
+        finalizedLink(required: false, wait: true) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
         editButton(wait: true) { $('#role_item-detail_inline-editBtn') }
         dataModelSearchBar(wait: true) { $('input#dataModelPolicy') }
@@ -54,6 +54,10 @@ class DataModelPage extends Page implements InputUtils {
 
     void exportXml() {
         exportXMLLink.click()
+    }
+
+    Boolean finalizedStatus() {
+        finalizedStatus[0].text().toLowerCase().contains("finalized")
     }
 
     void export() {

@@ -15,15 +15,40 @@ class VersionsPage extends Page {
 
     static content = {
         rows { $('#history-tab tbody tr') }
+        versionSelect (wait:true){ $('a.preserve-new-lines.ng-binding', text: it).siblings('a') }
+        expandLink (wait:true){ $('a.inf-cell-expand') }
+        dataElementDropDown (wait:true){ $('button#role_item_catalogue-elementBtn') }
+        deleteBttn(wait:true) { $('a#deleteBtn') }
+        deleteConfirmationBttn(wait:true) { $('button.btn.btn-primary') }
     }
 
-    boolean  rowsContainText(String text) {
-        for ( int i = 0; i < rows.size(); i++ ) {
-            if ( rows[i].text().contains(text) ) {
+    boolean rowsContainText(String text) {
+        for (int i = 0; i < rows.size(); i++) {
+            if (rows[i].text().contains(text)) {
                 return true
             }
         }
         false
+    }
+
+    void expandLinkClick() {
+        expandLink.click()
+    }
+
+    void selectVersion(String version) {
+        versionSelect(version).click()
+    }
+
+    void dataElementDropDownClick() {
+        dataElementDropDown.click()
+    }
+
+    void deleteBttnClick() {
+        deleteBttn.click()
+    }
+
+    void deleteConfirmationBttnClick() {
+        deleteConfirmationBttn.click()
     }
 
 }
