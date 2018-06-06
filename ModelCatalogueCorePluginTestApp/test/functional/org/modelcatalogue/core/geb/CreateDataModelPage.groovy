@@ -22,6 +22,7 @@ class CreateDataModelPage extends Page implements InputUtils {
         defaultTag { $("a.remove-tag") }
         policiesInput { $("input#dataModelPolicies") }
         policyTag { $("span.with-pointer.ng-binding") }
+        policiesCheckboxList { $('label', text: "Policies").siblings('ul').$('li') }
     }
 
     void submit() {
@@ -80,3 +81,11 @@ class CreateDataModelPage extends Page implements InputUtils {
     }
 }
 
+    void selectUniqueOfKindPolicy() {
+        policiesCheckboxList.$('input#dataModelPolicies', 0).click()
+    }
+
+    void selectDefaultsChecks() {
+        policiesCheckboxList.$('input#dataModelPolicies', 1).click()
+    }
+}

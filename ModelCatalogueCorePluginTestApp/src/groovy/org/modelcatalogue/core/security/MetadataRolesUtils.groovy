@@ -7,7 +7,7 @@ import static org.modelcatalogue.core.security.MetadataRoles.*
 class MetadataRolesUtils {
 
     static List<String> findAll() {
-        [ROLE_USER, ROLE_CURATOR, ROLE_SUPERVISOR]
+        [ROLE_USER, ROLE_CURATOR, ROLE_SUPERVISOR, ROLE_ADMIN]
     }
 
     static List<String> getRolesForDataModelAdministrationPermission() {
