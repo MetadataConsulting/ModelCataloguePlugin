@@ -151,7 +151,12 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void exit() {
         exitButton.click()
-        sleep(2000)
+        sleep(3_000)
+
+    }
+
+    void setName(String value) {
+        fillInput(nameInput, value)
     }
 
     void setModelCatalogueId(String value) {

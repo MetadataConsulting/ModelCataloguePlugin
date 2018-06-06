@@ -5,8 +5,8 @@ import geb.Module
 class DataModelTreeViewModule extends Module {
 
     static content = {
-        dataModelLink { $('a.catalogue-element-treeview-icon', 0) }
-        item { $('ul .catalogue-element-treeview-name', text: it) }
+        dataModelLink(wait: true) { $('a.catalogue-element-treeview-icon', 0) }
+        item(wait: true) { $('ul .catalogue-element-treeview-name', text: it) }
     }
 
     void dataModel() {
@@ -51,6 +51,6 @@ class DataModelTreeViewModule extends Module {
 
     void select(String name) {
         item(name).click()
-        sleep(2000)
+        sleep(3_000)
     }
 }
