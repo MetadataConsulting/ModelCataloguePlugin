@@ -33,6 +33,9 @@ class DataModelPage extends Page implements InputUtils {
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
         finalizedLink(required: false, wait: true) { $("a#finalize-menu-item-link") }
         rows { $('div.inf-table-body table tbody tr td') }
+        exportToCatalogXml { $('a#catalogue-element-export-specific-reports_4-menu-item-link') }
+        importLink(wait: true) { $('a#role_navigation-right_curator-menu-menu-item-link') }
+        importCatalogXmlLink(wait: true) { $('li#import-xml-menu-item') }
         cloneAnotherElementLink {
             $('span.action-label.ng-binding.ng-scope', text: contains('Clone Another Element into Current Data Model'))
         }
@@ -120,6 +123,19 @@ class DataModelPage extends Page implements InputUtils {
     void editDataModel() {
         editButton.click()
     }
+
+    void exportCatalogXml() {
+        exportToCatalogXml.click()
+    }
+
+    void importClick() {
+        importLink.click()
+    }
+
+    void importCatalogXml() {
+        importCatalogXmlLink.click()
+    }
+}
 
     void searchPolicy(String value) {
         fillInput(dataModelSearchBar, value)
