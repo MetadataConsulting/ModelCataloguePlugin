@@ -135,7 +135,6 @@ class DataModelPage extends Page implements InputUtils {
     void importCatalogXml() {
         importCatalogXmlLink.click()
     }
-}
 
     void searchPolicy(String value) {
         fillInput(dataModelSearchBar, value)
