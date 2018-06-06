@@ -70,8 +70,4 @@ class CreateDataElementPage extends Page implements InputUtils {
     void showAllDataType() {
         showAllDataTypeLink.click()
     }
-
-    void createDataType() {
-        createNewDataType.click()
-    }
 }
