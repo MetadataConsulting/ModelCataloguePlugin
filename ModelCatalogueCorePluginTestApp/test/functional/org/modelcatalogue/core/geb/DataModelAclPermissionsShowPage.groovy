@@ -29,12 +29,10 @@ class DataModelAclPermissionsShowPage extends Page {
     }
 
     void setUsername(String value) {
-//        usernameSelect = value
         usernameSelect(value).click()
     }
 
     void setPermission(String value) {
-//        permissionSelect = value
         permissionSelect(value).click()
     }
 

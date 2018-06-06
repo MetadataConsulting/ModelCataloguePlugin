@@ -15,6 +15,9 @@ class CreateDataElementPage extends Page implements InputUtils {
         createNewItem(wait: true) { $("a.cep-item", 1) }
         createNewDataTypeLink(required: false, wait: true) { $('a.create-new-cep-item', 0) }
         searchMoreButton(wait: true) { $('span.search-for-more-icon') }
+        createNewDataType(wait: true) { $("a.cep-item.ng-scope.create-new-cep-item") }
+        showAllDataTypeLink(wait: true) { $('a', text: "Show All") }
+        searchMoreLink(wait: true) { $('span.input-group-addon.search-for-more-icon') }
     }
 
     void setName(String value) {
@@ -57,5 +60,17 @@ class CreateDataElementPage extends Page implements InputUtils {
 
     void searchMore() {
         searchMoreButton.click()
+    }
+
+    void createDataType() {
+        createNewDataType.click()
+    }
+
+    void showAllDataType() {
+        showAllDataTypeLink.click()
+    }
+
+    void searchMore() {
+        searchMoreLink.click()
     }
 }

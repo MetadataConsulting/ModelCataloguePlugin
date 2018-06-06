@@ -1,9 +1,23 @@
 package org.modelcatalogue.core.datatype
 
+import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.CreateDataElementPage
+import org.modelcatalogue.core.geb.CreateDataTypePage
+import org.modelcatalogue.core.geb.CreateDataModelPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataTypesPage
+import org.modelcatalogue.core.geb.DataElementsPage
+import org.modelcatalogue.core.geb.DataModelAclPermissionsShowPage
+import org.modelcatalogue.core.geb.DataModelAclPermissionsPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.CloneOrImportPage
+import org.modelcatalogue.core.geb.SearchAllModalPage
+import org.modelcatalogue.core.geb.HomePage
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Ignore
-import spock.lang.Specification
+import spock.lang.Shared
+import spock.lang.Stepwise
 import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-2014')
@@ -35,6 +49,272 @@ import spock.lang.Title
 - Press save | Data type is saved
 -  Confirm that new data type has been added to the data model | Data type appears in list under data types. tag
 ''')
-@Ignore
-class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends Specification {
+@Stepwise
+class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
+
+    @Shared
+    String dataModelOneName = "DATA_MODEL_ONE"
+    @Shared
+    String dataModelTwoName = "DATA_MODEL_TWO"
+    @Shared
+    String dataModelThreeName = "DATA_MODEL_THREE"
+    @Shared
+    String dataTypeOneName = "DATATYPE_ONE"
+    @Shared
+    String dataTypeTwoName = "DATATYPE_TWO"
+    @Shared
+    String dataTypeThreeName = "DATATYPE_THREE"
+    @Shared
+    String dataElementName = "DATA_ELEMENT"
+
+    def "Login as supervisor"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
+        then:
+        at DashboardPage
+    }
+
+    def "create first data model"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = to CreateDataModelPage
+        createDataModelPage.name = dataModelOneName
+        createDataModelPage.submit()
+
+        then:
+        at DataModelPage
+    }
+
+    def "create first data type"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Types')
+        then:
+        at DataTypesPage
+
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.createDataTypeFromNavigation()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        createDataTypePage.name = dataTypeOneName
+        createDataTypePage.buttons.save()
+
+        then:
+        at DataTypesPage
+    }
+
+    def "create second data model"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = to CreateDataModelPage
+        createDataModelPage.name = dataModelTwoName
+        createDataModelPage.submit()
+
+        then:
+        at DataModelPage
+    }
+
+    def "create second data type"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Types')
+        then:
+        at DataTypesPage
+
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.createDataTypeFromNavigation()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page(CreateDataTypePage)
+        createDataTypePage.name = dataTypeTwoName
+        createDataTypePage.buttons.save()
+
+        then:
+        at DataTypesPage
+    }
+
+    def "create third data model"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.createDataModel()
+
+        then:
+        at CreateDataModelPage
+
+        when:
+        CreateDataModelPage createDataModelPage = to CreateDataModelPage
+        createDataModelPage.name = dataModelThreeName
+        createDataModelPage.submit()
+
+        then:
+        at DataModelPage
+    }
+
+    def "create third data type"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Types')
+        then:
+        at DataTypesPage
+
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.createDataTypeFromNavigation()
+        then:
+        at CreateDataTypePage
+
+        when:
+        CreateDataTypePage createDataTypePage = browser.page(CreateDataTypePage)
+        createDataTypePage.name = dataTypeThreeName
+        createDataTypePage.buttons.save()
+
+        then:
+        at DataTypesPage
+    }
+
+    def "select data model ACL"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.cogMenu()
+        dashboardPage.nav.dataModelPermission()
+        then:
+        at DataModelAclPermissionsPage
+    }
+
+    def "grant admin right to curator for first data model"() {
+        when:
+        DataModelAclPermissionsPage dataModelAclPermissionsPage = browser.page DataModelAclPermissionsPage
+        dataModelAclPermissionsPage.select(dataModelOneName)
+        then:
+        at DataModelAclPermissionsShowPage
+
+        when:
+        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
+        dataModelAclPermissionsShowPage.grant("curator", "administration")
+        then:
+        at DataModelAclPermissionsShowPage
+    }
+
+    def "grant admin right to curator for second data model"() {
+        when:
+        DataModelAclPermissionsPage dataModelAclPermissionsPage = to DataModelAclPermissionsPage
+        dataModelAclPermissionsPage.select(dataModelTwoName)
+        then:
+        at DataModelAclPermissionsShowPage
+
+        when:
+        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
+        dataModelAclPermissionsShowPage.grant("curator", "administration")
+        then:
+        at DataModelAclPermissionsShowPage
+    }
+
+    def "logout as supervisor"() {
+        when:
+        DataModelAclPermissionsShowPage dataModelPermissionGrantPage = browser.page DataModelAclPermissionsShowPage
+        dataModelPermissionGrantPage.nav.userMenu()
+        dataModelPermissionGrantPage.nav.logout()
+        then:
+        at HomePage
+    }
+
+    def "login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
+
+        then:
+        at DashboardPage
+    }
+
+    def "select first data model created"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.select(dataModelOneName)
+        then:
+        at DataModelPage
+    }
+
+    def "go to data element page"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select("Data Elements")
+        then:
+        at DataElementsPage
+    }
+
+    def "create data element"() {
+        when:
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
+        dataElementsPage.createDataElement()
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.name = dataElementName
+        createDataElementPage.searchMore()
+        createDataElementPage.showAllDataType()
+        then:
+        at SearchAllModalPage
+    }
+
+    def "verify data element from third model is not clonable"() {
+        when:
+        SearchAllModalPage searchAllModalPage = browser.page SearchAllModalPage
+        searchAllModalPage.searchDataType(dataTypeThreeName)
+        then:
+        waitFor(5) { searchAllModalPage.noResultFound() }
+    }
+
+    def "verify data element from second model is clonable"() {
+        when:
+        SearchAllModalPage searchAllModalPage = browser.page SearchAllModalPage
+        searchAllModalPage.clearSearchField()
+        searchAllModalPage.searchDataType(dataTypeTwoName)
+        then:
+        waitFor(5) { !searchAllModalPage.noResultFound() }
+    }
+
+    def "clone data element of second model"() {
+        when:
+        SearchAllModalPage searchAllModalPage = browser.page SearchAllModalPage
+        searchAllModalPage.selectDataType()
+        then:
+        at CloneOrImportPage
+
+        when:
+        CloneOrImportPage cloneOrImportPage = browser.page CloneOrImportPage
+        cloneOrImportPage.allowClone()
+        then:
+        at CreateDataElementPage
+
+        when:
+        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
+        createDataElementPage.finish()
+        then:
+        at DataElementsPage
+    }
+
 }
