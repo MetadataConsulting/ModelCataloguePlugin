@@ -79,7 +79,6 @@ class CreateDataModelPage extends Page implements InputUtils {
         }
         return policiesSelected
     }
-}
 
     void selectUniqueOfKindPolicy() {
         policiesCheckboxList.$('input#dataModelPolicies', 0).click()
