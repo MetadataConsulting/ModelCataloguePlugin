@@ -443,16 +443,6 @@ var initD3 = (function() {
       })
 
 
-      // mouseover to expand the name
-      .on("mouseover", function(d) {
-        d3.select(this).select("a").select("text").text(d.name)
-        infoMouseover(d)
-      })
-      .on("mouseout", function(d) {
-        d3.select(this).select("a").select("text").text(shortenedNodeText)
-      });
-
-
 
     // add circles for each node
     nodeEnter.append("svg:circle")
@@ -467,20 +457,6 @@ var initD3 = (function() {
      * @type {number}
      */
     var maxStringLength = 20;
-
-    function shouldNameBeShortened(d /*: D3JSON */) /*: boolean */ {
-      // return d.children || d._children
-      return (d.type == 'dataClass' || d.type == 'dataModel' || d.type == 'dataElement')
-    }
-
-    /**
-     * Name of node, shortened to maxStringLength
-     * @param d
-     * @returns {string}
-     */
-    function shortenedNodeText(d /*: D3JSON */) /*: string */ {
-      return (d.name.length >= maxStringLength && shouldNameBeShortened(d)) ? d.name.substring(0,maxStringLength) + "..." : d.name;
-    }
 
     /**
      * First n elements of arr, [] if arr is empty
