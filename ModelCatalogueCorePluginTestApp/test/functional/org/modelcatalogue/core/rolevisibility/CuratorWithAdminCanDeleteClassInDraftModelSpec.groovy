@@ -34,6 +34,7 @@ import spock.lang.Shared
 /$)
 
 @Stepwise
+@Ignore
 class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
 
     @Shared
@@ -70,7 +71,6 @@ class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
         then:
         at DataModelPage
     }
-
 
     def "create new data class"() {
         when:
@@ -164,6 +164,7 @@ class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
         when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         dataClassesPage.selectDataClass(dataClassName)
+        Thread.sleep(2000)
         then:
         at DataClassPage
 

@@ -4,6 +4,7 @@ import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
 import spock.lang.Narrative
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
@@ -39,6 +40,7 @@ import spock.lang.Title
 - Check that when you search in the parents tab, edits made to the data class in the imported model are carried through to your data model. | Edits are present from imported data model.
 ''')
 @Stepwise
+@Ignore
 class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
     @Shared
     String dataModelName = UUID.randomUUID().toString()
@@ -201,6 +203,7 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         when:
         ParentClassModalPage parentClassModalPage = browser.page ParentClassModalPage
         parentClassModalPage.searchMore()
+        Thread.sleep(1500)
         then:
         at SearchClassPage
 

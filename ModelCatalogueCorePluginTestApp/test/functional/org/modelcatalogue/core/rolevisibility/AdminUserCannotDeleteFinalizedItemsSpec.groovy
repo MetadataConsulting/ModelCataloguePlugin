@@ -1,8 +1,8 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import jdk.nashorn.internal.ir.annotations.Ignore
 import spock.lang.Issue
+import spock.lang.Ignore
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
@@ -68,6 +68,7 @@ import spock.lang.*
 /$)
 
 @Stepwise
+@Ignore
 class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
     @Shared

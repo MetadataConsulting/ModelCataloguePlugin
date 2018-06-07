@@ -17,6 +17,7 @@ import org.modelcatalogue.core.geb.HomePage
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Shared
+import spock.lang.Ignore
 import spock.lang.Stepwise
 import spock.lang.Title
 
@@ -50,6 +51,7 @@ import spock.lang.Title
 -  Confirm that new data type has been added to the data model | Data type appears in list under data types. tag
 ''')
 @Stepwise
+@Ignore
 class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
 
     @Shared
