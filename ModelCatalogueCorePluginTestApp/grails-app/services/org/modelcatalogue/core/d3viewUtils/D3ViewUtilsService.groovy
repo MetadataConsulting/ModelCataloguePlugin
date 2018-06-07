@@ -258,34 +258,44 @@ class D3ViewUtilsService {
     }
 }
 /**
- *  D3 view json recursive format
+ *  D3 view json recursive format representing a catalogue element and also info for displaying on D3.
  *
- *  type is a String from MetadataDomain.lowerCamelCaseDomainName e.g. 'dataClass'
- *  angularLinkis a String of format e.g. "http://localhost:8080/#/82467/dataClass/82470/", which is a link to the angular application view for data model 82467, data class 82470
- *  enumerations is a Map of Strings to Strings for enumerated types.
  *
  */
 class D3JSON {
+    // corresponding to fields on Catalogue Element
     String name
     long id
     String description
 
+    /**
+     * String of format e.g. "http://localhost:8080/#/82467/dataClass/82470/", which is a link to the angular application view for data model 82467, data class 82470
+     */
     String angularLink
+    /**
+     * String from MetadataDomain.lowerCamelCaseDomainName e.g. 'dataClass'
+     */
     String type
 
+    // corresponding to fields on Catalogue Element
     String status
     String dateCreated
     String lastUpdated
-    Map<String, String> metadata
+    Map<String, String> metadata // from Catalogue Element ext
 
     boolean loadedChildren = false // false by default; children will be loaded later.
     boolean loading = false
 
     List<D3JSON> children
 
+    /**
+     * Map whose keys are the directional names of relationshipTypes,
+     * values being lists representing the Catalogue Elements ("Relations") on the other end
+     * of the relationships of that type.
+     */
     Map<String, List<RelationJson>> relationships
 
-
+    // more information which may be on certain Catalogue Elements
     Map<String,String> enumerations
     String rule
     String measurementUnitName
@@ -298,6 +308,9 @@ class D3JSON {
 
 }
 
+/**
+ * JSON representing a "relation", a Catalogue Element somehow related to the one under consideration. Just the name and a link.
+ */
 class RelationJson {
     String name
     String angularLink
