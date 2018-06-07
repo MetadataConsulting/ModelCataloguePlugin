@@ -252,7 +252,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           }
 
         default:
-          throw new Error("Case not found for nodeContent: " + d.nodeContentType + " of D3JSON " + d)
+          throw new Error("Case not found for nodeContentType: " + d.nodeContentType + " of D3JSON " + d)
       }
     }
 
