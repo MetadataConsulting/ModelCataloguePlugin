@@ -6,6 +6,7 @@ pipeline {
   stages {
     stage('Test Execute') {
       steps {
+      
         dir(path: 'ModelCatalogueCorePluginTestApp') {
             sh 'npm install'
             sh 'bower install'
