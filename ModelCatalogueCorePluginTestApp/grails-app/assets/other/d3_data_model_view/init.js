@@ -492,25 +492,56 @@ var initD3 = (function() {
       return (arr.length == 0) ? [] : _.first(arr, n)
     }
 
+
+    /**
+     * Max number of lines for node label. Should be at least 1.
+     * @type {number}
+     */
+    var maxNodeLabelLines = 10
+
     /**
      * Splits name into array of three lines, made of whole words, each less than maxStringLength long.
-     * If a word is longer than maxStringLength it will mess things up.
      * @param d
      * @returns {Array}
      */
     function splitName(d) {
-      var words = d.name.split(/\s+/)
+      var words = d.name.split(/\s+/) // initial splitting
+
+      var truncatedWords = []
+
+      // split words longer than maxStringLength into parts
+      var i = 0
+      while (i < words.length) {
+        // loop invariant: words1[0..i) has been put into words
+
+        var word = words[i] // word to split
+
+        while (word.length > maxStringLength) {
+          // loop invariant: word is always the remainder of words1[i] that has not been pushed into words yet
+          // the following is fine even if maxStringLength-1 is greater than the length of word
+
+          truncatedWords.push(word.substring(0,maxStringLength-1) + '-')
+          word = word.substring(maxStringLength-1) // make word the remainder
+        }
+
+        truncatedWords.push(word) // the remainder. Could be the empty string but that is not a problem
+        i++
+        console.log(truncatedWords)
+      }
+
 
       var result = []
       var n = 0
-      while (n < 3) { // 3 lines
+      while (n < maxNodeLabelLines) {
         // words is the remaining array of words
-        var wordsPerLine = 0
-        var line = myFirst(words, wordsPerLine).join(' ')
 
-        while (line.length < maxStringLength && wordsPerLine < words.length) {
+        var wordsPerLine = 0
+        var line = myFirst(truncatedWords, wordsPerLine).join(' ')
+
+        while (line.length < maxStringLength && wordsPerLine < truncatedWords.length) {
+          // loop invariant: line == myFirst(truncatedWords, wordsPerLine).join(' ')
           wordsPerLine++
-          line = myFirst(words, wordsPerLine).join(' ')
+          line = myFirst(truncatedWords, wordsPerLine).join(' ')
         }
 
         if (line.length > maxStringLength) { // loop could terminate due to being over the max string length
@@ -518,18 +549,23 @@ var initD3 = (function() {
         }
 
 
-        result.push(words.splice(0, wordsPerLine).join(' '))
+        result.push(truncatedWords.splice(0, wordsPerLine).join(' '))
         n++
       }
+
+
       return result
+    }
+    function nodeLabelXOffset(d) {
+      var extra = 5; return shouldNameBeShortened(d) ? -(radius + extra): radius + extra;
     }
 
     // Text/link for each node
-    nodeEnter.append("svg:text")
+    var textD3Selection = nodeEnter.append("svg:text")
       .attr("dy", ".35em")
         // text with possibly shortened name
 
-      .attr("x", function(d) { var extra = 5; return shouldNameBeShortened(d) ? -(radius + extra): radius + extra; })
+      .attr("x", nodeLabelXOffset)
       .attr("text-anchor", function(d) {
         return shouldNameBeShortened(d) ? "end" : "start";
       })
@@ -537,19 +573,22 @@ var initD3 = (function() {
 
       .style("fill-opacity", 1e-6)
       .style("font", "15px sans-serif")
-      // Putting three lines in the text element
-      .append('svg:tspan')
-      .attr("x", function(d) { var extra = 5; return shouldNameBeShortened(d) ? -(radius + extra): radius + extra; })
-      .attr('dy', 5)
-      .text(function(d) { return splitName(d)[0]; })
-      .append('svg:tspan')
-      .attr("x", function(d) { var extra = 5; return shouldNameBeShortened(d) ? -(radius + extra): radius + extra; })
-      .attr('dy', 20)
-      .text(function(d) { return splitName(d)[1]; })
-      .append('svg:tspan')
-      .attr("x", function(d) { var extra = 5; return shouldNameBeShortened(d) ? -(radius + extra): radius + extra; })
-      .attr('dy', 20)
-      .text(function(d) { return splitName(d)[2]; });
+
+    function addLabelLines(textD3Selection) {
+      var currentSelection = textD3Selection
+      var i = 0
+      while (i < maxNodeLabelLines) {
+        var dy = (i == 0) ? 5 : 20
+        currentSelection = currentSelection.append('svg:tspan')
+          .attr("x", nodeLabelXOffset)
+          .attr('dy', dy)
+          .text(function(d) { return splitName(d)[i]; })
+        i++
+      }
+
+    }
+
+    addLabelLines(textD3Selection)
 
 
 
