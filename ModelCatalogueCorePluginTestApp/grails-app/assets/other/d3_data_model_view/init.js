@@ -111,7 +111,7 @@ var initD3 = (function() {
 
 
   //// naming functions
-  /** return Upper Case first letter
+  /** return string with first letter upper-cased
    * @param str
    * @returns {string}
    */
@@ -127,7 +127,7 @@ var initD3 = (function() {
   //// Info functions
 
   /**
-   * Return HTML for info panel on the right from node data
+   * Fill info panels with appropriate HTML generated from D3JSON fields
    * @param d node data
    * @returns {string}
    */
@@ -154,11 +154,11 @@ var initD3 = (function() {
   }
 
   /**
-   * Return HTML for enumeration from Map<String, String>
+   * Return HTML for enumeration or metadata of rhe form from Map<String, String>
    * @param map
    * @returns {string}
    */
-  function displayMap(map) {
+  function displayMap(map /*:{[string]: string} */) /*: string */ {
     var ret = "<ul>"
     Object.keys(map).forEach(function(key) {
       ret = ret + "<li>" + key + ": " + map[key] + "</li>"
@@ -167,13 +167,18 @@ var initD3 = (function() {
     return ret = ret + "</ul>"
   }
 
+  /**
+   * Display an object which is a map with relationship type names as keys and lists of "Relation"s as values
+   * @param relationships
+   * @returns {string}
+   */
   function displayRelationships(relationships /*:{[string]: Relation[]} */) /*: string */ {
     var ret = ""
-    Object.keys(relationships).forEach(function(relationshipName /*: string */){
-      var relations /*: Relation[]*/= relationships[relationshipName]
+    Object.keys(relationships).forEach(function(relationshipTypeName /*: string */){
+      var relations /*: Relation[]*/= relationships[relationshipTypeName]
       if (relations.length > 0) {
         relations.forEach(function(relation) {
-          ret = ret + relationshipName + ": " + "<a href='" + relation.angularLink + "' target='_blank'>" + relation.name + "</a>" + "<br/>"
+          ret = ret + relationshipTypeName + ": " + "<a href='" + relation.angularLink + "' target='_blank'>" + relation.name + "</a>" + "<br/>"
         })
       }
     })
@@ -239,7 +244,12 @@ var initD3 = (function() {
 
   //// path functions
 
-  function pathFromRoot(d) {
+  /**
+   * Path from root to d
+   * @param d
+   * @returns {*|*[]}
+   */
+  function pathFromRoot(d /*: D3JSON */) /*: D3JSON[] */ {
     var currentNode = d
     var pathToRoot = []
 
@@ -253,25 +263,39 @@ var initD3 = (function() {
     return pathToRoot.reverse()
   }
 
-  function namesFromPath(path) {
+  /**
+   * Names of nodes along path
+   * @param path
+   */
+  function namesFromPath(path /*: D3JSON[] */ ) /*: string[] */ {
     return _.pluck(path, "name")
   }
 
-  function angularTreeviewPathString(path) {
+  /**
+   * String used in angular treeview to represent path.
+   * Assumes the first id in the path is a data model id, followed by data class ids, followed by one data element id.
+   * Not sure about data types.
+   * @param path
+   */
+  function angularTreeviewPathString(path /*: D3JSON[] */) /*: string */ {
     var ids = _.pluck(path, "id")
     ids.splice(1,0, 'all')
     return ids.join('-')
   }
 
   /**
-   * Update a node (source)
+   * Update a node (source), usually after it has been toggled.
    * @param source
    */
   function update(source) {
 
     var duration = d3.event && d3.event.altKey ? 5000 : 500;
 
-    var radius = 7 // node circle radius
+    /**
+     * node circle radius
+     * @type {number}
+     */
+    var radius = 7
     var unopenedNodeBorderColour = "orangered"
 
 
@@ -293,6 +317,10 @@ var initD3 = (function() {
       }
     */
 
+    /**
+     * Collapse the siblings of d back into the parent.
+     * @param d
+     */
     function collapseSiblings(d /*: D3JSON */) {
       var parent = d.parent
       if (parent) {
@@ -301,8 +329,13 @@ var initD3 = (function() {
       }
     }
 
-    // load children if not loaded
-    function onNodeClick(d /*: D3JSON */) {
+    /**
+     * Event handler for node click.
+     * Toggles showing children or not.
+     * Loads children if not loaded.
+     * @param d
+     */
+    function onNodeClick(d /*: D3JSON */) /*: void */ {
       var path = pathFromRoot(d)
       console.log("Path from root: " + namesFromPath(path))
       console.log("Angular pathstring: " + angularTreeviewPathString(path))
@@ -366,6 +399,10 @@ var initD3 = (function() {
 
     }
 
+    /**
+     * Set the tooltip on mouseover
+     * @param d
+     */
     function tooltipMouseover(d) {
       div.transition()
         .duration(0)
@@ -377,13 +414,19 @@ var initD3 = (function() {
 
     }
 
+    /**
+     * Fade out the tooltip on mouseout
+     * @param d
+     */
     function tooltipMouseout(d) {
       div.transition()
         .duration(500)
         .style("opacity", 0);
     }
 
-    // display info on mouseover
+    /**
+     * display info on mouseover
+     */
     function infoMouseover(d){
       // don't do anything anymore. Maybe this would be useful another time.
     }
@@ -419,6 +462,10 @@ var initD3 = (function() {
       // .on("mouseover", tooltipMouseover)
       // .on("mouseout", tooltipMouseout);
 
+    /**
+     * max string length for text next to node
+     * @type {number}
+     */
     var maxStringLength = 20;
 
     function shouldNameBeShortened(d /*: D3JSON */) /*: boolean */ {
@@ -426,19 +473,31 @@ var initD3 = (function() {
       return (d.type == 'dataClass' || d.type == 'dataModel' || d.type == 'dataElement')
     }
 
-    function shortenedNodeText(d) {
+    /**
+     * Name of node, shortened to maxStringLength
+     * @param d
+     * @returns {string}
+     */
+    function shortenedNodeText(d /*: D3JSON */) /*: string */ {
       return (d.name.length >= maxStringLength && shouldNameBeShortened(d)) ? d.name.substring(0,maxStringLength) + "..." : d.name;
     }
 
+    /**
+     * First n elements of arr, [] if arr is empty
+     * @param arr
+     * @param n
+     * @returns {Array}
+     */
     function myFirst(arr, n) {
-      if (arr.length == 0) {
-        return []
-      }
-      else {
-        return _.first(arr, n)
-      }
+      return (arr.length == 0) ? [] : _.first(arr, n)
     }
 
+    /**
+     * Splits name into array of three lines, made of whole words, each less than maxStringLength long.
+     * If a word is longer than maxStringLength it will mess things up.
+     * @param d
+     * @returns {Array}
+     */
     function splitName(d) {
       var words = d.name.split(/\s+/)
 
@@ -448,6 +507,7 @@ var initD3 = (function() {
         // words is the remaining array of words
         var wordsPerLine = 0
         var line = myFirst(words, wordsPerLine).join(' ')
+
         while (line.length < maxStringLength && wordsPerLine < words.length) {
           wordsPerLine++
           line = myFirst(words, wordsPerLine).join(' ')
@@ -477,6 +537,7 @@ var initD3 = (function() {
 
       .style("fill-opacity", 1e-6)
       .style("font", "15px sans-serif")
+      // Putting three lines in the text element
       .append('svg:tspan')
       .attr("x", function(d) { var extra = 5; return shouldNameBeShortened(d) ? -(radius + extra): radius + extra; })
       .attr('dy', 5)
