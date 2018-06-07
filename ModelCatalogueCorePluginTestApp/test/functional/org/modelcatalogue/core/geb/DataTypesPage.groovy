@@ -22,7 +22,7 @@ class DataTypesPage extends Page {
         dataTypeByName(required: false, wait: true) { $('a', text: it) }
         createDataTypePlusButton { $('table tr.inf-table-footer-action span.fa-plus-circle') }
         expandLink { $('a.inf-cell-expand') }
-        dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
+        dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
     }
 
@@ -35,7 +35,7 @@ class DataTypesPage extends Page {
     }
 
     void dataElementDropDown() {
-        dataElementDropDown.click()
+        dataElementDropDownTag.click()
     }
 
     boolean isAddItemIconVisible() {

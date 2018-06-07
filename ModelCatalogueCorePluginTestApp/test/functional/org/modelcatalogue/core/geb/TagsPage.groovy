@@ -20,7 +20,7 @@ class TagsPage extends Page {
         }
         rows { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center") }
         expandLink { $('a.inf-cell-expand') }
-        dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
+        dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
         deleteBttn(required: false) { $('a#deleteBtn') }
     }
 
@@ -36,7 +36,7 @@ class TagsPage extends Page {
     }
 
     void dataElementDropDown() {
-        dataElementDropDown.click()
+        dataElementDropDownTag.click()
     }
 
     int count() {

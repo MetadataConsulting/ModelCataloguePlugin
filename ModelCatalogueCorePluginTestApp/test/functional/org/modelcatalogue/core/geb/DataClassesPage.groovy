@@ -24,7 +24,7 @@ class DataClassesPage extends Page {
         selectDataClass(wait: true) { $('span.ng-binding a', text: it) }
         titlename { $('div.col-md-12 h3') }
         expandLink { $('a.inf-cell-expand') }
-        dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
+        dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
     }
 
@@ -37,7 +37,7 @@ class DataClassesPage extends Page {
     }
 
     void dataElementDropDown() {
-        dataElementDropDown.click()
+        dataElementDropDownTag.click()
     }
 
     int count() {

@@ -18,7 +18,7 @@ class MeasurementUnitsPage extends Page {
             $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
         }
         expandLink { $('a.inf-cell-expand') }
-        dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
+        dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
     }
 
@@ -31,7 +31,7 @@ class MeasurementUnitsPage extends Page {
     }
 
     void dataElementDropDown() {
-        dataElementDropDown.click()
+        dataElementDropDownTag.click()
     }
 
     boolean isAddItemIconVisible() {

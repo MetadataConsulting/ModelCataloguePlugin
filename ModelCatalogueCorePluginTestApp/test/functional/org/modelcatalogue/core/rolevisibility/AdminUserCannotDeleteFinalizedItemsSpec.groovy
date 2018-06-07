@@ -68,7 +68,6 @@ import spock.lang.*
 /$)
 
 @Stepwise
-@Ignore
 class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
     @Shared
@@ -293,9 +292,10 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         at CreateAssetsPage
 
         when:
+
         CreateAssetsPage createAssetsPage = browser.page CreateAssetsPage
         createAssetsPage.name = assetName
-        createAssetsPage.upload(System.getProperty('downloadFilepath'))
+        createAssetsPage.upload(System.getProperty("downloadFilepath"))
         createAssetsPage.description = assetDescription
         createAssetsPage.submit()
         then:
@@ -304,6 +304,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
     def "Select and add tags entry"() {
         when:
+        Thread.sleep(3000)
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select("Tags")
         then:
@@ -414,7 +415,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         dataClassesPage.expandLinkClick()
-        dataClassesPage.selectDataElementDropDown()
+        dataClassesPage.dataElementDropDown()
         then:
         dataClassesPage.isDeleteBttnDisable()
     }
@@ -446,7 +447,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         when:
         DataTypesPage dataTypesPage = browser.page DataTypesPage
         dataTypesPage.expandLinkClick()
-        dataTypesPage.selectDataElementDropDown()
+        dataTypesPage.dataElementDropDown()
         then:
         dataTypesPage.isDeleteBttnDisable()
     }
@@ -462,7 +463,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         when:
         MeasurementUnitsPage measurementUnitsPage = browser.page MeasurementUnitsPage
         measurementUnitsPage.expandLinkClick()
-        measurementUnitsPage.selectDataElementDropDown()
+        measurementUnitsPage.dataElementDropDown()
         then:
         measurementUnitsPage.isDeleteBttnDisable()
     }
@@ -477,7 +478,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         when:
         BusinessRulesPage businessRulesPage = browser.page BusinessRulesPage
         businessRulesPage.expandLinkClick()
-        businessRulesPage.selectDataElementDropDown()
+        businessRulesPage.dataElementDropDown()
         then:
         businessRulesPage.isDeleteBttnDisable()
     }
@@ -492,7 +493,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         when:
         TagsPage tagsPage = browser.page TagsPage
         tagsPage.expandLinkClick()
-        tagsPage.selectDataElementDropDown()
+        tagsPage.dataElementDropDown()
         then:
         tagsPage.isDeleteBttnDissable()
     }
