@@ -25,6 +25,7 @@ import spock.lang.Ignore
 - Verify that suggestion are created once page is refreshed 
 ''')
 @Stepwise
+@Ignore
 class CuratorCanGenerateSuggestionsUsingMappingUtilitySpec extends GebSpec {
 
     @Shared
