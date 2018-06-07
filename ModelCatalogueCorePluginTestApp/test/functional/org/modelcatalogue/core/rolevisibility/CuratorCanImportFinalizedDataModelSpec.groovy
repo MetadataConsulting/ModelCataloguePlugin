@@ -177,6 +177,7 @@ class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
 
         when:
         dropDownImportPage = browser.page DropDownImportPage
+        Thread.sleep(1000)
         dropDownImportPage.finish()
         then:
         at DataModelPage
