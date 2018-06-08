@@ -168,6 +168,14 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     }
    */
 
+  /**
+   * Assuming request with offset and max returns paginated List[offset..offset+max)
+   * Actually prevLink is not needed at the moment with the way I'm doing it but it may be useful later
+   * @param prevLink
+   * @param offset
+   * @param max
+   * @constructor
+   */
   function PreviousLinkNode(prevLink /*: string */,
                   offset /*: number */,
                   max /*: number */) /*: PLNode */{
@@ -185,7 +193,9 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     this.x0 = 0;
     this.y0 = 0;
 
-    this.nodeContentType = CONTENT_TYPE.PREV_LINK
+    this.nodeContentType = CONTENT_TYPE.PREV_LINK;
+
+    return this;
 
   }
 
@@ -206,7 +216,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     this.x0 = 0;
     this.y0 = 0;
 
-    this.nodeContentType = CONTENT_TYPE.NEXT_LINK
+    this.nodeContentType = CONTENT_TYPE.NEXT_LINK;
 
     return this;
   }
@@ -531,9 +541,18 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         type ChildrenData = {
             children: Array<ReceivedD3JSON>,
             canAccessDataModel: boolean,
-            caseHandled: boolean
+            caseHandled: boolean,
+            paginationParametersFound: boolean,
+            total: number
         }
       */
+
+      /**
+       * Max width of three. Will be used in paginated requests for children.
+       * @type {number}
+       */
+      var maxPageSize = 10;
+
       /**
        * Event handler for node click.
        * Toggles showing children or not.
@@ -577,12 +596,22 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
           if (!d.loading) { // i.e. !d.loadedChildren
 
-            nodeHandler(
-              function(d /*: CENode */) {
+            function requestChildrenBaseUrl(d /*: CENode */) /*: string */ {
+              return serverUrl + "/dataModel/basicViewChildrenData/" + d.type + "/" + d.id
+            }
+
+            /**
+             * Returns a CENode handler that requests the children of the node from offset to max
+             * @param offset
+             * @param max
+             */
+            function ceNodeChildLoadingHandler(offset /*: number */, max /*: number */) /*: CENode => void */ {
+
+              return function(d /*: CENode */) /*: void */ {
                 writeMessage("Loading children for " + typeAndName(d) + "...")
                 d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough. Not really a completely well-thought-out concurrency thing.
                 $.ajax({
-                  url: serverUrl + "/dataModel/basicViewChildrenData/" + d.type + "/" + d.id
+                  url: requestChildrenBaseUrl(d) + "?offset=" + offset + "&max=" + max
                   // TODO: Make this paginated
                 }).then(function(data /*: ChildrenData */) {
 
@@ -595,10 +624,36 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                     d._children = null
                     if (data.children.length > 0) {
                       d._children = [];
-                      d._children = _.map(data.children, receiveD3JSON);
-                      // d._children.unshift(new PreviousLinkNode("", 0, 0));
-                      // d._children.push(new NextLinkNode("", 0, 0));
-                      // TODO: Calculate/add appropriate next and previous link nodes before and after data.children
+
+                      d._children = (_.map(data.children, receiveD3JSON) /*: Array<Node> */);
+
+                      if (d._children != null && d._children != undefined) {
+                        // There won't be PreviousLinkNode for this because this is offset=0.
+
+                        var newPrevOffset = Math.max(0, offset-max)
+                        if (offset > 0) {
+                          d._children.unshift(
+                            new PreviousLinkNode(
+                              requestChildrenBaseUrl(d),
+                              newPrevOffset,
+                              Math.min(maxPageSize, data.total - newPrevOffset)
+                            ));
+                        }
+
+                        var newNextOffset = offset + max // max as offset
+
+                        if (data.total > newNextOffset) {
+
+                          d._children.push(
+                            new NextLinkNode(
+                              requestChildrenBaseUrl(d),
+                              newNextOffset,
+                              Math.min(maxPageSize, data.total - newNextOffset)
+                            ));
+                        }
+                      }
+
+
                     }
                     writeMessage("Loading children for " + typeAndName(d) + " succeeded!", 'success')
                     toggle(d);
@@ -609,6 +664,9 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                     if (!data.canAccessDataModel) {
                       writeMessage("You do not have access to the data model of " + typeAndName(d) + " (you may have been logged out) or it does not exist.", 'danger')
                       // TODO: If you can't access the data model because you've been logged out, it's more appropriate that d.loadedChildren remains false, so the user can try to load the children again once logged in. But we need a more fine-grained response from the controller to differentiate the reason for inability to access.
+                    }
+                    else if (!data.paginationParametersFound) {
+                      writeMessage("You did not send the appropriate pagination parameters max and offset in your request.", 'danger')
                     }
                     else { // !data.caseHandled
                       writeMessage("Loading children is not handled for this case.", 'danger')
@@ -622,13 +680,40 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                   d.loading = false
                   // end loading
                 })
-              },
-              // TODO : Implement PLNode and NLNode handlers for loading next and previous elements
-              function(d /*: PLNode */) {
+              }
+            }
 
-              },
-              function(d /*: NLNode */) {
+            nodeHandler(
 
+              (ceNodeChildLoadingHandler(0, maxPageSize) /*: CENode => void */), // handles CENode
+
+              function(d /*: PLNode */) /*: void */ { // handles PLNode by calling the appropriate handler on its parent
+                if (d.parent) {
+                  var parent /*: Node */ = d.parent
+                  if (parent.nodeContentType === CONTENT_TYPE.CATALOGUE_ELEMENT) {
+                    ceNodeChildLoadingHandler(d.offset, d.max)(parent)
+                  }
+                  else {
+                    throw new Error("Parent of Previous Link Node is not a Catalogue Element Node")
+                  }
+                }
+                else {
+                  throw new Error("Previous Link Node has no Parent")
+                }
+              },
+              function(d /*: NLNode */) /*: void */ { // similar to PLNode
+                if (d.parent) {
+                  var parent /*: Node */ = d.parent
+                    if (parent.nodeContentType === CONTENT_TYPE.CATALOGUE_ELEMENT) {
+                      ceNodeChildLoadingHandler(d.offset, d.max)(parent)
+                    }
+                    else {
+                      throw new Error("Parent of Next Link Node is not a Catalogue Element Node")
+                    }
+                  }
+                else {
+                    throw new Error("Next Link Node has no Parent")
+                }
               }
             )(d)
           }
@@ -796,8 +881,12 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
               .attr('dy', dy)
               .text((nodeHandler(
                 function(d /*: CENode */) { return splitName(d)[i]; },
-                k((i === 0) ? "Previous Elements" : ""), // TODO: Enter text for Previous and Next nodes
-                k((i === 0) ? "Next Elements" : "")
+                (i === 0) ? function(d /*: PLNode */) /*: string */ {
+                  return "Previous Elements (" + d.offset + "-" + d.max + ")"
+                } : k(""),
+                (i === 0) ? function(d /*: NLNode */) /*: string */ {
+                  return "Next Elements (" + d.offset + "-" + d.max + ")"
+                } : k("")
               ) /*: Node => string */))
             i++
           }

@@ -290,13 +290,20 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      *
      * @return ChildrenData
      */
-    def basicViewChildrenData() {
+    def basicViewChildrenData(ChildrenDataCommand cmd) {
 
         String type = params.get('type').toString()
         long id = params.long('id')
 
         boolean canAccessDataModel = false
         boolean caseHandled = true
+
+        long offset = cmd.offset
+        long max = cmd.max
+        boolean paginationParametersFound = (offset != null && max != null)
+
+        long total = 0
+
         def children = []
 
         if (type == 'dataModel') {
@@ -319,9 +326,20 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             caseHandled = false
         }
 
+        if (children != null) {
+            total = children.size()
+            children = children[(offset.. offset+max-1)] // pseudo pagination.
+            // gets children [offset..offset+max)
+
+        }
+
 
         render(contentType: 'text/json') {
-            new ChildrenData(children: children, canAccessDataModel: canAccessDataModel, caseHandled: caseHandled)
+            new ChildrenData(children: children,
+                canAccessDataModel: canAccessDataModel,
+                caseHandled: caseHandled,
+                paginationParametersFound: paginationParametersFound,
+                total: total)
         }
     }
 

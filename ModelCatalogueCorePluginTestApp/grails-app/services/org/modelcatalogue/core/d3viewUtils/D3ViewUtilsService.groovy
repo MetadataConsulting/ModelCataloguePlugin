@@ -323,4 +323,9 @@ class ChildrenData {
     List<D3JSON> children
     boolean canAccessDataModel
     boolean caseHandled
+    boolean paginationParametersFound
+    /**
+     * For a paginated query this should be the total possible results (not the size of actually returned results)
+     */
+    long total
 }
