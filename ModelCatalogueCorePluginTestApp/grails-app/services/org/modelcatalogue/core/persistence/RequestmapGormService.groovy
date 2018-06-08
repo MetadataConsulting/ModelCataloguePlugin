@@ -13,8 +13,11 @@ class RequestmapGormService {
         for (Requestmap map in maps) {
             if (map.configAttribute == configAttribute) {
                 return map
+            } else {
+                println "Requestmap method: $method, url: $url has different config attribute - actual: $map.configAttribute replaced by $configAttribute"
+                map.configAttribute = configAttribute
+                map.save()
             }
-            println "Requestmap method: $method, url: $url has different config attribute - expected: $configAttribute, actual: $map.configAttribute"
         }
         Requestmap.findOrSaveByUrlAndConfigAttributeAndHttpMethod(url, configAttribute, method, [failOnError: true])
     }
