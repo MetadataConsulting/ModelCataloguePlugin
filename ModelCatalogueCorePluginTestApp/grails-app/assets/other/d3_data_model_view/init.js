@@ -337,6 +337,41 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
    * @returns {string}
    */
   function info(d /*: CENode */) /*: void */ {
+
+
+    /**
+     * Return HTML for enumeration or metadata of rhe form from Map<String, String>
+     * @param map
+     * @returns {string}
+     */
+    function displayMap(map /*:{[string]: string} */) /*: string */ {
+      var ret = "<ul>"
+      Object.keys(map).forEach(function(key) {
+        ret = ret + "<li>" + key + ": " + map[key] + "</li>"
+        console.log(key, map[key]);
+      });
+      return ret = ret + "</ul>"
+    }
+
+    /**
+     * Display an object which is a map with relationship type names as keys and lists of "Relation"s as values
+     * @param relationships
+     * @returns {string}
+     */
+    function displayRelationships(relationships /*:{[string]: Relation[]} */) /*: string */ {
+      var ret = ""
+      Object.keys(relationships).forEach(function(relationshipTypeName /*: string */){
+        var relations /*: Relation[]*/= relationships[relationshipTypeName]
+        if (relations.length > 0) {
+          relations.forEach(function(relation) {
+            ret = ret + relationshipTypeName + ": " + "<a href='" + relation.angularLink + "' target='_blank'>" + relation.name + "</a>" + "<br/>"
+          })
+        }
+      })
+      return ret
+    }
+
+
     $("#d3-info-name-description").html(
       "<b>Name: "  + "<a href='" + d.angularLink +  "' target='_blank'>" + d.name + "</a>" + "<br/>" +
       " <i>(Click to see Advanced View)</i>" + "</b>" + "<br/>" +
@@ -362,39 +397,9 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     )
 
     $("#d3-info-relationships").html((d.relationships ? displayRelationships(d.relationships): "No Relationships"))
+
   }
 
-  /**
-   * Return HTML for enumeration or metadata of rhe form from Map<String, String>
-   * @param map
-   * @returns {string}
-   */
-  function displayMap(map /*:{[string]: string} */) /*: string */ {
-    var ret = "<ul>"
-    Object.keys(map).forEach(function(key) {
-      ret = ret + "<li>" + key + ": " + map[key] + "</li>"
-      console.log(key, map[key]);
-    });
-    return ret = ret + "</ul>"
-  }
-
-  /**
-   * Display an object which is a map with relationship type names as keys and lists of "Relation"s as values
-   * @param relationships
-   * @returns {string}
-   */
-  function displayRelationships(relationships /*:{[string]: Relation[]} */) /*: string */ {
-    var ret = ""
-    Object.keys(relationships).forEach(function(relationshipTypeName /*: string */){
-      var relations /*: Relation[]*/= relationships[relationshipTypeName]
-      if (relations.length > 0) {
-        relations.forEach(function(relation) {
-          ret = ret + relationshipTypeName + ": " + "<a href='" + relation.angularLink + "' target='_blank'>" + relation.name + "</a>" + "<br/>"
-        })
-      }
-    })
-    return ret
-  }
 
 
   function writeMessage(text, type) {
@@ -457,7 +462,6 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
   //// Init, Update and Toggle
 
 
-
   var dataTypeColour = "green"
   // node colours
   var coloursMap /*: {[string] : string} */ = {
@@ -469,10 +473,14 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     "primitiveType": "olive",
     "referenceType": "mediumseagreen"
   }
-  // TODO: give an appropriate colour for next and previous nodes
-  coloursMap[CONTENT_TYPE.PREV_LINK] = "black"
-  coloursMap[CONTENT_TYPE.NEXT_LINK] = "hotpink"
 
+
+  /**
+   * node circle radius
+   * @type {number}
+   */
+  var radius = 7
+  var unopenedNodeBorderColour = "orangered"
 
   /**
    * Initialize
@@ -495,14 +503,12 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
    */
   function update(source) {
 
+    // TODO: give an appropriate colour for next and previous nodes
+    coloursMap[CONTENT_TYPE.PREV_LINK] = "black"
+    coloursMap[CONTENT_TYPE.NEXT_LINK] = "hotpink"
+
     var duration = d3.event && d3.event.altKey ? 5000 : 500;
 
-    /**
-     * node circle radius
-     * @type {number}
-     */
-    var radius = 7
-    var unopenedNodeBorderColour = "orangered"
 
 
     // Compute the new tree layout.
@@ -515,347 +521,371 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     var svgNodes = vis.selectAll("g.node")
       .data(nodeLayoutData, function(d) { return d.nodeId || (d.nodeId = ++i); });
 
-    /*::
-      type ChildrenData = {
-          children: Array<ReceivedD3JSON>,
-          canAccessDataModel: boolean,
-          caseHandled: boolean
-      }
-    */
+
 
     /**
-     * Collapse the siblings of d back into the parent.
-     * @param d
+     * Node Enter block
      */
-    function collapseSiblings(d /*: Node */) {
-      var parent = d.parent
-      if (parent) {
-        parent.children = [d]
-        parent.loadedChildren = false
-      }
-    }
+    (function() {
+      /*::
+        type ChildrenData = {
+            children: Array<ReceivedD3JSON>,
+            canAccessDataModel: boolean,
+            caseHandled: boolean
+        }
+      */
+      /**
+       * Event handler for node click.
+       * Toggles showing children or not.
+       * Loads children if not loaded.
+       * @param d
+       */
+      function onNodeClick(d /*: Node */) /*: void */ {
 
-    /**
-     * Event handler for node click.
-     * Toggles showing children or not.
-     * Loads children if not loaded.
-     * @param d
-     */
-    function onNodeClick(d /*: Node */) /*: void */ {
-      var path = pathFromRoot(d)
-      console.log("Path from root: " + namesFromPath(path).toString())
-      console.log("Angular pathstring: " + angularTreeviewPathString(path))
+        /**
+         * Collapse the siblings of d back into the parent.
+         * @param d
+         */
+        function collapseSiblings(d /*: Node */) {
+          var parent = d.parent
+          if (parent) {
+            parent.children = [d]
+            parent.loadedChildren = false
+          }
+        }
 
-      if (d.nodeContentType === CONTENT_TYPE.CATALOGUE_ELEMENT) {
-        info((d /*: CENode */)); // display info
-      }
+        var path = pathFromRoot(d)
+        console.log("Path from root: " + namesFromPath(path).toString())
+        console.log("Angular pathstring: " + angularTreeviewPathString(path))
+
+        if (d.nodeContentType === CONTENT_TYPE.CATALOGUE_ELEMENT) {
+          info((d /*: CENode */)); // display info
+        }
 
 
 
-      if (d.children === [] || d.children === null) {
-        collapseSiblings(d)
-      }
+        if (d.children === [] || d.children === null) {
+          collapseSiblings(d)
+        }
 
-      if (d.loadedChildren && !d.loading) {
-        toggle(d);
-        update(d);
-      }
+        if (d.loadedChildren && !d.loading) {
+          toggle(d);
+          update(d);
+        }
 
-      else {
+        else {
 
-        if (!d.loading) { // i.e. !d.loadedChildren
+          if (!d.loading) { // i.e. !d.loadedChildren
 
-          nodeHandler(
-            function(d /*: CENode */) {
-              writeMessage("Loading children for " + typeAndName(d) + "...")
-              d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough. Not really a completely well-thought-out concurrency thing.
-              $.ajax({
-                url: serverUrl + "/dataModel/basicViewChildrenData/" + d.type + "/" + d.id
-                // TODO: Make this paginated
-              }).then(function(data /*: ChildrenData */) {
+            nodeHandler(
+              function(d /*: CENode */) {
+                writeMessage("Loading children for " + typeAndName(d) + "...")
+                d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough. Not really a completely well-thought-out concurrency thing.
+                $.ajax({
+                  url: serverUrl + "/dataModel/basicViewChildrenData/" + d.type + "/" + d.id
+                  // TODO: Make this paginated
+                }).then(function(data /*: ChildrenData */) {
 
-                d.loadedChildren = true;
-                d.loading = false;
-                // end loading
+                  d.loadedChildren = true;
+                  d.loading = false;
+                  // end loading
 
-                if (data.canAccessDataModel && data.caseHandled) {
-                  d.children = null
-                  d._children = null
-                  if (data.children.length > 0) {
-                    d._children = [];
-                    d._children = _.map(data.children, receiveD3JSON);
-                    // d._children.unshift(new PreviousLinkNode("", 0, 0));
-                    // d._children.push(new NextLinkNode("", 0, 0));
-                    // TODO: Calculate/add appropriate next and previous link nodes before and after data.children
+                  if (data.canAccessDataModel && data.caseHandled) {
+                    d.children = null
+                    d._children = null
+                    if (data.children.length > 0) {
+                      d._children = [];
+                      d._children = _.map(data.children, receiveD3JSON);
+                      // d._children.unshift(new PreviousLinkNode("", 0, 0));
+                      // d._children.push(new NextLinkNode("", 0, 0));
+                      // TODO: Calculate/add appropriate next and previous link nodes before and after data.children
+                    }
+                    writeMessage("Loading children for " + typeAndName(d) + " succeeded!", 'success')
+                    toggle(d);
+                    update(d);
                   }
-                  writeMessage("Loading children for " + typeAndName(d) + " succeeded!", 'success')
-                  toggle(d);
-                  update(d);
-                }
 
-                else {
-                  if (!data.canAccessDataModel) {
-                    writeMessage("You do not have access to the data model of " + typeAndName(d) + " (you may have been logged out) or it does not exist.", 'danger')
-                    // TODO: If you can't access the data model because you've been logged out, it's more appropriate that d.loadedChildren remains false, so the user can try to load the children again once logged in. But we need a more fine-grained response from the controller to differentiate the reason for inability to access.
-                  }
-                  else { // !data.caseHandled
-                    writeMessage("Loading children is not handled for this case.", 'danger')
+                  else {
+                    if (!data.canAccessDataModel) {
+                      writeMessage("You do not have access to the data model of " + typeAndName(d) + " (you may have been logged out) or it does not exist.", 'danger')
+                      // TODO: If you can't access the data model because you've been logged out, it's more appropriate that d.loadedChildren remains false, so the user can try to load the children again once logged in. But we need a more fine-grained response from the controller to differentiate the reason for inability to access.
+                    }
+                    else { // !data.caseHandled
+                      writeMessage("Loading children is not handled for this case.", 'danger')
+                    }
+
                   }
 
-                }
+
+                }, function(jqXHR, textStatus, errorThrown) { // request failure
+                  writeMessage("Loading children for " + typeAndName(d) + " failed with error message: " + errorThrown, 'danger')
+                  d.loading = false
+                  // end loading
+                })
+              },
+              // TODO : Implement PLNode and NLNode handlers for loading next and previous elements
+              function(d /*: PLNode */) {
+
+              },
+              function(d /*: NLNode */) {
+
+              }
+            )(d)
+          }
+
+        }
+
+      }
+
+      // ENTER any new nodes at the parent's previous position.
+      // the g element includes the circle AND the text next to it (the name). So event listeners registered here will apply to both circle and text.
+      var nodeEnter = svgNodes.enter().append("svg:g")
+        .attr("class", "node")
+        .attr("transform", function(d /*: Node */) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+        .on("click", (onNodeClick /*: Node => void */))
+        .on('mousedown', function(d /*: Node */) {
+
+          d3.event.stopImmediatePropagation(); // to stop panning
+        });
+
+      // add circles for each node
+      nodeEnter.append("svg:circle")
+        .attr("r", 1e-6)
+        .style("fill", (nodeHandler(
+          function(d /*: CENode */) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; },
+          (k(coloursMap[CONTENT_TYPE.PREV_LINK]) /*: PLNode => string */),
+          (k(coloursMap[CONTENT_TYPE.NEXT_LINK]) /*: NLNode => string */)
+        ) /*: Node => string */));
 
 
-              }, function(jqXHR, textStatus, errorThrown) { // request failure
-                writeMessage("Loading children for " + typeAndName(d) + " failed with error message: " + errorThrown, 'danger')
-                d.loading = false
-                // end loading
-              })
-            },
-            // TODO : Implement PLNode and NLNode handlers for loading next and previous elements
-            function(d /*: PLNode */) {
+      /**
+       * Node labelling block
+       */
+      (function(){
 
-            },
-            function(d /*: NLNode */) {
+        /**
+         * max string length for text next to node
+         * @type {number}
+         */
+        var maxStringLength = 20;
 
+
+        /**
+         * First n elements of arr, [] if arr is empty
+         * @param arr
+         * @param n
+         * @returns {Array}
+         */
+        function myFirst(arr, n) {
+          return (arr.length === 0) ? [] : _.first(arr, n)
+        }
+
+
+        /**
+         * Max number of lines for node label. Should be at least 1.
+         * @type {number}
+         */
+        var maxNodeLabelLines = 10
+
+        /**
+         * Splits name into array of three lines, made of whole words, each less than maxStringLength long.
+         * @param d
+         * @returns {Array}
+         */
+        function splitName(d /*: CENode */) /*: string[] */ {
+          var words = d.name.split(/\s+/) // initial splitting
+
+          var truncatedWords = []
+
+          // split words longer than maxStringLength into parts
+          var i = 0
+          while (i < words.length) {
+            // loop invariant: words1[0..i) has been put into words
+
+            var word = words[i] // word to split
+
+            while (word.length > maxStringLength) {
+              // loop invariant: word is always the remainder of words1[i] that has not been pushed into words yet
+              // the following is fine even if maxStringLength-1 is greater than the length of word
+
+              truncatedWords.push(word.substring(0,maxStringLength-1) + '-')
+              word = word.substring(maxStringLength-1) // make word the remainder
             }
+
+            truncatedWords.push(word) // the remainder. Could be the empty string but that is not a problem
+            i++
+            console.log(truncatedWords)
+          }
+
+
+          var result = []
+          var n = 0
+          while (n < maxNodeLabelLines) {
+            // words is the remaining array of words
+
+            var wordsPerLine = 0
+            var line = myFirst(truncatedWords, wordsPerLine).join(' ')
+
+            while (line.length < maxStringLength && wordsPerLine < truncatedWords.length) {
+              // loop invariant: line == myFirst(truncatedWords, wordsPerLine).join(' ')
+              wordsPerLine++
+              line = myFirst(truncatedWords, wordsPerLine).join(' ')
+            }
+
+            if (line.length > maxStringLength) { // loop could terminate due to being over the max string length
+              wordsPerLine = wordsPerLine - 1
+            }
+
+
+            result.push(truncatedWords.splice(0, wordsPerLine).join(' '))
+            n++
+          }
+
+
+          return result
+        }
+
+
+        /**
+         * Should label be on the left of the node?
+         * @param d
+         * @returns {*}
+         */
+        function shouldLabelBeOnTheLeft(d /*: Node */) /*: boolean */ {
+          return nodeHandler(
+            function(d /*: CENode */) /*: boolean */ {
+              return (d.type === 'dataClass' || d.type === 'dataModel' || d.type === 'dataElement')
+            },
+            (k(true) /*: PLNode => boolean */),
+            (k(true) /*: NLNode => boolean */)
+
           )(d)
+
         }
 
-      }
-
-    }
-
-
-    // ENTER any new nodes at the parent's previous position.
-    // the g element includes the circle AND the text next to it (the name). So event listeners registered here will apply to both circle and text.
-    var nodeEnter = svgNodes.enter().append("svg:g")
-      .attr("class", "node")
-      .attr("transform", function(d /*: Node */) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-      .on("click", (onNodeClick /*: Node => void */))
-      .on('mousedown', function(d /*: Node */) {
-
-        d3.event.stopImmediatePropagation(); // to stop panning
-      });
-
-
-
-    // add circles for each node
-    nodeEnter.append("svg:circle")
-      .attr("r", 1e-6)
-      .style("fill", (nodeHandler(
-        function(d /*: CENode */) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; },
-        (k(coloursMap[CONTENT_TYPE.PREV_LINK]) /*: PLNode => string */),
-        (k(coloursMap[CONTENT_TYPE.NEXT_LINK]) /*: NLNode => string */)
-      ) /*: Node => string */));
-
-
-    /**
-     * max string length for text next to node
-     * @type {number}
-     */
-    var maxStringLength = 20;
-
-
-    /**
-     * First n elements of arr, [] if arr is empty
-     * @param arr
-     * @param n
-     * @returns {Array}
-     */
-    function myFirst(arr, n) {
-      return (arr.length === 0) ? [] : _.first(arr, n)
-    }
-
-
-    /**
-     * Max number of lines for node label. Should be at least 1.
-     * @type {number}
-     */
-    var maxNodeLabelLines = 10
-
-    /**
-     * Splits name into array of three lines, made of whole words, each less than maxStringLength long.
-     * @param d
-     * @returns {Array}
-     */
-    function splitName(d /*: CENode */) /*: string[] */ {
-      var words = d.name.split(/\s+/) // initial splitting
-
-      var truncatedWords = []
-
-      // split words longer than maxStringLength into parts
-      var i = 0
-      while (i < words.length) {
-        // loop invariant: words1[0..i) has been put into words
-
-        var word = words[i] // word to split
-
-        while (word.length > maxStringLength) {
-          // loop invariant: word is always the remainder of words1[i] that has not been pushed into words yet
-          // the following is fine even if maxStringLength-1 is greater than the length of word
-
-          truncatedWords.push(word.substring(0,maxStringLength-1) + '-')
-          word = word.substring(maxStringLength-1) // make word the remainder
+        function nodeLabelXOffset(d /*: Node */) /*: number */ {
+          var absoluteOffset = radius + 5;
+          return shouldLabelBeOnTheLeft(d) ? - (absoluteOffset) : absoluteOffset;
         }
 
-        truncatedWords.push(word) // the remainder. Could be the empty string but that is not a problem
-        i++
-        console.log(truncatedWords)
-      }
+        // Text/link for each node
+        var textD3Selection = nodeEnter.append("svg:text")
+          .attr("dy", ".35em")
+          // text with possibly shortened name
 
+          .attr("x", nodeLabelXOffset)
+          .attr("text-anchor", function(d /*: Node */) {
+            return shouldLabelBeOnTheLeft(d) ? "end" : "start";
+          })
+          // .text(shortenedNodeText)
 
-      var result = []
-      var n = 0
-      while (n < maxNodeLabelLines) {
-        // words is the remaining array of words
+          .style("fill-opacity", 1e-6)
+          .style("font", "15px sans-serif")
 
-        var wordsPerLine = 0
-        var line = myFirst(truncatedWords, wordsPerLine).join(' ')
+        /**
+         * Add text (label) next to node, in lines
+         * @param textD3Selection
+         */
+        function addLabelLines(textD3Selection) {
+          var currentSelection = textD3Selection
+          var i /*: number */ = 0
+          while (i < maxNodeLabelLines) {
+            var dy = (i === 0) ? 5 : 20
+            currentSelection = currentSelection.append('svg:tspan')
+              .attr("x", (nodeLabelXOffset /*: Node => number */))
+              .attr('dy', dy)
+              .text((nodeHandler(
+                function(d /*: CENode */) { return splitName(d)[i]; },
+                k((i === 0) ? "Previous Elements" : ""), // TODO: Enter text for Previous and Next nodes
+                k((i === 0) ? "Next Elements" : "")
+              ) /*: Node => string */))
+            i++
+          }
 
-        while (line.length < maxStringLength && wordsPerLine < truncatedWords.length) {
-          // loop invariant: line == myFirst(truncatedWords, wordsPerLine).join(' ')
-          wordsPerLine++
-          line = myFirst(truncatedWords, wordsPerLine).join(' ')
         }
 
-        if (line.length > maxStringLength) { // loop could terminate due to being over the max string length
-          wordsPerLine = wordsPerLine - 1
-        }
+        addLabelLines(textD3Selection)
 
+      })();
 
-        result.push(truncatedWords.splice(0, wordsPerLine).join(' '))
-        n++
-      }
+    })();
 
-
-      return result
-    }
 
 
     /**
-     * Should label be on the left of the node?
-     * @param d
-     * @returns {*}
+     * Transition block
      */
-    function shouldLabelBeOnTheLeft(d /*: Node */) /*: boolean */ {
-      return nodeHandler(
-        function(d /*: CENode */) /*: boolean */ {
-          return (d.type === 'dataClass' || d.type === 'dataModel' || d.type === 'dataElement')
-        },
-        (k(true) /*: PLNode => boolean */),
-        (k(true) /*: NLNode => boolean */)
+    (function() {
 
-      )(d)
+      // TRANSITION nodes to their new position.
+      var nodeUpdate = svgNodes.transition()
+        .duration(duration)
+        .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
-    }
-    function nodeLabelXOffset(d /*: Node */) /*: number */ {
-      var absoluteOffset = radius + 5;
-      return shouldLabelBeOnTheLeft(d) ? - (absoluteOffset) : absoluteOffset;
-    }
+      nodeUpdate.select("circle")
+        .attr("r", radius)
+        .style("stroke", function(d) {
+          return (d._children || !d.loadedChildren) ? unopenedNodeBorderColour: coloursMap[d.type]; })
+        .style("stroke-width", 3)
+        .style("fill", function(d) { return coloursMap[d.type]})
+      ;
 
-    // Text/link for each node
-    var textD3Selection = nodeEnter.append("svg:text")
-      .attr("dy", ".35em")
-      // text with possibly shortened name
+      nodeUpdate.select("text")
+        .style("fill-opacity", 1);
 
-      .attr("x", nodeLabelXOffset)
-      .attr("text-anchor", function(d /*: Node */) {
-        return shouldLabelBeOnTheLeft(d) ? "end" : "start";
-      })
-      // .text(shortenedNodeText)
 
-      .style("fill-opacity", 1e-6)
-      .style("font", "15px sans-serif")
+
+
+      // TRANSITION EXITING nodes to the parent's new position.
+      var nodeExit = svgNodes.exit().transition()
+        .duration(duration)
+        .attr("transform", function(d /*: Node */) { return "translate(" + source.y + "," + source.x + ")"; })
+        .remove();
+
+      nodeExit.select("circle")
+        .attr("r", 1e-6);
+
+      nodeExit.select("text")
+        .style("fill-opacity", 1e-6);
+
+    })();
+
+
 
     /**
-     * Add text (label) next to node, in lines
-     * @param textD3Selection
+     * Update links block
      */
-    function addLabelLines(textD3Selection) {
-      var currentSelection = textD3Selection
-      var i /*: number */ = 0
-      while (i < maxNodeLabelLines) {
-        var dy = (i === 0) ? 5 : 20
-        currentSelection = currentSelection.append('svg:tspan')
-          .attr("x", (nodeLabelXOffset /*: Node => number */))
-          .attr('dy', dy)
-          .text((nodeHandler(
-            function(d /*: CENode */) { return splitName(d)[i]; },
-            k((i === 0) ? "Previous Elements" : ""), // TODO: Enter text for Previous and Next nodes
-            k((i === 0) ? "Next Elements" : "")
-          ) /*: Node => string */))
-        i++
-      }
+    (function() {
+      // Update the LINKS…
+      var link = vis.selectAll("path.link")
+        .data(tree.links(nodeLayoutData), function(d) { return d.target.id; });
 
-    }
+      // ENTER any new links at the parent's previous position.
+      link.enter().insert("svg:path", "g")
+        .attr("class", "link")
+        .attr("d", function(d /*: Node */) {
+          var o = {x: source.x0, y: source.y0};
+          return diagonal({source: o, target: o});
+        })
+        .transition()
+        .duration(duration)
+        .attr("d", diagonal);
 
-    addLabelLines(textD3Selection)
+      // Transition links to their new position.
+      link.transition()
+        .duration(duration)
+        .attr("d", diagonal);
 
+      // Transition exiting links to the parent's new position.
+      link.exit().transition()
+        .duration(duration)
+        .attr("d", function(d /*: Node */) {
+          var o = {x: source.x, y: source.y};
+          return diagonal({source: o, target: o});
+        })
+        .remove();
+    })();
 
-
-
-    // TRANSITION nodes to their new position.
-    var nodeUpdate = svgNodes.transition()
-      .duration(duration)
-      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
-
-    nodeUpdate.select("circle")
-      .attr("r", radius)
-      .style("stroke", function(d) {
-        return (d._children || !d.loadedChildren) ? unopenedNodeBorderColour: coloursMap[d.type]; })
-      .style("stroke-width", 3)
-      .style("fill", function(d) { return coloursMap[d.type]})
-    ;
-
-    nodeUpdate.select("text")
-      .style("fill-opacity", 1);
-
-
-
-
-    // TRANSITION EXITING nodes to the parent's new position.
-    var nodeExit = svgNodes.exit().transition()
-      .duration(duration)
-      .attr("transform", function(d /*: Node */) { return "translate(" + source.y + "," + source.x + ")"; })
-      .remove();
-
-    nodeExit.select("circle")
-      .attr("r", 1e-6);
-
-    nodeExit.select("text")
-      .style("fill-opacity", 1e-6);
-
-
-
-
-    // Update the LINKS…
-    var link = vis.selectAll("path.link")
-      .data(tree.links(nodeLayoutData), function(d) { return d.target.id; });
-
-    // ENTER any new links at the parent's previous position.
-    link.enter().insert("svg:path", "g")
-      .attr("class", "link")
-      .attr("d", function(d /*: Node */) {
-        var o = {x: source.x0, y: source.y0};
-        return diagonal({source: o, target: o});
-      })
-      .transition()
-      .duration(duration)
-      .attr("d", diagonal);
-
-    // Transition links to their new position.
-    link.transition()
-      .duration(duration)
-      .attr("d", diagonal);
-
-    // Transition exiting links to the parent's new position.
-    link.exit().transition()
-      .duration(duration)
-      .attr("d", function(d /*: Node */) {
-        var o = {x: source.x, y: source.y};
-        return diagonal({source: o, target: o});
-      })
-      .remove();
 
     // Stash the old positions for transition.
     nodeLayoutData.forEach(function(d /*: Node */) {
