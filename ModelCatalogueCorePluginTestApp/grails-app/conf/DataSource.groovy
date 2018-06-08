@@ -25,7 +25,7 @@ environments {
     test {
         if (System.getenv('DOCKERIZED_TESTS') && System.properties["grails.test.phase"] == 'functional') {
             dataSource {
-                    driverClassName = "com.mysql.jdbc.Driver"
+                driverClassName = "com.mysql.jdbc.Driver"
                 dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
                 url = "jdbc:mysql://${System.getenv('MC_DOCKER_HOST') ?: 'localhost'}:43306/tester?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
                 username = 'root'
@@ -44,7 +44,7 @@ environments {
                 }
             }
         } else {
-            /* dataSource {
+            dataSource {
                 pooled = true
                 driverClassName = System.getenv('MDX_DB_DRIVER') ?: 'org.h2.Driver'
                 if ( System.getenv('MC_JDBC_DRIVER') == 'com.mysql.jdbc.Driver' ) {
@@ -55,29 +55,8 @@ environments {
                 password = System.getenv('MDX_DB_PASSWORD') ?: ''
                 dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
             }
-        }*/
-
-            dataSource {
-                driverClassName = "com.mysql.jdbc.Driver"
-                dialect = 'org.hibernate.dialect.MySQL5InnoDBDialect'
-                url = "jdbc:mysql://localhost:3306/tester?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
-                username = 'root'
-                password = 'nextdefault'
-                dbCreate = "create"
-                properties {
-                    maxActive = -1
-                    minEvictableIdleTimeMillis = 1800000
-                    timeBetweenEvictionRunsMillis = 1800000
-                    numTestsPerEvictionRun = 3
-                    testOnBorrow = true
-                    testWhileIdle = true
-                    testOnReturn = false
-                    validationQuery = "SELECT 1"
-                    jdbcInterceptors = "ConnectionState"
-                }
-            }
         }
-        }
+    }
     production {
         dataSource {
             driverClassName = "com.mysql.jdbc.Driver"
