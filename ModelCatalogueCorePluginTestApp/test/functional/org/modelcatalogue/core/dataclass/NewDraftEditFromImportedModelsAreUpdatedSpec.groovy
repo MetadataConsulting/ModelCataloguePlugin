@@ -40,7 +40,6 @@ import spock.lang.Title
 - Check that when you search in the parents tab, edits made to the data class in the imported model are carried through to your data model. | Edits are present from imported data model.
 ''')
 @Stepwise
-@Ignore
 class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
     @Shared
     String dataModelName = UUID.randomUUID().toString()
@@ -274,6 +273,7 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
 
         when:
         DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.search(importDataModelName)
         dashboardPage.select(importDataModelName)
         then:
         at DataModelPage

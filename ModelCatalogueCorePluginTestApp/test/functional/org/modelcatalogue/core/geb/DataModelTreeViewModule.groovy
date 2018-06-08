@@ -14,6 +14,7 @@ class DataModelTreeViewModule extends Module {
     }
 
     void dataClasses() {
+        sleep(2_000)
         select('Data Classes')
     }
 

@@ -11,6 +11,9 @@ class ParentClassModalPage extends Page {
         createRelationshipButton(required: false, wait: true) { $('button.btn-primary', type: 'submit') }
         cancelButton(required: true) { $('button.btn-warning') }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+        modelHome(wait: true) { String name ->
+            $('ul .catalogue-element-treeview-name', text: contains(name)).click()
+        }
     }
 
     void searchMore() {
@@ -18,11 +21,15 @@ class ParentClassModalPage extends Page {
     }
 
     void createRelationship() {
+        sleep(3_000)
         createRelationshipButton.click()
+        sleep(2_000)
+
     }
 
     void openModelHome(String modelname) {
-        $('ul .catalogue-element-treeview-name', text: contains(modelname)).click()
+        sleep(2_000)
+        modelHome(modelname)
     }
 
 }

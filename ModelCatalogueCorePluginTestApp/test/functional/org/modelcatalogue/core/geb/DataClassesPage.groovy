@@ -26,6 +26,7 @@ class DataClassesPage extends Page {
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
+        dataClassByName(wait: true) { rows.$('a', text: it) }
     }
 
     void expandLinkClick() {
@@ -77,7 +78,8 @@ class DataClassesPage extends Page {
     }
 
     void selectDataClassByName(String value) {
-        rows.$('a', text: value).click()
+        dataClassByName(value).click()
+        sleep(2_000)
     }
 
     boolean containsDataClass(String value) {

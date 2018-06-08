@@ -2,7 +2,6 @@ package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
 import spock.lang.Issue
-import spock.lang.Ignore
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title

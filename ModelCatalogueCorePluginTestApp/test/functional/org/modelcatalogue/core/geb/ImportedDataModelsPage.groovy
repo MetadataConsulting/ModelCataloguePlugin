@@ -25,5 +25,6 @@ class ImportedDataModelsPage extends Page {
 
     void selectModelByName(String name) {
         dataModelList.$('td a', text: name).click()
+        sleep(2_000)
     }
 }
