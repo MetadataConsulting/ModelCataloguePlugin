@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.change
 
 import grails.transaction.Transactional
+import grails.util.Environment
 import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
 import groovy.transform.CompileDynamic
@@ -14,14 +15,14 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
 
 @CompileStatic
 class ChangeSqlService {
-
+    final String changeTable = Environment.current == Environment.TEST ? 'CHANGE' : '`change`'
     def dataSource
 
     @Transactional(readOnly = true)
     ListWithTotalAndType<Change> findAllByDataModelFilter(DataModelFilter dataModelFilter, PaginationQuery paginationQuery, SortQuery sortQuery) {
         List<GroovyRowResult> countRows = findAllRowsByDataModelFilter(dataModelFilter, "count(*) ")
         Long total = countRows ? countRows.first()[0] as int : 0
-        List<GroovyRowResult> selectRows = findAllRowsByDataModelFilter(dataModelFilter, "`change`.id ", paginationQuery, sortQuery)
+        List<GroovyRowResult> selectRows = findAllRowsByDataModelFilter(dataModelFilter, "${changeTable}.id ", paginationQuery, sortQuery)
         List<Long> ids = selectRows.collect { GroovyRowResult row -> row.getAt(0) as Long } as List<Long>
         List<Change> l = ids ? Change.where { id in (ids) }.list() : [] as List<Change>
         new ListWithTotalAndTypeImpl<Change>(Change, l, total)
@@ -36,11 +37,11 @@ class ChangeSqlService {
         final Sql sql = instantiateSql()
         final String query = """\
 SELECT ${selectQuery} 
-FROM `change` WHERE 
-  `change`.changed_id IN (${queryByDataModelFilter(dataModels)}) AND 
-  `change`.parent_id is null AND
-  `change`.system<>true AND
-  `change`.other_side<>true
+FROM ${changeTable} WHERE 
+  ${changeTable}.changed_id IN (${queryByDataModelFilter(dataModels)}) AND 
+  ${changeTable}.parent_id IS NULL AND
+  ${changeTable}.system <> true AND
+  ${changeTable}.other_side <> true
 """
         if ( sortQuery ) {
             query += " ${sortQuery.toSQL()}".toString()
