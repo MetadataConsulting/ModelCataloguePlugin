@@ -39,6 +39,9 @@ class DataModelAclPermissionsShowPage extends Page {
     void grant(String username, String permission) {
         setUsername(username)
         setPermission(permission)
+        Thread.sleep(5000)
         inputSubmit.click()
+        Thread.sleep(5000)
+
     }
 }

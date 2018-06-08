@@ -17,7 +17,6 @@ import org.modelcatalogue.core.geb.HomePage
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Shared
-import spock.lang.Ignore
 import spock.lang.Stepwise
 import spock.lang.Title
 
@@ -50,8 +49,8 @@ import spock.lang.Title
 - Press save | Data type is saved
 -  Confirm that new data type has been added to the data model | Data type appears in list under data types. tag
 ''')
+
 @Stepwise
-@Ignore
 class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
 
     @Shared
@@ -254,6 +253,7 @@ class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
     def "select first data model created"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelOneName)
         dashboardPage.select(dataModelOneName)
         then:
         at DataModelPage
