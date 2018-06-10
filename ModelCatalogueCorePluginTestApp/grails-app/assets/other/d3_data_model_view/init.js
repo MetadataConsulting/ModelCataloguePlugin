@@ -799,13 +799,24 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
             nodeHandler(
 
-              (ceNodeChildLoadingHandler(0, maxPageSize) /*: CENode => void */), // handles CENode
+              function(d /*: CENode */) /*: void */ {
+
+                if (d.currentPaginationParams != null) {
+                  var cPP = d.currentPaginationParams
+                  ceNodeChildLoadingHandler(cPP.offset, cPP.max)(d)
+                }
+                else {
+                  (ceNodeChildLoadingHandler(0, maxPageSize) /*: CENode => void */)(d)
+                }
+
+              }, // handles CENode
 
               function(d /*: PageNode */) /*: void */ { // handles PageNode by calling the appropriate handler on its parent
 
                 ceNodeChildLoadingHandler(d.offset, d.max)(d.nodeWhoseChildrenArePaged)
 
               }
+
             )(d)
           }
 
@@ -1014,7 +1025,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           .style("text-decoration", "underline")
           .text((nodeHandler(
             function(d /*: CENode */) {
-              if (d.currentPaginationParams) {
+              if (d.currentPaginationParams != null) {
                 var cPP = d.currentPaginationParams
                   return "[" + (cPP.offset + 1) + "-" + (cPP.offset + cPP.max - 1 + 1) + "] / " + cPP.total
               }
