@@ -98,8 +98,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
   var CONTENT_TYPE = {
     CATALOGUE_ELEMENT: "CATALOGUE_ELEMENT",
-    PREV_LINK: "PREV_LINK",
-    NEXT_LINK: "NEXT_LINK"
+    PAGE: "PAGE"
   };
 
   /*::
@@ -130,15 +129,14 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       referenceAngularLink: ?string
     }
 
-    type Node = CENode | PLNode | NLNode
+    type Node = CENode | PageNode
     // the primary recursive type
 
     // Disjoint union:
     type CENode = {nodeContentType: "CATALOGUE_ELEMENT"} & D3JSON & CatalogueElementData & PaginationParams
     // PaginationParams being those of the currently displayed children.
 
-    type PLNode = {nodeContentType: "PREV_LINK" } & D3JSON & PaginationParams
-    type NLNode = {nodeContentType: "NEXT_LINK" } & D3JSON & PaginationParams
+    type PageNode = {nodeContentType: "PAGE" } & D3JSON & PaginationParams
 
     type D3JSON = {
 
@@ -154,6 +152,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       x0: number,
       y0: number
     }
+
 
     type PaginationParams = {
       offset: number,
@@ -217,10 +216,10 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
    * @param max
    * @constructor
    */
-  function PreviousLinkNode(
+  function MakePageNode(
                   offset /*: number */,
                   max /*: number */,
-                  total /*: number */) /*: PLNode */{
+                  total /*: number */) /*: PageNode */{
 
     applyDefaultD3JSON(this)
 
@@ -228,41 +227,24 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     this.max = max;
     this.total = total;
 
-    this.nodeContentType = CONTENT_TYPE.PREV_LINK;
+    this.nodeContentType = CONTENT_TYPE.PAGE
 
     return this;
 
   }
 
-
-  function NextLinkNode(
-                  offset /*: number */,
-                  max /*: number */,
-                  total /*: number */) /*: NLNode */{
-
-    applyDefaultD3JSON(this);
-
-    this.offset = offset;
-    this.max = max;
-    this.total = total;
-
-    this.nodeContentType = CONTENT_TYPE.NEXT_LINK;
-
-    return this;
-  }
 
 
   /**
-   * Given handlers for each case (CENode, PLNode, NLNode), return a handler for a Node
+   * Given handlers for each case (CENode, PageNode), return a handler for a Node
    * @param catalogueElementDataHandler
-   * @param prevLinkDataHandler
+   * @param pageNodeHandler
    * @param nextLinkDataHandler
    * @returns {handler}
    */
   function nodeHandler/*::<T>*/(
     catalogueElementDataHandler /*: CENode => T */,
-    prevLinkDataHandler /*: PLNode => T */,
-    nextLinkDataHandler /*: NLNode => T */
+    pageNodeHandler /*: PageNode => T */
   ) /*: Node => T */ {
 
     function handler(d /*: Node */) /*: T */ {
@@ -275,21 +257,14 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
             throw new Error("handler not provided for case CatalogueElementData");
           }
 
-        case CONTENT_TYPE.PREV_LINK:
-          if (prevLinkDataHandler) {
-            return prevLinkDataHandler(d);
+        case CONTENT_TYPE.PAGE:
+          if (pageNodeHandler) {
+            return pageNodeHandler(d);
           }
           else {
-            throw new Error("handler not provided for case PrevLinkData");
+            throw new Error("handler not provided for case Page");
           }
 
-        case CONTENT_TYPE.NEXT_LINK:
-          if (nextLinkDataHandler) {
-            return nextLinkDataHandler(d);
-          }
-          else {
-            throw new Error("handler not provided for case NextLinkData");
-          }
 
         default:
           throw new Error("Case not found for nodeContentType: " + d.nodeContentType + " of D3JSON " + d)
@@ -546,9 +521,6 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
    */
   function update(source) {
 
-    // TODO: give an appropriate colour for next and previous nodes
-    coloursMap[CONTENT_TYPE.PREV_LINK] = "black"
-    coloursMap[CONTENT_TYPE.NEXT_LINK] = "hotpink"
 
     var duration = d3.event && d3.event.altKey ? 5000 : 500;
 
@@ -600,8 +572,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
               function(d2 /*: CENode */) {
                 return d2 === d
               },
-              k(true), // keep the PLNodes and NLNodes
-              k(true)
+              k(true) // keep the PageNodes
             ))
             parent.loadedChildren = false
           }
@@ -662,7 +633,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
                       d._children = (_.map(data.children, receiveD3JSON) /*: Array<Node> */);
 
-                      if (d._children != null && d._children != undefined) {
+                      if (d._children != null && d._children !== undefined) {
                         var total = data.total
                         var actualLengthOfResults = data.children.length
 
@@ -681,7 +652,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
                             if (newPrevOffset > 0) {
                               d._children.unshift(
-                                new PreviousLinkNode(
+                                new MakePageNode(
                                   newPrevOffset,
                                   Math.min(maxPageSize, total - newPrevOffset),
                                   total
@@ -693,7 +664,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
                           d._children.unshift(
                             // Put a node at the start
-                            new PreviousLinkNode(
+                            new MakePageNode(
                               0,
                               Math.min(maxPageSize, total),
                               total
@@ -710,7 +681,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                             // if the new page won't reach the end,
                             // put a link in.
                             d._children.push(
-                              new NextLinkNode(
+                              new MakePageNode(
                                 newNextOffset,
                                 maxPageSize,
                                 total
@@ -724,7 +695,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                           // put a node for the end of the results
                           var endMax = Math.min(maxPageSize, total)
                           d._children.push( // End Node
-                            new NextLinkNode(
+                            new MakePageNode(
                               total - endMax,
                               endMax,
                               total
@@ -766,32 +737,18 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
               (ceNodeChildLoadingHandler(0, maxPageSize) /*: CENode => void */), // handles CENode
 
-              function(d /*: PLNode */) /*: void */ { // handles PLNode by calling the appropriate handler on its parent
+              function(d /*: PageNode */) /*: void */ { // handles PageNode by calling the appropriate handler on its parent
                 if (d.parent) {
                   var parent /*: Node */ = d.parent
                   if (parent.nodeContentType === CONTENT_TYPE.CATALOGUE_ELEMENT) {
                     ceNodeChildLoadingHandler(d.offset, d.max)(parent)
                   }
                   else {
-                    throw new Error("Parent of Previous Link Node is not a Catalogue Element Node")
+                    throw new Error("Parent of Page Node is not a Catalogue Element Node")
                   }
                 }
                 else {
-                  throw new Error("Previous Link Node has no Parent")
-                }
-              },
-              function(d /*: NLNode */) /*: void */ { // similar to PLNode
-                if (d.parent) {
-                  var parent /*: Node */ = d.parent
-                    if (parent.nodeContentType === CONTENT_TYPE.CATALOGUE_ELEMENT) {
-                      ceNodeChildLoadingHandler(d.offset, d.max)(parent)
-                    }
-                    else {
-                      throw new Error("Parent of Next Link Node is not a Catalogue Element Node")
-                    }
-                  }
-                else {
-                    throw new Error("Next Link Node has no Parent")
+                  throw new Error("Page Node has no Parent")
                 }
               }
             )(d)
@@ -817,8 +774,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         .attr("r", 1e-6)
         .style("fill", (nodeHandler(
           function(d /*: CENode */) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; },
-          (k(coloursMap[CONTENT_TYPE.PREV_LINK]) /*: PLNode => string */),
-          (k(coloursMap[CONTENT_TYPE.NEXT_LINK]) /*: NLNode => string */)
+          (k("#fff") /*: PageNode => string */)
         ) /*: Node => string */));
 
 
@@ -919,8 +875,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
             function(d /*: CENode */) /*: boolean */ {
               return (d.type === 'dataClass' || d.type === 'dataModel' || d.type === 'dataElement')
             },
-            (k(true) /*: PLNode => boolean */),
-            (k(true) /*: NLNode => boolean */)
+            (k(true) /*: PageNode => boolean */)
 
           )(d)
 
@@ -976,14 +931,10 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                   }
                 },
 
-                (i === 0) ? function(d /*: PLNode */) /*: string */ {
+                (i === 0) ? function(d /*: PageNode */) /*: string */ {
                   // d.offset + d.max - 1 is the index of the last element that would be displayed for that page.
                   // I add 1 to the indexes to "start counting from 1" for the user's sake. Since indexes start counting from 0.
                   return "Elements [" + (d.offset + 1) + "-" + (d.offset + d.max - 1 + 1) + "]" // line 0
-                } : k(""),
-
-                (i === 0) ? function(d /*: NLNode */) /*: string */ {
-                  return "Elements [" + (d.offset + 1) + "-" + (d.offset + d.max - 1 + 1) + "]"
                 } : k("")
               ) /*: Node => string */))
             i++
@@ -1017,7 +968,6 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
               }
 
             },
-            k(""),
             k("")
           ) /*: Node => string */))
 
