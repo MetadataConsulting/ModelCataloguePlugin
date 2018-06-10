@@ -630,7 +630,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                       if (d._children != null && d._children != undefined) {
                         // There won't be PreviousLinkNode for this because this is offset=0.
 
-                        var newPrevOffset = Math.max(0, offset-max)
+                        var newPrevOffset = Math.max(0, offset-maxPageSize) // not max as max might be less than maxPageSize for the page at the end of a list
                         if (offset > 0) {
                           d._children.unshift(
                             new PreviousLinkNode(
@@ -749,10 +749,14 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       (function(){
 
         /**
-         * max string length for text next to node
+         * max string length for text next to node. Should be positive integer.
          * @type {number}
          */
-        var maxStringLength = 20;
+        var maxStringLength = 15;
+
+        if (maxStringLength < 1) {
+          throw new Error("Max String Length < 1")
+        }
 
 
         /**
@@ -770,7 +774,10 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
          * Max number of lines for node label. Should be at least 1.
          * @type {number}
          */
-        var maxNodeLabelLines = 10
+        var maxNodeLabelLines = 4 // most space available when maxPageSize is 10 and height is h as set at the top:
+        // var m = [20, 120, 20, 120],
+        // w = 1280 + 6000 - m[1] - m[3],
+        // h = 800 - m[0] - m[2],
 
         /**
          * Splits name into array of three lines, made of whole words, each less than maxStringLength long.
@@ -785,46 +792,55 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           // split words longer than maxStringLength into parts
           var i = 0
           while (i < words.length) {
-            // loop invariant: words1[0..i) has been put into words
+            // loop invariant: words[0..i) has been put into truncatedWords
+            // truncatedWords has only strings of length <= maxStringLength
 
             var word = words[i] // word to split
 
             while (word.length > maxStringLength) {
-              // loop invariant: word is always the remainder of words1[i] that has not been pushed into words yet
+              // loop invariant: word is always the remainder of words[i] that has not been pushed into truncatedWords yet
               // the following is fine even if maxStringLength-1 is greater than the length of word
 
-              truncatedWords.push(word.substring(0,maxStringLength-1) + '-')
-              word = word.substring(maxStringLength-1) // make word the remainder
+              truncatedWords.push(word.substring(0,maxStringLength - 1) + '-')
+              word = word.substring(maxStringLength - 1) // make word the remainder
             }
 
-            truncatedWords.push(word) // the remainder. Could be the empty string but that is not a problem
+            truncatedWords.push(word) // the remainder, when word.length <= maxStringLength. Could be the empty string but that is not a problem
             i++
             console.log(truncatedWords)
           }
 
+          // now words[0..words.length) has been put into truncatedWords
+          // and truncatedWords has only strings of length <= maxStringLength
+
+
 
           var result = []
           var n = 0
-          while (n < maxNodeLabelLines) {
-            // words is the remaining array of words
+          if (maxStringLength > 0) {
+            while (truncatedWords.length > 0) {
+              // words is the remaining array of words
 
-            var wordsPerLine = 0
-            var line = myFirst(truncatedWords, wordsPerLine).join(' ')
+              var wordsPerLine = 0
+              var line = myFirst(truncatedWords, wordsPerLine).join(' ')
 
-            while (line.length < maxStringLength && wordsPerLine < truncatedWords.length) {
-              // loop invariant: line == myFirst(truncatedWords, wordsPerLine).join(' ')
-              wordsPerLine++
-              line = myFirst(truncatedWords, wordsPerLine).join(' ')
+              while (line.length < maxStringLength && wordsPerLine < truncatedWords.length) {
+                // loop invariant: line == myFirst(truncatedWords, wordsPerLine).join(' ')
+                wordsPerLine++
+                line = myFirst(truncatedWords, wordsPerLine).join(' ')
+              }
+
+              if (line.length > maxStringLength) { // loop could terminate due to being over the max string length
+                wordsPerLine = wordsPerLine - 1
+              }
+
+              // wordsPerLine will be at least 1 because the inner while loop must run at least once. Unless maxStringLength == 0
+              // Thus the outer loop will terminate because truncatedWords gets smaller on each loop.
+              result.push(truncatedWords.splice(0, wordsPerLine).join(' '))
+              n++
             }
-
-            if (line.length > maxStringLength) { // loop could terminate due to being over the max string length
-              wordsPerLine = wordsPerLine - 1
-            }
-
-
-            result.push(truncatedWords.splice(0, wordsPerLine).join(' '))
-            n++
           }
+
 
 
           return result
@@ -880,12 +896,28 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
               .attr("x", (nodeLabelXOffset /*: Node => number */))
               .attr('dy', dy)
               .text((nodeHandler(
-                function(d /*: CENode */) { return splitName(d)[i]; },
+                function(d /*: CENode */) {
+                  var line = splitName(d)[i];
+                  if ((i === maxNodeLabelLines - 1 && !!(splitName(d)[i+1]))) {
+                    // if this is the last line to display but there are still more lines that can't be displayed
+                    var overflow = line.length + 3 - maxStringLength // overflow from adding ellipsis
+                    if (overflow > 0) {
+                      return line.slice(0,-(overflow)) + "...";
+                    }
+                    else {
+                      return line + "...";
+                    }
+
+                  }
+                  else {
+                    return line;
+                  }
+                },
                 (i === 0) ? function(d /*: PLNode */) /*: string */ {
-                  return "Previous Elements (" + d.offset + "-" + d.max + ")"
+                  return "Previous Elements (" + d.offset + "-" + (d.offset + d.max) + ")"
                 } : k(""),
                 (i === 0) ? function(d /*: NLNode */) /*: string */ {
-                  return "Next Elements (" + d.offset + "-" + d.max + ")"
+                  return "Next Elements (" + d.offset + "-" + (d.offset + d.max) + ")"
                 } : k("")
               ) /*: Node => string */))
             i++

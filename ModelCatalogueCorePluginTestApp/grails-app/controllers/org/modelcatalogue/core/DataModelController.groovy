@@ -328,8 +328,10 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         if (children != null) {
             total = children.size()
-            children = children[(offset.. offset+max-1)] // pseudo pagination.
-            // gets children [offset..offset+max)
+            long end = Math.min(children.size() - 1, offset + max - 1)
+            children = children[(offset.. end)] // pseudo pagination.
+            // gets children [offset..offset+max-1] = [offset..offset+max)
+            // or [offset..length-1] = [offset..length)
 
         }
 
