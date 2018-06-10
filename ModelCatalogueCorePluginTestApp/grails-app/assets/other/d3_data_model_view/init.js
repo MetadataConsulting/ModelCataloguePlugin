@@ -152,13 +152,15 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     type PrevLinkData = {
       prevLink: string,
       offset: number,
-      max: number
+      max: number,
+      total: number
     }
 
     type NextLinkData = {
       nextLink: string,
       offset: number,
-      max: number
+      max: number,
+      total: number
     }
 
 
@@ -167,6 +169,21 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       angularLink: string
     }
    */
+
+
+  function applyDefaultD3JSON(x) /*: D3JSON */ {
+
+    x.loadedChildren = false;
+    x.loading = false;
+    x.parent = null;
+    x.children = null;
+    x._children = null;
+    x.x = 0;
+    x.y = 0;
+    x.x0 = 0;
+    x.y0 = 0;
+    return x;
+  }
 
   /**
    * Assuming request with offset and max returns paginated List[offset..offset+max)
@@ -178,20 +195,15 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
    */
   function PreviousLinkNode(prevLink /*: string */,
                   offset /*: number */,
-                  max /*: number */) /*: PLNode */{
+                  max /*: number */,
+                  total /*: number */) /*: PLNode */{
+
+    applyDefaultD3JSON(this)
+
     this.prevLink = prevLink;
     this.offset = offset;
     this.max = max;
-
-    this.loadedChildren = false;
-    this.loading = false;
-    this.parent = null;
-    this.children = null;
-    this._children = null;
-    this.x = 0;
-    this.y = 0;
-    this.x0 = 0;
-    this.y0 = 0;
+    this.total = total;
 
     this.nodeContentType = CONTENT_TYPE.PREV_LINK;
 
@@ -199,22 +211,18 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
   }
 
+
   function NextLinkNode(nextLink /*: string */,
                   offset /*: number */,
-                  max /*: number */) /*: NLNode */{
+                  max /*: number */,
+                  total /*: number */) /*: NLNode */{
+
+    applyDefaultD3JSON(this);
+
     this.nextLink = nextLink;
     this.offset = offset;
     this.max = max;
-
-    this.loadedChildren = false;
-    this.loading = false;
-    this.parent = null;
-    this.children = null;
-    this._children = null;
-    this.x = 0;
-    this.y = 0;
-    this.x0 = 0;
-    this.y0 = 0;
+    this.total = total;
 
     this.nodeContentType = CONTENT_TYPE.NEXT_LINK;
 
@@ -636,7 +644,9 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                             new PreviousLinkNode(
                               requestChildrenBaseUrl(d),
                               newPrevOffset,
-                              Math.min(maxPageSize, data.total - newPrevOffset)
+                              Math.min(maxPageSize, data.total - newPrevOffset),
+                              data.total
+
                             ));
                         }
 
@@ -648,7 +658,8 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                             new NextLinkNode(
                               requestChildrenBaseUrl(d),
                               newNextOffset,
-                              Math.min(maxPageSize, data.total - newNextOffset)
+                              Math.min(maxPageSize, data.total - newNextOffset),
+                              data.total
                             ));
                         }
                       }
@@ -889,7 +900,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
          */
         function addLabelLines(textD3Selection) {
           var currentSelection = textD3Selection
-          var i /*: number */ = 0
+          var i /*: number */ = 0 // line number
           while (i < maxNodeLabelLines) {
             var dy = (i === 0) ? 5 : 20
             currentSelection = currentSelection.append('svg:tspan')
@@ -913,11 +924,17 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                     return line;
                   }
                 },
+
                 (i === 0) ? function(d /*: PLNode */) /*: string */ {
-                  return "Previous Elements (" + d.offset + "-" + (d.offset + d.max) + ")"
+                  return "Previous Elements (" + d.offset + "-" + (d.offset + d.max) + ")" // line 0
+                } : (i === 1) ? function(d /*: PLNode */) /*: string */ {
+                  return "Total " + d.total // line 1
                 } : k(""),
+
                 (i === 0) ? function(d /*: NLNode */) /*: string */ {
                   return "Next Elements (" + d.offset + "-" + (d.offset + d.max) + ")"
+                } : (i === 1) ? function(d /*: NLNode */) /*: string */ {
+                  return "Total " + d.total
                 } : k("")
               ) /*: Node => string */))
             i++

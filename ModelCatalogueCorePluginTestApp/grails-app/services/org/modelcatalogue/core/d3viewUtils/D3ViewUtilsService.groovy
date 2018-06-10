@@ -25,7 +25,9 @@ import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
 
 @Transactional
 /**
@@ -97,12 +99,13 @@ class D3ViewUtilsService {
      * @param dataModel
      * @return List<D3JSON>
      */
-    List<D3JSON> dataModelD3JsonChildren(DataModel dataModel) {
+    ListWithTotal<D3JSON> dataModelD3JsonChildren(DataModel dataModel, long offset, long max) {
         DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
+        // This doesn't include imports, maybe it should.
         Map<String, Integer> stats = dataModelService.getStatistics(filter)
 
 
-        ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''])
+        ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [offset: offset, max: max, toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''])
 
 
         def dataClassChildrenJson = dataClasses.items.collect {dataClass ->
@@ -118,7 +121,7 @@ class D3ViewUtilsService {
 
 
 
-        return dataClassChildrenJson //+ dataElementChildrenJson
+        return (new ListWithTotalAndTypeImpl(D3JSON, dataClassChildrenJson, dataClasses.getTotal())) //+ dataElementChildrenJson
 
         // the dataElementChildrenJson seems to take a long time
         // TODO: Handle case where there are just DataTypes listed not connected to any DataElements
