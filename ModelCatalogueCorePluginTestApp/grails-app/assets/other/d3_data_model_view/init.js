@@ -187,6 +187,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
   /**
    * Assuming request with offset and max returns paginated List[offset..offset+max)
+   * Where List = List[0..total)
    * Actually prevLink is not needed at the moment with the way I'm doing it but it may be useful later
    * @param prevLink
    * @param offset
@@ -576,10 +577,17 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         function collapseSiblings(d /*: Node */) {
           var parent = d.parent
           if (parent) {
-            parent.children = [d]
+            parent.children = _.filter(parent.children, nodeHandler(
+              function(d2 /*: CENode */) {
+                return d2 === d
+              },
+              k(true), // keep the PLNodes and NLNodes
+              k(true)
+            ))
             parent.loadedChildren = false
           }
         }
+
 
         var path = pathFromRoot(d)
         console.log("Path from root: " + namesFromPath(path).toString())
@@ -640,6 +648,8 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
                         var newPrevOffset = Math.max(0, offset-maxPageSize) // not max as max might be less than maxPageSize for the page at the end of a list
                         if (offset > 0) {
+
+
                           d._children.unshift(
                             new PreviousLinkNode(
                               requestChildrenBaseUrl(d),
@@ -648,11 +658,26 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                               data.total
 
                             ));
+
+                          if (newPrevOffset > 0) {
+                            d._children.unshift( // Start Node
+                              new PreviousLinkNode(
+                                requestChildrenBaseUrl(d),
+                                0,
+                                Math.min(maxPageSize, data.total),
+                                data.total
+
+                              ));
+
+                          }
+
                         }
 
                         var newNextOffset = offset + max // max as offset
 
                         if (data.total > newNextOffset) {
+                          // all the children are children[0..total), so nothing from children[total] onwards.
+                          // so if newNextOffset >= data.total there will be nothing to get.
 
                           d._children.push(
                             new NextLinkNode(
@@ -661,6 +686,19 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                               Math.min(maxPageSize, data.total - newNextOffset),
                               data.total
                             ));
+
+                          if (newNextOffset + maxPageSize < data.total) {
+                            // doesn't reach the end
+                            var endMax = Math.min(maxPageSize, data.total)
+                            d._children.push( // End Node
+                              new NextLinkNode(
+                                requestChildrenBaseUrl(d),
+                                data.total - endMax,
+                                endMax,
+                                data.total
+                              ));
+
+                          }
                         }
                       }
 
@@ -785,7 +823,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
          * Max number of lines for node label. Should be at least 1.
          * @type {number}
          */
-        var maxNodeLabelLines = 4 // most space available when maxPageSize is 10 and height is h as set at the top:
+        var maxNodeLabelLines = 3 // most space available when maxPageSize is 10 and there are four next/previous nodes and height is h as set at the top:
         // var m = [20, 120, 20, 120],
         // w = 1280 + 6000 - m[1] - m[3],
         // h = 800 - m[0] - m[2],
@@ -926,13 +964,15 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                 },
 
                 (i === 0) ? function(d /*: PLNode */) /*: string */ {
-                  return "Previous Elements (" + d.offset + "-" + (d.offset + d.max) + ")" // line 0
+                  // d.offset + d.max - 1 is the index of the last element that would be displayed for that page.
+                  // I add 1 to the indexes to "start counting from 1" for the user's sake. Since indexes start counting from 0.
+                  return ((d.offset === 0) ? "Start" : "Previous") + " Elements [" + (d.offset + 1) + "-" + (d.offset + d.max - 1 + 1) + "]" // line 0
                 } : (i === 1) ? function(d /*: PLNode */) /*: string */ {
                   return "Total " + d.total // line 1
                 } : k(""),
 
                 (i === 0) ? function(d /*: NLNode */) /*: string */ {
-                  return "Next Elements (" + d.offset + "-" + (d.offset + d.max) + ")"
+                  return ((d.offset + d.max === d.total) ? "End" : "Next") + " Elements [" + (d.offset + 1) + "-" + (d.offset + d.max - 1 + 1) + "]"
                 } : (i === 1) ? function(d /*: NLNode */) /*: string */ {
                   return "Total " + d.total
                 } : k("")
