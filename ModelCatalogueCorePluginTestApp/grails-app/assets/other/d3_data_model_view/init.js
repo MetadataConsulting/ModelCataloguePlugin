@@ -25,7 +25,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
   // dimensions of page
   var m = [20, 120, 20, 120],
     w = 1280 + 6000 - m[1] - m[3],
-    h = 800 - m[0] - m[2],
+    h = 800 - m[0] - m[2] - 300,
     i = 0, // node ids
     root;
 
@@ -52,33 +52,44 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     .attr("class", "tooltip")
     .style("opacity", 0);
 
+  var pageParams = {
 
-  /**
-   * Max width of three. Will be used in paginated requests for children.
-   * @type {number}
-   */
-  var maxPageSize = 15;
+    /**
+     * Max width of tree. Used in paginated requests for children.
+     * @type {number}
+     */
+    maxPageSize: 20,
 
-  /**
-   * max string length for text next to node. Should be positive integer.
-   * @type {number}
-   */
-  var maxStringLength = 20;
-
-  if (maxStringLength < 1) {
-    throw new Error("Max String Length < 1")
   }
 
-  /**
-   * Max number of lines for node label. Should be at least 1.
-   * @type {number}
-   */
-  var maxNodeLabelLines = 2 // most space available when maxPageSize is 10 and there are four next/previous nodes and height is h as set at the top:
-  // var m = [20, 120, 20, 120],
-  // w = 1280 + 6000 - m[1] - m[3],
-  // h = 800 - m[0] - m[2],
+  var labelParams = {
+    /**
+     * max string length for text/label next to node. Should be positive integer.
+     * @type {number}
+     */
+    maxStringLength: 20,
 
-  var labelFontSize = 10
+    labelFontSize: 10,
+
+    /**
+     * Max number of lines for node label. Should be at least 1.
+     * @type {number}
+     */
+    maxNodeLabelLines: 2, // most space available when maxPageSize is 10 and there are four next/previous nodes and height is h as set at the top:
+    // var m = [20, 120, 20, 120],
+    // w = 1280 + 6000 - m[1] - m[3],
+    // h = 800 - m[0] - m[2],
+
+    nodeLabelLineSeparation: 10,
+
+    /**
+     * Spacing of the paging nodes above and below parent node
+     * @type {number}
+     */
+    pageNodeSpacing: 30
+  }
+
+
 
 
   //// Link with Grails GSP
@@ -135,7 +146,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     // Disjoint union:
     type CENode = {nodeContentType: "CATALOGUE_ELEMENT"} & D3JSON & CatalogueElementData & {currentPaginationParams: ?PaginationParams} & ChildrenPaged
 
-    type PageNode = {nodeContentType: "PAGE" } & D3JSON & PaginationParams & {nodeWhoseChildrenArePaged: CENode}
+    type PageNode = {nodeContentType: "PAGE" } & D3JSON & PaginationParams & {nodeWhoseChildrenArePaged: CENode, direction: Direction}
 
     type D3JSON = {
 
@@ -151,6 +162,8 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       x0: number,
       y0: number
     }
+
+    type Direction = "UP" | "DOWN"
 
     type ChildrenPaged = {
       pagesUp: Array<PageNode>,
@@ -210,6 +223,12 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     return x;
   }
 
+  var DIRECTIONS = {
+    UP: "UP",
+    DOWN: "DOWN"
+  }
+
+
   /**
    * Assuming request with offset and max returns paginated List[offset..offset+max)
    * Where List = List[0..total)
@@ -223,7 +242,8 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                   offset /*: number */,
                   max /*: number */,
                   total /*: number */,
-                  nodeWhoseChildrenArePaged /*: CENode */) /*: PageNode */{
+                  nodeWhoseChildrenArePaged /*: CENode */,
+                  direction /*: Direction */) /*: PageNode */{
 
     this.nodeContentType = CONTENT_TYPE.PAGE
 
@@ -233,6 +253,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     this.max = max;
     this.total = total;
     this.nodeWhoseChildrenArePaged = nodeWhoseChildrenArePaged;
+    this.direction = direction;
 
 
     return this;
@@ -563,7 +584,9 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     // Normalize for fixed-depth.
     nodeLayoutData.forEach(function(d) { d.y = d.depth * 180; });
 
-
+    /**
+     * Add page nodes to the layout
+     */
     eachTree(function(d /*: CENode */) {
       _.each([{pages: d.pagesUp, sign: -1},
           {pages: d.pagesDown, sign: 1}],
@@ -575,7 +598,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           var i = 0
           while (i<n) {
             var page = pages[i]
-            page.x = d.x  + sign * ((i + 1) * 50)
+            page.x = d.x  + sign * ((i + 1) * labelParams.pageNodeSpacing)
             page.y = d.y
             nodeLayoutData.push(page)
             i++
@@ -681,6 +704,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                   // end loading
 
                   if (data.canAccessDataModel && data.caseHandled) {
+
                     d.children = null;
                     d._children = null;
                     if (data.children.length > 0) {
@@ -696,6 +720,29 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                         var total = data.total
                         var actualLengthOfResults = data.children.length
 
+                        var numberOfPages = (total/pageParams.maxPageSize)
+
+                        var pageMultiples = [];
+
+                        (function() {
+                          var i = 0;
+                          while (Math.pow(2,i) < numberOfPages) {
+                            pageMultiples.push(Math.pow(2,i))
+                            i++
+                          }
+                        })();
+
+                        (function (){
+                          var i = 0
+                          var n = pageMultiples.length
+                          while (i< n) {
+                            if (i > 0 && pageMultiples[i] === pageMultiples[i-1]) {
+                              pageMultiples[i]++
+                            }
+                            i++
+                          }
+                        })();
+
                         d.currentPaginationParams = {
                           offset: offset,
                           max: actualLengthOfResults,
@@ -703,22 +750,21 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                         }; // current pagination parameters of returned results
 
 
-                        var multiples = [1,5,10]
-
                         if (offset > 0) {
 
 
-                          _.each(multiples, function(multiple) {
+                          _.each(pageMultiples, function(multiple) {
 
-                            var newPrevOffset = Math.max(0, offset- multiple * maxPageSize)
+                            var newPrevOffset = Math.max(0, offset- multiple * pageParams.maxPageSize)
 
                             if (newPrevOffset > 0) {
                               d.pagesUp.push(
                                 new MakePageNode(
                                   newPrevOffset,
-                                  Math.min(maxPageSize, total - newPrevOffset),
+                                  Math.min(pageParams.maxPageSize, total - newPrevOffset),
                                   total,
-                                  d
+                                  d,
+                                  DIRECTIONS.UP
 
                                 ));
                             }
@@ -729,27 +775,29 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                             // Put a node at the start
                             new MakePageNode(
                               0,
-                              Math.min(maxPageSize, total),
+                              Math.min(pageParams.maxPageSize, total),
                               total,
-                              d
+                              d,
+                              DIRECTIONS.UP
 
                             ));
 
 
                         }
 
-                        _.each(multiples, function(multiple) {
+                        _.each(pageMultiples, function(multiple) {
 
-                          var newNextOffset = offset + multiple * maxPageSize
-                          if (newNextOffset + maxPageSize < total) {
+                          var newNextOffset = offset + multiple * pageParams.maxPageSize
+                          if (newNextOffset + pageParams.maxPageSize < total) {
                             // if the new page won't reach the end,
                             // put a link in.
                             d.pagesDown.push(
                               new MakePageNode(
                                 newNextOffset,
-                                maxPageSize,
+                                pageParams.maxPageSize,
                                 total,
-                                d
+                                d,
+                                DIRECTIONS.DOWN
                               ));
                           }
 
@@ -758,13 +806,14 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                         if (offset + actualLengthOfResults < total) {
                           // if current page hasn't reached end
                           // put a node for the end of the results
-                          var endMax = Math.min(maxPageSize, total)
+                          var endMax = Math.min(pageParams.maxPageSize, total)
                           d.pagesDown.push( // End Node
                             new MakePageNode(
                               total - endMax,
                               endMax,
                               total,
-                              d
+                              d,
+                              DIRECTIONS.DOWN
                             ));
                         }
                       }
@@ -809,7 +858,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                   ceNodeChildLoadingHandler(cPP.offset, cPP.max)(d)
                 }
                 else {
-                  (ceNodeChildLoadingHandler(0, maxPageSize) /*: CENode => void */)(d)
+                  (ceNodeChildLoadingHandler(0, pageParams.maxPageSize) /*: CENode => void */)(d)
                 }
 
               }, // handles CENode
@@ -845,6 +894,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           function(d /*: CENode */) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; },
           (k("#fff") /*: PageNode => string */)
         ) /*: Node => string */));
+
 
 
       /**
@@ -884,12 +934,12 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
             var word = words[i] // word to split
 
-            while (word.length > maxStringLength) {
+            while (word.length > labelParams.maxStringLength) {
               // loop invariant: word is always the remainder of words[i] that has not been pushed into truncatedWords yet
               // the following is fine even if maxStringLength-1 is greater than the length of word
 
-              truncatedWords.push(word.substring(0,maxStringLength - 1) + '-')
-              word = word.substring(maxStringLength - 1) // make word the remainder
+              truncatedWords.push(word.substring(0,labelParams.maxStringLength - 1) + '-')
+              word = word.substring(labelParams.maxStringLength - 1) // make word the remainder
             }
 
             truncatedWords.push(word) // the remainder, when word.length <= maxStringLength. Could be the empty string but that is not a problem
@@ -903,20 +953,20 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
           var result = []
           var n = 0
-          if (maxStringLength > 0) {
+          if (labelParams.maxStringLength > 0) {
             while (truncatedWords.length > 0) {
               // words is the remaining array of words
 
               var wordsPerLine = 0
               var line = myFirst(truncatedWords, wordsPerLine).join(' ')
 
-              while (line.length < maxStringLength && wordsPerLine < truncatedWords.length) {
+              while (line.length < labelParams.maxStringLength && wordsPerLine < truncatedWords.length) {
                 // loop invariant: line == myFirst(truncatedWords, wordsPerLine).join(' ')
                 wordsPerLine++
                 line = myFirst(truncatedWords, wordsPerLine).join(' ')
               }
 
-              if (line.length > maxStringLength) { // loop could terminate due to being over the max string length
+              if (line.length > labelParams.maxStringLength) { // loop could terminate due to being over the max string length
                 wordsPerLine = wordsPerLine - 1
               }
 
@@ -966,7 +1016,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           // .text(shortenedNodeText)
 
           .style("fill-opacity", 1e-6)
-          .style("font", labelFontSize + "px sans-serif")
+          .style("font", labelParams.labelFontSize + "px sans-serif")
 
         /**
          * Add text (label) next to node, in lines
@@ -975,17 +1025,17 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         function addLabelLines(textD3Selection) {
           var currentSelection = textD3Selection
           var i /*: number */ = 0 // line number
-          while (i < maxNodeLabelLines) {
-            var dy = (i === 0) ? 5 : 20
+          while (i < labelParams.maxNodeLabelLines) {
+            var dy = (i === 0) ? 5 : labelParams.nodeLabelLineSeparation
             currentSelection = currentSelection.append('svg:tspan')
               .attr("x", (nodeLabelXOffset /*: Node => number */))
               .attr('dy', dy)
               .text((nodeHandler(
                 function(d /*: CENode */) {
                   var line = splitName(d)[i];
-                  if ((i === maxNodeLabelLines - 1 && !!(splitName(d)[i+1]))) {
+                  if ((i === labelParams.maxNodeLabelLines - 1 && !!(splitName(d)[i+1]))) {
                     // if this is the last line to display but there are still more lines that can't be displayed
-                    var overflow = line.length + 3 - maxStringLength // overflow from adding ellipsis
+                    var overflow = line.length + 3 - labelParams.maxStringLength // overflow from adding ellipsis
                     if (overflow > 0) {
                       return line.slice(0,-(overflow)) + "...";
                     }
@@ -1012,6 +1062,15 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
         addLabelLines(textD3Selection)
 
+        nodeEnter.append('text')
+          .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'central')
+          .attr('font-family', 'FontAwesome')
+          .attr('font-size', function(d) { return (d.size-5) +'em'} )
+          .text(nodeHandler(
+            function(d /*: CENode */) {return ""},
+            function(d /*: PageNode */) { return (d.direction === DIRECTIONS.UP) ? '\uf062' : '\uf063' })
+          );
 
         svgNodes.select("text.children-pagination-text").remove()
         svgNodes.append("svg:text")
@@ -1024,7 +1083,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           })
           // .text(shortenedNodeText)
 
-          .style("font", "italic " + labelFontSize + "px sans-serif")
+          .style("font", "italic " + labelParams.labelFontSize + "px sans-serif")
           .style("text-decoration", "underline")
           .text((nodeHandler(
             function(d /*: CENode */) {
