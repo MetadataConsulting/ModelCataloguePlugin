@@ -300,8 +300,8 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         boolean canAccessDataModel = false
         boolean caseHandled = true
 
-        long offset = cmd.offset
-        long max = cmd.max
+        int offset = cmd.offset
+        int max = cmd.max
         boolean paginationParametersFound = (offset != null && max != null)
 
         long total = 0
@@ -323,15 +323,10 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             canAccessDataModel = dataModelAclService.isAdminOrHasReadPermission(dataClass)
 
             if (canAccessDataModel) {
-                children = d3ViewUtilsService.dataClassD3JsonChildren(dataClass)
-                if (children != null) {
-                    total = children.size()
-                    long end = Math.min(children.size() - 1, offset + max - 1)
-                    children = children[(offset.. end)] // pseudo pagination.
-                    // gets children [offset..offset+max-1] = [offset..offset+max)
-                    // or [offset..length-1] = [offset..length)
+                ListWithTotal<D3JSON> childrenWithTotal = d3ViewUtilsService.dataClassD3JsonChildren(dataClass, offset, max)
+                children = childrenWithTotal.getItems()
+                total = childrenWithTotal.getTotal()
 
-                }
             }
         }
         else {

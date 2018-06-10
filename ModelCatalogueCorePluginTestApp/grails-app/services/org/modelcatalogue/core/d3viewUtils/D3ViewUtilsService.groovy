@@ -2,8 +2,12 @@ package org.modelcatalogue.core.d3viewUtils
 
 import com.google.common.collect.ImmutableSet
 import grails.transaction.Transactional
+import grails.util.Holders
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import org.hibernate.Query
+import org.hibernate.Session
+import org.hibernate.SessionFactory
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
@@ -18,6 +22,7 @@ import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipConfiguration
 import org.modelcatalogue.core.RelationshipInfo
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeName
 import org.modelcatalogue.core.RelationshipTypeService
 import org.modelcatalogue.core.api.ElementStatus
@@ -28,6 +33,8 @@ import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
+import org.modelcatalogue.core.util.lists.Lists
+import org.springframework.context.ApplicationContext
 
 @Transactional
 /**
@@ -99,7 +106,7 @@ class D3ViewUtilsService {
      * @param dataModel
      * @return List<D3JSON>
      */
-    ListWithTotal<D3JSON> dataModelD3JsonChildren(DataModel dataModel, long offset, long max) {
+    ListWithTotal<D3JSON> dataModelD3JsonChildren(DataModel dataModel, int offset, int max) {
         DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
         // This doesn't include imports, maybe it should.
         Map<String, Integer> stats = dataModelService.getStatistics(filter)
@@ -142,20 +149,82 @@ class D3ViewUtilsService {
         return ret
     }
 
-    List<D3JSON> dataClassD3JsonChildren(DataClass dataClass) {
+    ListWithTotal<D3JSON> dataClassD3JsonChildren(DataClass dataClass, int offset, int max) {
 
-        List<D3JSON> dataElementsJson = dataClassService.getDataElementsIn(dataClass).collect{
-                dataElementD3Json(it)
+//        ListWithTotal<Relationship> dataClassChildren = dataClassChildren(dataClass, offset, max)
+//
+//        List<D3JSON> childrenD3JSON = dataClassChildren.getItems()
+//            .collect{
+//                it.destination// result of HQL is list of Object[]s with Relationship at 0 and CatalogueElement at 1
+//            }
+//            .collect {
+//            if (it instanceof DataClass) {
+//                return dataClassD3Json(it)
+//            }
+//            else if (it instanceof DataElement) {
+//                return dataElementD3Json(it)
+//            }
+//            else {
+//                throw new Error("Data Class Children method got a CatalogueElement neither DataElement nor DataClass!")
+//            }
+//        }
+
+        ApplicationContext context = Holders.getApplicationContext()
+        SessionFactory sessionFactory = (SessionFactory) context.getBean('sessionFactory')
+        Session session = sessionFactory.getCurrentSession()
+        RelationshipType hierarchy = RelationshipType.hierarchyType
+        RelationshipType containment = RelationshipType.containmentType
+        Map queryProperties = [type: hierarchy, type2: containment, sourceDataClassId: dataClass.id]
+
+
+        // language=HQL
+        Query query = session.createQuery("""
+                select distinct relationship, relationship.relationshipType, destination
+                from Relationship as relationship
+                    inner join relationship.source as source
+                    inner join relationship.destination as destination
+                where ((relationship.relationshipType = :type) or (relationship.relationshipType = :type2))
+                        and relationship.source.id = :sourceDataClassId 
+                group by relationship.relationshipType.name, relationship.id, destination.name, destination.id
+                order by relationship.relationshipType.name, destination.name
+            """)
+        query.setFirstResult((int) offset).setMaxResults((int) max)
+        query.setProperties(queryProperties)
+        List list = query.list()
+
+        List<D3JSON> childrenD3JSON = list
+            .collect{
+            (CatalogueElement) it[2] // result of HQL is list of Object[]s with Relationship at 0 and CatalogueElement at 1
+        }
+        .collect {
+            if (it instanceof DataClass) {
+                return dataClassD3Json(it)
+            }
+            else if (it instanceof DataElement) {
+                return dataElementD3Json(it)
+            }
+            else {
+                throw new Error("Data Class Children method got a CatalogueElement neither DataElement nor DataClass!")
+            }
         }
 
-        List<D3JSON> childDataClassesJson = dataClassService.getChildDataClasses(dataClass).collect{
-                dataClassD3Json(it) // recursive
-        }
+        // language=HQL
+        Query countQuery = session.createQuery("""
+                select count(destination.id)
+                from Relationship as relationship
+                    inner join relationship.source as source
+                    inner join relationship.destination as destination
+                where ((relationship.relationshipType = :type) or (relationship.relationshipType = :type2))
+                        and relationship.source.id = :sourceDataClassId 
+                group by destination.name, destination.id
+            """)
+        countQuery.setProperties(queryProperties)
+        Long total = (Long) countQuery.uniqueResult()
+        println total
 
 
-        List<D3JSON> children = dataElementsJson + childDataClassesJson
+        return (new ListWithTotalAndTypeImpl(D3JSON, childrenD3JSON, total)) //+ dataElementChildrenJson
 
-        return children
     }
 
     //// Data Elements and Data Types:
