@@ -669,6 +669,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
               return function(d /*: CENode */) /*: void */ {
                 writeMessage("Loading children for " + typeAndName(d) + "...")
                 d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough. Not really a completely well-thought-out concurrency thing.
+                $(".loader").removeClass("hidden")
                 $.ajax({
                   url: requestChildrenBaseUrl(d) + "?offset=" + offset + "&max=" + max
                   // TODO: Make this paginated
@@ -676,6 +677,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
                   d.loadedChildren = true;
                   d.loading = false;
+                  $(".loader").addClass("hidden")
                   // end loading
 
                   if (data.canAccessDataModel && data.caseHandled) {
@@ -792,6 +794,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                 }, function(jqXHR, textStatus, errorThrown) { // request failure
                   writeMessage("Loading children for " + typeAndName(d) + " failed with error message: " + errorThrown, 'danger')
                   d.loading = false
+                  $(".loader").addClass("hidden")
                   // end loading
                 })
               }

@@ -60,7 +60,7 @@
       </div>
 
       <div id="d3-info" class="column column-right">
-
+        <div class="loader hidden"></div>
         <div class="info-box info-box-limited">
 
           <div id="d3-info-name-description"></div>
