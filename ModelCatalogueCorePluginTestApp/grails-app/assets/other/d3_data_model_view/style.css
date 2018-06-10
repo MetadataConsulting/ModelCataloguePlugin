@@ -30,9 +30,18 @@
     text-align: right;
 }
 */
+
+
 #container {
     display: flex;
     flex-direction: row;
+}
+
+#svg-body {
+    position: relative;
+    top: 100px;
+    border-top: solid 5px;
+    border-bottom: solid 5px;
 }
 .column {
 
