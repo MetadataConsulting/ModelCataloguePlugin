@@ -210,13 +210,13 @@ class D3ViewUtilsService {
 
         // language=HQL
         Query countQuery = session.createQuery("""
-                select count(destination.id)
+                select count (relationship.id)
                 from Relationship as relationship
                     inner join relationship.source as source
                     inner join relationship.destination as destination
                 where ((relationship.relationshipType = :type) or (relationship.relationshipType = :type2))
                         and relationship.source.id = :sourceDataClassId 
-                group by destination.name, destination.id
+                
             """)
         countQuery.setProperties(queryProperties)
         Long total = (Long) countQuery.uniqueResult()
