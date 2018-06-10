@@ -133,18 +133,17 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     // the primary recursive type
 
     // Disjoint union:
-    type CENode = {nodeContentType: "CATALOGUE_ELEMENT"} & D3JSON & CatalogueElementData & PaginationParams
-    // PaginationParams being those of the currently displayed children.
+    type CENode = {nodeContentType: "CATALOGUE_ELEMENT"} & D3JSON & CatalogueElementData & {currentPaginationParams: ?PaginationParams} & ChildrenPaged
 
-    type PageNode = {nodeContentType: "PAGE" } & D3JSON & PaginationParams
+    type PageNode = {nodeContentType: "PAGE" } & D3JSON & PaginationParams & {nodeWhoseChildrenArePaged: CENode}
 
     type D3JSON = {
 
       loadedChildren: boolean,
       loading: boolean,
-      parent: ?Node,
-      children: ?Array<Node>,
-      _children: ?Array<Node>,
+      parent: ?CENode,
+      children: ?Array<CENode>,
+      _children: ?Array<CENode>,
 
 
       x: number,
@@ -153,6 +152,10 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       y0: number
     }
 
+    type ChildrenPaged = {
+      pagesUp: Array<PageNode>,
+      pagesDown: Array<PageNode>
+    }
 
     type PaginationParams = {
       offset: number,
@@ -219,15 +222,18 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
   function MakePageNode(
                   offset /*: number */,
                   max /*: number */,
-                  total /*: number */) /*: PageNode */{
+                  total /*: number */,
+                  nodeWhoseChildrenArePaged /*: CENode */) /*: PageNode */{
+
+    this.nodeContentType = CONTENT_TYPE.PAGE
 
     applyDefaultD3JSON(this)
 
     this.offset = offset;
     this.max = max;
     this.total = total;
+    this.nodeWhoseChildrenArePaged = nodeWhoseChildrenArePaged;
 
-    this.nodeContentType = CONTENT_TYPE.PAGE
 
     return this;
 
@@ -298,6 +304,8 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
    */
   function receiveD3JSON(d /*: ReceivedD3JSON */) /*: CENode */ {
     return {
+      nodeContentType: CONTENT_TYPE.CATALOGUE_ELEMENT,
+
       name: d.name,
       id: d.id,
       description: d.description,
@@ -307,10 +315,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       dateCreated: d.dateCreated,
       lastUpdated: d.lastUpdated,
       metadata: d.metadata,
-      children: d.children ? _.map(d.children, receiveD3JSON) : null, // recurse into children
-      loadedChildren: d.loadedChildren,
-      loading: d.loading,
-      parent: null,
+
       relationships: d.relationships,
       enumerations: d.enumerations,
       rule: d.rule,
@@ -318,15 +323,25 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       measurementUnitSymbol: d.measurementUnitSymbol,
       referenceName: d.referenceName,
       referenceAngularLink: d.referenceAngularLink,
+
+
+      children: d.children ? _.map(d.children, receiveD3JSON) : null, // recurse into children
+      loadedChildren: d.loadedChildren,
+      loading: d.loading,
+      parent: null,
       _children: null,
+
       x: 0,
       y: 0,
       x0: 0,
       y0: 0,
-      offset: -1, // default which is meaningless in terms of pagination.
-      max: -1,
-      total: -1,
-      nodeContentType: CONTENT_TYPE.CATALOGUE_ELEMENT
+
+      currentPaginationParams: null,
+
+      pagesUp: [],
+      pagesDown: []
+
+
     }
   }
 
@@ -443,16 +458,16 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
    * @returns {*|*[]}
    */
   function pathFromRoot(d /*: D3JSON */) /*: D3JSON[] */ {
-    var currentNode = d
+    var currentNode /*: ?D3JSON */ = d
     var pathToRoot = []
 
-    while (d.parent) {
-      pathToRoot.push(d)
-      d = d.parent ? d.parent : null // flow doesn't notice that the while condition guarantees d.parent exists, so this more immediate check makes it typecheck
+    while (currentNode && currentNode.parent) {
+      pathToRoot.push(currentNode)
+      currentNode = currentNode.parent ? currentNode.parent : {parent: null} // flow doesn't notice that the while condition guarantees d.parent exists, so this more immediate check makes it typecheck
 
     }
     // !d.parent, so d is root
-    pathToRoot.push(d)
+    pathToRoot.push(currentNode)
 
     return pathToRoot.reverse()
   }
@@ -516,6 +531,21 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
   };
 
   /**
+   * traverse func tree applies func to each node of the tree, depth-first.
+   * @param func
+   * @returns {recursivelyApplyFunc}
+   */
+  function eachTree(func /*: CENode => void */ ) /*: CENode => void */ {
+    function recursivelyApplyFunc(tree /*: CENode */) {
+      func(tree)
+      _.each(tree.children, recursivelyApplyFunc)
+    }
+
+    return recursivelyApplyFunc
+  }
+
+
+  /**
    * Update a node (source), usually after it has been toggled.
    * @param source
    */
@@ -529,8 +559,31 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     // Compute the new tree layout.
     var nodeLayoutData = tree.nodes(root).reverse();
 
+
     // Normalize for fixed-depth.
     nodeLayoutData.forEach(function(d) { d.y = d.depth * 180; });
+
+
+    eachTree(function(d /*: CENode */) {
+      _.each([{pages: d.pagesUp, sign: -1},
+          {pages: d.pagesDown, sign: 1}],
+        function(o /*: {pages: Array<PageNode>, sign: number } */) {
+          var pages = o.pages;
+          var sign = o.sign;
+
+          var n = pages.length
+          var i = 0
+          while (i<n) {
+            var page = pages[i]
+            page.x = d.x  + sign * ((i + 1) * 50)
+            page.y = d.y
+            nodeLayoutData.push(page)
+            i++
+          }
+        })
+
+
+    })(root)
 
     // Update the nodes…
     var svgNodes = vis.selectAll("g.node")
@@ -629,17 +682,24 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                     d.children = null;
                     d._children = null;
                     if (data.children.length > 0) {
-                      d._children = [];
 
-                      d._children = (_.map(data.children, receiveD3JSON) /*: Array<Node> */);
+                      d._children = [];
+                      d._children = (_.map(data.children, receiveD3JSON) /*: Array<CENode> */);
 
                       if (d._children != null && d._children !== undefined) {
+
+                        d.pagesUp = []
+                        d.pagesDown = []
+
                         var total = data.total
                         var actualLengthOfResults = data.children.length
 
-                        d.offset = offset; // current pagination parameters of returned results
-                        d.max = actualLengthOfResults
-                        d.total = total;
+                        d.currentPaginationParams = {
+                          offset: offset,
+                          max: actualLengthOfResults,
+                          total: total
+                        }; // current pagination parameters of returned results
+
 
                         var multiples = [1,5,10]
 
@@ -651,23 +711,25 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                             var newPrevOffset = Math.max(0, offset- multiple * maxPageSize)
 
                             if (newPrevOffset > 0) {
-                              d._children.unshift(
+                              d.pagesUp.push(
                                 new MakePageNode(
                                   newPrevOffset,
                                   Math.min(maxPageSize, total - newPrevOffset),
-                                  total
+                                  total,
+                                  d
 
                                 ));
                             }
 
                           })
 
-                          d._children.unshift(
+                          d.pagesUp.push(
                             // Put a node at the start
                             new MakePageNode(
                               0,
                               Math.min(maxPageSize, total),
-                              total
+                              total,
+                              d
 
                             ));
 
@@ -680,11 +742,12 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                           if (newNextOffset + maxPageSize < total) {
                             // if the new page won't reach the end,
                             // put a link in.
-                            d._children.push(
+                            d.pagesDown.push(
                               new MakePageNode(
                                 newNextOffset,
                                 maxPageSize,
-                                total
+                                total,
+                                d
                               ));
                           }
 
@@ -694,11 +757,12 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
                           // if current page hasn't reached end
                           // put a node for the end of the results
                           var endMax = Math.min(maxPageSize, total)
-                          d._children.push( // End Node
+                          d.pagesDown.push( // End Node
                             new MakePageNode(
                               total - endMax,
                               endMax,
-                              total
+                              total,
+                              d
                             ));
                         }
                       }
@@ -738,18 +802,9 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
               (ceNodeChildLoadingHandler(0, maxPageSize) /*: CENode => void */), // handles CENode
 
               function(d /*: PageNode */) /*: void */ { // handles PageNode by calling the appropriate handler on its parent
-                if (d.parent) {
-                  var parent /*: Node */ = d.parent
-                  if (parent.nodeContentType === CONTENT_TYPE.CATALOGUE_ELEMENT) {
-                    ceNodeChildLoadingHandler(d.offset, d.max)(parent)
-                  }
-                  else {
-                    throw new Error("Parent of Page Node is not a Catalogue Element Node")
-                  }
-                }
-                else {
-                  throw new Error("Page Node has no Parent")
-                }
+
+                ceNodeChildLoadingHandler(d.offset, d.max)(d.nodeWhoseChildrenArePaged)
+
               }
             )(d)
           }
@@ -825,7 +880,6 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
             truncatedWords.push(word) // the remainder, when word.length <= maxStringLength. Could be the empty string but that is not a problem
             i++
-            console.log(truncatedWords)
           }
 
           // now words[0..words.length) has been put into truncatedWords
@@ -960,11 +1014,12 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           .style("text-decoration", "underline")
           .text((nodeHandler(
             function(d /*: CENode */) {
-              if (d.offset < 0) {
-                return ""
+              if (d.currentPaginationParams) {
+                var cPP = d.currentPaginationParams
+                  return "[" + (cPP.offset + 1) + "-" + (cPP.offset + cPP.max - 1 + 1) + "] / " + cPP.total
               }
               else {
-                return "[" + (d.offset + 1) + "-" + (d.offset + d.max - 1 + 1) + "] / " + d.total
+                return ""
               }
 
             },
