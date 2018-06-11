@@ -20,7 +20,7 @@ sourceSets {
     }
 }
 
-// Using the groovy plugin lets Gradle manage a separate "Groovy project" in src/nonGrails/groovy.
+// Using the groovy plugin lets Gradle manage a separate "Groovy project" in src/nonGrails/groovy.rr
 // This can be useful for separate utilities.
 // Meanwhile, Grails uses src/groovy as its source...
 
