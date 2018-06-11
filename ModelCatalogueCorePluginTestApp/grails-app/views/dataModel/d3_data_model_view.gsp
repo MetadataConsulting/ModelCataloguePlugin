@@ -111,7 +111,7 @@
       }
       else {
         initD3.writeMessage("Model ${dataModelId} not found.<br/>"  +
-          "Either it doesn't exist or you are not authorized to view it.")
+          "Either it doesn't exist or you are not authorized to view it.", "danger")
       }
 
 

@@ -458,17 +458,17 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
   function writeMessage(text, type) {
     console.log(text)
-    // type = type || 'info' // info by default
-    // return $.notify({
-    //   'message': (new Date().toLocaleString()) + " " + text
-    // }, {
-    //   'delay': 200,
-    //   'type': type,
-    //     'placement': {
-    //       'from': "bottom",
-    //       'align': "left"
-    //   }
-    // })
+    type = type || 'info' // info by default
+    return $.notify({
+      'message': (new Date().toLocaleString()) + " " + text
+    }, {
+      'delay': 200,
+      'type': type,
+        'placement': {
+          'from': "bottom",
+          'align': "left"
+      }
+    })
   }
 
   //// path functions
@@ -690,7 +690,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
             function ceNodeChildLoadingHandler(offset /*: number */, max /*: number */) /*: CENode => void */ {
 
               return function(d /*: CENode */) /*: void */ {
-                writeMessage("Loading children for " + typeAndName(d) + "...")
+                // writeMessage("Loading children for " + typeAndName(d) + "...")
                 d.loading = true // try to prevent double-loading, although race conditions may still result if you click fast enough. Not really a completely well-thought-out concurrency thing.
                 $(".loader").removeClass("hidden")
                 $.ajax({
@@ -820,7 +820,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
 
                     }
-                    writeMessage("Loading children for " + typeAndName(d) + " succeeded!", 'success')
+                    // writeMessage("Loading children for " + typeAndName(d) + " succeeded!", 'success')
                     toggle(d);
                     update(d);
                   }
