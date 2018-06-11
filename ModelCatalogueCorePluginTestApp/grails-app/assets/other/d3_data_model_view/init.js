@@ -319,6 +319,15 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
   }
 
   /**
+   * Identity function
+   * @param x
+   * @returns {*}
+   */
+  function id/*::<T>*/(x /*: T */) /*: T */ {
+    return x
+  }
+
+  /**
    * Type conversion function
    * @param d
    * @returns {{name, id, description, angularLink: *, type, status, dateCreated, lastUpdated, metadata, loadedChildren: boolean, loading: boolean, parent: null, relationships, enumerations: *, rule, measurementUnitName: *, measurementUnitSymbol: *, referenceName: *, referenceAngularLink: *, children: null, _children: null, x: number, y: number, x0: number, y0: 0; nodeContentType: string}}
@@ -398,10 +407,12 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
      * @param map
      * @returns {string}
      */
-    function displayMap(map /*:{[string]: string} */) /*: string */ {
+    function displayMap(map /*:{[string]: string} */, processKey /*: string => string */) /*: string */ {
       var ret = "<ul>"
+
+
       Object.keys(map).forEach(function(key) {
-        ret = ret + "<li>" + key + ": " + map[key] + "</li>"
+        ret = ret + "<li><u>" + processKey(key) + "</u>: " + map[key] + "</li>"
         console.log(key, map[key]);
       });
       return ret = ret + "</ul>"
@@ -440,13 +451,27 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         "<u>References:</u> " +
           (d.referenceAngularLink ? "<a href='" + d.referenceAngularLink +  "' target='_blank'>" : "")
         + d.referenceName + "</a>" + "<br/>" : "") +
-      (d.enumerations ? "<u>Enumerations:</u> <br/>" + displayMap(d.enumerations): ""))
+      (d.enumerations ? "<u>Enumerations:</u> <br/>" + displayMap(d.enumerations, id): ""))
+
+    /**
+     * Find the bit of the key after the first hash.
+     * @param key
+     */
+    function stripAndUppercase(key /*: string */) /*: string */ {
+      var matchResults = key.match(/#(.*)/)
+      if (matchResults && matchResults.length >= 2) {
+        return ucFirst(matchResults[1])
+      }
+      else {
+        return key
+      }
+    }
 
     $("#d3-info-metadata").html(
       "<u>Status:</u> " + d.status + "<br/>" +
       "<u>Date Created:</u> " + d.dateCreated + "<br/>" +
       "<u>Date Updated:</u> " + d.lastUpdated + "<br/>" +
-      (d.metadata ? "<u>Metadata:</u> <br/>" + displayMap(d.metadata) + "<br/>" : "")
+      (d.metadata ? "<u>Metadata:</u> <br/>" + displayMap(d.metadata, stripAndUppercase) + "<br/>" : "")
 
     )
 
