@@ -66,7 +66,7 @@ grails.project.dependency.resolution = {
         compile 'io.reactivex:rxjava:1.1.5'
 
         // does not work in tests
-        // compile 'io.reactivex:rxgroovy:1.0.3'
+        // compile 'io.reactivex:rxgroovy:1.0.3' test 123
 
 
         String mcToolkitVersion = '2.2.0'
