@@ -10,6 +10,7 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import spock.lang.Issue
+import spock.lang.Ignore
 
 class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
@@ -683,7 +684,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         DataClass.findByName('Parent 007', [sort: 'versionNumber', order: 'desc']).status == ElementStatus.DRAFT
     }
 
-
+    @Ignore
     def "migrates hierarchy relationship to new draft version"() {
         build {
             dataModel(name: 'MHR MODEL') {
