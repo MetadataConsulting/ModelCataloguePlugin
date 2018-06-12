@@ -97,10 +97,10 @@ mc.mappingsuggestions.matchAgainst = System.getenv('MATCH_AGAINST') ?: 'ELASTIC_
 environments {
     development {
 
-        mc.storage.s3.bucket = System.getenv('MDX_S3_BUCKET')  
-        mc.storage.s3.key = System.getenv('MDX_S3_KEY')  
-        mc.storage.s3.secret = System.getenv('MDX_S3_SECRET')  
-        mc.storage.s3.region = System.getenv('MDX_S3_REGION') 
+        mc.storage.s3.bucket = System.getenv('MDX_S3_BUCKET')
+        mc.storage.s3.key = System.getenv('MDX_S3_KEY')
+        mc.storage.s3.secret = System.getenv('MDX_S3_SECRET')
+        mc.storage.s3.region = System.getenv('MDX_S3_REGION')
 
         grails.logging.jul.usebridge = true
         grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}"
@@ -478,6 +478,7 @@ def assetExcludes = [
 
 
 grails.assets.excludes = assetExcludes
+grails.assets.includes = ["**/fonts/*"]
 
 grails.assets.plugin.famfamfam.excludes = ['**/*.*']
 
