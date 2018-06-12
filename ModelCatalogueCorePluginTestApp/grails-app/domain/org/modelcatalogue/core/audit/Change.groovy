@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.audit
 
+import grails.util.Environment
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.transaction.TransactionStatus
 
@@ -47,7 +48,7 @@ class Change {
     }
 
     static mapping = {
-        table '`change`'
+        table  (Environment.current == Environment.TEST ? 'CHANGE' : '`change`')
         version false
         newValue type: 'text'
         oldValue type: 'text'
