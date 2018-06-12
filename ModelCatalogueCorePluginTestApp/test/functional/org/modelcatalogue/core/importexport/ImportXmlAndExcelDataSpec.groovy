@@ -107,6 +107,7 @@ class ImportXmlAndExcelDataSpec extends GebSpec {
     def "export"() {
         when:
         DashboardPage dashboardPage = to DashboardPage
+        Thread.sleep(2000)
         dashboardPage.select(dataModelName)
         then:
         at DataModelPage
