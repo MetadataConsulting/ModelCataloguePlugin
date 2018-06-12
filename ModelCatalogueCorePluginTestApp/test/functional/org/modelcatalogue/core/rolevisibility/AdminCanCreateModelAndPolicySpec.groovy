@@ -29,6 +29,7 @@ import org.modelcatalogue.core.geb.*
  - Verify that name and policy text are correct. | Name and policy text are correct
 /$)
 @Stepwise
+@Ignore
 class AdminCanCreateModelAndPolicySpec extends GebSpec {
 
     @Shared
