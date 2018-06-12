@@ -690,7 +690,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
 
 
-        if (d.children === [] || d.children === null) {
+        if (d.parent && d.parent.children.length > 1) {
           collapseSiblings(d)
         }
 
