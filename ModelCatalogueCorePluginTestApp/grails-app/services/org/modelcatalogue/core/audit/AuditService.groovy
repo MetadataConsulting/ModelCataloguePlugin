@@ -269,8 +269,8 @@ class AuditService {
                 // MySQL uses backticks to escape the keywords
                 tableName = "`change`"
             } else if (sessionFactory.currentSession.connection().metaData.databaseProductName == 'H2') {
-                // H2 uses double quotes to escape the keywords
-                tableName = '"change"'
+                // H2 uses double quotes to escape the keywords - but CHANGE is not a keyword in H2
+                tableName = 'CHANGE'
             } else {
                 // if we cannot determine the database we use backtick which is used more often
                 log.warn "Cannot quote the change table name properly, using backticks."
