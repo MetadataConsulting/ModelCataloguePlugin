@@ -9,9 +9,9 @@ class DashboardPage extends Page {
     static at = { title == 'Dashboard' }
 
     static content = {
-        searchInputField(wait:true){ $('#search', 0) }
+        searchInputField(wait: true) { $('#search', 0) }
         dataModelLinks(required: false) { $('a.data-model-link') }
-        searchButton (wait:true){ $('#search-btn') }
+        searchButton(wait: true) { $('#search-btn') }
         dataModelLink(wait: true) { $('a.data-model-link', text: it) }
         nav { $('#topmenu', 0).module(NavModule) }
     }
@@ -25,6 +25,7 @@ class DashboardPage extends Page {
     }
 
     void select(String dataModelName) {
+        sleep(1_000)
         dataModelLink(dataModelName).click()
     }
 
