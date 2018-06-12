@@ -25,6 +25,7 @@ class DashboardPage extends Page {
     }
 
     void select(String dataModelName) {
+        sleep(1_000)
         dataModelLink(dataModelName).click()
     }
 

@@ -67,6 +67,7 @@ import spock.lang.*
 /$)
 
 @Stepwise
+@Ignore
 class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
     @Shared

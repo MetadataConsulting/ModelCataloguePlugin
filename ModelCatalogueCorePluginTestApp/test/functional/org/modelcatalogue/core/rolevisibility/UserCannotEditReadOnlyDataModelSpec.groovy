@@ -30,6 +30,7 @@ import spock.lang.Ignore
 - Check the inline edit button ( top right corner of data model homepage)  for the data model is disabled | User cannot edit the data model
 ''')
 @Stepwise
+@Ignore
 class UserCannotEditReadOnlyDataModelSpec extends GebSpec {
 
     @Shared

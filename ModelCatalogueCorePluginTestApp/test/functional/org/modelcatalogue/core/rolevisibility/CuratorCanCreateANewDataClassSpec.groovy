@@ -48,6 +48,7 @@ import spock.lang.Title
 - 31. Verify that new Data class has been created     
 ''')
 @Stepwise
+@Ignore
 class CuratorCanCreateANewDataClassSpec extends GebSpec {
 
     @Shared

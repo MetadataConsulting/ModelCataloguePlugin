@@ -34,6 +34,7 @@ import org.modelcatalogue.core.geb.*
 /$)
 
 @Stepwise
+@Ignore
 class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
 
     @Shared

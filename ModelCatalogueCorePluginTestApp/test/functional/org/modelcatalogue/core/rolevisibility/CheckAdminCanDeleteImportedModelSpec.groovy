@@ -29,6 +29,7 @@ import org.modelcatalogue.core.geb.*
  - Check that data model is removed from imported Data Models List | Data Model has been removed from 'Imported Data Models' list
 /$)
 @Stepwise
+@Ignore
 class CheckAdminCanDeleteImportedModelSpec extends GebSpec {
 
     @Shared

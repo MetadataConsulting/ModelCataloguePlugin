@@ -34,6 +34,7 @@ import spock.lang.Shared
 /$)
 
 @Stepwise
+@Ignore
 class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
 
     @Shared
