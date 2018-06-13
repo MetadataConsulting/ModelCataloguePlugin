@@ -55,7 +55,7 @@ class CheckDataModelPoliciesSpec extends GebSpec {
         DataModelPage dataModelPage = browser.page DataModelPage
         then:
         !dataModelPage.defaultChecksPolicyAdded()
-        dataModelPage.UniqueOfKingPolicyAdded()
+        dataModelPage.UniqueOfKindPolicyAdded()
     }
 
 }
