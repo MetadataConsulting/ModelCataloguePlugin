@@ -26,7 +26,7 @@ import org.modelcatalogue.core.geb.*
 class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "TESTING_MODEL"
+    String dataModelName = "TESTING_MODEL_${UUID.randomUUID().toString()}"
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared
