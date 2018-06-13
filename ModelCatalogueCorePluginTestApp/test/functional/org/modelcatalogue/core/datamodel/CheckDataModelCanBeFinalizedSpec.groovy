@@ -3,7 +3,6 @@ package org.modelcatalogue.core.datamodel
 import geb.spock.GebSpec
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
@@ -23,41 +22,14 @@ import spock.lang.Shared
  - Verify that you cannot add a new data class to the data model | No green plus button is present to add new data class
 ''')
 @Stepwise
-class CheckDataModelCanBeFinalizedSpec extends GebSpec {
+class CheckDataModelCanBeFinalizedSpec extends LoginCuratorCreateDataModelSpec {
 
-    @Shared
-    String dataModelName = "NEW_TESTING_MODEL_${UUID.randomUUID().toString()}"
-    @Shared
-    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+
     @Shared
     String dataModelVersion = "0.0.2"
     @Shared
     String dataModelVersionDescription = "DATAMODEL_FINALIZED"
 
-    def "Login as curator"() {
-        when:
-        LoginPage loginPage = to LoginPage
-        loginPage.login("curator", "curator")
-        then:
-        at DashboardPage
-    }
-
-    def "create a data model"() {
-        when:
-        DashboardPage dashboardPage = browser.page DashboardPage
-        dashboardPage.nav.createDataModel()
-        then:
-        at CreateDataModelPage
-
-        when:
-        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = dataModelName
-        createDataModelPage.description = dataModelDescription
-        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
-        createDataModelPage.submit()
-        then:
-        at DataModelPage
-    }
 
     def "finalize the data model"() {
         when:
