@@ -18,38 +18,11 @@ import spock.lang.Shared
  - Examine that in the Display panel on the right side, that underneath the Data Model name, in the Policies section, the data model policy that was chosen is present. | Confirm that the Data Model has been created with the Data Model Policies
 ''')
 @Stepwise
-class CheckDataModelPoliciesSpec extends GebSpec {
+class CheckDataModelPoliciesSpec extends LoginCuratorCreateDataModelSpec {
 
-    @Shared
-    String dataModelName = "DATA_MODEL_${UUID.randomUUID().toString()}"
-    @Shared
-    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
-
-    def "Login as curator"() {
-        when:
-        LoginPage loginPage = to LoginPage
-        loginPage.login("curator", "curator")
-        then:
-        at DashboardPage
-    }
-
-    def "create a data model"() {
-        when:
-        DashboardPage dashboardPage = browser.page DashboardPage
-        dashboardPage.nav.createDataModel()
-        then:
-        at CreateDataModelPage
-
-        when:
-        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = dataModelName
-        createDataModelPage.description = dataModelDescription
-        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
-        createDataModelPage.submit()
-        then:
-        at DataModelPage
-    }
-
+    /**
+     * Leads on from LoginCuratorCreateDataModelSpec
+     */
     def "check data model has uniqueofkind policy"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
