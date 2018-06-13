@@ -7,12 +7,18 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Shared
 
+/**
+ * Login as Curator and then Create Data Model
+ */
 class LoginCuratorCreateDataModelSpec extends LoginCuratorSpec {
     @Shared
     String dataModelName = "NEW_TESTING_MODEL_${UUID.randomUUID().toString()}"
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
 
+    /**
+     * Leads on from LoginCuratorSpec (where you login as curator)
+     */
     def "create a data model"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage

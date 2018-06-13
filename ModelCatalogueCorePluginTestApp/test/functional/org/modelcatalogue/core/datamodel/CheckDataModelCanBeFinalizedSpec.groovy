@@ -30,7 +30,9 @@ class CheckDataModelCanBeFinalizedSpec extends LoginCuratorCreateDataModelSpec {
     @Shared
     String dataModelVersionDescription = "DATAMODEL_FINALIZED"
 
-
+    /**
+    * Leads on from LoginCuratorCreateDataModelSpec
+    */
     def "finalize the data model"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage

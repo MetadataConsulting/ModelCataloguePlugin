@@ -4,6 +4,9 @@ import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
 
+/**
+ * Login as Curator
+ */
 class LoginCuratorSpec extends GebSpec {
 
     def "Login as curator"() {
