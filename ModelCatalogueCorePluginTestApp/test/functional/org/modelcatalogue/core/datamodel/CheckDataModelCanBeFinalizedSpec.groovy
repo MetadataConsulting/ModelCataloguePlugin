@@ -26,7 +26,7 @@ import spock.lang.Shared
 class CheckDataModelCanBeFinalizedSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "NEW_TESTING_MODEL"
+    String dataModelName = "NEW_TESTING_MODEL_${UUID.randomUUID().toString()}"
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared

@@ -21,7 +21,7 @@ import spock.lang.Shared
 class CheckDataModelPoliciesSpec extends GebSpec {
 
     @Shared
-    String dataModelName = UUID.randomUUID().toString()
+    String dataModelName = "DATA_MODEL_${UUID.randomUUID().toString()}"
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
 
