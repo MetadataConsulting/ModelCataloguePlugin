@@ -21,6 +21,7 @@ class NorthThamesMappingReportXlsxSqlExporter {
         LONDONPATHOLOGYCODES: [siteName: 'RFH', lpcModelName: 'LONDONPATHOLOGYCODES', localModelName: 'WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         RFH_LONDONPATHOLOGYCODES: [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         RFH_LONDONPATHOLOGYCODES_GEL_SUBSET: [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES_GEL_SUBSET', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        RFH_LONDONPATHOLOGYCODES_CLEANSED: [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES_CLEANSED', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         GOSH_OMNILAB: [siteName: 'GOSH', lpcModelName: 'GOSH_OMNILAB', localModelName: 'GOSH_OMNILAB', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         LNWH_WINPATH: [siteName: 'LNWH', lpcModelName: 'LNWH_WINPATH', localModelName: 'LNWH_WINPATH', loincModelName: 'LOINC', gelModelName: 'Rare Diseases']
     ]
@@ -87,7 +88,7 @@ FROM
 			JOIN data_element AS de USING (id)
 			LEFT JOIN extension_value AS ev2 ON ev2.element_id = ce.id AND ev2.`name`  = 'Ref Range'
 			LEFT JOIN relationship AS r ON r.source_id = ce.id AND r.relationship_type_id = 7
-	) AS lpc ON lpc.data_model_id = lpc_dm.id
+	) AS lpc ON lpc.data_model_id = lpc_dm.id OR lpc.data_model_id IN (SELECT destination_id FROM relationship WHERE source_id = lpc_dm.id AND relationship_type_id = 10)
 	LEFT JOIN (
 		SELECT 
 			r.source_id, ev.extension_value AS `code`, ce.`name`, ce.data_model_id
