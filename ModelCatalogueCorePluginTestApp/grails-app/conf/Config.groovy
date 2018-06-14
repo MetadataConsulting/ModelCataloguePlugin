@@ -142,6 +142,37 @@ environments {
                 [name: "Java Basic Types", url: "https://s3-eu-west-1.amazonaws.com/datamodels.metadata.org.uk/Java.mc.xml"]
         ]
         grails.mail.disabled=true
+        mc.welcome.jumbo = """
+<h1>Metadata Echange</h1>
+<p class="lead">
+    <b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b> and version new datasets <b><em>Generate</em></b> better software components
+</p>
+"""
+
+        mc.welcome.info = """
+
+        <div class="panel panel-default">
+          <div class="panel-heading">MDC Sandbox</div>
+          <div class="panel-body">
+            <p width=50% style="text-align: center" >This is a sandbox instance of the metadata exchange, in short we are aiming to demo the following: </p>
+                <li>Metadata Data Management</li>
+                <li>Modelling</li>
+                <li>Master Data Management</li>
+                <li>Rules Management</li>
+            </p>
+            <p>User documentation is available <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages">here</a>:
+
+            </p>
+            <p>...probably the best place to start is <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/32997386/Starting+Out+-+A+quick+look+around">here</a>
+
+            </p>
+            <p>and <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/45419911/Editing+Metadata">here</a>
+
+            </p>
+          </div>
+        </div>
+
+"""
     }
     local {
         grails.logging.jul.usebridge = true
@@ -169,6 +200,39 @@ environments {
 
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}"
+
+        mc.welcome.jumbo = """
+<h1>Metadata Echange</h1>
+<p class="lead">
+    <b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b> and version new datasets <b><em>Generate</em></b> better software components
+</p>
+"""
+
+        mc.welcome.info = """
+
+        <div class="panel panel-default">
+          <div class="panel-heading">MDC Sandbox</div>
+          <div class="panel-body">
+            <p width=50% style="text-align: center" >This is a sandbox instance of the metadata exchange, in short we are aiming to demo the following: </p>
+                <li>Metadata Data Management</li>
+                <li>Modelling</li>
+                <li>Master Data Management</li>
+                <li>Rules Management</li>
+            </p>
+            <p>User documentation is available <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages">here</a>:
+
+            </p>
+            <p>...probably the best place to start is <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/32997386/Starting+Out+-+A+quick+look+around">here</a>
+
+            </p>
+            <p>and <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/45419911/Editing+Metadata">here</a>
+
+            </p>
+          </div>
+        </div>
+
+"""
+
         if (System.getenv('DOCKERIZED_TESTS') && System.properties["grails.test.phase"] == 'functional') {
             mc.search.elasticsearch.host="localhost"
             mc.search.elasticsearch.port=49300
@@ -219,6 +283,12 @@ environments {
         println "MDX_WELCOME:" + System.getenv('MDX_WELCOME')
         println "MDX_INFO:" + System.getenv('MDX_INFO')
         println "MDX_ALLOW_SIGNUP:" + System.getenv('MDX_ALLOW_SIGNUP')
+
+        mc.storage.s3.key = System.getenv('MDX_S3_KEY')
+        mc.storage.s3.secret = System.getenv('MDX_S3_SECRET')
+        //mc.storage.s3.region = System.getenv('MDX_NAME')
+        mc.storage.s3.bucket = System.getenv('MDX_S3_BUCKET')
+
 
         grails.plugin.springsecurity.auth.loginFormUrl = grails.serverURL + "/login/auth"
         println grails.serverURL + "/login/ajaxSuccess"
@@ -463,37 +533,7 @@ grails.plugin.springsecurity.ajaxCheckClosure = { request ->
 }
 
 //language=HTML
-mc.welcome.jumbo = """
-<h1>Model Catalogue</h1>
-<p class="lead">
-    <b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b> and version new datasets <b><em>Generate</em></b> better software components
-</p>
-"""
 
-mc.welcome.info = """
-
-        <div class="panel panel-default">
-          <div class="panel-heading">NHS Digital Sandbox</div>
-          <div class="panel-body">
-            <p width=50% style="text-align: center" >This is a sandbox instance of the metadata exchange, in short we are aiming to demo the following: </p>
-                <li>Metadata Data Management</li>
-                <li>Modelling</li>
-                <li>Master Data Management</li>
-                <li>Rules Management</li>
-            </p>
-            <p>User documentation is available <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages">here</a>:
-
-            </p>
-            <p>...probably the best place to start is <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/32997386/Starting+Out+-+A+quick+look+around">here</a>
-
-            </p>
-            <p>and <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/45419911/Editing+Metadata">here</a>
-
-            </p>
-          </div>
-        </div>
-
-"""
 
 grails.plugin.springsecurity.ui.register.defaultRoleNames = [] // no roles
 
