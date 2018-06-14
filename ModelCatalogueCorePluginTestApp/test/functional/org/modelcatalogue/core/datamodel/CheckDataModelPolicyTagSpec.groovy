@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.datamodel
 
 import geb.spock.GebSpec
+import org.modelcatalogue.core.datamodel.utilities.LoginCreateDataModelSpec
+import org.modelcatalogue.core.security.UserRep
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
@@ -25,36 +27,11 @@ import spock.lang.Shared
  - Verify that underneath the policies section for the data model, there are no data model policies. | Verify that 'Unique of Kind' data model policy has been deleted
 ''')
 @Stepwise
-class CheckDataModelPolicyTagSpec extends GebSpec {
+class CheckDataModelPolicyTagSpec extends LoginCreateDataModelSpec {
 
-    @Shared
-    String dataModelName = "DATA_MODEL_${UUID.randomUUID().toString()}"
-    @Shared
-    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
-
-    def "Login as admin"() {
-        when:
-        LoginPage loginPage = to LoginPage
-        loginPage.login("supervisor", "supervisor")
-        then:
-        at DashboardPage
-    }
-
-    def "create a data model"() {
-        when:
-        DashboardPage dashboardPage = browser.page DashboardPage
-        dashboardPage.nav.createDataModel()
-        then:
-        at CreateDataModelPage
-
-        when:
-        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = dataModelName
-        createDataModelPage.description = dataModelDescription
-        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
-        createDataModelPage.submit()
-        then:
-        at DataModelPage
+    @Override
+    UserRep getLoginUser() {
+        UserRep.SUPERVISOR
     }
 
     def "verify policy text has no version number"() {
