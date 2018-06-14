@@ -55,25 +55,27 @@ class InitSecurityService {
         }
 
     }
+//
+//    static List<Map<String, String>> users = [
+//        [username: 'supervisor', password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'supervisor', email: System.getenv(UserService.ENV_SUPERVISOR_EMAIL), apiKey: 'supervisorabcdef123456'],
+//        [username: 'user', password: 'user', apiKey: 'viewerabcdef123456'],
+//        [username: 'curator', password: 'curator', apiKey: 'curatorabcdef123456'],
+//        [username: 'admin', password: 'admin', apiKey: 'adminabcdef123456'],
+//    ]
 
     void initUsers() {
         if ( maxActiveUsersService.maxActiveUsers() ) {
             log.info 'Limit of {} users has been reached', maxActiveUsersService.maxUsers
             return
         }
-        for ( Map m : [
-                [username: 'supervisor', password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'supervisor', email: System.getenv(UserService.ENV_SUPERVISOR_EMAIL), apiKey: 'supervisorabcdef123456'],
-                [username: 'user', password: 'user', apiKey: 'viewerabcdef123456'],
-                [username: 'curator', password: 'curator', apiKey: 'curatorabcdef123456'],
-                [username: 'admin', password: 'admin', apiKey: 'adminabcdef123456'],
-        ] ) {
-            if ( !userGormService.findByUsername(m.username as String) ) {
-                User user = new User(name: m.username,
-                        username: m.username,
+        for ( UserRep userRep :  UserRep.values()) {
+            if ( !userGormService.findByUsername(userRep.username as String) ) {
+                User user = new User(name: userRep.username,
+                        username: userRep.username,
                         enabled: true,
-                        password: m.password,
-                        email: m.email,
-                        apiKey: m.apiKey)
+                        password: userRep.password,
+                        email: userRep.email,
+                        apiKey: userRep.apiKey)
                 userGormService.save(user)
             }
         }

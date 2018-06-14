@@ -1,13 +1,12 @@
 package org.modelcatalogue.core.datamodel
 
-import geb.spock.GebSpec
+import org.modelcatalogue.core.datamodel.utilities.LoginCreateDataModelSpec
+import org.modelcatalogue.core.security.UserRep
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
-import spock.lang.Shared
 
 @Issue('https://metadata.atlassian.net/browse/MET-1604')
 @Title('Data Model is created with selected policies')
@@ -18,10 +17,12 @@ import spock.lang.Shared
  - Examine that in the Display panel on the right side, that underneath the Data Model name, in the Policies section, the data model policy that was chosen is present. | Confirm that the Data Model has been created with the Data Model Policies
 ''')
 @Stepwise
-class CheckDataModelPoliciesSpec extends LoginCuratorCreateDataModelSpec {
+class CheckDataModelPoliciesSpec extends LoginCreateDataModelSpec {
+
+    UserRep getLoginUser() {return UserRep.CURATOR}
 
     /**
-     * Leads on from LoginCuratorCreateDataModelSpec
+     * Leads on from LoginCreateDataModelSpec
      */
     def "check data model has uniqueofkind policy"() {
         when:

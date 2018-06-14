@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.datamodel
 
-import geb.spock.GebSpec
+import org.modelcatalogue.core.datamodel.utilities.LoginCreateDataModelSpec
+import org.modelcatalogue.core.security.UserRep
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
@@ -22,8 +23,11 @@ import spock.lang.Shared
  - Verify that you cannot add a new data class to the data model | No green plus button is present to add new data class
 ''')
 @Stepwise
-class CheckDataModelCanBeFinalizedSpec extends LoginCuratorCreateDataModelSpec {
+class CheckDataModelCanBeFinalizedSpec extends LoginCreateDataModelSpec {
 
+    UserRep getLoginUser() {
+        return UserRep.CURATOR
+    }
 
     @Shared
     String dataModelVersion = "0.0.2"
@@ -31,7 +35,7 @@ class CheckDataModelCanBeFinalizedSpec extends LoginCuratorCreateDataModelSpec {
     String dataModelVersionDescription = "DATAMODEL_FINALIZED"
 
     /**
-    * Leads on from LoginCuratorCreateDataModelSpec
+    * Leads on from LoginCreateDataModelSpec
     */
     def "finalize the data model"() {
         when:

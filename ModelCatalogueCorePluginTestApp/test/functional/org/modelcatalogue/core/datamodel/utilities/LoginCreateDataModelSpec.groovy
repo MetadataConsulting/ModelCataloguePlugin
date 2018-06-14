@@ -1,23 +1,24 @@
-package org.modelcatalogue.core.datamodel
+package org.modelcatalogue.core.datamodel.utilities
 
-import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.CreateDataModelPage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Shared
+import spock.lang.Stepwise
 
 /**
- * Login as Curator and then Create Data Model
+ * Login and then Create Data Model.
  */
-class LoginCuratorCreateDataModelSpec extends LoginCuratorSpec {
+@Stepwise
+abstract class LoginCreateDataModelSpec extends LoginSpec {
+
     @Shared
-    String dataModelName = "NEW_TESTING_MODEL_${UUID.randomUUID().toString()}"
+    String dataModelName = (String) "NEW_TESTING_MODEL_${UUID.randomUUID().toString()}"
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
 
     /**
-     * Leads on from LoginCuratorSpec (where you login as curator)
+     * Leads on from LoginSpec (where you login as some user)
      */
     def "create a data model"() {
         when:
