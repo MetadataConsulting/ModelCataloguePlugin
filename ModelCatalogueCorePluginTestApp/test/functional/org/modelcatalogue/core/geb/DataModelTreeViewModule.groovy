@@ -13,8 +13,8 @@ class DataModelTreeViewModule extends Module {
     }
 
     void dataModel() {
-        dataModelLink.siblings('a.catalogue-element-treeview-icon').click()
-        // dataModelLink(0).click()
+//        dataModelLink.siblings('a.catalogue-element-treeview-icon').click()
+        dataModelLink.click()
     }
 
     void dataClasses() {

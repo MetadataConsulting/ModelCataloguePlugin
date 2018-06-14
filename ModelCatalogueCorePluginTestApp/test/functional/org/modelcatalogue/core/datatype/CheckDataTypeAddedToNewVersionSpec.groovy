@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.datatype
 
 import geb.spock.GebSpec
+import org.modelcatalogue.core.datamodel.utilities.LoginCreateDataModelSpec
+import org.modelcatalogue.core.security.UserRep
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
@@ -37,12 +39,8 @@ import spock.lang.Shared
  - Check that new data type appears under list in Data Types main page ( 'Active Data types as title) | Data Type has been created
 ''')
 @Stepwise
-class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
+class CheckDataTypeAddedToNewVersionSpec extends LoginCreateDataModelSpec {
 
-    @Shared
-    String dataModelName = "DATA_MODEL_${UUID.randomUUID().toString()}" // "TESTING_MODEL"
-    @Shared
-    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared
     String dataTypeName = "DATA_TYPE_${UUID.randomUUID().toString()}" // "TESTING_DATATYPE"
     @Shared
@@ -58,30 +56,8 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
     @Shared
     String dataTypeTwoDescription = "TESTING_DATATYPE_TWO_DESCRIPTION"
 
-    def "Login as admin"() {
-        when:
-        LoginPage loginPage = to LoginPage
-        loginPage.login("admin", "admin")
-        then:
-        at DashboardPage
-    }
-
-    def "create a data model"() {
-        when:
-        DashboardPage dashboardPage = browser.page DashboardPage
-        dashboardPage.nav.createDataModel()
-        then:
-        at CreateDataModelPage
-
-        when:
-        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = dataModelName
-        createDataModelPage.description = dataModelDescription
-        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
-        createDataModelPage.submit()
-        then:
-        at DataModelPage
-    }
+    @Override
+    UserRep getLoginUser() { UserRep.ADMIN }
 
     def "create a data type"() {
         when:
