@@ -22,7 +22,7 @@ class CheckDataModelPoliciesSpec extends LoginCreateDataModelSpec {
     UserRep getLoginUser() {return UserRep.CURATOR}
 
     /**
-     * Leads on from LoginCreateDataModelSpec
+     * Continues on from LoginCreateDataModelSpec
      */
     def "check data model has uniqueofkind policy"() {
         when:

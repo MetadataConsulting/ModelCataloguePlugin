@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.datatype
 
 import geb.spock.GebSpec
+import org.modelcatalogue.core.datamodel.FinalizeDataModel
 import org.modelcatalogue.core.datamodel.utilities.LoginCreateDataModelSpec
 import org.modelcatalogue.core.security.UserRep
 import spock.lang.Issue
@@ -39,7 +40,7 @@ import spock.lang.Shared
  - Check that new data type appears under list in Data Types main page ( 'Active Data types as title) | Data Type has been created
 ''')
 @Stepwise
-class CheckDataTypeAddedToNewVersionSpec extends LoginCreateDataModelSpec {
+class CheckDataTypeAddedToNewVersionSpec extends LoginCreateDataModelSpec implements FinalizeDataModel {
 
     @Shared
     String dataTypeName = "DATA_TYPE_${UUID.randomUUID().toString()}" // "TESTING_DATATYPE"
@@ -47,8 +48,6 @@ class CheckDataTypeAddedToNewVersionSpec extends LoginCreateDataModelSpec {
     String dataTypeDescription = "TESTING_DATATYPE_DESCRIPTION"
     @Shared
     String dataModelVersion = "0.0.2"
-    @Shared
-    String dataModelVersionNote = "FINALIZING_DATAMODEL"
     @Shared
     String dataModelNewVersion = "0.0.3"
     @Shared
@@ -59,6 +58,9 @@ class CheckDataTypeAddedToNewVersionSpec extends LoginCreateDataModelSpec {
     @Override
     UserRep getLoginUser() { UserRep.ADMIN }
 
+    /**
+     * Continues on from LoginCreateDataModelSpec
+     */
     def "create a data type"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
@@ -91,28 +93,7 @@ class CheckDataTypeAddedToNewVersionSpec extends LoginCreateDataModelSpec {
 
     def "finalize the data model"() {
         when:
-        DataModelPage dataModelPage = browser.page DataModelPage
-        dataModelPage.dropdown()
-        then:
-        at DataModelPage
-
-        when:
-        dataModelPage = browser.page DataModelPage
-        dataModelPage.finalizedDataModel()
-        then:
-        at FinalizeDataModelPage
-
-        when:
-        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
-        finalizeDataModelPage.version = dataModelVersion
-        finalizeDataModelPage.versionNote = dataModelVersionNote
-        finalizeDataModelPage.submit()
-        then:
-        at FinalizedDataModelPage
-
-        when:
-        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
-        finalizedDataModelPage.hideConfirmation()
+        finalizeDataModel(browser, dataModelVersion)
         then:
         at DataModelPage
     }

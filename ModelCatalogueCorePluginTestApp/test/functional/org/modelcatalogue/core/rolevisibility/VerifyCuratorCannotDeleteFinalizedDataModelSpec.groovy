@@ -1,6 +1,9 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
+import org.modelcatalogue.core.datamodel.FinalizeDataModel
+import org.modelcatalogue.core.datamodel.utilities.LoginCreateDataModelSpec
+import org.modelcatalogue.core.security.UserRep
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
@@ -23,68 +26,23 @@ import org.modelcatalogue.core.geb.*
  - The data model is not deleted
 ''')
 @Stepwise
-class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends GebSpec {
+class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends LoginCreateDataModelSpec implements FinalizeDataModel {
 
-    @Shared
-    String dataModelName = "TESTING_MODEL_${UUID.randomUUID().toString()}"
-    @Shared
-    String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
+    @Override
+    UserRep getLoginUser() {
+        UserRep.CURATOR
+    }
     @Shared
     String dataModelVersion = "0.0.2"
-    @Shared
-    String dataModelVersionNote = "Version finalized"
 
-    def "Login as curator"() {
-        when:
-        LoginPage loginPage = to LoginPage
-        loginPage.login("curator", "curator")
-        then:
-        at DashboardPage
-    }
-
-    def "create a data model"() {
-        when:
-        DashboardPage dashboardPage = browser.page DashboardPage
-        dashboardPage.nav.createDataModel()
-        then:
-        at CreateDataModelPage
-
-        when:
-        CreateDataModelPage createDataModelPage = browser.page CreateDataModelPage
-        createDataModelPage.name = dataModelName
-        createDataModelPage.description = dataModelDescription
-        createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
-        createDataModelPage.submit()
-        then:
-        at DataModelPage
-
-    }
-
+    /**
+     * Continues on from LoginCreateDataModelSpec
+     */
     def "finalize the data model"() {
         when:
-        DataModelPage dataModelPage = browser.page DataModelPage
-        dataModelPage.dropdown()
+        finalizeDataModel(browser, dataModelVersion)
         then:
-        at DataModelPage
-
-        when:
-        dataModelPage = browser.page DataModelPage
-        dataModelPage.finalizedDataModel()
-        then:
-        at FinalizeDataModelPage
-
-        when:
-        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
-        finalizeDataModelPage.version = dataModelVersion
-        finalizeDataModelPage.versionNote = dataModelVersionNote
-        finalizeDataModelPage.submit()
-        then:
-        at FinalizedDataModelPage
-
-        when:
-        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
-        finalizedDataModelPage.hideConfirmation()
-        then:
+        noExceptionThrown()
         at DataModelPage
     }
 

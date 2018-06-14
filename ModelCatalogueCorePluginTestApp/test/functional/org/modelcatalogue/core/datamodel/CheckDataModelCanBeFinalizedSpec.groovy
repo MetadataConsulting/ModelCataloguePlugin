@@ -23,7 +23,7 @@ import spock.lang.Shared
  - Verify that you cannot add a new data class to the data model | No green plus button is present to add new data class
 ''')
 @Stepwise
-class CheckDataModelCanBeFinalizedSpec extends LoginCreateDataModelSpec {
+class CheckDataModelCanBeFinalizedSpec extends LoginCreateDataModelSpec implements FinalizeDataModel {
 
     UserRep getLoginUser() {
         return UserRep.CURATOR
@@ -31,37 +31,15 @@ class CheckDataModelCanBeFinalizedSpec extends LoginCreateDataModelSpec {
 
     @Shared
     String dataModelVersion = "0.0.2"
-    @Shared
-    String dataModelVersionDescription = "DATAMODEL_FINALIZED"
 
     /**
-    * Leads on from LoginCreateDataModelSpec
+    * Continues on from LoginCreateDataModelSpec
     */
     def "finalize the data model"() {
         when:
-        DataModelPage dataModelPage = browser.page DataModelPage
-        dataModelPage.dropdown()
+        finalizeDataModel(browser, dataModelVersion)
         then:
-        at DataModelPage
-
-        when:
-        dataModelPage = browser.page DataModelPage
-        dataModelPage.finalizedDataModel()
-        then:
-        at FinalizeDataModelPage
-
-        when:
-        FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
-        finalizeDataModelPage.version = dataModelVersion
-        finalizeDataModelPage.versionNote = dataModelVersionDescription
-        finalizeDataModelPage.submit()
-        then:
-        at FinalizedDataModelPage
-
-        when:
-        FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
-        finalizedDataModelPage.hideConfirmation()
-        then:
+        noExceptionThrown()
         at DataModelPage
     }
 

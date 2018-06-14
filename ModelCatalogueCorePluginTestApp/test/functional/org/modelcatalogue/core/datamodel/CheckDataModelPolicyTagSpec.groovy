@@ -34,6 +34,9 @@ class CheckDataModelPolicyTagSpec extends LoginCreateDataModelSpec {
         UserRep.SUPERVISOR
     }
 
+    /**
+     * Continues on from LoginCreateDataModelSpec
+     */
     def "verify policy text has no version number"() {
         given:
         String winHandleBefore = driver.getWindowHandle();
