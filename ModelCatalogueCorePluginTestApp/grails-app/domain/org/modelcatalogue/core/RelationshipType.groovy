@@ -175,7 +175,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
 
 
     static RelationshipType getContainmentType() {
-        readByName(RelationshipTypeName.CONTAINEMENT.name)
+        readByName(RelationshipTypeName.CONTAINMENT.name)
     }
 
 

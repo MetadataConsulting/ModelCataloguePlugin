@@ -8,6 +8,11 @@ interface ListWithTotal<T> {
 
     Long getTotal()
     List<T> getItems()
-    void totalKnownAlready(Long total) // if this is called with value total0, then immediately afterwards, getTotal() should return total0.
+    /**
+     * If this method is called with value total0, then immediately afterwards, getTotal() should return total0.
+     * In the simple case of the total being stored in a field, this would just be a setter.
+     * @param total
+     */
+    void totalKnownAlready(Long total)
 
 }

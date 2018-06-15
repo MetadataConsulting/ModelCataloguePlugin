@@ -2,7 +2,13 @@ package org.modelcatalogue.core.d3viewUtils
 
 import com.google.common.collect.ImmutableSet
 import grails.transaction.Transactional
+import grails.util.Holders
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import org.hibernate.Query
+import org.hibernate.Session
+import org.hibernate.SessionFactory
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataElement
@@ -11,10 +17,24 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.PrimitiveType
+import org.modelcatalogue.core.ReferenceType
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipConfiguration
+import org.modelcatalogue.core.RelationshipInfo
+import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.RelationshipTypeName
+import org.modelcatalogue.core.RelationshipTypeService
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.MetadataDomain
+import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
+import org.modelcatalogue.core.util.lists.Lists
+import org.springframework.context.ApplicationContext
 
 @Transactional
 /**
@@ -27,6 +47,8 @@ class D3ViewUtilsService {
     DataClassService dataClassService
     DataElementService dataElementService
     GrailsApplication grailsApplication
+    RelationshipTypeService relationshipTypeService
+    DataModelAclService dataModelAclService
 
     //// Utilities:
 
@@ -37,7 +59,32 @@ class D3ViewUtilsService {
     String angularLink(Long dataModelId, Long id, Class clazz) {
         return "${grailsApplication.config.grails.serverURL}/#/$dataModelId/${lowerCamelCaseDomainName(clazz)}/$id"
     }
+    String angularLink(CatalogueElement catalogueElement) {
+        return angularLink(dataModelAclService.dataModelFromInstance(catalogueElement).id,
+                            catalogueElement.id,
+                            catalogueElement.getClass())
+    }
 
+    D3JSON basicD3JSON(CatalogueElement catalogueElement) {
+        D3JSON ret = new D3JSON(
+            name: catalogueElement.name,
+            description: catalogueElement.description,
+            id: catalogueElement.id,
+            angularLink: angularLink(catalogueElement),
+            type: lowerCamelCaseDomainName(catalogueElement.getClass()),
+
+            status: catalogueElement.status.toString(),
+            dateCreated: catalogueElement.dateCreated,
+            lastUpdated: catalogueElement.lastUpdated
+        )
+
+        if (catalogueElement.ext.size() > 0) {
+            ret.metadata = catalogueElement.ext
+        }
+        ret = addRelationships(catalogueElement, ret)
+
+        return ret
+    }
 
     //// Data Models:
 
@@ -48,13 +95,10 @@ class D3ViewUtilsService {
      */
     D3JSON dataModelD3Json(DataModel dataModel) {
 
-        D3JSON dataModelJson = new D3JSON(
-            name: dataModel.name,
-            description: dataModel.description,
-            id: dataModel.id,
-            angularLink: angularLink(dataModel.id, dataModel.id, DataModel),
-            type: lowerCamelCaseDomainName(DataModel)
-        )
+        D3JSON ret = basicD3JSON(dataModel)
+
+
+        return ret
     }
 
     /**
@@ -62,12 +106,13 @@ class D3ViewUtilsService {
      * @param dataModel
      * @return List<D3JSON>
      */
-    List<D3JSON> dataModelD3JsonChildren(DataModel dataModel) {
+    ListWithTotal<D3JSON> dataModelD3JsonChildren(DataModel dataModel, int offset, int max) {
         DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
+        // This doesn't include imports, maybe it should.
         Map<String, Integer> stats = dataModelService.getStatistics(filter)
 
 
-        ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''])
+        ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [offset: offset, max: max, toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''])
 
 
         def dataClassChildrenJson = dataClasses.items.collect {dataClass ->
@@ -83,7 +128,7 @@ class D3ViewUtilsService {
 
 
 
-        return dataClassChildrenJson //+ dataElementChildrenJson
+        return (new ListWithTotalAndTypeImpl(D3JSON, dataClassChildrenJson, dataClasses.getTotal())) //+ dataElementChildrenJson
 
         // the dataElementChildrenJson seems to take a long time
         // TODO: Handle case where there are just DataTypes listed not connected to any DataElements
@@ -98,98 +143,261 @@ class D3ViewUtilsService {
      */
     D3JSON dataClassD3Json(DataClass dataClass) {
 
-
-        D3JSON ret = new D3JSON(
-            name: dataClass.name,
-            id: dataClass.id,
-            description: dataClass.description,
-            angularLink: angularLink(dataClass.dataModel.id, dataClass.id, DataClass),
-            type: lowerCamelCaseDomainName(DataClass),
-        )
-
+        D3JSON ret = basicD3JSON(dataClass)
 
 
         return ret
     }
 
-    List<D3JSON> dataClassD3JsonChildren(DataClass dataClass) {
+    ListWithTotal<D3JSON> dataClassD3JsonChildren(DataClass dataClass, int offset, int max) {
 
-        List<D3JSON> dataElementsJson = dataClassService.getDataElementsIn(dataClass).collect{
-                dataElementD3Json(it)
+//        ListWithTotal<Relationship> dataClassChildren = dataClassChildren(dataClass, offset, max)
+//
+//        List<D3JSON> childrenD3JSON = dataClassChildren.getItems()
+//            .collect{
+//                it.destination// result of HQL is list of Object[]s with Relationship at 0 and CatalogueElement at 1
+//            }
+//            .collect {
+//            if (it instanceof DataClass) {
+//                return dataClassD3Json(it)
+//            }
+//            else if (it instanceof DataElement) {
+//                return dataElementD3Json(it)
+//            }
+//            else {
+//                throw new Error("Data Class Children method got a CatalogueElement neither DataElement nor DataClass!")
+//            }
+//        }
+
+        ApplicationContext context = Holders.getApplicationContext()
+        SessionFactory sessionFactory = (SessionFactory) context.getBean('sessionFactory')
+        Session session = sessionFactory.getCurrentSession()
+        RelationshipType hierarchy = RelationshipType.hierarchyType
+        RelationshipType containment = RelationshipType.containmentType
+        Map queryProperties = [type: hierarchy, type2: containment, sourceDataClassId: dataClass.id]
+
+
+        // language=HQL
+        Query query = session.createQuery("""
+                select distinct relationship, relationship.relationshipType, destination
+                from Relationship as relationship
+                    inner join relationship.source as source
+                    inner join relationship.destination as destination
+                where ((relationship.relationshipType = :type) or (relationship.relationshipType = :type2))
+                        and relationship.source.id = :sourceDataClassId 
+                group by relationship.relationshipType.name, relationship.id, destination.name, destination.id
+                order by relationship.relationshipType.name, destination.name
+            """)
+        query.setFirstResult((int) offset).setMaxResults((int) max)
+        query.setProperties(queryProperties)
+        List list = query.list()
+
+        List<D3JSON> childrenD3JSON = list
+            .collect{
+            (CatalogueElement) it[2] // result of HQL is list of Object[]s with Relationship at 0 and CatalogueElement at 1
+        }
+        .collect {
+            if (it instanceof DataClass) {
+                return dataClassD3Json(it)
+            }
+            else if (it instanceof DataElement) {
+                return dataElementD3Json(it)
+            }
+            else {
+                throw new Error("Data Class Children method got a CatalogueElement neither DataElement nor DataClass!")
+            }
         }
 
-        List<D3JSON> childDataClassesJson = dataClassService.getChildDataClasses(dataClass).collect{
-                dataClassD3Json(it) // recursive
-        }
+        // language=HQL
+        Query countQuery = session.createQuery("""
+                select count (relationship.id)
+                from Relationship as relationship
+                    inner join relationship.source as source
+                    inner join relationship.destination as destination
+                where ((relationship.relationshipType = :type) or (relationship.relationshipType = :type2))
+                        and relationship.source.id = :sourceDataClassId 
+                
+            """)
+        countQuery.setProperties(queryProperties)
+        Long total = (Long) countQuery.uniqueResult()
+        println total
 
 
-        List<D3JSON> children = dataElementsJson + childDataClassesJson
+        return (new ListWithTotalAndTypeImpl(D3JSON, childrenD3JSON, total)) //+ dataElementChildrenJson
 
-        return children
     }
 
     //// Data Elements and Data Types:
 
 
     D3JSON dataElementD3Json(DataElement dataElement) {
-        D3JSON ret = new D3JSON(
 
-            name: dataElement.name,
-            id: dataElement.id,
-            description: dataElement.description,
-            angularLink: angularLink(dataElement.dataModel.id, dataElement.id, DataElement),
-            loadedChildren: true, // Just load data type, no laziness
-            type: lowerCamelCaseDomainName(DataElement)
-        )
+        D3JSON ret = basicD3JSON(dataElement)
+
+        ret.loadedChildren= true // Just load data type, no laziness
 
         if (dataElement.dataType) {
             ret.children = [dataTypeD3Json(dataElement.dataType)]
         }
 
+
+
         return ret
     }
 
     D3JSON dataTypeD3Json(DataType dataType) {
-        D3JSON ret = new D3JSON(
-            name: dataType.name,
-            id: dataType.id,
-            description: dataType.description,
-            angularLink: angularLink(dataType.dataModel.id, dataType.id, DataType),
-            loadedChildren: true, // No children, so "already loaded children."
-            type: lowerCamelCaseDomainName(DataType),
-        )
+        D3JSON ret = basicD3JSON(dataType)
+        ret.loadedChildren = true // No children, so "already loaded children."
 
+
+        if (dataType.rule) {
+            ret.rule = dataType.rule
+        }
         if (dataType instanceof EnumeratedType) {
             ret.enumerations = ((EnumeratedType) dataType).enumerations
         }
+        if (dataType instanceof PrimitiveType) {
+            ret.measurementUnitName = dataType.measurementUnit.name
+            ret.measurementUnitSymbol = dataType.measurementUnit.symbol
+        }
+        if (dataType instanceof ReferenceType) {
+            ret.referenceName = dataType.dataClass.name
+            ret.referenceAngularLink = angularLink(dataType.dataClass)
+        }
+
         return ret
+    }
+
+    static Map<String, Map<String, String>> relationshipTypes(Class type) {
+        Map<String, Map<String, String>> relationships  = [incoming: [:], outgoing: [:], bidirectional: [:]]
+
+        if (type.superclass && CatalogueElement.isAssignableFrom(type.superclass)) {
+            Map<String, Map<String,String>> fromSuperclass = relationshipTypes(type.superclass)
+            relationships.incoming.putAll(fromSuperclass.incoming ?: [:])
+            relationships.outgoing.putAll(fromSuperclass.outgoing ?: [:])
+            relationships.bidirectional.putAll(fromSuperclass.bidirectional ?: [:])
+        }
+
+        Map<String, Map<String, String>> fromType = GrailsClassUtils.getStaticFieldValue(type, 'relationships') ?: [incoming: [:], outgoing: [:], bidirectional: [:]]
+        relationships.incoming.putAll(fromType.incoming ?: [:])
+        relationships.outgoing.putAll(fromType.outgoing ?: [:])
+        relationships.bidirectional.putAll(fromType.bidirectional ?: [:])
+    }
+
+    /**
+     * add relationships to D3JSON, modifying and returning the D3JSON.
+     * @param catalogueElement
+     * @param d3JSON
+     * @return
+     */
+    D3JSON addRelationships(CatalogueElement catalogueElement, D3JSON d3JSON) {
+        RelationshipConfiguration relationshipConfiguration = relationshipTypeService.getRelationshipConfiguration(catalogueElement.getClass())
+        relationshipConfiguration.each {
+            Map<String, String> directionMap ->
+                directionMap.remove RelationshipTypeName.HIERARCHY.name // relationship type names
+                directionMap.remove RelationshipTypeName.CONTAINMENT.name
+        }
+        List<RelationshipInfo> relationshipInfos = relationshipTypeService.relationshipInfoOf(catalogueElement, relationshipConfiguration)
+        Map<String, List<RelationJson>> relationshipsJson = [:]
+
+        relationshipInfos.each {RelationshipInfo relationshipInfo ->
+
+            String capitalizedSpacedName = lowerCamelCaseToSeparated(relationshipInfo.directionalRelationshipName, ' ').capitalize()
+
+            relationshipsJson[capitalizedSpacedName] = relationshipInfo.relationships.collect {
+                Relationship relationship ->
+                    CatalogueElement otherElement = (relationshipInfo.relationshipDirection == RelationshipDirection.INCOMING) ? relationship.source : relationship.destination
+                    new RelationJson(name: otherElement.name,
+                        angularLink: angularLink(otherElement)
+                    )
+            }
+        }
+
+        if (relationshipsJson) {
+            d3JSON.relationships = relationshipsJson
+        }
+
+        return d3JSON
+
+    }
+    /**
+     * lower-camel-case to sep-separated
+     * @param s
+     * @return
+     */
+    String lowerCamelCaseToSeparated (String s, String sep) {
+        return s.replaceAll(/\B[A-Z]/) { sep + it }
     }
 }
 /**
- *  D3 view json recursive format
+ *  D3 view json recursive format representing a catalogue element and also info for displaying on D3.
  *
- *  type is a String from MetadataDomain.lowerCamelCaseDomainName e.g. 'dataClass'
- *  angularLinkis a String of format e.g. "http://localhost:8080/#/82467/dataClass/82470/", which is a link to the angular application view for data model 82467, data class 82470
- *  enumerations is a Map of Strings to Strings for enumerated types.
  *
  */
 class D3JSON {
+    // corresponding to fields on Catalogue Element
     String name
     long id
     String description
 
+    /**
+     * String of format e.g. "http://localhost:8080/#/82467/dataClass/82470/", which is a link to the angular application view for data model 82467, data class 82470
+     */
+    String angularLink
+    /**
+     * String from MetadataDomain.lowerCamelCaseDomainName e.g. 'dataClass'
+     */
+    String type
+
+    // corresponding to fields on Catalogue Element
+    String status
+    String dateCreated
+    String lastUpdated
+    Map<String, String> metadata // from Catalogue Element ext
+
     boolean loadedChildren = false // false by default; children will be loaded later.
     boolean loading = false
 
-    String angularLink
-    String type
-    Map<String,String> enumerations
     List<D3JSON> children
+
+    /**
+     * Map whose keys are the directional names of relationshipTypes,
+     * values being lists representing the Catalogue Elements ("Relations") on the other end
+     * of the relationships of that type.
+     */
+    Map<String, List<RelationJson>> relationships
+
+    // more information which may be on certain Catalogue Elements
+    Map<String,String> enumerations
+    String rule
+    String measurementUnitName
+    String measurementUnitSymbol
+    String referenceName
+    String referenceAngularLink
+
+
+
 
 }
 
+/**
+ * JSON representing a "relation", a Catalogue Element somehow related to the one under consideration. Just the name and a link.
+ */
+class RelationJson {
+    String name
+    String angularLink
+}
+
+/**
+ * Returned from DataModelController's basicViewChildrenData action
+ */
 class ChildrenData {
     List<D3JSON> children
     boolean canAccessDataModel
     boolean caseHandled
+    boolean paginationParametersFound
+    /**
+     * For a paginated query this should be the total possible results (not the size of actually returned results)
+     */
+    long total
 }
