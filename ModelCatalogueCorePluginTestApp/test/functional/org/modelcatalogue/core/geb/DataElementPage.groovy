@@ -5,7 +5,7 @@ import geb.Page
 class DataElementPage extends Page {
 
     static url = '/#'
-    static at = { title.contains('History of') }
+    static at = { dataElementDropdown.displayed }
 
     @Override
     String convertToPath(Object[] args) {
@@ -24,6 +24,7 @@ class DataElementPage extends Page {
         deleteDataElementLink { $('#delete-menu-item-link') }
         confirmDeleteButton(wait: true, required: false) { $('form button.btn-primary', text: "OK") }
         dataTypeList(required: false, wait: true) { $('a.small.with-pointer.ng-scope') }
+        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
     }
 
     String getUnitName() {
@@ -53,6 +54,10 @@ class DataElementPage extends Page {
         if ( submitButton.isDisplayed() ) {
             submitButton.click()
         }
+    }
+
+    boolean editDataElementDisabled() {
+        waitFor { editButton.@('disabled') }
     }
 
     void dataElementDropdown() {

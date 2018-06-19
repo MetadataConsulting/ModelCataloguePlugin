@@ -22,6 +22,7 @@ class TagsPage extends Page {
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
         deleteBttn(required: false) { $('a#deleteBtn') }
+        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
     }
 
     void expandLinkClick() {

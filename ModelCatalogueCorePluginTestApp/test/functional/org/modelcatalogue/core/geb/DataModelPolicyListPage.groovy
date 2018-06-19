@@ -10,8 +10,8 @@ class DataModelPolicyListPage extends Page {
 
     static content = {
         createLink { $('#role_list_create-catalogue-element-menu-item-link', 0) }
-        dataModelPolicyLinks { $('a', href: contains("#/catalogue/dataModelPolicy/")) }
-        nav { $('#topmenu', 0) .module(NavModule) }
+        dataModelPolicyLinks(wait: true) { String item -> $('a', href: contains("#/catalogue/dataModelPolicy/"), text: item) }
+        nav { $('#topmenu', 0).module(NavModule) }
     }
 
     int countDataModelPolicyLinks() {
@@ -20,6 +20,10 @@ class DataModelPolicyListPage extends Page {
 
     void create() {
         createLink.click()
+    }
+
+    void selectEnumeratedTypePolicy() {
+        dataModelPolicyLinks("Enumeration Checks").click()
     }
 
 }

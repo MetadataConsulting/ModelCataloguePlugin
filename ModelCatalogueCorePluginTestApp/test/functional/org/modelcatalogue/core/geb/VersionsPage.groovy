@@ -20,6 +20,9 @@ class VersionsPage extends Page {
         dataElementDropDown (wait:true){ $('button#role_item_catalogue-elementBtn') }
         deleteBttn(wait:true) { $('a#deleteBtn') }
         deleteConfirmationBttn(wait:true) { $('button.btn.btn-primary') }
+        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+        showMoreButton { $('span.fa-plus-square-o') }
+        editButton(required: false) { $('#role_item-detail_edit-catalogue-elementBtn') }
     }
 
     boolean rowsContainText(String text) {
@@ -51,4 +54,18 @@ class VersionsPage extends Page {
         deleteConfirmationBttn.click()
     }
 
+    void showMore() {
+        showMoreButton.click()
+    }
+
+    boolean editButtonVisible() {
+        if (editButton.empty) {
+            return false
+        }
+        true
+    }
+
+    void selectModelByVersion(String version) {
+        rows.$('td a', text: version).click()
+    }
 }

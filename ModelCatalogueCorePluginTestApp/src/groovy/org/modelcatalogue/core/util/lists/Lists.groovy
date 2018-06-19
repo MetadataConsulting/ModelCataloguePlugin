@@ -246,9 +246,14 @@ class Lists {
             int next = offset + max
             if (next < totalInt) {
                 nextLink = "${link}&offset=${next}"
+            } else if ((offset + 10) < totalInt) {
+                nextLink = "${link}&offset=${offset + 10}"
             }
             if (prev >= 0) {
                 previousLink = "${link}&offset=${prev}"
+            }
+            else if (offset > 0){
+                previousLink = "${link}&offset=0"
             }
         }
         [

@@ -27,6 +27,9 @@ class DataClassesPage extends Page {
         dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
         dataClassByName(wait: true) { rows.$('a', text: it) }
+        showMoreButton { $('span.fa-plus-square-o') }
+        editDataClassButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
+        titlename { $('div   h3') }
     }
 
     void expandLinkClick() {
@@ -89,4 +92,24 @@ class DataClassesPage extends Page {
         false
     }
 
+
+    void showMore() {
+        showMoreButton.click()
+    }
+
+    boolean editDataClassDisabled() {
+        waitFor { editDataClassButton.@('disabled') }
+    }
+
+    boolean containsDataClass(String value) {
+        rows.$('a', text: value).displayed
+    }
+
+    void selectDataClass(String value) {
+        rows.$('a', text: value).click()
+    }
+  
+    String titleText() {
+        return titlename.text()
+    }
 }

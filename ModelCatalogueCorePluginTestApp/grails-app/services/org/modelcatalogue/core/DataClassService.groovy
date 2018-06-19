@@ -6,6 +6,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.MetadataDomain
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
@@ -154,6 +155,16 @@ class DataClassService {
             }
             results
         }
+    }
+
+    static List<DataClass> getChildDataClasses(DataClass dataClass) {
+        List<CatalogueElement> children = dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)*.destination
+        children.collect{it as DataClass}
+    }
+
+    static List<DataElement> getDataElementsIn(DataClass dataClass) {
+        List<CatalogueElement> dcDEs = dataClass.getOutgoingRelationshipsByType(RelationshipType.containmentType)*.destination
+        dcDEs.collect{it as DataElement}
     }
 
 

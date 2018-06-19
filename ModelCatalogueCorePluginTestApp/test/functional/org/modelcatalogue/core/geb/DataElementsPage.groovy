@@ -27,6 +27,9 @@ class DataElementsPage extends Page {
         deleteBttn { $('a#deleteBtn') }
         rows { $('div.inf-table-body tbody tr') }
         elementByName(wait: true) { $('a', text: contains(it)) }
+        showMoreButton { $('span.fa-plus-square-o') }
+        editDataElementButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
+        elementsList { $('table.inf-table tbody tr') }
     }
 
     void createDataElement() {
@@ -77,5 +80,21 @@ class DataElementsPage extends Page {
 
     boolean hasDataElement(String name) {
         elementByName(name).displayed
+    }
+
+    void showMore() {
+        showMoreButton.click()
+    }
+
+    boolean editDataElementDisabled() {
+        waitFor { editDataElementButton.@('disabled') }
+    }
+
+    void selectDataElement(String value) {
+        rows.$('a', text: value).click()
+    }
+
+    boolean containsElement(String value) {
+        elementsList.$('a', text: value).displayed
     }
 }

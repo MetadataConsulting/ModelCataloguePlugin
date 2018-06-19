@@ -13,6 +13,10 @@ import org.modelcatalogue.core.util.SortQuery
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeImpl
 
+import java.beans.MetaData
+import java.sql.Connection
+import java.sql.DatabaseMetaData
+
 @CompileStatic
 class ChangeSqlService {
     final String changeTable = Environment.current == Environment.TEST ? 'CHANGE' : '`change`'

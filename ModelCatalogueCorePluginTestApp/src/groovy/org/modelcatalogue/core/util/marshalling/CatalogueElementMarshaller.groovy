@@ -49,7 +49,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 typeHierarchy        : [count: Integer.MAX_VALUE, itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/typeHierarchy".toString()]
         ]
 
-        Map<String, Map<String, String>> relationships = getRelationshipConfiguration(el.getClass())
+        RelationshipConfiguration relationships = relationshipTypeService.getRelationshipConfiguration(el.getClass())
 
         Map<String, RelationshipType> types = getRelationshipTypesFor(el.getClass())
 
@@ -91,70 +91,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         relationshipTypeService.getRelationshipTypesFor(elementClass)
     }
 
-    /**
-     * e.g. relationships = {
-     *     "incoming": {
-     *         "hierarchy": "childOf"
-     *     }
-     *     "outgoing": {
-     *         "hierarchy": "parentOf"
-     *     }
-     *     "bidirectional": {
-     *         "relatedTo": "relatedTo"
-     *     }
-     *  }
-     * @param type
-     * @return
-     */
-    Map<String, Map<String, String>> getRelationshipConfiguration(Class type) {
-        Map<String, Map<String, String>> relationships  = [incoming: [:], outgoing: [:], bidirectional: [:]]
-        if (type.superclass && CatalogueElement.isAssignableFrom(type.superclass)) {
-            def fromSuperclass = getRelationshipConfiguration(type.superclass)
-            relationships.incoming.putAll(fromSuperclass.incoming ?: [:])
-            relationships.outgoing.putAll(fromSuperclass.outgoing ?: [:])
-            relationships.bidirectional.putAll(fromSuperclass.bidirectional ?: [:])
-        }
-        def fromType = GrailsClassUtils.getStaticFieldValue(type, 'relationships') ?: [incoming: [:], outgoing: [:], bidirectional: [:]]
-        relationships.incoming.putAll(fromType.incoming ?: [:])
-        relationships.outgoing.putAll(fromType.outgoing ?: [:])
-        relationships.bidirectional.putAll(fromType.bidirectional ?: [:])
 
-        getRelationshipTypesFor(type).each { String name, RelationshipType relationshipType ->
-            if (relationshipType.system) {
-                relationships.each { String direction, Map config ->
-                    config.remove name
-                }
-                return
-            }
-
-            if (relationshipType.bidirectional) {
-                if (!relationships.bidirectional.containsKey(name)) {
-                    relationships.incoming.remove(name)
-                    relationships.outgoing.remove(name)
-
-                    relationships.bidirectional[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
-                }
-            } else {
-                if (relationshipType.sourceClass.isAssignableFrom(type)) {
-                    if (!relationships.outgoing.containsKey(name)){
-                        relationships.bidirectional.remove(name)
-
-                        relationships.outgoing[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
-                    }
-                }
-                if (relationshipType.destinationClass.isAssignableFrom(type)) {
-                    if (!relationships.incoming.containsKey(name)) {
-
-                        relationships.bidirectional.remove(name)
-
-                        relationships.incoming[name] = RelationshipType.toCamelCase(relationshipType.destinationToSource)
-                    }
-                }
-            }
-        }
-
-        relationships
-    }
 
     private static Closure addRelationsJson(RelationshipDirection direction, CatalogueElement el, Map ret, Map<String, RelationshipType> relationshipTypeMap) {
         { String relationshipTypeName, String relationshipTypeDirectionalName ->

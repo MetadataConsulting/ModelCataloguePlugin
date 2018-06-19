@@ -50,8 +50,16 @@ class DataModelTreeViewModule extends Module {
         select('Versions')
     }
 
+    void assets() {
+        select("Assets")
+    }
+
     void select(String name) {
         item(name).click()
         sleep(3_000)
+    }
+
+    Boolean checkItemDisplay(String name) {
+        return item(name)?.displayed
     }
 }

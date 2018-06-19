@@ -27,7 +27,8 @@ class DataModelPage extends Page implements InputUtils {
         modalDialog(required: false) { $('.modal-dialog', 0).module(ModalDialogModule) }
         dropdownLink(wait: true, required: false) { $('a#role_item_catalogue-element-menu-item-link', 0) }
         dropdownMenu(required: false) {
-            $('#role_item_catalogue-element-menu-item-link').siblings('ul').module(DataModelNavModule)
+            $('#role_item_catalogue-element-menu-item-link').siblings('ul.dropdown-menu').module(DataModelNavModule)
+            // was: $('#role_item_catalogue-element-menu-item-link').siblings('ul').module(DataModelNavModule)
         }
         exportLink(required: false) { $('a#role_item_export-menu-item-link') }
         exportXMLLink(required: false) { $('a#catalogue-element-export-specific-reports_12-menu-item-link') }
@@ -44,6 +45,10 @@ class DataModelPage extends Page implements InputUtils {
         policiesDropdown(wait: true) { $('input#dataModelPolicy').siblings('ul') }
         addedPoliciesInEditDataModel(wait: true) { $('div.tags>span') }
         saveButton(required: false, wait: true) { $('button#role_item-detail_inline-edit-submitBtn') }
+        editDataModelButton(required: false, wait: true) { $('a#role_item-detail_inline-editBtn') }
+        activityList {
+            $("#activity-changes>div.inf-table-body>table>tbody>tr")
+        }
         policiesList { $('div.row.detail-section', 0).$('div.ng-scope span') }
         editModelButton(wait: true) { $('#role_item-detail_inline-editBtn') }
         ModelEditSaveButton(required: false, wait: true) { $('#role_item-detail_inline-edit-submitBtn') }
@@ -76,6 +81,10 @@ class DataModelPage extends Page implements InputUtils {
 
     void finalizedDataModel() {
         finalizedLink.click()
+    }
+
+    Boolean isFinalizedDataModelVisible() {
+        return finalizedLink?.displayed
     }
 
     void dropdown() {
@@ -163,6 +172,17 @@ class DataModelPage extends Page implements InputUtils {
         $('a', text: contains(value)).click()
     }
 
+    boolean editButtonVisible() {
+        if (editDataModelButton) {
+            return true
+        }
+        return false
+    }
+
+    boolean isDataModelFinalized() {
+        activityList.$('td:nth-child(4) span span')*.text().join(",").contains("finalized")
+    }
+  
     boolean defaultChecksPolicyAdded() {
         policiesList.$('a', text: 'Default Checks').displayed
     }
