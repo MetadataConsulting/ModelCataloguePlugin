@@ -31,7 +31,7 @@ class DataImportsPage extends Page {
     }
 
     boolean isRemoveButtonVisible() {
-        if ( removeButton.empty ) {
+        if (removeButton.empty) {
             return false
         }
         return true
@@ -39,5 +39,14 @@ class DataImportsPage extends Page {
 
     void remove() {
         removeButton.click()
+    }
+
+    Boolean containsDataModel(String value) {
+        waitFor { addItemIcon }
+        $('a', text: value).displayed
+    }
+
+    boolean containsData(String value) {
+        $('a', text: value).displayed
     }
 }

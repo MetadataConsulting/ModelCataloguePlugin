@@ -8,9 +8,9 @@ class FinalizeDataModelPage extends Page implements InputUtils {
     static at = { $("div.modal-header>h4").text()?.contains('Finalize Data Model') }
 
     static content = {
-        versionNoteTextarea { $('textarea#revisionNotes') }
-        finalizeButton { $('a#role_modal_modal-finalize-data-modalBtn', 0) }
-        version { $('#semanticVersion') }
+        versionNoteTextarea(wait: true) { $('textarea#revisionNotes') }
+        finalizeButton(wait: true) { $('a#role_modal_modal-finalize-data-modalBtn', 0) }
+        version(wait: true) { $('#semanticVersion') }
     }
 
     void setVersionNote(String value) {

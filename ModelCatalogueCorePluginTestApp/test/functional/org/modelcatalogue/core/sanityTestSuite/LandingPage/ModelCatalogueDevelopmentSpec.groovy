@@ -11,9 +11,10 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
 //@IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 class ModelCatalogueDevelopmentSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String modelDevBox="footer.row>div>div>div"
+    private static final String modelDevBox = "footer.row>div>div>div"
 
     @Ignore
     void clickOnDevelopmentSupported() {

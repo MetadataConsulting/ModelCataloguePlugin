@@ -2,6 +2,7 @@ package org.modelcatalogue.core.finalized
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Stepwise
@@ -16,6 +17,7 @@ import spock.lang.Title
 - Verify that you can not create a new data element
 ''')
 @Stepwise
+@Ignore
 class CannotAddDataElementsToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:

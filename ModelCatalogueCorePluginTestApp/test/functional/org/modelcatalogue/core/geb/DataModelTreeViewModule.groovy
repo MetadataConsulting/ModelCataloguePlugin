@@ -5,19 +5,16 @@ import geb.Module
 class DataModelTreeViewModule extends Module {
 
     static content = {
-        // this may need sorting out!!
-        dataModelLink { $('a.catalogue-element-treeview-icon', 0) }
-        // dataModelLink { $('span.catalogue-element-treeview-name', 0) }
-        // dataModelLink(wait: true) { int index -> $('a.catalogue-element-treeview-icon', index) }
-        item { $('ul .catalogue-element-treeview-name', text: it) }
+        dataModelLink(wait: true) { int index -> $('a.catalogue-element-treeview-icon', index) }
+        item(wait: true) { $('ul .catalogue-element-treeview-name', text: it) }
     }
 
     void dataModel() {
-        dataModelLink.siblings('a.catalogue-element-treeview-icon').click()
-        // dataModelLink(0).click()
+        dataModelLink(0).click()
     }
 
     void dataClasses() {
+        sleep(2_000)
         select('Data Classes')
     }
 
@@ -59,7 +56,7 @@ class DataModelTreeViewModule extends Module {
 
     void select(String name) {
         item(name).click()
-        sleep(2000)
+        sleep(3_000)
     }
 
     Boolean checkItemDisplay(String name) {

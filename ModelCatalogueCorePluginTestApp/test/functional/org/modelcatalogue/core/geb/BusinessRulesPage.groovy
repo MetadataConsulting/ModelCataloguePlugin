@@ -14,12 +14,28 @@ class BusinessRulesPage extends Page {
     }
 
     static content = {
-        addItemIcon(required: false) { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle") }
-        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+        addItemIcon(required: false) {
+            $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
+        }
+        expandLink { $('a.inf-cell-expand') }
+        dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
+        deleteBttn { $('a#deleteBtn') }
+    }
+
+    void expandLinkClick() {
+        expandLink.click()
+    }
+
+    Boolean isDeleteBttnDisable() {
+        deleteBttn.attr("class") == "disabled"
+    }
+
+    void dataElementDropDown() {
+        dataElementDropDownTag.click()
     }
 
     boolean isAddItemIconVisible() {
-        if ( addItemIcon.empty ) {
+        if (addItemIcon.empty) {
             return false
         }
         true

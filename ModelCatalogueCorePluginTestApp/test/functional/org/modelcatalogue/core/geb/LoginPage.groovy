@@ -12,6 +12,7 @@ class LoginPage extends Page {
         inputUsername { $('input#username', 0) }
         inputPassword { $('input#password', 0) }
         submitButton { $('button', text: contains('Login')) }
+        disabledMessage { $('div.alert-danger', text: 'Sorry, your account is disabled.') }
     }
 
     void login(String username, String password) {
@@ -23,14 +24,18 @@ class LoginPage extends Page {
     }
 
     void fillUsername(String username) {
-        for ( char c : username.toCharArray() ) {
+        for (char c : username.toCharArray()) {
             inputUsername << "${c}".toString()
         }
     }
 
     void fillPassword(String password) {
-        for ( char c : password.toCharArray() ) {
+        for (char c : password.toCharArray()) {
             inputPassword << "${c}".toString()
         }
+    }
+
+    boolean isAccountDisabled() {
+        disabledMessage.displayed
     }
 }

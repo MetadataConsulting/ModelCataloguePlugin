@@ -4,7 +4,9 @@ import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.HomePage
 import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
 
+@Ignore
 class LogoutSpec extends GebSpec {
 
     def "user is able to logout"() {

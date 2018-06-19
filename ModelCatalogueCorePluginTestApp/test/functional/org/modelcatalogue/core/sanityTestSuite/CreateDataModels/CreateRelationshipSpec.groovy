@@ -16,16 +16,16 @@ import spock.lang.Stepwise
 @Stepwise
 class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String dataModel="a#role_item_catalogue-element-menu-item-link>span:nth-child(3"
-    private static final String relationship="a#create-new-relationship-menu-item-link>span:nth-child(3)"
-    private static final String createRelationship="button.btn-primary"
-    private static final String selectRelation ="select#type"
-    private static final String search="input#element"
-    private static final String undoButton="a#role_item_undo-changeBtn"
-    private static final String  table="tbody.ng-scope>tr:nth-child(1)>td:nth-child(4)"
-    private static String text="NHIC"
-    private static final String cancel="div.messages-modal-confirm>div>div>div:nth-child(3)>form>button:nth-child(3)"
-    private static final String plusButton="tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>a>span"
+    private static final String dataModel = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3"
+    private static final String relationship = "a#create-new-relationship-menu-item-link>span:nth-child(3)"
+    private static final String createRelationship = "button.btn-primary"
+    private static final String selectRelation = "select#type"
+    private static final String search = "input#element"
+    private static final String undoButton = "a#role_item_undo-changeBtn"
+    private static final String table = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(4)"
+    private static String text = "NHIC"
+    private static final String cancel = "div.messages-modal-confirm>div>div>div:nth-child(3)>form>button:nth-child(3)"
+    private static final String plusButton = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>a>span"
 
     def "login to model catalogue and navigate to data model"() {
         when:
@@ -58,7 +58,7 @@ class CreateRelationshipSpec extends AbstractModelCatalogueGebSpec {
 
     @Ignore
     def "create relationship"() {
-        when:'select relation'
+        when: 'select relation'
 
         def select = $(selectRelation).module(Select)
         select.selected = "is based on"

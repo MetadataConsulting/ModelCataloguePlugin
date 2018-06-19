@@ -1,11 +1,21 @@
 package org.modelcatalogue.core.rolevisibility
 
+import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.CreateDataModelPage
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.DataClassPage
+import org.modelcatalogue.core.geb.DataClassesPage
+import org.modelcatalogue.core.geb.DataModelAclPermissionsPage
+import org.modelcatalogue.core.geb.DataModelAclPermissionsShowPage
+import org.modelcatalogue.core.geb.DataModelPage
+import org.modelcatalogue.core.geb.HomePage
+import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Specification
 import spock.lang.Shared
+import spock.lang.Ignore
+import spock.lang.Stepwise
 import spock.lang.Title
-import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1495')
 @Title('Examine that User can edit data classes for Data Model they have administration rights to')
@@ -34,11 +44,11 @@ import org.modelcatalogue.core.geb.*
 - Click on the edit button and fill the form
 - Check that Metadata is edited     
 ''')
-class UserCanEditDataClassesForAdminDataModelSpec extends Specification {
-
+@Stepwise
+@Ignore
+class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
     @Shared
-    String dataModelName = "NEW_TESTING_MODEL"
-
+    String dataModelName = UUID.randomUUID().toString()
 
     def "Login as supervisor"() {
         when:
@@ -77,23 +87,24 @@ class UserCanEditDataClassesForAdminDataModelSpec extends Specification {
 
     def "grant admin right to user for draft data model"() {
         when:
-        DataModelAclPermissionsPage dataModelAclPermissionsPage = browser.page DataModelAclPermissionsPage
-        dataModelAclPermissionsPage.select(dataModelName)
+        DataModelAclPermissionsPage dataModelPermissionListPage = browser.page DataModelAclPermissionsPage
+        dataModelPermissionListPage.select(dataModelName)
         then:
         at DataModelAclPermissionsShowPage
 
         when:
-        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
-        dataModelAclPermissionsShowPage.grant("user", "administration")
+        DataModelAclPermissionsShowPage dataModelPermissionGrantPage = browser.page DataModelAclPermissionsShowPage
+        dataModelPermissionGrantPage.grant("user", "administration")
+
         then:
         at DataModelAclPermissionsShowPage
     }
 
     def "logout as supervisor"() {
         when:
-        DataModelAclPermissionsShowPage dataModelAclPermissionsShowPage = browser.page DataModelAclPermissionsShowPage
-        dataModelAclPermissionsShowPage.nav.userMenu()
-        dataModelAclPermissionsShowPage.nav.logout()
+        DataModelAclPermissionsShowPage dataModelPermissionGrantPage = browser.page DataModelAclPermissionsShowPage
+        dataModelPermissionGrantPage.nav.userMenu()
+        dataModelPermissionGrantPage.nav.logout()
         then:
         at HomePage
     }
@@ -137,5 +148,4 @@ class UserCanEditDataClassesForAdminDataModelSpec extends Specification {
         then:
         at DataClassPage
     }
-
 }

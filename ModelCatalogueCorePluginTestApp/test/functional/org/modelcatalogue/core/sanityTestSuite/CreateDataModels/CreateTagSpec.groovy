@@ -16,10 +16,10 @@ import spock.lang.Stepwise
 @Ignore
 class CreateTagSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String  table = 'td.col-md-4'
-    private static final String  tagCreated = 'td.col-md-4>span>span>a'
-    private static final String  deleteButton = 'a#delete-menu-item-link>span:nth-child(3)'
-    private static final String   dataElementButton = 'a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
+    private static final String table = 'td.col-md-4'
+    private static final String tagCreated = 'td.col-md-4>span>span>a'
+    private static final String deleteButton = 'a#delete-menu-item-link>span:nth-child(3)'
+    private static final String dataElementButton = 'a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
 
 
     def "login to model catalogue and select element"() {

@@ -24,16 +24,16 @@ import spock.lang.Stepwise
 @Ignore
 @Stepwise
 class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec {
-    private static final String reference= "input#pickReferenceType"
-    private static final String  dataClass="form.ng-dirty>div:nth-child(11)>div>span>span"
-    private static final String addImport="div.search-lg>p>span>a"
-    private static final String  search ="input#elements"
+    private static final String reference = "input#pickReferenceType"
+    private static final String dataClass = "form.ng-dirty>div:nth-child(11)>div>span>span"
+    private static final String addImport = "div.search-lg>p>span>a"
+    private static final String search = "input#elements"
     private static final String OK = "div.messages-modal-prompt>div>div>div:nth-child(3)>button:nth-child(1)"
-    private static final String clickX ="div.input-group-addon"
-    private static final String table ="tr.inf-table-item-row>td:nth-child(1)"
-    private static final String referenceType="a#role_item_catalogue-element-menu-item-link"
-    private static final String deleteButton="a#delete-menu-item-link>span:nth-child(3)"
-    private static final String dataType="tr.inf-table-item-row>td:nth-child(1)>span>span>a"
+    private static final String clickX = "div.input-group-addon"
+    private static final String table = "tr.inf-table-item-row>td:nth-child(1)"
+    private static final String referenceType = "a#role_item_catalogue-element-menu-item-link"
+    private static final String deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
+    private static final String dataType = "tr.inf-table-item-row>td:nth-child(1)>span>span>a"
 
     def "login to Model Catalogue and select Model"() {
         when:
@@ -62,9 +62,9 @@ class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec
 
     def "Navigate to data type page"() {
         when:
-             click create
+        click create
         then:
-             check modalHeader contains 'Create Data Type'
+        check modalHeader contains 'Create Data Type'
     }
 
     def "fill the create data type form"() {
@@ -98,16 +98,16 @@ class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec
     @Ignore
     @Unroll
     def "delete the created data type"() {
-        when:'click on the created data type'
+        when: 'click on the created data type'
         click dataType
 
-        and:'navigate to the top menu and click on the reference type button'
+        and: 'navigate to the top menu and click on the reference type button'
         click referenceType
 
         and:
         click deleteButton
 
-        and:'confirmation'
+        and: 'confirmation'
         click modalPrimaryButton
 
         then:

@@ -23,38 +23,41 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
-class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
-    private static final String metadataStep ="button#step-metadata"
-    private static final String finishButton ="button#step-finish"
-    private static final String parentStep ="button#step-parents"
-    private static final String formSection='ul.nav-pills>li:nth-child(1)>a'
-    private static final String section_title="textarea#section-title"
-    private static final String label="textarea#section-label"
-    private static final String instruction="textarea#section-instructions"
-    private static final String page_number='input#form-page-number'
-    private static final String occurrence ='ul.nav-pills>li:nth-child(3)>a'
-    private static final String  appearance='ul.nav-pills>li:nth-child(4)>a'
-    private static final String elementStep="button#step-elements"
-    private static final String  dataElement="input#data-element"
+@Ignore
+class CreateDataClassSpec extends AbstractModelCatalogueGebSpec {
+    private static final String metadataStep = "button#step-metadata"
+    private static final String finishButton = "button#step-finish"
+    private static final String parentStep = "button#step-parents"
+    private static final String formSection = 'ul.nav-pills>li:nth-child(1)>a'
+    private static final String section_title = "textarea#section-title"
+    private static final String label = "textarea#section-label"
+    private static final String instruction = "textarea#section-instructions"
+    private static final String page_number = 'input#form-page-number'
+    private static final String occurrence = 'ul.nav-pills>li:nth-child(3)>a'
+    private static final String appearance = 'ul.nav-pills>li:nth-child(4)>a'
+    private static final String elementStep = "button#step-elements"
+    private static final String dataElement = "input#data-element"
     private static final String plusButton = "span.input-group-btn>button"
-    private static final String  raw ="ul.nav-pills>li:nth-child(4)>a"
-    private static final String name ="input#local-name"
+    private static final String raw = "ul.nav-pills>li:nth-child(4)>a"
+    private static final String name = "input#local-name"
     private static final String wizardSummary = 'td.col-md-4'
     private static final String dataClass = 'td.col-md-4>span>span>a'
-    private static final String modelCatalogue= 'span.mc-name'
-    private static final String exitButton= 'button#exit-wizard'
+    private static final String modelCatalogue = 'span.mc-name'
+    private static final String exitButton = 'button#exit-wizard'
     private static final String deleteBtton = 'a#delete-menu-item-link>span:nth-child(3)'
     private static final String dataClassButton = 'a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
-    private static final String   greenButton='div#isBasedOn-changes>div:nth-child(3)>table>tfoot>tr>td>table>tfoot>tr>td:nth-child(1)>span'
-    private static final String  destinationTable='div#isBasedOn-changes>div:nth-child(3)>table>tbody>tr>td:nth-child(2)'
-    private static final String   type='div#isBasedOn-changes>div:nth-child(3)>table>tbody>tr>td:nth-child(3)'
-    private static final String  dataClassCreated='tbody.ng-scope>tr:nth-child(2)>td:nth-child(1)>span>span>a'
+    private static
+    final String greenButton = 'div#isBasedOn-changes>div:nth-child(3)>table>tfoot>tr>td>table>tfoot>tr>td:nth-child(1)>span'
+    private static
+    final String destinationTable = 'div#isBasedOn-changes>div:nth-child(3)>table>tbody>tr>td:nth-child(2)'
+    private static final String type = 'div#isBasedOn-changes>div:nth-child(3)>table>tbody>tr>td:nth-child(3)'
+    private static final String dataClassCreated = 'tbody.ng-scope>tr:nth-child(2)>td:nth-child(1)>span>span>a'
     private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
-    private static final String  dataWizard ='div.alert'
-    private static final String  delete ='a#delete-menu-item-link>span:nth-child(3)'
-    private static final String  isBasedOnTag='ul.nav-tabs>li:nth-child(3)>a>span:nth-child(1)'
-    private static final String   search='input#element'
-    private static final String  closeButton='div.modal-footer>button:nth-child(2)'
+    private static final String dataWizard = 'div.alert'
+    private static final String delete = 'a#delete-menu-item-link>span:nth-child(3)'
+    private static final String isBasedOnTag = 'ul.nav-tabs>li:nth-child(3)>a>span:nth-child(1)'
+    private static final String search = 'input#element'
+    private static final String closeButton = 'div.modal-footer>button:nth-child(2)'
 
     @Ignore
     def "login and navigate to the model "() {
@@ -168,11 +171,11 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         when:
         click create
 
-        then:'check the title of the page'
+        then: 'check the title of the page'
         check modalHeader is 'Data Class Wizard'
 
         when: 'fill the data class form'
-        fill nameLabel with'TESTING_CLASS'
+        fill nameLabel with 'TESTING_CLASS'
         fill modelCatalogueId with 'ME-34567'
         fill description with 'THIS IS MY TESTING DATA CLASS'
 
@@ -194,7 +197,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         $(dataClassCreated).text().contains('TESTING_CLASS')
 
 
-        when:'select the created data class and created a relationship based on'
+        when: 'select the created data class and created a relationship based on'
         click dataClassCreated
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 

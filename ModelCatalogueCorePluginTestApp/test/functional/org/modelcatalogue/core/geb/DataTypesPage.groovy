@@ -20,10 +20,27 @@ class DataTypesPage extends Page {
         addItemIcon(required: false) { $("tfoot span.fa-plus-circle") }
         showMoreButton { $('span.fa-plus-square-o') }
         editDataTypeButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
+        dataTypeByName(required: false, wait: true) { $('a', text: it) }
+        createDataTypePlusButton { $('table tr.inf-table-footer-action span.fa-plus-circle') }
+        expandLink { $('a.inf-cell-expand') }
+        dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
+        deleteBttn { $('a#deleteBtn') }
+    }
+
+    void expandLinkClick() {
+        expandLink.click()
+    }
+
+    Boolean isDeleteBttnDisable() {
+        deleteBttn.attr("class") == "disabled"
+    }
+
+    void dataElementDropDown() {
+        dataElementDropDownTag.click()
     }
 
     boolean isAddItemIconVisible() {
-        if ( addItemIcon.empty ) {
+        if (addItemIcon.empty) {
             return false
         }
         true
@@ -47,6 +64,25 @@ class DataTypesPage extends Page {
         createDateTypeLink.click()
     }
 
+    void createDataTypeFromPlusButton() {
+        createDataTypePlusButton.click()
+    }
+
+    boolean hasDataType(String name) {
+        if (dataTypeByName(name)) {
+            return true
+        }
+        false
+    }
+
+    boolean containsDataTypeByName(String value) {
+        $('a', text: value).displayed
+    }
+
+    void selectDataType(String value) {
+        dataTypeByName(value).click()
+    }
+
     void showMore() {
         showMoreButton.click()
     }
@@ -55,9 +91,6 @@ class DataTypesPage extends Page {
         waitFor { editDataTypeButton.@('disabled') }
     }
 
-    void selectDataType(String value) {
-        rows.$('a', text: value).click()
-    }
 
     void createDataTypeFromGreenPlusButton() {
         addItemIcon.click()

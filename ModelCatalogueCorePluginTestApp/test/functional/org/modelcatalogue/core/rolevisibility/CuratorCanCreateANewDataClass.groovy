@@ -4,6 +4,7 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Ignore
 
 @Issue('https://metadata.atlassian.net/browse/MET-1446')
 @Title('Verify that curator can create a new Data class')
@@ -43,5 +44,6 @@ import spock.lang.Title
 - 30. click on close. Verify that user is returned  to the initial data model page
 - 31. Verify that new Data class has been created     
 ''')
+@Ignore
 class CuratorCanCreateANewDataClass extends Specification {
 }

@@ -14,9 +14,11 @@ class DataModelNavModule extends Module {
     public static final String createDataClassLinkSelector = 'li#catalogue-element-create-dataClass-menu-item a'
     public static final String createDataElementLinkSelector = 'li#catalogue-element-create-dataElement-menu-item a'
     public static final String createDataTypeLinkSelector = 'li#catalogue-element-create-dataType-menu-item a'
-    public static final String createMeasurementUnitLinkSelector = 'li#catalogue-element-create-measurementUnit-menu-item a'
+    public static
+    final String createMeasurementUnitLinkSelector = 'li#catalogue-element-create-measurementUnit-menu-item a'
     public static final String createAssetLinkSelector = 'li#catalogue-element-create-asset-menu-item a'
-    public static final String createValidationRuleLinkSelector = 'li#catalogue-element-create-validationRule-menu-item a'
+    public static
+    final String createValidationRuleLinkSelector = 'li#catalogue-element-create-validationRule-menu-item a'
     public static final String mergeLinkSelector = 'li#merge-menu-item a'
     public static final String cloneAnotherIntoCurrentLinkSelector = 'li#clone-from-menu-item a'
     public static final String cloneCurrentIntoAnotherLinkSelector = 'li#clone-menu-item a'
@@ -27,7 +29,7 @@ class DataModelNavModule extends Module {
         creteNewVersionLink(required: false, wait: true) { $(creteNewVersionLinkSelector, 0) }
         archiveLink(required: false, wait: true) { $(archiveLinkSelector, 0) }
         deleteLink(required: false, wait: true) { $(deleteLinkSelector, 0) }
-        addImportLink(required: false,  wait: true) { $(addImportLinkSelector, 0) }
+        addImportLink(required: false, wait: true) { $(addImportLinkSelector, 0) }
         createNewRelationshipLink(required: false, wait: true) { $(createNewRelationshipLinkSelector, 0) }
         createDataClassLink(required: false, wait: true) { $(createDataClassLinkSelector, 0) }
         createDataElementLink(required: false, wait: true) { $(createDataElementLinkSelector, 0) }
@@ -167,5 +169,9 @@ class DataModelNavModule extends Module {
 
     void cloneCurrentIntoAnother() {
         cloneCurrentIntoAnotherLink.click()
+    }
+
+    Boolean newLinkDisplay() {
+        creteNewVersionLink.displayed
     }
 }

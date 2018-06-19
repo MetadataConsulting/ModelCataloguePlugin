@@ -1,9 +1,17 @@
 package org.modelcatalogue.core.mappingutility
 
+import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.DashboardPage
+import org.modelcatalogue.core.geb.LoginPage
+import org.modelcatalogue.core.geb.MappingPage
+import org.modelcatalogue.core.geb.MappingSuggestionsPage
+import org.modelcatalogue.core.geb.SuggestionsPage
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Specification
+import spock.lang.Shared
+import spock.lang.Stepwise
 import spock.lang.Title
+import spock.lang.Ignore
 
 @Issue('https://metadata.atlassian.net/browse/MET-1662')
 @Title('Examine that user can generate Suggestion using Mapping Utility')
@@ -16,5 +24,59 @@ import spock.lang.Title
 - Refresh the page to see Mapping suggestions | Mapping suggestions appear
 - Verify that suggestion are created once page is refreshed 
 ''')
-class CuratorCanGenerateSuggestionsUsingMappingUtilitySpec extends Specification {
+@Stepwise
+@Ignore
+class CuratorCanGenerateSuggestionsUsingMappingUtilitySpec extends GebSpec {
+
+    @Shared
+    String modelOneOption
+    @Shared
+    String modelTwoOption
+
+    def "Login as curator"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
+
+        then:
+        at DashboardPage
+    }
+
+    def "go to mapping utility"() {
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.cogMenu()
+        dashboardPage.nav.mappingUtility()
+
+        then:
+        at MappingPage
+    }
+
+    def "generate mapping"() {
+        when:
+        MappingPage mappingPage = browser.page MappingPage
+        mappingPage.generateMapping()
+        then:
+        at SuggestionsPage
+    }
+
+    def "create suggestions"() {
+        when:
+        SuggestionsPage suggestionsPage = browser.page SuggestionsPage
+        modelOneOption = suggestionsPage.selectDataModelOne().replaceAll(~/\d.\d.\d/, "")
+        modelTwoOption = suggestionsPage.selectDataModelTwo().replaceAll(~/\d.\d.\d/, "")
+        println(modelOneOption)
+        suggestionsPage.generateSuggestion()
+        then:
+        at MappingPage
+    }
+
+    def "find generated mapping"() {
+        when:
+        MappingPage mappingPage = browser.page MappingPage
+        driver.navigate().refresh()
+        mappingPage.hasMapping(modelOneOption, modelTwoOption)
+        then:
+        at MappingSuggestionsPage
+    }
 }
