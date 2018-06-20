@@ -8,6 +8,8 @@ import groovy.transform.CompileDynamic
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import org.grails.datastore.mapping.query.Query
+import org.hibernate.SQLQuery
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
@@ -42,6 +44,38 @@ class DataModelService {
     @PostConstruct
     void init() {
         this.legacyDataModels = grailsApplication.config.mc.legacy.dataModels
+    }
+
+    public Map<String, Integer> getStatisticsSql(DataModel dataModel) {
+        long dataModelId = dataModel.id
+
+        String query = '''
+SELECT
+	mu.cnt AS 'totalMeasurementUnitCount',
+	r.cnt AS 'totalValidationRuleCount',
+	a.cnt AS 'totalAssetCount',
+	t.cnt AS 'totalTagCount',
+	ced.cnt AS 'deprecatedCatalogueElementCount'
+FROM
+	(SELECT COUNT(a.id) AS cnt FROM asset AS a JOIN catalogue_element AS ce ON a.id = ce.id AND ce.data_model_id = :data_model_id) AS a,
+	(SELECT COUNT(m.id) AS cnt FROM measurement_unit AS m JOIN catalogue_element AS ce ON m.id = ce.id AND ce.data_model_id = :data_model_id) AS mu,
+	(SELECT COUNT(t.id) AS cnt FROM tag AS t JOIN catalogue_element AS ce ON t.id = ce.id AND ce.data_model_id = :data_model_id) AS t,
+	(SELECT COUNT(r.id) AS cnt FROM validation_rule AS r JOIN catalogue_element AS ce ON r.id = ce.id AND ce.data_model_id = :data_model_id) AS r,
+	(SELECT COUNT(dep.id) AS cnt FROM catalogue_element AS dep JOIN catalogue_element AS ce ON dep.id = ce.id AND ce.data_model_id = :data_model_id WHERE dep.`status` = 'DEPRECATED') AS ced
+'''
+        final session = sessionFactory.currentSession
+        final SQLQuery sqlQuery = session.createSQLQuery(query)
+        sqlQuery.with {
+            setLong('data_model_id', dataModelId)
+        }
+        Object[] row = sqlQuery.list().get(0)
+        return [
+            'totalMeasurementUnitCount':row[0] as Integer,
+            'totalValidationRuleCount': row[1] as Integer,
+            'totalAssetCount': row[2] as Integer,
+            'totalTagCount': row[3] as Integer,
+            'deprecatedCatalogueElementCount': row[4] as Integer
+        ]
     }
 
     public Map<String, Integer> getStatistics(DataModelFilter filter) {
