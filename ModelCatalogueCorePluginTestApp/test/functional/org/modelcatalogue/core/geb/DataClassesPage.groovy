@@ -101,15 +101,11 @@ class DataClassesPage extends Page {
         waitFor { editDataClassButton.@('disabled') }
     }
 
-    boolean containsDataClass(String value) {
-        rows.$('a', text: value).displayed
-    }
-
-//    void selectDataClass(String value) {
-//        rows.$('a', text: value).click()
+//    boolean containsDataClass(String value) {
+//        rows.$('a', text: value).displayed
 //    }
 
-    String titleText() {
-        return titlename.text()
+    void selectDataClass(String value) {
+        rows.$('a', text: value).click()
     }
 }
