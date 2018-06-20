@@ -74,10 +74,6 @@ class DataElementsPage extends Page {
         firstRowLink.text()
     }
 
-    void selectDataElement(String value) {
-        rows.$('a', text: value).click()
-    }
-
     boolean hasDataElement(String name) {
         elementByName(name).displayed
     }

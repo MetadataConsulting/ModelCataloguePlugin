@@ -96,7 +96,7 @@ class DataTypesPage extends Page {
         addItemIcon.click()
     }
 
-    boolean hasDataType(String name) {
-        rows.$('a', text: name).displayed
-    }
+//    boolean hasDataType(String name) {
+//        rows.$('a', text: name).displayed
+//    }
 }

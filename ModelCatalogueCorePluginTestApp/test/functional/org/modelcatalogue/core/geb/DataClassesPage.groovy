@@ -105,10 +105,10 @@ class DataClassesPage extends Page {
         rows.$('a', text: value).displayed
     }
 
-    void selectDataClass(String value) {
-        rows.$('a', text: value).click()
-    }
-  
+//    void selectDataClass(String value) {
+//        rows.$('a', text: value).click()
+//    }
+
     String titleText() {
         return titlename.text()
     }
