@@ -41,12 +41,6 @@ class BootStrap {
         log.info "BootStrap:addExtensionModules()"
         ExtensionModulesLoader.addExtensionModules()
         log.info "BootStrap:addExtensionModules():complete"
-//
-//        File file = grailsResourceLocator.findResourceForURI('classpath:/').getFile()
-//        TestUtil.createJenkinsFiles(file.absolutePath)
-
-        File file = grailsResourceLocator.findResourceForURI('classpath:/').getFile()
-        TestUtil.createJenkinsFiles(file.absolutePath)
 
         grailsApplication.domainClasses.each { GrailsDomainClass it ->
             if (CatalogueElement.isAssignableFrom(it.clazz)) {
