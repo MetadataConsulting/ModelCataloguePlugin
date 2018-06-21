@@ -25,6 +25,13 @@ class DataClass extends CatalogueElement {
         ret
     }
 
+    /**
+     * Mark with Top Level Data Class Extension
+     * @return
+     */
+    def afterInsert() {
+        ext.put(TopLevelDataClassService.TOP_LEVEL_DATA_CLASS_EXTENSION_KEY, TopLevelDataClassService.TRUE)
+    }
 
 
     @Override
