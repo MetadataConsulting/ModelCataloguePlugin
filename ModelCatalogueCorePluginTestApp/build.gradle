@@ -436,13 +436,14 @@ task runFunctionalTests(type: Exec, dependsOn: [bowerInstall]) {
     description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
 
     assertJava8()
-    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+   // environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server -Dwebdriver.chrome.driver=/var/lib/jenkins/chromedriver/chromedriver"
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server -Dwebdriver.chrome.driver=/var/lib/jenkins/chromedriver/chromedriver"
     environment 'FILE_OPENER_SKIP', "true"
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
 
 
-    //  def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-unit', '-integration', '-functional']
-    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-functional', 'org.modelcatalogue.core.generalTestSuit.*']
+    def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-unit', '-integration', '-functional']
+    //def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-functional', 'org.modelcatalogue.core.generalTestSuit.*']
     if (project.hasProperty('testArgs')) { // get arguments for grails test-app
         cmds.addAll(testArgs.split(' '))
     }
