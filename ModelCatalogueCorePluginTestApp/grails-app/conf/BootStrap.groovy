@@ -65,6 +65,8 @@ class BootStrap {
         log.info 'init role hierarchy'
         initSecurityService.initRoleHierarchyEntry()
 
+        // TODO: Call TopLevelDataClassService's calculateAndMarkTopLevelDataClasses method & make sure it works
+
         if ( isDev() ) {
             initDev()
 
