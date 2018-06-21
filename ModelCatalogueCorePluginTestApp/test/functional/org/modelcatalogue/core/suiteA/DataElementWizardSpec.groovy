@@ -11,8 +11,7 @@ import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ !System.getProperty('geb.env') })
-@Stepwise
+
 @Ignore
 class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 

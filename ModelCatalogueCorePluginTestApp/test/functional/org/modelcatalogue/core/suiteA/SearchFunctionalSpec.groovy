@@ -10,7 +10,6 @@ import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env')  })
 @Stepwise
 class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
 
