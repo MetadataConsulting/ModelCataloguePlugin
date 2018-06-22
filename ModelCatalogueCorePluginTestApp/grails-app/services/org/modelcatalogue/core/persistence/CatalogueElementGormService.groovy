@@ -47,7 +47,7 @@ class CatalogueElementGormService {
 
     Boolean hasElementsCached(Long dataModelId) {
         if (dataModelId == hasElementsDataModelId && (System.currentTimeMillis() - hasElementsWhen) < 60000) {
-            System.out.println("CatalogueElementGormService.hasElementsCached(${dataModelId}) => ${hasElementsResult}")
+//            System.out.println("CatalogueElementGormService.hasElementsCached(${dataModelId}) => ${hasElementsResult}")
             return hasElementsResult
         }
         return null
@@ -76,7 +76,7 @@ class CatalogueElementGormService {
         final session = sessionFactory.currentSession
         final SQLQuery sqlQuery = session.createSQLQuery(query)
         Boolean result = sqlQuery.uniqueResult() != null
-        System.out.println("CatalogueElementGormService.getHasElements(${dataModel.id}) => ${result} in ${(System.currentTimeMillis() - now)} ms")
+//        System.out.println("CatalogueElementGormService.getHasElements(${dataModel.id}) => ${result} in ${(System.currentTimeMillis() - now)} ms")
         setHasElementsCache(dataModel.id, result)
         return result
     }
