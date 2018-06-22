@@ -2,13 +2,15 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.*
 import spock.lang.IgnoreIf
+import spock.lang.Ignore
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 
 @IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
     private static final String deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
-    private static final String dataModelButton ="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
+    private static final String dataModelButton = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
 
     def "do create data model"() {
         when:

@@ -13,6 +13,7 @@ import spock.lang.*
 - Scroll down and select Finalized
 - Check that data model is finalized
 ''')
+@Ignore
 class UserCanFinalizeDataModelSpec extends GebSpec {
 
     @Shared
@@ -116,7 +117,7 @@ class UserCanFinalizeDataModelSpec extends GebSpec {
 
         then: 'The title of the data model displays "finalized" texts'
         dataModelPage.dataModelTitle.contains("$uuid")
-        dataModelPage.dataModelTitle.contains ("@0.0.1")
-        dataModelPage.rowsText.contains ("finalized")
+        dataModelPage.dataModelTitle.contains("@0.0.1")
+        dataModelPage.rowsText.contains("finalized")
     }
 }

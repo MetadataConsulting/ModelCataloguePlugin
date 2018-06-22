@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
+import org.modelcatalogue.core.TestUtil
 
 class BootStrap {
     def grailsResourceLocator
@@ -43,6 +44,9 @@ class BootStrap {
 //
 //        File file = grailsResourceLocator.findResourceForURI('classpath:/').getFile()
 //        TestUtil.createJenkinsFiles(file.absolutePath)
+
+        File file = grailsResourceLocator.findResourceForURI('classpath:/').getFile()
+        TestUtil.createJenkinsFiles(file.absolutePath)
 
         grailsApplication.domainClasses.each { GrailsDomainClass it ->
             if (CatalogueElement.isAssignableFrom(it.clazz)) {

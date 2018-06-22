@@ -6,9 +6,11 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.MeasurementUnitsPage
 import org.modelcatalogue.core.geb.TagsPage
+import spock.lang.Ignore
 import spock.lang.Stepwise
 
 @Stepwise
+@Ignore
 class CannotAddTagsToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:

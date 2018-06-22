@@ -5,6 +5,7 @@ import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
+import spock.lang.Ignore
 
 @Issue('https://metadata.atlassian.net/browse/MET-1447')
 @Title('Verify that curator can create a new Data Element and clone data type')
@@ -19,6 +20,7 @@ import spock.lang.Title
 - Select the destination data model for the cloned element and click on OK button
 - Verify that Data Element and Type are cloned
 ''')
+@Ignore
 class CanCreateDataElementAndCloneDataTypeSpec extends GebSpec {
 
     def "Verify that curator can create a new Data Element and clone data type"() {

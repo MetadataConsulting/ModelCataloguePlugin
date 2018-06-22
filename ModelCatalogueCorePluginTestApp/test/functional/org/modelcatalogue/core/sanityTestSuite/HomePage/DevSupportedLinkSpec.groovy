@@ -2,8 +2,10 @@ package org.modelcatalogue.core.sanityTestSuite.HomePage
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.HomePage
+import spock.lang.Ignore
 
 //@IgnoreIf({ !System.getProperty('geb.env')  })
+@Ignore
 class DevSupportedLinkSpec extends GebSpec {
 
     void modelDevelopmentLinks() {

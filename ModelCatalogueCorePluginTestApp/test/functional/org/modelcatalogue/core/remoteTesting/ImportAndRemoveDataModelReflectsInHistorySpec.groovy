@@ -5,6 +5,7 @@ import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
+import spock.lang.Ignore
 
 @Issue('https://metadata.atlassian.net/browse/MET-1650')
 @Title('Remove the imported data model appears in the list of Activity')
@@ -16,6 +17,7 @@ import spock.lang.Title
 - Check that the imported data model appears on the list of activity
 - Remove the imported data model
 ''')
+@Ignore
 class ImportAndRemoveDataModelReflectsInHistorySpec extends GebSpec {
 
     def "https://metadata.atlassian.net/browse/MET-1650"() {

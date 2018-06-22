@@ -2,10 +2,12 @@ package org.modelcatalogue.core.secured
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
 import spock.lang.Unroll
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ System.getProperty('spock.ignore.secured') })
+@Ignore
+//@IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class ModelCatalogueFormsUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {

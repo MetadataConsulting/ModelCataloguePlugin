@@ -20,20 +20,25 @@ import spock.lang.IgnoreIf
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
-    public static final CatalogueAction validateXsd = CatalogueAction.runFirst('item', 'catalogue-element', 'validate-xsd-schema')
+    public static
+    final CatalogueAction validateXsd = CatalogueAction.runFirst('item', 'catalogue-element', 'validate-xsd-schema')
     public static final String successInFooter = '.modal-footer .alert-success'
     public static final String dangerInFooter = '.modal-footer .alert-danger'
-    public static final CatalogueAction importMc = CatalogueAction.runFirst('navigation-right', 'curator-menu', 'import-mc')
+    public static
+    final CatalogueAction importMc = CatalogueAction.runFirst('navigation-right', 'curator-menu', 'import-mc')
     public static final CatalogueAction refreshAsset = CatalogueAction.runFirst('item-detail', 'refresh-asset')
     public static final CatalogueAction downloadButton = CatalogueAction.runFirst('item-detail', 'download-asset')
-    public static final CatalogueAction importExcel = CatalogueAction.runFirst('navigation-right', 'curator-menu', 'import-excel')
+    public static
+    final CatalogueAction importExcel = CatalogueAction.runFirst('navigation-right', 'curator-menu', 'import-excel')
     public static final CatalogueAction export = CatalogueAction.runFirst('item', 'export')
     public static final String asset = 'asset'
     public static final String infiniteTableRow = '.inf-table tbody .inf-table-item-row'
 
-    @Rule TemporaryFolder tmp = new TemporaryFolder()
+    @Rule
+    TemporaryFolder tmp = new TemporaryFolder()
 
     def "go to login"() {
         when:
@@ -207,7 +212,8 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
             if ($(refreshAsset.toSelector()).first().displayed) {
                 try {
                     click refreshAsset
-                } catch (ignored) {}
+                } catch (ignored) {
+                }
             }
             Thread.sleep(1000)
         }

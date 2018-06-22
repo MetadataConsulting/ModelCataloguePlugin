@@ -18,11 +18,16 @@ trait MetadataUtils {
         // last value might not be deleted
         parent.find('.soe-table-property-row:first-child .soe-table-property-actions .soe-remove-row').first().click()
 
-        newMetadata.each { key, value ->
+        Set keys = newMetadata.keySet()
+        for ( int i = 0; i < keys.size(); i++ ) {
+            def key = keys[i]
+            def value = newMetadata.get(key)
             // fill value first as key might disable both input
             parent.find('.soe-table-property-row:last-child .soe-table-property-value input').value(value?.toString() ?: '')
             parent.find('.soe-table-property-row:last-child .soe-table-property-key input').value(key?.toString() ?: '')
-            parent.find('.soe-table-property-row:last-child .soe-table-property-actions .soe-add-row').first().click()
+            if ( i != (keys.size() - 1) ) { // don't click for last item being filled
+                parent.find('.soe-table-property-row:last-child .soe-table-property-actions .soe-add-row').first().click()
+            }
         }
     }
 }

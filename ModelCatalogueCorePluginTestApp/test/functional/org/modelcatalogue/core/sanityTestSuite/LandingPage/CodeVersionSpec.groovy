@@ -4,8 +4,10 @@ import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
 import spock.lang.IgnoreIf
 import spock.lang.Unroll
+import spock.lang.Ignore
 
 @IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 class CodeVersionSpec extends GebSpec {
 
     @Unroll

@@ -11,7 +11,9 @@ import org.modelcatalogue.core.geb.FinalizedDataModelPage
 import org.modelcatalogue.core.geb.HomePage
 import org.modelcatalogue.core.geb.LoginModalPage
 import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
 
+@Ignore
 class FinalizedDataModelMenuVisibilitySpec extends GebSpec {
 
     def "login, add new data model, finalize it"() {

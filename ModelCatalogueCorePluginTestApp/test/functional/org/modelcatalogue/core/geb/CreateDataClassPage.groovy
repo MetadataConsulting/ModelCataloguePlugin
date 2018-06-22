@@ -1,11 +1,15 @@
 package org.modelcatalogue.core.geb
 
 import geb.Page
+import geb.navigator.Navigator
 
 class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
     static at = { $('.modal-dialog', 0).text().contains('Data Class Wizard') }
 
     static content = {
+
+        topNavigator { $('ul.tutorial-steps').module(CreateDataClassTopNavigatorModule) }
+
         nameInput { $('#name', 0) }
         descriptionInput { $('#description', 0) }
         modelCatalogueIdInput { $('#modelCatalogueId', 0) }
@@ -17,6 +21,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         exitButton(required: false, wait: true) { $('#exit-wizard') }
 
         formSectionLink { $('ul.nav-pills>li:nth-child(1)>a', 0) }
+        formGridLink { $('ul.nav-pills>li:nth-child(2)>a', 0) }
         ocurrenceLink { $('ul.nav-pills>li:nth-child(3)>a', 0) }
 
         appearanceLink(wait: true) { $('ul.nav-pills>li:nth-child(4)>a', 0) }
@@ -25,14 +30,17 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
         sectionTextArea { $("textarea#section-title") }
 
+        sectionSubtitleArea { $('textarea#section-subtitle') }
+
         sectionInstructionsTextArea { $("textarea#section-instructions") }
 
         formPageNumberTextArea { $("input#form-page-number") }
 
-        minOccursInput { $('input#minOccurs') }
-        maxOccursInput { $('input#maxOccurs') }
+        minOccursInput(required: false, wait: true, cache: false) { $('input#minOccurs') }
 
-        localNameInput { $('#local-name') }
+        maxOccursInput(required: false, wait: true, cache: false) { $('input#maxOccurs') }
+
+        localNameInput(required: false, wait: true, cache: false) { $('#local-name') }
 
         dataElementInput { $('#data-element') }
         createNewDataElementLink(required: false, wait: true) { $('a.create-new-cep-item', 0) }
@@ -41,6 +49,15 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         buttonPlus { $('span.input-group-btn button.btn-success', 0) }
         rawLink(wait: true) { $('a', text: 'Raw') }
         addMetadataButton(wait: true) { $('div.modal button.btn-success', text: 'Add Metadata') }
+        elementsList(wait: true) { $('ul.dropdown-menu.ng-isolate-scope li') }
+    }
+
+    void setName(String value) {
+        fillInput(nameInput, value)
+    }
+
+    void setDescription(String value) {
+        fillInput(descriptionInput, value)
     }
 
     void addMetadata() {
@@ -100,6 +117,10 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         formSectionLink.click()
     }
 
+    void formGrid() {
+        formGridLink.click()
+    }
+
     void elements() {
         elementsButton.click()
     }
@@ -118,7 +139,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void finish() {
         finishButton.click()
-        sleep(5_000)
+        sleep(5000)
     }
 
     void exit() {
@@ -126,16 +147,22 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         sleep(2_000)
     }
 
-    void setName(String value) {
-        fillInput(nameInput, value)
-    }
-
     void setModelCatalogueId(String value) {
         fillInput(modelCatalogueIdInput, value)
     }
 
-    void setDescription(String value) {
-        fillInput(descriptionInput, value)
+    void selectGrid() {
+        gridCheckbox.click()
+    }
+
+    void setMaxNumberOfRows(String value) {
+        maxNoOfRowsInput.value(value)
+    }
+
+    void searchDataElement(String value) {
+        setDataElement(value)
+        sleep(2000)
+        elementsList.$('a', text: contains(value)).click()
     }
 
     void createNewElement() {

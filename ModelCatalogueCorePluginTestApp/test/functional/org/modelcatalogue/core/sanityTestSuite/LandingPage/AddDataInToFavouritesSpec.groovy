@@ -14,16 +14,18 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
-    private static final String  creates  = "a#role_data-models_create-data-modelBtn"
-    private static final String  user="#role_navigation-right_user-menu-menu-item-link"
-    private static final String  favouriteButton= "a#user-favorites-menu-item-link"
-    private static final String   catalogueID = "tr.inf-table-header-row>th:nth-child(1)"
-    private static final String    searchField= "input#value"
-    private static final String   firstRow ="tr.inf-table-item-row>td:nth-child(1)"
-    private static final String   removeFavourite ="span.fa-star-o"
-    private static final String   favouriteModel ="tr.inf-table-item-row>td:nth-child(2)>a"
-    public static final String  greenButton ="#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > ui-view > div > div > div > div.inf-table-body > table > tfoot > tr > td > table > tfoot > tr > td.text-center > span"
+    private static final String creates = "a#role_data-models_create-data-modelBtn"
+    private static final String user = "#role_navigation-right_user-menu-menu-item-link"
+    private static final String favouriteButton = "a#user-favorites-menu-item-link"
+    private static final String catalogueID = "tr.inf-table-header-row>th:nth-child(1)"
+    private static final String searchField = "input#value"
+    private static final String firstRow = "tr.inf-table-item-row>td:nth-child(1)"
+    private static final String removeFavourite = "span.fa-star-o"
+    private static final String favouriteModel = "tr.inf-table-item-row>td:nth-child(2)>a"
+    public static
+    final String greenButton = "#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > ui-view > div > div > div > div.inf-table-body > table > tfoot > tr > td > table > tfoot > tr > td.text-center > span"
 
     def "login to model catalogue"() {
         when:
@@ -44,22 +46,22 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
         check catalogueID contains "Model Catalogue ID"
     }
 
-     def "add data to favourite"() {
-         when:
-         click greenButton
+    def "add data to favourite"() {
+        when:
+        click greenButton
 
-         then:
-         check modalHeader is "Add to Favourites"
+        then:
+        check modalHeader is "Add to Favourites"
 
-         when:
-         fill searchField with 'Ovarian Cancer (NHIC 0.0.1)' and pick first item
-         click modalPrimaryButton
+        when:
+        fill searchField with 'Ovarian Cancer (NHIC 0.0.1)' and pick first item
+        click modalPrimaryButton
 
-         refresh(browser) // TODO: It should not be necessary to refresh the page
+        refresh(browser) // TODO: It should not be necessary to refresh the page
 
-         then:
-         check firstRow displayed
-     }
+        then:
+        check firstRow displayed
+    }
 
     @Ignore
     def "remove favourite data model"() {

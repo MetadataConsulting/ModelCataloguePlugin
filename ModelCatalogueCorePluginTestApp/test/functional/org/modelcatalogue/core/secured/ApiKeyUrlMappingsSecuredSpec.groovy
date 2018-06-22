@@ -4,10 +4,12 @@ import geb.spock.GebSpec
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Unroll
 
 @IgnoreIf({ System.getProperty('spock.ignore.secured') })
+@Ignore
 class ApiKeyUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {

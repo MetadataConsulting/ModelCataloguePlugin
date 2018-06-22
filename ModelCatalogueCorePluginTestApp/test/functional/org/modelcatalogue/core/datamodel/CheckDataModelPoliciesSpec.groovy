@@ -3,7 +3,7 @@ package org.modelcatalogue.core.datamodel
 import geb.spock.GebSpec
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Specification
+import spock.lang.Ignore
 import spock.lang.Title
 import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
@@ -55,7 +55,7 @@ class CheckDataModelPoliciesSpec extends GebSpec {
         DataModelPage dataModelPage = browser.page DataModelPage
         then:
         !dataModelPage.defaultChecksPolicyAdded()
-        dataModelPage.UniqueOfKingPolicyAdded()
+        dataModelPage.UniqueOfKindPolicyAdded()
     }
 
 }

@@ -4,10 +4,12 @@ import geb.spock.GebSpec
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
 import spock.lang.Unroll
 import spock.lang.IgnoreIf
 
 @IgnoreIf({ System.getProperty('spock.ignore.secured') })
+@Ignore
 class CsvTransformationUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {
@@ -28,10 +30,10 @@ class CsvTransformationUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-            '/api/modelCatalogue/core/csvTransformation',
-            '/api/modelCatalogue/core/csvTransformation/$id/validate',
-            '/api/modelCatalogue/core/csvTransformation/validate',
-            '/api/modelCatalogue/core/csvTransformation/$id/transform',
+                '/api/modelCatalogue/core/csvTransformation',
+                '/api/modelCatalogue/core/csvTransformation/$id/validate',
+                '/api/modelCatalogue/core/csvTransformation/validate',
+                '/api/modelCatalogue/core/csvTransformation/$id/transform',
         ]
     }
 
@@ -65,7 +67,7 @@ class CsvTransformationUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-            '/api/modelCatalogue/core/csvTransformation/$id',
+                '/api/modelCatalogue/core/csvTransformation/$id',
         ]
     }
 
@@ -83,7 +85,7 @@ class CsvTransformationUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-           '/api/modelCatalogue/core/csvTransformation/$id',
+                '/api/modelCatalogue/core/csvTransformation/$id',
         ]
     }
 }

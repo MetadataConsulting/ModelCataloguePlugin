@@ -3,6 +3,7 @@ package org.modelcatalogue.core.datamodel
 import geb.spock.GebSpec
 import spock.lang.Issue
 import spock.lang.Narrative
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Stepwise
@@ -26,7 +27,7 @@ import spock.lang.Shared
 class CheckDataModelCanBeFinalizedSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "NEW_TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared

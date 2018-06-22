@@ -9,8 +9,8 @@ class DataModelAclPermissionsPage extends Page {
     static at = { title == 'Data Model Permissions' }
 
     static content = {
-        links { $('.panel-body a') }
-        link { $('.panel-body a', text: contains(it)) }
+        links(wait: true) { $('.panel-body a') }
+        link(wait: true) { $('.panel-body a', text: contains(it)) }
     }
 
     void select(String value) {

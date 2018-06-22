@@ -5,10 +5,11 @@ import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.IgnoreIf
-import spock.lang.Stepwise
+import spock.lang.Ignore
 import spock.lang.Unroll
 
 @IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 class DataModelSearchSpec extends GebSpec {
 
     @Unroll

@@ -15,21 +15,21 @@ import spock.lang.Stepwise
 @Stepwise
 class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String  component="input#component"
-    private static final String  focus="input#ruleFocus"
-    private static final String  trigger="input#trigger"
-    private static final String  rule="textarea#rule"
-    private static final String  errorCondition="input#errorCondition"
-    private static final String  issueRecord="input#issueRecord"
-    private static final String  notification="input#notification"
-    private static final String  target="input#notificationTarget"
-    private static final String  ICON="div.modal-body>form>div:nth-child(5)>span>span"
-    private static final String SEARCH="input#value"
-    private static final String modelCatalogue="span.mc-name"
-    private static final String table ="td.col-md-4"
-    private static final String businessRule ="td.col-md-4>span>span>a"
-    private static final String validationRuleButton ="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
-    private static final String deleteButton ="a#delete-menu-item-link>span:nth-child(3)"
+    private static final String component = "input#component"
+    private static final String focus = "input#ruleFocus"
+    private static final String trigger = "input#trigger"
+    private static final String rule = "textarea#rule"
+    private static final String errorCondition = "input#errorCondition"
+    private static final String issueRecord = "input#issueRecord"
+    private static final String notification = "input#notification"
+    private static final String target = "input#notificationTarget"
+    private static final String ICON = "div.modal-body>form>div:nth-child(5)>span>span"
+    private static final String SEARCH = "input#value"
+    private static final String modelCatalogue = "span.mc-name"
+    private static final String table = "td.col-md-4"
+    private static final String businessRule = "td.col-md-4>span>span>a"
+    private static final String validationRuleButton = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
+    private static final String deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
 
     def "login to model catalogue and select business rules"() {
         when:
@@ -54,17 +54,17 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
         at BusinessRulesPage
 
         and:
-        check rightSideTitle  contains 'Active Business Rules'
+        check rightSideTitle contains 'Active Business Rules'
     }
 
-     def "Navigate to business rules page"() {
-         when:
-         click create
-         then:
-         check modalHeader is "New Validation Rule"
-     }
+    def "Navigate to business rules page"() {
+        when:
+        click create
+        then:
+        check modalHeader is "New Validation Rule"
+    }
 
-     def "fill the form and save business rule"() {
+    def "fill the form and save business rule"() {
         when:
         fill nameLabel with "my validation Rule ${System.currentTimeMillis()}"
         fill component with "component ${System.currentTimeMillis()}"
@@ -107,18 +107,18 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
         at BusinessRulesPage
 
         and:
-        check rightSideTitle  contains 'Active Business Rules'
+        check rightSideTitle contains 'Active Business Rules'
 
         when:
         click businessRule
 
-        and:'navigate to the top menu and click on the validation button'
+        and: 'navigate to the top menu and click on the validation button'
         click validationRuleButton
 
         and:
         click deleteButton
 
-        and:'confirm the deletion'
+        and: 'confirm the deletion'
         click modalPrimaryButton
 
         then:

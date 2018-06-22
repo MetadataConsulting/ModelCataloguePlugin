@@ -5,8 +5,10 @@ import org.modelcatalogue.core.geb.ApiKeyPage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.HomePage
 import org.modelcatalogue.core.geb.LoginPage
+import spock.lang.Ignore
 import spock.lang.Unroll
 
+@Ignore
 class ApiKeySpec extends GebSpec {
 
     @Unroll
