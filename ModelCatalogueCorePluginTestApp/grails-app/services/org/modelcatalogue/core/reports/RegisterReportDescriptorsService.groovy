@@ -40,7 +40,7 @@ class RegisterReportDescriptorsService {
             depth 3
             type DataModel
             when { DataModel dataModel ->
-                dataModel.countDeclares() > 0
+                dataModel.hasElements()
             }
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
@@ -52,7 +52,7 @@ class RegisterReportDescriptorsService {
             depth 3
             type DataModel
             when { DataModel dataModel ->
-                dataModel.countDeclares() > 0
+                dataModel.hasElements()
             }
             link controller: 'dataModel', action: 'gridSpreadsheet', id: true
         }
@@ -64,7 +64,7 @@ class RegisterReportDescriptorsService {
             depth 3
             type DataModel
             when { DataModel dataModel ->
-                dataModel.countDeclares() > 0
+                dataModel.hasElements()
             }
             link controller: 'dataModel', action: 'excelExporterSpreadsheet', id: true
         }
@@ -79,7 +79,7 @@ class RegisterReportDescriptorsService {
                 depth 7 // for Rare Diseases
                 type DataModel
                 when { DataModel dataModel ->
-                    (dataModel.countDeclares() > 0) && (gelSourceModelNames.contains(dataModel.name))
+                    (dataModel.hasElements()) && (gelSourceModelNames.contains(dataModel.name))
                     // report only applies to Cancer Model and Rare Diseases!
                 }
                 link controller: 'northThames', action: 'northThamesGridHierarchyMappingSummaryReport', id: true, params: [organization: name]
@@ -92,7 +92,7 @@ class RegisterReportDescriptorsService {
                 depth 7 // for Rare Diseases
                 type DataModel
                 when { DataModel dataModel ->
-                    (dataModel.countDeclares() > 0) && (gelSourceModelNames.contains(dataModel.name))
+                    (dataModel.hasElements()) && (gelSourceModelNames.contains(dataModel.name))
                 }
                 link controller: 'northThames', action: 'northThamesMappingReport', id: true, params: [organization: name]
             }
@@ -147,7 +147,7 @@ class RegisterReportDescriptorsService {
             depth 3
             type DataModel
             when { DataModel dataModel ->
-                dataModel.countDeclares() > 0
+                dataModel.hasElements()
             }
             link controller: 'dataModel', action: 'inventoryDoc', id: true
         }
