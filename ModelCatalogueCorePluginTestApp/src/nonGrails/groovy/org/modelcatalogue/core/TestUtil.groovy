@@ -4,12 +4,15 @@ import java.util.regex.Pattern
 
 class TestUtil {
 
+    static String separator = ";\n" + "\t" * 4
+
     /**
      * Create Jenkins Files relative to project root, which should end in ModelCatalogueCorePluginTestApp
      * Create 5 files, splitting functional test cases into 5 groups.
      * @param projectRootPath
      */
     public static void createJenkinsFiles(String projectRootPath) {
+        String separator = separator
         Set<String> testCases = getFunctionalTestCaseNames(projectRootPath)
         Integer testSize = testCases.size()
         Integer remainder = testSize % 5
@@ -32,7 +35,7 @@ class TestUtil {
 
         // write jenkins files:
         treeBuilder.file("Jenkinsfile") {
-            write getJenkinsFileContent(subsetOfTestCase.collect{runFunctionalTestsCommand(it)}.join(';\n' + '\t' * 4))
+            write getJenkinsFileContent(subsetOfTestCase.collect{runFunctionalTestsCommand(it)}.join(separator))
         }
 //        subsetOfTestCase.eachWithIndex { List<String> tests, Integer index ->
 //            if (index < 5) {
@@ -49,6 +52,7 @@ class TestUtil {
     }
 
     static String runFunctionalTestsCommand(List<String> testNames){
+        return ((testNames.size() > 0) ? "sh 'echo \"Testing ${testNames[0]} etc.\"'" : "sh 'echo \"Testing no test cases\"'") + separator +
         "sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${testNames.join(" ")}'"
     }
 
