@@ -63,6 +63,7 @@ class CuratorCanCreateANewDataClassSpec extends GebSpec {
 
     def "Login as curator"() {
         when:
+        sleep(2_000)
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
 
