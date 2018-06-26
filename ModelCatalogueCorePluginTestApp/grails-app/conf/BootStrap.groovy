@@ -95,6 +95,7 @@ class BootStrap {
             initDev()
 
         } else if ( isTest() ) {
+            println "System property webdriver.chrome.driver = ${System.getProperty('webdriver.chrome.driver')}"
             initTest()
 
         }  else if ( isProduction() ) {

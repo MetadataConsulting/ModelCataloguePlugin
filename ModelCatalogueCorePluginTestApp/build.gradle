@@ -459,10 +459,16 @@ task runIntegrationTests(type: Exec, dependsOn: [bowerInstall]) {
 
 }
 task runFunctionalTests(type: Exec, dependsOn: [bowerInstall]) {
-    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+    description = """Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'
+            -Pwebdriver.chrome.driver=/path/to/chromedriver
+    """
 
     assertJava8()
-    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    String grailsOpts = "-Xmx8G -Xms1G -d64 -server"
+    if (project.hasProperty('webdriver.chrome.driver')) {
+        grailsOpts = grailsOpts + " -Dwebdriver.chrome.driver=${webdriver.chrome.driver}"
+    }
+    environment 'GRAILS_OPTS', grailsOpts
     environment 'FILE_OPENER_SKIP', "true"
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
 
