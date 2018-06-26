@@ -67,7 +67,6 @@ import spock.lang.*
 /$)
 
 @Stepwise
-@Ignore
 class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
     @Shared
@@ -219,6 +218,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
         when:
         CreateDataTypePage createDataClassPage = browser.page CreateDataTypePage
+        sleep(2_000)
         createDataClassPage.name = dataTypeName
         createDataClassPage.modelCatalogueId = dataTypeCatalogueId
         createDataClassPage.description = dataTypeDescription
@@ -304,7 +304,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
     def "Select and add tags entry"() {
         when:
-        Thread.sleep(3000)
+        sleep(5_000)
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select("Tags")
         then:
