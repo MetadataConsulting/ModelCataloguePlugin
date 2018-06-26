@@ -17,13 +17,16 @@ environments {
     // run via “./gradlew chromeTest”
     // See: http://code.google.com/p/selenium/wiki/ChromeDriver
     chrome {
+
+        ChromeOptions options = new ChromeOptions()
+        options.addArguments('--disable-dev-shm-usage')
+
         if (System.getProperty('downloadFilepath')) {
             String downloadFilepath = System.getProperty('downloadFilepath')
             HashMap<String, Object> chromePrefs = new HashMap<String, Object>()
             chromePrefs.put("profile.default_content_settings.popups", 0)
             chromePrefs.put("download.default_directory", downloadFilepath)
 
-            ChromeOptions options = new ChromeOptions()
             options.setExperimentalOption("prefs", chromePrefs)
             options.addArguments("--test-type")
             options.addArguments("--disable-extensions") //to disable browser extension popup
@@ -34,7 +37,7 @@ environments {
 
             driver = { new ChromeDriver(cap) }
         } else {
-            driver = { new ChromeDriver() }
+            driver = { new ChromeDriver(options) }
         }
     }
 
@@ -42,6 +45,7 @@ environments {
     // See: http://code.google.com/p/selenium/wiki/ChromeDriver
     chromeHeadless {
         ChromeOptions o = new ChromeOptions()
+        o.addArguments('--disable-dev-shm-usage')
         o.addArguments('--headless')
         driver = { new ChromeDriver(o) }
     }
