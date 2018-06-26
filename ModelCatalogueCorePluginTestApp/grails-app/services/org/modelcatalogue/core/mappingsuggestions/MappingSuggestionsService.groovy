@@ -136,22 +136,32 @@ class MappingSuggestionsService implements MappingsSuggestionsGateway {
     MappingSuggestion mappingSuggestionOfAction(Action actionInstance) {
         CatalogueElement sourceCatalogueElement = sourceCatalogueElementOfAction(actionInstance)
         CatalogueElement destinationCatalogueElement = destinationCatalogueElementOfAction(actionInstance)
-        ElementCompared sourceCompared = instantiateElementCompared(sourceCatalogueElement)
-        ElementCompared destinationCompared = instantiateElementCompared(destinationCatalogueElement)
-
-        ActionParameter score = actionInstance.extensions.find { ActionParameter actionParameter -> actionParameter.name == 'matchScore' }
-        new MappingSuggestionImpl(
-                mappingSuggestionId: actionInstance.id,
-                source: sourceCompared,
-                destination: destinationCompared,
-                score: score.extensionValue as float,
-                state: actionInstance.state
-        )
+        if (sourceCatalogueElement && destinationCatalogueElement) {
+            ElementCompared sourceCompared = instantiateElementCompared(sourceCatalogueElement)
+            ElementCompared destinationCompared = instantiateElementCompared(destinationCatalogueElement)
+            if (sourceCompared && destinationCompared) {
+                ActionParameter score = actionInstance.extensions.find { ActionParameter actionParameter -> actionParameter.name == 'matchScore' }
+                if (score) {
+                    return new MappingSuggestionImpl(
+                        mappingSuggestionId: actionInstance.id,
+                        source: sourceCompared,
+                        destination: destinationCompared,
+                        score: score.extensionValue as float,
+                        state: actionInstance.state
+                    )
+                }
+            }
+        }
+        null
     }
 
     CatalogueElement catalogueElementOfActionParameter(ActionParameter actionParameter) {
-        MetadataDomainEntity domainEntity = MetadataDomainEntity.of(actionParameter.extensionValue)
-        metadataDomainEntityService.findByMetadataDomainEntity(domainEntity)
+        if (actionParameter) {
+            MetadataDomainEntity domainEntity = MetadataDomainEntity.of(actionParameter.extensionValue)
+            metadataDomainEntityService.findByMetadataDomainEntity(domainEntity)
+        } else {
+            return null
+        }
     }
 
     ElementCompared instantiateElementCompared(CatalogueElement catalogueElement) {
