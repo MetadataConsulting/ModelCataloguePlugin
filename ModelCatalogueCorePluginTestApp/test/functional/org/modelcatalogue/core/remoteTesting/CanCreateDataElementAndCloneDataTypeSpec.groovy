@@ -20,7 +20,7 @@ import spock.lang.Ignore
 - Select the destination data model for the cloned element and click on OK button
 - Verify that Data Element and Type are cloned
 ''')
-@Ignore
+//@Ignore
 class CanCreateDataElementAndCloneDataTypeSpec extends GebSpec {
 
     def "Verify that curator can create a new Data Element and clone data type"() {
@@ -104,7 +104,8 @@ class CanCreateDataElementAndCloneDataTypeSpec extends GebSpec {
         createDataElementPage.modelCatalogueId = myCatalogue
         createDataElementPage.description = myDescription
         createDataElementPage.search(dataTypeName)
-        createDataElementPage.selectFirstItem(dataTypeName)
+        createDataElementPage.selectFirstItem()
+        Thread.sleep(2000)
         createDataElementPage.finish()
         Thread.sleep(5000)
 
