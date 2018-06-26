@@ -42,6 +42,8 @@ class BootStrap {
         ExtensionModulesLoader.addExtensionModules()
         log.info "BootStrap:addExtensionModules():complete"
 
+        log.info "testing pull request"
+
         File file = grailsResourceLocator.findResourceForURI('classpath:/').getFile()
         TestUtil.createJenkinsFiles(file.absolutePath)
 
