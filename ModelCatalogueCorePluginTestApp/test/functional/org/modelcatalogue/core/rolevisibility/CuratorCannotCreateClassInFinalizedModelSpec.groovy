@@ -88,6 +88,7 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
         assert "Active Data Classes" == dataClassesPage.titleText().trim()
 
         when:
+        dataClassesPage = browser.page DataClassesPage
         dataClassesPage.addItemIcon.click()
         then:
         at CreateDataClassPage
