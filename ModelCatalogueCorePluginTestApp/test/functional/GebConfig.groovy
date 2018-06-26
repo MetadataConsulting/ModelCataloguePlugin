@@ -20,6 +20,7 @@ environments {
 
         ChromeOptions options = new ChromeOptions()
         options.addArguments('--disable-dev-shm-usage')
+        options.addArguments("--no-sandbox")
 
         if (System.getProperty('downloadFilepath')) {
             String downloadFilepath = System.getProperty('downloadFilepath')
@@ -46,6 +47,7 @@ environments {
     chromeHeadless {
         ChromeOptions o = new ChromeOptions()
         o.addArguments('--disable-dev-shm-usage')
+        o.addArguments("--no-sandbox")
         o.addArguments('--headless')
         driver = { new ChromeDriver(o) }
     }
