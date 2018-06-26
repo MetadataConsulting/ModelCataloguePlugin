@@ -45,6 +45,8 @@ class BootStrap {
 //        File file = grailsResourceLocator.findResourceForURI('classpath:/').getFile()
 //        TestUtil.createJenkinsFiles(file.absolutePath)
 
+        log.info "testing pull request"
+
         File file = grailsResourceLocator.findResourceForURI('classpath:/').getFile()
         TestUtil.createJenkinsFiles(file.absolutePath)
 
