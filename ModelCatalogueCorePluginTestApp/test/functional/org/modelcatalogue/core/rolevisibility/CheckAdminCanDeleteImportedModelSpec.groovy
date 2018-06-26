@@ -29,7 +29,6 @@ import org.modelcatalogue.core.geb.*
  - Check that data model is removed from imported Data Models List | Data Model has been removed from 'Imported Data Models' list
 /$)
 @Stepwise
-@Ignore
 class CheckAdminCanDeleteImportedModelSpec extends GebSpec {
 
     @Shared
@@ -125,6 +124,8 @@ class CheckAdminCanDeleteImportedModelSpec extends GebSpec {
         when:
         DataImportsPage dataImportsPage = browser.page DataImportsPage
         driver.navigate().refresh()
+        dataImportsPage = browser.page DataImportsPage
+        sleep(3_000)
         then:
         !dataImportsPage.containsData(importDataModelName)
     }
