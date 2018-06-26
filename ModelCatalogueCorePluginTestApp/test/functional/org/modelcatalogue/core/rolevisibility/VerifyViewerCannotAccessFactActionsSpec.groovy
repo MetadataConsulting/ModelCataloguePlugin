@@ -25,7 +25,7 @@ import spock.lang.Stepwise
  - Logout of the Metadata Exchange | Logout successful
 ''')
 @Stepwise
-@Ignore
+//@Ignore
 class VerifyViewerCannotAccessFactActionsSpec extends GebSpec {
 
     def "login as supervisor"() {

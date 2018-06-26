@@ -31,6 +31,7 @@ class UnableToImportIfReadAccessSpec extends GebSpec {
 
         when: "Select data model that user has read-only rights to"
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Cancer Model')
         dashboardPage.select('Cancer Model')
 
         then:

@@ -45,7 +45,7 @@ import spock.lang.Title
 - Check that Metadata is edited     
 ''')
 @Stepwise
-@Ignore
+//@Ignore
 class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
     @Shared
     String dataModelName = UUID.randomUUID().toString()
@@ -121,6 +121,7 @@ class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
     def "select a draft model"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelName)
         dashboardPage.select(dataModelName)
         then:
         at DataModelPage

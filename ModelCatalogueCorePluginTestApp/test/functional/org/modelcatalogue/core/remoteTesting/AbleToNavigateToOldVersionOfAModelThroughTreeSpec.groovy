@@ -31,6 +31,7 @@ class AbleToNavigateToOldVersionOfAModelThroughTreeSpec extends GebSpec {
 
         when: 'select cancer model'
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Cancer Model')
         dashboardPage.select('Cancer Model')
 
         then:

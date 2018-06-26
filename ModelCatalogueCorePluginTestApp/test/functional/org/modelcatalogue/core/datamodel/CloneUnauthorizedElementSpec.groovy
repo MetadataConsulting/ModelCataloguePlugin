@@ -249,8 +249,10 @@ class CloneUnauthorizedElementSpec extends GebSpec {
     def "select first data model created"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
-        Thread.sleep(1000)
+        Thread.sleep(2000)
+        dashboardPage.search(dataModelOneName)
         dashboardPage.select(dataModelOneName)
+
         then:
         at DataModelPage
     }
@@ -287,6 +289,7 @@ class CloneUnauthorizedElementSpec extends GebSpec {
     def "check data element of first model is clonable"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelOneName)
         dashboardPage.select(dataModelOneName)
         then:
         at DataModelPage

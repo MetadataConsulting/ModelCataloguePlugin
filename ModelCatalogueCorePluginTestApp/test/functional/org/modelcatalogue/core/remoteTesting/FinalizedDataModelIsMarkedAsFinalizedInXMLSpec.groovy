@@ -35,6 +35,7 @@ class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
 
         when: 'Select a Finalized Model'
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelName)
         dashboardPage.select(dataModelName)
 
         then:

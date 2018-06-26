@@ -35,6 +35,7 @@ class CanImportDataModelSpec extends GebSpec {
 
         when: 'click the create data model button'
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelName)
         dashboardPage.select(dataModelName)
 
         then: "Data Model Page Should Open"
