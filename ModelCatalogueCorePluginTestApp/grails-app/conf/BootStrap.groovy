@@ -37,7 +37,29 @@ class BootStrap {
     DataModelAclService dataModelAclService
     DataModelGormService dataModelGormService
 
+    /**
+     * Executes command if it executes in 1000ms. Gives error message if it fails.
+     * @param command
+     * @return
+     */
+    String executeCommand(String command) {
+        long maxTime = 1000 // in milliseconds
+        def standardOut = new StringBuilder(), standardError = new StringBuilder()
+        def proc = command.execute()
+        proc.consumeProcessOutput(standardOut, standardError)
+        proc.waitForOrKill(maxTime)
+        if (standardOut) {
+            return standardOut
+        }
+        else {return standardError}
+    }
+
     def init = { servletContext ->
+
+        String hash = executeCommand('git rev-parse HEAD')//'git rev-parse HEAD'.execute().text.trim()
+        String branch = executeCommand('git rev-parse --abbrev-ref HEAD')//'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+
+        log.info "Branch: $branch, hash: $hash"
         log.info "BootStrap:addExtensionModules()"
         ExtensionModulesLoader.addExtensionModules()
         log.info "BootStrap:addExtensionModules():complete"
