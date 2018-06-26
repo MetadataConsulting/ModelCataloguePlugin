@@ -6,7 +6,7 @@ class CodeVersionPage extends Page {
 
     static url = '/modelCatalogueVersion/index'
 
-    static at = { title == 'Model Catalogue Version'}
+    static at = { title == 'Model Catalogue Version' }
 
     static content = {
         links { $('.panel-body a') }
@@ -14,8 +14,8 @@ class CodeVersionPage extends Page {
     }
 
     boolean isGithubLinkDisplayed() {
-        for ( int i = 0; i < links.size(); i++ ) {
-            if ( links[i].getAttribute('href').contains('github') ) {
+        for (int i = 0; i < links.size(); i++) {
+            if (links[i].getAttribute('href').contains('github')) {
                 return true
             }
         }
