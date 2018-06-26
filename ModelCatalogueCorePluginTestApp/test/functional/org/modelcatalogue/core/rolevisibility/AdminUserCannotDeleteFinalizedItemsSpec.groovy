@@ -128,6 +128,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
     def "Login as supervisor"() {
         when:
+        sleep(2_000)
         LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
@@ -304,7 +305,6 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
     def "Select and add tags entry"() {
         when:
-        sleep(5_000)
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select("Tags")
         then:

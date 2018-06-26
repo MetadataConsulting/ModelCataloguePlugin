@@ -48,7 +48,6 @@ import spock.lang.Title
 - 31. Verify that new Data class has been created     
 ''')
 @Stepwise
-@Ignore
 class CuratorCanCreateANewDataClassSpec extends GebSpec {
 
     @Shared
@@ -449,6 +448,7 @@ class CuratorCanCreateANewDataClassSpec extends GebSpec {
     def "verify new data class has been created"() {
         when:
         DraftDataModelListPage draftDataModelListPage = browser.page DraftDataModelListPage
+        sleep(2_000)
         draftDataModelListPage.treeView.select("Data Classes")
         then:
         at DataClassesPage

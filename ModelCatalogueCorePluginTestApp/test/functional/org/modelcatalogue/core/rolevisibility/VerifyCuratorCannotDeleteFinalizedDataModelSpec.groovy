@@ -24,7 +24,6 @@ import org.modelcatalogue.core.geb.*
  - The data model is not deleted
 ''')
 @Stepwise
-@Ignore
 class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends GebSpec {
 
     @Shared
@@ -39,6 +38,7 @@ class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends GebSpec {
     def "Login as curator"() {
         when:
         LoginPage loginPage = to LoginPage
+        sleep(2_000)
         loginPage.login("curator", "curator")
         then:
         at DashboardPage

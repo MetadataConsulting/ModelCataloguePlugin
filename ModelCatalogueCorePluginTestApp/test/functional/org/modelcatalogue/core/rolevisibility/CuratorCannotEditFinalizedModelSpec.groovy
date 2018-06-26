@@ -236,7 +236,7 @@ class CuratorCannotEditFinalizedModelSpec extends GebSpec {
     def "open data class and verify edit button is disabled"() {
         when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
-        dataClassesPage.selectDataClass(dataClassName)
+        dataClassesPage.selectDataClassLink(dataClassName)
         then:
         at DataClassPage
 

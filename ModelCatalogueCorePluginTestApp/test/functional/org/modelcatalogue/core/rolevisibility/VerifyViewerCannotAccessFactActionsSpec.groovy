@@ -3,7 +3,6 @@ package org.modelcatalogue.core.rolevisibility
 import geb.spock.GebSpec
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Ignore
 import spock.lang.Title
 import org.modelcatalogue.core.geb.*
 import spock.lang.Stepwise
@@ -25,7 +24,6 @@ import spock.lang.Stepwise
  - Logout of the Metadata Exchange | Logout successful
 ''')
 @Stepwise
-//@Ignore
 class VerifyViewerCannotAccessFactActionsSpec extends GebSpec {
 
     def "login as supervisor"() {
