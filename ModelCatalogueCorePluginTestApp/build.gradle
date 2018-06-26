@@ -442,7 +442,7 @@ task runFunctionalTests(type: Exec, dependsOn: [bowerInstall]) {
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
 
 
-    def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-unit', '-integration', '-functional']
+    def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-functional']
     //def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-functional', 'org.modelcatalogue.core.generalTestSuit.*']
     if (project.hasProperty('testArgs')) { // get arguments for grails test-app
         cmds.addAll(testArgs.split(' '))
