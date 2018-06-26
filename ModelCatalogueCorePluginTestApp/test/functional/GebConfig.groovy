@@ -27,6 +27,8 @@ environments {
             options.setExperimentalOption("prefs", chromePrefs)
             options.addArguments("--test-type")
             options.addArguments("--disable-extensions") //to disable browser extension popup
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
 
             DesiredCapabilities cap = DesiredCapabilities.chrome()
             cap.setCapability(ChromeOptions.CAPABILITY, options)
