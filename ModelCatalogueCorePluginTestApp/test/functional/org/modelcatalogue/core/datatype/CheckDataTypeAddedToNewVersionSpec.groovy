@@ -130,6 +130,7 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
         FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
         finalizeDataModelPage.version = dataModelVersion
         finalizeDataModelPage.versionNote = dataModelVersionNote
+        Thread.sleep(1000)
         finalizeDataModelPage.submit()
         then:
         at FinalizedDataModelPage
@@ -166,12 +167,15 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
         CreateDataModelNewVersionPage createDataModelNewVersionPage = browser.page CreateDataModelNewVersionPage
         createDataModelNewVersionPage.newVersion = dataModelNewVersion
         createDataModelNewVersionPage.createNewVersion()
+        Thread.sleep(1000)
         then:
         at CreatedDataModelNewVersionPage
 
         when:
         CreatedDataModelNewVersionPage createdDataModelNewVersionPage = browser.page CreatedDataModelNewVersionPage
+        Thread.sleep(1000)
         createdDataModelNewVersionPage.hide()
+        Thread.sleep(2000)
         then:
         at DataModelPage
     }
