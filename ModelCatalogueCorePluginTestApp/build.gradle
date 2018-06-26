@@ -466,7 +466,7 @@ task runFunctionalTests(type: Exec, dependsOn: [bowerInstall]) {
     assertJava8()
     String grailsOpts = "-Xmx8G -Xms1G -d64 -server"
     if (project.hasProperty('webdriver.chrome.driver')) {
-        grailsOpts = grailsOpts + " -Dwebdriver.chrome.driver=${webdriver.chrome.driver}"
+        grailsOpts = grailsOpts + " -Dwebdriver.chrome.driver=${project.getProperty('webdriver.chrome.driver')}"
     }
     environment 'GRAILS_OPTS', grailsOpts
     environment 'FILE_OPENER_SKIP', "true"
