@@ -37,6 +37,7 @@ class HistoryIsPopulatedAccordingToModelActivitySpec extends GebSpec {
 
         when: 'Select any Data Model'
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Test 1')
         dashboardPage.select('Test 1')
 
         then:

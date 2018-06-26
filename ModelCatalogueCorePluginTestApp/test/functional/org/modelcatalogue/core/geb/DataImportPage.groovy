@@ -3,14 +3,13 @@ package org.modelcatalogue.core.geb
 import geb.Page
 
 class DataImportPage extends Page implements InputUtils {
-
-    static at = { $("#type").displayed }
+    static at = { $("h4").text().contains("Import") }
 
     static content = {
         addItemIcon(required: false) {
             $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
         }
-        search(wait: true) { $("input#element", 0) }
+        search(wait: true) { $("input#elements", 0) }
         searchMoreLink(wait: true) { $("span.search-for-more-icon", 0) }
         submitButton(wait: true) { $("div.modal-footer>button.btn-primary") }
     }
@@ -28,9 +27,9 @@ class DataImportPage extends Page implements InputUtils {
     }
 
     void finish() {
-        waitFor(5) { $("#type") }
         sleep(2000)
         submitButton.click()
         sleep(2000)
     }
 }
+

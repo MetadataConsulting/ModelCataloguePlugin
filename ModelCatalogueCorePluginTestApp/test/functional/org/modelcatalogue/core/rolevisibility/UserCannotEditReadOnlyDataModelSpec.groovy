@@ -107,6 +107,7 @@ class UserCannotEditReadOnlyDataModelSpec extends GebSpec {
     def "select data model"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelName)
         dashboardPage.select(dataModelName)
         then:
         at DataModelPage

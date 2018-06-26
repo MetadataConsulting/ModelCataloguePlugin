@@ -32,6 +32,7 @@ class CanCreateDataTypeSpec extends GebSpec {
 
         when: 'select a data model for which the user has administration roles'
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Test 1')
         dashboardPage.select('Test 1')
 
         then:

@@ -34,6 +34,7 @@ class ImportAndRemoveDataModelReflectsInHistorySpec extends GebSpec {
 
         when: 'Selected an Finalized Data Model'
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(selectModelToEdit)
         dashboardPage.select(selectModelToEdit)
 
         then:
