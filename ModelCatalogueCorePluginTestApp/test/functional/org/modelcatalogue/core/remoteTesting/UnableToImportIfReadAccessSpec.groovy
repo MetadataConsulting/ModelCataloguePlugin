@@ -18,7 +18,6 @@ import spock.lang.Title
 - Navigate to the tree view and select  Imported Data Models 
 - Click on the grey plus button
 ''')
-@Ignore
 class UnableToImportIfReadAccessSpec extends GebSpec {
 
     def "Login to Model Catalouge"() {

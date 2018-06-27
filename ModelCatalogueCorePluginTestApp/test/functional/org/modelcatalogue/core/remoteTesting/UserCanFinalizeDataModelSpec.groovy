@@ -13,7 +13,6 @@ import spock.lang.*
 - Scroll down and select Finalized
 - Check that data model is finalized
 ''')
-@Ignore
 class UserCanFinalizeDataModelSpec extends GebSpec {
 
     @Shared

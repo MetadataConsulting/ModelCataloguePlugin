@@ -19,7 +19,6 @@ import spock.lang.Title
 - Navigate to the tree view and select Data Types
 - Click on the grey plus button
 ''')
-@Ignore
 class CanCreateDataTypeSpec extends GebSpec {
 
     def "Check that a viewer is not able to create a data type for unauthorised model"() {

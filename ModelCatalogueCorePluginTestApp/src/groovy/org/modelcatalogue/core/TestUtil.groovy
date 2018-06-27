@@ -68,7 +68,8 @@ class TestUtil {
             String fileName = it.name
             Set<String> dataFiles = fileName.split(Pattern.quote("."))
             if (dataFiles[0].contains("Spec") && dataFiles[1] == "groovy") {
-                if (it.text && (!it.text.contains("@Ignore"))) {
+                println fileName
+                if (!it.text?.contains("@Ignore")) {
                     files.add(dataFiles[0])
                 } else {
                     ignoredFileCount++
