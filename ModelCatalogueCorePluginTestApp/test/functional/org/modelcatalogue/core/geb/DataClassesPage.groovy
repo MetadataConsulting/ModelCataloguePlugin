@@ -79,7 +79,7 @@ class DataClassesPage extends Page {
     }
 
     void findByName(String value) {
-        $('a', text: value).click()
+        checkDataClass(value).click()
     }
 
     void selectDataClassByName(String value) {

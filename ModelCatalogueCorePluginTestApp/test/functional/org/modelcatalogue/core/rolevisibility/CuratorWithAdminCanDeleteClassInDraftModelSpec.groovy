@@ -176,6 +176,7 @@ class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
         dataClassPage.dataClassDropdown()
         dataClassPage.deleteDataClass()
         dataClassPage.confirmDelete()
+        Thread.sleep(2000)
         then:
         at DataClassesPage
     }
