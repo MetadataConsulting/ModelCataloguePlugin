@@ -10,7 +10,7 @@ pipeline {
             sh 'npm install'
             sh 'bower install'
             wrap([$class: 'Xvfb']) {
-              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: CuratorCannotCreateClassInFinalizedModelSpec VerifyViewerCannotAccessFactActionsSpec CuratorCanCreateANewDataClassSpec UserCannotEditReadOnlyDataModelSpec CannotAddElementToFinalizedModelSpec CannotAddDataElementsToFinalizedDataModelSpec GrantRoleCuratorSpec VersionVerificationSpec'
+              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: CuratorCannotCreateClassInFinalizedModelSpec VerifyViewerCannotAccessFactActionsSpec CuratorCanCreateANewDataClassSpec UserCannotEditReadOnlyDataModelSpec CannotAddElementToFinalizedModelSpec CannotAddDataElementsToFinalizedDataModelSpec GrantRoleCuratorSpec'
             }
 
         }
