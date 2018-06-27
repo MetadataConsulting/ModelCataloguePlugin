@@ -26,7 +26,6 @@ import spock.lang.Title
 - On the top menu, click on the data model link
 - Click on the delete link
 ''')
-@Ignore
 class CannotDeleteFinalizedDataModelSpec extends GebSpec {
 
     @Shared

@@ -10,7 +10,7 @@ pipeline {
             sh 'npm install'
             sh 'bower install'
             wrap([$class: 'Xvfb']) {
-              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: EditDataElementSpec AddUsernameToFavouriteSpec QuickSearchSpec RelationshipIsBaseForSpec RelationshipIsImportedBySpec RelationshipImportsSpec CreateDataTypeAndSelectPrimitiveSpec ChangeLogForEligibilitySpec DataClassWizardSpec ChangesSpec DataTypeWizardSpec DataElementWizardSpec AssetWizardSpec BatchAndActionsSpec SearchFunctionalSpec ValidationRuleWizardSpec RegisterSpec MeasurementUnitWizardSpec DataModelWizardSpec UserIsAbleToDownloadAnAssetSpec CheckDataModelCanBeFinalizedSpec CheckDataModelPolicyTagSpec CheckDataModelPoliciesSpec CreateNewVersionOfDataModelSpec CloneUnauthorizedElementSpec CuratorCanGenerateSuggestionsUsingMappingUtilitySpec ValidateValueAgainstDataTypeSpec CannotCreateDataElementWithUnauthorizedDataTypeSpec CheckDataTypeAddedToNewVersionSpec'
+              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: CheckDataModelCanBeFinalizedSpec CheckDataModelPolicyTagSpec CheckDataModelPoliciesSpec CreateNewVersionOfDataModelSpec CloneUnauthorizedElementSpec ValidateValueAgainstDataTypeSpec CannotCreateDataElementWithUnauthorizedDataTypeSpec CheckDataTypeAddedToNewVersionSpec'
             }
 
         }

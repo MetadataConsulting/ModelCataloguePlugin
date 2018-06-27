@@ -19,7 +19,6 @@ import spock.lang.Title
 - Fill the form and select Select unique of kind or default checks
 - Click on the green button
 ''')
-@Ignore
 class CanSelectPoliciesWhileCreatingDataModelSpec extends GebSpec {
 
     def "Data Model is created when selecting policies"() {

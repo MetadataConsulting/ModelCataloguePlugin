@@ -17,7 +17,6 @@ import spock.lang.Title
 - Verify that you can not create a new data element
 ''')
 @Stepwise
-@Ignore
 class CannotAddDataElementsToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:
