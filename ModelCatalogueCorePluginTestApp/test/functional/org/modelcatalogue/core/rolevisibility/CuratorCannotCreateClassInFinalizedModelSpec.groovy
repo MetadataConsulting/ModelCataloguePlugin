@@ -55,6 +55,7 @@ class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
         when:
         sleep(3_000)
         LoginPage loginPage = to LoginPage
+        sleep(8_000)
         loginPage.login('curator', 'curator')
 
         then:

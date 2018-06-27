@@ -30,6 +30,7 @@ class DataClassesPage extends Page {
         showMoreButton { $('span.fa-plus-square-o') }
         editDataClassButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
         titlename { $('div   h3') }
+        checkDataClass(required: false, wait: true) { String value -> $('a', text: value) }
     }
 
     void expandLinkClick() {
@@ -65,7 +66,8 @@ class DataClassesPage extends Page {
 
     Boolean dataClassPresent(String value) {
         waitFor { createDateClassLink }
-        $('a', text: value).displayed
+        sleep(3_000)
+        checkDataClass(value)?.displayed
     }
 
     void selectDataClassLink(String value) {
@@ -105,7 +107,5 @@ class DataClassesPage extends Page {
 //        rows.$('a', text: value).displayed
 //    }
 
-    void selectDataClass(String value) {
-        rows.$('a', text: value).click()
-    }
+
 }

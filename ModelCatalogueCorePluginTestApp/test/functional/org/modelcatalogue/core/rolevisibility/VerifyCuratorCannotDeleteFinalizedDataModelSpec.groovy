@@ -38,7 +38,7 @@ class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends GebSpec {
     def "Login as curator"() {
         when:
         LoginPage loginPage = to LoginPage
-        sleep(2_000)
+        sleep(8_000)
         loginPage.login("curator", "curator")
         then:
         at DashboardPage

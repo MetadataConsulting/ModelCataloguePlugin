@@ -207,6 +207,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
     def "Select and add Data types"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        sleep(2_000)
         dataModelPage.treeView.select("Data Types")
         then:
         DataTypesPage
@@ -293,10 +294,8 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         at CreateAssetsPage
 
         when:
-
         CreateAssetsPage createAssetsPage = browser.page CreateAssetsPage
         createAssetsPage.name = assetName
-        createAssetsPage.upload(System.getProperty("downloadFilepath"))
         createAssetsPage.description = assetDescription
         createAssetsPage.submit()
         then:
