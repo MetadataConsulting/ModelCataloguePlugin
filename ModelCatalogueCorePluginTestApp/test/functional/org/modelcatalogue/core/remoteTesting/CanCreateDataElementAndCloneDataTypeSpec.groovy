@@ -20,7 +20,6 @@ import spock.lang.Ignore
 - Select the destination data model for the cloned element and click on OK button
 - Verify that Data Element and Type are cloned
 ''')
-//@Ignore
 class CanCreateDataElementAndCloneDataTypeSpec extends GebSpec {
 
     def "Verify that curator can create a new Data Element and clone data type"() {

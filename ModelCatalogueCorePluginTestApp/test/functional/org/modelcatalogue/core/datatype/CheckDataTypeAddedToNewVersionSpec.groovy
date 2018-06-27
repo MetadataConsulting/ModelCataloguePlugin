@@ -5,6 +5,7 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Ignore
 import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
 import spock.lang.Shared
@@ -37,6 +38,7 @@ import spock.lang.Shared
  - Check that new data type appears under list in Data Types main page ( 'Active Data types as title) | Data Type has been created
 ''')
 @Stepwise
+@Ignore
 class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
 
     @Shared

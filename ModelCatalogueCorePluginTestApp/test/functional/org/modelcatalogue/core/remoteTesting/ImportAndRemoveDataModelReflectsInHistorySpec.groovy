@@ -17,7 +17,6 @@ import spock.lang.Ignore
 - Check that the imported data model appears on the list of activity
 - Remove the imported data model
 ''')
-//@Ignore
 class ImportAndRemoveDataModelReflectsInHistorySpec extends GebSpec {
 
     def "https://metadata.atlassian.net/browse/MET-1650"() {

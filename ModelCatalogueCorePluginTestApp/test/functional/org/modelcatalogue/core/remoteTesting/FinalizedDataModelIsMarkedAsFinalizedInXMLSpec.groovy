@@ -20,7 +20,6 @@ import spock.lang.IgnoreIf
 - Open the downloaded file and verify that the status is marked as finalized
 ''')
 @IgnoreIf({ !System.getProperty("downloadFilepath") })
-//@Ignore
 class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
     def 'Examine that finalized data model is marked as finalized in the XML'() {
         given:

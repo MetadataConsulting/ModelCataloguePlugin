@@ -50,6 +50,7 @@ import spock.lang.Title
 - Check that Data Element from second data model now exists in first data model
 ''')
 @Stepwise
+@Ignore
 class CloneUnauthorizedElementSpec extends GebSpec {
 
     @Shared

@@ -24,6 +24,7 @@ import org.modelcatalogue.core.geb.*
  - The data model is not deleted
 ''')
 @Stepwise
+@Ignore
 class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends GebSpec {
 
     @Shared
