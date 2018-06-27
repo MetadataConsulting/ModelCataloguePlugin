@@ -144,7 +144,7 @@ class CheckCreateElementFromClassWizardSpec extends GebSpec {
     def "select newly creted data class"() {
         when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
-        dataClassesPage.selectDataClass(dataClassName)
+        dataClassesPage.selectDataClassLink(dataClassName)
         then:
         at DataClassPage
     }
