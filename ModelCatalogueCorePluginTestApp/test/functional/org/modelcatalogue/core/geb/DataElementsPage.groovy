@@ -26,7 +26,7 @@ class DataElementsPage extends Page {
         dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
         rows { $('div.inf-table-body tbody tr') }
-        elementByName(wait: true) { $('a', text: contains(it)) }
+        elementByName(wait: true) { $('.inf-table-item-cell a', text: contains(it)) }
         showMoreButton { $('span.fa-plus-square-o') }
         editDataElementButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
         elementsList { $('table.inf-table tbody tr') }

@@ -23,7 +23,7 @@ class DataTypesPage extends Page {
         showMoreButton { $('span.fa-plus-square-o') }
         editDataTypeButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
         dataTypeByName(required: false, wait: true) { $('a', text: it) }
-        createDataTypePlusButton { $('table tr.inf-table-footer-action span.fa-plus-circle') }
+        createDataTypePlusButton { $('a#role_list_create-catalogue-element-menu-item-link') }
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }

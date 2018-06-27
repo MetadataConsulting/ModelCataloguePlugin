@@ -20,6 +20,7 @@ class BusinessRulesPage extends Page {
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
+        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
     }
 
     void expandLinkClick() {
