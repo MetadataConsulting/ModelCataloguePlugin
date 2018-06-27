@@ -296,6 +296,7 @@ class CloneUnauthorizedElementSpec extends GebSpec {
 
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        sleep(3_000)
         dataModelPage.dropdown()
         dataModelPage.cloneAnotherElement()
         then:
