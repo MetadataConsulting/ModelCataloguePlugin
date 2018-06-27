@@ -20,6 +20,8 @@ class AssetsPage extends Page {
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
+        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+
     }
 
     void expandLinkClick() {
