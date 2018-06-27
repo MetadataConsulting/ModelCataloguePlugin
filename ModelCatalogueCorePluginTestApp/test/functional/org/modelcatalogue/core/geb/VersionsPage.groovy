@@ -15,11 +15,11 @@ class VersionsPage extends Page {
 
     static content = {
         rows { $('#history-tab tbody tr') }
-        versionSelect (wait:true){ $('a.preserve-new-lines.ng-binding', text: it).siblings('a') }
-        expandLink (wait:true){ $('a.inf-cell-expand') }
-        dataElementDropDown (wait:true){ $('button#role_item_catalogue-elementBtn') }
-        deleteBttn(wait:true) { $('a#deleteBtn') }
-        deleteConfirmationBttn(wait:true) { $('button.btn.btn-primary') }
+        versionSelect(wait: true) { $('a.preserve-new-lines.ng-binding', text: it).siblings('a') }
+        expandLink(wait: true) { $('a.inf-cell-expand') }
+        dataElementDropDown(wait: true) { $('button#role_item_catalogue-elementBtn') }
+        deleteBttn(wait: true) { $('a#deleteBtn') }
+        deleteConfirmationBttn(wait: true) { $('button.btn.btn-primary') }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         showMoreButton { $('span.fa-plus-square-o') }
         editButton(required: false) { $('#role_item-detail_edit-catalogue-elementBtn') }

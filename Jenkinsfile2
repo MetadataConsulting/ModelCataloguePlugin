@@ -10,7 +10,7 @@ pipeline {
             sh 'npm install'
             sh 'bower install'
             wrap([$class: 'Xvfb']) {
-              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: AddAndRemoveManyDataElementsSpec VerifyMinOccursCanBeZeroSpec MaxOccursShowsInHistorySpec NewDraftEditFromImportedModelsAreUpdatedSpec AbstractModelCatalogueGebSpec ModelCatalogueGenomicsUrlMappingsSecuredSpec ClassificationUrlMappingsSecuredSpec DataArchitectUrlMappingsSecuredSpec CatalogueElementUrlMappingsSecuredSpec ReindexCatalogueUrlMappingsSecuredSpec ModelCatalogueNorthThamesUrlMappingsSecuredSpec DataClassUrlMappingsSecuredSpec ModelCatalogueFormsUrlMappingsSecuredSpec MeasurementUnitUrlMappingsSecuredSpec DataElementUrlMappingsSecuredSpec DataImportCreateUrlMappingsSecuredSpec ModelCatalogueCorePluginUrlMappingsSecuredSpec CsvTransformationUrlMappingsSecuredSpec EnumeratedTypeUrlMappingsSecuredSpec DataModelPolicyUrlMappingsSecuredSpec DataModelUrlMappingsSecuredSpec ApiKeyUrlMappingsSecuredSpec ModelCatalogueVersionUrlMappingsSecuredSpec LogsUrlMappingsSecuredSpec LastSeenUrlMappingsSecuredSpec DataTypeUrlMappingsSecuredSpec UserUrlMappingSecuredSpec'
+              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: CuratorCannotCreateClassInFinalizedModelSpec VerifyViewerCannotAccessFactActionsSpec CuratorCanCreateANewDataClassSpec UserCannotEditReadOnlyDataModelSpec CannotAddElementToFinalizedModelSpec CannotAddDataElementsToFinalizedDataModelSpec GrantRoleCuratorSpec'
             }
 
         }

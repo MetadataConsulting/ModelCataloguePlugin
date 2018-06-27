@@ -18,7 +18,6 @@ import spock.lang.Title
 - Navigate to the tree view and select  Imported Data Models 
 - Click on the grey plus button
 ''')
-@Ignore
 class UnableToImportIfReadAccessSpec extends GebSpec {
 
     def "Login to Model Catalouge"() {
@@ -31,6 +30,7 @@ class UnableToImportIfReadAccessSpec extends GebSpec {
 
         when: "Select data model that user has read-only rights to"
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Cancer Model')
         dashboardPage.select('Cancer Model')
 
         then:

@@ -31,18 +31,25 @@ class TestUtil {
         File jenkinsFile = null
 
         // write jenkins files:
-        subsetOfTestCase.eachWithIndex { List<String> tests, Integer index ->
-            if (index < 5) {
-                String newJenkinsFileName = "Jenkinsfile${index + 1}"
-                jenkinsFile = new File("$parentFolder/$newJenkinsFileName")
-                if (jenkinsFile.exists()) {
-                    jenkinsFile.delete()
-                }
-                treeBuilder.file(newJenkinsFileName) {
-                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'")
-                }
-            }
+        treeBuilder.file("Jenkinsfile") {
+            write getJenkinsFileContent(subsetOfTestCase.collect{runFunctionalTestsCommand(it)}.join(';\n' + '\t' * 4))
         }
+//        subsetOfTestCase.eachWithIndex { List<String> tests, Integer index ->
+//            if (index < 5) {
+//                String newJenkinsFileName = "Jenkinsfile${index + 1}"
+//                jenkinsFile = new File("$parentFolder/$newJenkinsFileName")
+//                if (jenkinsFile.exists()) {
+//                    jenkinsFile.delete()
+//                }
+//                treeBuilder.file(newJenkinsFileName) {
+//                    write getJenkinsFileContent(runFunctionalTestsCommand(tests))
+//                }
+//            }
+//        }
+    }
+
+    static String runFunctionalTestsCommand(List<String> testNames){
+        "sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${testNames.join(" ")}'"
     }
 
     static String getJenkinsFileContent(String scriptText) {

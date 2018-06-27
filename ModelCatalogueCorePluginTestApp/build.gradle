@@ -561,6 +561,30 @@ task beforePullRequest(dependsOn: [createAndAddJenkinsFiles])
 
 war.finalizedBy copyWar
 
+task sourceSetProperties {
+
+    sourceSets {
+
+        main {
+
+            println "java.srcDirs = ${java.srcDirs}"
+            println "groovy.srcDirs = ${groovy.srcDirs}"
+
+            println "resources.srcDirs = ${resources.srcDirs}"
+
+            println "output.classesDir = ${output.classesDir}"
+
+            println "output.resourcesDir = ${output.resourcesDir}"
+
+            println "output.files = ${output.files}"
+
+        }
+
+    }
+
+}
+
+
 private static String getGrailsw()  {
    if (Os.isFamily(Os.FAMILY_WINDOWS))  {
       return "grailsw.bat"

@@ -11,6 +11,7 @@ class DataModelAclPermissionsPage extends Page {
     static content = {
         links(wait: true) { $('.panel-body a') }
         link(wait: true) { $('.panel-body a', text: contains(it)) }
+        nav { $('#topmenu', 0).module(NavModule) }
     }
 
     void select(String value) {

@@ -19,6 +19,7 @@ class CannotAddDataClassesToFinalizedDataModelSpec extends GebSpec {
     def "Select a Finalized Model"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Cancer Model')
         dashboardPage.select('Cancer Model')
 
         then:

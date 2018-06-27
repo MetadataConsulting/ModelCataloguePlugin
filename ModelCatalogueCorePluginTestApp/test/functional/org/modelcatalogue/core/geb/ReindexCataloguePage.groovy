@@ -2,11 +2,11 @@ package org.modelcatalogue.core.geb
 
 import geb.Page
 
-class LastSeenPage extends Page {
+class ReindexCataloguePage extends Page {
 
-    static url = '/lastSeen/index'
+    static url = '/reindexCatalogue/index'
 
-    static at = { title == 'User Activity' }
+    static at = { title == 'Reindex Catalogue' }
 
     static content = {
         nav { $('#topmenu', 0).module(NavModule) }

@@ -1,13 +1,7 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Specification
-import spock.lang.Title
-import spock.lang.Ignore
-import spock.lang.Stepwise
-import spock.lang.Shared
+import spock.lang.*
 import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1626')
@@ -33,8 +27,8 @@ import org.modelcatalogue.core.geb.*
  - 18. Verify that imported Data model name is listed under '[Data model name] Imports' page. | Imported Data Model is listed.
 /$)
 
-@Stepwise
 @Ignore
+@Stepwise
 class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
 
     @Shared
@@ -56,6 +50,7 @@ class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
 
     def "login to curator"() {
         when:
+        sleep(3_000)
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
 
