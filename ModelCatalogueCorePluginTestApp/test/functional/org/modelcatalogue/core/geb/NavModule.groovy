@@ -20,8 +20,8 @@ class NavModule extends Module {
         reindexCatalogueLink(required: false, wait: true) { $("#reindexcatalogue-link", 0) }
         relationshipTypesLink(required: false, wait: true) { $("#relationshiptypes-link", 0) }
         dataModelPolicyLink(required: false, wait: true) { $("#datamodelpolicy-link", 0) }
-        monitoringLink(required: false, wait: true) { $("#monitoring-link", 0) }
-        logsLink(required: false, wait: true) { $("#logs-link", 0) }
+        monitoringLink(required: false, wait: true) { $("#monitoring-menu-item-link", 0) }
+        logsLink(required: false, wait: true) { $("#logs-archive-menu-item", 0) }
         feedbacksLink(required: false, wait: true) { $("#feedbacks-link", 0) }
         importMenuLink(required: false, wait: true) { $("#importmenu-link", 0) }
         importExcelLink(required: false, wait: true) { $("#importexcel-link", 0) }
@@ -29,10 +29,15 @@ class NavModule extends Module {
         importDslLink(required: false, wait: true) { $("#importdsl-link", 0) }
         importXmlLink(required: false, wait: true) { $("#importxml-link", 0) }
         createDataModelLink(required: false, wait: true) { $("#createdatamodel-link", 0) }
+        settingDropDownTag(required: false, wait: true) { $("#role_navigation-right_admin-menu-menu-item-link", 0) }
     }
 
     void dataModelPermission() {
         dataModelPermissionLink.click()
+    }
+
+    void settingDropDown() {
+        settingDropDownTag.click()
     }
 
     void home() {
