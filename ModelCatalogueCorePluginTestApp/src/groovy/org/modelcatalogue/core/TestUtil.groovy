@@ -63,13 +63,19 @@ class TestUtil {
     private static Set<String> getTestCases(String testPath) {
         String pathTillFunctioal = testPath + "/test/functional/"
         Set<String> files = []
+        Integer ignoredFileCount = 0
         new File(pathTillFunctioal).eachFileRecurse {
             String fileName = it.name
             Set<String> dataFiles = fileName.split(Pattern.quote("."))
-            if (dataFiles[0].contains("Spec") && dataFiles[1] == "groovy")
-                files.add(dataFiles[0])
+            if (dataFiles[0].contains("Spec") && dataFiles[1] == "groovy") {
+                if (it.text && (!it.text.contains("@Ignore"))) {
+                    files.add(dataFiles[0])
+                } else {
+                    ignoredFileCount++
+                }
+            }
         }
-
+        println("Total $ignoredFileCount has been ignored")
         return files
     }
 }
