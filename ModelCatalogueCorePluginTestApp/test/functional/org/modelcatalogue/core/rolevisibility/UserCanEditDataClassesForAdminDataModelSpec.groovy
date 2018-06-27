@@ -45,7 +45,7 @@ import spock.lang.Title
 - Check that Metadata is edited     
 ''')
 @Stepwise
-//@Ignore
+@Ignore
 class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
     @Shared
     String dataModelName = UUID.randomUUID().toString()
