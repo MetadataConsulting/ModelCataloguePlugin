@@ -62,6 +62,8 @@ class TestUtil {
             }
 
         }
+        publishHTML(target: [allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports/html', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: ''])
+
       }
     }
   }
