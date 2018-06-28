@@ -10,10 +10,12 @@ pipeline {
             sh 'npm install'
             sh 'bower install'
             wrap([$class: 'Xvfb']) {
-              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: AddAndRemoveManyDataElementsSpec VerifyMinOccursCanBeZeroSpec MaxOccursShowsInHistorySpec NewDraftEditFromImportedModelsAreUpdatedSpec AbstractModelCatalogueGebSpec ModelCatalogueGenomicsUrlMappingsSecuredSpec ClassificationUrlMappingsSecuredSpec DataArchitectUrlMappingsSecuredSpec CatalogueElementUrlMappingsSecuredSpec ReindexCatalogueUrlMappingsSecuredSpec ModelCatalogueNorthThamesUrlMappingsSecuredSpec DataClassUrlMappingsSecuredSpec ModelCatalogueFormsUrlMappingsSecuredSpec MeasurementUnitUrlMappingsSecuredSpec DataElementUrlMappingsSecuredSpec DataImportCreateUrlMappingsSecuredSpec ModelCatalogueCorePluginUrlMappingsSecuredSpec CsvTransformationUrlMappingsSecuredSpec EnumeratedTypeUrlMappingsSecuredSpec DataModelPolicyUrlMappingsSecuredSpec DataModelUrlMappingsSecuredSpec ApiKeyUrlMappingsSecuredSpec ModelCatalogueVersionUrlMappingsSecuredSpec LogsUrlMappingsSecuredSpec LastSeenUrlMappingsSecuredSpec DataTypeUrlMappingsSecuredSpec UserUrlMappingSecuredSpec'
+              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: CloneAanClassIntoAnotherModelSpec CompareTwoDataModelSpec CreateDataModelAndCreatePolicesSpec CreateNewVersionFromFinalisedToDraftSpec CustomMetadataNotCarriedNewVersionSpec InvalidRegistrationSpec MaxOccursIsShowingInHistorySpec VerifyResetPasswordPresentOnLoginPageSpec VerifyUserCanTagUsingTreeViewSpec AbleToNavigateToOldVersionOfAModelThroughTreeSpec CanCreateDataElementAndCloneDataTypeSpec CanCreateDataTypeSpec CanImportDataModelSpec CannotDeleteFinalizedDataModelSpec CanSelectPoliciesWhileCreatingDataModelSpec FinalizedDataModelIsMarkedAsFinalizedInXMLSpec HistoryIsPopulatedAccordingToModelActivitySpec ImportAndRemoveDataModelReflectsInHistorySpec UnableToImportIfReadAccessSpec UserCanFinalizeDataModelSpec AdminCanCreateModelAndPolicySpec AdminUserCannotDeleteFinalizedItemsSpec CheckAdminCanDeleteImportedModelSpec CuratorCanCreateANewDataClassSpec CuratorCanImportFinalizedDataModelSpec CuratorCannotCreateClassInFinalizedModelSpec CuratorCannotEditFinalizedModelSpec CuratorWithAdminCanDeleteClassInDraftModelSpec'
             }
 
         }
+        publishHTML(target: [allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports/html', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: ''])
+
       }
     }
   }
