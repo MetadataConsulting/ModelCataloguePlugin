@@ -14,19 +14,21 @@ import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.save
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
-class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpec{
+@Ignore
+class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String enumerated ="input#pickEnumeratedType"
-    private static final String  paste="button.btn-default"
-    private static final String  deleteButton="a#delete-menu-item-link>span:nth-child(3)"
-    private static final String  enumeratedType="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
-    private static final String  dataType="tr.inf-table-item-row>td:nth-child(1)>span>span>a"
-    private static final String  first_row="tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)"
+    private static final String enumerated = "input#pickEnumeratedType"
+    private static final String paste = "button.btn-default"
+    private static final String deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
+    private static final String enumeratedType = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
+    private static final String dataType = "tr.inf-table-item-row>td:nth-child(1)>span>span>a"
+    private static final String first_row = "tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)"
 
     //@NotYetImplemented
     def "login and navigate to the model"() {

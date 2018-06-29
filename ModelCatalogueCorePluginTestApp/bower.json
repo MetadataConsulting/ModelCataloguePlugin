@@ -53,8 +53,10 @@
     "underscore": "1.9.0",
     "sockjs-client": "^1.1.5",
     "stomp-websocket": "^2.3.4"
+    "jquery-resizable": "^0.20.0"
   },
   "resolutions": {
-    "angular": "1.4.10"
+    "angular": "1.4.10",
+    "jquery-resizable": "^0.20.0"
   }
 }

@@ -7,6 +7,7 @@ import org.modelcatalogue.core.geb.ImportedDataModelsPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
 import spock.lang.Narrative
+import spock.lang.Ignore
 import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-1654')
@@ -17,6 +18,7 @@ import spock.lang.Title
 - Navigate to the tree view and select  Imported Data Models 
 - Click on the grey plus button
 ''')
+@Ignore
 class UnableToImportIfReadAccessSpec extends GebSpec {
 
     def "Login to Model Catalouge"() {

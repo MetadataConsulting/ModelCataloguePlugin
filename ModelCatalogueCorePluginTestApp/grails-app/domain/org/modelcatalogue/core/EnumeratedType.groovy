@@ -88,6 +88,18 @@ class EnumeratedType extends DataType {
 	}
 
     @Override
+    void afterMerge(CatalogueElement destination) {
+        if (destination instanceof EnumeratedType) {
+            def thisMap = getEnumerationsObject()
+            def destMap = destination.getEnumerationsObject()
+            SortedMap<String, String> destEnums = new TreeMap<>(destMap)
+            destEnums.putAll(thisMap)
+            destination.setEnumerations(destEnums)
+        }
+        super.afterMerge(destination)
+    }
+
+    @Override
     String getExplicitRule() {
         return "x == null || x in [${enumerations.keySet().collect{ "'${it.replace('\'', '\\\'')}'" }.join(', ')}]"
     }

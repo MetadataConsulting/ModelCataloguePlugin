@@ -41,11 +41,9 @@ environments {
     // run via “./gradlew chromeHeadlessTest”
     // See: http://code.google.com/p/selenium/wiki/ChromeDriver
     chromeHeadless {
-        driver = {
-            ChromeOptions o = new ChromeOptions()
-            o.addArguments('headless')
-            new ChromeDriver(o)
-        }
+        ChromeOptions o = new ChromeOptions()
+        o.addArguments('--headless')
+        driver = { new ChromeDriver(o) }
     }
 
 }

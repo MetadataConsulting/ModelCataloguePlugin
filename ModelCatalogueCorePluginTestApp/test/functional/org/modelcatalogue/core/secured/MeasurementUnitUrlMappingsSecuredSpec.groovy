@@ -5,9 +5,11 @@ import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Unroll
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ System.getProperty('spock.ignore.secured') })
+@Ignore
+//@IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class MeasurementUnitUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {
@@ -109,6 +111,6 @@ class MeasurementUnitUrlMappingsSecuredSpec extends GebSpec {
                 '/api/modelCatalogue/core/measurementUnit/$id/mapping/$destination',
                 '/api/modelCatalogue/core/measurementUnit/$id/incoming/$type',
                 '/api/modelCatalogue/core/measurementUnit/$id/outgoing/$type',
-                ]
+        ]
     }
 }

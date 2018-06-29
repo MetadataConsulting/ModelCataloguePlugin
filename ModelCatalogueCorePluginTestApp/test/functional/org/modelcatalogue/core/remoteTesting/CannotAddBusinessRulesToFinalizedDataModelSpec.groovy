@@ -3,8 +3,10 @@ package org.modelcatalogue.core.remoteTesting
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
 import spock.lang.Stepwise
+import spock.lang.Ignore
 
 @Stepwise
+@Ignore
 class CannotAddBusinessRulesToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:

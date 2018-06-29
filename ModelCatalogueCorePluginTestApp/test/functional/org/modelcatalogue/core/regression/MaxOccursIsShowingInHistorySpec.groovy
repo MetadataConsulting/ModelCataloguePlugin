@@ -23,31 +23,34 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
-class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
+@Ignore
+class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec {
 
     static final String stepImports = "#step-imports"
     static final String wizardName = 'div.create-classification-wizard #name'
-    private static final String  createButton='a#role_data-models_create-data-modelBtn'
-    private static final String  closeButton='div.modal-footer>button:nth-child(2)'
-    private static final String  finishButton='button#step-finish'
-    private static final String  search ='input#element'
-    private static final String  dataWizard ='div.alert'
-    private static final String  alert ='div.alert>div>span'
-    private static final String   deleteButton='a#delete-menu-item-link>span:nth-child(3)'
-    private static final String  exitButton='div.modal-footer>button:nth-child(2)'
-    private static final String  stepParent='button#step-parents'
-    private static final String  occurrence='ul.nav-pills>li:nth-child(3)>a'
-    private static final String  modelCatalogue='span.mc-name'
-    private static final String  metadataButton='label.expand-metadata'
-    private static final String   table='#data-elements-changes > div.inf-table-body > table > tbody > tr > td:nth-child(3) > span > span'
-    private static final String  firstRow='tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)'
-    private static final String  dataClass='tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a'
-    private static final String  createRelationshipButton='a#create-new-relationship-menu-item-link>span:nth-child(3)'
-    private static final String parentOf ='#type > option:nth-child(6)'
-    private static final String  dataClassButton='a#role_list_create-catalogue-element-menu-item-link>span:nth-child(3)'
-    private static final String  menuButton='a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
-    private static final String  minOccurs='input#minOccurs'
-    private static final String  maxOccurs='input#maxOccurs'
+    private static final String createButton = 'a#role_data-models_create-data-modelBtn'
+    private static final String closeButton = 'div.modal-footer>button:nth-child(2)'
+    private static final String finishButton = 'button#step-finish'
+    private static final String search = 'input#element'
+    private static final String dataWizard = 'div.alert'
+    private static final String alert = 'div.alert>div>span'
+    private static final String deleteButton = 'a#delete-menu-item-link>span:nth-child(3)'
+    private static final String exitButton = 'div.modal-footer>button:nth-child(2)'
+    private static final String stepParent = 'button#step-parents'
+    private static final String occurrence = 'ul.nav-pills>li:nth-child(3)>a'
+    private static final String modelCatalogue = 'span.mc-name'
+    private static final String metadataButton = 'label.expand-metadata'
+    private static
+    final String table = '#data-elements-changes > div.inf-table-body > table > tbody > tr > td:nth-child(3) > span > span'
+    private static final String firstRow = 'tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)'
+    private static final String dataClass = 'tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a'
+    private static final String createRelationshipButton = 'a#create-new-relationship-menu-item-link>span:nth-child(3)'
+    private static final String parentOf = '#type > option:nth-child(6)'
+    private static
+    final String dataClassButton = 'a#role_list_create-catalogue-element-menu-item-link>span:nth-child(3)'
+    private static final String menuButton = 'a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
+    private static final String minOccurs = 'input#minOccurs'
+    private static final String maxOccurs = 'input#maxOccurs'
     private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
 
     def "login to model catalogue and create a data model"() {
@@ -95,16 +98,16 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
         when:
         click create
 
-        then:'check the title of the page'
+        then: 'check the title of the page'
         check modalHeader is 'Data Class Wizard'
 
         when: 'fill the data class form'
-        fill nameLabel with'TESTING_CLASS'
+        fill nameLabel with 'TESTING_CLASS'
         fill modelCatalogueId with 'ME-345'
         fill description with 'THIS IS MY TESTING DATA CLASS'
 
 
-        and:'select parent and fill the occurrence'
+        and: 'select parent and fill the occurrence'
         click stepParent
 
         and:
@@ -143,11 +146,11 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
         when:
         click dataClassButton
 
-        then:'check the title of the page'
+        then: 'check the title of the page'
         check modalHeader is 'Data Class Wizard'
 
         when: 'fill the data class form'
-        fill nameLabel with'TESTING'
+        fill nameLabel with 'TESTING'
         fill modelCatalogueId with 'ME-322'
         fill description with 'THIS IS MY TESTING DATA CLASS'
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
@@ -172,20 +175,20 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
         click dataClass
         click menuButton
 
-        and:'click on the create relationship and select is based on from the drop down list'
+        and: 'click on the create relationship and select is based on from the drop down list'
         click createRelationshipButton
         click parentOf
 
-        and:'select destination'
-        fill search with  'TESTING_CLASS' and pick first item
+        and: 'select destination'
+        fill search with 'TESTING_CLASS' and pick first item
 
-        and:'click on the metadata and select occurrence'
+        and: 'click on the metadata and select occurrence'
         click metadataButton
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         click occurrence
 
         and:
-        fill minOccurs with'1'
+        fill minOccurs with '1'
         fill maxOccurs with '10'
 
         and:
@@ -194,7 +197,7 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check table contains 'Min Occurs: 1\n' +
-            'Max Occurs: 10'
+                'Max Occurs: 10'
     }
 
     @Ignore
@@ -219,6 +222,6 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
 
         then:
         noExceptionThrown()
-       // check alert contains 'TESTING_DATA_MODEL_MAX is deleted'
+        // check alert contains 'TESTING_DATA_MODEL_MAX is deleted'
     }
 }

@@ -11,6 +11,7 @@ import org.modelcatalogue.spreadsheet.query.api.Predicate
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.IgnoreIf
+import spock.lang.Ignore
 
 @IgnoreIf({ System.getProperty('IGNORE_OFFICE') })
 class DataModelToXlsxExporterSpec extends AbstractIntegrationSpec {
@@ -86,6 +87,7 @@ class DataModelToXlsxExporterSpec extends AbstractIntegrationSpec {
     }
 
     @IgnoreIf( { System.getProperty('spock.ignore.slow') })
+    @Ignore
     def "export model to excel"() {
         setup:
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")

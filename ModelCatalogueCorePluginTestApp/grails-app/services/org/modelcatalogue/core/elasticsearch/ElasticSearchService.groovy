@@ -274,7 +274,10 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
-            boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
+            boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.matchQuery('ext.value', search)).boost(10))
+
+            // Uncomment this when nested enumerated_value problem solved
+//            boolQuery.should(QueryBuilders.nestedQuery('enumerated_value', QueryBuilders.termQuery('enumerated_value.value', search)).boost(10))
 
             boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
 
@@ -573,7 +576,7 @@ class ElasticSearchService implements SearchCatalogue {
         log.info "Reindexing IndexingSession.create"
         //index Data Models
         indexDomains(DataModel, session)
-        log.info "Reindexing starindexDomains(DataModel, session)t"
+        log.info "Reindexing starindexDomains(DataModel, session)"
         //index DataClasses
         indexDomains(DataClass, session)
         log.info "Reindexing indexDomains(DataClass, session)"
@@ -598,6 +601,9 @@ class ElasticSearchService implements SearchCatalogue {
         //Index RelationshipType
         indexDomains(RelationshipType, session)
         log.info "Reindexing indexDomains(RelationshipType, session)"
+        //Index ValidationRule
+        indexDomains(ValidationRule, session)
+        log.info "Reindexing indexDomains(ValidationRule, session)"
         //Index Users
         indexDomains(User, session)
         log.info "Reindexing indexDomains(User, session)"
@@ -651,11 +657,10 @@ class ElasticSearchService implements SearchCatalogue {
             //split indexing into batches
             if ((i + 1) % ELEMENTS_PER_BATCH == 0 || (i + 1) == count) {
                 //TODO: can we get rid of placeholder for last
-                println "Index " + element.toString() + i
+                log.info("Indexing " + element.toString() + i)
                 try {
                     indexSimpleIndexRequests(singleRequests).toBlocking().last()
                     singleRequests.clear()
-                    println "Clear" + i
                 }catch(Error e){
                     log.error e
                 }

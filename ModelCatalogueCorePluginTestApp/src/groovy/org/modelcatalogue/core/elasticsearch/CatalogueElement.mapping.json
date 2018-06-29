@@ -64,6 +64,19 @@
         "properties": {
           "key": {
             "type": "string",
+            "index": "analyzed"
+          },
+          "value": {
+            "type": "string",
+            "index": "analyzed"
+          }
+        }
+      },
+      "enumerated_value": {
+        "type": "nested",
+        "properties": {
+          "key": {
+            "type": "string",
             "index": "not_analyzed"
           },
           "value": {

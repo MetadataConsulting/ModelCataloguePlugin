@@ -8,14 +8,16 @@ import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getPick
 
 //functionality has been removed so ignore for the moment
+@Ignore
 class CompareTwoDataModelSpec extends AbstractModelCatalogueGebSpec {
-    private static final String Icon ="div.content-row>div>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(2)>div>div:nth-child(4)>div>div>div>div:nth-child(9)>div:nth-child(1)>div:nth-child(1)>h3>a>span:nth-child(1)"
-    private static final String dataModel="a#role_item_catalogue-element-menu-item-link>span:nth-child(1)"
-    private static final String compare ="a#compare-catalogue-element-menu-item-link>span:nth-child(3)"
-    private static final String leftIcon="span.input-group-addon"
-    private static final String search_box ="input#value"
-    private static final String clickOK="button.btn-primary"
-     private static String text ="cancer Model"
+    private static
+    final String Icon = "div.content-row>div>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(2)>div>div:nth-child(4)>div>div>div>div:nth-child(9)>div:nth-child(1)>div:nth-child(1)>h3>a>span:nth-child(1)"
+    private static final String dataModel = "a#role_item_catalogue-element-menu-item-link>span:nth-child(1)"
+    private static final String compare = "a#compare-catalogue-element-menu-item-link>span:nth-child(3)"
+    private static final String leftIcon = "span.input-group-addon"
+    private static final String search_box = "input#value"
+    private static final String clickOK = "button.btn-primary"
+    private static String text = "cancer Model"
 
     @Ignore
     def "compare two models"() {
@@ -48,7 +50,7 @@ class CompareTwoDataModelSpec extends AbstractModelCatalogueGebSpec {
         click leftIcon
 
         then:
-         noExceptionThrown()
+        noExceptionThrown()
 
         when:
         // selectRelation a model

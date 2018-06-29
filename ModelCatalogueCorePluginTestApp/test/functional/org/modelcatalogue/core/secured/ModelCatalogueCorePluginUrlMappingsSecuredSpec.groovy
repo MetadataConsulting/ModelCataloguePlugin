@@ -8,7 +8,8 @@ import spock.lang.Ignore
 import spock.lang.Unroll
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ System.getProperty('spock.ignore.secured') })
+@Ignore
+//@IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class ModelCatalogueCorePluginUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {
@@ -65,17 +66,17 @@ class ModelCatalogueCorePluginUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/forms/generate/$id',
-        '/api/modelCatalogue/core/forms/preview/$id',
-        '/catalogue/ext/$key/$value',
-        '/catalogue/ext/$key/$value/export',
-        '/catalogue/$resource/$id',
-        '/catalogue/$resource/$id/export',
-        '/api/modelCatalogue/core/feedback',
-        '/api/modelCatalogue/core/feedback/$key',
-        '/api/modelCatalogue/core/logs',
-        '/load',
-        '/api/modelCatalogue/core/search/$search?',
-                ]
+                '/api/modelCatalogue/core/forms/generate/$id',
+                '/api/modelCatalogue/core/forms/preview/$id',
+                '/catalogue/ext/$key/$value',
+                '/catalogue/ext/$key/$value/export',
+                '/catalogue/$resource/$id',
+                '/catalogue/$resource/$id/export',
+                '/api/modelCatalogue/core/feedback',
+                '/api/modelCatalogue/core/feedback/$key',
+                '/api/modelCatalogue/core/logs',
+                '/load',
+                '/api/modelCatalogue/core/search/$search?',
+        ]
     }
 }

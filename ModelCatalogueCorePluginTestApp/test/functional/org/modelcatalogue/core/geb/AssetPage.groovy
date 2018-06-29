@@ -13,5 +13,15 @@ class AssetPage extends Page {
 
     static content = {
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+        showMoreButton { $('a.inf-cell-expand') }
+        downloadAssetLink(required: false, wait: true) { $('a', text: "Download Asset") }
+    }
+
+    void showMore() {
+        showMoreButton.click()
+    }
+
+    void downloadAsset() {
+        downloadAssetLink.click()
     }
 }

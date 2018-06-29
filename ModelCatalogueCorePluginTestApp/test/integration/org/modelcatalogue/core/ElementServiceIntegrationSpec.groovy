@@ -9,6 +9,7 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import spock.lang.IgnoreIf
 import spock.lang.Issue
 import spock.lang.Unroll
+import spock.lang.Ignore
 
 @IgnoreIf( { System.getProperty('spock.ignore.slow') })
 class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
@@ -214,6 +215,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         cosd?.delete()
     }
 
+    @Ignore
     def "create new version of hierarchy model"() {
 
         setup:

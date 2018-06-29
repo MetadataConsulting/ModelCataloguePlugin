@@ -13,12 +13,13 @@ import spock.lang.IgnoreIf
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 
     public static final CatalogueAction exportAction = CatalogueAction.runFirst('item', 'export')
     public static
     final CatalogueContent changeLogForRDEligibilityXSLX =
-        CatalogueContent.create('.menu-item-link', text: 'Change Log for RD Eligibility (Excel)')
+            CatalogueContent.create('.menu-item-link', text: 'Change Log for RD Eligibility (Excel)')
 
     @Ignore
     def "go to login"() {
@@ -47,15 +48,15 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
     def "download the change log as MS Excel spreadsheet"() {
 
         when:
-            click exportAction
-            click changeLogForRDEligibilityXSLX
+        click exportAction
+        click changeLogForRDEligibilityXSLX
 
-            // tracking the window open does not work very well but the asset will appear in the treeview when created
-            selectInTree 'Assets', true
-            selectInTree 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet)'
+        // tracking the window open does not work very well but the asset will appear in the treeview when created
+        selectInTree 'Assets', true
+        selectInTree 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet)'
 
         then:
-            check Common.rightSideTitle contains 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet)'
-            check Common.rightSideDescription is 'Your report is ready. Use Download button to download it.'
+        check Common.rightSideTitle contains 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet)'
+        check Common.rightSideDescription is 'Your report is ready. Use Download button to download it.'
     }
 }

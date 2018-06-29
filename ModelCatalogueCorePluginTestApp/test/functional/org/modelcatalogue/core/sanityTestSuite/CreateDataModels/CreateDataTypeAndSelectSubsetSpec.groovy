@@ -22,13 +22,14 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('geb.env') == 'chromeHeadless' })
 @Stepwise
+@Ignore
 class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String  subset= "input#pickSubsetType"
-    private static final String enumeratedTypeBase ="input#baseEnumeration"
-    private static final String  deleteButton="a#delete-menu-item-link>span:nth-child(3)"
-    private static final String  dataType ="tr.inf-table-item-row>td:nth-child(1)>span>span>a"
-    private static final String  enumeratedType ="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
+    private static final String subset = "input#pickSubsetType"
+    private static final String enumeratedTypeBase = "input#baseEnumeration"
+    private static final String deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
+    private static final String dataType = "tr.inf-table-item-row>td:nth-child(1)>span>span>a"
+    private static final String enumeratedType = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
     private static final String table = "tr.inf-table-item-row>td:nth-child(1)"
 
     def "login and navigate to Data model"() {
@@ -86,16 +87,16 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "delete the created data type"() {
-        when:'click on the created data type'
+        when: 'click on the created data type'
         click dataType
 
-        and:'navigate to the top menu and click on the reference type button'
+        and: 'navigate to the top menu and click on the reference type button'
         click enumeratedType
 
         and:
         click deleteButton
 
-        and:'confirmation'
+        and: 'confirmation'
         click modalPrimaryButton
 
         then:
