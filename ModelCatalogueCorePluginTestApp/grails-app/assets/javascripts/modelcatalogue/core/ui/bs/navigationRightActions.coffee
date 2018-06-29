@@ -21,7 +21,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     {
       position:   -5000
       icon:       'fa fa-plus fa-fw'
-      label:      'Create Data Model'
+      label:      'Create Data Model'data
       iconOnly:   true
       action: ->
         $window.location.replace("#{security.contextPath}/dataModel/create")
