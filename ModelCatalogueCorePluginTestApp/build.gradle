@@ -513,12 +513,13 @@ task runKarmaTests(type: NodeTask) {
     description = "Runs Karma tests for Angular"
 
     script = file('node_modules/karma/bin/karma')
-    args = [ 'start', '--single-run', '--browsers', 'Firefox']
+    args = [ 'start', '--single-run=false', '--auto-watch', '--browsers', 'Chrome']
     inputs.files file('karma.conf.json')
     inputs.files files('test/js')
     inputs.files files('grails-app/assets')
     outputs.files file('target/test-reports-js')
-    dependsOn([bowerInstall, runGrailsTests])
+//    dependsOn([bowerInstall, runGrailsTests])
+    dependsOn([bowerInstall])
 }
 
 task collectTestReports(type: Copy) {

@@ -3,6 +3,8 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
   beforeEach module 'mc.core.ui.states.bs'
   beforeEach module 'sly'
 
+  beforeEach module 'karmaTestingTemplates'
+
   return unless window.fixtures
 
   it "element get compiled",  inject ($compile, $rootScope, enhance, modelCatalogueApiRoot, $httpBackend) ->
@@ -24,14 +26,14 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
 
     expect(element.prop('tagName').toLowerCase()).toBe('li')
     expect(element.find('span.catalogue-element-treeview-name').text().replace(/^\s+|\s+$/g, '').replace(/\s\s+/g, ' '))
-      .toBe(catEl.name)
+      .toBe("#{catEl.name} #{catEl.name}")
     # No longer test for total since we've removed it for now
     # expect(element.find('span.badge').text().replace(/^\s+|\s+$/g, '').replace(/\s\s+/g, ' ')).toBe("#{catEl.outgoingRelationships.total}")
 
 
     relationships = angular.copy(fixtures.dataType.outgoing1)
 
-    $httpBackend.expect('GET', catEl.outgoingRelationships.link).respond(relationships)
+    $httpBackend.expect('GET', "#{catEl.outgoingRelationships.link}?minimal=true").respond(relationships)
 
     element.find('a').click()
 

@@ -1,17 +1,6 @@
-angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'mc.util.ui.applicationTitle', 'ui.router', 'mc.core.ui.catalogueElementProperties', 'ngSanitize', 'mc.core.ui.messagesPanel', 'mc.util.ui.treeview.DescendPath']).directive 'catalogueElementView',  [-> {
-    restrict: 'E'
-    replace: true
-    scope:
-      element: '='
-      property: '=?'
-      id: '@'
-      displayOnly: '=?'
-
-    templateUrl: '/mc/core/ui/catalogueElementView.html'
-
-    controller: [
-     '$scope', '$filter', '$q', '$timeout', '$state', 'enhance', 'names', 'columns', 'messages', '$element', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'catalogueElementResource', 'detailSections', 'rest', 'modelCatalogueApiRoot','publishedStatuses',
-     ($scope ,  $filter ,  $q ,  $timeout ,  $state ,  enhance ,  names ,  columns ,  messages ,  $element ,  $rootScope ,  security ,  catalogueElementProperties ,  $injector ,  applicationTitle ,  catalogue ,  catalogueElementResource ,  detailSections, rest, modelCatalogueApiRoot, publishedStatuses) ->
+class CatalogueElementViewController
+  constructor: ($scope ,  $filter ,  $q ,  $timeout ,  $state ,  enhance ,  names ,  columns ,  messages ,  $element ,  $rootScope ,  security ,  catalogueElementProperties ,  $injector ,  applicationTitle ,  catalogue ,  catalogueElementResource ,  detailSections, rest, modelCatalogueApiRoot, publishedStatuses) ->
+      'ngInject'
       showErrorsUsingMessages = (localMessages) ->
         (response) ->
           if response?.data and response.data.errors
@@ -224,22 +213,22 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.supportsInlineEdit = (editableForm) ->
         return security.hasRole('CURATOR') \
-            and editableForm \
-            and angular.isFunction($scope.element?.isInstanceOf) \
-            and (\
-              $scope.element?.isInstanceOf('dataModel') \
-                or $scope.element?.isInstanceOf('enumeratedType')\
-                or $scope.element?.isInstanceOf('asset')\
-                or $scope.element?.isInstanceOf('dataClass')\
-                or $scope.element?.isInstanceOf('dataType')\
-                or $scope.element?.isInstanceOf('primitiveType')\
-                or $scope.element?.isInstanceOf('referenceType')\
-                or $scope.element?.isInstanceOf('measurementUnit')\
-                or $scope.element?.isInstanceOf('dataElement')\
-                or $scope.element?.isInstanceOf('validationRule')\
-                or $scope.element?.isInstanceOf('tag')\
-            )\
-            and ($scope.element?.status == 'DRAFT' or security.hasRole('SUPERVISOR'))
+          and editableForm \
+          and angular.isFunction($scope.element?.isInstanceOf) \
+          and (\
+            $scope.element?.isInstanceOf('dataModel') \
+              or $scope.element?.isInstanceOf('enumeratedType')\
+              or $scope.element?.isInstanceOf('asset')\
+              or $scope.element?.isInstanceOf('dataClass')\
+              or $scope.element?.isInstanceOf('dataType')\
+              or $scope.element?.isInstanceOf('primitiveType')\
+              or $scope.element?.isInstanceOf('referenceType')\
+              or $scope.element?.isInstanceOf('measurementUnit')\
+              or $scope.element?.isInstanceOf('dataElement')\
+              or $scope.element?.isInstanceOf('validationRule')\
+              or $scope.element?.isInstanceOf('tag')\
+          )\
+          and ($scope.element?.status == 'DRAFT' or security.hasRole('SUPERVISOR'))
 
       $scope.inlineUpdateElement = ->
         deferred = $q.defer()
@@ -313,6 +302,21 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       # watches
       $scope.$watch 'element', onElementUpdate
       $scope.$watch 'property', onPropertyUpdate
-    ]
+
+angular.module('mc.core.ui.catalogueElementView',
+  ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'mc.util.ui.applicationTitle', 'ui.router', 'mc.core.ui.catalogueElementProperties', 'ngSanitize', 'mc.core.ui.messagesPanel', 'mc.util.ui.treeview.DescendPath']).controller('CatalogueElementViewController', CatalogueElementViewController)
+  .directive 'catalogueElementView',  [-> {
+    restrict: 'E'
+    replace: true
+    scope:
+      element: '='
+      property: '=?'
+      id: '@'
+      displayOnly: '=?'
+
+    templateUrl: '/mc/core/ui/catalogueElementView.html'
+
+    controller: 'CatalogueElementViewController'
+
   }
 ]
