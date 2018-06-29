@@ -2,12 +2,14 @@ package org.modelcatalogue.core.sanityTestSuite.Login
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.RegisterPage
+import spock.lang.Ignore
 
+@Ignore
 class ValidateRegistrationSpec extends GebSpec {
 
     void goToRegistration() {
 
-        when:'Password must have at least one letter, number, and special character and should be longer then 8 characters.'
+        when: 'Password must have at least one letter, number, and special character and should be longer then 8 characters.'
         to RegisterPage
 
         then:

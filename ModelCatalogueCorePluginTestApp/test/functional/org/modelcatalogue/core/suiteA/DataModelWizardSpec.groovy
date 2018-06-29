@@ -16,12 +16,13 @@ import spock.lang.IgnoreIf
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     static final String classificationWizzard = 'div.create-classification-wizard'
     static final String wizardName = 'div.create-classification-wizard #name'
-    static final String description ='div.create-classification-wizard #description'
-    static final String modelCatalogueId ='div.create-classification-wizard #modelCatalogueId'
+    static final String description = 'div.create-classification-wizard #description'
+    static final String modelCatalogueId = 'div.create-classification-wizard #modelCatalogueId'
     static final String stepImports = "#step-imports"
     static final String stepFinish = "#step-finish"
     static final String exitButton = "#exit-wizard"
@@ -169,12 +170,12 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         click Common.createNewDataModel
 
         then: 'the model dialog opens'
-            check classificationWizzard displayed
+        check classificationWizzard displayed
 
         when:
-            fill wizardName with "New Data Model $uuid"
-            fill modelCatalogueId with "http://www.example.com/$uuid"
-            fill description with "Description of Data Model"
+        fill wizardName with "New Data Model $uuid"
+        fill modelCatalogueId with "http://www.example.com/$uuid"
+        fill description with "Description of Data Model"
 
         then:
         // TODO: check does not work even if the button is enabled
@@ -182,42 +183,42 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         true
 
         when:
-            click stepFinish
+        click stepFinish
 
         then:
-            check '#summary' is "Data Model New Data Model $uuid created"
+        check '#summary' is "Data Model New Data Model $uuid created"
 
         when:
-            click exitButton
-            remove Common.messages
+        click exitButton
+        remove Common.messages
 
         then:
-            check Common.rightSideTitle contains "New Data Model $uuid"
+        check Common.rightSideTitle contains "New Data Model $uuid"
 
         check Common.backdrop gone
         when: "delete action is clicked"
-            click Common.delete
+        click Common.delete
 
         then: "modal prompt is displayed"
-            check Common.confirm displayed
+        check Common.confirm displayed
 
         when: "ok is clicked"
-            click Common.OK
+        click Common.OK
 
         then: "you are redirected to the data models page"
-            waitFor(120) { browser.title == 'Data Models' }
+        waitFor(120) { browser.title == 'Data Models' }
 
         when: "you try to create the data model with the same name"
 
-            click Common.createNewDataModel
+        click Common.createNewDataModel
 
         then: 'the model dialog opens'
-            check classificationWizzard displayed
+        check classificationWizzard displayed
 
         when:
-            fill wizardName with "New Data Model $uuid"
-            fill modelCatalogueId with "http://www.example.com/$uuid"
-            fill description with "Description of Data Model"
+        fill wizardName with "New Data Model $uuid"
+        fill modelCatalogueId with "http://www.example.com/$uuid"
+        fill description with "Description of Data Model"
 
         then:
         // TODO: check does not work even if the button is enabled
@@ -225,16 +226,16 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         true
 
         when:
-            click stepFinish
+        click stepFinish
 
         then:
-            check '#summary' is "Data Model New Data Model $uuid created"
+        check '#summary' is "Data Model New Data Model $uuid created"
 
         when:
-            click exitButton
-            remove Common.messages
+        click exitButton
+        remove Common.messages
 
         then:
-            check Common.rightSideTitle contains "New Data Model $uuid"
+        check Common.rightSideTitle contains "New Data Model $uuid"
     }
 }

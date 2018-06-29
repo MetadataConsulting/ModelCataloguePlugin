@@ -13,15 +13,17 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String  adminTag = "#role_navigation-right_admin-menu-menu-item-link > span.fa.fa-cog"
-    private static final String userName="#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td:nth-child(3) > span > span > a"
-    private static final String  favourite ="a#role_item-detail_favorite-elementBtn"
-    private static final String  User="a#role_navigation-right_user-menu-menu-item-link>span:nth-child(1)"
-    private static final String  favouriteTag="a#user-favorites-menu-item-link>span:nth-child(3)"
-    private static final String  tableFirstROW ="tr.inf-table-item-row>td:nth-child(1)"
-    private static final String   plusButton ="span.fa-plus-square-o"
+    private static final String adminTag = "#role_navigation-right_admin-menu-menu-item-link > span.fa.fa-cog"
+    private static
+    final String userName = "#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td:nth-child(3) > span > span > a"
+    private static final String favourite = "a#role_item-detail_favorite-elementBtn"
+    private static final String User = "a#role_navigation-right_user-menu-menu-item-link>span:nth-child(1)"
+    private static final String favouriteTag = "a#user-favorites-menu-item-link>span:nth-child(3)"
+    private static final String tableFirstROW = "tr.inf-table-item-row>td:nth-child(1)"
+    private static final String plusButton = "span.fa-plus-square-o"
 
     def "login to model catalogue"() {
         when:
@@ -54,25 +56,25 @@ class AddUsernameToFavouriteSpec extends AbstractModelCatalogueGebSpec {
     @Ignore
     def "navigate to the author tag and select a username"() {
 
-         when:
-         click userName
+        when:
+        click userName
 
-         then:
-         check favourite displayed
+        then:
+        check favourite displayed
     }
 
     @Ignore
     def "click on the favourite button and verify favourite tag"() {
-         when:
-         click favourite
+        when:
+        click favourite
 
-         and:
-         Thread.sleep(2000l)
-         click User
-         click favouriteTag
+        and:
+        Thread.sleep(2000l)
+        click User
+        click favouriteTag
 
-         then:
-         check tableFirstROW displayed
+        then:
+        check tableFirstROW displayed
     }
 
     @Ignore

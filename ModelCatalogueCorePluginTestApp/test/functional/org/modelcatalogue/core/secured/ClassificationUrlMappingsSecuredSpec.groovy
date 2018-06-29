@@ -5,9 +5,11 @@ import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Unroll
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
 @IgnoreIf({ System.getProperty('spock.ignore.secured') })
+@Ignore
 class ClassificationUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {
@@ -28,20 +30,20 @@ class ClassificationUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/classification',
-        '/api/modelCatalogue/core/classification/$id/validate',
-        '/api/modelCatalogue/core/classification/validate',
-        '/api/modelCatalogue/core/classification/$id/outgoing/$type',
-        '/api/modelCatalogue/core/classification/$id/incoming/$type',
-        '/api/modelCatalogue/core/classification/$id/mapping/$destination',
-        '/api/modelCatalogue/core/classification/$id/archive',
-        '/api/modelCatalogue/core/classification/$id/restore',
-        '/api/modelCatalogue/core/classification/$id/clone/$destinationDataModelId',
-        '/api/modelCatalogue/core/classification/$source/merge/$destination',
-        '/api/modelCatalogue/core/classification/preload',
-        '/api/modelCatalogue/core/classification/$id/newVersion',
-        '/api/modelCatalogue/core/classification/$id/reindex',
-                ]
+                '/api/modelCatalogue/core/classification',
+                '/api/modelCatalogue/core/classification/$id/validate',
+                '/api/modelCatalogue/core/classification/validate',
+                '/api/modelCatalogue/core/classification/$id/outgoing/$type',
+                '/api/modelCatalogue/core/classification/$id/incoming/$type',
+                '/api/modelCatalogue/core/classification/$id/mapping/$destination',
+                '/api/modelCatalogue/core/classification/$id/archive',
+                '/api/modelCatalogue/core/classification/$id/restore',
+                '/api/modelCatalogue/core/classification/$id/clone/$destinationDataModelId',
+                '/api/modelCatalogue/core/classification/$source/merge/$destination',
+                '/api/modelCatalogue/core/classification/preload',
+                '/api/modelCatalogue/core/classification/$id/newVersion',
+                '/api/modelCatalogue/core/classification/$id/reindex',
+        ]
     }
 
     @Unroll
@@ -54,29 +56,29 @@ class ClassificationUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/classification/$id/incoming',
-        '/api/modelCatalogue/core/classification/$id/outgoing',
-        '/api/modelCatalogue/core/classification/preload',
-        '/api/modelCatalogue/core/classification/$id/inventorySpreadsheet',
-        '/api/modelCatalogue/core/classification/$id/incoming/search',
-        '/api/modelCatalogue/core/classification/$id/incoming/$type/search',
-        '/api/modelCatalogue/core/classification/$id/incoming/$type',
-        '/api/modelCatalogue/core/classification',
-        '/api/modelCatalogue/core/classification/search/$search',
-        '/api/modelCatalogue/core/classification/$id',
-        '/api/modelCatalogue/core/classification/$id/outgoing/search',
-        '/api/modelCatalogue/core/classification/$id/outgoing/$type/search',
-        '/api/modelCatalogue/core/classification/$id/outgoing/$type',
-        '/api/modelCatalogue/core/classification/$id/gridSpreadsheet',
-        '/api/modelCatalogue/core/classification/$id/excelExporterSpreadsheet',
-        '/api/modelCatalogue/core/classification/$id/inventoryDoc',
-        '/api/modelCatalogue/core/classification/$id/dependents',
-        '/api/modelCatalogue/core/classification/$id/containsOrImports/$other',
-        '/api/modelCatalogue/core/classification/$id/content',
-        '/api/modelCatalogue/core/classification/$id/mapping',
-        '/api/modelCatalogue/core/classification/$id/typeHierarchy',
-        '/api/modelCatalogue/core/classification/$id/history',
-        '/api/modelCatalogue/core/classification/$id/path',
+                '/api/modelCatalogue/core/classification/$id/incoming',
+                '/api/modelCatalogue/core/classification/$id/outgoing',
+                '/api/modelCatalogue/core/classification/preload',
+                '/api/modelCatalogue/core/classification/$id/inventorySpreadsheet',
+                '/api/modelCatalogue/core/classification/$id/incoming/search',
+                '/api/modelCatalogue/core/classification/$id/incoming/$type/search',
+                '/api/modelCatalogue/core/classification/$id/incoming/$type',
+                '/api/modelCatalogue/core/classification',
+                '/api/modelCatalogue/core/classification/search/$search',
+                '/api/modelCatalogue/core/classification/$id',
+                '/api/modelCatalogue/core/classification/$id/outgoing/search',
+                '/api/modelCatalogue/core/classification/$id/outgoing/$type/search',
+                '/api/modelCatalogue/core/classification/$id/outgoing/$type',
+                '/api/modelCatalogue/core/classification/$id/gridSpreadsheet',
+                '/api/modelCatalogue/core/classification/$id/excelExporterSpreadsheet',
+                '/api/modelCatalogue/core/classification/$id/inventoryDoc',
+                '/api/modelCatalogue/core/classification/$id/dependents',
+                '/api/modelCatalogue/core/classification/$id/containsOrImports/$other',
+                '/api/modelCatalogue/core/classification/$id/content',
+                '/api/modelCatalogue/core/classification/$id/mapping',
+                '/api/modelCatalogue/core/classification/$id/typeHierarchy',
+                '/api/modelCatalogue/core/classification/$id/history',
+                '/api/modelCatalogue/core/classification/$id/path',
         ]
     }
 
@@ -94,9 +96,9 @@ class ClassificationUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/classification/$id',
-        '/api/modelCatalogue/core/classification/$id/outgoing/$type',
-        '/api/modelCatalogue/core/classification/$id/incoming/$type',
+                '/api/modelCatalogue/core/classification/$id',
+                '/api/modelCatalogue/core/classification/$id/outgoing/$type',
+                '/api/modelCatalogue/core/classification/$id/incoming/$type',
         ]
     }
 
@@ -114,10 +116,10 @@ class ClassificationUrlMappingsSecuredSpec extends GebSpec {
 
         where:
         endpoint << [
-        '/api/modelCatalogue/core/classification/$id',
-        '/api/modelCatalogue/core/classification/$id/outgoing/$type',
-        '/api/modelCatalogue/core/classification/$id/incoming/$type',
-        '/api/modelCatalogue/core/classification/$id/mapping/$destination',
+                '/api/modelCatalogue/core/classification/$id',
+                '/api/modelCatalogue/core/classification/$id/outgoing/$type',
+                '/api/modelCatalogue/core/classification/$id/incoming/$type',
+                '/api/modelCatalogue/core/classification/$id/mapping/$destination',
         ]
     }
 }

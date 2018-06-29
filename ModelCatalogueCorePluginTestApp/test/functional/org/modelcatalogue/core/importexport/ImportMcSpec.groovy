@@ -1,12 +1,14 @@
 package org.modelcatalogue.core.importexport
 
 import geb.spock.GebSpec
+import spock.lang.Ignore
 import org.modelcatalogue.core.geb.AssetPage
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataTypesPage
 import org.modelcatalogue.core.geb.LoginPage
 import org.modelcatalogue.core.geb.ImportModelCatalogueDslPage
 
+@Ignore
 class ImportMcSpec extends GebSpec {
 
     def "import mc file"() {
@@ -59,7 +61,7 @@ class ImportMcSpec extends GebSpec {
     int numberOfLinesContains(File f, String value) {
         int numberOfLinesContainsDataType = 0
         f.eachLine { String line ->
-            if ( line.contains(value) ) {
+            if (line.contains(value)) {
                 numberOfLinesContainsDataType++
             }
         }

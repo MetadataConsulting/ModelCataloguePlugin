@@ -8,6 +8,7 @@ import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
 import spock.lang.Narrative
+import spock.lang.Ignore
 import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-1604')
@@ -18,6 +19,7 @@ import spock.lang.Title
 - Fill the form and select Select unique of kind or default checks
 - Click on the green button
 ''')
+@Ignore
 class CanSelectPoliciesWhileCreatingDataModelSpec extends GebSpec {
 
     def "Data Model is created when selecting policies"() {

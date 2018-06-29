@@ -26,9 +26,11 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     private static final String xmlEditorStylesheet = '#xml-editor-stylesheet'
     private static final String xmlEditorSource = '#xml-editor-source'
     private static final String xmlEditorResult = '#xml-editor-result'
-    private static final CatalogueContent detailSectionDataElement = CatalogueContent.create('data-view-name': 'Children')
+    private static
+    final CatalogueContent detailSectionDataElement = CatalogueContent.create('data-view-name': 'Children')
     private static final CatalogueAction exportXml = CatalogueAction.runLast('item', 'export', 'edit-XML')
-    private static final CatalogueContent resultContentLines = CatalogueContent.create(xmlEditorResult).find('.ace_content .ace_line')
+    private static
+    final CatalogueContent resultContentLines = CatalogueContent.create(xmlEditorResult).find('.ace_content .ace_line')
     private static final String NEW_DATA_CLASS_NAME = "New ${UUID.randomUUID().toString()}"
 
     def "go to login"() {

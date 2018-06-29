@@ -64,11 +64,11 @@
         "properties": {
           "key": {
             "type": "string",
-            "index": "not_analyzed"
+            "index": "analyzed"
           },
           "value": {
             "type": "string",
-            "index": "not_analyzed"
+            "index": "analyzed"
           }
         }
       }

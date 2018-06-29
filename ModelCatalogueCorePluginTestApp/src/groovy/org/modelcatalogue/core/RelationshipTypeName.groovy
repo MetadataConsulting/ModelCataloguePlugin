@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 enum RelationshipTypeName {
-    CONTAINEMENT("containment"),
+    CONTAINMENT("containment"),
     INVOLVEDNESS("involvedness"),
     RULE_CONTEXT("ruleContext"),
     DECLARATION("declaration"),

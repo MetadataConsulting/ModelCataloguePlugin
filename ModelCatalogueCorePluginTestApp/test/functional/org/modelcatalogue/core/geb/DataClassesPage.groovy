@@ -20,9 +20,28 @@ class DataClassesPage extends Page {
         }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         rows { $('div.inf-table-body tbody tr') }
+        nav { $('div.navbar-collapse', 0).module(NavModuleAdmin) }
+        selectDataClass(wait: true) { $('span.ng-binding a', text: it) }
+        titlename { $('div.col-md-12 h3') }
+        expandLink { $('a.inf-cell-expand') }
+        dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
+        deleteBttn { $('a#deleteBtn') }
+        dataClassByName(wait: true) { rows.$('a', text: it) }
         showMoreButton { $('span.fa-plus-square-o') }
         editDataClassButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
         titlename { $('div   h3') }
+    }
+
+    void expandLinkClick() {
+        expandLink.click()
+    }
+
+    Boolean isDeleteBttnDisable() {
+        deleteBttn.attr("class") == "disabled"
+    }
+
+    void dataElementDropDown() {
+        dataElementDropDownTag.click()
     }
 
     int count() {
@@ -39,6 +58,40 @@ class DataClassesPage extends Page {
     void createDataClass() {
         createDateClassLink.click()
     }
+
+    /*void selectDataClass(String value) {
+        rows.$('a', text: value).click()
+    }*/
+
+    Boolean dataClassPresent(String value) {
+        waitFor { createDateClassLink }
+        $('a', text: value).displayed
+    }
+
+    void selectDataClassLink(String value) {
+        selectDataClass(value).click()
+    }
+
+    String titleText() {
+        return titlename.text()
+    }
+
+    void findByName(String value) {
+        $('a', text: value).click()
+    }
+
+    void selectDataClassByName(String value) {
+        dataClassByName(value).click()
+        sleep(2_000)
+    }
+
+    boolean containsDataClass(String value) {
+        if ($('a', text: value)) {
+            return true
+        }
+        false
+    }
+
 
     void showMore() {
         showMoreButton.click()

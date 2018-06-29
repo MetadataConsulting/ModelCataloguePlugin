@@ -8,6 +8,7 @@ import org.modelcatalogue.core.geb.VersionsPage
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
+import spock.lang.Ignore
 
 @Issue('https://metadata.atlassian.net/browse/MET-1433')
 @Title('Verify navigation to old version of a model using the tree view')
@@ -17,6 +18,7 @@ import spock.lang.Title
 - On the tree view, click on the Versions link
 - Verify version is displaying at the end of every model
 ''')
+@Ignore
 class AbleToNavigateToOldVersionOfAModelThroughTreeSpec extends GebSpec {
 
     void "Verify navigation to old version of a model using the tree view"() {

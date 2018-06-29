@@ -5,9 +5,11 @@ import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Unroll
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 
-@IgnoreIf({ System.getProperty('spock.ignore.secured') })
+@Ignore
+//@IgnoreIf({ System.getProperty('spock.ignore.secured') })
 class ModelCatalogueGenomicsUrlMappingsSecuredSpec extends GebSpec {
 
     protected String getBaseUrl() {
@@ -59,6 +61,6 @@ class ModelCatalogueGenomicsUrlMappingsSecuredSpec extends GebSpec {
                 '/api/modelCatalogue/core/genomics/exportAllRareDiseaseReports/$id',
                 '/api/modelCatalogue/core/genomics/exportRareDiseasesWebsite/$id',
                 '/api/modelCatalogue/core/genomics/exportRareDiseaseSplitDocs/$id',
-                ]
+        ]
     }
 }

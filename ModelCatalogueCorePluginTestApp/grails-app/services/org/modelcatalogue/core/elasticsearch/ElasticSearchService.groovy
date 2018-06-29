@@ -274,7 +274,7 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
-            boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
+            boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.matchQuery('ext.value', search)).boost(10))
 
             boolQuery.should(QueryBuilders.matchPhraseQuery("name", search).boost(300))
 
@@ -598,6 +598,9 @@ class ElasticSearchService implements SearchCatalogue {
         //Index RelationshipType
         indexDomains(RelationshipType, session)
         log.info "Reindexing indexDomains(RelationshipType, session)"
+        //Index ValidationRule
+        indexDomains(ValidationRule, session)
+        log.info "Reindexing indexDomains(ValidationRule, session)"
         //Index Users
         indexDomains(User, session)
         log.info "Reindexing indexDomains(User, session)"

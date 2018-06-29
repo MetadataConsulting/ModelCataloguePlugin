@@ -6,15 +6,17 @@ import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
-@IgnoreIf({ !System.getProperty('geb.env')  })
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
-class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
-    private static final String searchInput2 ="#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > div:nth-child(1) > div > div:nth-child(1) > div > div > div > div > input"
+@Ignore
+class SearchCatalogueModelsSpec extends AbstractModelCatalogueGebSpec {
+    private static
+    final String searchInput2 = "#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > div:nth-child(1) > div > div:nth-child(1) > div > div > div > div > input"
     private static final String defaultButton = 'button.ng-binding'
     private static final String all = "ul.dropdown-menu-right>li:nth-child(1)>a"
     private static final String draft = "ul.dropdown-menu-right>li:nth-child(2)>a"
     private static final String finalized = "ul.dropdown-menu-right>li:nth-child(3)>a"
-    private static final String  catalogueModels ='ul.nav-tabs>li:nth-child(2)>a'
+    private static final String catalogueModels = 'ul.nav-tabs>li:nth-child(2)>a'
     private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
 
     @Ignore
@@ -23,7 +25,7 @@ class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
 
-        and:'click on the catalogue model'
+        and: 'click on the catalogue model'
         click catalogueModels
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
@@ -42,17 +44,17 @@ class SearchCatalogueModelsSpec  extends AbstractModelCatalogueGebSpec{
         click draft
 
         then: 'verify that draft is displayed'
-        check defaultButton contains  "Draft"
+        check defaultButton contains "Draft"
     }
 
     @Ignore
     def "search for finalized model"() {
-         when: 'click on button next to search catalogue'
-         click defaultButton
-         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-         click finalized
+        when: 'click on button next to search catalogue'
+        click defaultButton
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+        click finalized
 
-         then:
-         check defaultButton is "Finalized"
+        then:
+        check defaultButton is "Finalized"
     }
 }

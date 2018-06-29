@@ -9,6 +9,7 @@ import org.modelcatalogue.core.geb.UserSearchPage
 import org.modelcatalogue.core.security.MetadataRoles
 import spock.lang.Issue
 import spock.lang.Narrative
+import spock.lang.Ignore
 import spock.lang.Stepwise
 import spock.lang.Title
 
@@ -27,6 +28,7 @@ import spock.lang.Title
 - Check that User X now sees the import menu next to the admin menu in the top left corner. The admin menu should also include the option for Mapping Utility
 ''')
 @Stepwise
+@Ignore
 class GrantRoleCuratorSpec extends GebSpec {
 
     def "Login as supervisor"() {

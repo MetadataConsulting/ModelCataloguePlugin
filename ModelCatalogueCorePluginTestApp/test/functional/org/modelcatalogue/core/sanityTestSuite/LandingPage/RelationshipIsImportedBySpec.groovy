@@ -17,18 +17,19 @@ import spock.lang.Stepwise
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
 @Ignore
-class RelationshipIsImportedBySpec extends AbstractModelCatalogueGebSpec{
+class RelationshipIsImportedBySpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String dataModel ="a#role_item_catalogue-element-menu-item-link"
-    private static final String createRelationship ="a#create-new-relationship-menu-item-link>span:nth-child(3)"
-    private static final String  destination ="h3.panel-title"
-    private static final String  destinationIcon="span.input-group-addon"
-    private static final String   isImportedBy ="#type > option:nth-child(8)"
-    private static final String  search ="input#value"
-    private static final String  imported_by="ul.nav-tabs>li:nth-child(2)>a"
-    private static final String  removeRelationshipButton="a#role_item_remove-relationshipBtn"
-    private static final String  plusButton="span.fa-plus-square-o"
-    private static final String  table ="#importedBy-changes > div.inf-table-body > table > tbody > tr > td:nth-child(1) > span > span"
+    private static final String dataModel = "a#role_item_catalogue-element-menu-item-link"
+    private static final String createRelationship = "a#create-new-relationship-menu-item-link>span:nth-child(3)"
+    private static final String destination = "h3.panel-title"
+    private static final String destinationIcon = "span.input-group-addon"
+    private static final String isImportedBy = "#type > option:nth-child(8)"
+    private static final String search = "input#value"
+    private static final String imported_by = "ul.nav-tabs>li:nth-child(2)>a"
+    private static final String removeRelationshipButton = "a#role_item_remove-relationshipBtn"
+    private static final String plusButton = "span.fa-plus-square-o"
+    private static
+    final String table = "#importedBy-changes > div.inf-table-body > table > tbody > tr > td:nth-child(1) > span > span"
 
     def "login to model catalogue and select a data model"() {
         when:

@@ -13,6 +13,7 @@ class DropDownImportPage extends Page implements InputUtils {
 
     void fillSearchBox(String searchText) {
         fillInput(search, searchText)
+        waitFor { searchMoreLink }
     }
 
     void searchMore() {
