@@ -21,7 +21,7 @@ class NorthThamesMappingReportXlsxSqlExporter {
         LONDONPATHOLOGYCODES: [siteName: 'RFH', lpcModelName: 'LONDONPATHOLOGYCODES', localModelName: 'WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         RFH_LONDONPATHOLOGYCODES: [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         RFH_LONDONPATHOLOGYCODES_GEL_SUBSET: [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES_GEL_SUBSET', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
-        RFH_LONDONPATHOLOGYCODES_CLEANSED: [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES_CLEANSED', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        RFH_LONDONPATHOLOGYCODES_CLEANSED: [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES_CLEANSED', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases', includeImports: true],
         GOSH_OMNILAB: [siteName: 'GOSH', lpcModelName: 'GOSH_OMNILAB', localModelName: 'GOSH_OMNILAB', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         LNWH_WINPATH: [siteName: 'LNWH', lpcModelName: 'LNWH_WINPATH', localModelName: 'LNWH_WINPATH', loincModelName: 'LOINC', gelModelName: 'Rare Diseases']
     ]
@@ -64,7 +64,26 @@ class NorthThamesMappingReportXlsxSqlExporter {
     }
 
     private List getMappedDataElements(Map<String, String> siteMap){
-        String query = '''
+        String lpcQuery = siteMap.includeImports ?
+'''
+		SELECT 
+			de_ce.id, de_ce.model_catalogue_id AS `code`, de_ce.`name`, dc_ce.data_model_id, ev2.extension_value AS ref_range
+		FROM catalogue_element AS de_ce
+			JOIN data_element AS de USING (id)
+			JOIN relationship AS de_r ON de_r.destination_id = de_ce.id AND de_r.relationship_type_id = 1
+			JOIN data_class AS dc ON dc.id = de_r.source_id 
+			JOIN catalogue_element AS dc_ce ON dc_ce.id = dc.id
+			LEFT JOIN extension_value AS ev2 ON ev2.element_id = de_ce.id AND ev2.`name` = 'Ref Range'
+'''
+            :
+'''
+		SELECT 
+			ce.id, ce.model_catalogue_id AS `code`, ce.`name`, ce.data_model_id, ev2.extension_value AS ref_range
+		FROM catalogue_element AS ce
+			JOIN data_element AS de USING (id)
+			LEFT JOIN extension_value AS ev2 ON ev2.element_id = ce.id AND ev2.`name` = 'Ref Range'
+'''
+        String query = """
 SELECT DISTINCT
 	IFNULL(lpc_dm.`name`, '') AS `lpc_model`,
 	IFNULL(lpc.`code`, '') AS `lpc_code`,
@@ -82,13 +101,8 @@ SELECT DISTINCT
 FROM
 	(catalogue_element AS lpc_dm, catalogue_element AS wpath_dm, catalogue_element AS loinc_dm, catalogue_element AS gel_dm)
 	JOIN (
-		SELECT 
-			ce.id, r.source_id, ce.model_catalogue_id AS `code`, ce.`name`, ce.data_model_id, ev2.extension_value AS ref_range
-		FROM catalogue_element AS ce
-			JOIN data_element AS de USING (id)
-			LEFT JOIN extension_value AS ev2 ON ev2.element_id = ce.id AND ev2.`name`  = 'Ref Range'
-			LEFT JOIN relationship AS r ON r.source_id = ce.id AND r.relationship_type_id = 7
-	) AS lpc ON lpc.data_model_id = lpc_dm.id OR lpc.data_model_id IN (SELECT destination_id FROM relationship WHERE source_id = lpc_dm.id AND relationship_type_id = 10)
+        ${lpcQuery}        
+	) AS lpc ON lpc.data_model_id = lpc_dm.id
 	LEFT JOIN (
 		SELECT 
 			r.source_id, ev.extension_value AS `code`, ce.`name`, ce.data_model_id
@@ -121,7 +135,7 @@ WHERE
 	AND gel_dm.id = IFNULL((SELECT id FROM catalogue_element JOIN data_model USING (id) WHERE `name` = :gelModel ORDER BY version_number DESC LIMIT 1), (SELECT id FROM data_element ORDER BY id LIMIT 1))
 ORDER BY
     `lpc_name`, `local_model`, `loinc_code`, `gel_code`
-'''
+"""
         final session = sessionFactory.currentSession
         final sqlQuery = session.createSQLQuery(query)
         sqlQuery.with {
