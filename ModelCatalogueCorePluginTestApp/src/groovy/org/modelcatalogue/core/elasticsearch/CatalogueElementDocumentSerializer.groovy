@@ -1,11 +1,14 @@
 package org.modelcatalogue.core.elasticsearch
 
+import org.modelcatalogue.core.EnumeratedType
+
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import grails.util.GrailsNameUtils
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.enumeration.Enumeration
 
 class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements DocumentSerializer<T> {
 
@@ -31,7 +34,9 @@ class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements 
         safePut(builder, 'date_created', new Date(element.dateCreated.time))
         safePut(builder, 'version_created', new Date(element.versionCreated.time))
         safePut(builder, 'last_updated', new Date(element.lastUpdated.time))
-        safePut(builder, 'ext', getExtensions(element.ext))
+        if (!element instanceof EnumeratedType) {
+            safePut(builder, 'ext', getExtensions(element.ext))
+        }
         return builder
     }
 
