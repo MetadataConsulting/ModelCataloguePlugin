@@ -42,6 +42,7 @@ class RelationshipImportsSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Test 3')
         dashboardPage.select('Test 3')
 
         then:
@@ -87,6 +88,7 @@ class RelationshipImportsSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Test 3')
         dashboardPage.select('Test 3')
 
         then:

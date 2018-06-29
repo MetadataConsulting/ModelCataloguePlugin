@@ -18,7 +18,6 @@ import spock.lang.Ignore
 - On the tree view, click on the Versions link
 - Verify version is displaying at the end of every model
 ''')
-@Ignore
 class AbleToNavigateToOldVersionOfAModelThroughTreeSpec extends GebSpec {
 
     void "Verify navigation to old version of a model using the tree view"() {
@@ -31,6 +30,7 @@ class AbleToNavigateToOldVersionOfAModelThroughTreeSpec extends GebSpec {
 
         when: 'select cancer model'
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Cancer Model')
         dashboardPage.select('Cancer Model')
 
         then:

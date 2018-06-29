@@ -50,6 +50,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Test 1')
         dashboardPage.select("Test 1")
 
         then:

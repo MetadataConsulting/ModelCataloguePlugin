@@ -5,6 +5,7 @@ import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
 import spock.lang.Title
+import spock.lang.Ignore
 import spock.lang.Shared
 import org.modelcatalogue.core.geb.*
 import spock.lang.Stepwise
@@ -60,6 +61,7 @@ import spock.lang.Stepwise
  - 46. Verify that in menu in the show more panel, there is no option to edit. | No option to edit.
 /$)
 @Stepwise
+@Ignore
 class CuratorCannotEditFinalizedModelSpec extends GebSpec {
 
     @Shared
@@ -236,7 +238,7 @@ class CuratorCannotEditFinalizedModelSpec extends GebSpec {
     def "open data class and verify edit button is disabled"() {
         when:
         DataClassesPage dataClassesPage = browser.page DataClassesPage
-        dataClassesPage.selectDataClass(dataClassName)
+        dataClassesPage.selectDataClassLink(dataClassName)
         then:
         at DataClassPage
 

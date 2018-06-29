@@ -11,7 +11,7 @@ class DataModelPolicyListPage extends Page {
     static content = {
         createLink { $('#role_list_create-catalogue-element-menu-item-link', 0) }
         dataModelPolicyLinks(wait: true) { String item -> $('a', href: contains("#/catalogue/dataModelPolicy/"), text: item) }
-        nav { $('#topmenu', 0).module(NavModule) }
+        nav { $('div.navbar-collapse').module(NavModule) }
     }
 
     int countDataModelPolicyLinks() {

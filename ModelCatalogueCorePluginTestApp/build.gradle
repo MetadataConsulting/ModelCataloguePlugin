@@ -497,7 +497,7 @@ task runFunctionalTests(type: Exec, dependsOn: [bowerInstall]) {
 
 
     //  def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-unit', '-integration', '-functional']
-    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-functional', 'org.modelcatalogue.core.generalTestSuit.*']
+    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', 'functional:']
     if (project.hasProperty('testArgs')) { // get arguments for grails test-app
         cmds.addAll(testArgs.split(' '))
     }
@@ -571,6 +571,30 @@ task createAndAddJenkinsFiles(type: Exec, dependsOn: [createJenkinsFiles]) {
 task beforePullRequest(dependsOn: [createAndAddJenkinsFiles])
 
 war.finalizedBy copyWar
+
+task sourceSetProperties {
+
+    sourceSets {
+
+        main {
+
+            println "java.srcDirs = ${java.srcDirs}"
+            println "groovy.srcDirs = ${groovy.srcDirs}"
+
+            println "resources.srcDirs = ${resources.srcDirs}"
+
+            println "output.classesDir = ${output.classesDir}"
+
+            println "output.resourcesDir = ${output.resourcesDir}"
+
+            println "output.files = ${output.files}"
+
+        }
+
+    }
+
+}
+
 
 private static String getGrailsw()  {
    if (Os.isFamily(Os.FAMILY_WINDOWS))  {

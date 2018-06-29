@@ -50,6 +50,7 @@ import spock.lang.Title
 - Check that Data Element from second data model now exists in first data model
 ''')
 @Stepwise
+@Ignore
 class CloneUnauthorizedElementSpec extends GebSpec {
 
     @Shared
@@ -249,8 +250,10 @@ class CloneUnauthorizedElementSpec extends GebSpec {
     def "select first data model created"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
-        Thread.sleep(1000)
+        Thread.sleep(2000)
+        dashboardPage.search(dataModelOneName)
         dashboardPage.select(dataModelOneName)
+
         then:
         at DataModelPage
     }
@@ -287,12 +290,14 @@ class CloneUnauthorizedElementSpec extends GebSpec {
     def "check data element of first model is clonable"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelOneName)
         dashboardPage.select(dataModelOneName)
         then:
         at DataModelPage
 
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        sleep(3_000)
         dataModelPage.dropdown()
         dataModelPage.cloneAnotherElement()
         then:

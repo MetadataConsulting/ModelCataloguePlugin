@@ -132,6 +132,7 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         when:
         ImportedDataModelsPage importedDataModelsPage = browser.page ImportedDataModelsPage
         importedDataModelsPage.importDataModel()
+        Thread.sleep(2000)
         then:
         at ImportDataModelPage
     }
