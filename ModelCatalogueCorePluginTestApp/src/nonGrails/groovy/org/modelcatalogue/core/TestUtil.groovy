@@ -46,7 +46,40 @@ class TestUtil {
     }
 
     static String getJenkinsFileContent(String scriptText, String context) {
-        return """pipeline {
+        return """
+def getRepoURL() {
+  sh "git config --get remote.origin.url > .git/remote-url"
+  return readFile(".git/remote-url").trim()
+}
+def getCommitSha() {
+  sh "git rev-parse HEAD > .git/current-commit"
+  return readFile(".git/current-commit").trim()
+}
+ 
+def updateGithubCommitStatus(build, String context, String buildUrl) {
+  // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
+  repoUrl = getRepoURL()
+  commitSha = getCommitSha()
+ 
+  step([
+    \$class: 'GitHubCommitStatusSetter',
+    reposSource: [\$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+    commitShaSource: [\$class: "ManuallyEnteredShaSource", sha: commitSha],
+    errorHandlers: [[\$class: 'ShallowAnyErrorHandler']],
+    contextSource: [\$class: "ManuallyEnteredCommitContextSource", context: context],
+    statusBackrefSource: [\$class: "ManuallyEnteredBackrefSource", backref: buildUrl],
+        
+    statusResultSource: [
+      \$class: 'ConditionalStatusResultSource',
+      results: [
+        [\$class: 'BetterThanOrEqualBuildResult', result: 'SUCCESS', state: 'SUCCESS', message: build.description],
+        [\$class: 'BetterThanOrEqualBuildResult', result: 'FAILURE', state: 'FAILURE', message: build.description],
+        [\$class: 'AnyBuildResult', state: 'FAILURE', message: 'Loophole']
+      ]
+    ]
+  ])
+}
+pipeline {
   agent any
   options {
     disableConcurrentBuilds()
@@ -58,12 +91,7 @@ class TestUtil {
             sh 'npm install'
             sh 'bower install'
         }
-        step([
-        \$class: "GitHubCommitStatusSetter",
-        
-        contextSource: [\$class: "ManuallyEnteredCommitContextSource", context: \"$context\"],
-        
-        ]);
+        updateGithubCommitStatus(currentBuild, "$context", BUILD_URL)
       }
     }
   }
