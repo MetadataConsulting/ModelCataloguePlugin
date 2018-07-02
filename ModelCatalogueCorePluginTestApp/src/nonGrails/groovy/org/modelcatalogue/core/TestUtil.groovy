@@ -60,6 +60,8 @@ def updateGithubCommitStatus(build, String context, String buildUrl) {
   // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
   repoUrl = getRepoURL()
   commitSha = getCommitSha()
+  println "repoUrl \$repoUrl"
+  println "commitSha \$commitSha"
  
   step([
     \$class: 'GitHubCommitStatusSetter',
