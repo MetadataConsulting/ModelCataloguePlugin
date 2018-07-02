@@ -94,6 +94,9 @@ pipeline {
         dir(path: 'ModelCatalogueCorePluginTestApp') {
             sh 'npm install'
             sh 'bower install'
+            wrap([\$class: 'Xvfb']) {
+              ${scriptText}
+            }
         }
         updateGithubCommitStatus(currentBuild, "$context", BUILD_URL)
       }
