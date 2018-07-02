@@ -70,8 +70,6 @@ class TestUtil {
 }"""
     }
 
-    // Comment for Jenkins to build again
-
     /**
      * Get names of functional test cases. These are names of files *Spec.groovy.
      * @param projectRootPath
