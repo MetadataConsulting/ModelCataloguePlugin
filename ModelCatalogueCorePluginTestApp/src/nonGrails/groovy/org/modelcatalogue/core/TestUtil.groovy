@@ -39,13 +39,13 @@ class TestUtil {
                     jenkinsFile.delete()
                 }
                 treeBuilder.file(newJenkinsFileName) {
-                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'")
+                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'", "continuous-integration/jenkins${index + 1}")
                 }
             }
         }
     }
 
-    static String getJenkinsFileContent(String scriptText) {
+    static String getJenkinsFileContent(String scriptText, String context) {
         return """pipeline {
   agent any
   options {
@@ -57,11 +57,13 @@ class TestUtil {
         dir(path: 'ModelCatalogueCorePluginTestApp') {
             sh 'npm install'
             sh 'bower install'
-            wrap([\$class: 'Xvfb']) {
-              ${scriptText}
-            }
-
         }
+        step([
+        \$class: "GitHubCommitStatusSetter",
+        
+        contextSource: [\$class: "ManuallyEnteredCommitContextSource", context: \"$context\"],
+        
+        ]);
       }
     }
   }
