@@ -101,7 +101,6 @@ pipeline {
   }
 }"""
     }
-    // comment
 
     /**
      * Get names of functional test cases. These are names of files *Spec.groovy.
