@@ -41,6 +41,8 @@ pipeline {
   stages {
     stage('Test Execute') {
       steps {
+
+        updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins2", BUILD_URL)
         dir(path: 'ModelCatalogueCorePluginTestApp') {
             sh 'npm install'
             sh 'bower install'

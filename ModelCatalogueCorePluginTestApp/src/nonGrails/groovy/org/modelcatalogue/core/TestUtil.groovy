@@ -89,6 +89,8 @@ pipeline {
   stages {
     stage('Test Execute') {
       steps {
+
+        updateGithubCommitStatus(currentBuild, "$context", BUILD_URL)
         dir(path: 'ModelCatalogueCorePluginTestApp') {
             sh 'npm install'
             sh 'bower install'
