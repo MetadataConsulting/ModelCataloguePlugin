@@ -101,21 +101,23 @@ pipeline {
             wrap([\$class: 'Xvfb']) {
               ${scriptText}
             }
-        }
-        
+        }        
       }
     }
-    stage('Notify Github') {
-      steps {
-        if (currentBuild.resultIsBetterThanOrEqualTo("SUCCESS")) {
-            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Success!", 'SUCCESS')
-        }    
-        else {
-            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Failed.", 'FAILURE')
-        }
-        
-      }
-        
+
+    if (currentBuild.resultIsBetterThanOrEqualTo("SUCCESS")) {
+        stage('Notify Github') {
+          steps {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Success!", 'SUCCESS')            
+          }           
+        }            
+    }    
+    else {    
+        stage('Notify Github') {
+          steps {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Failed.", 'FAILURE')                
+          }            
+        }        
     }
   }
 }"""

@@ -52,21 +52,23 @@ pipeline {
             wrap([$class: 'Xvfb']) {
               sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: CloneAanClassIntoAnotherModelSpec'
             }
-        }
-        
+        }        
       }
     }
-    stage('Notify Github') {
-      steps {
-        if (currentBuild.resultIsBetterThanOrEqualTo("SUCCESS")) {
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins2", BUILD_URL, "Build Success!", 'SUCCESS')
-        }    
-        else {
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins2", BUILD_URL, "Build Failed.", 'FAILURE')
-        }
-        
-      }
-        
+
+    if (currentBuild.resultIsBetterThanOrEqualTo("SUCCESS")) {
+        stage('Notify Github') {
+          steps {
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins2", BUILD_URL, "Build Success!", 'SUCCESS')            
+          }           
+        }            
+    }    
+    else {    
+        stage('Notify Github') {
+          steps {
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins2", BUILD_URL, "Build Failed.", 'FAILURE')                
+          }            
+        }        
     }
   }
 }
