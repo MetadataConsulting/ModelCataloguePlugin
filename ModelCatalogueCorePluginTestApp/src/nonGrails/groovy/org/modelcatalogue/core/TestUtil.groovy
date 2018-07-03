@@ -40,6 +40,7 @@ class TestUtil {
                 }
                 treeBuilder.file(newJenkinsFileName) {
                     write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'")
+//                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests[0]}'")
                 }
             }
         }
@@ -62,6 +63,8 @@ class TestUtil {
             }
 
         }
+        publishHTML(target: [allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports', reportFiles: 'html/index.html', reportName: 'HTML Report', reportTitles: ''])
+
       }
     }
   }

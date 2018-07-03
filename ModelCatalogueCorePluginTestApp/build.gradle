@@ -497,7 +497,7 @@ task runFunctionalTests(type: Exec, dependsOn: [bowerInstall]) {
 
 
     //  def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-unit', '-integration', '-functional']
-    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-functional', 'org.modelcatalogue.core.generalTestSuit.*']
+    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', 'functional:']
     if (project.hasProperty('testArgs')) { // get arguments for grails test-app
         cmds.addAll(testArgs.split(' '))
     }
