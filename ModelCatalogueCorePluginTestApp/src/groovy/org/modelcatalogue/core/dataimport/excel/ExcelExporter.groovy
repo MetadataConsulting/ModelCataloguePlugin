@@ -41,13 +41,6 @@ class ExcelExporter {
         this.depth = depth
     }
 
-    protected Closure standardCellStyle = {
-        wrap text
-        border top, left, {
-            color black
-            style medium
-        }
-    }
     List<DataClass> getDataClasses() {
         return getDataClassesFromModel(element as DataModel)
     }
@@ -72,13 +65,20 @@ class ExcelExporter {
 
         builder.build(outputStream) {
             apply ModelCatalogueStyles
+            style ('standard') {
+                wrap text
+                border top, left, {
+                    color black
+                    style medium
+                }
+            }
             sheet("$element.name $element.dataModelSemanticVersion" ) { SheetDefinition sheetDefinition ->
                 row {
+                    style H1
                     excelHeaders.each { header ->
                         cell {
                             value header
                             width auto
-                            style H1
                         }
                     }
                 }
@@ -169,11 +169,11 @@ class ExcelExporter {
                 cell {
                     value getModelCatalogueIdToPrint(parent)
                     link to url "${urlFromModelCatalogueId(parent.defaultModelCatalogueId)}"
-                    style standardCellStyle
+                    style 'standard'
                 }
                 cell {
                     value parent.name
-                    style standardCellStyle
+                    style 'standard'
                 }
             }
             Closure printChild = {
@@ -181,19 +181,19 @@ class ExcelExporter {
                 cell {
                     value getModelCatalogueIdToPrint(child)
                     link to url "${urlFromModelCatalogueId(child.defaultModelCatalogueId)}"
-                    style standardCellStyle
+                    style 'standard'
                 }
                 cell {
                     value child.name
-                    style standardCellStyle
+                    style 'standard'
                 }
             }
             if (parent) {
                 printParent()
             }
             else { // no parent
-                cell {style standardCellStyle}
-                cell {style standardCellStyle}
+                cell {style 'standard'}
+                cell {style 'standard'}
             }
             printChild()
 
@@ -209,47 +209,41 @@ class ExcelExporter {
                     value getModelCatalogueIdToPrint(dataElement)
                     link to url "${urlFromModelCatalogueId(dataElement.defaultModelCatalogueId)}"
 
-                    style standardCellStyle
+                    style 'standard'
                 }
                 cell {
                     value dataElement.name
                     link to url "${getLoadURL(dataElement)}"
-                    style {
-                        wrap text
-                        border top, left, {
-                            color black
-                            style medium
-                        }
-                    }
+                    style 'standard'
                 }
 
                 //'Multiplicity', 'Data Element Description',
                 cell{
                     value "${getMultiplicity(dataElementRelationship)}"
-                    style standardCellStyle
+                    style 'standard'
                 }
                 cell{
-                    value "${dataElement?.description ?: blank}"
-                    style standardCellStyle
+                    value Excel.getDescription(dataElement, blank)
+                    style 'standard'
                 }
                 // 'Data Type ID', 'Data Type Name',
                 cell{
                     value "${(dataElement?.dataType) ? getModelCatalogueIdToPrint(dataElement?.dataType) : blank}"
-                    style standardCellStyle
+                    style 'standard'
                 }
                 cell{
                     value "${dataElement?.dataType?.name ?: blank}"
-                    style standardCellStyle
+                    style 'standard'
                 }
 
                 //'Data Type Enumerations', 'Data Type Rule',
                 cell{
                     value "${(dataElement?.dataType) ? printEnumeratedType(dataElement?.dataType) : blank}"
-                    style standardCellStyle
+                    style 'standard'
                 }
                 cell{
                     value "${dataElement?.dataType?.rule ?: blank}"
-                    style standardCellStyle
+                    style 'standard'
                 }
 
                 //'Measurement Unit ID', 'Measurement Unit Name',
@@ -257,30 +251,27 @@ class ExcelExporter {
                     PrimitiveType prim = (PrimitiveType) dataElement.dataType
                     cell {
                         value "${getModelCatalogueIdToPrint(prim?.measurementUnit)}"
-                        style standardCellStyle
+                        style 'standard'
                     }
                     cell {
                         value "${prim.measurementUnit.name}"
-                        style standardCellStyle
+                        style 'standard'
                     }
                 }
                 else {
                     // leave blank
-                    cell {style standardCellStyle}
-                    cell {style standardCellStyle}
+                    cell {style 'standard'}
+                    cell {style 'standard'}
                 }
                 // 'Metadata'
 
                 cell {
                     value "${dataElement?.ext.sort().collect { key, value -> "$key: $value"}.join('\n')}"
-                    style standardCellStyle
+                    style 'standard'
                 }
             }
         }
     }
-
-
-
 
     String printEnumeratedType(DataType dataType){
 

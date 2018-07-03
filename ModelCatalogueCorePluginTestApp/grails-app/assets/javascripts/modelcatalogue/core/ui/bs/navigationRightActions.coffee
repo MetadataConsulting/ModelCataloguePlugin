@@ -24,7 +24,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       label:      'Create Data Model'
       iconOnly:   true
       action: ->
-        $window.open("#{security.contextPath}/dashboard/index")
+        $window.location.replace("#{security.contextPath}/dataModel/create")
     }
   ]
 

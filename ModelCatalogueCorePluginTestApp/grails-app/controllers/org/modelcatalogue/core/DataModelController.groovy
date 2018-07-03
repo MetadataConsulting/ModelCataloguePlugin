@@ -426,12 +426,9 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             notFound()
             return
         }
-
         DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
-        Map<String, Integer> stats = dataModelService.getStatistics(filter)
-
+        Map<String, Integer> stats = dataModelService.getStatisticsSql(dataModel)
         ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''])
-
         ListWithTotalAndType<Map> list = Lists.lazy(params, Map) {
             List<Map> contentDescriptors = []
 
@@ -460,7 +457,6 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
             contentDescriptors
         }
-
         respond Lists.wrap(params, "/${resourceName}/${dataModelId}/content", list)
     }
 

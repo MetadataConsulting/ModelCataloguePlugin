@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.enumeration
 
+import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableMap
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
@@ -64,7 +66,27 @@ import groovy.transform.CompileStatic
         return from(LegacyEnumerations.stringToMap(text))
 
     }
+    @CompileDynamic
+    static Enumerations from(List<Map<String, String>> enumerations) {
+        if (!enumerations) {
+            return new Enumerations()
+        }
+        Enumerations enums = new Enumerations()
 
+        for (enumeration in (enumerations ?: [])) {
+            if (!enumeration.id && !enumeration.key && !enumeration.value) {
+                continue
+            }
+            Long id = (enumeration.id as Number)?.longValue()
+            boolean deprecated = enumeration.deprecated ? true : false
+            if (id != null) {
+                enums.put(id, enumeration.key?.toString(), enumeration.value?.toString(), deprecated)
+            } else {
+                enums.put(enumeration.key?.toString(), enumeration.value?.toString(), deprecated)
+            }
+        }
+        return enums
+    }
     @CompileDynamic
     static Enumerations from(Map<String, Object> enumerations) {
         if (!enumerations) {

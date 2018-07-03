@@ -42,6 +42,8 @@ module.exports = function(config) {
             'grails-app/assets/bower_components/angular-ui-ace/ui-ace.js',
             'grails-app/assets/bower_components/angular-file-saver/dist/angular-file-saver.js',
             'grails-app/assets/bower_components/sly-repeat/scalyr.js',
+            'grails-app/assets/bower_components/sockjs-client/dist/sockjs.min.js',
+            'grails-app/assets/bower_components/stomp-websocket/src/stomp.coffee',
 
             'web-app/js/libs/google-diff-match-patch/javascript/diff_match_patch.js',
 
@@ -109,9 +111,7 @@ module.exports = function(config) {
             //   if you'd like to generate modules dynamically
             //   htmlPath is a originalPath stripped and/or prepended
             //   with all provided suffixes and prefixes
-            moduleName: function(htmlPath) {
-                return htmlPath.substring(1, htmlPath.lastIndexOf('/')).replace(/\//g,'.');
-            }
+            moduleName: "karmaTestingTemplates"
         },
         babelPreprocessor: {
             options: {

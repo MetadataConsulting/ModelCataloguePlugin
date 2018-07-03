@@ -93,6 +93,13 @@ class DataModel extends CatalogueElement {
         catalogueElementGormService.findAllByDataModel(this)
     }
 
+    Boolean hasElements() {
+        if (!readyForQueries) {
+            return 0
+        }
+        catalogueElementGormService.hasElements(this)
+    }
+
     Number countDeclares() {
         if (!readyForQueries) {
             return 0

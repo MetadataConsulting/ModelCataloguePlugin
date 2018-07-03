@@ -17,7 +17,7 @@ class CatalogueElementMarshallersSpec extends Specification {
             findRelationshipTypes() >> []
         }
 
-        def relationships = marshallers.getRelationshipConfiguration(DataElement)
+        def relationships = marshallers.relationshipTypeService.getRelationshipConfiguration(DataElement)
 
         expect:
         relationships.incoming

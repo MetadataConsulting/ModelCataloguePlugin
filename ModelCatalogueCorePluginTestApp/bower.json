@@ -51,6 +51,8 @@
     "validator-js": "^10.2.0",
     "d3": "3.0.0",
     "underscore": "1.9.0",
+    "sockjs-client": "^1.1.5",
+    "stomp-websocket": "^2.3.4",
     "jquery-resizable": "^0.20.0"
   },
   "resolutions": {
