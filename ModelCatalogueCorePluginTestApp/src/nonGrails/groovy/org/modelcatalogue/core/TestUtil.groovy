@@ -39,8 +39,8 @@ class TestUtil {
                     jenkinsFile.delete()
                 }
                 treeBuilder.file(newJenkinsFileName) {
-                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'", "continuous-integration/jenkins${index + 1}")
-//                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests[0]}'", "continuous-integration/jenkins${index + 1}") // Just do one test for the purpose of testing Jenkins Pipelines
+//                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'", "continuous-integration/jenkins${index + 1}")
+                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests[0]}'", "continuous-integration/jenkins${index + 1}") // Just do one test for the purpose of testing Jenkins Pipelines
                 }
             }
         }
@@ -105,39 +105,27 @@ pipeline {
             }
         }        
       }
-    }
-    stage('Notify Github Success') {
-      when {
-        expression {
-            currentBuild.resultIsBetterOrEqualTo("SUCCESS")
+      post {
+        always {
+            publishHTML(target: [allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports',
+                    reportFiles: 'html/index.html',
+                    reportName: 'HTML Report',
+                    reportTitles: ''])
+        }      
+        failure {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Failed.", 'FAILURE')     
+        }
+        success {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Success!", 'SUCCESS')
+        }
+        unstable {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Unstable.", 'UNSTABLE')     
         }
       }
-      steps {
-        updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Success!", 'SUCCESS')            
-      }           
-    }
-    stage('Notify Github Failure') {
-      when {
-        expression {
-            currentBuild.resultIsWorseOrEqualTo("UNSTABLE")
-        }
-      }
-      steps {
-        updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Failed.", 'FAILURE')           
-      }           
-    }
-    stage("Publish HTML") {
-      steps {
-        publishHTML(target: [allowMissing: true,
-        alwaysLinkToLastBuild: true,
-        keepAll: true,
-        reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports',
-        reportFiles: 'html/index.html',
-        reportName: 'HTML Report',
-        reportTitles: ''])        
-      }
-    }
-    
+    }   
 
   }
 }"""

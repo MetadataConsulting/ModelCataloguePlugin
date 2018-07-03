@@ -56,39 +56,27 @@ pipeline {
             }
         }        
       }
-    }
-    stage('Notify Github Success') {
-      when {
-        expression {
-            currentBuild.resultIsBetterOrEqualTo("SUCCESS")
+      post {
+        always {
+            publishHTML(target: [allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports',
+                    reportFiles: 'html/index.html',
+                    reportName: 'HTML Report',
+                    reportTitles: ''])
+        }      
+        failure {
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Failed.", 'FAILURE')     
+        }
+        success {
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Success!", 'SUCCESS')
+        }
+        unstable {
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Unstable.", 'UNSTABLE')     
         }
       }
-      steps {
-        updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Success!", 'SUCCESS')            
-      }           
-    }
-    stage('Notify Github Failure') {
-      when {
-        expression {
-            currentBuild.resultIsWorseOrEqualTo("UNSTABLE")
-        }
-      }
-      steps {
-        updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Failed.", 'FAILURE')           
-      }           
-    }
-    stage("Publish HTML") {
-      steps {
-        publishHTML(target: [allowMissing: true,
-        alwaysLinkToLastBuild: true,
-        keepAll: true,
-        reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports',
-        reportFiles: 'html/index.html',
-        reportName: 'HTML Report',
-        reportTitles: ''])        
-      }
-    }
-    
+    }   
 
   }
 }
