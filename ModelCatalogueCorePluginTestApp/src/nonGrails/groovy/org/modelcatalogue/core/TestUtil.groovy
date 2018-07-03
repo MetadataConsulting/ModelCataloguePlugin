@@ -109,7 +109,7 @@ pipeline {
     stage('Notify Github Success') {
       when {
         expression {
-            currentBuild.resultIsBetterThanOrEqualTo("SUCCESS")
+            currentBuild.resultIsBetterOrEqualTo("SUCCESS")
         }
       }
       steps {
@@ -119,7 +119,7 @@ pipeline {
     stage('Notify Github Failure') {
       when {
         expression {
-            currentBuild.resultIsWorseThanOrEqualTo("UNSTABLE")
+            currentBuild.resultIsWorseOrEqualTo("UNSTABLE")
         }
       }
       steps {
