@@ -102,7 +102,10 @@ pipeline {
       }
     }
     stage('Notify Github') {
+      steps {
         updateGithubCommitStatus(currentBuild, "$context", BUILD_URL)
+      }
+        
     }
   }
 }"""

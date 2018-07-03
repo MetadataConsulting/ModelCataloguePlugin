@@ -54,7 +54,10 @@ pipeline {
       }
     }
     stage('Notify Github') {
+      steps {
         updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins4", BUILD_URL)
+      }
+        
     }
   }
 }
