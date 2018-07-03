@@ -104,20 +104,25 @@ pipeline {
         }        
       }
     }
-
-    if (currentBuild.resultIsBetterThanOrEqualTo("SUCCESS")) {
-        stage('Notify Github') {
-          steps {
-            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Success!", 'SUCCESS')            
-          }           
-        }            
-    }    
-    else {    
-        stage('Notify Github') {
-          steps {
-            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Failed.", 'FAILURE')                
-          }            
-        }        
+    stage('Notify Github Success') {
+      when {
+        expression {
+            currentBuild.resultIsBetterThanOrEqualTo("SUCCESS")
+        }
+      }
+      steps {
+        updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Success!", 'SUCCESS')            
+      }           
+    }
+    stage('Notify Github Failure') {
+      when {
+        expression {
+            currentBuild.resultIsWorseThanOrEqualTo("UNSTABLE")
+        }
+      }
+      steps {
+        updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Failed.", 'FAILURE')           
+      }           
     }
   }
 }"""

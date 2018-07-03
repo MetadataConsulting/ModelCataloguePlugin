@@ -52,21 +52,28 @@ pipeline {
             wrap([$class: 'Xvfb']) {
               sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: DataModelPolicyUrlMappingsSecuredSpec'
             }
-        }
-        
+        }        
       }
     }
-    stage('Notify Github') {
-      steps {
-        if (currentBuild.resultIsBetterThanOrEqualTo("SUCCESS")) {
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins5", BUILD_URL, "Build Success!", 'SUCCESS')
-        }    
-        else {
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins5", BUILD_URL, "Build Failed.", 'FAILURE')
+    stage('Notify Github Success') {
+      when {
+        expression {
+            currentBuild.resultIsBetterThanOrEqualTo("SUCCESS")
         }
-        
       }
-        
+      steps {
+        updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins5", BUILD_URL, "Build Success!", 'SUCCESS')            
+      }           
+    }
+    stage('Notify Github Failure') {
+      when {
+        expression {
+            currentBuild.resultIsWorseThanOrEqualTo("UNSTABLE")
+        }
+      }
+      steps {
+        updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins5", BUILD_URL, "Build Failed.", 'FAILURE')           
+      }           
     }
   }
 }
