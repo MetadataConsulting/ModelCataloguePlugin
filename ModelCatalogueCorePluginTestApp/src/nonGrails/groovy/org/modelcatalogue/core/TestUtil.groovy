@@ -117,31 +117,27 @@ pipeline {
             }
         }        
       }
-    }
-    stage("Post") {
-        post {
-                always {
-                    publishHTML(target: [allowMissing: true,
-                            alwaysLinkToLastBuild: true,
-                            keepAll: true,
-                            reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports',
-                            reportFiles: 'html/index.html',
-                            reportName: 'HTML Report',
-                            reportTitles: ''])
-                }      
-                failure {
-                    updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Failed.", 'FAILURE')     
-                }
-                success {
-                    updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Success!", 'SUCCESS')
-                }
-                unstable {
-                    updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Unstable.", 'UNSTABLE')     
-                }
-            }  
-    }
-         
-
+      post {
+        always {
+            publishHTML(target: [allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports',
+                    reportFiles: 'html/index.html',
+                    reportName: 'HTML Report',
+                    reportTitles: ''])
+        }      
+        failure {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Failed.", 'FAILURE')     
+        }
+        success {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Success!", 'SUCCESS')
+        }
+        unstable {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Unstable.", 'UNSTABLE')     
+        }
+      }
+    }        
   }
 }"""
     }
