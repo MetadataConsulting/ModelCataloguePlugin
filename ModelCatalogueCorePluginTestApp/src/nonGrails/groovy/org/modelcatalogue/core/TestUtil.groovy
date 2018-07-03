@@ -101,6 +101,9 @@ pipeline {
         updateGithubCommitStatus(currentBuild, "$context", BUILD_URL)
       }
     }
+    stage('Notify Github') {
+        updateGithubCommitStatus(currentBuild, "$context", BUILD_URL)
+    }
   }
 }"""
     }
