@@ -9,16 +9,16 @@ def getCommitSha() {
   sh "git rev-parse HEAD > .git/current-commit"
   return readFile(".git/current-commit").trim()
 }
-
+ 
 def updateGithubCommitStatus(build, String context, String buildUrl, String message, String state) {
   // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
   repoUrl = getRepoURL()
   commitSha = getCommitSha()
-  println "Updating Github Commit Status"
+  println "Updating Github Commit Status" 
   println "repoUrl $repoUrl"
   println "commitSha $commitSha"
   println "build result: ${build.result}, currentResult: ${build.currentResult}"
-
+ 
   step([
     $class: 'GitHubCommitStatusSetter',
     reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
@@ -26,7 +26,7 @@ def updateGithubCommitStatus(build, String context, String buildUrl, String mess
     errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
     contextSource: [$class: "ManuallyEnteredCommitContextSource", context: context],
     statusBackrefSource: [$class: "ManuallyEnteredBackrefSource", backref: buildUrl],
-
+        
     statusResultSource: [
       $class: 'ConditionalStatusResultSource',
       results: [
@@ -52,31 +52,34 @@ pipeline {
             sh 'bower install'
             updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins4", BUILD_URL, "Running Functional Tests", "PENDING")
             wrap([$class: 'Xvfb']) {
-              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: ImportAndRemoveDataModelReflectsInHistorySpec HistoryIsPopulatedAccordingToModelActivitySpec CanImportDataModelSpec UserCanFinalizeDataModelSpec CannotDeleteFinalizedDataModelSpec CanCreateDataElementAndCloneDataTypeSpec CanCreateDataTypeSpec'
+              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: AddUsernameToFavouriteSpec CodeVersionSpec EditDataElementSpec LastSeenSpec ModelCatalogueDevelopmentSpec NavItemVisibilitySpec QuickSearchSpec RelationshipHasAttachmentOfSpec RelationshipImportsSpec RelationshipIsBaseForSpec RelationshipIsImportedBySpec RelationshipIsSynonymForSpec RelationshipRelatedToSpec SearchCatalogueModelsSpec LoginAsViewerSpec LoginInAndClickOnCancelSpec LoginSpec ResetPasswordSpec ValidateRegistrationSpec LogoutSpec ApiKeyUrlMappingsSecuredSpec CatalogueElementUrlMappingsSecuredSpec ClassificationUrlMappingsSecuredSpec CsvTransformationUrlMappingsSecuredSpec DataArchitectUrlMappingsSecuredSpec DataClassUrlMappingsSecuredSpec DataElementUrlMappingsSecuredSpec DataImportCreateUrlMappingsSecuredSpec'
             }
-        }
+        }        
       }
     }
-    post {
-        always {
-            publishHTML(target: [allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports',
-                    reportFiles: 'html/index.html',
-                    reportName: 'HTML Report',
-                    reportTitles: ''])
-        }
-        failure {
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins4", BUILD_URL, "Build Failed.", 'FAILURE')
-        }
-        success {
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins4", BUILD_URL, "Build Success!", 'SUCCESS')
-        }
-        unstable {
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins4", BUILD_URL, "Build Unstable.", 'UNSTABLE')
-        }
+    stage("Post") {
+        post {
+                always {
+                    publishHTML(target: [allowMissing: true,
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true,
+                            reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports',
+                            reportFiles: 'html/index.html',
+                            reportName: 'HTML Report',
+                            reportTitles: ''])
+                }      
+                failure {
+                    updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins4", BUILD_URL, "Build Failed.", 'FAILURE')     
+                }
+                success {
+                    updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins4", BUILD_URL, "Build Success!", 'SUCCESS')
+                }
+                unstable {
+                    updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins4", BUILD_URL, "Build Unstable.", 'UNSTABLE')     
+                }
+            }  
     }
+         
 
   }
 }
