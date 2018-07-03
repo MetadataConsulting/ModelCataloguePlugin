@@ -15,7 +15,9 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
+@IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String createButton = 'a#role_data-models_create-data-modelBtn'
@@ -31,10 +33,6 @@ class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec {
     private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 2000
     static final String stepImports = "#step-imports"
     static final String wizardName = 'div.create-classification-wizard #name'
-
-    def "Deliberate failure for testing Jenkins"() {
-        expect: false
-    }
 
     def "login to model catalogue and create a data model"() {
         when:
