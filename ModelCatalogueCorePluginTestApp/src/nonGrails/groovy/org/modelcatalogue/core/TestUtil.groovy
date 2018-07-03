@@ -49,10 +49,12 @@ class TestUtil {
     static String getJenkinsFileContent(String scriptText, String context) {
         return """
 def getRepoURL() {
+  sh "mkdir -p .git"
   sh "git config --get remote.origin.url > .git/remote-url"
   return readFile(".git/remote-url").trim()
 }
 def getCommitSha() {
+  sh "mkdir -p .git"
   sh "git rev-parse HEAD > .git/current-commit"
   return readFile(".git/current-commit").trim()
 }
