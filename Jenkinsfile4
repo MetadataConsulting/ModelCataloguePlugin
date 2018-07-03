@@ -10,7 +10,7 @@ pipeline {
             sh 'npm install'
             sh 'bower install'
             wrap([$class: 'Xvfb']) {
-              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: AddUsernameToFavouriteSpec CodeVersionSpec EditDataElementSpec LastSeenSpec ModelCatalogueDevelopmentSpec NavItemVisibilitySpec QuickSearchSpec RelationshipHasAttachmentOfSpec RelationshipImportsSpec RelationshipIsBaseForSpec RelationshipIsImportedBySpec RelationshipIsSynonymForSpec RelationshipRelatedToSpec SearchCatalogueModelsSpec LoginAsViewerSpec LoginInAndClickOnCancelSpec LoginSpec ResetPasswordSpec ValidateRegistrationSpec LogoutSpec ApiKeyUrlMappingsSecuredSpec CatalogueElementUrlMappingsSecuredSpec ClassificationUrlMappingsSecuredSpec CsvTransformationUrlMappingsSecuredSpec DataArchitectUrlMappingsSecuredSpec DataClassUrlMappingsSecuredSpec DataElementUrlMappingsSecuredSpec DataImportCreateUrlMappingsSecuredSpec'
+              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: AddUsernameToFavouriteSpec'
             }
 
         }

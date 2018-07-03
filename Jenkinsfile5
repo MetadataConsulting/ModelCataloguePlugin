@@ -10,7 +10,7 @@ pipeline {
             sh 'npm install'
             sh 'bower install'
             wrap([$class: 'Xvfb']) {
-              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: DataModelPolicyUrlMappingsSecuredSpec DataModelUrlMappingsSecuredSpec DataTypeUrlMappingsSecuredSpec EnumeratedTypeUrlMappingsSecuredSpec LastSeenUrlMappingsSecuredSpec LogsUrlMappingsSecuredSpec MeasurementUnitUrlMappingsSecuredSpec ModelCatalogueCorePluginUrlMappingsSecuredSpec ModelCatalogueFormsUrlMappingsSecuredSpec ModelCatalogueGenomicsUrlMappingsSecuredSpec ModelCatalogueNorthThamesUrlMappingsSecuredSpec ModelCatalogueVersionUrlMappingsSecuredSpec ReindexCatalogueUrlMappingsSecuredSpec UserUrlMappingSecuredSpec GrantRoleCuratorSpec AssetWizardSpec BatchAndActionsSpec ChangeLogForEligibilitySpec ChangesSpec DataClassWizardSpec DataElementWizardSpec DataModelWizardSpec DataTypeWizardSpec MeasurementUnitWizardSpec RegisterSpec SearchFunctionalSpec ValidationRuleWizardSpec VersionVerificationSpec'
+              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: DataModelPolicyUrlMappingsSecuredSpec'
             }
 
         }
