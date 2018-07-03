@@ -40,6 +40,7 @@ class TestUtil {
                 }
                 treeBuilder.file(newJenkinsFileName) {
                     write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'", "continuous-integration/jenkins${index + 1}")
+//                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests[0]}'", "continuous-integration/jenkins${index + 1}")
                 }
             }
         }
@@ -60,8 +61,10 @@ def updateGithubCommitStatus(build, String context, String buildUrl) {
   // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
   repoUrl = getRepoURL()
   commitSha = getCommitSha()
+  println "Updating Github Commit Status" 
   println "repoUrl \$repoUrl"
   println "commitSha \$commitSha"
+  println "build result: \${build.result}, currentResult: \${build.currentResult}"
  
   step([
     \$class: 'GitHubCommitStatusSetter',

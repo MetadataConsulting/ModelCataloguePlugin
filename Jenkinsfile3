@@ -12,8 +12,10 @@ def updateGithubCommitStatus(build, String context, String buildUrl) {
   // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
   repoUrl = getRepoURL()
   commitSha = getCommitSha()
+  println "Updating Github Commit Status" 
   println "repoUrl $repoUrl"
   println "commitSha $commitSha"
+  println "build result: ${build.result}, currentResult: ${build.currentResult}"
  
   step([
     $class: 'GitHubCommitStatusSetter',
@@ -47,7 +49,7 @@ pipeline {
             sh 'npm install'
             sh 'bower install'
             wrap([$class: 'Xvfb']) {
-              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: DisableUserSpec FinalizedDataModelMenuVisibilitySpec UserCanEditDataClassesForAdminDataModelSpec UserCannotEditReadOnlyDataModelSpec UsersDontSeeUnauthorizedDataModelsSpec VerifyCuratorCannotDeleteFinalizedDataModelSpec VerifyRegularUserCanSeeApiKeySpec VerifySupervisorCanActionSettingsSpec VerifyViewerCannotAccessFactActionsSpec ApiKeySpec CreateAssetsAndImportDataSpec CreateBusinessRulesSpec CreateDataClassSpec CreateDataModelSpec CreateDataTypeAndSelectEnumeratedSpec CreateDataTypeAndSelectReferenceSpec CreateDataTypeAndSelectSubsetSpec CreateMeasurementUnitSpec CreateNewDataElementSpec CreateRelationshipSpec CreateTagSpec SearchMoreOptionPolicySpec CreateDataTypeAndSelectPrimitiveSpec DataModelSearchSpec CreateMeasurementUnitFromFavouritesSpec DevSupportedLinkSpec AddDataInToFavouritesSpec AddDataModelImportSpec'
+              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: DisableUserSpec'
             }
         }
         updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins3", BUILD_URL)
