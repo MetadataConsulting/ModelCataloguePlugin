@@ -14,12 +14,14 @@ class AssetsPage extends Page {
     }
 
     static content = {
-        addItemIcon(required: false) {
-            $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
+        addItemIcon(required: false, wait: true) {
+            $("#role_list_create-catalogue-element-menu-item-link")
         }
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
+        treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+
     }
 
     void expandLinkClick() {

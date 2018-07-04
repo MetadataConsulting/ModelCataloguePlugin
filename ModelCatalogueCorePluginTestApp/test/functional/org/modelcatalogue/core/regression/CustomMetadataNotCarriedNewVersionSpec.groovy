@@ -25,6 +25,7 @@ class CustomMetadataNotCarriedNewVersionSpec extends AbstractModelCatalogueGebSp
 
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Clinical Tags')
         dashboardPage.select('Clinical Tags')
 
         then:

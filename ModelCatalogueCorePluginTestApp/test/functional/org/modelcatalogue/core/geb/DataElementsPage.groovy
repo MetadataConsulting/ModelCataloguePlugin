@@ -18,15 +18,15 @@ class DataElementsPage extends Page {
         anchorElements { $("td.col-md-4>span>span>a") }
         dataElements { $("td.col-md-4>span>span>a", text: it) }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
-        addItemIcon(required: false) {
-            $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
+        addItemIcon(required: false, wait: true) {
+            $("#role_list_create-catalogue-element-menu-item-link")
         }
         firstRowLink { $('tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a') }
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDown { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
         rows { $('div.inf-table-body tbody tr') }
-        elementByName(wait: true) { $('a', text: contains(it)) }
+        elementByName(wait: true) { $('.inf-table-item-cell a', text: contains(it)) }
         showMoreButton { $('span.fa-plus-square-o') }
         editDataElementButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
         elementsList { $('table.inf-table tbody tr') }
@@ -72,10 +72,6 @@ class DataElementsPage extends Page {
 
     String dataElementCreated() {
         firstRowLink.text()
-    }
-
-    void selectDataElement(String value) {
-        rows.$('a', text: value).click()
     }
 
     boolean hasDataElement(String name) {

@@ -67,7 +67,6 @@ import spock.lang.*
 /$)
 
 @Stepwise
-@Ignore
 class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
     @Shared
@@ -129,6 +128,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
     def "Login as supervisor"() {
         when:
+        sleep(2_000)
         LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
@@ -207,6 +207,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
     def "Select and add Data types"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        sleep(2_000)
         dataModelPage.treeView.select("Data Types")
         then:
         DataTypesPage
@@ -219,6 +220,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
         when:
         CreateDataTypePage createDataClassPage = browser.page CreateDataTypePage
+        sleep(2_000)
         createDataClassPage.name = dataTypeName
         createDataClassPage.modelCatalogueId = dataTypeCatalogueId
         createDataClassPage.description = dataTypeDescription
@@ -292,10 +294,8 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         at CreateAssetsPage
 
         when:
-
         CreateAssetsPage createAssetsPage = browser.page CreateAssetsPage
         createAssetsPage.name = assetName
-        createAssetsPage.upload(System.getProperty("downloadFilepath"))
         createAssetsPage.description = assetDescription
         createAssetsPage.submit()
         then:
@@ -304,7 +304,6 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
 
     def "Select and add tags entry"() {
         when:
-        Thread.sleep(3000)
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select("Tags")
         then:

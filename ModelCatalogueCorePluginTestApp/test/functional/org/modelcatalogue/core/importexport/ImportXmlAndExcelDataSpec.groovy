@@ -108,6 +108,7 @@ class ImportXmlAndExcelDataSpec extends GebSpec {
         when:
         DashboardPage dashboardPage = to DashboardPage
         Thread.sleep(2000)
+        dashboardPage.search(dataModelName)
         dashboardPage.select(dataModelName)
         then:
         at DataModelPage

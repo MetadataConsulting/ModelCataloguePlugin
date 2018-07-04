@@ -6,7 +6,7 @@ import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.LoginPage
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Ignore
+import spock.lang.Narrative
 import spock.lang.Stepwise
 import spock.lang.Title
 
@@ -19,7 +19,6 @@ import spock.lang.Title
 - Check that the model catalogue carries the correct version
 ''')
 @Stepwise
-@Ignore
 class VersionVerificationSpec extends GebSpec {
 
     def "Login as user"() {

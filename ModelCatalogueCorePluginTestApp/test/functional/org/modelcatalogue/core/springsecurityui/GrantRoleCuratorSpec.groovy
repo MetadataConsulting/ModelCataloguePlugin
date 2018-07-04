@@ -28,7 +28,6 @@ import spock.lang.Title
 - Check that User X now sees the import menu next to the admin menu in the top left corner. The admin menu should also include the option for Mapping Utility
 ''')
 @Stepwise
-@Ignore
 class GrantRoleCuratorSpec extends GebSpec {
 
     def "Login as supervisor"() {

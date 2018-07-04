@@ -32,6 +32,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search("Rare Disease Conditions")
         dashboardPage.select("Rare Disease Conditions")
 
         then:
