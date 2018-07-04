@@ -51,11 +51,11 @@ class DataModelService {
 
         String query = '''
 SELECT
-	mu.cnt AS 'totalMeasurementUnitCount',
-	r.cnt AS 'totalValidationRuleCount',
-	a.cnt AS 'totalAssetCount',
-	t.cnt AS 'totalTagCount',
-	ced.cnt AS 'deprecatedCatalogueElementCount'
+	mu.cnt AS totalMeasurementUnitCount,
+	r.cnt AS totalValidationRuleCount,
+	a.cnt AS totalAssetCount,
+	t.cnt AS totalTagCount,
+	ced.cnt AS deprecatedCatalogueElementCount
 FROM
 	(SELECT COUNT(a.id) AS cnt FROM asset AS a JOIN catalogue_element AS ce ON a.id = ce.id AND ce.data_model_id = :data_model_id) AS a,
 	(SELECT COUNT(m.id) AS cnt FROM measurement_unit AS m JOIN catalogue_element AS ce ON m.id = ce.id AND ce.data_model_id = :data_model_id) AS mu,
