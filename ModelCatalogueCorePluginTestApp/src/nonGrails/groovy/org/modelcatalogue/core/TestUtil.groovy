@@ -39,14 +39,64 @@ class TestUtil {
                     jenkinsFile.delete()
                 }
                 treeBuilder.file(newJenkinsFileName) {
-                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'")
+                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'", "continuous-integration/jenkins${index + 1}")
+//                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests[0]}'", "continuous-integration/jenkins${index + 1}") // Just do one test for the purpose of testing Jenkins Pipelines
                 }
             }
         }
+//        subsetOfTestCase.eachWithIndex { List<String> tests, Integer index ->
+//            if (index < 5) {
+//                String newJenkinsFileName = "Jenkinsfile${index + 1}"
+//                jenkinsFile = new File("$parentFolder/$newJenkinsFileName")
+//                if (jenkinsFile.exists()) {
+//                    jenkinsFile.delete()
+//                }
+//                treeBuilder.file(newJenkinsFileName) {
+//                    write getJenkinsFileContent(runFunctionalTestsCommand(tests))
+//                }
+//            }
+//        }
     }
 
-    static String getJenkinsFileContent(String scriptText) {
-        return """pipeline {
+    static String getJenkinsFileContent(String scriptText, String context) {
+        return """
+def getRepoURL() {
+  sh "mkdir -p .git"
+  sh "git config --get remote.origin.url > .git/remote-url"
+  return readFile(".git/remote-url").trim()
+}
+def getCommitSha() {
+  sh "mkdir -p .git"
+  sh "git rev-parse HEAD > .git/current-commit"
+  return readFile(".git/current-commit").trim()
+}
+ 
+def updateGithubCommitStatus(build, String context, String buildUrl, String message, String state) {
+  // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
+  repoUrl = getRepoURL()
+  commitSha = getCommitSha()
+  println "Updating Github Commit Status" 
+  println "repoUrl \$repoUrl"
+  println "commitSha \$commitSha"
+  println "build result: \${build.result}, currentResult: \${build.currentResult}"
+ 
+  step([
+    \$class: 'GitHubCommitStatusSetter',
+    reposSource: [\$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+    commitShaSource: [\$class: "ManuallyEnteredShaSource", sha: commitSha],
+    errorHandlers: [[\$class: 'ShallowAnyErrorHandler']],
+    contextSource: [\$class: "ManuallyEnteredCommitContextSource", context: context],
+    statusBackrefSource: [\$class: "ManuallyEnteredBackrefSource", backref: buildUrl],
+        
+    statusResultSource: [
+      \$class: 'ConditionalStatusResultSource',
+      results: [
+        [\$class: 'AnyBuildResult', state: state, message: message]
+      ]
+    ]
+  ])
+}
+pipeline {
   agent any
   options {
     disableConcurrentBuilds()
@@ -54,19 +104,44 @@ class TestUtil {
   stages {
     stage('Test Execute') {
       steps {
+
+        updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "In Progress", "PENDING")
         dir(path: 'ModelCatalogueCorePluginTestApp') {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Installing Node Modules", "PENDING")
             sh 'npm install'
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Installing Bower Components", "PENDING")
             sh 'bower install'
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Running Functional Tests", "PENDING")
             wrap([\$class: 'Xvfb']) {
               ${scriptText}
             }
-
+        }        
+      }
+      post {
+        always {
+            publishHTML(target: [allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports',
+                    reportFiles: 'html/index.html',
+                    reportName: 'HTML Report',
+                    reportTitles: ''])
+        }      
+        failure {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Failed.", 'FAILURE')     
+        }
+        success {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Success!", 'SUCCESS')
+        }
+        unstable {
+            updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Build Unstable.", 'UNSTABLE')     
         }
       }
-    }
+    }        
   }
 }"""
     }
+    // comment
 
     /**
      * Get names of functional test cases. These are names of files *Spec.groovy.
@@ -91,4 +166,5 @@ class TestUtil {
         String projectRootAbsolutePath = args[0]
         TestUtil.createJenkinsFiles(projectRootAbsolutePath)
     }
+    // run tests again
 }

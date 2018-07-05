@@ -17,7 +17,6 @@ import spock.lang.Title
 - Verify that you can not create a new data element
 ''')
 @Stepwise
-@Ignore
 class CannotAddDataElementsToFinalizedDataModelSpec extends GebSpec {
     def "Login to Model Catalogue"() {
         when:
@@ -31,6 +30,7 @@ class CannotAddDataElementsToFinalizedDataModelSpec extends GebSpec {
     def "Select a Finalized Model"() {
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Cancer Model')
         dashboardPage.select('Cancer Model')
 
         then:

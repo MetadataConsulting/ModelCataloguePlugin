@@ -16,7 +16,7 @@ class DataClassesPage extends Page {
     static content = {
         createDateClassLink(required: false) { $('a#role_list_create-catalogue-element-menu-item-link', 0) }
         addItemIcon(required: false) {
-            $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center>span.fa-plus-circle")
+            $("a#role_list_create-catalogue-element-menu-item-link")
         }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         rows { $('div.inf-table-body tbody tr') }
@@ -30,6 +30,7 @@ class DataClassesPage extends Page {
         showMoreButton { $('span.fa-plus-square-o') }
         editDataClassButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
         titlename { $('div   h3') }
+        checkDataClass(required: false, wait: true) { String value -> $('a', text: value) }
     }
 
     void expandLinkClick() {
@@ -65,7 +66,8 @@ class DataClassesPage extends Page {
 
     Boolean dataClassPresent(String value) {
         waitFor { createDateClassLink }
-        $('a', text: value).displayed
+        sleep(3_000)
+        checkDataClass(value)?.displayed
     }
 
     void selectDataClassLink(String value) {
@@ -77,7 +79,7 @@ class DataClassesPage extends Page {
     }
 
     void findByName(String value) {
-        $('a', text: value).click()
+        checkDataClass(value).click()
     }
 
     void selectDataClassByName(String value) {
@@ -101,15 +103,9 @@ class DataClassesPage extends Page {
         waitFor { editDataClassButton.@('disabled') }
     }
 
-    boolean containsDataClass(String value) {
-        rows.$('a', text: value).displayed
-    }
+//    boolean containsDataClass(String value) {
+//        rows.$('a', text: value).displayed
+//    }
 
-    void selectDataClass(String value) {
-        rows.$('a', text: value).click()
-    }
-  
-    String titleText() {
-        return titlename.text()
-    }
+
 }

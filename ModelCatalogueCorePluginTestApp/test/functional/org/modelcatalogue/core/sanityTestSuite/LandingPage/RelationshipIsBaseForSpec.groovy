@@ -36,6 +36,7 @@ class RelationshipIsBaseForSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('NHIC')
         dashboardPage.select('NHIC')
 
         then:

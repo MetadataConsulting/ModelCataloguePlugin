@@ -28,7 +28,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         DashboardPage dashboardPage = browser.page DashboardPage
-        dashboardPage.search('Test 1')
+        dashboardPage.search('Test 2')
         dashboardPage.select('Test 2')
 
         then:
