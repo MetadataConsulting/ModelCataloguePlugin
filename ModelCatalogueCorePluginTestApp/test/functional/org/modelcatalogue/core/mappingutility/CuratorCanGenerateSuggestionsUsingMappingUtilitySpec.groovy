@@ -17,15 +17,15 @@ import spock.lang.Ignore
 @Title('Examine that user can generate Suggestion using Mapping Utility')
 @Narrative('''
 - Login to Model Catalogue as curator
+- Create two Data Models, A and B, with random names. Create a data element in each of them named "Test Data Element".
 - On the top menu, click on the Settings menu button from the top left hand menu | Drop-down menu appears
 - Select Mapping Utility form the drop dwon menu | Mapping batches page is open
-- Select button to the right of the page called 'Generate Mappings' | Generate Suggestsion page is opened
-- Populate form buy selecting name of Data Models from list from Data Mdoel 1 and Data Model 2 drop down. Select option for type of optimization and click button called "Generate" | Taken back to Mapping batches page, popup states that mapping suggestions are being generated. 
+- Select button to the right of the page called 'Generate Mappings' | Generate Suggestions page is opened
+- Populate form by selecting names of Data Models A and B from the dropdown menus. Select option for type of optimisation  and then click button called 'Generate'  | Taken back to Mapping batches page, popup states that mapping suggestions are being generated. 
 - Refresh the page to see Mapping suggestions | Mapping suggestions appear
 - Verify that suggestion are created once page is refreshed 
 ''')
 @Stepwise
-@Ignore
 class CuratorCanGenerateSuggestionsUsingMappingUtilitySpec extends GebSpec {
 
     @Shared
