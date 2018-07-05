@@ -20,7 +20,7 @@ import spock.lang.IgnoreIf
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
-@Ignore
+
 class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
     public static
