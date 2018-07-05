@@ -18,7 +18,7 @@ import spock.lang.Stepwise
 import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-1495')
-@Title('Examine that User can edit data classes for Data Model they have administration rights to')
+@Title('Examine that Curator can edit data classes for Data Model they have administration rights to')
 @Narrative('''
 - Login to Model Catalogue as supervisor
 - Select the 'create new data model' button ( black plus sign) from the top right hand menu. | Redirected to 'Create new data model' page
@@ -26,10 +26,10 @@ import spock.lang.Title
 - Click on the Settings menu button in the top left hand menu  | Drop- down menu appears
 - Select Data Model ACL from the drop-down menu | Redirected to Data Model ACL page . Data Model Permissions is the title 
 - In the Data Model ACL (Access Clearance Level) page, Select the data model you just created from the list | Go to Data Model Users Permissions page  (title is name of data model) .  List  shown of users and permissions
-- In Data Models Users Permissions page, From first drop down, select User's name ( User) and in the second drop down select Administration to give them administration rights
-- Press the button 'Grant' in order to grand User administration rights to the data model  | User's name appears in list with Administration written in next column showing user rights. 
+- In Data Models Users Permissions page, From first drop down, select Curator's name ( Curator) and in the second drop down select Administration to give them administration rights
+- Press the button 'Grant' in order to grand Curator administration rights to the data model  | Curator's name appears in list with Administration written in next column showing user rights. 
 - Log out of Mx. | Supervisor is logged out
-- Log in as User | User is Logged in
+- Log in as Curator | Curator is Logged in
 - Select a Draft Data Model
 - on the tree view, select data Classes | Active Data Classes is displayed
 - Select a data class | Taken to Data Class page
@@ -45,8 +45,7 @@ import spock.lang.Title
 - Check that Metadata is edited     
 ''')
 @Stepwise
-@Ignore
-class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
+class CuratorCanEditDataClassesForAdminDataModelSpec extends GebSpec {
     @Shared
     String dataModelName = UUID.randomUUID().toString()
 
@@ -85,7 +84,7 @@ class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
         at DataModelAclPermissionsPage
     }
 
-    def "grant admin right to user for draft data model"() {
+    def "grant admin right to curator for draft data model"() {
         when:
         DataModelAclPermissionsPage dataModelPermissionListPage = browser.page DataModelAclPermissionsPage
         dataModelPermissionListPage.select(dataModelName)
@@ -94,7 +93,7 @@ class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
 
         when:
         DataModelAclPermissionsShowPage dataModelPermissionGrantPage = browser.page DataModelAclPermissionsShowPage
-        dataModelPermissionGrantPage.grant("user", "administration")
+        dataModelPermissionGrantPage.grant("curator", "administration")
 
         then:
         at DataModelAclPermissionsShowPage
@@ -109,10 +108,10 @@ class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
         at HomePage
     }
 
-    def "login as user"() {
+    def "login as curator"() {
         when:
         LoginPage loginPage = to LoginPage
-        loginPage.login('user', 'user')
+        loginPage.login('curator', 'curator')
 
         then:
         at DashboardPage
