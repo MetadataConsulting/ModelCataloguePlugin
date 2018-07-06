@@ -20,7 +20,6 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
     final CatalogueContent changeLogForRDEligibilityXSLX =
             CatalogueContent.create('.menu-item-link', text: 'Change Log for RD Eligibility (Excel)')
 
-    @Ignore
     def "go to login"() {
         when:
         LoginPage loginPage = to LoginPage
@@ -44,7 +43,6 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
         dataModelPage.dataModelTitle.contains 'Rare Disease Conditions'
     }
 
-    @Ignore
     def "download the change log as MS Excel spreadsheet"() {
 
         when:
