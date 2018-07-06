@@ -25,7 +25,6 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
     private static final String UNIQUE_EXTENSION_VALUE = 'TEST_27'
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 1000
 
-    @Ignore
     def "search for patient identity details"() {
         when:
         LoginPage loginPage = to LoginPage
