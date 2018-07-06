@@ -11,7 +11,6 @@ import spock.lang.IgnoreIf
 import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
-@Ignore
 @Stepwise
 class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
 

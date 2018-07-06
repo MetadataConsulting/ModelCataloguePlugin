@@ -16,7 +16,6 @@ import spock.lang.IgnoreIf
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
-@Ignore
 class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     static final String classificationWizzard = 'div.create-classification-wizard'
