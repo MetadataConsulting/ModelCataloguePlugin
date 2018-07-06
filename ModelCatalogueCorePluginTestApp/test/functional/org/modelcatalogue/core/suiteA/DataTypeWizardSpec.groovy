@@ -17,7 +17,6 @@ import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf
 
 @Stepwise
-@Ignore
 @IgnoreIf({ !System.getProperty('geb.env') })
 class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
