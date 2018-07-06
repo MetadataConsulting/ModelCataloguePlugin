@@ -13,6 +13,7 @@ import spock.lang.IgnoreIf
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
     static final String detailSectionFormItemContent = ".metadata-form-item-content"

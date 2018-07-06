@@ -11,6 +11,7 @@ import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.Stepwise
 
 @Stepwise
+@Ignore
 class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
     private static

@@ -18,6 +18,7 @@ import spock.lang.IgnoreIf
 
 @Stepwise
 @IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     public static final String expandTableHeader = '.inf-table thead .inf-cell-expand'
