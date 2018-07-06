@@ -24,9 +24,9 @@ import spock.lang.Shared
  - In the disable user pop-up dialogue box, select the OK button | User is disabled
  - Log out of Metadata Exchange | Logout successful
  - Login to Metadata Exchange as curator | 'Sorry your account is disabled' appears in the login dialogue box and curator cannot login
+ - Re-enable curator as supervisor. (For following tests to work)
 ''')
 @Stepwise
-@Ignore
 class DisableUserSpec extends GebSpec {
 
     @Shared
