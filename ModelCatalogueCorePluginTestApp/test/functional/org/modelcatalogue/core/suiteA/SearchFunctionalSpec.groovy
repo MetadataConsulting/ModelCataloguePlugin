@@ -12,6 +12,7 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
 
     private static final CatalogueAction search = CatalogueAction.runFirst('navigation-right', 'search-menu')

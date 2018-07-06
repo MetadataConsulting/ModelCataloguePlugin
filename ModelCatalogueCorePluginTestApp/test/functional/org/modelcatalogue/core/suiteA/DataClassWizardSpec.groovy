@@ -14,6 +14,7 @@ import spock.lang.IgnoreIf
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String stepMetadata = "#step-metadata"
