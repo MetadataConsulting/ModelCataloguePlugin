@@ -1,13 +1,8 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Ignore
-import spock.lang.Title
 import org.modelcatalogue.core.geb.*
-import spock.lang.Stepwise
-import spock.lang.Shared
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1728')
 @Title('Disable a user')
@@ -96,7 +91,7 @@ class DisableUserSpec extends GebSpec {
     def "disable user"() {
         when:
         UserProfilePage userProfilePage = browser.page UserProfilePage
-        userProfilePage.disableUser()
+        userProfilePage.disableOrEnableUser()
         then:
         at ConfirmDisableUserPage
 
@@ -127,5 +122,39 @@ class DisableUserSpec extends GebSpec {
         loginPage.login("curator", "curator")
         then:
         loginPage.isAccountDisabled()
+    }
+
+
+    def "Enable user"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("supervisor", "supervisor")
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelName)
+        dashboardPage.select(dataModelName)
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.openActivityUser()
+        then:
+        at UserProfilePage
+
+        when:
+        UserProfilePage userProfilePage = browser.page UserProfilePage
+        userProfilePage.disableOrEnableUser()
+        then:
+        at ConfirmEnableUserPage
+
+        when:
+        ConfirmEnableUserPage confirmEnableUserPage = browser.page ConfirmEnableUserPage
+        confirmEnableUserPage.confirmEnableUser()
+        then:
+        at UserProfilePage
     }
 }
