@@ -18,15 +18,41 @@ import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 @Log
 class NorthThamesMappingReportXlsxSqlExporter {
     static Map<String, Map<String, String>> ntSitesMap = [
-        LONDONPATHOLOGYCODES: [siteName: 'RFH', lpcModelName: 'LONDONPATHOLOGYCODES', localModelName: 'WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
-        RFH_LONDONPATHOLOGYCODES: [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
-        RFH_LONDONPATHOLOGYCODES_GEL_SUBSET: [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES_GEL_SUBSET', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
-        RFH_LONDONPATHOLOGYCODES_CLEANSED: [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES_CLEANSED', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases', includeImports: true],
-        GOSH_OMNILAB: [siteName: 'GOSH', lpcModelName: 'GOSH_OMNILAB', localModelName: 'GOSH_OMNILAB', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
-        LNWH_WINPATH: [siteName: 'LNWH', lpcModelName: 'LNWH_WINPATH', localModelName: 'LNWH_WINPATH', loincModelName: 'LOINC', gelModelName: 'Rare Diseases']
+        LONDONPATHOLOGYCODES:
+            [siteName: 'RFH', lpcModelName: 'LONDONPATHOLOGYCODES',                localModelName: 'WinPath',     loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        RFH_LONDONPATHOLOGYCODES:
+            [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES',            localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        RFH_LONDONPATHOLOGYCODES_GEL_SUBSET:
+            [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES_GEL_SUBSET', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        RFH_LONDONPATHOLOGYCODES_CLEANSED:
+            [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES_CLEANSED',   localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases', includeImports: true],
+        GOSH_OMNILAB:
+            [siteName: 'GOSH', lpcModelName: 'GOSH_OMNILAB', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        LNWH_WINPATH:
+            [siteName: 'LNWH', lpcModelName: 'LNWH_WINPATH', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        'MEH MOORFIELDS PATHOLOGY CODES':
+            [siteName: 'MEH', lpcModelName: 'MEH MOORFIELDS PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        'RNOH PATHOLOGY CODES':
+            [siteName: 'RNOH', lpcModelName: 'RNOH PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        'BARTS PATHOLOGY CODES':
+            [siteName: 'BARTS', lpcModelName: 'BARTS PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        'UCLH PATHOLOGY CODES':
+            [siteName: 'UCLH', lpcModelName: 'UCLH PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        'GOSH PATHOLOGY CODES':
+            [siteName: 'GOSH', lpcModelName: 'GOSH PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+        'LNWH PATHOLOGY CODES':
+            [siteName: 'LNWH', lpcModelName: 'LNWH PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
     ]
-    static Map<String, String> defaultSiteMap = [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'RFH_LONDONPATHOLOGYCODES_GEL_SUBSET']
-
+    static Map<String, String> defaultSiteMap =
+        [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases']
+/*
+MEH MOORFIELDS PATHOLOGY CODES - uploaded data models
+RNOH PATHOLOGY CODES - uploaded data models
+BARTS PATHOLOGY CODES - empty
+UCLH PATHOLOGY CODES - empty
+GOSH PATHOLOGY CODES - empty
+LNWH PATHOLOGY CODES - empty
+ */
     /**
      * Map of data source systems
      */
@@ -34,10 +60,16 @@ class NorthThamesMappingReportXlsxSqlExporter {
 //    final GrailsApplication grailsApplication
     ApplicationContext context = Holders.getApplicationContext()
     SessionFactory sessionFactory = (SessionFactory) context.getBean('sessionFactory')
-    protected List<String> excelHeaders = [
+    protected List<String> excelHeaders4Models = [
         'LOCAL SITE',
         'LOCAL CODESET 1', 'LOCAL CODE 1', 'LOCAL CODE 1 NAME',
         'LOCAL CODESET 2', 'LOCAL CODE 2', 'LOCAL CODE 2 DESCRIPTION',
+        'LOINC CODE', 'LOINC CODE DESCRIPTION', 'LOINC SYSTEM(SPECIMEN)',
+        'GEL CODE', 'GEL CODE DESCRIPTION', 'OPENEHR QUERY', 'REF RANGE'
+    ]
+    protected List<String> excelHeaders3Models = [
+        'LOCAL SITE',
+        'LOCAL CODESET 1', 'LOCAL CODE 1', 'LOCAL CODE 1 NAME',
         'LOINC CODE', 'LOINC CODE DESCRIPTION', 'LOINC SYSTEM(SPECIMEN)',
         'GEL CODE', 'GEL CODE DESCRIPTION', 'OPENEHR QUERY', 'REF RANGE'
     ]
@@ -165,8 +197,10 @@ ORDER BY
     void export(OutputStream outputStream) {
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
         Map<String, String> siteMap = setModelNames(sourceModel)
-        log.info("siteName:${siteMap.siteName} sourceModel:${sourceModel.name} lpcModel:${siteMap.lpcModelName} localModel:${siteMap.localModelName} loincModel:${siteMap.loincModelName} gelModel:${siteMap.gelModelName}")
+        String localModelName = siteMap.localModelName
+        log.info("siteName:${siteMap.siteName} sourceModel:${sourceModel.name} lpcModel:${siteMap.lpcModelName} localModel:${siteMap.localModelName ?: 'NONE'} loincModel:${siteMap.loincModelName} gelModel:${siteMap.gelModelName}")
         List mappedDataElements = getMappedDataElements(siteMap)
+        List<String> excelHeaders = (localModelName ? excelHeaders4Models : excelHeaders3Models)
 //        log.info(mappedDataElements.toString())
 
         builder.build(outputStream) {
@@ -191,13 +225,13 @@ ORDER BY
                 for (de in mappedDataElements) {
 //                    log.info('=================')
 //                    log.info(de.toString())
-                    printMapping(siteMap.siteName, de, sheetDefinition)
+                    printMapping(siteMap.siteName, de, sheetDefinition, localModelName)
                 }
             }
         }
     }
 
-    void printMapping(String siteName, deRow, SheetDefinition sheet){
+    void printMapping(String siteName, deRow, SheetDefinition sheet, String localModelName){
         //print a row with all the mappings form the source models to the mapped models
         //get the mapped items from the source data element
 //        log.info(deRow)
@@ -221,21 +255,23 @@ ORDER BY
                     width auto
                 }
 
-                //mapped items local
-                cell {
-                    value deRow[cols.local_model.ordinal()]
-                    width auto
-                }
-                cell {
-                    value deRow[cols.local_code.ordinal()]
-                    width auto
-                }
-                cell {
-                    value deRow[cols.local_name.ordinal()]
-                    width auto
+                if (localModelName) {
+                    // mapped local items (WinPath)
+                    cell {
+                        value deRow[cols.local_model.ordinal()]
+                        width auto
+                    }
+                    cell {
+                        value deRow[cols.local_code.ordinal()]
+                        width auto
+                    }
+                    cell {
+                        value deRow[cols.local_name.ordinal()]
+                        width auto
+                    }
                 }
 
-                //mapped loinc items
+                // mapped LOINC items
                 cell {
                     value  deRow[cols.loinc_code.ordinal()]
                     width auto
@@ -249,7 +285,7 @@ ORDER BY
                     width auto
                 }
 
-                //mapped gel items
+                // mapped GEL items (usually Rare Diseases)
                 cell {
                     value deRow[cols.gel_code.ordinal()]
                     width auto
