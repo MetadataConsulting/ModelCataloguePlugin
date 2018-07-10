@@ -11,6 +11,10 @@ class SearchModelPage extends Page implements InputUtils {
         dataModelList(required: false, wait: true) { $('h4.list-group-item-heading') }
     }
 
+    void searchInput(String value){
+        fillInput(search,value)
+        sleep(2_000)
+    }
     void searchModelByName(String name) {
         searchTagLink(name).click()
     }
