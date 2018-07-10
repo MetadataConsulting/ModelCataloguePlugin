@@ -32,6 +32,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     transient dataModelAclService
 
+    transient topLevelDataClassService
+
     DataModel dataModel
 
     String name
@@ -446,6 +448,11 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         }
         if ( !(this instanceof User) ) {
             auditService.logElementCreated(this)
+        }
+
+        if (this instanceof DataClass) {
+            // mark top level
+            topLevelDataClassService.markTopLevel(this)
         }
     }
 
