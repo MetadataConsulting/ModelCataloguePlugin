@@ -3,18 +3,36 @@ package org.modelcatalogue.core
 import com.google.common.collect.ImmutableSet
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import spock.lang.Shared
 
 /**
  * Test that TopLevelDataClassService methods work
  */
 class TopLevelDataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 
-    DataModel dataModel = new DataModel(name: "DM1")
-    DataClass dataClassParent = new DataClass(name: "DC1", dataModel: dataModel)
-    DataClass dataClassChild = new DataClass(name: "DC2", dataModel: dataModel)
-    DataModelFilter dataModelFilter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
+    @Shared
+    DataModel dataModel
+    @Shared
+    DataClass dataClassParent
+    @Shared
+    DataClass dataClassChild
+    @Shared
+    DataModelFilter dataModelFilter
+    @Shared
     TopLevelDataClassService topLevelDataClassService
 
+    def setupSpec() {
+        dataModel = new DataModel(name: "DM1")
+        dataModel.save(flush:true)
+
+        dataClassParent = new DataClass(name: "DC1", dataModel: dataModel)
+        dataClassParent.save(flush:true)
+
+        dataClassChild = new DataClass(name: "DC2", dataModel: dataModel)
+        dataClassChild.save(flush:true)
+
+        dataModelFilter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
+    }
 
     def "dataClassChild and dataClassParent both initially top-level"() {
 
