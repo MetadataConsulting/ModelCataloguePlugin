@@ -79,7 +79,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     // var m = [20, 120, 20, 120],
     // w = 1280 + 6000 - m[1] - m[3],
     // h = 800 - m[0] - m[2],
-
+    initialLineYOffset: 5,
     nodeLabelLineSeparation: 10,
 
     /**
@@ -87,6 +87,24 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
      * @type {number}
      */
     pageNodeSpacing: 30
+  }
+
+  var nodeRectParams = {
+    dx: -(labelParams.maxStringLength * 7),
+    dy: -10,
+    rx: 6,
+    ry: 6,
+    width: 0,
+    height: labelParams.maxNodeLabelLines * 20
+  }
+  nodeRectParams.width = -nodeRectParams.dx
+
+  function rectangleHeight(numLines) {
+    var lineHeight = 5 // not sure if this is actually the line height. Not sure about this whole algorithm really
+    return -(nodeRectParams.dy) // top
+      + labelParams.initialLineYOffset // space to top of first line
+      + numLines * labelParams.nodeLabelLineSeparation // rest of the lines
+       // bottom
   }
 
 
@@ -142,6 +160,11 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
     type Node = CENode | PageNode
     // the primary recursive type
+
+    type Link = {
+      source: Node,
+      target: Node
+    }
 
     // Disjoint union:
     type CENode = {nodeContentType: "CATALOGUE_ELEMENT"} & D3JSON & CatalogueElementData & {currentPaginationParams: ?PaginationParams} & ChildrenPaged
@@ -598,6 +621,88 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
   function update(source) {
 
 
+    /**
+     * First n elements of arr, [] if arr is empty
+     * @param arr
+     * @param n
+     * @returns {Array}
+     */
+    function myFirst(arr, n) {
+      return (arr.length === 0) ? [] : _.first(arr, n)
+    }
+
+
+    /**
+     * Splits name into array of lines, made of possibly truncated words, each less than maxStringLength long.
+     * @param d
+     * @returns {Array}
+     */
+    function splitName(d /*: CENode */) /*: string[] */ {
+      var words = d.name.split(/\s+/) // initial splitting
+
+      var truncatedWords = []
+
+      // split words longer than maxStringLength into parts
+      var i = 0
+      while (i < words.length) {
+        // loop invariant: words[0..i) has been put into truncatedWords
+        // truncatedWords has only strings of length <= maxStringLength
+
+        var word = words[i] // word to split
+
+        while (word.length > labelParams.maxStringLength) {
+          // loop invariant: word is always the remainder of words[i] that has not been pushed into truncatedWords yet
+          // the following is fine even if maxStringLength-1 is greater than the length of word
+
+          truncatedWords.push(word.substring(0,labelParams.maxStringLength - 1) + '-')
+          word = word.substring(labelParams.maxStringLength - 1) // make word the remainder
+        }
+
+        truncatedWords.push(word) // the remainder, when word.length <= maxStringLength. Could be the empty string but that is not a problem
+        i++
+      }
+
+      // now words[0..words.length) has been put into truncatedWords
+      // and truncatedWords has only strings of length <= maxStringLength
+
+
+
+      var result = []
+      var n = 0
+      if (labelParams.maxStringLength > 0) {
+        while (truncatedWords.length > 0) {
+          // words is the remaining array of words
+
+          var wordsPerLine = 0
+          var line = myFirst(truncatedWords, wordsPerLine).join(' ')
+
+          while (line.length < labelParams.maxStringLength && wordsPerLine < truncatedWords.length) {
+            // loop invariant: line == myFirst(truncatedWords, wordsPerLine).join(' ')
+            wordsPerLine++
+            line = myFirst(truncatedWords, wordsPerLine).join(' ')
+          }
+
+          if (line.length > labelParams.maxStringLength) { // loop could terminate due to being over the max string length
+            wordsPerLine = wordsPerLine - 1
+          }
+
+          // wordsPerLine will be at least 1 because the inner while loop must run at least once. Unless maxStringLength == 0
+          // Thus the outer loop will terminate because truncatedWords gets smaller on each loop.
+          result.push(truncatedWords.splice(0, wordsPerLine).join(' '))
+          n++
+        }
+      }
+
+
+
+      return result
+    }
+
+    function nodeRectangleHeight(d /*: CENode */) {
+      return rectangleHeight(Math.min(splitName(d).length, labelParams.maxNodeLabelLines));
+    }
+
+
     var duration = d3.event && d3.event.altKey ? 5000 : 500;
 
 
@@ -623,7 +728,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           var i = 0
           while (i<n) {
             var page = pages[i]
-            page.x = d.x  + sign * ((i + 1) * labelParams.pageNodeSpacing)
+            page.x = d.x  + sign * ((i + 1) * labelParams.pageNodeSpacing) + ((sign > 0) ? nodeRectangleHeight(d) - 20 : 0)
             page.y = d.y
             nodeLayoutData.push(page)
             i++
@@ -912,8 +1017,48 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           d3.event.stopImmediatePropagation(); // to stop panning
         });
 
-      // add circles for each node
-      nodeEnter.append("svg:circle")
+      /**
+       * "this" will be the HTML DOM element under consideration when doing a selection.
+       * @param d
+       * @returns {*}
+       * @constructor
+       */
+      function CENodeSelector(d /*: Node */) {
+        return nodeHandler(
+          function(d /*: CENode */) {
+            return true
+          },
+          function(d /*: PageNode */){
+            return false
+          }
+        )(d)
+      }
+
+      function PageNodeSelector(d /*: Node */) {
+        return nodeHandler(
+          function(d /*: CENode */) {
+            return false
+          },
+          function(d /*: PageNode */){
+            return true
+          }
+        )(d)
+      }
+
+      // add rectangles for CENodes
+      nodeEnter.filter(CENodeSelector).append("svg:rect")
+        .attr("width", nodeRectParams.width)
+        .attr("height", nodeRectangleHeight)//nodeRectParams.height)
+        .attr('x', nodeRectParams.dx)
+        .attr('y', nodeRectParams.dy)
+        .attr('rx', nodeRectParams.rx)
+        .attr('ry', nodeRectParams.ry)
+        .style("fill", "lightblue")
+        .attr("stroke-width", 1)
+        .attr("stroke", "#808080")
+
+      // add circles for PageNodes
+      nodeEnter.filter(PageNodeSelector).append("svg:circle")
         .attr("r", 1e-6)
         .style("fill", (nodeHandler(
           function(d /*: CENode */) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; },
@@ -922,90 +1067,13 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
 
 
+
+
       /**
        * Node labelling block
        */
       (function(){
 
-
-
-        /**
-         * First n elements of arr, [] if arr is empty
-         * @param arr
-         * @param n
-         * @returns {Array}
-         */
-        function myFirst(arr, n) {
-          return (arr.length === 0) ? [] : _.first(arr, n)
-        }
-
-
-
-        /**
-         * Splits name into array of three lines, made of whole words, each less than maxStringLength long.
-         * @param d
-         * @returns {Array}
-         */
-        function splitName(d /*: CENode */) /*: string[] */ {
-          var words = d.name.split(/\s+/) // initial splitting
-
-          var truncatedWords = []
-
-          // split words longer than maxStringLength into parts
-          var i = 0
-          while (i < words.length) {
-            // loop invariant: words[0..i) has been put into truncatedWords
-            // truncatedWords has only strings of length <= maxStringLength
-
-            var word = words[i] // word to split
-
-            while (word.length > labelParams.maxStringLength) {
-              // loop invariant: word is always the remainder of words[i] that has not been pushed into truncatedWords yet
-              // the following is fine even if maxStringLength-1 is greater than the length of word
-
-              truncatedWords.push(word.substring(0,labelParams.maxStringLength - 1) + '-')
-              word = word.substring(labelParams.maxStringLength - 1) // make word the remainder
-            }
-
-            truncatedWords.push(word) // the remainder, when word.length <= maxStringLength. Could be the empty string but that is not a problem
-            i++
-          }
-
-          // now words[0..words.length) has been put into truncatedWords
-          // and truncatedWords has only strings of length <= maxStringLength
-
-
-
-          var result = []
-          var n = 0
-          if (labelParams.maxStringLength > 0) {
-            while (truncatedWords.length > 0) {
-              // words is the remaining array of words
-
-              var wordsPerLine = 0
-              var line = myFirst(truncatedWords, wordsPerLine).join(' ')
-
-              while (line.length < labelParams.maxStringLength && wordsPerLine < truncatedWords.length) {
-                // loop invariant: line == myFirst(truncatedWords, wordsPerLine).join(' ')
-                wordsPerLine++
-                line = myFirst(truncatedWords, wordsPerLine).join(' ')
-              }
-
-              if (line.length > labelParams.maxStringLength) { // loop could terminate due to being over the max string length
-                wordsPerLine = wordsPerLine - 1
-              }
-
-              // wordsPerLine will be at least 1 because the inner while loop must run at least once. Unless maxStringLength == 0
-              // Thus the outer loop will terminate because truncatedWords gets smaller on each loop.
-              result.push(truncatedWords.splice(0, wordsPerLine).join(' '))
-              n++
-            }
-          }
-
-
-
-          return result
-        }
 
 
         /**
@@ -1025,8 +1093,17 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         }
 
         function nodeLabelXOffset(d /*: Node */) /*: number */ {
-          var absoluteOffset = radius + 5;
-          return shouldLabelBeOnTheLeft(d) ? - (absoluteOffset) : absoluteOffset;
+          return nodeHandler(
+            function(d /*: CENode */) {return nodeRectParams.dx + 5},
+            function(d /*: PageNode */) {return - (radius + 5)}
+          )(d)
+        }
+
+        function startOrEnd(d /*: Node */) /*: string */ {
+          return nodeHandler(
+            function(d /*: CENode */) {return "start"},
+            function(d /*: PageNode */) { return "end"}
+          )(d)
         }
 
         // Text/link for each node
@@ -1035,9 +1112,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           // text with possibly shortened name
 
           .attr("x", nodeLabelXOffset)
-          .attr("text-anchor", function(d /*: Node */) {
-            return shouldLabelBeOnTheLeft(d) ? "end" : "start";
-          })
+          .attr("text-anchor", startOrEnd)
           // .text(shortenedNodeText)
 
           .style("fill-opacity", 1e-6)
@@ -1051,7 +1126,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           var currentSelection = textD3Selection
           var i /*: number */ = 0 // line number
           while (i < labelParams.maxNodeLabelLines) {
-            var dy = (i === 0) ? 5 : labelParams.nodeLabelLineSeparation
+            var dy = (i === 0) ? labelParams.initialLineYOffset : labelParams.nodeLabelLineSeparation
             currentSelection = currentSelection.append('svg:tspan')
               .attr("x", (nodeLabelXOffset /*: Node => number */))
               .attr('dy', dy)
@@ -1087,6 +1162,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
         addLabelLines(textD3Selection)
 
+        // Font-Awesome Up/Down arrow for pagination nodes
         nodeEnter.append('text')
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'central')
@@ -1097,15 +1173,16 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
             function(d /*: PageNode */) { return (d.direction === DIRECTIONS.UP) ? '\uf062' : '\uf063' })
           );
 
+
+        // current pagination information text:
+
         svgNodes.select("text.children-pagination-text").remove()
         svgNodes.append("svg:text")
           .attr("class", "children-pagination-text")
           .attr("dy", "-1em")
 
           .attr("x", nodeLabelXOffset)
-          .attr("text-anchor", function(d /*: Node */) {
-            return shouldLabelBeOnTheLeft(d) ? "end" : "start";
-          })
+          .attr("text-anchor", startOrEnd)
           // .text(shortenedNodeText)
 
           .style("font", "italic " + labelParams.labelFontSize + "px sans-serif")
@@ -1177,23 +1254,38 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     (function() {
       // Update the LINKS…
       var link = vis.selectAll("path.link")
-        .data(tree.links(nodeLayoutData), function(d) { return d.target.id; });
+        .data(tree.links(nodeLayoutData), function(d) { return d.target.nodeId; });
 
       // ENTER any new links at the parent's previous position.
       link.enter().insert("svg:path", "g")
         .attr("class", "link")
-        .attr("d", function(d /*: Node */) {
+        .attr("d", function(l /*: Link */) {
           var o = {x: source.x0, y: source.y0};
           return diagonal({source: o, target: o});
         })
         .transition()
         .duration(duration)
-        .attr("d", diagonal);
+        .attr("d", linkDiagonalAccountingForRectangles);
+
+      function linkDiagonalAccountingForRectangles(l /*: Link */) {
+        return nodeHandler(
+          function(d /*: CENode */) {
+            var linkDataAccountingForRectangle = {
+              source: l.source,
+              target: {x: l.target.x,
+                       y: l.target.y + nodeRectParams.dx}}
+            return diagonal(linkDataAccountingForRectangle)
+          },
+          function(d /*: PageNode */) {
+            return diagonal(l)
+          }
+        )(l.target)
+      }
 
       // Transition links to their new position.
       link.transition()
         .duration(duration)
-        .attr("d", diagonal);
+        .attr("d", linkDiagonalAccountingForRectangles);
 
       // Transition exiting links to the parent's new position.
       link.exit().transition()
