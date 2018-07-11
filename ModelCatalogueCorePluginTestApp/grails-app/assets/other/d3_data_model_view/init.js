@@ -1179,7 +1179,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         svgNodes.select("text.children-pagination-text").remove()
         svgNodes.append("svg:text")
           .attr("class", "children-pagination-text")
-          .attr("dy", "-1em")
+          .attr("dy", "-2em")
 
           .attr("x", nodeLabelXOffset)
           .attr("text-anchor", startOrEnd)
@@ -1237,6 +1237,11 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         .duration(duration)
         .attr("transform", function(d /*: Node */) { return "translate(" + source.y + "," + source.x + ")"; })
         .remove();
+
+
+      nodeExit.select("rect")
+        .attr("width", 1e-6)
+        .attr("height", 1e-6)
 
       nodeExit.select("circle")
         .attr("r", 1e-6);
