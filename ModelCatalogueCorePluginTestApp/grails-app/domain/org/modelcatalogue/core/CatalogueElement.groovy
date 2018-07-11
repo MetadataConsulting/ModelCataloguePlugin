@@ -452,7 +452,10 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
         if (this instanceof DataClass) {
             // mark top level
-            topLevelDataClassService.markTopLevel(this)
+            DataClass.withNewSession {
+                final Long dataClassId = this.id
+                topLevelDataClassService.markTopLevel(dataClassId)
+            }
         }
     }
 

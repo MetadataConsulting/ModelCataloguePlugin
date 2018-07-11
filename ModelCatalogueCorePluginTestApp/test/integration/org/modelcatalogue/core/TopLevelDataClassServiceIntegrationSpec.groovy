@@ -1,69 +1,72 @@
 package org.modelcatalogue.core
 
 import com.google.common.collect.ImmutableSet
+import org.modelcatalogue.core.persistence.DataClassGormService
+import org.modelcatalogue.core.persistence.DataModelGormService
+import org.modelcatalogue.core.persistence.ExtensionValueGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
-import spock.lang.Shared
 
 /**
  * Test that TopLevelDataClassService methods work
  */
 class TopLevelDataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 
-    @Shared
-    DataModel dataModel
-    @Shared
-    DataClass dataClassParent
-    @Shared
-    DataClass dataClassChild
-    @Shared
-    DataModelFilter dataModelFilter
-    @Shared
     TopLevelDataClassService topLevelDataClassService
 
-    def setupSpec() {
-        dataModel = new DataModel(name: "DM1")
-        dataModel.save(flush:true)
+    DataModelGormService dataModelGormService
 
-        dataClassParent = new DataClass(name: "DC1", dataModel: dataModel)
-        dataClassParent.save(flush:true)
+    DataClassGormService dataClassGormService
 
-        dataClassChild = new DataClass(name: "DC2", dataModel: dataModel)
-        dataClassChild.save(flush:true)
-
-        dataModelFilter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
-    }
+    ExtensionValueGormService extensionValueGormService
 
     def "dataClassChild and dataClassParent both initially top-level"() {
+        when:
+        DataModel dataModel = dataModelGormService.saveWithName("DM1")
 
-        when: "two unrelated dataClasses in model"
-        ListWithTotalAndType<DataClass> topLevelDataClasses = topLevelDataClassService.getTopLevelDataClasses(dataModelFilter, [:])
+        then:
+        dataModelGormService.count() == old(dataModelGormService.count()) + 1
 
-        then: "2 top level dataClasses"
-        topLevelDataClasses.total == 2
+        when:
+        DataClass dataClassParent = dataClassGormService.saveWithNameAndDataModel("DM1", dataModel)
 
+        then:
+        dataClassGormService.count() == old(dataClassGormService.count()) + 1
+        extensionValueGormService.count() == old(extensionValueGormService.count()) + 1
+
+        when:
+        DataClass dataClassChild = dataClassGormService.saveWithNameAndDataModel("DM2", dataModel)
+
+        then:
+        dataClassGormService.count() == old(dataClassGormService.count()) + 1
+        extensionValueGormService.count() == old(extensionValueGormService.count()) + 1
+
+//        when: "two unrelated dataClasses in model"
+//        DataModelFilter dataModelFilter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
+//        ListWithTotalAndType<DataClass> topLevelDataClasses = topLevelDataClassService.getTopLevelDataClasses(dataModelFilter, [:])
+//
+//        then: "2 top level dataClasses"
+//        topLevelDataClasses.total as int == dataClassNames.size()
+//
+//        when: "hierarchy relationship between dataClasses is added"
+//        dataClassParent.addToParentOf(dataClassChild)
+//        topLevelDataClasses = topLevelDataClassService.getTopLevelDataClasses(dataModelFilter, [:])
+//
+//        then: "child is no longer top-level"
+//        topLevelDataClasses.getItems() == [dataClassParent]
+//
+//        when: "hierarchy relationship is removed"
+//        dataClassParent.removeFromParentOf(dataClassChild)
+//        topLevelDataClasses = topLevelDataClassService.getTopLevelDataClasses(dataModelFilter, [:])
+//
+//        then: "child is top-level again"
+//        topLevelDataClasses.total == 2
+
+        cleanup:
+        extensionValueGormService.deleteByElement(dataClassChild)
+        extensionValueGormService.deleteByElement(dataClassParent)
+        dataClassGormService.deleteByName("DM1")
+        dataClassGormService.deleteByName("DM2")
+        dataModelGormService.delete(dataModel)
     }
-
-    def "dataClassChild no longer top-level when hierarchy relationship added"() {
-
-        when: "hierarchy relationship between dataClasses is added"
-        dataClassParent.addToParentOf(dataClassChild)
-        ListWithTotalAndType<DataClass> topLevelDataClasses = topLevelDataClassService.getTopLevelDataClasses(dataModelFilter, [:])
-
-        then: "child is no longer top-level"
-        topLevelDataClasses.getItems() == [dataClassParent]
-
-    }
-
-    def "dataClassChild top-level again when hierarchy relationship removed"() {
-
-        when: "hierarchy relationship is removed"
-        dataClassParent.removeFromParentOf(dataClassChild)
-        ListWithTotalAndType<DataClass> topLevelDataClasses = topLevelDataClassService.getTopLevelDataClasses(dataModelFilter, [:])
-
-        then: "child is top-level again"
-        topLevelDataClasses.total == 2
-
-    }
-
 }

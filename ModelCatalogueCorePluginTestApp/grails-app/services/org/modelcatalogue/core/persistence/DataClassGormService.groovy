@@ -61,6 +61,11 @@ class DataClassGormService implements WarnGormErrors {
     }
 
     @Transactional
+    DataClass saveWithNameAndDataModel(String name, DataModel dataModel) {
+        save(new DataClass(name: name, dataModel: dataModel))
+    }
+
+    @Transactional
     DataClass saveWithNameAndDescription(String name, String description) {
         save(new DataClass(name: name, description: description))
     }
@@ -104,11 +109,31 @@ class DataClassGormService implements WarnGormErrors {
         DataClass.where { id in ids }
     }
 
+    DetachedCriteria<DataClass> queryByName(String nameParam) {
+        DataClass.where { name == nameParam }
+    }
+
     @Transactional(readOnly = true)
     List<DataClass> findAllByIds(List<Long> ids) {
         if ( !ids ) {
             return [] as List<DataClass>
         }
         queryByIds(ids).list()
+    }
+
+    @Transactional
+    void delete(DataClass dataClass) {
+        dataClass?.delete()
+    }
+
+    @Transactional
+    void deleteByName(String name) {
+        DataClass dataClass = queryByName(name).get()
+        dataClass?.delete()
+    }
+
+    @Transactional(readOnly = true)
+    Integer count() {
+        DataClass.count()
     }
 }

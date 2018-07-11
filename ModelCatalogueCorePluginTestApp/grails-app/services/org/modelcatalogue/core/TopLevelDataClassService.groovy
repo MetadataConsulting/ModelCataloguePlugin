@@ -1,25 +1,34 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
+import org.modelcatalogue.core.persistence.DataClassGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 
-
-@Transactional
 /**
  * Service dealing with marking Data Classes as TopLevel, so that we don't have to do the negative query "Find all Data Classes in this Data Model that DON'T have parent Data Classes".
  */
+@Slf4j
 class TopLevelDataClassService {
 
     public static final String TOP_LEVEL_DATA_CLASS_EXTENSION_KEY = 'http://www.modelcatalogue.org/system/#top-level-data-class'
     public static final String TRUE = 'true'
+
+    DataClassGormService dataClassGormService
 
     /**
      * Marks a DataClass as Top-Level
      * @param dataClass
      * @return
      */
-    def markTopLevel(DataClass dataClass) {
+    @Transactional
+    def markTopLevel(Long dataClassId) {
+        DataClass dataClass = dataClassGormService.findById(dataClassId)
+        if (!dataClass) {
+            log.warn('Data Class not found with id {}', dataClassId)
+            return
+        }
         dataClass.ext.put(TOP_LEVEL_DATA_CLASS_EXTENSION_KEY, TRUE)
     }
 
@@ -28,6 +37,7 @@ class TopLevelDataClassService {
      * @param dataClass
      * @return
      */
+    @Transactional
     def unmarkTopLevel(DataClass dataClass) {
         dataClass.ext.remove(TOP_LEVEL_DATA_CLASS_EXTENSION_KEY)
     }
@@ -37,6 +47,7 @@ class TopLevelDataClassService {
      * @param dataModel
      * @return
      */
+    @Transactional(readOnly = true)
     ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter,
                                                            Map params = [:],
                                                            Boolean canViewDraftsParam = null) {
@@ -49,6 +60,7 @@ class TopLevelDataClassService {
     /**
      * For any DataModel in the catalogue that doesn't have data classes marked top-level, find top-level data classes with the old method, and then mark them.
      */
+    @Transactional
     def calculateAndMarkTopLevelDataClasses() {
 
         // TODO: Implement
