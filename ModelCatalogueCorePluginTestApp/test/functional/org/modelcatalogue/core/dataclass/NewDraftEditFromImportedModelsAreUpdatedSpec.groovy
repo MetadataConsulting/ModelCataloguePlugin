@@ -2,13 +2,7 @@ package org.modelcatalogue.core.dataclass
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Ignore
-import spock.lang.Shared
-import spock.lang.Specification
-import spock.lang.Stepwise
-import spock.lang.Title
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1554')
 @Title('Examine that when creating a new draft - if there are Data Classes from other models -edits from imported models are updated in your model.')
@@ -334,5 +328,4 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         then:
         dataClassesPage.containsDataClass(importDataClassNewName)
     }
-
 }

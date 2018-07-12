@@ -1,26 +1,8 @@
 package org.modelcatalogue.core.datamodel
 
 import geb.spock.GebSpec
-import org.modelcatalogue.core.geb.CreateDataModelPage
-import org.modelcatalogue.core.geb.CreateDataTypePage
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.DataModelAclPermissionsPage
-import org.modelcatalogue.core.geb.DataModelAclPermissionsShowPage
-import org.modelcatalogue.core.geb.CloneIntoDataModulePage
-import org.modelcatalogue.core.geb.SearchCatalogElementPage
-import org.modelcatalogue.core.geb.DataTypesPage
-import org.modelcatalogue.core.geb.DataTypePage
-import org.modelcatalogue.core.geb.HomePage
-import org.modelcatalogue.core.geb.LoginModalPage
-import org.modelcatalogue.core.geb.LoginPage
-import org.modelcatalogue.core.geb.DataTypePage
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Shared
-import spock.lang.Ignore
-import spock.lang.Stepwise
-import spock.lang.Title
+import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-2026')
 @Title('Check that the user is not capable to clone unauthorized Element into an authorized model')
@@ -50,7 +32,6 @@ import spock.lang.Title
 - Check that Data Element from second data model now exists in first data model
 ''')
 @Stepwise
-@Ignore
 class CloneUnauthorizedElementSpec extends GebSpec {
 
     @Shared
@@ -327,6 +308,6 @@ class CloneUnauthorizedElementSpec extends GebSpec {
         when:
         DataTypePage dataTypePage = browser.page DataTypePage
         then:
-        dataTypePage.isDataTypePageFor(dataTypeTwoName)
+        dataTypePage.isDataTypePageFor(dataTypeTwoName) 
     }
 }

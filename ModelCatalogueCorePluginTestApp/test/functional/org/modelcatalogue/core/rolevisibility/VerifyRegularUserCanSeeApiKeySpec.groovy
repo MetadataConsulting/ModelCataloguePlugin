@@ -1,12 +1,11 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.*
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Specification
-import spock.lang.Title
-import org.modelcatalogue.core.geb.*
 import spock.lang.Stepwise
+import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-1563')
 @Title('Verify that regular user can see api key')
@@ -36,6 +35,7 @@ class VerifyRegularUserCanSeeApiKeySpec extends GebSpec {
 
     def "login as supervisor"() {
         when:
+        sleep(2_000)
         LoginPage loginPage = to LoginPage
         loginPage.login("supervisor", "supervisor")
         then:
@@ -141,5 +141,4 @@ class VerifyRegularUserCanSeeApiKeySpec extends GebSpec {
         then:
         at HomePage
     }
-
 }

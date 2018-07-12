@@ -24,13 +24,13 @@ class CuratorCanGenerateSuggestionsUsingMappingUtilitySpec extends GebSpec {
     @Shared
     String modelTwoOption
     @Shared
-    String dataModelNameA = UUID.randomUUID().toString()+"modelA"
+    String dataModelNameA = UUID.randomUUID().toString()
     @Shared
     String dataElementNameA = "Test Data Element A"
     @Shared
     String dataElementNameB = "Test Data Element B"
     @Shared
-    String dataModelNameB = UUID.randomUUID().toString()+"modelB"
+    String dataModelNameB = UUID.randomUUID().toString()
 
     def "Login as curator"() {
         when:
@@ -150,7 +150,7 @@ class CuratorCanGenerateSuggestionsUsingMappingUtilitySpec extends GebSpec {
         when:
         MappingPage mappingPage = browser.page MappingPage
         driver.navigate().refresh()
-        mappingPage.hasMapping(modelOneOption,dataModelNameA)
+        mappingPage.hasMapping(modelOneOption, dataModelNameA)
         then:
         at MappingSuggestionsPage
     }

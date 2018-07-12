@@ -36,6 +36,7 @@ class DataTypePage extends Page {
     }
 
     boolean isDataTypePageFor(String value) {
+        sleep(2_000)
         checkForDataType(value)?.displayed
     }
 

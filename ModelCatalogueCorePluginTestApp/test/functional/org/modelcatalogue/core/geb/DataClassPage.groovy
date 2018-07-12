@@ -10,6 +10,7 @@ class DataClassPage extends Page {
 
     static content = {
         editButton { $('a#role_item-detail_inline-editBtn') }
+        editButtonDissable { $('a#role_item-detail_edit-catalogue-elementBtn') }
         saveButton(wait: false, required: false) { $('button#role_item-detail_inline-edit-submitBtn') }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         formMetadataLink { $('span.btn.btn-link btn-sm ng-binding') }
@@ -66,7 +67,7 @@ class DataClassPage extends Page {
     }
 
     boolean editDataClassDisabled() {
-        waitFor { editButton.@('disabled') }
+        waitFor { editButtonDissable.@('disabled') }
     }
 
     void dataClassDropdown() {
