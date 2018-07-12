@@ -2,9 +2,11 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.persistence.DataClassGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 
 /**
  * Service dealing with marking Data Classes as TopLevel, so that we don't have to do the negative query "Find all Data Classes in this Data Model that DON'T have parent Data Classes".
@@ -49,12 +51,94 @@ class TopLevelDataClassService {
      */
     @Transactional(readOnly = true)
     ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter,
-                                                           Map params = [:],
-                                                           Boolean canViewDraftsParam = null) {
-        // TODO: Implement similarly to DataClassService's method, only using extension value to search.
+                                                           Map params = [:]) {
         // TODO: Use this method when D3 Basic Data Model View requests data model children
         // TODO: Use this method when Angular treeview requests top level data classes
-        throw new Exception("Method not implemented!")
+
+        List<ElementStatus> status = ElementService.getStatusFromParams(params)
+
+        if (dataModelFilter.unclassifiedOnly) {
+            // TODO: Implement
+//            // language=HQL
+//            return Lists.fromQuery(params, DataClass, """
+//                select distinct m
+//                from DataClass as m
+//                where m.status in :status
+//                    and m.id not in (
+//                        select distinct r.destination.id
+//                        from Relationship r
+//                        where r.relationshipType = :type
+//                        and r.source.dataModel is null
+//                    )
+//                    and m.dataModel is null
+//                group by m.name, m.id
+//                order by m.name
+//            ""","""
+//                select count(m.id)
+//                from DataClass as m
+//                where m.status in :status
+//                    and m.id not in (
+//                        select distinct r.destination.id
+//                        from Relationship r
+//                        where r.relationshipType = :type
+//                        and r.source.dataModel is null
+//                    )
+//                    and m.dataModel is null
+//            """, [type: hierarchy, status: status])
+        }
+
+        if (dataModelFilter.excludes && !dataModelFilter.includes) {
+            // TODO: Implement
+//            // language=HQL
+//            return Lists.fromQuery(params, DataClass, """
+//                select distinct m
+//                from DataClass as m
+//                where m.status in :status
+//                    and m.id not in (
+//                        select distinct r.destination.id
+//                        from Relationship r
+//                        where r.relationshipType = :type
+//                        and (r.source.dataModel.id not in (:dataModels) or r.source.dataModel is null)
+//                    )
+//                    and m.dataModel.id not in (:dataModels) or m.dataModel is null
+//                group by m.name, m.id
+//                order by m.name
+//            ""","""
+//                select count(m.id)
+//                from DataClass as m
+//                where m.status in :status
+//                    and m.id not in (
+//                        select distinct r.destination.id
+//                        from Relationship r
+//                        where r.relationshipType = :type
+//                        and (r.source.dataModel.id not in (:dataModels) or r.source.dataModel is null)
+//                    )
+//                    and m.dataModel.id not in (:dataModels) or m.dataModel is null
+//            """, [type: hierarchy, status: status, dataModels: dataModelFilter.excludes])
+        }
+        if (dataModelFilter.excludes && dataModelFilter.includes) {
+            throw new IllegalStateException("Combining exclusion and inclusion is no longer supported. Exclusion would be ignored!")
+        }
+        if (dataModelFilter.includes && !dataModelFilter.excludes) {
+            // language=HQL
+            return Lists.fromQuery(params, DataClass, """
+                select distinct m
+                from DataClass as m JOIN m.extensions e
+                where m.status in :status
+                    and e.name = :topLevelKey
+                    and e.extensionValue = :topLevelValue
+                    and m.dataModel.id in (:dataModels)
+                group by m.name, m.id
+                order by m.name
+            ""","""
+                select count(m.id)
+                from DataClass as m JOIN m.extensions e
+                where m.status in :status
+                    and e.name = :topLevelKey
+                    and e.extensionValue = :topLevelValue
+                    and m.dataModel.id in (:dataModels)
+            """, [status: status, dataModels: dataModelFilter.includes, topLevelKey: TOP_LEVEL_DATA_CLASS_EXTENSION_KEY, topLevelValue: TRUE])
+        }
     }
 
     /**

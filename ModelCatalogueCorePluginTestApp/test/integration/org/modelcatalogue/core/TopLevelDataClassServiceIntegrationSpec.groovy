@@ -41,12 +41,12 @@ class TopLevelDataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         dataClassGormService.count() == old(dataClassGormService.count()) + 1
         extensionValueGormService.count() == old(extensionValueGormService.count()) + 1
 
-//        when: "two unrelated dataClasses in model"
-//        DataModelFilter dataModelFilter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
-//        ListWithTotalAndType<DataClass> topLevelDataClasses = topLevelDataClassService.getTopLevelDataClasses(dataModelFilter, [:])
-//
-//        then: "2 top level dataClasses"
-//        topLevelDataClasses.total as int == dataClassNames.size()
+        when: "two unrelated dataClasses in model"
+        DataModelFilter dataModelFilter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
+        ListWithTotalAndType<DataClass> topLevelDataClasses = topLevelDataClassService.getTopLevelDataClasses(dataModelFilter, [:])
+
+        then: "2 top level dataClasses"
+        topLevelDataClasses.total as int == 2
 //
 //        when: "hierarchy relationship between dataClasses is added"
 //        dataClassParent.addToParentOf(dataClassChild)
