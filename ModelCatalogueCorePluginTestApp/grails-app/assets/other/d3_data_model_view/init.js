@@ -91,7 +91,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
   var nodeRectParams = {
     dx: -(labelParams.maxStringLength * 7),
-    dy: -10,
+    dy: -5,
     rx: 6,
     ry: 6,
     width: 0,
@@ -104,6 +104,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     return -(nodeRectParams.dy) // top
       + labelParams.initialLineYOffset // space to top of first line
       + numLines * labelParams.nodeLabelLineSeparation // rest of the lines
+    - 8
        // bottom
   }
 
@@ -729,7 +730,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           while (i<n) {
             var page = pages[i]
             page.x = d.x  + sign * ((i + 1) * labelParams.pageNodeSpacing) + ((sign > 0) ? nodeRectangleHeight(d) - 20 : 0)
-            page.y = d.y
+            page.y = d.y - 10
             nodeLayoutData.push(page)
             i++
           }
