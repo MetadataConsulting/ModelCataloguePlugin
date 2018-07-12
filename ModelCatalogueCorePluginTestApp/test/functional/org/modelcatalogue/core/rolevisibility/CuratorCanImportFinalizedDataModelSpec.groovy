@@ -27,7 +27,6 @@ import org.modelcatalogue.core.geb.*
  - 18. Verify that imported Data model name is listed under '[Data model name] Imports' page. | Imported Data Model is listed.
 /$)
 
-@Ignore
 @Stepwise
 class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
 
