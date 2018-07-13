@@ -1,9 +1,11 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableSet
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.persistence.DataClassGormService
+import org.modelcatalogue.core.persistence.DataModelGormService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
@@ -17,7 +19,9 @@ class TopLevelDataClassService {
     public static final String TOP_LEVEL_DATA_CLASS_EXTENSION_KEY = 'http://www.modelcatalogue.org/system/#top-level-data-class'
     public static final String TRUE = 'true'
 
+    DataModelGormService dataModelGormService
     DataClassGormService dataClassGormService
+    DataClassService dataClassService
 
     /**
      * Marks a DataClass as Top-Level
@@ -57,6 +61,29 @@ class TopLevelDataClassService {
         ExtensionValue.where {element == dataClass && name == TOP_LEVEL_DATA_CLASS_EXTENSION_KEY}.deleteAll() // somehow this worked when the others didn't in the afterInsert() clause...
 //      ExtensionValue.findAllByElementAndName(dataClass, TOP_LEVEL_DATA_CLASS_EXTENSION_KEY).each {it.delete()}
 //        dataClass.ext.remove(TOP_LEVEL_DATA_CLASS_EXTENSION_KEY)
+    }
+
+
+    /**
+     * Retrieve all Top-Level DataClasses of a DataModel by their extension value, recalculating with the old query if there are none.
+     * @param dataModel
+     * @return
+     */
+    @Transactional(readOnly = true)
+    ListWithTotalAndType<DataClass> getTopLevelDataClassesRecalculateIfNecessary(DataModel dataModel,
+                                                           Map params = [:]) {
+        DataModelFilter dataModelFilter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
+
+        ListWithTotalAndType<DataClass> dataClasses = getTopLevelDataClasses(dataModelFilter, params)
+
+        if (dataClasses.total == 0) { // none marked as top-level, so recalculate
+            calculateAndMarkTopLevelDataClassesForDataModel(dataModel)
+            dataClasses = getTopLevelDataClasses(dataModelFilter, params)
+            return dataClasses
+        }
+        else {
+            return dataClasses
+        }
     }
 
     /**
@@ -174,15 +201,42 @@ class TopLevelDataClassService {
         """, [status: status, topLevelKey: TOP_LEVEL_DATA_CLASS_EXTENSION_KEY, topLevelValue: TRUE]
     }
 
+
     /**
-     * For any DataModel in the catalogue that doesn't have data classes marked top-level, find top-level data classes with the old method, and then mark them.
+     * For any DataModel in the catalogue (optionally: that doesn't have any DataClasses marked top-level), find top-level DataClasses with the old method, and then mark them.
+     * @param calculateForAll whether to calculate for all data models (true) or just those that don't have any data classes marked top level (false)
      */
     @Transactional
-    def calculateAndMarkTopLevelDataClasses() {
+    def calculateAndMarkTopLevelDataClasses(boolean calculateForAll) {
 
-        // TODO: Implement
-        // TODO: Put this in Bootstrap
-        throw new Exception("Method not implemented!")
+        List<DataModel> dataModels = dataModelGormService.findAll()
+        for (DataModel dataModel: dataModels) {
+            // not sure about using DataModelGormService? It filters its results depending on the user's permission. Not sure what will happen in Bootstrap when this is run.
+            if (calculateForAll) {
+                calculateAndMarkTopLevelDataClassesForDataModel(dataModel)
+            }
+            else {
+                DataModelFilter dataModelFilter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
+                ListWithTotalAndType<DataClass> topLevelDataClasses = getTopLevelDataClasses(dataModelFilter, [:])
+                if (topLevelDataClasses.total == 0) {
+                    calculateAndMarkTopLevelDataClassesForDataModel(dataModel)
+                }
+            }
+        }
+    }
+
+    /**
+     * Calculate (with the old negative query), and mark top-level DataClasses for a particular DataModel
+     * @param dataModel
+     */
+    @Transactional
+    def calculateAndMarkTopLevelDataClassesForDataModel(DataModel dataModel) {
+        DataModelFilter dataModelFilter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
+        ListWithTotalAndType<DataClass> topLevelDataClasses = dataClassService.getTopLevelDataClasses(dataModelFilter, [:])
+        for (DataClass dataClass : topLevelDataClasses.items) {
+            markTopLevel(dataClass.id)
+        }
+        log.info "Calculated and marked top-level DataClasses for ${dataModel.toString()}"
     }
 
 
