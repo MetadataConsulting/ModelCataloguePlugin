@@ -26,6 +26,10 @@ class TopLevelDataClassService {
      */
     @Transactional
     def markTopLevel(Long dataClassId) {
+        if (!dataClassId) {
+            log.warn("No data class id in markTopLevel")
+            return
+        }
         DataClass dataClass = dataClassGormService.findById(dataClassId)
         if (!dataClass) {
             log.warn('Data Class not found with id {}', dataClassId)
@@ -40,8 +44,19 @@ class TopLevelDataClassService {
      * @return
      */
     @Transactional
-    def unmarkTopLevel(DataClass dataClass) {
-        dataClass.ext.remove(TOP_LEVEL_DATA_CLASS_EXTENSION_KEY)
+    def unmarkTopLevel(Long dataClassId) {
+        if (!dataClassId) {
+            log.warn("No data class id in markTopLevel")
+            return
+        }
+        DataClass dataClass = dataClassGormService.findById(dataClassId)
+        if (!dataClass) {
+            log.warn('Data Class not found with id {}', dataClassId)
+            return
+        }
+        ExtensionValue.where {element == dataClass && name == TOP_LEVEL_DATA_CLASS_EXTENSION_KEY}.deleteAll() // somehow this worked when the others didn't in the afterInsert() clause...
+//      ExtensionValue.findAllByElementAndName(dataClass, TOP_LEVEL_DATA_CLASS_EXTENSION_KEY).each {it.delete()}
+//        dataClass.ext.remove(TOP_LEVEL_DATA_CLASS_EXTENSION_KEY)
     }
 
     /**
@@ -123,7 +138,7 @@ class TopLevelDataClassService {
             // language=HQL
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
-                from DataClass as m JOIN m.extensions e
+                from DataClass as m JOIN m.extensions as e
                 where m.status in :status
                     and e.name = :topLevelKey
                     and e.extensionValue = :topLevelValue
@@ -132,13 +147,26 @@ class TopLevelDataClassService {
                 order by m.name
             ""","""
                 select count(m.id)
-                from DataClass as m JOIN m.extensions e
+                from DataClass as m JOIN m.extensions as e
                 where m.status in :status
                     and e.name = :topLevelKey
                     and e.extensionValue = :topLevelValue
                     and m.dataModel.id in (:dataModels)
             """, [status: status, dataModels: dataModelFilter.includes, topLevelKey: TOP_LEVEL_DATA_CLASS_EXTENSION_KEY, topLevelValue: TRUE])
         }
+
+        // language=HQL
+//        Lists.fromQuery params, DataClass, """
+//            select distinct m
+//            from DataClass m
+//            where m.status in :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+//            group by m.name, m.id
+//            order by m.name
+//        ""","""
+//            select count(m.id)
+//            from DataClass m
+//            where m.status in :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+//        """, [type: hierarchy, status: status]
     }
 
     /**

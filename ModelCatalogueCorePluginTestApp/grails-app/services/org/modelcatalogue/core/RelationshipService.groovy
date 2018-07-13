@@ -364,14 +364,15 @@ class RelationshipService {
                 }
             }
 
-            destination.removeFromIncomingRelationships(relationshipInstance)
-            source.removeFromOutgoingRelationships(relationshipInstance)
+//            destination.removeFromIncomingRelationships(relationshipInstance)
+//            source.removeFromOutgoingRelationships(relationshipInstance)
 
             Map<String,String> metadata = relationshipInstance.ext
 
-            relationshipInstance.source = null
-            relationshipInstance.destination = null
-            relationshipInstance.dataModel = null
+            // making the destination null means you can't mark the destination of a to-be-deleted hierarchy relationship in the beforeDelete clause.
+//            relationshipInstance.source = null
+//            relationshipInstance.destination = null
+//            relationshipInstance.dataModel = null
             relationshipInstance.delete(flush: true)
 
             CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(source.getId())

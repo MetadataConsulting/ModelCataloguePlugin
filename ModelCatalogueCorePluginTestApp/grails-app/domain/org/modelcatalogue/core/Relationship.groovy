@@ -53,8 +53,10 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
      * If it's a hierarchy relationship, mark the child as not top level.
      */
     def afterInsert() {
-        if (relationshipType == RelationshipType.getHierarchyType()) {
-            topLevelDataClassService.unmarkTopLevel((DataClass) destination)
+        Relationship.withNewSession {
+            if (relationshipType.id == RelationshipType.getHierarchyType().id) {
+                topLevelDataClassService.unmarkTopLevel(destination?.id)
+            }
         }
     }
 
@@ -62,8 +64,10 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
      * If it's a hierarchy relationship, mark the child as top level.
      */
     def beforeDelete() {
-        if (relationshipType == RelationshipType.getHierarchyType()) {
-            topLevelDataClassService.markTopLevel((DataClass) destination)
+        Relationship.withNewSession {
+            if (relationshipType.id == RelationshipType.getHierarchyType().id) {
+                topLevelDataClassService.markTopLevel(((DataClass) destination)?.id)
+            }
         }
     }
 
