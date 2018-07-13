@@ -1,3 +1,4 @@
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -36,6 +37,8 @@ class BootStrap {
     UserGormService userGormService
     DataModelAclService dataModelAclService
     DataModelGormService dataModelGormService
+    TopLevelDataClassService topLevelDataClassService
+    SpringSecurityService springSecurityService
 
     def init = { servletContext ->
         log.info "BootStrap:addExtensionModules()"
@@ -63,8 +66,6 @@ class BootStrap {
         log.info 'init role hierarchy'
         initSecurityService.initRoleHierarchyEntry()
 
-        // TODO: Call TopLevelDataClassService's calculateAndMarkTopLevelDataClasses method & make sure it works
-
         if ( isDev() ) {
             initDev()
 
@@ -76,6 +77,10 @@ class BootStrap {
             log.info 'init register reports'
             registerReportDescriptorsService.register()
         }
+
+        log.info "Bootstrap: Currently logged in as ${springSecurityService.principal}."
+        log.info "Calculating and marking top-level DataClasses in DataModels with none such marked. (Could be because they don't have DataClasses in the first place)"
+        topLevelDataClassService.calculateAndMarkTopLevelDataClasses(false)
     }
 
 
@@ -108,7 +113,6 @@ class BootStrap {
 
         log.info 'init register reports'
         registerReportDescriptorsService.register()
-
 
     }
 
