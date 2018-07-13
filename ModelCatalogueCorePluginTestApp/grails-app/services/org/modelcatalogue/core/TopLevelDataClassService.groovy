@@ -72,64 +72,57 @@ class TopLevelDataClassService {
 
         List<ElementStatus> status = ElementService.getStatusFromParams(params)
 
+
         if (dataModelFilter.unclassifiedOnly) {
-            // TODO: Implement
-//            // language=HQL
-//            return Lists.fromQuery(params, DataClass, """
-//                select distinct m
-//                from DataClass as m
-//                where m.status in :status
-//                    and m.id not in (
-//                        select distinct r.destination.id
-//                        from Relationship r
-//                        where r.relationshipType = :type
-//                        and r.source.dataModel is null
-//                    )
-//                    and m.dataModel is null
-//                group by m.name, m.id
-//                order by m.name
-//            ""","""
-//                select count(m.id)
-//                from DataClass as m
-//                where m.status in :status
-//                    and m.id not in (
-//                        select distinct r.destination.id
-//                        from Relationship r
-//                        where r.relationshipType = :type
-//                        and r.source.dataModel is null
-//                    )
-//                    and m.dataModel is null
-//            """, [type: hierarchy, status: status])
+            // language=HQL
+            return Lists.fromQuery(params, DataClass, """
+                select distinct m
+                
+                from DataClass as m JOIN m.extensions as e
+                where m.status in :status
+                    and e.name = :topLevelKey
+                    and e.extensionValue = :topLevelValue
+                    
+                    and m.dataModel is null
+                    
+                group by m.name, m.id
+                order by m.name
+            ""","""
+                select count(m.id)
+                
+                from DataClass as m JOIN m.extensions as e
+                where m.status in :status
+                    and e.name = :topLevelKey
+                    and e.extensionValue = :topLevelValue
+                    
+                    and m.dataModel is null
+            """, [status: status, topLevelKey: TOP_LEVEL_DATA_CLASS_EXTENSION_KEY, topLevelValue: TRUE])
         }
 
         if (dataModelFilter.excludes && !dataModelFilter.includes) {
-            // TODO: Implement
-//            // language=HQL
-//            return Lists.fromQuery(params, DataClass, """
-//                select distinct m
-//                from DataClass as m
-//                where m.status in :status
-//                    and m.id not in (
-//                        select distinct r.destination.id
-//                        from Relationship r
-//                        where r.relationshipType = :type
-//                        and (r.source.dataModel.id not in (:dataModels) or r.source.dataModel is null)
-//                    )
-//                    and m.dataModel.id not in (:dataModels) or m.dataModel is null
-//                group by m.name, m.id
-//                order by m.name
-//            ""","""
-//                select count(m.id)
-//                from DataClass as m
-//                where m.status in :status
-//                    and m.id not in (
-//                        select distinct r.destination.id
-//                        from Relationship r
-//                        where r.relationshipType = :type
-//                        and (r.source.dataModel.id not in (:dataModels) or r.source.dataModel is null)
-//                    )
-//                    and m.dataModel.id not in (:dataModels) or m.dataModel is null
-//            """, [type: hierarchy, status: status, dataModels: dataModelFilter.excludes])
+            // language=HQL
+            return Lists.fromQuery(params, DataClass, """
+                select distinct m
+                
+                from DataClass as m JOIN m.extensions as e
+                where m.status in :status
+                    and e.name = :topLevelKey
+                    and e.extensionValue = :topLevelValue
+                    
+                    and m.dataModel.id not in (:dataModels) or m.dataModel is null
+                    
+                group by m.name, m.id
+                order by m.name
+            ""","""
+                select count(m.id)
+                
+                from DataClass as m JOIN m.extensions as e
+                where m.status in :status
+                    and e.name = :topLevelKey
+                    and e.extensionValue = :topLevelValue
+                    
+                    and m.dataModel.id not in (:dataModels) or m.dataModel is null
+            """, [status: status, dataModels: dataModelFilter.excludes, topLevelKey: TOP_LEVEL_DATA_CLASS_EXTENSION_KEY, topLevelValue: TRUE])
         }
         if (dataModelFilter.excludes && dataModelFilter.includes) {
             throw new IllegalStateException("Combining exclusion and inclusion is no longer supported. Exclusion would be ignored!")
@@ -138,35 +131,47 @@ class TopLevelDataClassService {
             // language=HQL
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
+                
                 from DataClass as m JOIN m.extensions as e
                 where m.status in :status
                     and e.name = :topLevelKey
                     and e.extensionValue = :topLevelValue
+                    
                     and m.dataModel.id in (:dataModels)
+                    
                 group by m.name, m.id
                 order by m.name
             ""","""
                 select count(m.id)
+                
                 from DataClass as m JOIN m.extensions as e
                 where m.status in :status
                     and e.name = :topLevelKey
                     and e.extensionValue = :topLevelValue
+                    
                     and m.dataModel.id in (:dataModels)
             """, [status: status, dataModels: dataModelFilter.includes, topLevelKey: TOP_LEVEL_DATA_CLASS_EXTENSION_KEY, topLevelValue: TRUE])
         }
 
         // language=HQL
-//        Lists.fromQuery params, DataClass, """
-//            select distinct m
-//            from DataClass m
-//            where m.status in :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-//            group by m.name, m.id
-//            order by m.name
-//        ""","""
-//            select count(m.id)
-//            from DataClass m
-//            where m.status in :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-//        """, [type: hierarchy, status: status]
+        Lists.fromQuery params, DataClass, """
+            select distinct m
+            
+            from DataClass as m JOIN m.extensions as e
+                where m.status in :status
+                    and e.name = :topLevelKey
+                    and e.extensionValue = :topLevelValue
+                    
+            group by m.name, m.id
+            order by m.name
+        ""","""
+            select count(m.id)
+            
+            from DataClass as m JOIN m.extensions as e
+                where m.status in :status
+                    and e.name = :topLevelKey
+                    and e.extensionValue = :topLevelValue
+        """, [status: status, topLevelKey: TOP_LEVEL_DATA_CLASS_EXTENSION_KEY, topLevelValue: TRUE]
     }
 
     /**
