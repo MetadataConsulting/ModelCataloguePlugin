@@ -1,21 +1,8 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import org.modelcatalogue.core.geb.CreateDataModelPage
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataClassPage
-import org.modelcatalogue.core.geb.DataClassesPage
-import org.modelcatalogue.core.geb.DataModelAclPermissionsPage
-import org.modelcatalogue.core.geb.DataModelAclPermissionsShowPage
-import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.HomePage
-import org.modelcatalogue.core.geb.LoginPage
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Shared
-import spock.lang.Ignore
-import spock.lang.Stepwise
-import spock.lang.Title
+import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1495')
 @Title('Examine that Curator can edit data classes for Data Model they have administration rights to')
@@ -44,10 +31,15 @@ import spock.lang.Title
 - Click on the edit button and fill the form
 - Check that Metadata is edited     
 ''')
+@Ignore
 @Stepwise
 class CuratorCanEditDataClassesForAdminDataModelSpec extends GebSpec {
     @Shared
     String dataModelName = UUID.randomUUID().toString()
+    @Shared
+    String dataClassName = UUID.randomUUID().toString()
+    @Shared
+    String dataClassNewName = "New class name"
 
     def "Login as supervisor"() {
         when:
@@ -73,6 +65,33 @@ class CuratorCanEditDataClassesForAdminDataModelSpec extends GebSpec {
 
         then:
         at DataModelPage
+    }
+
+    def "Create data class"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Classes')
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = "NEW_TESTING_MODEL "
+        createDataClassPage.modelCatalogueId = dataClassName
+        createDataClassPage.description = 'THIS IS MY DATA CLASS'
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+
+        then: 'your are redirected to the data classes page'
+        at DataClassesPage
+
     }
 
     def "select data model acl"() {
@@ -130,12 +149,13 @@ class CuratorCanEditDataClassesForAdminDataModelSpec extends GebSpec {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select('Data Classes')
+        sleep(2_000)
         then:
         at DataClassesPage
 
         when:
         DataClassesPage dataClassesPage = browser.page(DataClassesPage)
-        dataClassesPage.openDataClass(0)
+        dataClassesPage.openDataClass()
 
         then:
         at DataClassPage
@@ -147,5 +167,26 @@ class CuratorCanEditDataClassesForAdminDataModelSpec extends GebSpec {
         dataClassPage.formMetadata()
         then:
         at DataClassPage
+
+        when:
+        dataClassPage = browser.page DataClassPage
+        dataClassPage.edit()
+        then:
+        at DataClassPage
+
+        when:
+        dataClassPage = browser.page DataClassPage
+        dataClassPage.editClassName(dataClassNewName)
+        dataClassPage.save()
+        then:
+        at DataClassPage
+    }
+
+    def "Check edited form metadata"() {
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+        then:
+        println browser.title
+        dataClassPage.checkClassName(dataClassNewName)
     }
 }

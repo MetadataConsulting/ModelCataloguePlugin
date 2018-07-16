@@ -35,7 +35,7 @@ class VerifyRegularUserCanSeeApiKeySpec extends GebSpec {
 
     def "login as supervisor"() {
         when:
-        sleep(2_000)
+        go("/login/auth")
         LoginPage loginPage = to LoginPage
         loginPage.login("supervisor", "supervisor")
         then:

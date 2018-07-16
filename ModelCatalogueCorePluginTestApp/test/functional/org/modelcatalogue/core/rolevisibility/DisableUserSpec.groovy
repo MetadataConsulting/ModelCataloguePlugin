@@ -156,5 +156,6 @@ class DisableUserSpec extends GebSpec {
         confirmEnableUserPage.confirmEnableUser()
         then:
         at UserProfilePage
+        loginPage.finalize()
     }
 }

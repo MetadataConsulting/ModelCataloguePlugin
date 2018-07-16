@@ -2,7 +2,7 @@ package org.modelcatalogue.core.geb
 
 import geb.Page
 
-class DataClassPage extends Page {
+class DataClassPage extends Page implements InputUtils {
 
     static url = '/#'
 
@@ -13,7 +13,7 @@ class DataClassPage extends Page {
         editButtonDissable { $('a#role_item-detail_edit-catalogue-elementBtn') }
         saveButton(wait: false, required: false) { $('button#role_item-detail_inline-edit-submitBtn') }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
-        formMetadataLink { $('span.btn.btn-link btn-sm ng-binding') }
+        formMetadataLink { $('span.btn.btn-link.btn-sm.ng-binding', text: 'Form Metadata') }
         tabs { $('ul.nav.nav-tabs a', text: it) }
         parentAddButton(wait: true) { $('td span.fa.fa-plus-circle') }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
@@ -26,7 +26,8 @@ class DataClassPage extends Page {
         dataClassMenu { $('#role_item_catalogue-element-menu-item-link') }
         dataClassMenuDropdown { $('#role_item_catalogue-element-menu-item ul.dropdown-menu li') }
         historyList(required: false, wait: true) { $('div#history-changes tbody tr') }
-        className { $('h3.ce-name input', 0) }
+        className(wait: true) { $('h3.ce-name input', 0) }
+        newClassName(wait: true) { $('h3 span', 0) }
     }
 
     void edit() {
@@ -47,6 +48,7 @@ class DataClassPage extends Page {
     }
 
     void save() {
+        sleep(2_000)
         saveButton.click()
     }
 
@@ -96,7 +98,11 @@ class DataClassPage extends Page {
     }
 
     void editClassName(String value) {
-        className.value(value)
+        fillInput(className,value)
+    }
+
+    Boolean checkClassName(String value) {
+        newClassName.text().equals(value)
     }
 
 }

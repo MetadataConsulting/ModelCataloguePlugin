@@ -47,6 +47,7 @@ class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
 
     def "Login as supervisor"() {
         when:
+        go("/login/auth")
         LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
 
