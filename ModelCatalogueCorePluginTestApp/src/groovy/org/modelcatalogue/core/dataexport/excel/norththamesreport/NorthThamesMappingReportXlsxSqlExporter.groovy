@@ -63,7 +63,7 @@ LNWH PATHOLOGY CODES - empty
     protected List<String> excelHeaders4Models = [
         'LOCAL SITE',
         'LOCAL CODESET 1', 'LOCAL CODE 1', 'LOCAL CODE 1 NAME',
-        'LOCAL CODESET 2', 'LOCAL CODE 2', 'LOCAL CODE 2 DESCRIPTION',
+        'LOCAL CODESET 2', 'LOCAL CODE 2', 'LOCAL CODE 2 DESCRIPTION', 'LOCAL CODE 2 CLASS',
         'LOINC CODE', 'LOINC CODE DESCRIPTION', 'LOINC SYSTEM(SPECIMEN)',
         'GEL CODE', 'GEL CODE DESCRIPTION', 'OPENEHR QUERY', 'REF RANGE'
     ]
@@ -73,7 +73,7 @@ LNWH PATHOLOGY CODES - empty
         'LOINC CODE', 'LOINC CODE DESCRIPTION', 'LOINC SYSTEM(SPECIMEN)',
         'GEL CODE', 'GEL CODE DESCRIPTION', 'OPENEHR QUERY', 'REF RANGE'
     ]
-    enum cols {lpc_model, lpc_code, lpc_name, local_model, local_code, local_name, loinc_code, loinc_name, loinc_system, gel_code, gel_name, gel_openehr, ref_range}
+    enum cols {lpc_model, lpc_code, lpc_name, local_model, local_code, local_name, local_class, loinc_code, loinc_name, loinc_system, gel_code, gel_name, gel_openehr, ref_range}
     /**
      * The report is triggered from a DataModel (element), and is on the
      * location of data elements specified by that DataModel in the given 'organization'.
@@ -123,6 +123,7 @@ SELECT DISTINCT
 	IF(wpath.`code` IS NULL, '', wpath_dm.`name`) AS `local_model`,
 	IFNULL(wpath.`code`, '') AS `local_code`,
 	IFNULL(wpath.`name`, '') AS `local_name`,
+	IFNULL(wpath.`class`, '') AS `local_class`,
 	IFNULL(loinc.`code`, '') AS `loinc_code`,
 	IFNULL(loinc.`name`, '') AS `loinc_name`,
 	IFNULL(loinc.system, '') AS `loinc_system`,
@@ -137,11 +138,13 @@ FROM
 	) AS lpc ON lpc.data_model_id = lpc_dm.id
 	LEFT JOIN (
 		SELECT 
-			r.source_id, ev.extension_value AS `code`, ce.`name`, ce.data_model_id
+			r.source_id, ev.extension_value AS `code`, ce.`name`, ce.data_model_id, parent_ce.`name` AS class
 		FROM
 			catalogue_element AS ce
 			JOIN extension_value AS ev ON ev.element_id = ce.id AND ev.`name` = 'WinPath TFC'
 			JOIN relationship AS r ON r.destination_id = ce.id AND r.relationship_type_id = 7
+			JOIN relationship AS parent_rel ON parent_rel.destination_id = ce.id AND parent_rel.relationship_type_id = 1
+			JOIN catalogue_element AS parent_ce ON parent_ce.id = parent_rel.source_id
 	) AS wpath ON wpath.source_id = lpc.id AND wpath.data_model_id = wpath_dm.id
 	LEFT JOIN (
 		SELECT 
@@ -267,6 +270,10 @@ ORDER BY
                     }
                     cell {
                         value deRow[cols.local_name.ordinal()]
+                        width auto
+                    }
+                    cell {
+                        value deRow[cols.local_class.ordinal()]
                         width auto
                     }
                 }
