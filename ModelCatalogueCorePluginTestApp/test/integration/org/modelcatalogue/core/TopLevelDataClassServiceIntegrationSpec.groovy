@@ -35,14 +35,14 @@ class TopLevelDataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         dataClassGormService.count() == old(dataClassGormService.count()) + 1
-        extensionValueGormService.count() == old(extensionValueGormService.count()) + 1
+        extensionValueGormService.count() == old(extensionValueGormService.count())
 
         when:
         DataClass dataClassChild = dataClassGormService.saveWithNameAndDataModel("DC2", dataModel)
 
         then:
         dataClassGormService.count() == old(dataClassGormService.count()) + 1
-        extensionValueGormService.count() == old(extensionValueGormService.count()) + 1
+        extensionValueGormService.count() == old(extensionValueGormService.count())
 
         when: "two unrelated dataClasses in model"
         DataModelFilter dataModelFilter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())

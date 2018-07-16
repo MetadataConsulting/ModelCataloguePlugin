@@ -35,6 +35,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     transient topLevelDataClassService
 
     DataModel dataModel
+    Boolean topLevel = false
 
     String name
     String description
@@ -452,10 +453,12 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
         if (this instanceof DataClass) {
             // mark top level
-            DataClass.withNewSession {
-                final Long dataClassId = this.id
-                topLevelDataClassService.markTopLevel(dataClassId)
-            }
+            topLevelDataClassService.markTopLevel((DataClass) this) // This won't work as it reloads the dataClass as a new object...
+//            this.topLevel = true
+//            DataClass.withNewSession {
+//                final Long dataClassId = this.id
+//                topLevelDataClassService.markTopLevel(dataClassId)
+//            }
         }
     }
 

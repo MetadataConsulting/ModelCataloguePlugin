@@ -56,19 +56,21 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
         Relationship.withNewSession {
             if (relationshipType.id == RelationshipType.getHierarchyType().id) {
                 if (!destination) {throw new Exception("afterInsert of ${id}:No destination in hierarchy relationship ${id}")}
-                topLevelDataClassService.unmarkTopLevel(destination.id)
+                topLevelDataClassService.unmarkTopLevel((DataClass) destination)
+
             }
         }
     }
 
     /**
-     * If it's a hierarchy relationship, mark the child as top level.
+     * If it's a hierarchy relationship, mark the child as top level.j
      */
     def beforeDelete() {
         Relationship.withNewSession {
             if (relationshipType.id == RelationshipType.getHierarchyType().id) {
                 if (!destination) {throw new Exception("beforeDelete of ${id}: No destination in hierarchy relationship ${id}; may have been deleted in the process of deleting relationship")}
-                topLevelDataClassService.markTopLevel(destination.id)
+                topLevelDataClassService.markTopLevel((DataClass) destination)
+
             }
         }
     }
