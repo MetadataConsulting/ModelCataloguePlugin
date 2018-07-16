@@ -1,13 +1,11 @@
 package org.modelcatalogue.core.datamodel
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Specification
-import spock.lang.Title
-import spock.lang.Ignore
 import org.modelcatalogue.core.geb.*
 import spock.lang.*
+import spock.lang.Issue
+import spock.lang.Narrative
+import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-1756')
 @Title('Create a new version of a data model')
@@ -130,6 +128,7 @@ class CreateNewVersionOfDataModelSpec extends GebSpec {
         versionsPage.dataElementDropDownClick()
         versionsPage.deleteBttnClick()
         versionsPage.deleteConfirmationBttnClick()
+        sleep(2_000)
         then:
         at DashboardPage
     }

@@ -2,7 +2,6 @@ package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
@@ -120,7 +119,7 @@ class HistoryIsPopulatedAccordingToModelActivitySpec extends GebSpec {
         cloneOrImportPage.allowClone()
 
         then:
-        Thread.sleep(2000)
+        sleep(2000)
         at CreateDataElementPage
 
         when:
@@ -132,6 +131,7 @@ class HistoryIsPopulatedAccordingToModelActivitySpec extends GebSpec {
 
         when: 'create tag'
         dataElementsPage = browser.page(DataElementsPage)
+        sleep(2000)
         dataElementsPage.treeView.select('Tags')
 
         then:
@@ -157,6 +157,6 @@ class HistoryIsPopulatedAccordingToModelActivitySpec extends GebSpec {
         tagsPage = browser.page(TagsPage)
 
         then:
-        tagsPage.count() == 1
+        tagsPage.count() >= 1
     }
 }

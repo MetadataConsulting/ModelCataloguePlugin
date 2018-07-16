@@ -2,7 +2,6 @@ package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
@@ -42,6 +41,7 @@ class CanImportDataModelSpec extends GebSpec {
 
         when: 'navigate to createRelationship page'
         DataModelPage dataModelPage = browser.page DataModelPage
+        sleep(2_000)
         dataModelPage.dropdown()
         dataModelPage.dropdownMenu.addImport()
 

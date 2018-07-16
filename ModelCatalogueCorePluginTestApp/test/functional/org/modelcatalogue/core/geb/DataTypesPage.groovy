@@ -82,6 +82,7 @@ class DataTypesPage extends Page {
     }
 
     void selectDataType(String value) {
+        sleep(2_000)
         dataTypeByName(value).click()
     }
 
