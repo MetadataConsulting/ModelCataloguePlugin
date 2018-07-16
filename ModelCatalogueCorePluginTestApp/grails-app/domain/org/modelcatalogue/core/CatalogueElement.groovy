@@ -105,6 +105,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 		name index :'CtlgElement_name_idx'
 		latestVersionId index :'CtlgElement_latestVersionId_idx'
         modelCatalogueId index :'CtlgElement_modelCatalogueId_idx'
+        topLevel index: 'CtlgElement_topLevel_idx'
         description type: "text"
         extensions lazy: false, sort: 'orderIndex', cascade: "all-delete-orphan"
         dataModel lazy: false
