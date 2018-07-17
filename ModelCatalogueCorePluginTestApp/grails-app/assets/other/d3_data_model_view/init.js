@@ -838,7 +838,62 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     var svgNodes = vis.selectAll("g.node")
       .data(nodeLayoutData, function(d) { return d.nodeId || (d.nodeId = ++i); });
 
+    /**
+     * Whether the node is to have a rectangle
+     * @param d
+     * @returns {*}
+     * @constructor
+     */
+    function useRectangleForNode(d /*: Node */) {
+      return nodeHandler(
+        (k(true) /*: CENode => boolean */),
+        (k(false) /*: PageNode => boolean */),
+        (k(true) /*: HeaderNode => boolean */)
+      )(d)
+    }
 
+    /**
+     * Whether the node is to have a circle
+     * @param d
+     * @returns {*}
+     * @constructor
+     */
+    function useCircleForNode(d /*: Node */) {
+      return nodeHandler(
+        (k(false) /*: CENode => boolean */),
+        (k(true) /*: PageNode => boolean */),
+        (k(false) /*: HeaderNode => boolean */)
+      )(d)
+    }
+
+    /**
+     * X-Offset of node label
+     * @param d
+     * @returns {*}
+     */
+    function nodeLabelXOffsetInitial(d /*: Node */) /*: number */ {
+      if (useRectangleForNode(d)) {
+        return 0
+      }
+      else {
+        return - (radius + 5)
+      }
+    }
+
+
+    /**
+     * X-Offset of node label
+     * @param d
+     * @returns {*}
+     */
+    function nodeLabelXOffset(d /*: Node */) /*: number */ {
+      if (useRectangleForNode(d)) {
+        return nodeRectParams.dx + 5
+      }
+      else {
+        return - (radius + 5)
+      }
+    }
 
     /**
      * Node Enter block
@@ -1114,33 +1169,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           d3.event.stopImmediatePropagation(); // to stop panning
         });
 
-      /**
-       * Whether the node is to have a rectangle
-       * @param d
-       * @returns {*}
-       * @constructor
-       */
-      function useRectangleForNode(d /*: Node */) {
-        return nodeHandler(
-          (k(true) /*: CENode => boolean */),
-          (k(false) /*: PageNode => boolean */),
-          (k(true) /*: HeaderNode => boolean */)
-        )(d)
-      }
 
-      /**
-       * Whether the node is to have a circle
-       * @param d
-       * @returns {*}
-       * @constructor
-       */
-      function useCircleForNode(d /*: Node */) {
-        return nodeHandler(
-          (k(false) /*: CENode => boolean */),
-          (k(true) /*: PageNode => boolean */),
-          (k(false) /*: HeaderNode => boolean */)
-        )(d)
-      }
 
       currentNode.select("rect")
         .style("fill", (nodeHandler(
@@ -1155,12 +1184,6 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
       // add rectangles for CENodes and HeaderNodes
       nodeEnter.filter(useRectangleForNode).append("svg:rect")
-        .attr("width", nodeRectParams.width)
-        .attr("height", nodeRectangleHeight)//nodeRectParams.height)
-        .attr('x', nodeRectParams.dx)
-        .attr('y', nodeRectParams.dy)
-        .attr('rx', nodeRectParams.rx)
-        .attr('ry', nodeRectParams.ry)
         .style("fill", (nodeHandler(
           function(d /*: CENode */) { return coloursMap[d.type]  },
           (k("#fff") /*: PageNode => string */),
@@ -1181,26 +1204,11 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
 
 
-
       /**
        * Node labelling block
        */
       (function(){
 
-
-        /**
-         * X-Offset of node label
-         * @param d
-         * @returns {*}
-         */
-        function nodeLabelXOffset(d /*: Node */) /*: number */ {
-          if (useRectangleForNode(d)) {
-            return nodeRectParams.dx + 5
-          }
-          else {
-            return - (radius + 5)
-          }
-        }
 
         /**
          * Text anchor:
@@ -1222,7 +1230,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           .attr("dy", ".35em")
           // text with possibly shortened name
 
-          .attr("x", nodeLabelXOffset)
+          .attr("x", nodeLabelXOffsetInitial)
           .attr("text-anchor", startOrEnd)
           // .text(shortenedNodeText)
 
@@ -1328,10 +1336,22 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
      */
     (function() {
 
+      svgNodes.select("text")
+        .attr("x", nodeLabelXOffsetInitial)
+
       // TRANSITION nodes to their new position.
       var nodeUpdate = svgNodes.transition()
+
         .duration(duration)
         .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+      nodeUpdate.select("rect")
+        .attr("width", nodeRectParams.width)
+        .attr("height", nodeRectangleHeight)//nodeRectParams.height)
+        .attr('x', nodeRectParams.dx)
+        .attr('y', nodeRectParams.dy)
+        .attr('rx', nodeRectParams.rx)
+        .attr('ry', nodeRectParams.ry)
 
       nodeUpdate.select("circle")
         .attr("r", radius)
@@ -1341,17 +1361,20 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         .style("fill", function(d) { return coloursMap[d.type]})
       ;
 
-      nodeUpdate.select("text")
-        .style("fill-opacity", 1);
-      nodeUpdate.select('text').filter(function(d) {return d.nodeId === source.nodeId}).style("color", "red")
+      nodeUpdate
+      // svgNodes
+        .select("text")
+        // .transition(nodeUpdate).ease(function(t) {if (t < 0.999) {return 0} else { return 1}})
+        .attr("x", nodeLabelXOffset)
 
+        .style("fill-opacity", 1);
 
 
 
       // TRANSITION EXITING nodes to the parent's new position.
       var nodeExit = svgNodes.exit().transition()
         .duration(duration)
-        .attr("transform", function(d /*: Node */) { return "translate(" + source.y + "," + source.x + ")"; })
+        .attr("transform", function(d /*: Node */) { return "translate(" + ((useRectangleForNode(d) ? nodeRectParams.width : 0) + source.y) + "," + source.x + ")"; })
         .remove();
 
 
@@ -1389,18 +1412,20 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         .attr("d", linkDiagonalAccountingForRectangles);
 
       function linkDiagonalAccountingForRectangles(l /*: Link */) {
+
+        function handlerAccountingForRectangles(d) {
+          var linkDataAccountingForRectangle = {
+            source: l.source,
+            target: {x: l.target.x,
+              y: l.target.y + nodeRectParams.dx}}
+          return diagonal(linkDataAccountingForRectangle)
+        }
+
         return nodeHandler(
-          function(d /*: CENode */) {
-            var linkDataAccountingForRectangle = {
-              source: l.source,
-              target: {x: l.target.x,
-                       y: l.target.y + nodeRectParams.dx}}
-            return diagonal(linkDataAccountingForRectangle)
-          },
-          function(d /*: PageNode */) {
-            return diagonal(l)
-          }
-        )(l.target)
+          handlerAccountingForRectangles,
+          k(diagonal(l)),
+          handlerAccountingForRectangles
+        )(l.target) // depending on the type of the target, do a diagonal between different points.
       }
 
       // Transition links to their new position.
