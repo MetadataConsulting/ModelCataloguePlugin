@@ -565,16 +565,16 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
   //// Init, Update and Toggle
 
 
-  var dataTypeColour = "green"
+  var dataTypeColour = "lime"
   // node colours
   var coloursMap /*: {[string] : string} */ = {
-    "dataModel": "blueviolet",
-    "dataClass": "blue",
+    "dataModel": "plum",
+    "dataClass": "skyblue",
     "dataElement": "gold",
     "dataType": dataTypeColour,
-    "enumeratedType": "lawngreen",
-    "primitiveType": "olive",
-    "referenceType": "mediumseagreen"
+    "enumeratedType": "darkorange",
+    "primitiveType": "red",
+    "referenceType": "seashell"
   }
 
 
@@ -1054,7 +1054,10 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         .attr('y', nodeRectParams.dy)
         .attr('rx', nodeRectParams.rx)
         .attr('ry', nodeRectParams.ry)
-        .style("fill", "lightblue")
+        .style("fill", (nodeHandler(
+          function(d /*: CENode */) { return coloursMap[d.type]  },
+          (k("#fff") /*: PageNode => string */)
+        ) /*: Node => string */))
         .attr("stroke-width", 1)
         .attr("stroke", "#808080")
 
