@@ -18,7 +18,7 @@ class TagsPage extends Page {
         addItemIcon(required: false) {
             $("#role_list_create-catalogue-element-menu-item-link")
         }
-        rows { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center") }
+        infiniteTableFooterRows { $("div.inf-table-body>table>tfoot>tr>td>table>tfoot>tr>td.text-center") }
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
         deleteBttn(required: false) { $('a#deleteBtn') }
@@ -40,8 +40,8 @@ class TagsPage extends Page {
         dataElementDropDownTag.click()
     }
 
-    int count() {
-        rows.size()
+    int countInfiniteTableFooterRows() {
+        infiniteTableFooterRows.size()
     }
 
     void createTag() {
