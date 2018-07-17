@@ -252,6 +252,10 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     return !singlePage(d)
   }
 
+  function pagedCENode(d /*: CENode */) /*: boolean */ {
+    return (!!d.currentPaginationParams && paged(d.currentPaginationParams))
+  }
+
   function applyDefaultD3JSON(x) /*: D3JSON */ {
 
     x.loadedChildren = false;
@@ -747,8 +751,25 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       return result
     }
 
-    function nodeRectangleHeight(d /*: CENode */) {
-      return rectangleHeight(Math.min(splitName(d).length, labelParams.maxNodeLabelLines));
+    function nodeRectangleHeight(d /*: Node */) /*: number */ {
+      return nodeHandler(
+        function(d /*: CENode */) {
+          if (d.currentPaginationParams && paged(d.currentPaginationParams)) {
+            return rectangleHeight(1)
+          }
+          else {
+            return rectangleHeight(Math.min(splitName(d).length, labelParams.maxNodeLabelLines));
+          }
+        },
+        function (d /*: PageNode */) {
+          return 0
+        },
+        function (d /*: HeaderNode */) {
+          return rectangleHeight(Math.min(splitName(d).length, labelParams.maxNodeLabelLines));
+        }
+      )(d)
+
+
     }
 
 
@@ -785,11 +806,17 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
             var n = pages.length
             var i = 0
+
+            function assignXY(assignee /*: D3JSON */) {
+              assignee.x = d.x + sign * ((i + 1) * labelParams.pageNodeSpacing) + ((pagesDown(sign)) ? nodeRectangleHeight(d) - 10 : 0)
+              assignee.y = d.y
+              // because the tree is rotated, x is actually the vertical. Increasing x is going down.
+            }
+
             while (i<n) {
               var page /*: PageNode */ = pages[i]
-              page.x = d.x + sign * ((i + 1) * labelParams.pageNodeSpacing) + ((pagesDown(sign)) ? nodeRectangleHeight(d) - 10 : 0)
-              // because the tree is rotated, x is actually the vertical. Increasing x is going down.
-              page.y = d.y - 10
+              assignXY(page)
+              page.y = page.y - 10
               nodeLayoutData.push(page)
               i++
             }
@@ -797,8 +824,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
             if (pagesUp(sign)) { // not single page, so display header
 
               var header /*: HeaderNode */ = d.header
-              header.x = d.x + sign * ((i + 1) * labelParams.pageNodeSpacing) // using i from the while loop above
-              header.y = d.y - 10
+              assignXY(header)
               nodeLayoutData.push(header)
 
             }
@@ -1127,7 +1153,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         (function(d /*: HeaderNode */) {return coloursMap[d.type] } /*: HeaderNode => string */)
       ) /*: Node => string */))
 
-      // add rectangles for CENodes
+      // add rectangles for CENodes and HeaderNodes
       nodeEnter.filter(useRectangleForNode).append("svg:rect")
         .attr("width", nodeRectParams.width)
         .attr("height", nodeRectangleHeight)//nodeRectParams.height)
