@@ -10,8 +10,8 @@ import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.Stepwise
 
-@Ignore
 @Stepwise
+@Ignore
 class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
     private static

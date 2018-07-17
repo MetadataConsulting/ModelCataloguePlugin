@@ -17,8 +17,8 @@ import org.openqa.selenium.Keys
 import spock.lang.IgnoreIf
 
 @Stepwise
-@Ignore
 @IgnoreIf({ !System.getProperty('geb.env') })
+@Ignore
 class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     public static final String expandTableHeader = '.inf-table thead .inf-cell-expand'
@@ -64,7 +64,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String removeRelationshipButton = '#role_item_remove-relationshipBtn'
     public static final String primitiveContent = '[data-view-name="Measurement Unit"]'
 
-    @Ignore
     def "go to login"() {
         when:
         LoginPage loginPage = to LoginPage
@@ -92,7 +91,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check Common.rightSideTitle is 'Active Data Types'
     }
 
-    @Ignore
     def "create reference"() {
         when:
         DashboardPage dashboardPage = to DashboardPage
@@ -139,7 +137,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 2, text: 'DEMOGRAPHICS') } displayed
     }
 
-    @Ignore
     def "create primitive"() {
         when:
         remove Common.messages
@@ -167,7 +164,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 2, text: 'new unit') } displayed
     }
 
-    @Ignore
     def "create enum"() {
         when:
         remove Common.messages
@@ -194,7 +190,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 1) } contains "Enumeration 1"
     }
 
-    @Ignore
     def "create subset 2"() {
         when:
         remove Common.messages
@@ -223,7 +218,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 1) } contains "Enumeration 2"
     }
 
-    @Ignore
     def "create subset 3"() {
         when:
         remove Common.messages
@@ -252,7 +246,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 2) } contains '01: one'
     }
 
-    @Ignore
     def "updating parent propagates to child and grandchild"() {
         when:
         refresh browser
@@ -275,7 +268,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check enumerationsDetail missing 'one'
     }
 
-    @Ignore
     def "create standard"() {
         when:
         select 'Test 1' select 'Data Types'
@@ -296,7 +288,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 1) } contains "New Data Type"
     }
 
-    @Ignore
     def "check it shows up with own detail page"() {
         when:
         click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
@@ -305,7 +296,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check Common.rightSideTitle contains 'New Data Type'
     }
 
-    @Ignore
     def "Check Form (Item) detail section is present and collapsed"() {
         expect:
         check Common.detailSectionFormMetadata present Common.once
@@ -321,7 +311,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click Common.detailSectionFormMetadata.find('.title .btn')
     }
 
-    @Ignore
     def "add metadata"() {
         setup:
         click Common.inlineEdit
@@ -343,7 +332,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click Common.detailSectionMetadata.find('.title .btn')
     }
 
-    @Ignore
     def "remove metadata"() {
         setup:
         click Common.inlineEdit
@@ -365,7 +353,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click Common.detailSectionMetadata.find('.title .btn')
     }
 
-    @Ignore
     def "create new mapping"() {
         remove Common.messages
         check Common.backdrop gone
@@ -391,7 +378,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check tabTotal('mappings') is '1'
     }
 
-    @Ignore
     def "convert value"() {
         check Common.backdrop gone
 
@@ -420,7 +406,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check Common.modalDialog gone
     }
 
-    @Ignore
     def "edit mapping"() {
         remove Common.messages
 
@@ -447,7 +432,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 2) } is 'x'
     }
 
-    @Ignore
     def "create relationship"() {
         check Common.backdrop gone
         remove Common.messages
@@ -481,7 +465,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     }
 
-    @Ignore
     def "create relationship from footer action"() {
         check Common.backdrop gone
         remove Common.messages
@@ -511,7 +494,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check tabTotal('relatedTo') is '2'
     }
 
-    @Ignore
     def "remove relationship"() {
         check Common.backdrop gone
         remove Common.messages
@@ -531,7 +513,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check tabTotal('relatedTo') is '1'
     }
 
-    @Ignore
     def "remove mapping"() {
         check Common.backdrop gone
         remove Common.messages
@@ -553,7 +534,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         }
     }
 
-    @Ignore
     def "change type"() {
         given:
         scroll Common.up

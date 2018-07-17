@@ -67,7 +67,6 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check Common.rightSideTitle is 'Active Assets'
     }
 
-    @Ignore
     def "upload new asset"() {
         when:
         click Common.create
@@ -88,7 +87,6 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check Common.modalDialog gone
     }
 
-    @Ignore
     def "Check the asset shows up with own detail page"() {
         expect:
         check { infTableCell(1, 2, text: "Sample XSD") } displayed
@@ -98,7 +96,6 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check Common.rightSideTitle contains 'Sample XSD'
     }
 
-    @Ignore
     def "validate xml schema"() {
         when:
         click validateXsd
@@ -125,7 +122,6 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check Common.modalDialog gone
     }
 
-    @Ignore
     def "upload mc file"() {
         click importMc
 
@@ -148,7 +144,6 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check 'h3' contains 'Import for MET-523.mc'
     }
 
-    @Ignore
     def "upload excel file"() {
         click importExcel
 
@@ -178,12 +173,6 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check Common.rightSideTitle contains 'MET-522.M1'
     }
 
-    /**
-     * This test is currently ignored as it is very unreliable. It's better to have reliable tests than cover every
-     * bit of the application.
-     */
-    @Issue('MET-1050')
-    @Ignore
     def "export to excel"() {
         when:
         withNewWindow({
