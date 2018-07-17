@@ -72,7 +72,6 @@ class CanCreateDataTypeFromCreateDataElementWizardSpec extends GebSpec {
 
     def "fill the create data element form"() {
         when:
-        when:
         CreateDataElementPage createDataElementPage = browser.page(CreateDataElementPage)
         createDataElementPage.name = dataElementName
         sleep(2_000)
