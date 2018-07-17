@@ -128,7 +128,8 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
   var CONTENT_TYPE = {
     CATALOGUE_ELEMENT: "CATALOGUE_ELEMENT",
-    PAGE: "PAGE"
+    PAGE: "PAGE",
+    HEADER: "HEADER"
   };
 
   /*::
@@ -159,7 +160,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       referenceAngularLink: ?string
     }
 
-    type Node = CENode | PageNode
+    type Node = CENode | PageNode | HeaderNode
     // the primary recursive type
 
     type Link = {
@@ -172,6 +173,10 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
     type PageNode = {nodeContentType: "PAGE" } & D3JSON & PaginationParams & {nodeWhoseChildrenArePaged: CENode, direction: Direction}
 
+    type HeaderNode = {nodeContentType: "HEADER"} & Named & D3JSON & {type: string}
+
+    type Named = {name: string}
+
     type D3JSON = {
 
       loadedChildren: boolean,
@@ -179,6 +184,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       parent: ?CENode,
       children: ?Array<CENode>,
       _children: ?Array<CENode>,
+      nodeId: ?number,
 
 
       x: number,
@@ -190,7 +196,9 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     type Direction = "UP" | "DOWN"
 
     type ChildrenPaged = {
+      header: HeaderNode,
       pagesUp: Array<PageNode>,
+
       pagesDown: Array<PageNode>
     }
 
@@ -200,8 +208,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       total: number
     }
 
-    type CatalogueElementData = {
-      name: string,
+    type CatalogueElementData = Named & {
       id: number,
       description: string,
 
@@ -232,6 +239,18 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     }
    */
 
+  function singlePage(d /*: PaginationParams */) /*: boolean */ {
+    return (d.total <= (d.max - d.offset))
+  }
+
+  /**
+   * Returns true iff the PaginationParams indicate that there are more than one page.
+   * @param d
+   * @returns {boolean}
+   */
+  function paged(d /*: PaginationParams */) /*: boolean */ {
+    return !singlePage(d)
+  }
 
   function applyDefaultD3JSON(x) /*: D3JSON */ {
 
@@ -244,6 +263,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     x.y = 0;
     x.x0 = 0;
     x.y0 = 0;
+    x.nodeId = null;
     return x;
   }
 
@@ -254,9 +274,10 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
 
   /**
+   * Constructor for PageNodes.
+   * A PageNode is a node containing information for a paged request.
    * Assuming request with offset and max returns paginated List[offset..offset+max)
    * Where List = List[0..total)
-   * Actually prevLink is not needed at the moment with the way I'm doing it but it may be useful later
    * @param prevLink
    * @param offset
    * @param max
@@ -285,6 +306,22 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
   }
 
 
+  /**
+   * Constructor for HeaderNodes.
+   * @param name
+   * @returns {MakeHeaderNode}
+   * @constructor
+   */
+  function MakeHeaderNode(name /*: string */, type /*: string */) /*: HeaderNode */ {
+    this.nodeContentType = CONTENT_TYPE.HEADER
+
+    applyDefaultD3JSON(this)
+
+    this.name = name
+    this.type = type
+
+    return this;
+  }
 
   /**
    * Given handlers for each case (CENode, PageNode), return a handler for a Node
@@ -295,7 +332,8 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
    */
   function nodeHandler/*::<T>*/(
     catalogueElementDataHandler /*: CENode => T */,
-    pageNodeHandler /*: PageNode => T */
+    pageNodeHandler /*: PageNode => T */,
+    headerNodeHandler /*: HeaderNode => T */
   ) /*: Node => T */ {
 
     function handler(d /*: Node */) /*: T */ {
@@ -314,6 +352,14 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           }
           else {
             throw new Error("handler not provided for case Page");
+          }
+
+        case CONTENT_TYPE.HEADER:
+          if (headerNodeHandler) {
+            return headerNodeHandler(d);
+          }
+          else {
+            throw new Error("handler not provided for case Header")
           }
 
 
@@ -384,6 +430,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       loading: d.loading,
       parent: null,
       _children: null,
+      nodeId: null,
 
       x: 0,
       y: 0,
@@ -393,7 +440,8 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       currentPaginationParams: null,
 
       pagesUp: [],
-      pagesDown: []
+      pagesDown: [],
+      header: new MakeHeaderNode(d.name, d.type)
 
 
     }
@@ -619,7 +667,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
    * Update a node (source), usually after it has been toggled.
    * @param source
    */
-  function update(source) {
+  function update(source /*: Node */) {
 
 
     /**
@@ -638,7 +686,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
      * @param d
      * @returns {Array}
      */
-    function splitName(d /*: CENode */) /*: string[] */ {
+    function splitName(d /*: Named */) /*: string[] */ {
       var words = d.name.split(/\s+/) // initial splitting
 
       var truncatedWords = []
@@ -716,30 +764,51 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
     nodeLayoutData.forEach(function(d) { d.y = d.depth * 180; });
 
     /**
-     * Add page nodes to the layout
+     * Add PageNodes and HeaderNodes to the layout
      */
     eachTree(function(d /*: CENode */) {
-      _.each([{pages: d.pagesUp, sign: -1},
-          {pages: d.pagesDown, sign: 1}],
-        function(o /*: {pages: Array<PageNode>, sign: number } */) {
-          var pages = o.pages;
-          var sign = o.sign;
+      if (d.currentPaginationParams && paged(d.currentPaginationParams)) {
 
-          var n = pages.length
-          var i = 0
-          while (i<n) {
-            var page = pages[i]
-            page.x = d.x  + sign * ((i + 1) * labelParams.pageNodeSpacing) + ((sign > 0) ? nodeRectangleHeight(d) - 20 : 0)
-            page.y = d.y - 10
-            nodeLayoutData.push(page)
-            i++
-          }
-        })
+        function pagesUp(sign /*: number */) /*: boolean */ {
+          return (sign < 0)
+        }
+        function pagesDown(sign /*: number */) /*: boolean */ {
+          return !pagesUp(sign)
+        }
 
+        _.each([{pages: d.pagesUp, sign: -1},
+            {pages: d.pagesDown, sign: 1}],
+          function(o /*: {pages: Array<PageNode>, sign: number } */) {
+
+            var pages = o.pages;
+            var sign = o.sign;
+
+            var n = pages.length
+            var i = 0
+            while (i<n) {
+              var page /*: PageNode */ = pages[i]
+              page.x = d.x + sign * ((i + 1) * labelParams.pageNodeSpacing) + ((pagesDown(sign)) ? nodeRectangleHeight(d) - 10 : 0)
+              // because the tree is rotated, x is actually the vertical. Increasing x is going down.
+              page.y = d.y - 10
+              nodeLayoutData.push(page)
+              i++
+            }
+
+            if (pagesUp(sign)) { // not single page, so display header
+
+              var header /*: HeaderNode */ = d.header
+              header.x = d.x + sign * ((i + 1) * labelParams.pageNodeSpacing) // using i from the while loop above
+              header.y = d.y - 10
+              nodeLayoutData.push(header)
+
+            }
+
+          })
+      }
 
     })(root)
 
-    // Update the nodes…
+    // Update the nodes with the data.
     var svgNodes = vis.selectAll("g.node")
       .data(nodeLayoutData, function(d) { return d.nodeId || (d.nodeId = ++i); });
 
@@ -775,12 +844,9 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         function collapseSiblings(d /*: Node */) {
           var parent = d.parent
           if (parent) {
-            parent.children = _.filter(parent.children, nodeHandler(
-              function(d2 /*: CENode */) {
-                return d2 === d
-              },
-              k(true) // keep the PageNodes
-            ))
+            parent.children = _.filter(parent.children, function(d2 /*: CENode */) {
+              return d2 === d
+            })
             parent.loadedChildren = false
           }
         }
@@ -998,7 +1064,9 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
                 ceNodeChildLoadingHandler(d.offset, d.max)(d.nodeWhoseChildrenArePaged)
 
-              }
+              },
+
+              function(d /*: HeaderNode */) /*: void */ {}
 
             )(d)
           }
@@ -1006,6 +1074,8 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         }
 
       }
+
+      var currentNode = svgNodes.filter(function(d) {return d.nodeId === source.nodeId})
 
       // ENTER any new nodes at the parent's previous position.
       // the g element includes the circle AND the text next to it (the name). So event listeners registered here will apply to both circle and text.
@@ -1019,35 +1089,46 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         });
 
       /**
-       * "this" will be the HTML DOM element under consideration when doing a selection.
+       * Whether the node is to have a rectangle
        * @param d
        * @returns {*}
        * @constructor
        */
-      function CENodeSelector(d /*: Node */) {
+      function useRectangleForNode(d /*: Node */) {
         return nodeHandler(
-          function(d /*: CENode */) {
-            return true
-          },
-          function(d /*: PageNode */){
-            return false
-          }
+          (k(true) /*: CENode => boolean */),
+          (k(false) /*: PageNode => boolean */),
+          (k(true) /*: HeaderNode => boolean */)
         )(d)
       }
 
-      function PageNodeSelector(d /*: Node */) {
+      /**
+       * Whether the node is to have a circle
+       * @param d
+       * @returns {*}
+       * @constructor
+       */
+      function useCircleForNode(d /*: Node */) {
         return nodeHandler(
-          function(d /*: CENode */) {
-            return false
-          },
-          function(d /*: PageNode */){
-            return true
-          }
+          (k(false) /*: CENode => boolean */),
+          (k(true) /*: PageNode => boolean */),
+          (k(false) /*: HeaderNode => boolean */)
         )(d)
       }
+
+      currentNode.select("rect")
+        .style("fill", (nodeHandler(
+        function(d /*: CENode */) { if (d.currentPaginationParams && paged(d.currentPaginationParams)) {
+          return '#fff'
+        } else {
+          return coloursMap[d.type]
+        }},
+        (k("#fff") /*: PageNode => string */),
+        (function(d /*: HeaderNode */) {return coloursMap[d.type] } /*: HeaderNode => string */)
+      ) /*: Node => string */))
 
       // add rectangles for CENodes
-      nodeEnter.filter(CENodeSelector).append("svg:rect")
+      nodeEnter.filter(useRectangleForNode).append("svg:rect")
         .attr("width", nodeRectParams.width)
         .attr("height", nodeRectangleHeight)//nodeRectParams.height)
         .attr('x', nodeRectParams.dx)
@@ -1056,17 +1137,19 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         .attr('ry', nodeRectParams.ry)
         .style("fill", (nodeHandler(
           function(d /*: CENode */) { return coloursMap[d.type]  },
-          (k("#fff") /*: PageNode => string */)
+          (k("#fff") /*: PageNode => string */),
+          (function(d /*: HeaderNode */) {return coloursMap[d.type] } /*: HeaderNode => string */)
         ) /*: Node => string */))
         .attr("stroke-width", 1)
         .attr("stroke", "#808080")
 
       // add circles for PageNodes
-      nodeEnter.filter(PageNodeSelector).append("svg:circle")
+      nodeEnter.filter(useCircleForNode).append("svg:circle")
         .attr("r", 1e-6)
         .style("fill", (nodeHandler(
           function(d /*: CENode */) { return !d.children ? coloursMap[d.type] /*"lightsteelblue"*/ : "#fff"; },
-          (k("#fff") /*: PageNode => string */)
+          (k("#fff") /*: PageNode => string */),
+          (k("#fff") /*: HeaderNode => string */)
         ) /*: Node => string */));
 
 
@@ -1079,35 +1162,33 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
       (function(){
 
 
-
         /**
-         * Should label be on the left of the node?
+         * X-Offset of node label
          * @param d
          * @returns {*}
          */
-        function shouldLabelBeOnTheLeft(d /*: Node */) /*: boolean */ {
-          return nodeHandler(
-            function(d /*: CENode */) /*: boolean */ {
-              return (d.type === 'dataClass' || d.type === 'dataModel' || d.type === 'dataElement')
-            },
-            (k(true) /*: PageNode => boolean */)
-
-          )(d)
-
-        }
-
         function nodeLabelXOffset(d /*: Node */) /*: number */ {
-          return nodeHandler(
-            function(d /*: CENode */) {return nodeRectParams.dx + 5},
-            function(d /*: PageNode */) {return - (radius + 5)}
-          )(d)
+          if (useRectangleForNode(d)) {
+            return nodeRectParams.dx + 5
+          }
+          else {
+            return - (radius + 5)
+          }
         }
 
+        /**
+         * Text anchor:
+         * Whether text is left (start) or right (end) justified
+         * @param d
+         * @returns {*}
+         */
         function startOrEnd(d /*: Node */) /*: string */ {
-          return nodeHandler(
-            function(d /*: CENode */) {return "start"},
-            function(d /*: PageNode */) { return "end"}
-          )(d)
+          if (useRectangleForNode(d)) {
+            return "start"
+          }
+          else {
+            return "end"
+          }
         }
 
         // Text/link for each node
@@ -1123,6 +1204,36 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           .style("font", labelParams.labelFontSize + "px sans-serif")
 
         /**
+         * lineText(i) is a handler that takes a node satisfying the Named interface and returns the correct string for
+         * line i of the name.
+         * @param i
+         * @returns {Function}
+         */
+        function lineText(i /*: number */) /*: Named => string */ {
+          return function(d /*: Named */) /*: string */ {
+            var line = splitName(d)[i];
+            if ((i === labelParams.maxNodeLabelLines - 1 && !!(splitName(d)[i+1]))) {
+              // if this is the last line to display but there are still more lines that can't be displayed
+              var overflow = line.length + 3 - labelParams.maxStringLength // overflow from adding ellipsis
+              if (overflow > 0) {
+                return line.slice(0,-(overflow)) + "...";
+              }
+              else {
+                return line + "...";
+              }
+
+            }
+            else {
+              return line;
+            }
+          }
+        }
+
+        function printParams(d /*: PaginationParams */, printTotal /*: boolean */) /*: string */ {
+          return "Elements [" + (d.offset + 1) + "-" + (d.offset + d.max - 1 + 1) + "]" + (printTotal ?  " / " + d.total : "")
+        }
+
+        /**
          * Add text (label) next to node, in lines
          * @param textD3Selection
          */
@@ -1136,28 +1247,23 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
               .attr('dy', dy)
               .text((nodeHandler(
                 function(d /*: CENode */) {
-                  var line = splitName(d)[i];
-                  if ((i === labelParams.maxNodeLabelLines - 1 && !!(splitName(d)[i+1]))) {
-                    // if this is the last line to display but there are still more lines that can't be displayed
-                    var overflow = line.length + 3 - labelParams.maxStringLength // overflow from adding ellipsis
-                    if (overflow > 0) {
-                      return line.slice(0,-(overflow)) + "...";
-                    }
-                    else {
-                      return line + "...";
-                    }
-
+                  if (d.currentPaginationParams != null && paged(d.currentPaginationParams)) {
+                    var cPP = d.currentPaginationParams
+                    return (i === 0) ? printParams(cPP, true)
+                                      : ""
                   }
                   else {
-                    return line;
+                    return lineText(i)(d)
                   }
+
                 },
 
                 (i === 0) ? function(d /*: PageNode */) /*: string */ {
                   // d.offset + d.max - 1 is the index of the last element that would be displayed for that page.
                   // I add 1 to the indexes to "start counting from 1" for the user's sake. Since indexes start counting from 0.
-                  return "Elements [" + (d.offset + 1) + "-" + (d.offset + d.max - 1 + 1) + "]" // line 0
-                } : k("")
+                  return printParams(d, false) // line 0
+                } : k(""),
+                lineText(i)
               ) /*: Node => string */))
             i++
           }
@@ -1165,6 +1271,11 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         }
 
         addLabelLines(textD3Selection)
+
+        var currentNodeText = currentNode.select("text")
+        currentNodeText.html(null)
+
+        addLabelLines(currentNodeText)
 
         // Font-Awesome Up/Down arrow for pagination nodes
         nodeEnter.append('text')
@@ -1174,36 +1285,10 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
           .attr('font-size', function(d) { return (d.size-5) +'em'} )
           .text(nodeHandler(
             function(d /*: CENode */) {return ""},
-            function(d /*: PageNode */) { return (d.direction === DIRECTIONS.UP) ? '\uf062' : '\uf063' })
+            function(d /*: PageNode */) { return (d.direction === DIRECTIONS.UP) ? '\uf062' : '\uf063' },
+            function(d /*: HeaderNode */) { return ""})
+
           );
-
-
-        // current pagination information text:
-
-        svgNodes.select("text.children-pagination-text").remove()
-        svgNodes.append("svg:text")
-          .attr("class", "children-pagination-text")
-          .attr("dy", "-1em")
-
-          .attr("x", nodeLabelXOffset)
-          .attr("text-anchor", startOrEnd)
-          // .text(shortenedNodeText)
-
-          .style("font", "italic " + labelParams.labelFontSize + "px sans-serif")
-          .style("text-decoration", "underline")
-          .text((nodeHandler(
-            function(d /*: CENode */) {
-              if (d.currentPaginationParams != null) {
-                var cPP = d.currentPaginationParams
-                  return "[" + (cPP.offset + 1) + "-" + (cPP.offset + cPP.max - 1 + 1) + "] / " + cPP.total
-              }
-              else {
-                return ""
-              }
-
-            },
-            k("")
-          ) /*: Node => string */))
 
 
       })();
@@ -1232,6 +1317,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
 
       nodeUpdate.select("text")
         .style("fill-opacity", 1);
+      nodeUpdate.select('text').filter(function(d) {return d.nodeId === source.nodeId}).style("color", "red")
 
 
 
