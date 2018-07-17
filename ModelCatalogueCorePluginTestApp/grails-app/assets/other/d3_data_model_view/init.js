@@ -1180,7 +1180,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
         svgNodes.select("text.children-pagination-text").remove()
         svgNodes.append("svg:text")
           .attr("class", "children-pagination-text")
-          .attr("dy", "-2em")
+          .attr("dy", "-1em")
 
           .attr("x", nodeLabelXOffset)
           .attr("text-anchor", startOrEnd)
