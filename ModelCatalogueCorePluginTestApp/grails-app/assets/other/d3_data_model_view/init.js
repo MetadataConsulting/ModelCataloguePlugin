@@ -25,7 +25,7 @@ var initD3 = (function() { // initD3 is an object holding functions exposed at t
   // dimensions of page
   var m = [20, 120, 20, 120],
     w = 1280 + 6000 - m[1] - m[3],
-    h = 800 - m[0] - m[2] - 300,
+    h = 800 - m[0] - m[2] - 150,
     i = 0, // node ids
     root;
 
