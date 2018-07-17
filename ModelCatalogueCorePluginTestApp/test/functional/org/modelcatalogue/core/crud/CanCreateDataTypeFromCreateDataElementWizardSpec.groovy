@@ -137,5 +137,12 @@ class CanCreateDataTypeFromCreateDataElementWizardSpec extends GebSpec {
         DataElementPage dataElementPage = browser.page DataElementPage
         then:
         dataElementPage.containsDataType(dataTypeName)
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 }

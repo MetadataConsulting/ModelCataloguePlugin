@@ -156,6 +156,13 @@ class DisableUserSpec extends GebSpec {
         confirmEnableUserPage.confirmEnableUser()
         then:
         at UserProfilePage
-        loginPage.finalize()
+
+        when:
+        dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+
+        then:
+        at HomePage
     }
 }

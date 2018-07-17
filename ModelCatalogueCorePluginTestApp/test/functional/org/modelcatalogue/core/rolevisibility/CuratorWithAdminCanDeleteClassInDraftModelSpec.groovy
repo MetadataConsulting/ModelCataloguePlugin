@@ -1,13 +1,8 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Ignore
-import spock.lang.Title
-import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
-import spock.lang.Shared
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1463')
 @Title('A curator is able to delete a data class on draft data model that they have administration rights to')
@@ -48,9 +43,10 @@ class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
     def "Login as supervisor"() {
         when:
         go("/login/auth")
-        LoginPage loginPage = to LoginPage
+        LoginPage loginPage = browser.page LoginPage
         loginPage.login('supervisor', 'supervisor')
-
+        println "===" + browser.currentUrl
+        println "===" + browser.title
         then:
         at DashboardPage
     }
