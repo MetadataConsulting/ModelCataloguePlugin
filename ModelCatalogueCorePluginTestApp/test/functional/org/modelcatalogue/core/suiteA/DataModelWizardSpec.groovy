@@ -71,6 +71,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         check Common.rightSideTitle contains "New Data Model $uuid"
     }
 
+    @Ignore
     def "finalize element"() {
         check Common.backdrop gone
 
@@ -110,6 +111,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         check Common.status has 'label-primary'
     }
 
+    @Ignore
     def "create new version of the element"() {
         check Common.backdrop gone
         when: "new version is clicked"
@@ -135,6 +137,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         check Common.status has 'label-warning'
     }
 
+    @Ignore('Draft versions cannot be deprecated')
     def "deprecate the data model"() {
         waitUntilModalClosed()
         when: "deprecate action is clicked"
@@ -151,6 +154,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     }
 
+    @Ignore
     def "create new data model, hard delete the data model and create new with the same name"() {
         given:
         def uuid = UUID.randomUUID().toString()

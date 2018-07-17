@@ -14,6 +14,7 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class ValidationRuleWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {

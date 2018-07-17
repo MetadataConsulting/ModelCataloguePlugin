@@ -9,16 +9,16 @@ def getCommitSha() {
   sh "git rev-parse HEAD > .git/current-commit"
   return readFile(".git/current-commit").trim()
 }
- 
+
 def updateGithubCommitStatus(build, String context, String buildUrl, String message, String state) {
   // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
   repoUrl = getRepoURL()
   commitSha = getCommitSha()
-  println "Updating Github Commit Status" 
+  println "Updating Github Commit Status"
   println "repoUrl $repoUrl"
   println "commitSha $commitSha"
   println "build result: ${build.result}, currentResult: ${build.currentResult}"
- 
+
   step([
     $class: 'GitHubCommitStatusSetter',
     reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
@@ -26,7 +26,7 @@ def updateGithubCommitStatus(build, String context, String buildUrl, String mess
     errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
     contextSource: [$class: "ManuallyEnteredCommitContextSource", context: context],
     statusBackrefSource: [$class: "ManuallyEnteredBackrefSource", backref: buildUrl],
-        
+
     statusResultSource: [
       $class: 'ConditionalStatusResultSource',
       results: [
@@ -64,15 +64,14 @@ pipeline {
         }
       }
       post {
-
         failure {
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Failed.", 'FAILURE')     
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Failed.", 'FAILURE')
         }
         success {
             updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Success!", 'SUCCESS')
         }
         unstable {
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Unstable.", 'UNSTABLE')     
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Unstable.", 'UNSTABLE')
         }
       }
     }
@@ -145,6 +144,5 @@ pipeline {
             }
           }
     }
-
   }
 }
