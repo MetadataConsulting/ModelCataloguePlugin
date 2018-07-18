@@ -329,5 +329,14 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
         then:
         assert text.contains(searchDataModelName)
         assert text.contains("Max Occurs")
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
+
+
 }

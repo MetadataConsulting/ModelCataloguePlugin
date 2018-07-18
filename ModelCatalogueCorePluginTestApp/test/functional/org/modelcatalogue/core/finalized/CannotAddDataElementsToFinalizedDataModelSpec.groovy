@@ -52,5 +52,12 @@ class CannotAddDataElementsToFinalizedDataModelSpec extends GebSpec {
 
         then:
         !dataElementsPage.isAddItemIconVisible()
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 }

@@ -183,6 +183,7 @@ class VerifyMinOccursCanBeZeroSpec extends GebSpec {
         dataClassPage.createRelationshipClick()
         then:
         CreateRelationshipPage createRelationshipPage = browser.page CreateRelationshipPage
+        sleep(2_000)
         createRelationshipPage.matchPageHeading(dataClassName)
 
     }

@@ -98,6 +98,7 @@ class DataClassPage extends Page implements InputUtils {
     }
 
     void editClassName(String value) {
+        className.value("")
         fillInput(className,value)
     }
 

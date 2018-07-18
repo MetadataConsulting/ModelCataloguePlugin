@@ -33,6 +33,7 @@ import spock.lang.*
 - Navigate back to your Data Model and to the data class.
 - Check that when you search in the parents tab, edits made to the data class in the imported model are carried through to your data model. | Edits are present from imported data model.
 ''')
+
 @Stepwise
 class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
     @Shared
@@ -78,6 +79,7 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select("Data Classes")
+        sleep(2_000)
         then:
         at DataClassesPage
 

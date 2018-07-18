@@ -114,5 +114,12 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
 
         then:
         waitFor { !dataTypeValueValidatePage.outputIsValid() }
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 }

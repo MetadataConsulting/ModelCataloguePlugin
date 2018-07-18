@@ -1,8 +1,8 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import spock.lang.*
 import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1626')
 @Title('Check that a curator can Add Data Model Import from Data Model menu')
@@ -190,5 +190,15 @@ class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
         driver.navigate().refresh()
         then:
         dataImportsPage.containsDataModel(dataModelOneName)
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
+        dashboardPage.finalize()
+
     }
+
 }

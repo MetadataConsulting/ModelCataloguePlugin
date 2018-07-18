@@ -45,8 +45,6 @@ class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
         go("/login/auth")
         LoginPage loginPage = browser.page LoginPage
         loginPage.login('supervisor', 'supervisor')
-        println "===" + browser.currentUrl
-        println "===" + browser.title
         then:
         at DashboardPage
     }
@@ -181,6 +179,13 @@ class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         then:
         !dataClassesPage.dataClassPresent(dataClassName)
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 
 }

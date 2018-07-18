@@ -309,6 +309,13 @@ class CloneUnauthorizedElementSpec extends GebSpec {
         when:
         DataTypePage dataTypePage = browser.page DataTypePage
         then:
-        dataTypePage.isDataTypePageFor(dataTypeTwoName) 
+        dataTypePage.isDataTypePageFor(dataTypeTwoName)
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage         
     }
 }

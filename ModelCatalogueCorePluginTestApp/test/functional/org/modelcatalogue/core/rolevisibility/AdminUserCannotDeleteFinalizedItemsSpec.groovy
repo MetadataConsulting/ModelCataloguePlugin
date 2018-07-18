@@ -329,6 +329,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
     def "finalize data model"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        sleep(2_000)
         dataModelPage.treeView.select("Assets")
         then:
         AssetsPage

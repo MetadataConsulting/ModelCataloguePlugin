@@ -1,15 +1,10 @@
 package org.modelcatalogue.core.springsecurityui
 
 import geb.spock.GebSpec
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.HomePage
-import org.modelcatalogue.core.geb.LoginPage
-import org.modelcatalogue.core.geb.UserEditPage
-import org.modelcatalogue.core.geb.UserSearchPage
+import org.modelcatalogue.core.geb.*
 import org.modelcatalogue.core.security.MetadataRoles
 import spock.lang.Issue
 import spock.lang.Narrative
-import spock.lang.Ignore
 import spock.lang.Stepwise
 import spock.lang.Title
 
@@ -52,7 +47,7 @@ class GrantRoleCuratorSpec extends GebSpec {
         when:
         UserSearchPage userSearchPage = browser.page UserSearchPage
         userSearchPage.fillUser("user")
-        Thread.sleep(5000)
+        sleep(2_000)
         userSearchPage.search()
         then:
         at UserSearchPage
@@ -108,5 +103,63 @@ class GrantRoleCuratorSpec extends GebSpec {
 
         then:
         dashboardPage.nav.importMenuLink.displayed
+
+        when:
+        dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
+    }
+
+    def "Revoke acces"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login('supervisor', 'supervisor')
+
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.nav.cogMenu()
+        dashboardPage.nav.users()
+        then:
+        at UserSearchPage
+
+        when:
+        UserSearchPage userSearchPage = browser.page UserSearchPage
+        userSearchPage.fillUser("user")
+        sleep(2_000)
+        userSearchPage.search()
+        then:
+        at UserSearchPage
+
+        when:
+        userSearchPage = browser.page UserSearchPage
+        userSearchPage.selectUser()
+
+        then:
+        at UserEditPage
+
+
+        when:
+        UserEditPage userEditPage = browser.page UserEditPage
+        userEditPage.clickRoles()
+        then:
+        at UserEditPage
+
+        when:
+        userEditPage = browser.page UserEditPage
+        userEditPage.grant(MetadataRoles.ROLE_CURATOR)
+        userEditPage.update()
+        then:
+        at UserEditPage
+
+        when:
+        userEditPage = browser.page UserEditPage
+        userEditPage.logout()
+        then:
+        at HomePage
     }
 }

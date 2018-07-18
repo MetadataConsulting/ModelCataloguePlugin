@@ -125,6 +125,7 @@ class CreateNewVersionOfDataModelSpec extends GebSpec {
         when:
         VersionsPage versionsPage = browser.page VersionsPage
         versionsPage.selectVersion(semanticVersion)
+        sleep(2_000)
         versionsPage.dataElementDropDownClick()
         versionsPage.deleteBttnClick()
         versionsPage.deleteConfirmationBttnClick()

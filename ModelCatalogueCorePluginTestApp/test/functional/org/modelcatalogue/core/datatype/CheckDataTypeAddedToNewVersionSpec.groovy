@@ -125,7 +125,7 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
         FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
         finalizeDataModelPage.version = dataModelVersion
         finalizeDataModelPage.versionNote = dataModelVersionNote
-        Thread.sleep(1_000)
+        sleep(2_000)
         finalizeDataModelPage.submit()
         then:
         at FinalizedDataModelPage
@@ -218,5 +218,12 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
         DataTypesPage dataTypesPage = browser.page DataTypesPage
         then:
         dataTypesPage.hasDataType(dataTypeTwoName)
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 }

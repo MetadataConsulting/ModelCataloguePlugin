@@ -150,6 +150,7 @@ class CuratorCanGenerateSuggestionsUsingMappingUtilitySpec extends GebSpec {
         when:
         MappingPage mappingPage = browser.page MappingPage
         driver.navigate().refresh()
+        sleep(2_000)
         mappingPage.hasMapping(modelOneOption, dataModelNameA)
         then:
         at MappingSuggestionsPage

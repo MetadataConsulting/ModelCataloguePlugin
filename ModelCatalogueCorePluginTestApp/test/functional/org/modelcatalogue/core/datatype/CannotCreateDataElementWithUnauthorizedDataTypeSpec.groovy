@@ -143,6 +143,7 @@ class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
 
         when:
         DataTypesPage dataTypesPage = browser.page DataTypesPage
+        sleep(2_000)
         dataTypesPage.createDataTypeFromNavigation()
         then:
         at CreateDataTypePage
@@ -263,6 +264,7 @@ class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select("Data Elements")
+        sleep(2_000)
         then:
         at DataElementsPage
     }
