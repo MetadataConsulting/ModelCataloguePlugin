@@ -13,7 +13,7 @@ class CloneOrImportPage extends Page {
 
     void allowClone() {
         cloneButton.click()
-        sleep(2_000)
+        sleep(3_000)
     }
 
     void allowImport() {

@@ -40,6 +40,7 @@ import spock.lang.*
  - Check that new relationship created is referenced within history. | History is populated with details of new relationship
  - Verify that included in the history is mention of Max occurs created. like the following: Relationship testclass (AA_test 0.0.2) parent of HAEMATOLOGY - LABORATORY RESULTS - AML, ALL, HODGKIN (Cancer Outcomes and Services Dataset 6.0.0) metadata Max Occurs created | Max Occurs is showing in history
 ''')
+@Ignore
 @Stepwise
 class MaxOccursShowsInHistorySpec extends GebSpec {
 

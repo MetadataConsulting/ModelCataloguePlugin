@@ -227,6 +227,13 @@ class VerifyMinOccursCanBeZeroSpec extends GebSpec {
         dataClassPage = browser.page DataClassPage
         then:
         dataClassPage.occuranceStatus().contains("Max Occurs: 10")
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 
 }

@@ -155,6 +155,7 @@ class CloneUnauthorizedElementSpec extends GebSpec {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select('Data Types')
+        sleep(2_000)
         then:
         at DataTypesPage
 

@@ -76,20 +76,16 @@ class CanCreateDataTypeFromCreateDataElementWizardSpec extends GebSpec {
         createDataElementPage.name = dataElementName
         sleep(2_000)
         createDataElementPage.search(dataTypeName)
+        createDataElementPage.createNewDataType()
 
         then:
-        at CreateDataElementPage
+        at CreateDataTypePage
     }
 
     def "create data type"() {
         when:
-        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
-        createDataElementPage.createDataType()
-        then:
-        at DataElementsPage
-
-        when:
         CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        sleep(2_000)
         createDataTypePage.buttons.save()
         then:
         at CreateDataElementPage

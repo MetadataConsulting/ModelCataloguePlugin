@@ -311,6 +311,7 @@ class CannotCreateDataElementWithUnauthorizedDataTypeSpec extends GebSpec {
 
         when:
         CloneOrImportPage cloneOrImportPage = browser.page CloneOrImportPage
+        sleep(2_000)
         cloneOrImportPage.allowClone()
         then:
         at CreateDataElementPage
