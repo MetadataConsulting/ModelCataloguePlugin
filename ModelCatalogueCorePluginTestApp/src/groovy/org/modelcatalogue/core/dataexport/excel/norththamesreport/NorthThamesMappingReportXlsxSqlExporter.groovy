@@ -138,10 +138,9 @@ FROM
 	) AS lpc ON lpc.data_model_id = lpc_dm.id
 	LEFT JOIN (
 		SELECT 
-			r.source_id, ev.extension_value AS `code`, ce.`name`, ce.data_model_id, parent_ce.`name` AS class
+			r.source_id, ce.model_catalogue_id AS `code`, ce.`name`, ce.data_model_id, parent_ce.`name` AS class
 		FROM
 			catalogue_element AS ce
-			JOIN extension_value AS ev ON ev.element_id = ce.id AND ev.`name` = 'WinPath TFC'
 			JOIN relationship AS r ON r.destination_id = ce.id AND r.relationship_type_id = 7
 			JOIN relationship AS parent_rel ON parent_rel.destination_id = ce.id AND parent_rel.relationship_type_id = 1
 			JOIN catalogue_element AS parent_ce ON parent_ce.id = parent_rel.source_id
