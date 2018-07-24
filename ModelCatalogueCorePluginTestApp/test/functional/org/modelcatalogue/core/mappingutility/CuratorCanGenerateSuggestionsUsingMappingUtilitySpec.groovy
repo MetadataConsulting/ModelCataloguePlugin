@@ -16,6 +16,7 @@ import spock.lang.*
 - Refresh the page to see Mapping suggestions | Mapping suggestions appear
 - Verify that suggestion are created once page is refreshed 
 ''')
+@Ignore
 @Stepwise
 class CuratorCanGenerateSuggestionsUsingMappingUtilitySpec extends GebSpec {
 

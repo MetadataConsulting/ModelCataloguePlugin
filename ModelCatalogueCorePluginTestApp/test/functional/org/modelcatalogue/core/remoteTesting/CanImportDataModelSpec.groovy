@@ -78,5 +78,12 @@ class CanImportDataModelSpec extends GebSpec {
 
         then:
         at DataImportsPage
+
+        when:
+        dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 }

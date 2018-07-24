@@ -338,6 +338,4 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
         then:
         at HomePage
     }
-
-
 }

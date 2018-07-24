@@ -29,7 +29,7 @@ import spock.lang.*
  - Verify that (In Active Data Classes) under the list of Data Classes, there is no 'Create new' green plus button . | No option to create new data class.
  - Verify that there is no left hand menu and no 'Data Class' menu button | No Data Class menu button present in Finalized version of the Data Model
 /$)
-
+@Ignore
 @Stepwise
 class CuratorCannotCreateClassInFinalizedModelSpec extends GebSpec {
 

@@ -1,7 +1,11 @@
 package org.modelcatalogue.core.dataclass
 
 import geb.spock.GebSpec
-import spock.lang.*
+import spock.lang.Issue
+import spock.lang.Narrative
+import spock.lang.Ignore
+import spock.lang.Title
+import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1564')

@@ -3,9 +3,6 @@ package org.modelcatalogue.core.datamodel
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
 import spock.lang.*
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-1756')
 @Title('Create a new version of a data model')
@@ -29,7 +26,7 @@ import spock.lang.Title
  - Select 'Data Model' button from top-left menu . | Data Model button menu drop-down appears
  - Verify that you can select the option 'New Version' | Option is selectable
 /$)
-
+@Ignore
 @Stepwise
 class CreateNewVersionOfDataModelSpec extends GebSpec {
 

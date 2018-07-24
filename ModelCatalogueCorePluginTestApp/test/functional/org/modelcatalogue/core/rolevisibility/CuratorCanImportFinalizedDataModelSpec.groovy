@@ -26,7 +26,7 @@ import spock.lang.*
  - 17. Select 'Imported Data Models' tag using tree-navigation panel. | Imported Data Models tag opens. Display panel is directed to '[Data model name] Imports' page.
  - 18. Verify that imported Data model name is listed under '[Data model name] Imports' page. | Imported Data Model is listed.
 /$)
-
+@Ignore
 @Stepwise
 class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
 
