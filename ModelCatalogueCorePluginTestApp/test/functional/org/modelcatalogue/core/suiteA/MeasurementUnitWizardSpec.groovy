@@ -13,6 +13,7 @@ import spock.lang.Stepwise
 
 @IgnoreIf({ !System.getProperty('geb.env') })
 @Stepwise
+@Ignore
 class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {

@@ -15,8 +15,8 @@ import spock.lang.Stepwise
 import spock.lang.IgnoreIf
 
 @IgnoreIf({ !System.getProperty('geb.env') })
-@Stepwise
 @Ignore
+@Stepwise
 class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
     public static final String FIRST_NEW_ELEMENT_CREATED_CHANGE = "a.change-NEW_ELEMENT_CREATED:first-of-type"
