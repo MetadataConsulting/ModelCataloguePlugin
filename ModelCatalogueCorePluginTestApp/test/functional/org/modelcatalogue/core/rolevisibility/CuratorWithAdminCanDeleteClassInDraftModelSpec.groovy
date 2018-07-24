@@ -28,6 +28,7 @@ import spock.lang.*
  - Select the OK button to continue deleting Data Class. | Data Class is deleted. Redirected to 'Data Classes' page.
 /$)
 
+@Ignore
 @Stepwise
 class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
 

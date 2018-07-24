@@ -113,6 +113,7 @@ pipeline {
             sh 'bower install'
             updateGithubCommitStatus(currentBuild, "$context", BUILD_URL, "Running Functional Tests", "PENDING")
             wrap([\$class: 'Xvfb']) {
+              sh /opt/grails/bin/grails clean;
               ${scriptText}
             }
         }        
