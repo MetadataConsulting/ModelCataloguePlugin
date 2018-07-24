@@ -7,6 +7,25 @@ import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
+/**
+ * A DataModelFilter uses dataModels as filters for content. To get the idea, remember that there was a time when DataModels were "Classifiers" of DataClasses which were "Models".
+ *
+ * DataModelFilter then acts as a "classifier" of content itself, by having DataModels which are included and those which are excluded.
+ *
+ * includes: Set of ids of DataModels which are to be included in some operation.
+ * excludes: Set of ids of DataModels which are to excluded in some operation.
+ *
+ * The precise semantics is really up to the user of the filter.
+ * This class itself imposes no opinion about how the included/excluded sets should be combined.
+ * (e.g. 1. use every DataModel in the included set, except the excluded set, i.e. "includes - excludes"
+ * or use 2. ((any DataModel NOT in the excluded set) + (any DataModel in the included set)) i.e. "all data models - (excludes - includes)"
+ * or 3. only accept one of the sets to be non-empty, and use the set "includes" to specify itself, and "excludes" to specify "all data models - excludes"
+ * )
+ * For example, in topLevelDataClass methods, we have said you can only have one or the other set: includes or excludes, and the use of excludes is to specify "all data models - excludes".
+ * In the content method of DataClassController, both sets are used, so that option 1 is specified: anything (NOT in excluded) AND (in included)
+ *
+
+ */
 class DataModelFilter {
 
     public static final DataModelFilter NO_FILTER = new DataModelFilter(false)

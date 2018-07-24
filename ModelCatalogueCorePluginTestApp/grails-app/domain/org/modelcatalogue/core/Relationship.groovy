@@ -32,6 +32,8 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
     def auditService
     def relationshipService
 
+    transient topLevelDataClassService
+
     CatalogueElement source
     CatalogueElement destination
 
@@ -45,6 +47,32 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
     // init the indexes
     {
         resetIndexes()
+    }
+
+    /**
+     * If it's a hierarchy relationship, mark the child as not top level.
+     */
+    def afterInsert() {
+        Relationship.withNewSession {
+            if (relationshipType.id == RelationshipType.getHierarchyType().id) {
+                if (!destination) {throw new Exception("afterInsert of ${id}:No destination in hierarchy relationship ${id}")}
+                topLevelDataClassService.unmarkTopLevel((DataClass) destination)
+
+            }
+        }
+    }
+
+    /**
+     * If it's a hierarchy relationship, mark the child as top level.j
+     */
+    def beforeDelete() {
+        Relationship.withNewSession {
+            if (relationshipType.id == RelationshipType.getHierarchyType().id) {
+                if (!destination) {throw new Exception("beforeDelete of ${id}: No destination in hierarchy relationship ${id}; may have been deleted in the process of deleting relationship")}
+                topLevelDataClassService.markTopLevel((DataClass) destination)
+
+            }
+        }
     }
 
     static hasMany = [extensions: RelationshipMetadata]

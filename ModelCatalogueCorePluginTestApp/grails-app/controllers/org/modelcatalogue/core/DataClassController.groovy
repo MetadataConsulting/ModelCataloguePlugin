@@ -22,6 +22,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     DataClassCatalogueElementService dataClassCatalogueElementService
     AssetGormService assetGormService
     AssetMetadataService assetMetadataService
+    TopLevelDataClassService topLevelDataClassService
 
     DataClassController() {
         super(DataClass, false)
@@ -166,7 +167,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         if (!params.boolean("toplevel")) {
             return super.getAllEffectiveItems(max)
         }
-        return Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelDataClasses(overridableDataModelFilter, params))
+        return Lists.wrap(params, "/${resourceName}/", topLevelDataClassService.getTopLevelDataClasses(overridableDataModelFilter, params))
     }
 
     protected DataClass findById(long id) {
