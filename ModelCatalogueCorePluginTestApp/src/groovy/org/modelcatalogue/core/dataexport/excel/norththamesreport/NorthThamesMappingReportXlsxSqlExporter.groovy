@@ -161,7 +161,7 @@ FROM
 			JOIN relationship AS r ON r.destination_id = ce.id AND r.relationship_type_id = 7
 			LEFT JOIN relationship AS r2 ON r2.source_id = ce.id AND r2.relationship_type_id = 7
 			LEFT JOIN extension_value AS ev ON ev.element_id = r2.destination_id AND ev.`name` = 'Archetype Path Query Statement'
-	) AS gel ON gel.source_id = lpc.id AND gel.data_model_id = gel_dm.id AND gel.openehr <> ''
+	) AS gel ON gel.source_id = lpc.id AND gel.data_model_id = gel_dm.id
 WHERE
 	lpc_dm.id = (SELECT id FROM catalogue_element JOIN data_model USING (id) WHERE `name` = :lpcModel ORDER BY version_number DESC LIMIT 1)
 	AND wpath_dm.id = IFNULL((SELECT id FROM catalogue_element JOIN data_model USING (id) WHERE `name` = :localModel ORDER BY version_number DESC LIMIT 1), (SELECT id FROM data_element ORDER BY id LIMIT 1))
