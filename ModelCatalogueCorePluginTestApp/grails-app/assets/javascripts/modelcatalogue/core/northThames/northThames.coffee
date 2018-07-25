@@ -5,6 +5,7 @@ angular.module('mc.core.northThames.metadata', [])
 stewardship = angular.module('mc.core.northThames',
   ['mc.core.ui.detailSections',
     'mc.core.northThames.metadata' # Need to include this to use the templates under stewardship/metadata
+
     # bootstrap for date picker?
     #,'ui.bootstrap'
   ])
@@ -18,13 +19,19 @@ stewardship.controller 'SelectYesNoUnk', ($scope) ->
   ]
 
 stewardship.config ['detailSectionsProvider', (detailSectionsProvider)->
+
   detailSectionsProvider.register {
     title: 'North Thames Metadata'
     position: 50
     types: [
       'dataModel'
       'dataElement'
-      # may later extend to Data Types
+# may later extend to Data Types
+    ]
+
+    # Available if any features from the following list are turned on.
+    availableIfAnyFeaturesFrom: [
+      'northThamesFeatures'
     ]
     keys: [
       "Semantic Matching" # yesNoType
@@ -45,4 +52,6 @@ stewardship.config ['detailSectionsProvider', (detailSectionsProvider)->
     hideByDefault: true
     template: '/mc/core/northThames/northThamesMetadata.html'
   }
+
+
 ]

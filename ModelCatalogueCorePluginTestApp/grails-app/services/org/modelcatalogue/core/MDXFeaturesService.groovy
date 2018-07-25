@@ -2,13 +2,14 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.springframework.beans.factory.annotation.Autowired
 
 import javax.annotation.PostConstruct
 
 @Transactional
 class MDXFeaturesService {
 
-    GrailsApplication grailsApplication
+    @Autowired GrailsApplication grailsApplication
 
 // if we want to get it one-off
 
@@ -28,9 +29,12 @@ class MDXFeaturesService {
      * @return
      */
     MDXFeatures getMDXFeatures() {
+
+        String trueString = 'true'
+
         return new MDXFeatures(
-            northThamesFeatures: (grailsApplication.config.mdx.features.northThames == 'true'),
-            gelFeatures: (grailsApplication.config.mdx.features.gel == 'true')
+            northThamesFeatures: (grailsApplication.config.mdx.features.northThames == trueString),
+            gelFeatures: (grailsApplication.config.mdx.features.gel == trueString)
         )
     }
 }

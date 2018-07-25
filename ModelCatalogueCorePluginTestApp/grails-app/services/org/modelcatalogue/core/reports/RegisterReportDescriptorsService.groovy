@@ -26,7 +26,7 @@ class OrganizationDescription {
 class RegisterReportDescriptorsService {
 
     ReportDescriptorRegistry reportDescriptorRegistry
-    @Autowired MDXFeaturesService mdxFeaturesService
+    MDXFeaturesService mdxFeaturesService
 
     void register() {
 
