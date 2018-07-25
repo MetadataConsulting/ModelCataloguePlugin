@@ -29,7 +29,6 @@ import org.modelcatalogue.core.geb.*
  - 16. Repeat steps 11-14 to Delete a Data Element | Data Element is deleted
  - 17. Repeat steps 15 and 16 five more times. | Check that Metadata Exchange does not crash when Data Elements are repeatedly created and deleted.
 /$)
-@Ignore
 @Stepwise
 class AddAndRemoveManyDataElementsSpec extends GebSpec {
 

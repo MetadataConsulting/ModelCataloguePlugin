@@ -26,7 +26,6 @@ import spock.lang.*
  - Select 'Data Model' button from top-left menu . | Data Model button menu drop-down appears
  - Verify that you can select the option 'New Version' | Option is selectable
 /$)
-@Ignore
 @Stepwise
 class CreateNewVersionOfDataModelSpec extends GebSpec {
 

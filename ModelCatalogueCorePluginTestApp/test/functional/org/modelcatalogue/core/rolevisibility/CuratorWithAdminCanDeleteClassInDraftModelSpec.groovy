@@ -27,8 +27,6 @@ import spock.lang.*
  - Select option 'Delete' to delete Data Class. | Delete pop-up appears asking 'Do you really want to delete Data Class [data class]?'.
  - Select the OK button to continue deleting Data Class. | Data Class is deleted. Redirected to 'Data Classes' page.
 /$)
-
-@Ignore
 @Stepwise
 class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
 
