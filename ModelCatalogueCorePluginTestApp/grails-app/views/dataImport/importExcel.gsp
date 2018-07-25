@@ -13,6 +13,7 @@
     <g:render template="/templates/flasherror" />
 
     <g:uploadForm url='/api/modelCatalogue/core/dataArchitect/imports/upload'>
+    <g:set var="excelImportTypeService" bean="excelImportTypeService"/>
 
         <fieldset>
             <ol>
@@ -22,7 +23,7 @@
                 </li>
                 <li>
                     <label for="excelImportType"><g:message code="dataImport.excel.importType" default="Select Excel Import Type"/></label>
-                    <g:select name="excelImportType" from="${[ExcelImportType.CONFIG, ExcelImportType.GOSH_LAB_TEST_CODES, ExcelImportType.NORTH_THAMES_DATA_SOURCE_MAPPING]*.humanReadableName}"/>
+                    <g:select name="excelImportType" from="${excelImportTypeService.filteredExcelImportTypes()*.humanReadableName}"/>
                 </li>
                 <li>
                     <label for="file"><g:message code="dataImport.file" default="File"/></label>

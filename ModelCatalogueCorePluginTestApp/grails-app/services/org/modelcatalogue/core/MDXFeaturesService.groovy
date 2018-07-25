@@ -4,8 +4,6 @@ import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.beans.factory.annotation.Autowired
 
-import javax.annotation.PostConstruct
-
 @Transactional
 class MDXFeaturesService {
 
@@ -29,17 +27,62 @@ class MDXFeaturesService {
      * @return
      */
     MDXFeatures getMDXFeatures() {
+        return MDXFeaturesEnum.createFeatureObj(grailsApplication)
 
-        String trueString = 'true'
-
-        return new MDXFeatures(
-            northThamesFeatures: (grailsApplication.config.mdx.features.northThames == trueString),
-            gelFeatures: (grailsApplication.config.mdx.features.gel == trueString)
-        )
     }
+
+
 }
 
+/**
+ * Object representing the settings of features.
+ * The names of the fields should correspond to the configNames in MDXFeaturesEnum as described in the docstring of configName.
+ */
 class MDXFeatures {
     boolean northThamesFeatures
     boolean gelFeatures
+
+
+}
+
+/**
+ * Enumeration of possible features.
+ *
+ */
+enum MDXFeaturesEnum {
+    VANILLA(''),
+    NORTH_THAMES('northThames'),
+    GEL('gel')
+
+    /**
+     * grailsApplication.config.mdx.features[configName] will be the config variable checked.
+     * The corresponding field in MDXFeatures object should be "${configName}Features"
+     */
+    final String configName
+
+    MDXFeaturesEnum(String configName) {
+        this.configName = configName
+    }
+
+    boolean trueFromConfig(GrailsApplication grailsApplication) {
+
+        return grailsApplication.config.mdx.features[configName] == 'true'
+    }
+
+    /**
+     * Values (except VANILLA) as map to be put as argument for MDXFeatures constructor.
+     * @param grailsApplication
+     * @return
+     */
+    static Map<String,Boolean> asMap(GrailsApplication grailsApplication) {
+        (values() - [VANILLA]).collectEntries {
+            [(it.configName + 'Features'): it.trueFromConfig(grailsApplication)]
+        }
+    }
+
+    static MDXFeatures createFeatureObj(GrailsApplication grailsApplication) {
+        return new MDXFeatures(
+            asMap(grailsApplication)
+        )
+    }
 }
