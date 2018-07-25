@@ -197,8 +197,5 @@ class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
         dashboardPage.nav.logout()
         then:
         at HomePage
-        dashboardPage.finalize()
-
     }
-
 }

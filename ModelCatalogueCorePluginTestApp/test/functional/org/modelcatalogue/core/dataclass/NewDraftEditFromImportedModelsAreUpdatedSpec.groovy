@@ -199,18 +199,20 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         when:
         ParentClassModalPage parentClassModalPage = browser.page ParentClassModalPage
         parentClassModalPage.searchMore()
-        Thread.sleep(1500)
+        sleep(2_000)
         then:
         at SearchClassPage
 
         when:
         SearchClassPage searchClassPage = browser.page SearchClassPage
         searchClassPage.search(importDataClassName)
+        sleep(2_000)
         then:
         at ParentClassModalPage
 
         when:
         parentClassModalPage = browser.page ParentClassModalPage
+        sleep(2_000)
         parentClassModalPage.createRelationship()
         then:
         at ParentClassModalPage

@@ -84,13 +84,16 @@ class HistoryIsPopulatedAccordingToModelActivitySpec extends GebSpec {
         createDataClassPage.raw()
         createDataClassPage.finish()
         createDataClassPage.exit()
+        sleep(2_000)
 
         then:
         at DataClassesPage
+    }
 
+    def "verify that data is created"() {
         when: 'Create Data Element'
-        dataClassesPage = browser.page(DataClassesPage)
-        Thread.sleep(1000)
+        DataClassesPage dataClassesPage = browser.page(DataClassesPage)
+        sleep(2_000)
         dataClassesPage.treeView.select('Data Elements')
 
         then:
