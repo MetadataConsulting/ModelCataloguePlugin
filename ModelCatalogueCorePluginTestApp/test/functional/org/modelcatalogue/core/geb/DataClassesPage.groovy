@@ -2,7 +2,7 @@ package org.modelcatalogue.core.geb
 
 import geb.Page
 
-class DataClassesPage extends Page {
+class DataClassesPage extends AdvancedDataModelViewPage {
 
     static url = '/#'
 
