@@ -32,10 +32,16 @@ class DataElementsPage extends Page {
         elementsList { $('table.inf-table tbody tr') }
         settings(wait: true) { $('#role_navigation-right_admin-menu-menu-item-link') }
         mappingUtilityTag(wait: true) { $('#action-batches-menu-item-link') }
+        tagPlus { $('.btn.ng-scope.fa.fa-plus-circle.text-success') }
+        tagName { $('a.preserve-new-lines') }
     }
 
     void createDataElement() {
         createDateElementLink.click()
+    }
+
+    void createTagRelationShip() {
+        tagPlus.click()
     }
 
     void expandLinkClick() {
@@ -99,5 +105,9 @@ class DataElementsPage extends Page {
     void mappingUtility() {
         settings.click()
         mappingUtilityTag.click()
+    }
+
+    boolean displayTagName(String name) {
+        tagName.text().contains(name)
     }
 }
