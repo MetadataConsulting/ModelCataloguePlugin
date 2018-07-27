@@ -25,7 +25,16 @@ class DataElementPage extends Page {
         confirmDeleteButton(wait: true, required: false) { $('form button.btn-primary', text: "OK") }
         dataTypeList(required: false, wait: true) { $('a.small.with-pointer.ng-scope') }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+        tagPlus { $('span.fa.fa-plus-circle.text-success') }
+        tagName (wait: true){ $('a.preserve-new-lines',0) }
+    }
 
+    boolean displayTagName(String name) {
+        sleep(2_000)
+        tagName.text().contains(name)
+    }
+    void createTagRelationShip() {
+        tagPlus.click()
     }
 
     String getUnitName() {

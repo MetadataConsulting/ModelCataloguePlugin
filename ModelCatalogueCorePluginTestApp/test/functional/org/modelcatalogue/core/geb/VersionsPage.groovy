@@ -42,6 +42,10 @@ class VersionsPage extends Page {
         versionSelect(version).click()
     }
 
+    Boolean verifyVersionCreated(String version) {
+        versionSelect(version)?.displayed
+    }
+
     void dataElementDropDownClick() {
         dataElementDropDown.click()
     }

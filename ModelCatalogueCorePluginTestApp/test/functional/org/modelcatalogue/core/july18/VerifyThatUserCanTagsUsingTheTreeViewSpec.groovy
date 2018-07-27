@@ -40,7 +40,6 @@ class VerifyThatUserCanTagsUsingTheTreeViewSpec extends GebSpec {
         createDataModelPage.name = datamodelName
         createDataModelPage.modelCatalogueIdInput = UUID.randomUUID().toString()
         createDataModelPage.description = datamodelDescription
-        println(policies = createDataModelPage.selectedPolicyName())
         createDataModelPage.submit()
         then:
         at DataModelPage
@@ -94,19 +93,20 @@ class VerifyThatUserCanTagsUsingTheTreeViewSpec extends GebSpec {
     def "Select data element and create relationship"() {
         when:
         TagsPage tagsPage = browser.page TagsPage
-        tagsPage.treeView.dataElements()
-        then:
-        at DataElementPage
-
-        when:
-        DataElementPage dataElementPage = browser.page(DataElementPage)
-        dataElementPage.selectdataElements(dataElementName)
+        sleep(3_000)
+        tagsPage.treeView.select("Data Elements")
         then:
         at DataElementsPage
 
         when:
         DataElementsPage dataElementsPage = browser.page(DataElementsPage)
-        dataElementsPage.createTagRelationShip()
+        dataElementsPage.selectdataElements(dataElementName)
+        then:
+        at DataElementPage
+
+        when:
+        DataElementPage dataElementPage=browser.page(DataElementPage)
+        dataElementPage.createTagRelationShip()
         then:
         at CreateRelationshipPage
 
@@ -115,13 +115,14 @@ class VerifyThatUserCanTagsUsingTheTreeViewSpec extends GebSpec {
         createRelationshipPage.destinationalue(tagNme)
         createRelationshipPage.createRelationship()
         then:
-        at DataElementsPage
+        at DataElementPage
     }
 
     def "Verify tag added to data element"() {
         when:
-        DataElementsPage dataElementsPage = browser.page(DataElementsPage)
+        DataElementPage dataElementPage = browser.page(DataElementPage)
         then:
-        dataElementsPage.displayTagName(tagNme)
+        dataElementPage.displayTagName(tagNme)
     }
+
 }
