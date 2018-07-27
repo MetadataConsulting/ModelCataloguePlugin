@@ -4,10 +4,10 @@ import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
 import spock.lang.*
 
-@Issue('https://metadata.atlassian.net/browse/MET-1438')
-@Title('Verify Rare Disease Website Generator')
+@Issue('https://metadata.atlassian.net/browse/MET-1448')
+@Title('Verify that User can create a new Data Element and import data type')
 @Stepwise
-class VerifyRareDiseaseWebsiteGeneratorSpec extends GebSpec {
+class UserCanCreateDataElementAndImportDataTypeSpec extends GebSpec {
 
     @Shared
     String dataTypeName = UUID.randomUUID().toString()
