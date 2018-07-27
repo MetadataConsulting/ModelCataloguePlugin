@@ -102,10 +102,13 @@ pipeline {
     }
 
     stage ('Integration Tests') {
-         dir(path: 'ModelCatalogueCorePluginTestApp') {
-                    updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Running Integration Tests", "PENDING")
-                    sh './grailsw test-app :integration'
+        steps {
+            dir(path: 'ModelCatalogueCorePluginTestApp') {
+                                updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Running Integration Tests", "PENDING")
+                                sh './grailsw test-app :integration'
+            }
         }
+
         post {
             always {
                 publishHTMLWithName('Integration Test Reports')
