@@ -117,6 +117,23 @@ class DataModelGormService implements WarnGormErrors {
         dataModelInstance
     }
 
+    @PreAuthorize("hasRole('ROLE_METADATA_CURATOR') or hasRole('ROLE_SUPERVISOR')")
+    @Transactional
+    DataModel save(DataModel dataModelInstance) {
+        if (!dataModelInstance.save()) {
+            warnErrors(dataModelInstance, messageSource)
+            transactionStatus.setRollbackOnly()
+        }
+        dataModelInstance
+    }
+
+    @PreAuthorize("hasRole('ROLE_METADATA_CURATOR') or hasRole('ROLE_SUPERVISOR')")
+    @Transactional
+    DataModel saveWithName(String name) {
+        DataModel dataModelInstance = new DataModel(name: name)
+        save(dataModelInstance)
+    }
+
     DetachedCriteria<DataModel> queryByIds(List<Long> ids) {
         DataModel.where { id in ids }
     }
@@ -127,5 +144,17 @@ class DataModelGormService implements WarnGormErrors {
             return [] as List<DataModel>
         }
         queryByIds(ids).list()
+    }
+
+    @PreAuthorize("hasRole('ROLE_METADATA_CURATOR') or hasRole('ROLE_SUPERVISOR')")
+    @Transactional
+    void delete(DataModel dataModel) {
+        dataModel.delete()
+    }
+
+    @PreAuthorize("hasRole('ROLE_METADATA_CURATOR') or hasRole('ROLE_SUPERVISOR')")
+    @Transactional(readOnly = true)
+    Integer count() {
+        DataModel.count()
     }
 }

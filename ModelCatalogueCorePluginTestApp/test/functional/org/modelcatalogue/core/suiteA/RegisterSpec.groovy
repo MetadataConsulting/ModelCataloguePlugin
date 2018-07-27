@@ -7,6 +7,7 @@ import spock.lang.Stepwise
 
 //@IgnoreIf({ !System.getProperty('geb.env') || System.getProperty('spock.ignore.suiteA')  })
 @Stepwise
+@Ignore
 class RegisterSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String primaryButton = ".btn.btn-primary"

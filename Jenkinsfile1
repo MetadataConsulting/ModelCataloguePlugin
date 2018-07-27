@@ -35,13 +35,24 @@ def updateGithubCommitStatus(build, String context, String buildUrl, String mess
     ]
   ])
 }
+
+def publishHTMLWithName(String name) {
+    publishHTML(target: [allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports',
+                        reportFiles: 'html/index.html',
+                        reportName: name,
+                        reportTitles: ''])
+}
 pipeline {
   agent any
   options {
     disableConcurrentBuilds()
   }
   stages {
-    stage('Test Execute') {
+
+    stage('Setup') {
       steps {
 
         updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "In Progress", "PENDING")
@@ -50,22 +61,10 @@ pipeline {
             sh 'npm install'
             updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Installing Bower Components", "PENDING")
             sh 'bower install'
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Running Functional Tests", "PENDING")
-            wrap([$class: 'Xvfb']) {
-              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: CanCreateDataTypeFromCreateDataElementWizardSpec VerifyRegularUserCanSeeApiKeySpec CheckAdminCanDeleteImportedModelSpec VerifySupervisorCanActionSettingsSpec AdminUserCannotDeleteFinalizedItemsSpec CuratorWithAdminCanDeleteClassInDraftModelSpec AdminCanCreateModelAndPolicySpec'
-            }
+
         }
       }
       post {
-        always {
-            publishHTML(target: [allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'ModelCatalogueCorePluginTestApp/target/test-reports',
-                    reportFiles: 'html/index.html',
-                    reportName: 'HTML Report',
-                    reportTitles: ''])
-        }
         failure {
             updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Failed.", 'FAILURE')
         }
@@ -76,6 +75,75 @@ pipeline {
             updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Unstable.", 'UNSTABLE')
         }
       }
+    }
+
+    stage('Unit Tests') {
+        steps {
+            dir(path: 'ModelCatalogueCorePluginTestApp') {
+                        updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Running Unit Tests", "PENDING")
+                        sh './grailsw test-app'
+
+            }
+        }
+        post {
+            always {
+                publishHTMLWithName('Unit Test Reports')
+            }
+            failure {
+                updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Failed.", 'FAILURE')
+            }
+            success {
+                updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Success!", 'SUCCESS')
+            }
+            unstable {
+                updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Unstable.", 'UNSTABLE')
+            }
+        }
+    }
+
+    stage ('Integration Tests') {
+         dir(path: 'ModelCatalogueCorePluginTestApp') {
+                    updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Running Integration Tests", "PENDING")
+                    sh './grailsw test-app :integration'
+        }
+        post {
+            always {
+                publishHTMLWithName('Integration Test Reports')
+            }
+            failure {
+                updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Failed.", 'FAILURE')
+            }
+            success {
+                updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Success!", 'SUCCESS')
+            }
+            unstable {
+                updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Unstable.", 'UNSTABLE')
+            }
+        }
+    }
+
+    stage('Functional Tests') {
+        steps {
+                updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Running Functional Tests", "PENDING")
+                wrap([$class: 'Xvfb']) {
+                  sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: CanCreateDataTypeFromCreateDataElementWizardSpec VerifyRegularUserCanSeeApiKeySpec CheckAdminCanDeleteImportedModelSpec VerifySupervisorCanActionSettingsSpec AdminUserCannotDeleteFinalizedItemsSpec CuratorWithAdminCanDeleteClassInDraftModelSpec AdminCanCreateModelAndPolicySpec'
+                }
+            }
+          }
+          post {
+            always {
+                publishHTMLWithName('Functional Test Report')
+            }
+            failure {
+                updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Failed.", 'FAILURE')
+            }
+            success {
+                updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Success!", 'SUCCESS')
+            }
+            unstable {
+                updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1", BUILD_URL, "Build Unstable.", 'UNSTABLE')
+            }
+          }
     }
   }
 }
