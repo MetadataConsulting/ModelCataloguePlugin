@@ -7,8 +7,10 @@ import spock.lang.*
 @Issue('https://metadata.atlassian.net/browse/MET-1438')
 @Title('Verify Rare Disease Website Generator')
 @Stepwise
-class VerifyRareDiseaseWebsiteGenerator extends GebSpec {
+class VerifyRareDiseaseWebsiteGeneratorSpec extends GebSpec {
 
+    @Shared
+    String dataTypeName = UUID.randomUUID().toString()
 
     def "login as supervisor"() {
         when: 'login as a curator'
@@ -28,17 +30,16 @@ class VerifyRareDiseaseWebsiteGenerator extends GebSpec {
 
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.dropdown()
         dataModelPage.dropdownMenu.createDataType()
         then:
         at CreateDataTypePage
 
         when:
         CreateDataTypePage createDataTypePage = browser.page(CreateDataTypePage)
-        createDataTypePage.name = dataTypeOneName
+        createDataTypePage.name = dataTypeName
         createDataTypePage.buttons.save()
-
         then:
-        at DataTypesPage
-
+        at DraftDataModelListPage
     }
 }
