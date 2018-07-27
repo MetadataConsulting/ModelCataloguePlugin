@@ -32,7 +32,10 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     transient dataModelAclService
 
+    transient topLevelDataClassService
+
     DataModel dataModel
+    Boolean topLevel = false
 
     String name
     String description
@@ -102,6 +105,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 		name index :'CtlgElement_name_idx'
 		latestVersionId index :'CtlgElement_latestVersionId_idx'
         modelCatalogueId index :'CtlgElement_modelCatalogueId_idx'
+        topLevel index: 'CtlgElement_topLevel_idx'
         description type: "text"
         extensions lazy: false, sort: 'orderIndex', cascade: "all-delete-orphan"
         dataModel lazy: false
@@ -446,6 +450,16 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         }
         if ( !(this instanceof User) ) {
             auditService.logElementCreated(this)
+        }
+
+        if (this instanceof DataClass) {
+            // mark top level
+            topLevelDataClassService.markTopLevel((DataClass) this) // This won't work as it reloads the dataClass as a new object...
+//            this.topLevel = true
+//            DataClass.withNewSession {
+//                final Long dataClassId = this.id
+//                topLevelDataClassService.markTopLevel(dataClassId)
+//            }
         }
     }
 

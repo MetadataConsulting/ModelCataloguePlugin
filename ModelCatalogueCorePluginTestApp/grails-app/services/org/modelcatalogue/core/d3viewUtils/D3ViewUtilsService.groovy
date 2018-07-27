@@ -25,6 +25,7 @@ import org.modelcatalogue.core.RelationshipInfo
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeName
 import org.modelcatalogue.core.RelationshipTypeService
+import org.modelcatalogue.core.TopLevelDataClassService
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.DataModelAclService
 import org.modelcatalogue.core.util.DataModelFilter
@@ -49,6 +50,7 @@ class D3ViewUtilsService {
     GrailsApplication grailsApplication
     RelationshipTypeService relationshipTypeService
     DataModelAclService dataModelAclService
+    TopLevelDataClassService topLevelDataClassService
 
     //// Utilities:
 
@@ -102,17 +104,14 @@ class D3ViewUtilsService {
     }
 
     /**
-     * Get "children" of data model for display (top level data classes and data elements
+     * Get "children" of data model for display (top level data classes)
+     * TODO: get "top-Level DataElements as children too"
      * @param dataModel
      * @return List<D3JSON>
      */
     ListWithTotal<D3JSON> dataModelD3JsonChildren(DataModel dataModel, int offset, int max) {
-        DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
-        // This doesn't include imports, maybe it should.
-        Map<String, Integer> stats = dataModelService.getStatistics(filter)
 
-
-        ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [offset: offset, max: max, toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''])
+        ListWithTotalAndType<DataClass> dataClasses = topLevelDataClassService.getTopLevelDataClassesRecalculateIfNecessary(dataModel, [offset: offset, max: max, toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''])
 
 
         def dataClassChildrenJson = dataClasses.items.collect {dataClass ->

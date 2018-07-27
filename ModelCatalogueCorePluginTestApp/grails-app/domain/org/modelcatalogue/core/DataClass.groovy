@@ -25,8 +25,6 @@ class DataClass extends CatalogueElement {
         ret
     }
 
-
-
     @Override
     void setModelCatalogueId(String mcID) {
         super.setModelCatalogueId(Legacy.fixModelCatalogueId(mcID))
