@@ -60,7 +60,7 @@ class D3DataModelViewSpec extends GebSpec {
         at DataModelPage
     }
 
-    // The following code copied from CheckCreateElementFromClassWizardSpec
+    // The following code copied from CheckCreateElementFromClassWizardSpec to create DataClass with two DataElements
 
 
     def "go to data classes"() {
@@ -121,6 +121,8 @@ class D3DataModelViewSpec extends GebSpec {
         at DataClassesPage
     }
 
+    // Actual D3DataModelView stuff
+
 
     def "Navigate to Basic Data Model View page from Advanced Data Model View Page"() {
         when:
@@ -131,24 +133,36 @@ class D3DataModelViewSpec extends GebSpec {
         at BasicDataModelViewPage
     }
 
-    def "Click around"() {
-        when:
+    def "Click around checking content panels"() {
+
+        when: "click DataModel node"
         BasicDataModelViewPage basicDataModelViewPage = browser.page BasicDataModelViewPage
         basicDataModelViewPage.clickElementWithName(dataModelName)
 
-        then:
-        noExceptionThrown()
+        then: "Content panel has item name"
+        basicDataModelViewPage.hasItemNameInContentPanel(dataModelName)
+
+        when: "Click DataClass node"
+        waitFor(3, 0.5) {
+            basicDataModelViewPage.hasNodeWithName(dataClassName)
+        }
+        basicDataModelViewPage.clickElementWithName(dataClassName)
+
+        then: "Content panel has item name"
+        basicDataModelViewPage.hasItemNameInContentPanel(dataClassName)
+
     }
 
-    // TODO: click dataClass node to open that as well
     // TODO: test content of content panels
 
     def "Go back to Advanced from Basic"() {
+
         when:
         BasicDataModelViewPage basicDataModelViewPage = browser.page BasicDataModelViewPage
         basicDataModelViewPage.goToAdvancedDataModelView()
 
         then:
         at DataModelPage
+
     }
 }
