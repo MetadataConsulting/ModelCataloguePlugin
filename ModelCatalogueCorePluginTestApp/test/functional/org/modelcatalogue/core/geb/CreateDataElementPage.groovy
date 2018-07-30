@@ -27,7 +27,7 @@ class CreateDataElementPage extends Page implements InputUtils {
 
     void search(String value) {
         fillInput(searchDataType, value)
-        waitFor { createNewDataTypeLink }
+        waitFor(30) { createNewDataTypeLink }
     }
 
     Boolean matchSearch(String value) {
