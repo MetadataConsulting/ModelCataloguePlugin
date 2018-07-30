@@ -20,6 +20,10 @@ class RegisterPage extends Page {
     }
 
     boolean isAlertDisplayed() {
+        newEmailInput.@('disabled')
+    }
+
+    boolean isEmailDisabled() {
         alertDiv.isDisplayed()
     }
 
