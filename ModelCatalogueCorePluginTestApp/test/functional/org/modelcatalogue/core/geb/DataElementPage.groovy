@@ -5,7 +5,7 @@ import geb.Page
 class DataElementPage extends Page {
 
     static url = '/#'
-    static at = { dataElementDropdown.displayed }
+    static at = { dataElementDropdownTag.displayed }
 
     @Override
     String convertToPath(Object[] args) {
@@ -20,15 +20,25 @@ class DataElementPage extends Page {
         }
         dataTypeInput(required: false) { $("input#dataType", 0) }
         unitNameSpan(required: false) { $('span.unit-name', 0) }
-        dataElementDropdown { $('#role_item_catalogue-element-menu-item-link') }
+        dataElementDropdownTag { $('#role_item_catalogue-element-menu-item-link') }
         deleteDataElementLink { $('#delete-menu-item-link') }
         confirmDeleteButton(wait: true, required: false) { $('form button.btn-primary', text: "OK") }
         dataTypeList(required: false, wait: true) { $('a.small.with-pointer.ng-scope') }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
+        tagPlus { $('span.fa.fa-plus-circle.text-success') }
+        tagName (wait: true){ $('a.preserve-new-lines',0) }
+    }
+
+    boolean displayTagName(String name) {
+        sleep(2_000)
+        tagName.text().contains(name)
+    }
+    void createTagRelationShip() {
+        tagPlus.click()
     }
 
     String getUnitName() {
-        if ( unitNameSpan.isDisplayed() ) {
+        if (unitNameSpan.isDisplayed()) {
             return unitNameSpan.text()
         }
         null
@@ -39,19 +49,19 @@ class DataElementPage extends Page {
     }
 
     void setDataType(String value) {
-        for ( char c : value.toCharArray() ) {
+        for (char c : value.toCharArray()) {
             dataTypeInput << "${c}".toString()
         }
     }
 
     void setDescription(String description) {
-        if ( descriptionTextarea.isDisplayed() ) {
+        if (descriptionTextarea.isDisplayed()) {
             descriptionTextarea << description
         }
     }
 
     void submit() {
-        if ( submitButton.isDisplayed() ) {
+        if (submitButton.isDisplayed()) {
             submitButton.click()
         }
     }
@@ -61,7 +71,7 @@ class DataElementPage extends Page {
     }
 
     void dataElementDropdown() {
-        dataElementDropdown.click()
+        dataElementDropdownTag.click()
     }
 
     void deleteDataElement() {
@@ -75,4 +85,6 @@ class DataElementPage extends Page {
     boolean containsDataType(String name) {
         dataTypeList.text().contains(name)
     }
+
+
 }

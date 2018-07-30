@@ -20,7 +20,7 @@ class DataModelTreeViewModule extends Module {
 
     void dataElements() {
         sleep(2_000)
-        select('Data Elements')
+        select('curator')
     }
 
     void dataTypes() {

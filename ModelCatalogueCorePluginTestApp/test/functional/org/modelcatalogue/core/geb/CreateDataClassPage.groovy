@@ -50,6 +50,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         rawLink(wait: true) { $('a', text: 'Raw') }
         addMetadataButton(wait: true) { $('div.modal button.btn-success', text: 'Add Metadata') }
         elementsList(wait: true) { $('ul.dropdown-menu.ng-isolate-scope li') }
+        elemenAddedText(wait: true) { $('span.with-pointer.ng-binding') }
     }
 
     void setName(String value) {
@@ -62,6 +63,10 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void addMetadata() {
         addMetadataButton.click()
+    }
+
+    void verifyDataElementAdded(String val) {
+        elemenAddedText.text().contains(val)
     }
 
     void raw() {
