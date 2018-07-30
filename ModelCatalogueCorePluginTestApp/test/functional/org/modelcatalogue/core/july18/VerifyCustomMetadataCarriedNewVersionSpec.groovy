@@ -258,7 +258,7 @@ class VerifyCustomMetadataCarriedNewVersionSpec extends GebSpec {
         when:
         dataModelPage = browser.page DataModelPage
         then:
-        dataModelPage.verifySemanticNumber()
+        dataModelPage.verifySemanticNumber("0.0.2")
     }
 
     def "create new version"() {
@@ -285,6 +285,14 @@ class VerifyCustomMetadataCarriedNewVersionSpec extends GebSpec {
     }
 
     def "verify new version created"() {
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        sleep(2_000)
+        dashboardPage.search(datamodelName2)
+        dashboardPage.select(datamodelName2)
+        then:
+        at DataModelPage
+
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.versions()
