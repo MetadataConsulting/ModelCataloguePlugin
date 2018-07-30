@@ -7,7 +7,7 @@ import spock.lang.*
 @Issue('https://metadata.atlassian.net/browse/MET-1439')
 @Title('Verify that user can clone an Element')
 @Stepwise
-class VerifyThatUserCanCloneElement extends GebSpec {
+class VerifyThatUserCanCloneElementSpec extends GebSpec {
 
     @Shared
     String dataTypeName = UUID.randomUUID().toString()
