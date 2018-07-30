@@ -100,7 +100,7 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
         dataTypesPage.selectDataType(dataTypeName)
 
         then:
-        at DataTypePage
+        waitFor(5) {at DataTypePage}
     }
 
     def "select validate value"() {
