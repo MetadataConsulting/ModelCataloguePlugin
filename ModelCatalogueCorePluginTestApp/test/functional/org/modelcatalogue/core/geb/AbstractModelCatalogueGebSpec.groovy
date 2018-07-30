@@ -29,6 +29,11 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }, false)
     }
 
+
+   public Boolean checkIfConnectionLost() {
+        $('strong', text: contains('Connection lost'))?.displayed
+    }
+
     DataModelNavigator select(String dataModelName, boolean latest = false) {
 
         for (int i = 0; i < 10; i++) {
