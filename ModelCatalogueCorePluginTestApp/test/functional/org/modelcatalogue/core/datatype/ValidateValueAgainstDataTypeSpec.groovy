@@ -97,6 +97,7 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
     def "select newly created data type"() {
         when:
         DataTypesPage dataTypesPage = browser.page DataTypesPage
+        wait(20)
         dataTypesPage.selectDataType(dataTypeName)
 
         then:
@@ -129,3 +130,4 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
         waitFor { !dataTypeValueValidatePage.outputIsValid() }
     }
 }
+
