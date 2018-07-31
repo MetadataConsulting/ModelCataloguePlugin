@@ -10,7 +10,7 @@ import spock.lang.*
 class VerifyRememberMeCheckboxOnLoginPageSpec extends GebSpec {
 
     def "login as supervisor"() {
-        when: 'login as a curator'
+        when: 'login as a supervisor'
         LoginPage loginPage = to LoginPage
         loginPage.fillUsername("supervisor")
         loginPage.fillPassword("supervisor")

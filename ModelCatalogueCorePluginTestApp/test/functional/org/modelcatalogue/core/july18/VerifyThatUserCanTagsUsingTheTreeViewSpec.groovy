@@ -21,7 +21,7 @@ class VerifyThatUserCanTagsUsingTheTreeViewSpec extends GebSpec {
     String dataElementName = "dataElementName"
 
     def "login as supervisor"() {
-        when: 'login as a curator'
+        when: 'login as a supervisor'
         LoginPage loginPage = to LoginPage
         loginPage.login('supervisor', 'supervisor')
         then:
