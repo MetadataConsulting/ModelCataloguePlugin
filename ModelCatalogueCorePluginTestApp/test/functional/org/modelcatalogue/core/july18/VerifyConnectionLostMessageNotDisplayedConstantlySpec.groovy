@@ -29,22 +29,39 @@ class VerifyConnectionLostMessageNotDisplayedConstantlySpec extends AbstractMode
         at DataModelPage
 
         when:
-        DataModelPage dataModelPage=browser.page DataModelPage
+        DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.dataClasses()
         then:
         !checkIfConnectionLost()
 
         when:
-        DataClassesPage dataClassesPage=browser.page DataClassesPage
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
         dataClassesPage.treeView.dataElements()
         then:
         !checkIfConnectionLost()
 
         when:
-        DataElementsPage dataElementsPage=browser.page DataElementsPage
+        DataElementsPage dataElementsPage = browser.page DataElementsPage
         dataElementsPage.treeView.dataTypes()
         then:
         !checkIfConnectionLost()
 
+        when:
+        DataTypesPage dataTypesPage = browser.page DataTypesPage
+        dataTypesPage.treeView.measurementUnits()
+        then:
+        !checkIfConnectionLost()
+
+        when:
+        MeasurementUnitsPage measurementUnitsPage = browser.page MeasurementUnitsPage
+        measurementUnitsPage.treeView.businessRules()
+        then:
+        !checkIfConnectionLost()
+
+        when:
+        BusinessRulesPage businessRulesPage = browser.page BusinessRulesPage
+        businessRulesPage.treeView.tags()
+        then:
+        !checkIfConnectionLost()
     }
 }
