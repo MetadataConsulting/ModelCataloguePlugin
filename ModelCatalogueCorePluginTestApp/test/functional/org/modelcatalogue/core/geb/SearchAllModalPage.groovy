@@ -8,6 +8,7 @@ class SearchAllModalPage extends Page implements InputUtils {
     static content = {
         searchBar(required: false, wait: true) { $('input#value') }
         searchMoreModalsList(wait: true) { $('h4.list-group-item-heading') }
+        searchList(wait: true) { $('h4.list-group-item-heading', text: contains(it)) }
     }
 
     void searchDataType(String value) {
@@ -20,6 +21,11 @@ class SearchAllModalPage extends Page implements InputUtils {
 
     void selectDataType() {
         searchMoreModalsList[0].click()
+    }
+
+    Boolean selectDataTypeText(String dataTypeName, String dataModelVersion) {
+        String text = searchList(dataTypeName).text()
+        text.contains(dataTypeName) && text.contains(dataModelVersion)
     }
 
     boolean noResultFound() {
