@@ -284,15 +284,15 @@ class VerifyCustomMetadataCarriedNewVersionSpec extends GebSpec {
         at DataModelPage
     }
 
-    def "verify new version created"() {
+    def"verify new version created"(){
         when:
-        DataModelPage dataModelPage = browser.page DataModelPage
+        DataModelPage dataModelPage=browser.page DataModelPage
         dataModelPage.treeView.versions()
         then:
         at VersionsPage
 
         when:
-        VersionsPage versionsPage = browser.page VersionsPage
+        VersionsPage versionsPage=browser.page VersionsPage
         then:
         versionsPage.verifyVersionCreated("0.0.3")
     }
