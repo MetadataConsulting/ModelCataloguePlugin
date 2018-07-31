@@ -56,7 +56,7 @@ class VerifyCustomMetadataCarriedNewVersionSpec extends GebSpec {
     String dataTypeName2 = "Data type Name"
 
 
-    def "login as supervisor"() {
+    def "login as curator"() {
         when: 'login as a curator'
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
