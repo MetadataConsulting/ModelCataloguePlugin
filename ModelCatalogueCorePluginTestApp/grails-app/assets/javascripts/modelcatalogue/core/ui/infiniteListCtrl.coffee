@@ -259,6 +259,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
 
   $scope.$on 'catalogueElementDeleted', (ignored, deleted, result, url) ->
+    return unless deleted
     console.log url, $scope.list
     return if url and catalogue.isContentCandidate($scope.list, deleted, url: url) <= 0
     indexOfDeleted = -1

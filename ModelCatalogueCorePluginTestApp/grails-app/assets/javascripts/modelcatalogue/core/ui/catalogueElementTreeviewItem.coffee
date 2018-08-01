@@ -237,6 +237,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           $scope.node.loadChildren()
 
       $scope.$on 'catalogueElementDeleted', (event, element) ->
+        return unless element
         indexesToRemove = []
         if $scope.element.$$relationship == element
           delete $scope.element.$$relationship

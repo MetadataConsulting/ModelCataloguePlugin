@@ -84,7 +84,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
                 "#{$scope.element.getLabel()} has been added to favourites")
               $scope.element.favourite = not favourite
               if favourite
-                $rootScope.$broadcast 'catalogueElementDeleted', $scope.element, relation, url
+                $rootScope.$broadcast 'catalogueElementDeleted', null, relation, url
+                # Before, this broadcast the event that a catalogueElement was deleted: $scope.element.
+                # However that element is not deleted, the favourites relationship is.
               else
                 $rootScope.$broadcast 'catalogueElementCreated', relation, url, $scope.element
 
