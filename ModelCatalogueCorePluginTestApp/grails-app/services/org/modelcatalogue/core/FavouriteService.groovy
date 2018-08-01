@@ -64,7 +64,7 @@ class FavouriteService {
             DataElement dataElement = dataElementGormService.findById(elementId)
             favouriteDataElement(dataElement)
 
-        } else if ( elementType == 'org.modelcatalogue.core.DatType' ) {
+        } else if ( elementType == 'org.modelcatalogue.core.DataType' ) {
             DataType dataType = dataTypeGormService.findById(elementId)
             favouriteDataType(dataType)
 
@@ -84,7 +84,7 @@ class FavouriteService {
             DataElement dataElement = dataElementGormService.findById(elementId)
             unfavouriteDataElement(dataElement)
 
-        } else if ( elementType == 'org.modelcatalogue.core.DatType' ) {
+        } else if ( elementType == 'org.modelcatalogue.core.DataType' ) {
             DataType dataType = dataTypeGormService.findById(elementId)
             unfavouriteDataType(dataType)
 
