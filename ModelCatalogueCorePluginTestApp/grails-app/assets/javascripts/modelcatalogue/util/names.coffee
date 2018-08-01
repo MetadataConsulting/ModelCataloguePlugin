@@ -1,8 +1,37 @@
 naturalNames = {'validationRule': 'Business Rule'} # hack: call validationRules Business Rules
 propertyNamesFromTypes = {}
 propertyNamesFromQualifiers = {}
+metadataDomain =
+  ASSET: 'asset'
+  ASSET_FILE: 'assetFile'
+  CATALOGUE_ELEMENT: 'catalogueElement'
+  DATA_CLASS: 'dataClass'
+  DATA_ELEMENT: 'dataElement'
+  DATA_MODEL: 'dataModel'
+  DATA_MODEL_POLICY: 'dataModelPolicy'
+  DATA_TYPE: 'dataType'
+  ENUMERATED_TYPE: 'enumeratedType'
+  EXTENSION_VALUE: 'extensionValue'
+  MAPPING: 'mapping'
+  MEASUREMENT_UNIT: 'measurementUnit'
+  PRIMITIVE_TYPE: 'primitiveType'
+  REFERENCE_TYPE: 'referenceType'
+  RELATIONSHIP: 'relationship'
+  RELATIONSHIP_METADATA: 'relationshipMetadata'
+  RELATIONSHIP_TYPE: 'relationshipType'
+  RELATIONSHIP_TAG: 'relationshipTag'
+  VALIDATION_RULE: 'validationRule'
+  TAG: 'tag'
+
 
 names = {
+  metadataDomain: metadataDomain
+
+  favouriteableClasses: [metadataDomain.DATA_MODEL,
+    metadataDomain.DATA_CLASS,
+    metadataDomain.DATA_ELEMENT,
+    metadataDomain.DATA_TYPE]
+
   getNaturalName: (propertyName) ->
     return null if not propertyName
     return propertyName if propertyName.indexOf('http') == 0

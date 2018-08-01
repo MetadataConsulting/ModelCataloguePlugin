@@ -53,13 +53,16 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
   actionsProvider.registerActionInRoles 'favorite-element',
     [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INFINITE_LIST],
-    ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest, $rootScope) ->
+    ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest, $rootScope, names) ->
       'ngInject'
       elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and
         angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and
         $scope.element.isInstanceOf('catalogueElement')
 
+      instanceOf = (className) -> $scope.element.isInstanceOf(className)
+
       return undefined if not elementPresent
+      return undefined if not (_.some(_.map(names.favouriteableClasses, instanceOf))) #(_.some(_.map(['dataModel', 'dataClass', 'dataElement', 'dataType'], instanceOf))) # Favourites can be made of these Classes. See FavouriteService.groovy.
       return undefined if not security.getCurrentUser()?.id
       return undefined if $scope.element.classifiedName=="Not authorised to view details"
 

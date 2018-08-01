@@ -54,6 +54,23 @@ class FavouriteService {
         user.createLinkTo(dataType, RelationshipType.favouriteType)
     }
 
+    private List<String> dataTypeNames = [
+        'org.modelcatalogue.core.DataType',
+        'org.modelcatalogue.core.PrimitiveType',
+        'org.modelcatalogue.core.ReferenceType',
+        'org.modelcatalogue.core.EnumeratedType'
+    ]
+
+    private boolean isDataTypeName(String name) {
+        dataTypeNames.collect {dataTypeName -> dataTypeName == name}.any {it}
+    }
+
+    /**
+     * Favourites is enabled for these classes. On the front-end
+     * search for """actionsProvider.registerActionInRoles 'favorite-element'"""
+     * @param elementType
+     * @param elementId
+     */
     @Transactional
     void favouriteElementTypeById(String elementType, Long elementId) {
         if ( elementType == 'org.modelcatalogue.core.DataClass' ) {
@@ -64,7 +81,7 @@ class FavouriteService {
             DataElement dataElement = dataElementGormService.findById(elementId)
             favouriteDataElement(dataElement)
 
-        } else if ( elementType == 'org.modelcatalogue.core.DataType' ) {
+        } else if ( isDataTypeName(elementType) ) {
             DataType dataType = dataTypeGormService.findById(elementId)
             favouriteDataType(dataType)
 
@@ -84,7 +101,7 @@ class FavouriteService {
             DataElement dataElement = dataElementGormService.findById(elementId)
             unfavouriteDataElement(dataElement)
 
-        } else if ( elementType == 'org.modelcatalogue.core.DataType' ) {
+        } else if ( isDataTypeName(elementType) ) {
             DataType dataType = dataTypeGormService.findById(elementId)
             unfavouriteDataType(dataType)
 
