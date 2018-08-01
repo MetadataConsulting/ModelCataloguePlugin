@@ -28,10 +28,28 @@ class DataClassPage extends Page implements InputUtils {
         historyList(required: false, wait: true) { $('div#history-changes tbody tr') }
         className(wait: true) { $('h3.ce-name input', 0) }
         newClassName(wait: true) { $('h3 span', 0) }
+        cloneIntoAnotherTag(wait: true) { $('a#clone-menu-item-link') }
+        seachMoreTag(wait: true) { $('span.input-group-addon.search-for-more-icon') }
+        seachMoreListTag(wait: true) { $('a.list-group-item', text:it) }
+        finishBttn(wait: true) { $('button.btn.btn-primary') }
+        searchBar(wait: true) { $('#value') }
     }
 
     void edit() {
         editButton.click()
+    }
+
+    void seachMore() {
+        seachMoreTag.click()
+    }
+
+    void finishButton() {
+        finishBttn.click()
+    }
+
+    void seachMoreList(String val) {
+        sleep(2_000)
+        seachMoreListTag(val).click()
     }
 
     String occuranceStatus() {
@@ -89,6 +107,10 @@ class DataClassPage extends Page implements InputUtils {
         dataClassMenu.click()
     }
 
+    void cloneIntoAnother() {
+        cloneIntoAnotherTag.click()
+    }
+
     void selectCreateRelationship() {
         $('a#create-new-relationship-menu-item-link').click()
     }
@@ -99,7 +121,11 @@ class DataClassPage extends Page implements InputUtils {
 
     void editClassName(String value) {
         className.value("")
-        fillInput(className,value)
+        fillInput(className, value)
+    }
+
+    void searchBarFill(String value) {
+        fillInput(searchBar, value)
     }
 
     Boolean checkClassName(String value) {

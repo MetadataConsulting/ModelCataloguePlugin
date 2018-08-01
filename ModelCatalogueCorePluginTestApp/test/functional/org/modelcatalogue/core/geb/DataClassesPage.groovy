@@ -29,7 +29,6 @@ class DataClassesPage extends Page {
         dataClassByName(wait: true) { rows.$('a', text: it) }
         showMoreButton { $('span.fa-plus-square-o') }
         editDataClassButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
-        titlename { $('div   h3') }
         openDataClassTag { $('.ui-sortable tr td span a', 0) }
         checkDataClass(required: false, wait: true) { String value -> $('a', text: value) }
         dataClassesElement(required: false, wait: true) { $('tr.inf-table-item-row a', text: it) }
@@ -84,7 +83,7 @@ class DataClassesPage extends Page {
         selectDataClass(value)?.displayed
     }
 
-    String titleText() {
+        String titleText() {
         return titlename.text()
     }
 
@@ -105,6 +104,10 @@ class DataClassesPage extends Page {
 
     void showMore() {
         showMoreButton.click()
+    }
+
+    String dataClassText(String val) {
+        selectDataClass(val).text()
     }
 
     boolean editDataClassDisabled() {

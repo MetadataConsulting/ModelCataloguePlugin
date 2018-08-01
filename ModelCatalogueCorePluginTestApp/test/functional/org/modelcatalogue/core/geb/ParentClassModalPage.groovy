@@ -10,6 +10,7 @@ class ParentClassModalPage extends Page {
         searchMoreButton(required: false, wait: true) { $('span.search-for-more-icon') }
         createRelationshipButton(required: false, wait: true) { $('button.btn-primary', type: 'submit') }
         cancelButton(required: true) { $('button.btn-warning') }
+        children(required: true) { $('p.small.ng-scope', text: 'Children') }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         modelHome(wait: true) { String name ->
             $('ul .catalogue-element-treeview-name', text: contains(name)).click()
@@ -18,6 +19,10 @@ class ParentClassModalPage extends Page {
 
     void searchMore() {
         searchMoreButton.click()
+    }
+
+    void selectChildren() {
+        children.$('span.fa.fa-plus-circle').click()
     }
 
     void createRelationship() {
