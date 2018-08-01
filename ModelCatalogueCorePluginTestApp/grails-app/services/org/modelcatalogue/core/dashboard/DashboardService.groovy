@@ -15,6 +15,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MaxOffsetSublistUtils
+import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeName
@@ -398,7 +399,7 @@ class DashboardService {
 
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllMeasurementUnitViewBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        searchResult(ValidationRule.class, MetadataDomain.MEASUREMENT_UNIT, searchStatusQuery, sortQuery, paginationQuery)
+        searchResult(MeasurementUnit.class, MetadataDomain.MEASUREMENT_UNIT, searchStatusQuery, sortQuery, paginationQuery)
     }
 
     @Transactional(readOnly = true)
