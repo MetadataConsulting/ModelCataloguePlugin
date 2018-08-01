@@ -93,14 +93,14 @@ grails.exceptionresolver.params.exclude = ['password', 'password1', 'password2',
 // configure auto-caching of queries by default (if false you can documentCache individual queries with 'documentCache: true')
 grails.hibernate.cache.queries = false
 
-mc.mappingsuggestions.matchAgainst = System.getenv('MATCH_AGAINST') ?: 'ELASTIC_SEARCH'
+mc.mappingsuggestions.matchAgainst = (System.getProperty('MATCH_AGAINST') ?: System.getenv('MATCH_AGAINST')) ?: 'ELASTIC_SEARCH'
 environments {
     development {
 
-        mc.storage.s3.bucket = System.getenv('MDX_S3_BUCKET')
-        mc.storage.s3.key = System.getenv('MDX_S3_KEY')
-        mc.storage.s3.secret = System.getenv('MDX_S3_SECRET')
-        mc.storage.s3.region = System.getenv('MDX_S3_REGION')
+        mc.storage.s3.bucket = (System.getProperty('MDX_S3_BUCKET') ?: System.getenv('MDX_S3_BUCKET'))
+        mc.storage.s3.key = (System.getProperty('MDX_S3_KEY') ?: System.getenv('MDX_S3_KEY'))
+        mc.storage.s3.secret = (System.getProperty('MDX_S3_SECRET') ?: System.getenv('MDX_S3_SECRET'))
+        mc.storage.s3.region = (System.getProperty('MDX_S3_REGION') ?: System.getenv('MDX_S3_REGION'))
 
         grails.logging.jul.usebridge = true
         grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}"
@@ -122,8 +122,8 @@ environments {
         mc.allow.signup = true
 
         grails.plugin.console.enabled = true
-        mc.search.elasticsearch.host = System.getenv('MDX_ELASTIC_HOST') ?: '127.0.0.1'
-        mc.search.elasticsearch.port = System.getenv('MDX_ELASTIC_PORT') ?: '9300'
+        mc.search.elasticsearch.host = (System.getProperty('MDX_ELASTIC_HOST') ?: System.getenv('MDX_ELASTIC_HOST')) ?: '127.0.0.1'
+        mc.search.elasticsearch.port = (System.getProperty('MDX_ELASTIC_PORT') ?: System.getenv('MDX_ELASTIC_PORT')) ?: '9300'
         mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
         mc.css.custom = """
           /* green for dev mode to show it's safe to do any changes */
@@ -195,7 +195,7 @@ environments {
 
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}"
-        if (System.getenv('DOCKERIZED_TESTS') && System.properties["grails.test.phase"] == 'functional') {
+        if ((System.getProperty('DOCKERIZED_TESTS') ?: System.getenv('DOCKERIZED_TESTS')) && System.properties["grails.test.phase"] == 'functional') {
             mc.search.elasticsearch.host="localhost"
             mc.search.elasticsearch.port=49300
             // this must be set to be able to send any mails
@@ -257,14 +257,13 @@ environments {
         mc.storage.directory = "/tmp/mc/storage"
         mc.storage.maxSize = 50 * 1024 * 1024
         // S3 Storage
-        mc.storage.s3.bucket = System.getenv('MDX_S3_BUCKET') //="nt.assets.metadataexchange.org.uk"
-        mc.storage.s3.key = System.getenv('MDX_S3_KEY') //"AKIAJR5COCVSMNZ3JUAA"
-        mc.storage.s3.secret = System.getenv('MDX_S3_SECRET') //"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"
-        mc.storage.s3.region = System.getenv('MDX_S3_REGION') // eu-west-1 or eu-west-2
+        mc.storage.s3.bucket = (System.getProperty('MDX_S3_BUCKET') ?: System.getenv('MDX_S3_BUCKET')) //="nt.assets.metadataexchange.org.uk"
+        mc.storage.s3.key = (System.getProperty('MDX_S3_KEY') ?: System.getenv('MDX_S3_KEY')) //"AKIAJR5COCVSMNZ3JUAA"
+        mc.storage.s3.secret = (System.getProperty('MDX_S3_SECRET') ?: System.getenv('MDX_S3_SECRET')) //"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"
+        mc.storage.s3.region = (System.getProperty('MDX_S3_REGION') ?: System.getenv('MDX_S3_REGION')) // eu-west-1 or eu-west-2
         //Server details
-        println "ServerURL:" + grails.serverURL
-        println "MDX_SERVER_URL:" + System.getenv('MDX_SERVER_URL')
-        grails.serverURL = System.getenv('MDX_SERVER_URL')//e.g. "https://localhost:8899/mc"
+        println "MDX_SERVER_URL:" + (System.getProperty('MDX_SERVER_URL') ?: System.getenv('MDX_SERVER_URL'))
+        grails.serverURL = (System.getProperty('MDX_SERVER_URL') ?: System.getenv('MDX_SERVER_URL'))//e.g. "https://localhost:8899/mc"
         println "ServerURL:${grails.serverURL}:"
 
         grails.plugin.springsecurity.auth.loginFormUrl = grails.serverURL + "/login/auth"
@@ -274,63 +273,63 @@ environments {
         grails.plugin.springsecurity.logout.afterLogoutUrl = grails.serverURL
         grails.plugin.springsecurity.successHandler.defaultTargetUrl = grails.serverURL
         //DB Details
-        println "MDX_DB_URL:" + System.getenv('MDX_DB_URL')
-        println "MDX_DB_USERNAME:" + System.getenv('MDX_DB_USERNAME')
-        println "MDX_DB_PASSWORD:" + System.getenv('MDX_DB_PASSWORD')
+        println "MDX_DB_URL:" + (System.getProperty('MDX_DB_URL') ?: System.getenv('MDX_DB_URL'))
+        println "MDX_DB_USERNAME:" + (System.getProperty('MDX_DB_USERNAME') ?: System.getenv('MDX_DB_USERNAME'))
+        println "MDX_DB_PASSWORD:" + (System.getProperty('MDX_DB_PASSWORD') ?: System.getenv('MDX_DB_PASSWORD'))
         //Elastic Details
-        println "MDX_ELASTIC_HOST:" + System.getenv('MDX_ELASTIC_HOST')
-        println "MDX_ELASTIC_PORT:" + System.getenv('MDX_ELASTIC_PORT')
+        println "MDX_ELASTIC_HOST:" + (System.getProperty('MDX_ELASTIC_HOST') ?: System.getenv('MDX_ELASTIC_HOST'))
+        println "MDX_ELASTIC_PORT:" + (System.getProperty('MDX_ELASTIC_PORT') ?: System.getenv('MDX_ELASTIC_PORT'))
 
-        mc.search.elasticsearch.host=System.getenv('MDX_ELASTIC_HOST')
-        mc.search.elasticsearch.port=System.getenv('MDX_ELASTIC_PORT')
+        mc.search.elasticsearch.host=(System.getProperty('MDX_ELASTIC_HOST') ?: System.getenv('MDX_ELASTIC_HOST'))
+        mc.search.elasticsearch.port=(System.getProperty('MDX_ELASTIC_PORT') ?: System.getenv('MDX_ELASTIC_PORT'))
         //Email Details for signup
-        println "MDX_MAIL_FROM:" + System.getenv('MC_MAIL_FROM')
-        println "MDX_MAIL_HOST:" + System.getenv('MDX_MAIL_HOST')
-        println "MDX_MAIL_PORT:" + System.getenv('MDX_MAIL_PORT')
-        println "MDX_MAIL_USERNAME:" + System.getenv('MDX_MAIL_USERNAME')
-        println "MDX_MAIL_PASSWORD:" + System.getenv('MDX_MAIL_PASSWORD')
+        println "MDX_MAIL_FROM:" + (System.getProperty('MC_MAIL_FROM') ?: System.getenv('MC_MAIL_FROM'))
+        println "MDX_MAIL_HOST:" + (System.getProperty('MDX_MAIL_HOST') ?: System.getenv('MDX_MAIL_HOST'))
+        println "MDX_MAIL_PORT:" + (System.getProperty('MDX_MAIL_PORT') ?: System.getenv('MDX_MAIL_PORT'))
+        println "MDX_MAIL_USERNAME:" + (System.getProperty('MDX_MAIL_USERNAME') ?: System.getenv('MDX_MAIL_USERNAME'))
+        println "MDX_MAIL_PASSWORD:" + (System.getProperty('MDX_MAIL_PASSWORD') ?: System.getenv('MDX_MAIL_PASSWORD'))
 
-        grails.mail.default.from = System.getenv("MDX_MAIL_FROM")//"admin@datalink.org.uk"//System.getenv("MC_MAIL_FROM")
-        grails.plugin.springsecurity.ui.register.emailFrom = System.getenv("MDX_MAIL_FROM")//"david@metadataconsulting.co.uk"//System.getenv("MC_MAIL_FROM")
-        grails.plugin.springsecurity.ui.forgotPassword.emailFrom = System.getenv("MDX_MAIL_FROM")//"david@metadataconsulting.co.uk"//System.getenv("MC_MAIL_FROM")
+        grails.mail.default.from = (System.getProperty('MDX_MAIL_FROM') ?: System.getenv('MDX_MAIL_FROM'))//"admin@datalink.org.uk"//System.getenv("MC_MAIL_FROM")
+        grails.plugin.springsecurity.ui.register.emailFrom = (System.getProperty('MDX_MAIL_FROM') ?: System.getenv('MDX_MAIL_FROM'))//"david@metadataconsulting.co.uk"//System.getenv("MC_MAIL_FROM")
+        grails.plugin.springsecurity.ui.forgotPassword.emailFrom = (System.getProperty('MDX_MAIL_FROM') ?: System.getenv('MDX_MAIL_FROM'))//"david@metadataconsulting.co.uk"//System.getenv("MC_MAIL_FROM")
 
         //Signup and email details
-        mc.allow.signup = System.getenv('MDX_ALLOW_SIGNUP')//true
+        mc.allow.signup = (System.getProperty('MDX_ALLOW_SIGNUP') ?: System.getenv('MDX_ALLOW_SIGNUP'))//true
         grails {
             mail {
-                host = System.getenv('MDX_MAIL_HOST')//"vps.beenleigh.com"
-                port = System.getenv('MDX_MAIL_PORT')//"25" as Integer
-                username = System.getenv('MDX_MAIL_USERNAME')//"testadmin@datalink.org.uk"//System.getenv("MC_MAIL_USERNAME")
-                password = System.getenv('MDX_MAIL_PASSWORD')//"adm1nAtB33nl31gh"//System.getenv("MC_MAIL_PASSWORD")
-                if (System.getenv("MDX_MAIL_PROPS")) {
-                    props = new JsonSlurper().parseText(System.getenv("MDX_MAIL_PROPS"))
+                host = (System.getProperty('MDX_MAIL_HOST') ?: System.getenv('MDX_MAIL_HOST'))//"vps.beenleigh.com"
+                port = (System.getProperty('MDX_MAIL_PORT') ?: System.getenv('MDX_MAIL_PORT'))//"25" as Integer
+                username = (System.getProperty('MDX_MAIL_USERNAME') ?: System.getenv('MDX_MAIL_USERNAME'))//"testadmin@datalink.org.uk"//System.getenv("MC_MAIL_USERNAME")
+                password = (System.getProperty('MDX_MAIL_PASSWORD') ?: System.getenv('MDX_MAIL_PASSWORD'))//"adm1nAtB33nl31gh"//System.getenv("MC_MAIL_PASSWORD")
+                if ((System.getProperty('MDX_MAIL_PROPS') ?: System.getenv('MDX_MAIL_PROPS'))) {
+                    props = new JsonSlurper().parseText((System.getProperty('MDX_MAIL_PROPS') ?: System.getenv('MDX_MAIL_PROPS')))
                 }
             }
         }
         //General Instance Text
-        println "MDX_NAME:" + System.getenv('MDX_NAME')
-        println "MDX_WELCOME:" + System.getenv('MDX_WELCOME')
-        println "MDX_INFO:" + System.getenv('MDX_INFO')
-        println "MDX_ALLOW_SIGNUP:" + System.getenv('MDX_ALLOW_SIGNUP')
-        println "MDX_CSS_CUSTOM:" + System.getenv("MDX_CSS_CUSTOM")
-        println "MDX_MAX_ACTIVE_USERS:" + System.getenv('MDX_MAX_ACTIVE_USERS')
-        println "MDX_PRELOAD:" + System.getenv('MDX_PRELOAD')
+        println "MDX_NAME:" + (System.getProperty('MDX_NAME') ?: System.getenv('MDX_NAME'))
+        println "MDX_WELCOME:" + (System.getProperty('MDX_WELCOME') ?: System.getenv('MDX_WELCOME'))
+        println "MDX_INFO:" + (System.getProperty('MDX_INFO') ?: System.getenv('MDX_INFO'))
+        println "MDX_ALLOW_SIGNUP:" + (System.getProperty('MDX_ALLOW_SIGNUP') ?: System.getenv('MDX_ALLOW_SIGNUP'))
+        println "MDX_CSS_CUSTOM:" + (System.getProperty('MDX_CSS_CUSTOM') ?: System.getenv('MDX_CSS_CUSTOM'))
+        println "MDX_MAX_ACTIVE_USERS:" + (System.getProperty('MDX_MAX_ACTIVE_USERS') ?: System.getenv('MDX_MAX_ACTIVE_USERS'))
+        println "MDX_PRELOAD:" + (System.getProperty('MDX_PRELOAD') ?: System.getenv('MDX_PRELOAD'))
 
-        mc.name = System.getenv('MDX_NAME')//"Metadata Exchange"
-        mc.welcome.jumbo = System.getenv('MDX_WELCOME')//"The Metadata Exchange is loaded with some test data"
-        mc.welcome.info = System.getenv('MDX_INFO')//"Welcome to the Metadata Exchange"
+        mc.name = (System.getProperty('MDX_NAME') ?: System.getenv('MDX_NAME'))//"Metadata Exchange"
+        mc.welcome.jumbo = (System.getProperty('MDX_WELCOME') ?: System.getenv('MDX_WELCOME'))//"The Metadata Exchange is loaded with some test data"
+        mc.welcome.info = (System.getProperty('MDX_INFO') ?: System.getenv('MDX_INFO'))//"Welcome to the Metadata Exchange"
 
-        if (System.getenv("MDX_CSS_CUSTOM")) {
-            mc.css.custom = System.getenv("MDX_CSS_CUSTOM")
+        if ((System.getProperty('MDX_CSS_CUSTOM') ?: System.getenv('MDX_CSS_CUSTOM'))) {
+            mc.css.custom = (System.getProperty('MDX_CSS_CUSTOM') ?: System.getenv('MDX_CSS_CUSTOM'))
         }
 
-        if (System.getenv('MDX_MAX_ACTIVE_USERS')) {
-            mc.max.active.users = System.getenv('MDX_MAX_ACTIVE_USERS')
+        if ((System.getProperty('MDX_MAX_ACTIVE_USERS') ?: System.getenv('MDX_MAX_ACTIVE_USERS'))) {
+            mc.max.active.users = (System.getProperty('MDX_MAX_ACTIVE_USERS') ?: System.getenv('MDX_MAX_ACTIVE_USERS'))
         }
 
-        if (System.getenv('MDX_PRELOAD')) {
+        if ((System.getProperty('MDX_PRELOAD') ?: System.getenv('MDX_PRELOAD'))) {
             try {
-                mc.preload = new JsonSlurper().parseText(System.getenv('MDX_PRELOAD'))
+                mc.preload = new JsonSlurper().parseText((System.getProperty('MDX_PRELOAD') ?: System.getenv('MDX_PRELOAD')))
             } catch (ignored) {}
         }
 
