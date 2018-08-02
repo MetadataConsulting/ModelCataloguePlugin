@@ -14,7 +14,7 @@ class VersionsPage extends Page {
     }
 
     static content = {
-        rows { $('#history-tab tbody tr') }
+        rows(wait: true) { $('#history-tab tbody tr') }
         versionSelect(wait: true) { $('a.preserve-new-lines.ng-binding', text: it).siblings('a') }
         expandLink(wait: true) { $('a.inf-cell-expand') }
         dataElementDropDown(wait: true) { $('button#role_item_catalogue-elementBtn') }
@@ -23,6 +23,7 @@ class VersionsPage extends Page {
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
         showMoreButton { $('span.fa-plus-square-o') }
         editButton(required: false) { $('#role_item-detail_edit-catalogue-elementBtn') }
+        addDataModel(required: false) { $('a#role_navigation-right_create-data-model-menu-item-link') }
     }
 
     boolean rowsContainText(String text) {
@@ -36,6 +37,10 @@ class VersionsPage extends Page {
 
     void expandLinkClick() {
         expandLink.click()
+    }
+
+    void editButtonClick() {
+        editButton.click()
     }
 
     void selectVersion(String version) {
@@ -52,6 +57,10 @@ class VersionsPage extends Page {
 
     void deleteBttnClick() {
         deleteBttn.click()
+    }
+
+    void addDataModelClick() {
+        addDataModel.click()
     }
 
     void deleteConfirmationBttnClick() {
