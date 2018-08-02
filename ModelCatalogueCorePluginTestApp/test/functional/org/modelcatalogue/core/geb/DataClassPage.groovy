@@ -30,9 +30,11 @@ class DataClassPage extends Page implements InputUtils {
         newClassName(wait: true) { $('h3 span', 0) }
         cloneIntoAnotherTag(wait: true) { $('a#clone-menu-item-link') }
         seachMoreTag(wait: true) { $('span.input-group-addon.search-for-more-icon') }
-        seachMoreListTag(wait: true) { $('a.list-group-item', text:it) }
+        seachMoreListTag(wait: true) { $('a.list-group-item', text: contains(it)) }
         finishBttn(wait: true) { $('button.btn.btn-primary') }
         searchBar(wait: true) { $('#value') }
+        titlename { $('div.col-md-12 h3') }
+
     }
 
     void edit() {
@@ -130,6 +132,10 @@ class DataClassPage extends Page implements InputUtils {
 
     Boolean checkClassName(String value) {
         newClassName.text().equals(value)
+    }
+
+    Boolean matchTitleText(String val) {
+        titlename.text().contains(val)
     }
 
 }

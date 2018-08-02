@@ -11,7 +11,7 @@ class VerifyThatUserCanCloneElementSpec extends AbstractModelCatalogueGebSpec {
     @Shared
     String dataTypeName = UUID.randomUUID().toString()
     @Shared
-    String importDataModelName = UUID.randomUUID().toString()+"imp"
+    String importDataModelName = UUID.randomUUID().toString()
     @Shared
     String sampleDataModel = UUID.randomUUID().toString()
     @Shared
@@ -21,7 +21,7 @@ class VerifyThatUserCanCloneElementSpec extends AbstractModelCatalogueGebSpec {
     @Shared
     String consent = UUID.randomUUID().toString()
     @Shared
-    String testDataClass = UUID.randomUUID().toString()+"test"
+    String testDataClass = UUID.randomUUID().toString()
 
     def "Login as supervisor"() {
         when:
@@ -217,20 +217,21 @@ class VerifyThatUserCanCloneElementSpec extends AbstractModelCatalogueGebSpec {
         at DataClassPage
 
         when:
-        dataClassPage = browser.page DataClassPage
-        dataClassPage.treeView.dataModel()
-        dataClassPage.treeView.dataClasses()
-        sleep(2_000)
+        DataClassPage dataClassPage1=browser.page DataClassPage
+        sleep(3_000)
+        dataClassPage1.treeView.dataClasses()
         then:
         at DataClassesPage
 
         when:
-        dataClassesPage=browser.page DataClassesPage
-        dataClassesPage.selectDataClassLink(consent)
+        DataClassesPage dataClassesPage1=browser.page DataClassesPage
+        dataClassesPage1.selectDataClassLink(parentDataClass)
         then:
-        sleep(1_000)
-        dataClassesPage.titleText().contains(consent)
+        at DataClassPage
 
-
+        when:
+        dataClassPage=browser.page DataClassPage
+        then:
+        dataClassPage.matchTitleText(parentDataClass)
     }
 }

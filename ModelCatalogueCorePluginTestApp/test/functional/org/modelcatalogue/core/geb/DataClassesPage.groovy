@@ -83,7 +83,7 @@ class DataClassesPage extends Page {
         selectDataClass(value)?.displayed
     }
 
-        String titleText() {
+    String titleText() {
         return titlename.text()
     }
 
