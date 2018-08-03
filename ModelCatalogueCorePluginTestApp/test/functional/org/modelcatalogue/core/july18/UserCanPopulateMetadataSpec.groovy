@@ -106,17 +106,16 @@ class UserCanPopulateMetadataSpec extends GebSpec {
         at DataModelPage
     }
 
-    def "create data element for data model B"() {
+
+    def "finalize the data model"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.dataModel()
         then:
         at DataModelPage
-    }
 
-    def "finalize the data model"() {
         when:
-        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage = browser.page DataModelPage
         dataModelPage.dropdown()
         then:
         at DataModelPage
@@ -156,7 +155,7 @@ class UserCanPopulateMetadataSpec extends GebSpec {
         versionsPage.rowsContainText(dataModelName)
     }
 
-    def "select draft data model"() {
+    def "select draft data model and verify new edited name"() {
         when:
         DashboardPage dashboardPage = to DashboardPage
         dashboardPage.search("Test 1")
@@ -186,6 +185,4 @@ class UserCanPopulateMetadataSpec extends GebSpec {
         then:
         at DataModelPage
     }
-
-
 }
