@@ -129,3 +129,4 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
         waitFor { !dataTypeValueValidatePage.outputIsValid() }
     }
 }
+
