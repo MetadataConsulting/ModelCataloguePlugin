@@ -16,7 +16,7 @@ class UserCanPopulateMetadataSpec extends GebSpec {
     @Shared
     String dataModelName = UUID.randomUUID().toString()
     @Shared
-    String NewDataModelName = UUID.randomUUID().toString()
+    String newDataModelName = UUID.randomUUID().toString()
     @Shared
     String dataModelVersion = "1.3"
     @Shared
@@ -64,7 +64,7 @@ class UserCanPopulateMetadataSpec extends GebSpec {
         EditDataModelPage editDataModelPage = browser.page EditDataModelPage
         editDataModelPage.fillName(name)
         editDataModelPage.fillDescription(description)
-        sleep(5_000)
+        sleep(2_000)
         editDataModelPage.submitBttn()
         then:
         at VersionsPage
@@ -72,7 +72,7 @@ class UserCanPopulateMetadataSpec extends GebSpec {
         when:
         versionsPage = browser.page VersionsPage
         then:
-        sleep(1_000)
+        sleep(2_000)
         versionsPage.rowsContainText(name)
 
         when:
@@ -166,8 +166,9 @@ class UserCanPopulateMetadataSpec extends GebSpec {
 
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        sleep(2_000)
         dataModelPage.editDataModel()
-        dataModelPage.editInputField(NewDataModelName)
+        dataModelPage.editInputField(newDataModelName)
         dataModelPage.save()
         then:
         at DataModelPage
@@ -175,7 +176,7 @@ class UserCanPopulateMetadataSpec extends GebSpec {
         when:
         dataModelPage = browser.page DataModelPage
         then:
-        dataModelPage.verifySemanticNumber("NewDataModelName")
+        dataModelPage.verifySemanticNumber(newDataModelName)
 
         when:
         dataModelPage = browser.page DataModelPage
