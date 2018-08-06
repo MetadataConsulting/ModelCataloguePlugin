@@ -14,6 +14,9 @@ class LoginPage extends Page {
         submitButton { $('button', text: contains('Login')) }
         rememberMeCheckBox { $('.checkbox input') }
         disabledMessage { $('div.alert-danger', text: 'Sorry, your account is disabled.') }
+        incorrecCredentialMessage {
+            $('div.alert-danger', text: contains('Sorry, we were not able to find a user with that username and password'))
+        }
     }
 
     void login(String username, String password) {
@@ -38,6 +41,11 @@ class LoginPage extends Page {
 
     boolean isAccountDisabled() {
         disabledMessage.displayed
+    }
+
+
+    boolean incorrecCredentialMessageDisabled() {
+        incorrecCredentialMessage.displayed
     }
 
     boolean clickRememberMeCheckBox() {
