@@ -7,7 +7,7 @@ import spock.lang.*
 @Issue('https://metadata.atlassian.net/browse/MET-1483')
 @Title('Login with wrong credential')
 @Stepwise
-class UserCanCreateDataElementAndImportDataTypeSpec extends GebSpec {
+class LoginWithWrongCredentialSpec extends GebSpec {
 
     @Shared
     String dataTypeName = UUID.randomUUID().toString()
