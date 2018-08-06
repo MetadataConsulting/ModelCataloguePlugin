@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.july18
+package org.modelcatalogue.core.august18
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
