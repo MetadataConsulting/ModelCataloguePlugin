@@ -15,6 +15,8 @@ class DashboardPage extends Page {
         dataModelLink(wait: true) { $('a.data-model-link', text: it, 0) }
         nav { $('#topmenu', 0).module(NavModule) }
         sponsor { $('.sponsor', it) }
+        nav { $('#topmenu', 0).module(NavModule) }
+
     }
 
     void search(String query) {

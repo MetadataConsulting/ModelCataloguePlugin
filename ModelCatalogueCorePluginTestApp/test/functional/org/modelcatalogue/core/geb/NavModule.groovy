@@ -22,7 +22,7 @@ class NavModule extends Module {
         dataModelPolicyLink(required: false, wait: true) { $("#datamodelpolicy-link", 0) }
         monitoringLink(required: false, wait: true) { $("#monitoring-menu-item-link", 0) }
         logsLink(required: false, wait: true) { $("#logs-archive-menu-item", 0) }
-        feedbacksLink(required: false, wait: true) { $("#feedbacks-link", 0) }
+        feedbacksLink(required: false, wait: true) { $("#feedbacks-menu-item", 0) }
         importMenuLink(required: false, wait: true) { $("#importmenu-link", 0) }
         importExcelLink(required: false, wait: true) { $("#importexcel-link", 0) }
         importOboLink(required: false, wait: true) { $("#importobo-link", 0) }
