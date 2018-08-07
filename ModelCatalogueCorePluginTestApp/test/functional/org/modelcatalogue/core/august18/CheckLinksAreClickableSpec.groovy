@@ -23,43 +23,43 @@ class CheckLinksAreClickableSpec extends GebSpec {
         DashboardPage dashboardPage = browser.page DashboardPage
         dashboardPage.sponsorLink(0)
         sleep(2_000)
-        ArrayList<String> tabs2 = new ArrayList<String> (driver.getWindowHandles())
+        ArrayList<String> tabs2 = driver.getWindowHandles()
         then:
-        driver.switchTo().window(tabs2.get(1));
+        driver.switchTo().window(tabs2.get(1))
         browser.title.contains("Genomics England")
 
         when:
-        driver.close();
+        driver.close()
         driver.switchTo().window(tabs2.get(0))
         dashboardPage = browser.page DashboardPage
         dashboardPage.sponsorLink(1)
-        tabs2 = new ArrayList<String> (driver.getWindowHandles())
+        tabs2 = driver.getWindowHandles()
         then:
-        driver.switchTo().window(tabs2.get(1));
+        driver.switchTo().window(tabs2.get(1))
         browser.title.contains("Home - Medical Research Council")
 
         when:
-        driver.close();
+        driver.close()
         driver.switchTo().window(tabs2.get(0))
         dashboardPage = browser.page DashboardPage
         dashboardPage.sponsorLink(2)
-        tabs2 = new ArrayList<String> (driver.getWindowHandles())
+        tabs2 = driver.getWindowHandles()
         then:
-        driver.switchTo().window(tabs2.get(1));
+        driver.switchTo().window(tabs2.get(1))
         browser.title.contains("NIHR | National Institute for Health Research")
 
         when:
-        driver.close();
+        driver.close()
         driver.switchTo().window(tabs2.get(0))
         dashboardPage = browser.page DashboardPage
         dashboardPage.sponsorLink(3)
-        tabs2 = new ArrayList<String> (driver.getWindowHandles())
+        tabs2 = driver.getWindowHandles()
         then:
-        driver.switchTo().window(tabs2.get(1));
+        driver.switchTo().window(tabs2.get(1))
         browser.title.contains("Metadata Consulting Ltd")
 
         when:
-        driver.close();
+        driver.close()
         driver.switchTo().window(tabs2.get(0))
         dashboardPage = to DashboardPage
         dashboardPage.nav.userMenu()
