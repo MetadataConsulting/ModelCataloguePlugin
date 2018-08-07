@@ -12,8 +12,9 @@ class DashboardPage extends Page {
         searchInputField(wait: true) { $('#search', 0) }
         dataModelLinks(required: false) { $('a.data-model-link') }
         searchButton(wait: true) { $('#search-btn') }
-        dataModelLink(wait: true) { $('a.data-model-link', text: it,0) }
+        dataModelLink(wait: true) { $('a.data-model-link', text: it, 0) }
         nav { $('#topmenu', 0).module(NavModule) }
+        sponsor { $('.sponsor', it) }
     }
 
     void search(String query) {
@@ -22,6 +23,10 @@ class DashboardPage extends Page {
         }
         searchButton.click()
         waitFor(5) { dataModelLink(query) }
+    }
+
+    void sponsorLink(int val) {
+        sponsor(val).click()
     }
 
     void select(String dataModelName) {
