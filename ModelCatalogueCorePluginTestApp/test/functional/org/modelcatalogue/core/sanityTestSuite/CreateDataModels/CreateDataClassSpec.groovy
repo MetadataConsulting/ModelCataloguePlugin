@@ -1,4 +1,4 @@
-!package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
+package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.geb.DashboardPage
