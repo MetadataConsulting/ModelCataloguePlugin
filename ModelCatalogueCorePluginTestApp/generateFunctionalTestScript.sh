@@ -8,23 +8,7 @@ then
     exit 1
 fi
 
-TEST_REPORT_DIR="$1" # Test report directory should be first argument to script
-#if [ ! -d "$TEST_REPORT_DIR" ]
-#then
-#    echo "first argument ${TEST_REPORT_DIR} needs to be a directory path"
-#    exit 1
-#fi
-
 SPECNAMES="$(find test/functional -print | grep Spec.groovy | sed "s|.*/\(.*\).groovy|\1|")"
-
-DOWNLOAD_FILE_PATH="/home/james/Downloads/functionalTestDownloads"
-CHROME_DRIVER_PATH="/usr/local/lib/node_modules/chromedriver/bin/chromedriver"
-#GRAILS_TEST_COMMAND="XYZ"
-GRAILS_TEST_COMMAND="./grailsw test-app -Xmx8G -Dgeb.env=chrome -DdownloadFilepath=${DOWNLOAD_FILE_PATH} -Dwebdriver.chrome.driver=${CHROME_DRIVER_PATH} functional: "
-printf "$GRAILS_TEST_COMMAND\n"
-
-COMMAND_MARKER="COMMAND_MARKER"
-DIRECTORY_MARKER="DIRECTORY_MARKER"
 
 GROUPED_SPECNAMES="$(printf "$SPECNAMES" \
 | sed -n "
@@ -39,72 +23,79 @@ GROUPED_SPECNAMES="$(printf "$SPECNAMES" \
 # and then substitute newline \n with space (s/\n/ /g),
 # and then print (p)
 
-GROUPED_SPECNAMES_DOUBLED_MARKED="$(printf "$GROUPED_SPECNAMES" \
-| sed -n "
-    s/\(.*\)/${COMMAND_MARKER}\1/
-    p
-    =
-    s/${COMMAND_MARKER}\(.*\)/${DIRECTORY_MARKER}\1/
-    p
-  "
-)"
-# Print each line twice: One prefixed with COMMAND_MARKER, one prefixed with DIRECTORY_MARKER.
-# Print line number before line with DIRECTORY_MARKER (=)
+printf "GROUPED_SPECNAMES: ${GROUPED_SPECNAMES}"
 
-printf "GROUPED_SPECNAMES_DOUBLED_MARKED: ${GROUPED_SPECNAMES_DOUBLED_MARKED}\n"
+# Grouped Specnames into Array:
 
-GROUPED_SPECNAMES_DOUBLED_MARKED_2="$(printf "$GROUPED_SPECNAMES_DOUBLED_MARKED" \
-| sed "
-    /[0-9][0-9]*/ {
-        N
-        s/\(.*\)\n${DIRECTORY_MARKER}\(.*\)/${DIRECTORY_MARKER}\1_\2/
-    }
-  "
-)"
-
-# Incorporate line number (\1) into DIRECTORY_MARKER line
-
-printf "GROUPED_SPECNAMES_DOUBLED_MARKED_2: ${GROUPED_SPECNAMES_DOUBLED_MARKED_2}"
+echo "groupedSpecnamesArray content:"
+IFS=$'\n' groupedSpecnamesArray=($(printf "$GROUPED_SPECNAMES"))
+for t in "${groupedSpecnamesArray[@]}"
+do
+    echo "$t LOL"
+done
+echo "Read array content!"
 
 
-TEST_REPORT_DIR_VAR="TEST_REPORT_DIR"
-OVERALL_TEST_REPORT_PATH="\"\${${TEST_REPORT_DIR_VAR}}/overallTestReport.txt\""
+# SPEC_BATCHES_ARRAY_INIT will be code to initialize an array in the generated script.
 
+SPEC_BATCHES_ARRAY_INIT="declare -a SPEC_BATCHES_ARRAY=("
+for i in $(seq ${#groupedSpecnamesArray[*]}); do
+    echo "$i ${groupedSpecnamesArray[$i-1]}"
+    SPEC_BATCHES_ARRAY_INIT="${SPEC_BATCHES_ARRAY_INIT}\"${groupedSpecnamesArray[$i-1]}\"
+    "
+done
+SPEC_BATCHES_ARRAY_INIT="${SPEC_BATCHES_ARRAY_INIT})"
+printf "SPEC_BATCHES_ARRAY_INIT: ${SPEC_BATCHES_ARRAY_INIT}"
 
-COMMANDLINES="$(printf "$GROUPED_SPECNAMES_DOUBLED_MARKED_2" \
-| sed "/${COMMAND_MARKER}/ s|${COMMAND_MARKER}\(.*\)|${GRAILS_TEST_COMMAND}\1 \| tee -a ${OVERALL_TEST_REPORT_PATH}; printf \"Just ran \1\" >> ${OVERALL_TEST_REPORT_PATH}|")"
-# Add Grails Test Command to each line marked COMMAND_MARKER:
-# Use | as delimiter for sed (s)ubstitute command since GRAILS_TEST_COMMAND has / in it
-
-printf "COMMANDLINES: ${COMMANDLINES}\n"
-
-MOVE_RESULTS_TO_DIRECTORY="$(printf "$COMMANDLINES" \
-| sed "
-    /${DIRECTORY_MARKER}/ {
-        s| |_|g
-        s|${DIRECTORY_MARKER}\(.*\)|mkdir \"\${${TEST_REPORT_DIR_VAR}}/\1\"; mv target/test-reports \"\${${TEST_REPORT_DIR_VAR}}/\1\"|
-
-    }
-  "
-)"
-
-printf "$MOVE_RESULTS_TO_DIRECTORY\n"
-
+# create functionalTestScript.sh
 
 FUNCTIONAL_TEST_SCRIPT="functionalTestScript.sh"
 touch "$FUNCTIONAL_TEST_SCRIPT"
 chmod +x "$FUNCTIONAL_TEST_SCRIPT"
 
 
+# Write script:
+
 printf "#!/bin/bash
 # Generated from generateFunctionalTestScript.sh
-${TEST_REPORT_DIR_VAR}=\"\$(./testReport.sh)\"
+TEST_REPORT_DIR=\"\$(./testReport.sh)\"
 
-if [ ! -d \"\$${TEST_REPORT_DIR_VAR}\" ]
+if [ ! -d \"\${TEST_REPORT_DIR}\" ]
 then
-    echo \"first argument \"\$${TEST_REPORT_DIR_VAR}\" needs to be a directory path\"
+    echo \"TEST_REPORT_DIR \"\${TEST_REPORT_DIR}\" needs to be a directory path\"
     exit 1
 fi
-touch ${OVERALL_TEST_REPORT_PATH}
-$MOVE_RESULTS_TO_DIRECTORY
+
+OVERALL_TEST_REPORT_PATH=\"\${TEST_REPORT_DIR}/overallTestReport.txt\"
+touch \"\${OVERALL_TEST_REPORT_PATH}\"
+
+DOWNLOAD_FILE_PATH="/home/james/Downloads/functionalTestDownloads" # Make these into arguments
+CHROME_DRIVER_PATH="/usr/local/lib/node_modules/chromedriver/bin/chromedriver"
+GRAILS_TEST_COMMAND_ARGS=(test-app -Xmx8G -Dgeb.env=chrome "-DdownloadFilepath=\${DOWNLOAD_FILE_PATH}" "-Dwebdriver.chrome.driver=\${CHROME_DRIVER_PATH}" functional:)
+
+
+${SPEC_BATCHES_ARRAY_INIT}
+for i2 in \$(seq \${#SPEC_BATCHES_ARRAY[*]})
+do
+    i=\"\$((\$i2-1))\"
+    batch=\"\${SPEC_BATCHES_ARRAY[\$i]}\"
+    echo \"index/batch: \$i \${batch}\"
+
+    batchArr=(\$(echo \${batch}))
+    allTestArgs=(\"\${GRAILS_TEST_COMMAND_ARGS[@]}\" \"\${batchArr[@]}\")
+    echo \"batchArr[0]: \${batchArr[0]}\"
+    echo \"allTestArgs: \${allTestArgs[@]}\"
+
+    batchUnderscore=\"\$(echo \${batch} | sed \"s/ /_/g\")\"
+    echo \"batchUnderscore: \${batchUnderscore}\"
+    batchReportDir=\"\${TEST_REPORT_DIR}/\${batchUnderscore}\"
+    echo \"batchReportDir: \${batchReportDir}\"
+
+    # ./grailsw \"\${allTestArgs[@]}\" | tee -a \"\${OVERALL_TEST_REPORT_PATH}\"
+    printf \"\\\nJust ran \${batch}\\\n\" >> \"\${OVERALL_TEST_REPORT_PATH}\"
+
+
+    mkdir \"\${batchReportDir}\"
+    mv target/test-reports \"\${batchReportDir}\"
+done
 " > "$FUNCTIONAL_TEST_SCRIPT" # Overwrites the file
