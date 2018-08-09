@@ -1,4 +1,7 @@
 #!/bin/bash
+# Run functional tests in specified batches.
+# Depends on testReport.sh to create a directory for test results to go into.
+# Takes chromedriver path as an argument.
 
 TEST_REPORT_DIR="$(./testReport.sh)"
 
@@ -8,6 +11,24 @@ then
     exit 1
 fi
 
+
+CHROME_DRIVER_PATH="$1"
+if [ -z "${CHROME_DRIVER_PATH}" ]
+then
+    echo "Missing first argument. Command usage: $0 CHROME_DRIVER_PATH [DOWNLOAD_FILE_PATH]"
+    exit 1
+fi
+# /usr/local/lib/node_modules/chromedriver/bin/chromedriver
+
+DOWNLOAD_FILE_PATH="$2"
+if [ -z "${DOWNLOAD_FILE_PATH}" ]
+then
+  DOWNLOAD_FILE_PATH="${TEST_REPORT_DIR}/downloads"
+  mkdir "${DOWNLOAD_FILE_PATH}"
+  echo "Using download path at ${DOWNLOAD_FILE_PATH}"
+fi
+
+
 COLLATED_CONSOLE_OUTPUT_FILE="${TEST_REPORT_DIR}/collatedConsoleOutput.txt"
 touch "${COLLATED_CONSOLE_OUTPUT_FILE}"
 
@@ -15,8 +36,6 @@ touch "${COLLATED_CONSOLE_OUTPUT_FILE}"
 START_TIME="$(date)"
 echo "START TIME: ${START_TIME}" >> "${COLLATED_CONSOLE_OUTPUT_FILE}"
 
-DOWNLOAD_FILE_PATH=/home/james/Downloads/functionalTestDownloads
-CHROME_DRIVER_PATH=/usr/local/lib/node_modules/chromedriver/bin/chromedriver
 GRAILS_TEST_COMMAND_ARGS=(test-app -Xmx8G -Dgeb.env=chrome -DdownloadFilepath=${DOWNLOAD_FILE_PATH} -Dwebdriver.chrome.driver=${CHROME_DRIVER_PATH} functional:)
 # GRAILS_TEST_COMMAND_ARGS=(test-app)
 
