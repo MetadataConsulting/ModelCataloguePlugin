@@ -3,7 +3,7 @@
 # Depends on testReport.sh to create a directory for test results to go into.
 # Takes chromedriver path as an argument.
 
-TEST_REPORT_DIR="$(./testReport.sh)"
+TEST_REPORT_DIR="$(./scripts/testing/testReport.sh)"
 
 if [ ! -d "${TEST_REPORT_DIR}" ]
 then
