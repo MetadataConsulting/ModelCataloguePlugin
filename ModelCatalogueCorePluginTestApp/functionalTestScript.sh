@@ -8,18 +8,19 @@ then
     exit 1
 fi
 
-COLLATED_CONSOLE_OUTPUT="${TEST_REPORT_DIR}/collatedConsoleOutput.txt"
-touch "${COLLATED_CONSOLE_OUTPUT}"
+COLLATED_CONSOLE_OUTPUT_FILE="${TEST_REPORT_DIR}/collatedConsoleOutput.txt"
+touch "${COLLATED_CONSOLE_OUTPUT_FILE}"
 
 
 START_TIME="$(date)"
-echo "START TIME: ${START_TIME}" >> "${COLLATED_CONSOLE_OUTPUT}"
+echo "START TIME: ${START_TIME}" >> "${COLLATED_CONSOLE_OUTPUT_FILE}"
 
 DOWNLOAD_FILE_PATH=/home/james/Downloads/functionalTestDownloads
 CHROME_DRIVER_PATH=/usr/local/lib/node_modules/chromedriver/bin/chromedriver
 GRAILS_TEST_COMMAND_ARGS=(test-app -Xmx8G -Dgeb.env=chrome -DdownloadFilepath=${DOWNLOAD_FILE_PATH} -Dwebdriver.chrome.driver=${CHROME_DRIVER_PATH} functional:)
+# GRAILS_TEST_COMMAND_ARGS=(test-app)
 
-
+Full Functional Spec list
 declare -a SPEC_BATCHES_ARRAY=("UserIsAbleToDownloadAnAssetSpec CanCreateDataTypeFromCreateDataElementWizardSpec AddAndRemoveManyDataElementsSpec"
                                "CheckCreateElementFromClassWizardSpec MaxOccursShowsInHistorySpec NewDraftEditFromImportedModelsAreUpdatedSpec"
                                "VerifyMinOccursCanBeZeroSpec CheckDataModelCanBeFinalizedSpec CheckDataModelPoliciesSpec"
@@ -73,10 +74,10 @@ declare -a SPEC_BATCHES_ARRAY=("UserIsAbleToDownloadAnAssetSpec CanCreateDataTyp
     )
 
 
-TEST_SUMMARY="${TEST_REPORT_DIR}/testSummary.txt"
-touch "${TEST_SUMMARY}"
+TEST_SUMMARY_FILE="${TEST_REPORT_DIR}/testSummary.txt"
+touch "${TEST_SUMMARY_FILE}"
 BATCHES_ARRAY_SIZE="${#SPEC_BATCHES_ARRAY[*]}"
-for i2 in $(seq ${BATCH_ARRAY_SIZE})
+for i2 in $(seq ${#SPEC_BATCHES_ARRAY[*]})
 do
     i="$(($i2-1))"
     batch="${SPEC_BATCHES_ARRAY[$i]}"
@@ -92,8 +93,8 @@ do
     batchReportDir="${TEST_REPORT_DIR}/${batchUnderscore}"
     echo "batchReportDir: ${batchReportDir}"
 
-    ./grailsw "${allTestArgs[@]}" | tee -a "${COLLATED_CONSOLE_OUTPUT}"
-    printf "Just ran batch ${i}/${BATCH_ARRAY_SIZE}: ${batch}\n" >> "${COLLATED_CONSOLE_OUTPUT}"
+    ./grailsw "${allTestArgs[@]}" | tee -a "${COLLATED_CONSOLE_OUTPUT_FILE}"
+    printf "Just ran batch ${i}/${BATCH_ARRAY_SIZE}: <batch>${batch}</batch>\n" >> "${COLLATED_CONSOLE_OUTPUT_FILE}"
 
 
     mkdir "${batchReportDir}"
@@ -102,13 +103,35 @@ do
 
     sed -n "
         /Completed [0-9][0-9]* spock test/ p
-        /Just ran/ p
-    " "${COLLATED_CONSOLE_OUTPUT}" > "${TEST_SUMMARY}"
+        /<batch>/ p
+    " "${COLLATED_CONSOLE_OUTPUT_FILE}" > "${TEST_SUMMARY_FILE}"
 
     CURRENT_TIME="$(date)"
-    echo "CURRENT TIME: ${CURRENT_TIME}" >> "${COLLATED_CONSOLE_OUTPUT}"
+    echo "CURRENT TIME: ${CURRENT_TIME}" >> "${COLLATED_CONSOLE_OUTPUT_FILE}"
 done
 
 
 CURRENT_TIME="$(date)"
-echo "END TIME: ${CURRENT_TIME}" >> "${COLLATED_CONSOLE_OUTPUT}"
+echo "END TIME: ${CURRENT_TIME}" >> "${COLLATED_CONSOLE_OUTPUT_FILE}"
+
+
+ALL_FAILED_FILE="${TEST_REPORT_DIR}/allFailed.html"
+touch "${ALL_FAILED_FILE}"
+echo "" > "${ALL_FAILED_FILE}"
+
+
+echo "$(cat "${TEST_SUMMARY_FILE}" | sed -n "
+    /[1-9][1-9]* failed in/ {
+        N
+        s_.*\(Completed[^|]*\)|.*\(<batch>.*</batch>\)_\1<br/>\
+\2_
+        p
+    }
+" | sed "
+    /<batch>/ {
+        s/ /_/g
+        s|.*<batch>\(.*\)</batch>.*|<br/><a href=\"\1/test-reports/html/failed.html\">Failed Tests: \1</a><br/>|
+    }
+")" >> "${ALL_FAILED_FILE}"
+
+
