@@ -1,7 +1,7 @@
 #!/bin/bash
 # Creates a new folder for test reports to go in and outputs the folder name.
 
-DATE=$(date)
+DATE=$(date "+date_%Y_%m_%d_time_%H_%M_%S")
 
 
 # Create folder
