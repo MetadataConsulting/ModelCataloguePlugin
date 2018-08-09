@@ -24,7 +24,10 @@ DOWNLOAD_FILE_PATH="$2"
 if [ -z "${DOWNLOAD_FILE_PATH}" ]
 then
   DOWNLOAD_FILE_PATH="${TEST_REPORT_DIR}/downloads"
-  mkdir "${DOWNLOAD_FILE_PATH}"
+  if [ ! -e "${DOWNLOAD_FILE_PATH}" ]
+  then
+    mkdir "${DOWNLOAD_FILE_PATH}"
+  fi
   echo "Using download path at ${DOWNLOAD_FILE_PATH}"
 fi
 
