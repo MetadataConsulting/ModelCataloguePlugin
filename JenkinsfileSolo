@@ -49,11 +49,12 @@ pipeline {
 
         updateGithubCommitStatus(currentBuild, "continuous-integration/jenkinsSolo", BUILD_URL, "In Progress", "PENDING")
         dir(path: 'ModelCatalogueCorePluginTestApp') {
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkinsSolo", BUILD_URL, "Installing Node Modules", "PENDING")
-            sh 'npm install'
-            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkinsSolo", BUILD_URL, "Installing Bower Components", "PENDING")
-            sh 'bower install'
+            // updateGithubCommitStatus(currentBuild, "continuous-integration/jenkinsSolo", BUILD_URL, "Installing Node Modules", "PENDING")
+            // sh 'npm install'
+            // updateGithubCommitStatus(currentBuild, "continuous-integration/jenkinsSolo", BUILD_URL, "Installing Bower Components", "PENDING")
+            // sh 'bower install'
             updateGithubCommitStatus(currentBuild, "continuous-integration/jenkinsSolo", BUILD_URL, "Running Functional Tests", "PENDING")
+            sh "echo $PWD"
             sh "mkdir ${functionalTestBatchReportDirectory}"
             wrap([$class: 'Xvfb']) {
               sh "./scripts/testing/runFunctionalTestBatches.sh -testReportDir=${functionalTestBatchReportDirectory} -grailsCommand=/opt/grails/bin/grails -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver"
