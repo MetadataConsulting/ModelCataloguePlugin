@@ -52,7 +52,20 @@ pipeline {
             sh 'bower install'
             updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins3", BUILD_URL, "Running Functional Tests", "PENDING")
             wrap([$class: 'Xvfb']) {
-              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: VerifyRegularUserCanSeeApiKeySpec AdminUserCannotDeleteFinalizedItemsSpec CuratorCanImportFinalizedDataModelSpec CheckAdminCanDeleteImportedModelSpec CuratorCannotCreateClassInFinalizedModelSpec CheckCreateElementFromClassWizardSpec AddAndRemoveManyDataElementsSpec MaxOccursShowsInHistorySpec NewDraftEditFromImportedModelsAreUpdatedSpec VerifyMinOccursCanBeZeroSpec CannotAddDataElementsToFinalizedDataModelSpec'
+              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: UserCannotEditReadOnlyDataModelSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: VerifyThatBusinessRulesCanBeCreatedSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: ImportModelAndVerifyTypesSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: CheckLinksAreClickableSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: VerifyBusinessRulesRemainDuringNewVersionCreationSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: LoginWithWrongCredentialSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: CannotAddElementToFinalizedModelSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: CannotAddDataElementsToFinalizedDataModelSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: GrantRoleCuratorSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: VersionVerificationSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: CheckCreateElementFromClassWizardSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: AddAndRemoveManyDataElementsSpec'
+		sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: VerifyMinOccursCanBeZeroSpec'
+		
             }
         }        
       }
