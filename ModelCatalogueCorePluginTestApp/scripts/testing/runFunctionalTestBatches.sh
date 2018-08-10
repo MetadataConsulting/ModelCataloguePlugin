@@ -3,7 +3,70 @@
 # Depends on testReport.sh to create a directory for test results to go into.
 # Takes chromedriver path as an argument.
 
-TEST_REPORT_DIR="$(./scripts/testing/testReport.sh)"
+USAGE="Usage: Key: [option=(default)]. Mandatory if not in square brackets
+$0 [-grailsCommand=(./grailsw)]
+[-testReportDir=(directory created according to date)]
+[-Dserver.port=(8080)]
+-Dwebdriver.chrome.driver=(no default)
+[-Dgeb.env=(chrome)]
+[-DdownloadFilePath=(directory in testReportDir)]
+"
+
+for i in "$@"
+do
+case $i in
+    -grailsCommand=*)
+    GRAILS_COMMAND="${i#*=}"
+    shift # past argument=value
+    ;;
+
+
+    -testReportDir=*)
+    TEST_REPORT_DIR="${i#*=}"
+    shift # past argument=value
+    ;;
+
+    -Dserver.port=*)
+    SERVER_PORT="${i#*=}"
+    shift # past argument=value
+    ;;
+
+
+    -Dwebdriver.chrome.driver=*)
+    CHROME_DRIVER_PATH="${i#*=}"
+    shift # past argument=value
+    ;;
+
+    -Dgeb.env=*)
+    GEB_ENV="${i#*=}"
+    shift # past argument=value
+    ;;
+
+    -DdownloadFilepath=*)
+    DOWNLOAD_FILE_PATH="${i#*=}"
+    shift # past argument=value
+    ;;
+
+    *)
+    echo "Unknown option $i. See ${USAGE}"
+    exit 1
+    ;;
+esac
+done
+
+
+if [ -z "${GRAILS_COMMAND}" ]
+then
+    GRAILS_COMMAND="./grailsw"
+fi
+
+
+
+if [ -z "${TEST_REPORT_DIR}" ]
+then
+    TEST_REPORT_DIR="$(./scripts/testing/testReport.sh)"
+fi
+
 
 if [ ! -d "${TEST_REPORT_DIR}" ]
 then
@@ -12,25 +75,35 @@ then
 fi
 
 
-CHROME_DRIVER_PATH="$1"
+if [ -z "${SERVER_PORT}" ]
+then
+    SERVER_PORT=8080
+fi
+
+if [ -z "${GEB_ENV}" ]
+then
+    GEB_ENV="chrome"
+fi
+
 if [ -z "${CHROME_DRIVER_PATH}" ]
 then
-    echo "Missing first argument. Command usage: $0 CHROME_DRIVER_PATH [DOWNLOAD_FILE_PATH]"
+    echo "Missing chrome driver path. ${USAGE}"
     exit 1
 fi
 # /usr/local/lib/node_modules/chromedriver/bin/chromedriver
 
-DOWNLOAD_FILE_PATH="$2"
 if [ -z "${DOWNLOAD_FILE_PATH}" ]
 then
   DOWNLOAD_FILE_PATH="${TEST_REPORT_DIR}/downloads"
-  if [ ! -e "${DOWNLOAD_FILE_PATH}" ]
-  then
-    mkdir "${DOWNLOAD_FILE_PATH}"
-  fi
-  echo "Using download path at ${DOWNLOAD_FILE_PATH}"
+
 fi
 
+if [ ! -e "${DOWNLOAD_FILE_PATH}" ]
+then
+    mkdir "${DOWNLOAD_FILE_PATH}"
+fi
+
+echo "Using download path at ${DOWNLOAD_FILE_PATH}"
 
 COLLATED_CONSOLE_OUTPUT_FILE="${TEST_REPORT_DIR}/collatedConsoleOutput.txt"
 touch "${COLLATED_CONSOLE_OUTPUT_FILE}"
@@ -39,7 +112,7 @@ touch "${COLLATED_CONSOLE_OUTPUT_FILE}"
 START_TIME="$(date)"
 echo "START TIME: ${START_TIME}" >> "${COLLATED_CONSOLE_OUTPUT_FILE}"
 
-GRAILS_TEST_COMMAND_ARGS=(test-app -Xmx8G -Dgeb.env=chrome -DdownloadFilepath=${DOWNLOAD_FILE_PATH} -Dwebdriver.chrome.driver=${CHROME_DRIVER_PATH} functional:)
+GRAILS_TEST_COMMAND_ARGS=(test-app -Xmx8G -Dserver.port=${SERVER_PORT} -Dgeb.env=${GEB_ENV} -DdownloadFilepath=${DOWNLOAD_FILE_PATH} -Dwebdriver.chrome.driver=${CHROME_DRIVER_PATH} functional:)
 # GRAILS_TEST_COMMAND_ARGS=(test-app)
 
 Full Functional Spec list
@@ -115,7 +188,7 @@ do
     batchReportDir="${TEST_REPORT_DIR}/${batchUnderscore}"
     echo "batchReportDir: ${batchReportDir}"
 
-    ./grailsw "${allTestArgs[@]}" | tee -a "${COLLATED_CONSOLE_OUTPUT_FILE}"
+    "${GRAILS_COMMAND}" "${allTestArgs[@]}" | tee -a "${COLLATED_CONSOLE_OUTPUT_FILE}"
     printf "Just ran batch ${i}/${BATCH_ARRAY_SIZE}: <batch>${batch}</batch>\n" >> "${COLLATED_CONSOLE_OUTPUT_FILE}"
 
 
@@ -141,6 +214,7 @@ ALL_FAILED_FILE="${TEST_REPORT_DIR}/allFailed.html"
 touch "${ALL_FAILED_FILE}"
 echo "" > "${ALL_FAILED_FILE}"
 
+echo "<h1> Failures: </h1><br/>" >> "${ALL_FAILED_FILE}"
 
 echo "$(cat "${TEST_SUMMARY_FILE}" | sed -n "
     /[1-9][1-9]* failed in/ {
@@ -155,5 +229,6 @@ echo "$(cat "${TEST_SUMMARY_FILE}" | sed -n "
         s|.*<batch>\(.*\)</batch>.*|<br/><a href=\"\1/test-reports/html/failed.html\">Failed Tests: \1</a><br/>|
     }
 ")" >> "${ALL_FAILED_FILE}"
+
 
 
