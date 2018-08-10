@@ -59,6 +59,14 @@ pipeline {
             wrap([$class: 'Xvfb']) {
               sh "./scripts/testing/runFunctionalTestBatches.sh -testReportDir=${functionalTestBatchReportDirectory} -grailsCommand=/opt/grails/bin/grails -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver"
             }
+            script {
+                ALLFAILED = sh (script: "cat ${functionalTestBatchReportDirectory}/allFailed.html", returnStdout: true)
+                echo "ALLFAILED: ${ALLFAILED}"
+                if (ALLFAILED.contains("Failed Tests")) {
+                    error("Some tests failed")
+                }
+            }
+
         }
       }
       post {
