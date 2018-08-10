@@ -26,22 +26,23 @@ class NorthThamesMappingReportXlsxSqlExporter {
             [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES_GEL_SUBSET', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         RFH_LONDONPATHOLOGYCODES_CLEANSED:
             [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES_CLEANSED',   localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases', includeImports: true],
+        // The following are being mapped to localModel "Dummy_WinPath" which doesn't exist, but just to make all the produced spreadsheets have consistent headers.
         GOSH_OMNILAB:
-            [siteName: 'GOSH', lpcModelName: 'GOSH_OMNILAB', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+            [siteName: 'GOSH', lpcModelName: 'GOSH_OMNILAB', localModelName: 'Dummy_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         LNWH_WINPATH:
-            [siteName: 'LNWH', lpcModelName: 'LNWH_WINPATH', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+            [siteName: 'LNWH', lpcModelName: 'LNWH_WINPATH', localModelName: 'Dummy_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         'MEH MOORFIELDS PATHOLOGY CODES':
-            [siteName: 'MEH', lpcModelName: 'MEH MOORFIELDS PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+            [siteName: 'MEH', lpcModelName: 'MEH MOORFIELDS PATHOLOGY CODES', localModelName: 'Dummy_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         'RNOH PATHOLOGY CODES':
-            [siteName: 'RNOH', lpcModelName: 'RNOH PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+            [siteName: 'RNOH', lpcModelName: 'RNOH PATHOLOGY CODES', localModelName: 'Dummy_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         'BARTS PATHOLOGY CODES':
-            [siteName: 'BARTS', lpcModelName: 'BARTS PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+            [siteName: 'BARTS', lpcModelName: 'BARTS PATHOLOGY CODES', localModelName: 'Dummy_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         'UCLH PATHOLOGY CODES':
-            [siteName: 'UCLH', lpcModelName: 'UCLH PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+            [siteName: 'UCLH', lpcModelName: 'UCLH PATHOLOGY CODES', localModelName: 'Dummy_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         'GOSH PATHOLOGY CODES':
-            [siteName: 'GOSH', lpcModelName: 'GOSH PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+            [siteName: 'GOSH', lpcModelName: 'GOSH PATHOLOGY CODES', localModelName: 'Dummy_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
         'LNWH PATHOLOGY CODES':
-            [siteName: 'LNWH', lpcModelName: 'LNWH PATHOLOGY CODES', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
+            [siteName: 'LNWH', lpcModelName: 'LNWH PATHOLOGY CODES', localModelName: 'Dummy_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases'],
     ]
     static Map<String, String> defaultSiteMap =
         [siteName: 'RFH', lpcModelName: 'RFH_LONDONPATHOLOGYCODES', localModelName: 'RFH_WinPath', loincModelName: 'LOINC', gelModelName: 'Rare Diseases']
