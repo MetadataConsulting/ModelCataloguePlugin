@@ -1,3 +1,43 @@
+
+def getRepoURL() {
+  sh "mkdir -p .git"
+  sh "git config --get remote.origin.url > .git/remote-url"
+  return readFile(".git/remote-url").trim()
+}
+def getCommitSha() {
+  sh "mkdir -p .git"
+  sh "git rev-parse HEAD > .git/current-commit"
+  return readFile(".git/current-commit").trim()
+}
+
+def updateGithubCommitStatus(build, String context, String buildUrl, String message, String state) {
+  // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
+  repoUrl = getRepoURL()
+  commitSha = getCommitSha()
+  println "Updating Github Commit Status"
+  println "repoUrl $repoUrl"
+  println "commitSha $commitSha"
+  println "build result: ${build.result}, currentResult: ${build.currentResult}"
+
+  step([
+    $class: 'GitHubCommitStatusSetter',
+    reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+    commitShaSource: [$class: "ManuallyEnteredShaSource", sha: commitSha],
+    errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
+    contextSource: [$class: "ManuallyEnteredCommitContextSource", context: context],
+    statusBackrefSource: [$class: "ManuallyEnteredBackrefSource", backref: buildUrl],
+
+    statusResultSource: [
+      $class: 'ConditionalStatusResultSource',
+      results: [
+        [$class: 'AnyBuildResult', state: state, message: message]
+      ]
+    ]
+  ])
+}
+
+def functionalTestBatchReportDirectory="target/functionalTestBatchReportDirectory"
+
 pipeline {
   agent any
   options {
@@ -6,17 +46,38 @@ pipeline {
   stages {
     stage('Test Execute') {
       steps {
-        dir(path: 'ModelCatalogueCorePluginTestApp') {
-            sh 'npm install'
-            sh 'bower install'
-            wrap([$class: 'Xvfb']) {
-              sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: UserIsAbleToDownloadAnAssetSpec CanCreateDataTypeFromCreateDataElementWizardSpec AddAndRemoveManyDataElementsSpec CheckCreateElementFromClassWizardSpec MaxOccursShowsInHistorySpec NewDraftEditFromImportedModelsAreUpdatedSpec VerifyMinOccursCanBeZeroSpec CheckDataModelCanBeFinalizedSpec CheckDataModelPoliciesSpec CheckDataModelPolicyEnumeratedTypeSpec CheckDataModelPolicyTagSpec CloneUnauthorizedElementSpec CreateNewVersionOfDataModelSpec CannotCreateDataElementWithUnauthorizedDataTypeSpec CheckDataTypeAddedToNewVersionSpec ValidateValueAgainstDataTypeSpec CannotAddAssetToFinalizedDataModelSpec CannotAddBusinessRulesToFinalizedDataModelSpec CannotAddDataClassesToFinalizedDataModelSpec CannotAddDataElementsToFinalizedDataModelSpec CannotAddDataTypesToFinalizedDataModelSpec CannotAddElementToFinalizedModelSpec CannotAddMeasurementUnitToFinalizedDataModelSpec CannotAddTagsToFinalizedDataModelSpec AbstractModelCatalogueGebSpec ImportMcSpec ImportXmlAndExcelDataSpec CuratorCanGenerateSuggestionsUsingMappingUtilitySpec';
-				sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: CloneAanClassIntoAnotherModelSpec CompareTwoDataModelSpec CreateDataModelAndCreatePolicesSpec CreateNewVersionFromFinalisedToDraftSpec CustomMetadataNotCarriedNewVersionSpec InvalidRegistrationSpec MaxOccursIsShowingInHistorySpec VerifyResetPasswordPresentOnLoginPageSpec VerifyUserCanTagUsingTreeViewSpec AbleToNavigateToOldVersionOfAModelThroughTreeSpec CanCreateDataElementAndCloneDataTypeSpec CanCreateDataTypeSpec CanImportDataModelSpec CannotDeleteFinalizedDataModelSpec CanSelectPoliciesWhileCreatingDataModelSpec FinalizedDataModelIsMarkedAsFinalizedInXMLSpec HistoryIsPopulatedAccordingToModelActivitySpec ImportAndRemoveDataModelReflectsInHistorySpec UnableToImportIfReadAccessSpec UserCanFinalizeDataModelSpec AdminCanCreateModelAndPolicySpec AdminUserCannotDeleteFinalizedItemsSpec CheckAdminCanDeleteImportedModelSpec CuratorCanCreateANewDataClassSpec CuratorCanImportFinalizedDataModelSpec CuratorCannotCreateClassInFinalizedModelSpec CuratorCannotEditFinalizedModelSpec CuratorWithAdminCanDeleteClassInDraftModelSpec';
-				sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: DisableUserSpec FinalizedDataModelMenuVisibilitySpec UserCanEditDataClassesForAdminDataModelSpec UserCannotEditReadOnlyDataModelSpec UsersDontSeeUnauthorizedDataModelsSpec VerifyCuratorCannotDeleteFinalizedDataModelSpec VerifyRegularUserCanSeeApiKeySpec VerifySupervisorCanActionSettingsSpec VerifyViewerCannotAccessFactActionsSpec ApiKeySpec CreateAssetsAndImportDataSpec CreateBusinessRulesSpec CreateDataClassSpec CreateDataModelSpec CreateDataTypeAndSelectEnumeratedSpec CreateDataTypeAndSelectReferenceSpec CreateDataTypeAndSelectSubsetSpec CreateMeasurementUnitSpec CreateNewDataElementSpec CreateRelationshipSpec CreateTagSpec SearchMoreOptionPolicySpec CreateDataTypeAndSelectPrimitiveSpec DataModelSearchSpec CreateMeasurementUnitFromFavouritesSpec DevSupportedLinkSpec AddDataInToFavouritesSpec AddDataModelImportSpec';
-				sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: AddUsernameToFavouriteSpec CodeVersionSpec EditDataElementSpec LastSeenSpec ModelCatalogueDevelopmentSpec NavItemVisibilitySpec QuickSearchSpec RelationshipHasAttachmentOfSpec RelationshipImportsSpec RelationshipIsBaseForSpec RelationshipIsImportedBySpec RelationshipIsSynonymForSpec RelationshipRelatedToSpec SearchCatalogueModelsSpec LoginAsViewerSpec LoginInAndClickOnCancelSpec LoginSpec ResetPasswordSpec ValidateRegistrationSpec LogoutSpec ApiKeyUrlMappingsSecuredSpec CatalogueElementUrlMappingsSecuredSpec ClassificationUrlMappingsSecuredSpec CsvTransformationUrlMappingsSecuredSpec DataArchitectUrlMappingsSecuredSpec DataClassUrlMappingsSecuredSpec DataElementUrlMappingsSecuredSpec DataImportCreateUrlMappingsSecuredSpec';
-				sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: DataModelPolicyUrlMappingsSecuredSpec DataModelUrlMappingsSecuredSpec DataTypeUrlMappingsSecuredSpec EnumeratedTypeUrlMappingsSecuredSpec LastSeenUrlMappingsSecuredSpec LogsUrlMappingsSecuredSpec MeasurementUnitUrlMappingsSecuredSpec ModelCatalogueCorePluginUrlMappingsSecuredSpec ModelCatalogueFormsUrlMappingsSecuredSpec ModelCatalogueGenomicsUrlMappingsSecuredSpec ModelCatalogueNorthThamesUrlMappingsSecuredSpec ModelCatalogueVersionUrlMappingsSecuredSpec ReindexCatalogueUrlMappingsSecuredSpec UserUrlMappingSecuredSpec GrantRoleCuratorSpec AssetWizardSpec BatchAndActionsSpec ChangeLogForEligibilitySpec ChangesSpec DataClassWizardSpec DataElementWizardSpec DataModelWizardSpec DataTypeWizardSpec MeasurementUnitWizardSpec RegisterSpec SearchFunctionalSpec ValidationRuleWizardSpec VersionVerificationSpec'
-            }
 
+        updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1Solo", BUILD_URL, "In Progress", "PENDING")
+        dir(path: 'ModelCatalogueCorePluginTestApp') {
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1Solo", BUILD_URL, "Installing Node Modules", "PENDING")
+            sh 'npm install'
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1Solo", BUILD_URL, "Installing Bower Components", "PENDING")
+            sh 'bower install'
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1Solo", BUILD_URL, "Running Functional Tests", "PENDING")
+            sh "mkdir ${functionalTestBatchReportDirectory}"
+            wrap([$class: 'Xvfb']) {
+              sh "./scripts/testing/runFunctionalTestBatches.sh -testReportDir=${functionalTestBatchReportDirectory} -grailsCommand=/opt/grails/bin/grails -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver"
+            }
+        }
+      }
+      post {
+        always {
+            publishHTML(target: [allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: "ModelCatalogueCorePluginTestApp/${functionalTestBatchReportDirectory}",
+                    reportFiles: 'allFailed.html',
+                    reportName: 'HTML Report',
+                    reportTitles: ''])
+        }
+        failure {
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1Solo", BUILD_URL, "Build Failed.", 'FAILURE')
+        }
+        success {
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1Solo", BUILD_URL, "Build Success!", 'SUCCESS')
+        }
+        unstable {
+            updateGithubCommitStatus(currentBuild, "continuous-integration/jenkins1Solo", BUILD_URL, "Build Unstable.", 'UNSTABLE')
         }
       }
     }
