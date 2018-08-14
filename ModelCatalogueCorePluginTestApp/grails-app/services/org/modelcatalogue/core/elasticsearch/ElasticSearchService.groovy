@@ -107,9 +107,14 @@ class ElasticSearchService implements SearchCatalogue {
 
     @PostConstruct
     private void init() {
+        println "elasticsearch init"
         if (grailsApplication.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
+            println "grailsApplication.config.mc.search.elasticsearch.host: ${grailsApplication.config.mc.search.elasticsearch.host}"
+            println "System.getProperty('mc.search.elasticsearch.host'): ${System.getProperty('mc.search.elasticsearch.host')}"
             initRemoteClient()
         } else if (grailsApplication.config.mc.search.elasticsearch.local || System.getProperty('mc.search.elasticsearch.local')) {
+            println "grailsApplication.config.mc.search.elasticsearch.local: ${grailsApplication.config.mc.search.elasticsearch.local}"
+            println "System.getProperty('mc.search.elasticsearch.local'): ${System.getProperty('mc.search.elasticsearch.local')}"
             initLocalClient()
         }
 
