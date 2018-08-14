@@ -156,7 +156,7 @@ do
     echo "batchReportDir: ${batchReportDir}"
 
     "${GRAILS_COMMAND}" "${allTestArgs[@]}" | tee -a "${COLLATED_CONSOLE_OUTPUT_FILE}"
-    printf "Just ran batch ${i}/${BATCH_ARRAY_SIZE}: <batch>${batch}</batch>\n" >> "${COLLATED_CONSOLE_OUTPUT_FILE}"
+    printf "Just ran batch ${i}/${BATCHES_ARRAY_SIZE}: <batch>${batch}</batch>\n" >> "${COLLATED_CONSOLE_OUTPUT_FILE}"
 
 
     mkdir "${batchReportDir}"
