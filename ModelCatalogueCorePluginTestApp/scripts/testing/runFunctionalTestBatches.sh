@@ -116,21 +116,10 @@ GRAILS_TEST_COMMAND_ARGS=(test-app -Xmx8G -Dserver.port=${SERVER_PORT} -Dgeb.env
 # GRAILS_TEST_COMMAND_ARGS=(test-app)
 
 Full Functional Spec list
-declare -a SPEC_BATCHES_ARRAY=("UserIsAbleToDownloadAnAssetSpec CanCreateDataTypeFromCreateDataElementWizardSpec AddAndRemoveManyDataElementsSpec"
-                               "CheckCreateElementFromClassWizardSpec MaxOccursShowsInHistorySpec NewDraftEditFromImportedModelsAreUpdatedSpec"
-                               "VerifyMinOccursCanBeZeroSpec CheckDataModelCanBeFinalizedSpec CheckDataModelPoliciesSpec"
-                               "CheckDataModelPolicyEnumeratedTypeSpec CheckDataModelPolicyTagSpec CloneUnauthorizedElementSpec"
-                               "CreateNewVersionOfDataModelSpec CannotCreateDataElementWithUnauthorizedDataTypeSpec CheckDataTypeAddedToNewVersionSpec"
-                               "ValidateValueAgainstDataTypeSpec CannotAddDataElementsToFinalizedDataModelSpec CannotAddElementToFinalizedModelSpec"
-                               "AbstractModelCatalogueGebSpec ImportXmlAndExcelDataSpec CuratorCanGenerateSuggestionsUsingMappingUtilitySpec"
-                               "AbleToNavigateToOldVersionOfAModelThroughTreeSpec CanCreateDataElementAndCloneDataTypeSpec CanCreateDataTypeSpec"
-                               "CanImportDataModelSpec CannotDeleteFinalizedDataModelSpec CanSelectPoliciesWhileCreatingDataModelSpec"
-                               "HistoryIsPopulatedAccordingToModelActivitySpec ImportAndRemoveDataModelReflectsInHistorySpec UnableToImportIfReadAccessSpec"
-                               "UserCanFinalizeDataModelSpec AdminCanCreateModelAndPolicySpec AdminUserCannotDeleteFinalizedItemsSpec"
-                               "CheckAdminCanDeleteImportedModelSpec CuratorCanCreateANewDataClassSpec CuratorCanImportFinalizedDataModelSpec"
-                               "CuratorCannotCreateClassInFinalizedModelSpec CuratorCannotEditFinalizedModelSpec CuratorWithAdminCanDeleteClassInDraftModelSpec"
-                               "DisableUserSpec UserCannotEditReadOnlyDataModelSpec VerifyCuratorCannotDeleteFinalizedDataModelSpec"
-                               "VerifyRegularUserCanSeeApiKeySpec VerifySupervisorCanActionSettingsSpec VerifyViewerCannotAccessFactActionsSpec"
+declare -a SPEC_BATCHES_ARRAY=("MaxOccursShowsInHistorySpec VerifyMinOccursCanBeZeroSpec CheckCreateElementFromClassWizardSpec AddAndRemoveManyDataElementsSpec NewDraftEditFromImportedModelsAreUpdatedSpec GrantRoleCuratorSpec CannotCreateDataElementWithUnauthorizedDataTypeSpec CheckDataTypeAddedToNewVersionSpec ValidateValueAgainstDataTypeSpec VerifySupervisorCanActionSettingsSpec"
+                               "VerifyViewerCannotAccessFactActionsSpec AdminUserCannotDeleteFinalizedItemsSpec VerifyCuratorCannotDeleteFinalizedDataModelSpec CuratorCannotCreateClassInFinalizedModelSpec AdminCanCreateModelAndPolicySpec DisableUserSpec CheckAdminCanDeleteImportedModelSpec VerifyRegularUserCanSeeApiKeySpec CuratorCanCreateANewDataClassSpec UserCannotEditReadOnlyDataModelSpec"
+                               "CuratorCannotEditFinalizedModelSpec CuratorCanImportFinalizedDataModelSpec CuratorWithAdminCanDeleteClassInDraftModelSpec CannotAddElementToFinalizedModelSpec CannotAddDataElementsToFinalizedDataModelSpec CanCreateDataElementAndCloneDataTypeSpec CanSelectPoliciesWhileCreatingDataModelSpec CanImportDataModelSpec CanCreateDataTypeSpec UnableToImportIfReadAccessSpec"
+                               "AbleToNavigateToOldVersionOfAModelThroughTreeSpec CannotDeleteFinalizedDataModelSpec UserCanFinalizeDataModelSpec HistoryIsPopulatedAccordingToModelActivitySpec ImportAndRemoveDataModelReflectsInHistorySpec ImportXmlAndExcelDataSpec CanCreateDataTypeFromCreateDataElementWizardSpec UserIsAbleToDownloadAnAssetSpec CuratorCanGenerateSuggestionsUsingMappingUtilitySpec VersionVerificationSpec"
 
 
     )
