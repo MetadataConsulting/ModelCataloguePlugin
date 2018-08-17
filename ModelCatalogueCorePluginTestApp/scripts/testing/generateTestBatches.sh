@@ -48,10 +48,6 @@ GROUPED_SPECNAMES="$(printf "$SPECS_WITHOUT_IGNORE_NAMES" \
     N
     N
     N
-    N
-    N
-    N
-    N
     s/\n/ /g
     s/\(.*\)/\"\1\"/
     p
