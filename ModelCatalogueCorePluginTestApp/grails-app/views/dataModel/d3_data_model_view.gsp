@@ -41,12 +41,13 @@
     </style>
 
     <meta name="layout" content="main"/>
+    <title>Basic Data Model View for ${dataModelJson.name}</title>
   </head>
 
   <body>
     <div id="container">
       <div id="column-left" class="column column-left">
-        &emsp;<b>Basic View</b> | <a id="advanced-view-link" href="" target="_blank">Advanced View</a>
+        &emsp;<b>Basic View</b> | <a id="advanced-view-link" href="">Advanced View</a>
 
         <div id="svg-body">
           <!--<div id="footer">

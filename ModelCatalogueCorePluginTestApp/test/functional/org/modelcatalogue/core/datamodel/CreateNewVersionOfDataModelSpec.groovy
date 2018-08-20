@@ -144,4 +144,5 @@ class CreateNewVersionOfDataModelSpec extends GebSpec {
         then:
         dataModelPage.dropdownMenu.newLinkDisplay()
     }
+
 }

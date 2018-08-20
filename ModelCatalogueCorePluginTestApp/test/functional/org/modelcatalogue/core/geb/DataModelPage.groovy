@@ -3,7 +3,10 @@ package org.modelcatalogue.core.geb
 
 import geb.Page
 
-class DataModelPage extends Page implements InputUtils {
+/**
+ * Describes the view of a particular DataModel within the "Advanced" Data Model View Page
+ */
+class DataModelPage extends AdvancedDataModelViewPage implements InputUtils {
 
     static at = {
         title.startsWith('Activity of')
@@ -62,7 +65,9 @@ class DataModelPage extends Page implements InputUtils {
             $("#activity-changes > div.inf-table-body > table > tbody > tr > td:nth-child(3) > span > span > a")
         }
         dataModelActions { $('div.contextual-actions.ng-isolate-scope.btn-toolbar') }
+
     }
+
 
     String getRowsText() {
         rows.collect { it.text() }.join(' ')
@@ -184,7 +189,7 @@ class DataModelPage extends Page implements InputUtils {
     boolean isDataModelFinalized() {
         activityList.$('td:nth-child(4) span span')*.text().join(",").contains("finalized")
     }
-  
+
     boolean defaultChecksPolicyAdded() {
         policiesList.$('a', text: 'Default Checks').displayed
     }

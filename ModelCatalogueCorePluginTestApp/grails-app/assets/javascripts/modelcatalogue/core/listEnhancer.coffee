@@ -118,7 +118,8 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
         sort: 'name'
         order: 'asc'
       }, extra)
-      enhanced.reload = -> $q.when(enhanced)
+      enhanced.reload = ->
+        $q.when(enhanced)
       enhanced
 
     listEnhancer.createArrayList = (array, extra = {}) ->
@@ -131,7 +132,8 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
         sort: 'name'
         order: 'asc'
       }, extra)
-      enhanced.reload = -> $q.when(enhanced)
+      enhanced.reload = ->
+        $q.when(enhanced)
       enhanced
 
     listEnhancer.createSingletonList = (item, extra = {base: item.link}) ->

@@ -15,6 +15,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MaxOffsetSublistUtils
+import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeName
@@ -43,6 +44,7 @@ import org.modelcatalogue.core.util.SortQuery
 import org.modelcatalogue.core.view.AssetViewModel
 import org.modelcatalogue.core.view.CatalogueElementViewModel
 import org.modelcatalogue.core.view.CatalogueElementViewModelUtils
+import org.modelcatalogue.core.view.DataModelViewModel
 import org.modelcatalogue.core.view.DataModelViewModelUtils
 
 @Slf4j
@@ -276,12 +278,16 @@ class DashboardService {
 
         def countItems = clazz.createCriteria().get {
             and {
-                dataModelQuery.delegate = delegate
-                dataModelQuery()
+                if (dataModelIds) {
+                    dataModelQuery.delegate = delegate
+                    dataModelQuery()
+                }
                 searchQuery.delegate = delegate
                 searchQuery()
-                statusQuery.delegate = delegate
-                statusQuery()
+                if (query?.statusList) {
+                    statusQuery.delegate = delegate
+                    statusQuery()
+                }
             }
             projections {
                 countDistinct('id')
@@ -291,12 +297,16 @@ class DashboardService {
         Date start = new Date()
         def items = clazz.createCriteria().list(params) {
             and {
-                dataModelQuery.delegate = delegate
-                dataModelQuery()
+                if (dataModelIds) {
+                    dataModelQuery.delegate = delegate
+                    dataModelQuery()
+                }
                 searchQuery.delegate = delegate
                 searchQuery()
-                statusQuery.delegate = delegate
-                statusQuery()
+                if (query?.statusList) {
+                    statusQuery.delegate = delegate
+                    statusQuery()
+                }
             }
             if ( sortQuery ) {
                 order(sortQuery.sort, sortQuery.order)
@@ -307,8 +317,11 @@ class DashboardService {
                 property('lastUpdated', 'lastUpdated')
                 property('status', 'status')
                 property('modelCatalogueId', 'modelCatalogueId')
-                property('dataModel.id', 'dataModel.id')
-                property('dataModel.name', 'dataModel.name')
+                if(dataModelIds) {
+                    property('dataModel.id', 'dataModel.id')
+                    property('dataModel.name', 'dataModel.name')
+                }
+
             }
         }
         Date stop = new Date()
@@ -398,7 +411,7 @@ class DashboardService {
 
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllMeasurementUnitViewBySearchStatusQuery(SearchQuery searchStatusQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        searchResult(ValidationRule.class, MetadataDomain.MEASUREMENT_UNIT, searchStatusQuery, sortQuery, paginationQuery)
+        searchResult(MeasurementUnit.class, MetadataDomain.MEASUREMENT_UNIT, searchStatusQuery, sortQuery, paginationQuery)
     }
 
     @Transactional(readOnly = true)
@@ -431,16 +444,27 @@ class DashboardService {
         searchResult(Tag.class, MetadataDomain.TAG, searchStatusQuery, sortQuery, paginationQuery)
     }
 
+
     @CompileDynamic
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllDataModelViewBySearchStatusQuery(SearchQuery searchQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
-        List dataModelList = dataModelGormService.findAllBySearchStatusQuery(searchQuery, sortQuery, ['asset'])
-        dataModelList = MaxOffsetSublistUtils.subList(dataModelList, paginationQuery.toMap())
-
-        List<Long> dataModelIds = dataModelList*.id ?: [] as List<Long>
+        CatalogueElementSearchResult searchResult =
+                searchResult(DataModel.class, MetadataDomain.DATA_MODEL, searchQuery, sortQuery, paginationQuery)
+        List<Long> dataModelIds = searchResult.viewModels*.id
+        List<Long> allowedDataModelIds = dataModelGormService.findAll()*.id
+        dataModelIds = dataModelIds.intersect(allowedDataModelIds)
         Map<Long, List<AssetViewModel>> dataModelToAssets = findAllAssetViewModelByPublishedStatus(dataModelIds, [PublishedStatus.PUBLISHED])
         int total = countAllDataModelBySearchStatusQuery(searchQuery)
-        List viewModels = DataModelViewModelUtils.ofProjections(dataModelList, dataModelToAssets)
+        List<DataModelViewModel> viewModels = searchResult.viewModels.findAll { dataModelIds.contains(it.id) }
+                .collect {
+            new DataModelViewModel(
+                    id: it.id,
+                    name: it.name,
+                    lastUpdated: it.lastUpdated,
+                    status: it.status,
+                    assetsList: dataModelToAssets.get(it.id)
+            )
+        }
         new CatalogueElementSearchResult(total: total, viewModels: viewModels)
     }
 
@@ -527,5 +551,7 @@ class DashboardService {
 @CompileStatic
 class CatalogueElementSearchResult {
     int total
-    List viewModels
+ 
+    List<CatalogueElementViewModel> viewModels
 }
+ 

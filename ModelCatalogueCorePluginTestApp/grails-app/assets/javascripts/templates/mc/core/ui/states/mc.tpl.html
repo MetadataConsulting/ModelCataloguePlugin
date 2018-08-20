@@ -5,7 +5,7 @@
     <div class="split-view-content">
 
       <!-- link to basic view -->
-      <a href="/dataModel/basicView/{{currentDataModel.id}}" target="_blank"> Basic View</a> | <b>Advanced View</b>
+      <a class="basic-data-model-view-link" href="/dataModel/basicView/{{currentDataModel.id}}"> Basic View</a> | <b>Advanced View</b>
       <br/><br/>
 
       <catalogue-element-treeview list="elementAsList" descend="content" on-select="onTreeviewSelected($element, $descendPath)"

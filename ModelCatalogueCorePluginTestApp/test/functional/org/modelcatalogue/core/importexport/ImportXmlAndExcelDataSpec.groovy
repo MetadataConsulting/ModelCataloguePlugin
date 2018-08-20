@@ -176,3 +176,4 @@ class ImportXmlAndExcelDataSpec extends GebSpec {
         xmlUtil.serialize(xml, new FileWriter(xmlFromFile))
     }
 }
+

@@ -1,13 +1,17 @@
 package org.modelcatalogue.core.reports
 
+import grails.transaction.Transactional
 import groovy.transform.Immutable
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.MDXFeatures
+import org.modelcatalogue.core.MDXFeaturesService
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.util.Metadata
+import org.springframework.beans.factory.annotation.Autowired
 
 @Immutable(copyWith=true)
 class OrganizationDescription {
@@ -17,11 +21,17 @@ class OrganizationDescription {
         new OrganizationDescription(fullName, abbreviatedName, abbreviatedName + "(.*)")
     }
 }
+
+
 class RegisterReportDescriptorsService {
 
     ReportDescriptorRegistry reportDescriptorRegistry
+    MDXFeaturesService mdxFeaturesService
 
     void register() {
+
+        MDXFeatures mdxFeatures = mdxFeaturesService.getMDXFeatures()
+
         reportDescriptorRegistry.register {
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
@@ -69,38 +79,40 @@ class RegisterReportDescriptorsService {
             link controller: 'dataModel', action: 'excelExporterSpreadsheet', id: true
         }
 
-        List<String> northThamesHospitalNames = ['GOSH', 'LNWH', 'MEH', 'UCLH'] // not sure if this should be defined here. Maybe it would be better in a source file, or perhaps a config file.
-        List<String> gelSourceModelNames = ['Cancer Model', 'Rare Diseases']
-        northThamesHospitalNames.each { name ->
-            reportDescriptorRegistry.register {
-                creates asset
-                title { "GMC Grid Report – North Thames – ${name}" }
-                defaultName { "${it.name} report as MS Excel Document Grid" }
-                depth 7 // for Rare Diseases
-                type DataModel
-                when { DataModel dataModel ->
-                    (dataModel.hasElements()) && (gelSourceModelNames.contains(dataModel.name))
-                    // report only applies to Cancer Model and Rare Diseases!
+        if (mdxFeatures.northThamesFeatures) {
+
+            List<String> northThamesHospitalNames = ['GOSH', 'LNWH', 'MEH', 'UCLH'] // not sure if this should be defined here. Maybe it would be better in a source file, or perhaps a config file.
+            List<String> gelSourceModelNames = ['Cancer Model', 'Rare Diseases']
+            northThamesHospitalNames.each { name ->
+                reportDescriptorRegistry.register {
+                    creates asset
+                    title { "GMC Grid Report – North Thames – ${name}" }
+                    defaultName { "${it.name} report as MS Excel Document Grid" }
+                    depth 7 // for Rare Diseases
+                    type DataModel
+                    when { DataModel dataModel ->
+                        (dataModel.hasElements()) && (gelSourceModelNames.contains(dataModel.name))
+                        // report only applies to Cancer Model and Rare Diseases!
+                    }
+                    link controller: 'northThames', action: 'northThamesGridHierarchyMappingSummaryReport', id: true, params: [organization: name]
                 }
-                link controller: 'northThames', action: 'northThamesGridHierarchyMappingSummaryReport', id: true, params: [organization: name]
+
+                reportDescriptorRegistry.register {
+                    creates asset
+                    title { "GMC Mapping Report – North Thames – ${name}" }
+                    defaultName { "${it.name} North Thames mapping report as MS Excel Document" }
+                    depth 7 // for Rare Diseases
+                    type DataModel
+                    when { DataModel dataModel ->
+                        (dataModel.hasElements()) && (gelSourceModelNames.contains(dataModel.name))
+                    }
+                    link controller: 'northThames', action: 'northThamesMappingReport', id: true, params: [organization: name]
+                }
+
             }
 
-            reportDescriptorRegistry.register {
-                creates asset
-                title { "GMC Mapping Report – North Thames – ${name}" }
-                defaultName { "${it.name} North Thames mapping report as MS Excel Document" }
-                depth 7 // for Rare Diseases
-                type DataModel
-                when { DataModel dataModel ->
-                    (dataModel.hasElements()) && (gelSourceModelNames.contains(dataModel.name))
-                }
-                link controller: 'northThames', action: 'northThamesMappingReport', id: true, params: [organization: name]
-            }
 
-        }
-
-
-        List<OrganizationDescription> organizationDescriptions = [
+            List<OrganizationDescription> organizationDescriptions = [
                 OrganizationDescription.createWithAbbrevNamePrefixAsRegex("Royal Free Hospital", "RFH"),
                 OrganizationDescription.createWithAbbrevNamePrefixAsRegex("University College London Hospital", "UCLH"),
                 OrganizationDescription.createWithAbbrevNamePrefixAsRegex("Great Ormond Street Hospital", "GOSH"),
@@ -109,20 +121,22 @@ class RegisterReportDescriptorsService {
                 OrganizationDescription.createWithAbbrevNamePrefixAsRegex("London North West Hospital", "LNWH"),
                 OrganizationDescription.createWithAbbrevNamePrefixAsRegex("Moorfields Eye Hospital", "MEH"),
                 new OrganizationDescription("North Thames Genomic Medical Centres", "NT", "LONDONPATHOLOGYCODES(.*)")
-        ]
+            ]
 
-        for (OrganizationDescription organizationDescription : organizationDescriptions) {
-            OrganizationDescription copiedOrganizationDescription = organizationDescription.copyWith() // copy so that each reportDescriptor has a different variable
-            reportDescriptorRegistry.register {
-                creates asset
-                title { "${copiedOrganizationDescription.fullName} Mapping Report" }
-                defaultName { "${copiedOrganizationDescription.abbreviatedName} Mapping Report Document" }
-                depth 3
-                type DataModel
-                when { DataModel dataModel ->
-                    dataModel.name.matches(copiedOrganizationDescription.regexForDataModelName)
+            for (OrganizationDescription organizationDescription : organizationDescriptions) {
+                OrganizationDescription copiedOrganizationDescription = organizationDescription.copyWith() // copy so that each reportDescriptor has a different variable
+                reportDescriptorRegistry.register {
+                    creates asset
+                    title { "${copiedOrganizationDescription.fullName} Mapping Report" }
+                    defaultName { "${copiedOrganizationDescription.abbreviatedName} Mapping Report Document" }
+                    depth 3
+                    type DataModel
+                    when { DataModel dataModel ->
+                        dataModel.name.matches(copiedOrganizationDescription.regexForDataModelName)
+                    }
+                    link controller: 'northThames', action: 'northThamesMappingReport', id: true
                 }
-                link controller: 'northThames', action: 'northThamesMappingReport', id: true
+
             }
 
         }
@@ -181,143 +195,147 @@ class RegisterReportDescriptorsService {
             }
         }
 
-        ///// Genomics England Reports
+        if (mdxFeatures.gelFeatures) {
 
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Generate all ${it.name} Cancer Report files" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.ALL_CANCER_REPORTS) == 'true'
+            ///// Genomics England Reports
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Generate all ${it.name} Cancer Report files" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get(Metadata.ALL_CANCER_REPORTS) == 'true'
+                }
+                link controller: 'genomics', action: 'exportAllCancerReports', id: true
             }
-            link controller: 'genomics', action: 'exportAllCancerReports', id: true
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Generate all ${it.name} Rare Disease Report files" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true'
+                }
+                link controller: 'genomics', action: 'exportAllRareDiseaseReports', id: true
+            }
+
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Rare Diseases Disorder List (CSV)" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+                }
+                link controller: 'genomics', action: 'exportRareDiseaseDisorderListAsCsv', id: true
+            }
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Rare Diseases Eligibility Criteria Report (Word Doc)" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+                }
+                link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
+            }
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Rare Diseases Phenotypes and Clinical Tests Report (Word Doc)" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+                }
+                link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
+            }
+
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Rare Diseases Eligibility Phenotypes Split Docs" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+                }
+                link controller: 'genomics', action: 'exportRareDiseaseSplitDocs', id: true
+            }
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Rare Diseases HPO And Clinical Tests (JSON)" }
+                defaultName { "${it.name} report as Json" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+                }
+                link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsJson', id: true
+            }
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Rare Diseases Disorder List Only (JSON)" }
+                defaultName { "${it.name} report as Json" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+                }
+                link controller: 'genomics', action: 'exportRareDiseaseListAsJson', id: true
+            }
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Rare Diseases Eligibility Criteria (JSON)" }
+                defaultName { "${it.name} report as Json" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+                }
+                link controller: 'genomics', action: 'exportRareDiseaseHPOEligibilityCriteriaAsJson', id: true
+            }
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Rare Diseases HPO And Clinical Tests (CSV)" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+                }
+                link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
+            }
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Rare Disease Eligibility Criteria Report (CSV)" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+                }
+                link controller: 'genomics', action: 'exportRareDiseaseEligibilityCsv', id: true
+            }
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Rare Diseases Static Website" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get('Rare Disease Report Available') == 'true' || dataModel.ext.get("All Rare Disease Conditions Reports") == 'true' || dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true' || dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+                }
+                link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
+            }
+
+
+
+            reportDescriptorRegistry.register {
+                creates link
+                title { "Rare Diseases Static Website" }
+                type DataModel
+                when { DataModel dataModel ->
+                    dataModel.ext.get('Rare Disease Report Available') == 'true' || dataModel.ext.get("All Rare Disease Conditions Reports") == 'true' || dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true' || dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+                }
+                link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
+            }
         }
 
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Generate all ${it.name} Rare Disease Report files" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true'
-            }
-            link controller: 'genomics', action: 'exportAllRareDiseaseReports', id: true
-        }
-
-
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Rare Diseases Disorder List (CSV)" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseaseDisorderListAsCsv', id: true
-        }
-
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Rare Diseases Eligibility Criteria Report (Word Doc)" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
-        }
-
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Rare Diseases Phenotypes and Clinical Tests Report (Word Doc)" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
-        }
-
-
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Rare Diseases Eligibility Phenotypes Split Docs" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseaseSplitDocs', id: true
-        }
-
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Rare Diseases HPO And Clinical Tests (JSON)" }
-            defaultName { "${it.name} report as Json" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsJson', id: true
-        }
-
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Rare Diseases Disorder List Only (JSON)" }
-            defaultName { "${it.name} report as Json" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseaseListAsJson', id: true
-        }
-
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Rare Diseases Eligibility Criteria (JSON)" }
-            defaultName { "${it.name} report as Json" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseaseHPOEligibilityCriteriaAsJson', id: true
-        }
-
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Rare Diseases HPO And Clinical Tests (CSV)" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
-        }
-
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Rare Disease Eligibility Criteria Report (CSV)" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseaseEligibilityCsv', id: true
-        }
-
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Rare Diseases Static Website" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get('Rare Disease Report Available') == 'true' || dataModel.ext.get("All Rare Disease Conditions Reports") == 'true' || dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true' || dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
-        }
-
-
-
-        reportDescriptorRegistry.register {
-            creates link
-            title { "Rare Diseases Static Website" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get('Rare Disease Report Available') == 'true' || dataModel.ext.get("All Rare Disease Conditions Reports") == 'true' || dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true' || dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
-        }
     }
 }

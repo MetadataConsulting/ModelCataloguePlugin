@@ -353,6 +353,10 @@ environments {
     }
 }
 
+mdx.features.northThames = System.getenv("MDX_FEATURES_NORTH_THAMES") ?: null
+//mdx.features.northThames = "true"
+mdx.features.gel = System.getenv("MDX_FEATURES_GEL") ?: null
+
 hibernate {
     format_sql = true
     use_sql_comments = true

@@ -30,7 +30,7 @@ class DashboardIndexCommand {
         search nullable: true, blank: true
         offset nullable: true, min: 0
         searchCatalogueElementScopes nullable: false, minSize: 1
-        sort nullable: true, inList: ['name', 'status', 'semanticVersion', 'lastUpdated']
+        sort nullable: true, inList: ['name', 'status', 'modelCatalogueId', 'semanticVersion', 'lastUpdated']
         order nullable: true, inList: ['asc', 'desc']
     }
 

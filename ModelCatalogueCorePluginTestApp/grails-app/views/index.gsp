@@ -67,6 +67,8 @@
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.10/angular-sanitize${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.10/angular-cookies${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/rx-angular/1.1.3/rx.angular${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.0/underscore-min.js"></script>
+
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/URI.js/1.17.1/URI${minSuffix}.js"></script>
 
         <!-- code -->
@@ -91,15 +93,17 @@
         <asset:javascript src="angular-sanitize/angular-sanitize.js"/>
         <asset:javascript src="angular-animate/angular-animate.js"/>
         <asset:javascript src="angular-rx/dist/rx.angular.js"/>
+        <asset:javascript src="underscore/underscore-min.js"/>
         <asset:javascript src="modelcatalogue/modelcatalogue.js"/>
         <asset:javascript src="urijs/src/URI.js"/>
     </g:else>
     <g:set var="configurationProvider" bean="frontendConfigurationProviderRegistry"/>
     <g:set var="oauthService" bean="oauthService"/>
+    <g:set var="mdxFeaturesService" bean="mdxFeaturesService"/>
     <script type="text/javascript">
         ${configurationProvider.frontendConfiguration}
-        var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security']);
-        demoConfig.config(['$logProvider', 'securityProvider', function ($logProvider, securityProvider) {
+        var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security', 'mc.util.mdxFeatures']);
+        demoConfig.config(['$logProvider', 'securityProvider', 'mdxFeaturesProvider', function ($logProvider, securityProvider, mdxFeaturesProvider) {
             $logProvider.debugEnabled(${Environment.current == Environment.DEVELOPMENT ? 'true' : 'false'});
             securityProvider.springSecurity({
                 oauthProviders: ${oauthService.services.keySet().collect{"'$it'"}},
@@ -121,6 +125,8 @@
                 }
                 </sec:ifLoggedIn>
             })
+            mdxFeaturesProvider.setFeatures(${mdxFeaturesService.getMDXFeatures() as grails.converters.JSON})
+
         }]);
 
         demoConfig.run(['$templateCache', function ($templateCache) {
