@@ -17,14 +17,20 @@ class BusinessRulesPage extends Page {
         addItemIcon(required: false, wait: true) {
             $("#role_list_create-catalogue-element-menu-item-link")
         }
+        addBusinessRule { $('span.fa.fa-plus-circle.text-success') }
         expandLink { $('a.inf-cell-expand') }
         dataElementDropDownTag { $('button#role_item_catalogue-elementBtn') }
         deleteBttn { $('a#deleteBtn') }
+        businessElement { $('tr.inf-table-item-row td span a', text: contains(it),0) }
         treeView { $('div.data-model-treeview-pane', 0).module(DataModelTreeViewModule) }
     }
 
     void expandLinkClick() {
         expandLink.click()
+    }
+
+    void addBusinessRuleClick() {
+        addBusinessRule.click()
     }
 
     Boolean isDeleteBttnDisable() {
@@ -40,5 +46,9 @@ class BusinessRulesPage extends Page {
             return false
         }
         true
+    }
+
+    boolean isBusinessElementVisible(String val) {
+        businessElement(val).displayed
     }
 }
