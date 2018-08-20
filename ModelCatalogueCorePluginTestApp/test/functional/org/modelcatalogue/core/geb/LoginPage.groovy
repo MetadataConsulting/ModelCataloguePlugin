@@ -12,6 +12,7 @@ class LoginPage extends Page {
         inputUsername { $('input#username', 0) }
         inputPassword { $('input#password', 0) }
         submitButton { $('button', text: contains('Login')) }
+        rememberMeCheckBox { $('.checkbox input') }
         disabledMessage { $('div.alert-danger', text: 'Sorry, your account is disabled.') }
     }
 
@@ -37,5 +38,9 @@ class LoginPage extends Page {
 
     boolean isAccountDisabled() {
         disabledMessage.displayed
+    }
+
+    boolean clickRememberMeCheckBox() {
+        rememberMeCheckBox.click()
     }
 }

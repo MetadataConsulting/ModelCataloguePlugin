@@ -1,6 +1,7 @@
 
 package org.modelcatalogue.core.geb
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import geb.Page
 
 class DataModelPage extends Page implements InputUtils {
@@ -62,6 +63,8 @@ class DataModelPage extends Page implements InputUtils {
             $("#activity-changes > div.inf-table-body > table > tbody > tr > td:nth-child(3) > span > span > a")
         }
         dataModelActions { $('div.contextual-actions.ng-isolate-scope.btn-toolbar') }
+        dataExchangeIcon { $('span.fa.fa-fw.fa-book.fa-2x') }
+        semanticNumber { $('a.label.ng-binding.label-primary') }
     }
 
     String getRowsText() {
@@ -99,6 +102,10 @@ class DataModelPage extends Page implements InputUtils {
 
     void dataModel() {
         dataModelButton.click()
+    }
+
+    void clickDataExchangeIcon() {
+        dataExchangeIcon.click()
     }
 
     void settiings() {
@@ -235,5 +242,9 @@ class DataModelPage extends Page implements InputUtils {
 
     void cloneAnotherElement() {
         cloneAnotherElementLink.click()
+    }
+
+    Boolean verifySemanticNumber(String num) {
+        semanticNumber.text().contains(num)
     }
 }

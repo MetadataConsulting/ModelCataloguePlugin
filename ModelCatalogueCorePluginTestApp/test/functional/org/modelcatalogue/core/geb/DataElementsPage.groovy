@@ -32,11 +32,13 @@ class DataElementsPage extends Page {
         elementsList { $('table.inf-table tbody tr') }
         settings(wait: true) { $('#role_navigation-right_admin-menu-menu-item-link') }
         mappingUtilityTag(wait: true) { $('#action-batches-menu-item-link') }
+
     }
 
     void createDataElement() {
         createDateElementLink.click()
     }
+
 
     void expandLinkClick() {
         expandLink.click()
@@ -100,4 +102,6 @@ class DataElementsPage extends Page {
         settings.click()
         mappingUtilityTag.click()
     }
+
+
 }
