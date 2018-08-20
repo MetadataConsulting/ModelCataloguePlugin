@@ -24,6 +24,15 @@ class DataClassService {
         getTopLevelDataClasses(dataModelService.dataModelFilter, params)
     }
 
+    /**
+     * "Old" (negative query) method of getting getTopLevelDataClasses. Still useful for calculating which ones to mark as top-level in TopLevelDataClassService.
+     * Searches for top-level DataClasses as those which are not destinations of a hierarchy relationship.
+     * The semantics is a bit wonky if the DataModelFilter includes multiple DataModels; if DM1 has a DataClass DC1 which is parent of DataClass DC2 in DataModel DM2, DC2 will be discounted as top-level, even if it is top-level if you look within DM2 alone.
+     * @param dataModelFilter
+     * @param params
+     * @param canViewDraftsParam
+     * @return
+     */
     ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter,
                                                            Map params = [:],
                                                             Boolean canViewDraftsParam = null) {

@@ -2,12 +2,7 @@ package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Ignore
-import spock.lang.Shared
-import spock.lang.Stepwise
-import spock.lang.Title
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1446')
 @Title('Verify that curator can create a new Data class')

@@ -1,12 +1,8 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Specification
-import spock.lang.Title
 import org.modelcatalogue.core.geb.*
-import spock.lang.Stepwise
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1563')
 @Title('Verify that regular user can see api key')
@@ -141,5 +137,4 @@ class VerifyRegularUserCanSeeApiKeySpec extends GebSpec {
         then:
         at HomePage
     }
-
 }

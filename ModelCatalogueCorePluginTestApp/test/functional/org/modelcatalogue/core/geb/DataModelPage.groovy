@@ -1,8 +1,12 @@
+
 package org.modelcatalogue.core.geb
 
 import geb.Page
 
-class DataModelPage extends Page implements InputUtils {
+/**
+ * Describes the view of a particular DataModel within the "Advanced" Data Model View Page
+ */
+class DataModelPage extends AdvancedDataModelViewPage implements InputUtils {
 
     static at = {
         title.startsWith('Activity of')
@@ -54,14 +58,16 @@ class DataModelPage extends Page implements InputUtils {
         ModelEditSaveButton(required: false, wait: true) { $('#role_item-detail_inline-edit-submitBtn') }
         finalizedStatus(required: false, wait: true) { $('div.col-md-6', text: 'Status').siblings() }
         setting { $('a#role_navigation-right_admin-menu-menu-item-link') }
-        dataModelAcl { $('a#datamodelpermission-admin-menu-item-link') }
+        dataModelAclTag { $('a#datamodelpermission-admin-menu-item-link') }
         userLink(wait: true) { $('#role_navigation-right_user-menu-menu-item-link') }
         logoutLink(wait: true) { $('#user-login-right-menu-item-link') }
         activityUser(wait: true) {
             $("#activity-changes > div.inf-table-body > table > tbody > tr > td:nth-child(3) > span > span > a")
         }
         dataModelActions { $('div.contextual-actions.ng-isolate-scope.btn-toolbar') }
+
     }
+
 
     String getRowsText() {
         rows.collect { it.text() }.join(' ')
@@ -80,6 +86,7 @@ class DataModelPage extends Page implements InputUtils {
     }
 
     void finalizedDataModel() {
+        sleep(2_000)
         finalizedLink.click()
     }
 
@@ -104,7 +111,7 @@ class DataModelPage extends Page implements InputUtils {
     }
 
     void dataModelAcl() {
-        dataModelAcl.click()
+        dataModelAclTag.click()
     }
 
     String getDataModelTitle() {
@@ -182,7 +189,7 @@ class DataModelPage extends Page implements InputUtils {
     boolean isDataModelFinalized() {
         activityList.$('td:nth-child(4) span span')*.text().join(",").contains("finalized")
     }
-  
+
     boolean defaultChecksPolicyAdded() {
         policiesList.$('a', text: 'Default Checks').displayed
     }

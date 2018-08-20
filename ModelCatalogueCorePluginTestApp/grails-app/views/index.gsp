@@ -96,10 +96,11 @@
     </g:else>
     <g:set var="configurationProvider" bean="frontendConfigurationProviderRegistry"/>
     <g:set var="oauthService" bean="oauthService"/>
+    <g:set var="mdxFeaturesService" bean="mdxFeaturesService"/>
     <script type="text/javascript">
         ${configurationProvider.frontendConfiguration}
-        var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security']);
-        demoConfig.config(['$logProvider', 'securityProvider', function ($logProvider, securityProvider) {
+        var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security', 'mc.util.mdxFeatures']);
+        demoConfig.config(['$logProvider', 'securityProvider', 'mdxFeaturesProvider', function ($logProvider, securityProvider, mdxFeaturesProvider) {
             $logProvider.debugEnabled(${Environment.current == Environment.DEVELOPMENT ? 'true' : 'false'});
             securityProvider.springSecurity({
                 oauthProviders: ${oauthService.services.keySet().collect{"'$it'"}},
@@ -121,6 +122,8 @@
                 }
                 </sec:ifLoggedIn>
             })
+            mdxFeaturesProvider.setFeatures(${mdxFeaturesService.getMDXFeatures() as grails.converters.JSON})
+
         }]);
 
         demoConfig.run(['$templateCache', function ($templateCache) {

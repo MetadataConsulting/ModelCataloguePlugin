@@ -1,24 +1,11 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import org.modelcatalogue.core.geb.CreateDataModelPage
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataClassPage
-import org.modelcatalogue.core.geb.DataClassesPage
-import org.modelcatalogue.core.geb.DataModelAclPermissionsPage
-import org.modelcatalogue.core.geb.DataModelAclPermissionsShowPage
-import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.HomePage
-import org.modelcatalogue.core.geb.LoginPage
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Shared
-import spock.lang.Ignore
-import spock.lang.Stepwise
-import spock.lang.Title
+import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1495')
-@Title('Examine that User can edit data classes for Data Model they have administration rights to')
+@Title('Examine that Curator can edit data classes for Data Model they have administration rights to')
 @Narrative('''
 - Login to Model Catalogue as supervisor
 - Select the 'create new data model' button ( black plus sign) from the top right hand menu. | Redirected to 'Create new data model' page
@@ -26,10 +13,10 @@ import spock.lang.Title
 - Click on the Settings menu button in the top left hand menu  | Drop- down menu appears
 - Select Data Model ACL from the drop-down menu | Redirected to Data Model ACL page . Data Model Permissions is the title 
 - In the Data Model ACL (Access Clearance Level) page, Select the data model you just created from the list | Go to Data Model Users Permissions page  (title is name of data model) .  List  shown of users and permissions
-- In Data Models Users Permissions page, From first drop down, select User's name ( User) and in the second drop down select Administration to give them administration rights
-- Press the button 'Grant' in order to grand User administration rights to the data model  | User's name appears in list with Administration written in next column showing user rights. 
+- In Data Models Users Permissions page, From first drop down, select Curator's name ( Curator) and in the second drop down select Administration to give them administration rights
+- Press the button 'Grant' in order to grand Curator administration rights to the data model  | Curator's name appears in list with Administration written in next column showing user rights. 
 - Log out of Mx. | Supervisor is logged out
-- Log in as User | User is Logged in
+- Log in as Curator | Curator is Logged in
 - Select a Draft Data Model
 - on the tree view, select data Classes | Active Data Classes is displayed
 - Select a data class | Taken to Data Class page
@@ -44,11 +31,15 @@ import spock.lang.Title
 - Click on the edit button and fill the form
 - Check that Metadata is edited     
 ''')
-@Stepwise
 @Ignore
-class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
+@Stepwise
+class CuratorCanEditDataClassesForAdminDataModelSpec extends GebSpec {
     @Shared
     String dataModelName = UUID.randomUUID().toString()
+    @Shared
+    String dataClassName = UUID.randomUUID().toString()
+    @Shared
+    String dataClassNewName = "New class name"
 
     def "Login as supervisor"() {
         when:
@@ -76,6 +67,33 @@ class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
         at DataModelPage
     }
 
+    def "Create data class"() {
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.treeView.select('Data Classes')
+        then:
+        at DataClassesPage
+
+        when:
+        DataClassesPage dataClassesPage = browser.page DataClassesPage
+        dataClassesPage.createDataClass()
+
+        then:
+        at CreateDataClassPage
+
+        when:
+        CreateDataClassPage createDataClassPage = browser.page CreateDataClassPage
+        createDataClassPage.name = "NEW_TESTING_MODEL "
+        createDataClassPage.modelCatalogueId = dataClassName
+        createDataClassPage.description = 'THIS IS MY DATA CLASS'
+        createDataClassPage.finish()
+        createDataClassPage.exit()
+
+        then: 'your are redirected to the data classes page'
+        at DataClassesPage
+
+    }
+
     def "select data model acl"() {
         when:
         DashboardPage dashboardPage = to DashboardPage
@@ -85,7 +103,7 @@ class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
         at DataModelAclPermissionsPage
     }
 
-    def "grant admin right to user for draft data model"() {
+    def "grant admin right to curator for draft data model"() {
         when:
         DataModelAclPermissionsPage dataModelPermissionListPage = browser.page DataModelAclPermissionsPage
         dataModelPermissionListPage.select(dataModelName)
@@ -94,7 +112,7 @@ class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
 
         when:
         DataModelAclPermissionsShowPage dataModelPermissionGrantPage = browser.page DataModelAclPermissionsShowPage
-        dataModelPermissionGrantPage.grant("user", "administration")
+        dataModelPermissionGrantPage.grant("curator", "administration")
 
         then:
         at DataModelAclPermissionsShowPage
@@ -109,10 +127,10 @@ class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
         at HomePage
     }
 
-    def "login as user"() {
+    def "login as curator"() {
         when:
         LoginPage loginPage = to LoginPage
-        loginPage.login('user', 'user')
+        loginPage.login('curator', 'curator')
 
         then:
         at DashboardPage
@@ -131,12 +149,13 @@ class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select('Data Classes')
+        sleep(2_000)
         then:
         at DataClassesPage
 
         when:
         DataClassesPage dataClassesPage = browser.page(DataClassesPage)
-        dataClassesPage.openDataClass(0)
+        dataClassesPage.openDataClass()
 
         then:
         at DataClassPage
@@ -148,5 +167,26 @@ class UserCanEditDataClassesForAdminDataModelSpec extends GebSpec {
         dataClassPage.formMetadata()
         then:
         at DataClassPage
+
+        when:
+        dataClassPage = browser.page DataClassPage
+        dataClassPage.edit()
+        then:
+        at DataClassPage
+
+        when:
+        dataClassPage = browser.page DataClassPage
+        dataClassPage.editClassName(dataClassNewName)
+        dataClassPage.save()
+        then:
+        at DataClassPage
+    }
+
+    def "Check edited form metadata"() {
+        when:
+        DataClassPage dataClassPage = browser.page DataClassPage
+        then:
+        println browser.title
+        dataClassPage.checkClassName(dataClassNewName)
     }
 }

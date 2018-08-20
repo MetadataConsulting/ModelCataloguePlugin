@@ -291,6 +291,12 @@ class AddAndRemoveManyDataElementsSpec extends GebSpec {
         dataElementPage.confirmDelete()
         then:
         at DataElementsPage
-    }
 
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
+    }
 }

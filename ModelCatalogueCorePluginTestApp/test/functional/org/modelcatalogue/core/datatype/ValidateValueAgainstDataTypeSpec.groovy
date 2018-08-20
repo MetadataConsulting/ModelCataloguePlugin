@@ -1,20 +1,8 @@
 package org.modelcatalogue.core.datatype
 
 import geb.spock.GebSpec
-import org.modelcatalogue.core.geb.CreateDataModelPage
-import org.modelcatalogue.core.geb.CreateDataTypePage
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.DataTypePage
-import org.modelcatalogue.core.geb.DataTypesPage
-import org.modelcatalogue.core.geb.DataTypeValueValidatePage
-import org.modelcatalogue.core.geb.LoginPage
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Ignore
-import spock.lang.Shared
-import spock.lang.Stepwise
-import spock.lang.Title
+import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1722')
 @Title('Validate Value against Data Type')
@@ -73,7 +61,7 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select('Data Types')
         then:
-        at DataTypesPage
+        waitFor(30) { at DataTypesPage }
 
         when:
         DataTypesPage dataTypesPage = browser.page DataTypesPage
@@ -98,9 +86,8 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
         when:
         DataTypesPage dataTypesPage = browser.page DataTypesPage
         dataTypesPage.selectDataType(dataTypeName)
-
         then:
-        at DataTypePage
+        waitFor(5) {at DataTypePage}
     }
 
     def "select validate value"() {
@@ -118,7 +105,7 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
         dataTypeValueValidatePage.validateKeyField = "one"
 
         then:
-        waitFor { dataTypeValueValidatePage.outputIsValid() }
+        waitFor(5) { dataTypeValueValidatePage.outputIsValid() }
 
         when:
         dataTypeValueValidatePage = browser.page DataTypeValueValidatePage
@@ -127,5 +114,13 @@ class ValidateValueAgainstDataTypeSpec extends GebSpec {
 
         then:
         waitFor { !dataTypeValueValidatePage.outputIsValid() }
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 }
+

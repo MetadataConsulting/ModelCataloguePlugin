@@ -1,11 +1,6 @@
 package org.modelcatalogue.core.datamodel
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Specification
-import spock.lang.Title
-import spock.lang.Ignore
 import org.modelcatalogue.core.geb.*
 import spock.lang.*
 
@@ -31,7 +26,6 @@ import spock.lang.*
  - Select 'Data Model' button from top-left menu . | Data Model button menu drop-down appears
  - Verify that you can select the option 'New Version' | Option is selectable
 /$)
-
 @Stepwise
 class CreateNewVersionOfDataModelSpec extends GebSpec {
 
@@ -127,9 +121,11 @@ class CreateNewVersionOfDataModelSpec extends GebSpec {
         when:
         VersionsPage versionsPage = browser.page VersionsPage
         versionsPage.selectVersion(semanticVersion)
+        sleep(2_000)
         versionsPage.dataElementDropDownClick()
         versionsPage.deleteBttnClick()
         versionsPage.deleteConfirmationBttnClick()
+        sleep(2_000)
         then:
         at DashboardPage
     }
@@ -148,4 +144,5 @@ class CreateNewVersionOfDataModelSpec extends GebSpec {
         then:
         dataModelPage.dropdownMenu.newLinkDisplay()
     }
+
 }

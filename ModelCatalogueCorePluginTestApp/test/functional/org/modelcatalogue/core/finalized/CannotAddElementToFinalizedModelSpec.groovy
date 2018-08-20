@@ -1,13 +1,11 @@
 package org.modelcatalogue.core.finalized
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Specification
-import spock.lang.Ignore
-import spock.lang.Title
 import org.modelcatalogue.core.geb.*
 import spock.lang.*
+import spock.lang.Issue
+import spock.lang.Narrative
+import spock.lang.Title
 
 @Issue('https://metadata.atlassian.net/browse/MET-1566')
 @Title('Check that When Data Model is finalized,you are not able to add new elements')
@@ -76,9 +74,11 @@ class CannotAddElementToFinalizedModelSpec extends GebSpec {
         FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
         finalizeDataModelPage.version = version
         finalizeDataModelPage.setVersionNote(versionNote)
+        sleep(1_000)
         finalizeDataModelPage.submit()
+        sleep(2_000)
         then:
-        at FinalizedDataModelPage
+        waitFor { at FinalizedDataModelPage }
         when:
         FinalizedDataModelPage finalizedDataModelPage = browser.page FinalizedDataModelPage
         finalizedDataModelPage.hideConfirmation()

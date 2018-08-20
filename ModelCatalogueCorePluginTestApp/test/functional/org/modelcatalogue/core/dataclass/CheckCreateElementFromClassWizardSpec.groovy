@@ -4,9 +4,7 @@ import geb.spock.GebSpec
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Specification
-import spock.lang.Title
-import spock.lang.Stepwise
-import spock.lang.Shared
+import spock.lang.*
 import org.modelcatalogue.core.geb.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1496')

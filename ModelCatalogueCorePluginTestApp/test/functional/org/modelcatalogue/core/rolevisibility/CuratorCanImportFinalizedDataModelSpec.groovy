@@ -1,8 +1,8 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import spock.lang.*
 import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1626')
 @Title('Check that a curator can Add Data Model Import from Data Model menu')
@@ -26,8 +26,6 @@ import org.modelcatalogue.core.geb.*
  - 17. Select 'Imported Data Models' tag using tree-navigation panel. | Imported Data Models tag opens. Display panel is directed to '[Data model name] Imports' page.
  - 18. Verify that imported Data model name is listed under '[Data model name] Imports' page. | Imported Data Model is listed.
 /$)
-
-@Ignore
 @Stepwise
 class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
 
@@ -191,5 +189,12 @@ class CuratorCanImportFinalizedDataModelSpec extends GebSpec {
         driver.navigate().refresh()
         then:
         dataImportsPage.containsDataModel(dataModelOneName)
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 }

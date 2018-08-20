@@ -2,13 +2,7 @@ package org.modelcatalogue.core.dataclass
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Ignore
-import spock.lang.Shared
-import spock.lang.Specification
-import spock.lang.Stepwise
-import spock.lang.Title
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1554')
 @Title('Examine that when creating a new draft - if there are Data Classes from other models -edits from imported models are updated in your model.')
@@ -39,8 +33,8 @@ import spock.lang.Title
 - Navigate back to your Data Model and to the data class.
 - Check that when you search in the parents tab, edits made to the data class in the imported model are carried through to your data model. | Edits are present from imported data model.
 ''')
+
 @Stepwise
-@Ignore
 class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
     @Shared
     String dataModelName = UUID.randomUUID().toString()
@@ -85,6 +79,7 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
         dataModelPage.treeView.select("Data Classes")
+        sleep(2_000)
         then:
         at DataClassesPage
 
@@ -204,18 +199,20 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         when:
         ParentClassModalPage parentClassModalPage = browser.page ParentClassModalPage
         parentClassModalPage.searchMore()
-        Thread.sleep(1500)
+        sleep(2_000)
         then:
         at SearchClassPage
 
         when:
         SearchClassPage searchClassPage = browser.page SearchClassPage
         searchClassPage.search(importDataClassName)
+        sleep(2_000)
         then:
         at ParentClassModalPage
 
         when:
         parentClassModalPage = browser.page ParentClassModalPage
+        sleep(2_000)
         parentClassModalPage.createRelationship()
         then:
         at ParentClassModalPage
@@ -304,7 +301,8 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
     def "open new version of data model"() {
         when:
         DashboardPage dashboardPage = to DashboardPage
-        dashboardPage.selectModelByNameAndIndex(dataModelName, 1)
+        dashboardPage.search(dataModelName)
+        dashboardPage.select(dataModelName)
         then:
         at DataModelPage
 
@@ -334,5 +332,4 @@ class NewDraftEditFromImportedModelsAreUpdatedSpec extends GebSpec {
         then:
         dataClassesPage.containsDataClass(importDataClassNewName)
     }
-
 }

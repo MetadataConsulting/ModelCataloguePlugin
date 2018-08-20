@@ -6,6 +6,7 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.MDXFeaturesService
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.MetadataDomainEntityService
 import org.modelcatalogue.core.PrimitiveType
@@ -103,6 +104,8 @@ beans = {
 
 
     mergeConfig(application)
+
+    mdxFeaturesService(MDXFeaturesService)
 
     relationshipsXmlRenderer(RelationshipsXmlRenderer)
     reportDescriptorRegistry(ReportDescriptorRegistry)

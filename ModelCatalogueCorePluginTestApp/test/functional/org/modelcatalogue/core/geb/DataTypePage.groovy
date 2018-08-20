@@ -15,6 +15,7 @@ class DataTypePage extends Page {
             $('a#role_item_catalogue-element-menu-item-link')
         }
         validateValueLink { $('a#validate-value-menu-item-link') }
+        checkForDataType(wait: true, required: false) { $('h3.ce-name span', text: it) }
     }
 
 
@@ -25,6 +26,7 @@ class DataTypePage extends Page {
     boolean editDataTypeDisabled() {
         waitFor { editButton.@('disabled') }
     }
+
     void enumeratedType() {
         enumeratedTypeDropdown.click()
     }
@@ -34,7 +36,8 @@ class DataTypePage extends Page {
     }
 
     boolean isDataTypePageFor(String value) {
-        $('h3.ce-name span', text: value).displayed
+        sleep(2_000)
+        checkForDataType(value)?.displayed
     }
 
 }
