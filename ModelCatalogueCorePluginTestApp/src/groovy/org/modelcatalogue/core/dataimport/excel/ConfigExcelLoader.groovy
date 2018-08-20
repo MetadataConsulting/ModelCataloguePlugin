@@ -205,14 +205,15 @@ class ConfigExcelLoader extends ExcelLoader {
         Iterator<Row> rowIt = sheet.rowIterator()
         List<String> headers
         List<Map<String, String>> rowMaps = []
-        int rowNum = 1
+        int rowNum = 1 // start counting from 1 rather than 0 (very un-computer-science-y)
         while (rowIt.hasNext()) {
 //            println("processing row" + counter)
-            if(rowNum % EXCEL_BATCH_SIZE == 0 ) {
+            if(rowNum % EXCEL_BATCH_SIZE == 0 ) { // on every EXCEL_BATCH_SIZE (default 1000th) row, do processRowMaps.
                 processRowMaps(rowMaps, headersMap)
                 rowMaps.clear()
             }
             Row row = rowIt.next()
+            // now row is rowMaps[rowNum-1]. i.e. the first row is when rowNum = 1.
             if (rowNum == headerRow) {
                 headers = getRowData(row)
                 log.info("Headers are ${headers as String}")
@@ -813,7 +814,7 @@ class ConfigExcelLoader extends ExcelLoader {
      */
     def processRowMaps(List<Map<String, String>> rowMaps, Map<String, Object> headersMap, String dataModelName = this.dataModelName) {
         int rowNum = 1
-        if (rowMaps && headersMap) {
+        if (rowMaps != null && headersMap) {
             DataModel dataModel = processDataModel(dataModelName)
 
             for (Map<String, String> rowMap in rowMaps) {
