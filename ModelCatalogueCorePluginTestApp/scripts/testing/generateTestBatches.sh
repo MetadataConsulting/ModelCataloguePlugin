@@ -45,12 +45,15 @@ GROUPED_SPECNAMES="$(printf "$SPECS_WITHOUT_IGNORE_NAMES" \
 | sed -n "
     N
     N
+    N
+    N
+    N
     s/\n/ /g
     s/\(.*\)/\"\1\"/
     p
   "
 )"
-# Collect three Specs at a time:
+# Collect ten Specs at a time:
 # for each line pull in two lines: (N N),
 # and then substitute newline \n with space (s/\n/ /g),
 # add quotes around the line (s/\(.*\)/\"\1\"/)

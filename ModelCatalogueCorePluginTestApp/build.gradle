@@ -428,7 +428,7 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     description = "Run all Grails MX tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
 
     assertJava8()
-    environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+    environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server "
     environment 'DOCKERIZED_TESTS', "true"
     environment 'FILE_OPENER_SKIP', "true"
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
@@ -478,7 +478,7 @@ task runIntegrationTests(type: Exec, dependsOn: [bowerInstall]) {
     environment 'FILE_OPENER_SKIP', "true"
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
 
-    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-integration']
+    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', '-integration' ]
     if (project.hasProperty('testArgs')) { // get arguments for grails test-app
         cmds.addAll(testArgs.split(' '))
     }
@@ -487,7 +487,7 @@ task runIntegrationTests(type: Exec, dependsOn: [bowerInstall]) {
 
 
 }
-task runFunctionalTests(type: Exec, dependsOn: [bowerInstall]) {
+task runFunctionalTests0(type: Exec, dependsOn: [bowerInstall, cleanGrails]) {
     description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
 
     assertJava8()
@@ -496,16 +496,217 @@ task runFunctionalTests(type: Exec, dependsOn: [bowerInstall]) {
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
 
 
-    //  def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-unit', '-integration', '-functional']
-    def cmds = [grailsw, 'test-app', '--non-interactive', '--stacktrace', 'functional:']
+    def cmds1 = [grailsw,'-Dwebdriver.chrome.driver=/var/lib/jenkins/chromedriver/chromedriver',
+                 'test-app', '--non-interactive', '--stacktrace',
+                 'functional: MaxOccursShowsInHistorySpec VerifyMinOccursCanBeZeroSpec VerifySupervisorCanActionSettingsSpec']
     if (project.hasProperty('testArgs')) { // get arguments for grails test-app
-        cmds.addAll(testArgs.split(' '))
+        cmds1.addAll(testArgs.split(' '))
     }
-    commandLine cmds
-    outputs.files file('/usr/workspace/testreports/target/test-reports-functional/')
 
+    commandLine cmds1
+    outputs.files file('/usr/workspace/testreports/target/test-reports-functional1/')
 
 }
+
+task runFunctionalTests01(type: Exec, dependsOn: [bowerInstall, cleanGrails]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+
+    def cmds1 = [grailsw,'-Dwebdriver.chrome.driver=/var/lib/jenkins/chromedriver/chromedriver',
+                 'test-app', '--non-interactive', '--stacktrace',
+                 'functional: AddAndRemoveManyDataElementsSpec CheckCreateElementFromClassWizardSpec GrantRoleCuratorSpec ']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds1.addAll(testArgs.split(' '))
+    }
+
+
+
+    commandLine cmds1
+    outputs.files file('/usr/workspace/testreports/target/test-reports-functional1/')
+
+}
+
+task runFunctionalTests02(type: Exec, dependsOn: [bowerInstall, cleanGrails]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+
+    def cmds1 = [grailsw,'-Dwebdriver.chrome.driver=/var/lib/jenkins/chromedriver/chromedriver',
+                 'test-app', '--non-interactive', '--stacktrace',
+                 'functional:  CheckDataTypeAddedToNewVersionSpec ValidateValueAgainstDataTypeSpec  ']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds1.addAll(testArgs.split(' '))
+    }
+
+
+
+    commandLine cmds1
+    outputs.files file('/usr/workspace/testreports/target/test-reports-functional1/')
+
+}
+
+task runFunctionalTests03(type: Exec, dependsOn: [bowerInstall, cleanGrails]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+
+    def cmds1 = [grailsw,'-Dwebdriver.chrome.driver=/var/lib/jenkins/chromedriver/chromedriver',
+                 'test-app', '--non-interactive', '--stacktrace',
+                 'functional: NewDraftEditFromImportedModelsAreUpdatedSpec CannotCreateDataElementWithUnauthorizedDataTypeSpec   ']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds1.addAll(testArgs.split(' '))
+    }
+
+
+
+    commandLine cmds1
+    outputs.files file('/usr/workspace/testreports/target/test-reports-functional1/')
+
+}
+//AddAndRemoveManyDataElementsSpec  CheckCreateElementFromClassWizardSpec
+// '   ' +CannotCreateDataElementWithUnauthorizedDataTypeSpec - OK
+//' CannotCreateDataElementWithUnauthorizedDataTypeSpec' +
+//    ' CheckDataTypeAddedToNewVersionSpec ValidateValueAgainstDataTypeSpec ' +
+//
+//NewDraftEditFromImportedModelsAreUpdatedSpec - segfault suspect
+
+task runFunctionalTests04(type: Exec, dependsOn: [bowerInstall, cleanGrails]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+
+    def cmds1 = [grailsw,'-Dwebdriver.chrome.driver=/var/lib/jenkins/chromedriver/chromedriver',
+                 'test-app', '--non-interactive', '--stacktrace',
+                 'functional: "VerifyViewerCannotAccessFactActionsSpec AdminUserCannotDeleteFinalizedItemsSpec' +
+                     ' VerifyCuratorCannotDeleteFinalizedDataModelSpec CuratorCannotCreateClassInFinalizedModelSpec' +
+                     ' AdminCanCreateModelAndPolicySpec DisableUserSpec' +
+                     ' CheckAdminCanDeleteImportedModelSpec VerifyRegularUserCanSeeApiKeySpec' +
+                     ' CuratorCanCreateANewDataClassSpec UserCannotEditReadOnlyDataModelSpec " ']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds1.addAll(testArgs.split(' '))
+    }
+
+    commandLine cmds1
+    outputs.files file('/usr/workspace/testreports/target/test-reports-functional1/')
+
+}
+
+task runFunctionalTests10(type: Exec, dependsOn: [bowerInstall, cleanGrails]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+    //wd = System.getenv('WEB_DRIVER')
+    //println "Web.drivert: ${wd}"
+    def cmds1 = [grailsw,'-Dwebdriver.chrome.driver=/var/lib/jenkins/chromedriver/chromedriver',
+                 'test-app', '--non-interactive', '--stacktrace',
+                 'functional: CuratorCannotEditFinalizedModelSpec CuratorCanImportFinalizedDataModelSpec' +
+                     ' CuratorWithAdminCanDeleteClassInDraftModelSpec CannotAddElementToFinalizedModelSpec' +
+                     ' CannotAddDataElementsToFinalizedDataModelSpec CanCreateDataElementAndCloneDataTypeSpec' +
+                     ' CanSelectPoliciesWhileCreatingDataModelSpec ' ]
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds1.addAll(testArgs.split(' '))
+    }
+
+    commandLine cmds1
+    outputs.files file('/usr/workspace/testreports/target/test-reports-functional1/')
+
+}
+//UnableToImportIfReadAccessSpec CanImportDataModelSpec CanCreateDataTypeSpec
+
+
+task runFunctionalTests20(type: Exec, dependsOn: [bowerInstall, cleanGrails]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+
+    def cmds1 = [grailsw,'-Dwebdriver.chrome.driver=/var/lib/jenkins/chromedriver/chromedriver',
+                 'test-app', '--non-interactive', '--stacktrace',
+                 'functional: UnableToImportIfReadAccessSpec CanImportDataModelSpec CanCreateDataTypeSpec']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds1.addAll(testArgs.split(' '))
+    }
+
+    commandLine cmds1
+    outputs.files file('/usr/workspace/testreports/target/test-reports-functional1/')
+
+}
+task runFunctionalTests30(type: Exec, dependsOn: [bowerInstall, cleanGrails]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+
+    def cmds1 = [grailsw,'-Dwebdriver.chrome.driver=/var/lib/jenkins/chromedriver/chromedriver',
+                 'test-app', '--non-interactive', '--stacktrace',
+                 'functional: AbleToNavigateToOldVersionOfAModelThroughTreeSpec CannotDeleteFinalizedDataModelSpec' +
+                     ' UserCanFinalizeDataModelSpec ' +
+                     '  UserIsAbleToDownloadAnAssetSpec' +
+                     ' CuratorCanGenerateSuggestionsUsingMappingUtilitySpec VersionVerificationSpec']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds1.addAll(testArgs.split(' '))
+    }
+
+    commandLine cmds1
+    outputs.files file('/usr/workspace/testreports/target/test-reports-functional1/')
+
+}
+
+task runFunctionalTests40(type: Exec, dependsOn: [bowerInstall, cleanGrails]) {
+    description = "Run all Grails MX  tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx8G -Xms1G -d64 -server"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+
+    def cmds1 = [grailsw,'-Dwebdriver.chrome.driver=/var/lib/jenkins/chromedriver/chromedriver',
+                 'test-app', '--non-interactive', '--stacktrace',
+                 'functional: ImportAndRemoveDataModelReflectsInHistorySpec ImportXmlAndExcelDataSpec' +
+                     ' CanCreateDataTypeFromCreateDataElementWizardSpec ']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds1.addAll(testArgs.split(' '))
+    }
+
+    commandLine cmds1
+    outputs.files file('/usr/workspace/testreports/target/test-reports-functional1/')
+
+}
+//ImportXmlAndExcelDataSpec ImportAndRemoveDataModelReflectsInHistorySpec HistoryIsPopulatedAccordingToModelActivitySpec CanCreateDataTypeFromCreateDataElementWizardSpec
+
+///"MaxOccursShowsInHistorySpec VerifyMinOccursCanBeZeroSpec CheckCreateElementFromClassWizardSpec AddAndRemoveManyDataElementsSpec NewDraftEditFromImportedModelsAreUpdatedSpec GrantRoleCuratorSpec CannotCreateDataElementWithUnauthorizedDataTypeSpec CheckDataTypeAddedToNewVersionSpec ValidateValueAgainstDataTypeSpec VerifySupervisorCanActionSettingsSpec"
+//"VerifyViewerCannotAccessFactActionsSpec AdminUserCannotDeleteFinalizedItemsSpec VerifyCuratorCannotDeleteFinalizedDataModelSpec CuratorCannotCreateClassInFinalizedModelSpec AdminCanCreateModelAndPolicySpec DisableUserSpec CheckAdminCanDeleteImportedModelSpec VerifyRegularUserCanSeeApiKeySpec CuratorCanCreateANewDataClassSpec UserCannotEditReadOnlyDataModelSpec"
+//"CuratorCannotEditFinalizedModelSpec CuratorCanImportFinalizedDataModelSpec CuratorWithAdminCanDeleteClassInDraftModelSpec CannotAddElementToFinalizedModelSpec CannotAddDataElementsToFinalizedDataModelSpec CanCreateDataElementAndCloneDataTypeSpec CanSelectPoliciesWhileCreatingDataModelSpec CanImportDataModelSpec CanCreateDataTypeSpec UnableToImportIfReadAccessSpec"
+//"AbleToNavigateToOldVersionOfAModelThroughTreeSpec CannotDeleteFinalizedDataModelSpec UserCanFinalizeDataModelSpec HistoryIsPopulatedAccordingToModelActivitySpec ImportAndRemoveDataModelReflectsInHistorySpec ImportXmlAndExcelDataSpec CanCreateDataTypeFromCreateDataElementWizardSpec UserIsAbleToDownloadAnAssetSpec CuratorCanGenerateSuggestionsUsingMappingUtilitySpec VersionVerificationSpec"
+
+
 
 
 task runKarmaTests(type: NodeTask) {
