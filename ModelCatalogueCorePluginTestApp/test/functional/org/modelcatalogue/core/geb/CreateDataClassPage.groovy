@@ -51,6 +51,7 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
         addMetadataButton(wait: true) { $('div.modal button.btn-success', text: 'Add Metadata') }
         elementsList(wait: true) { $('ul.dropdown-menu.ng-isolate-scope li') }
         elemenAddedText(wait: true) { $('span.with-pointer.ng-binding') }
+        alert(wait: true) { $('div.alert',0) }
     }
 
     void setName(String value) {
@@ -176,5 +177,9 @@ class CreateDataClassPage extends Page implements InputUtils, MetadataUtils {
 
     void createNewElementFromPlusButton() {
         createNewDataElementPlusButton.click()
+    }
+
+    Boolean isAlertDisplayed() {
+        alert?.displayed
     }
 }
