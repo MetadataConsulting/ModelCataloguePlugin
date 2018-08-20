@@ -9,6 +9,7 @@ class DropDownImportPage extends Page implements InputUtils {
         search(wait: true) { $("input#elements", 0) }
         searchMoreLink(wait: true) { $("a.show-more-cep-item", 0) }
         submitButton(wait: true) { $("div.modal-footer>button.btn-primary") }
+        searchMoreIcon(wait: true) { $("span.input-group-addon") }
     }
 
     void fillSearchBox(String searchText) {
@@ -18,6 +19,10 @@ class DropDownImportPage extends Page implements InputUtils {
 
     void searchMore() {
         searchMoreLink.click()
+    }
+
+    void searchMoreIconButton() {
+        searchMoreIcon.click()
     }
 
     void finish() {

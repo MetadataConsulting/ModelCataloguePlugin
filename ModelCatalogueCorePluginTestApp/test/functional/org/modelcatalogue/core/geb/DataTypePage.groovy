@@ -16,11 +16,25 @@ class DataTypePage extends Page {
         }
         validateValueLink { $('a#validate-value-menu-item-link') }
         checkForDataType(wait: true, required: false) { $('h3.ce-name span', text: it) }
+        deprecate(wait: true, required: false) { $('a#archive-menu-item-link span', 2) }
+        confirmDeprecateTag(wait: true, required: false) { $('button.btn', 0) }
     }
 
 
     void edit() {
         editButton.click()
+    }
+
+    void confirmDeprecate() {
+        confirmDeprecateTag.click()
+    }
+
+    void selectDataTypeDropdown() {
+        dataTypeDropdown.click()
+    }
+
+    void clickDeprecate() {
+        deprecate.click()
     }
 
     boolean editDataTypeDisabled() {
