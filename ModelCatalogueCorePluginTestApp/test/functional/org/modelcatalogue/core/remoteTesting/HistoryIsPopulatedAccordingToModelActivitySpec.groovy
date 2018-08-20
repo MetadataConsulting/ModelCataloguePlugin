@@ -2,7 +2,6 @@ package org.modelcatalogue.core.remoteTesting
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
@@ -85,13 +84,40 @@ class HistoryIsPopulatedAccordingToModelActivitySpec extends GebSpec {
         createDataClassPage.raw()
         createDataClassPage.finish()
         createDataClassPage.exit()
+        sleep(2_000)
 
         then:
         at DataClassesPage
 
+    }
+
+    def "verify that data is created"() {
+
+        given:
+        final String myName = " testing data element "
+        final String myCatalogue = UUID.randomUUID().toString()
+        final String myDescription = "This a test element"
+        final String tagName = "myTag"
+
+        when: 'login as a curator'
+        LoginPage loginPage = to LoginPage
+        loginPage.login('curator', 'curator')
+
+        then: 'you get redirected to Dashboard page'
+        at DashboardPage
+
+        when: 'Select any Data Model'
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search('Test 1')
+        dashboardPage.select('Test 1')
+
+        then:
+        at DataModelPage
+
+
         when: 'Create Data Element'
-        dataClassesPage = browser.page(DataClassesPage)
-        Thread.sleep(1000)
+        DataClassesPage dataClassesPage = browser.page(DataClassesPage)
+        sleep(3_000)
         dataClassesPage.treeView.select('Data Elements')
 
         then:
@@ -120,7 +146,7 @@ class HistoryIsPopulatedAccordingToModelActivitySpec extends GebSpec {
         cloneOrImportPage.allowClone()
 
         then:
-        Thread.sleep(2000)
+        sleep(3_000)
         at CreateDataElementPage
 
         when:
@@ -132,6 +158,7 @@ class HistoryIsPopulatedAccordingToModelActivitySpec extends GebSpec {
 
         when: 'create tag'
         dataElementsPage = browser.page(DataElementsPage)
+        sleep(3_000)
         dataElementsPage.treeView.select('Tags')
 
         then:
@@ -157,6 +184,6 @@ class HistoryIsPopulatedAccordingToModelActivitySpec extends GebSpec {
         tagsPage = browser.page(TagsPage)
 
         then:
-        tagsPage.count() == 1
+        tagsPage.count() >= 1
     }
 }

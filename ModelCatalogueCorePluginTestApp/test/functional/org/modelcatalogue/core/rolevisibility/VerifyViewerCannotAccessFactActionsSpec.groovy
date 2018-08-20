@@ -76,6 +76,7 @@ class VerifyViewerCannotAccessFactActionsSpec extends GebSpec {
         UserEditPage userEditPage = browser.page UserEditPage
         then:
         userEditPage.userRoleGranted()
+        sleep(2_000)
         !userEditPage.metadatacuratorRoleGranted()
         !userEditPage.supervisorRoleGranted()
     }

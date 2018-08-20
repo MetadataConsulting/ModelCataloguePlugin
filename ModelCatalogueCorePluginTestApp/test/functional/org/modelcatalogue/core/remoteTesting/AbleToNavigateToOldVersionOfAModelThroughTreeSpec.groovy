@@ -8,7 +8,6 @@ import org.modelcatalogue.core.geb.VersionsPage
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
-import spock.lang.Ignore
 
 @Issue('https://metadata.atlassian.net/browse/MET-1433')
 @Title('Verify navigation to old version of a model using the tree view')

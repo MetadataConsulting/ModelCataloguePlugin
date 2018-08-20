@@ -17,7 +17,7 @@ class SearchClassPage extends Page implements InputUtils {
 
     void search(String value) {
         fillInput(searchBar, value)
-        Thread.sleep(1000)       //search result take time to appear so need sleep to select searched record
+        sleep(3_000)       //search result take time to appear so need sleep to select searched record
         selectDataClass(0)
     }
 

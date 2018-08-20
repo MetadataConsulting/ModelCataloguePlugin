@@ -2,11 +2,7 @@ package org.modelcatalogue.core.finalized
 
 import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.*
-import spock.lang.Ignore
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Stepwise
-import spock.lang.Title
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1566')
 @Title('Check that When Data Model is finalized,you are not able to add new elements')
@@ -52,5 +48,12 @@ class CannotAddDataElementsToFinalizedDataModelSpec extends GebSpec {
 
         then:
         !dataElementsPage.isAddItemIconVisible()
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 }

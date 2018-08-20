@@ -11,12 +11,11 @@ class UserProfilePage extends Page {
     static url = '/#/catalogue/user'
 
     static content = {
-        disableUserButton { $('#role_item-detail_update-userBtn') }
+        disableOrEnableUserButton(wait: true) { $('#role_item-detail_update-userBtn') }
         nav { $('div.navbar-collapse', 0).module(NavModuleAdmin) }
     }
 
-    void disableUser() {
-        disableUserButton.click()
+    void disableOrEnableUser() {
+        disableOrEnableUserButton.click()
     }
-
 }

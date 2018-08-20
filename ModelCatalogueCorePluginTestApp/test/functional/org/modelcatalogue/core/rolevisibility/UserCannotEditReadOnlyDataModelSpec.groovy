@@ -115,6 +115,8 @@ class UserCannotEditReadOnlyDataModelSpec extends GebSpec {
     def "check inline edit button is disabled"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        sleep(2_000)
+
         then:
         !dataModelPage.inlineEditButtonPresent()
     }

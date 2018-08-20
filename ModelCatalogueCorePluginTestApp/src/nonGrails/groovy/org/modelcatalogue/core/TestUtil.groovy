@@ -39,7 +39,7 @@ class TestUtil {
                     jenkinsFile.delete()
                 }
                 treeBuilder.file(newJenkinsFileName) {
-                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'", "continuous-integration/jenkins${index + 1}")
+                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu/download -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests.join(" ")}'", "continuous-integration/jenkins${index + 1}")
 //                    write getJenkinsFileContent("sh '/opt/grails/bin/grails test-app -Dserver.port=8081 -Dgeb.env=chrome -DdownloadFilepath=/home/ubuntu -Dwebdriver.chrome.driver=/opt/chromedriver functional: ${tests[0]}'", "continuous-integration/jenkins${index + 1}") // Just do one test for the purpose of testing Jenkins Pipelines
                 }
             }
@@ -151,13 +151,19 @@ pipeline {
     private static Set<String> getFunctionalTestCaseNames(String projectRootPath) {
         String functionalTestRootPath = projectRootPath + "/test/functional/"
         Set<String> files = []
+        Integer ignoredFileCount = 0
         new File(functionalTestRootPath).eachFileRecurse {
             String fileName = it.name
             Set<String> dataFiles = fileName.split(Pattern.quote("."))
-            if (dataFiles[0].contains("Spec") && dataFiles[1] == "groovy")
-                files.add(dataFiles[0])
+            if (dataFiles[0].contains("Spec") && dataFiles[1] == "groovy") {
+                if (!it.text?.contains("@Ignore")) {
+                    files.add(dataFiles[0])
+                } else {
+                    ignoredFileCount++
+                }
+            }
         }
-
+        println("Total $ignoredFileCount has been ignored")
         return files
     }
 

@@ -28,7 +28,7 @@ class ParentClassModalPage extends Page {
     }
 
     void openModelHome(String modelname) {
-        sleep(2_000)
+        sleep(3_000)
         modelHome(modelname)
     }
 

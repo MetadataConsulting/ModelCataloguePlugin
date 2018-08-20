@@ -22,6 +22,7 @@ class FinalizeDataModelPage extends Page implements InputUtils {
     }
 
     void submit() {
+        sleep(2_000)
         finalizeButton.click()
         sleep(3_000)
     }

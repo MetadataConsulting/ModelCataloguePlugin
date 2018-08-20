@@ -1,13 +1,8 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Ignore
-import spock.lang.Title
-import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
-import spock.lang.Shared
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1463')
 @Title('A curator is able to delete a data class on draft data model that they have administration rights to')
@@ -32,7 +27,6 @@ import spock.lang.Shared
  - Select option 'Delete' to delete Data Class. | Delete pop-up appears asking 'Do you really want to delete Data Class [data class]?'.
  - Select the OK button to continue deleting Data Class. | Data Class is deleted. Redirected to 'Data Classes' page.
 /$)
-
 @Stepwise
 class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
 
@@ -47,9 +41,9 @@ class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
 
     def "Login as supervisor"() {
         when:
-        LoginPage loginPage = to LoginPage
+        go("/login/auth")
+        LoginPage loginPage = browser.page LoginPage
         loginPage.login('supervisor', 'supervisor')
-
         then:
         at DashboardPage
     }
@@ -184,6 +178,13 @@ class CuratorWithAdminCanDeleteClassInDraftModelSpec extends GebSpec {
         DataClassesPage dataClassesPage = browser.page DataClassesPage
         then:
         !dataClassesPage.dataClassPresent(dataClassName)
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 
 }
