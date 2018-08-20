@@ -1,7 +1,5 @@
-
 package org.modelcatalogue.core.geb
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import geb.Page
 
 class DataModelPage extends Page implements InputUtils {
@@ -64,7 +62,8 @@ class DataModelPage extends Page implements InputUtils {
         }
         dataModelActions { $('div.contextual-actions.ng-isolate-scope.btn-toolbar') }
         dataExchangeIcon { $('span.fa.fa-fw.fa-book.fa-2x') }
-        semanticNumber { $('h3.ce-name a') }
+        semanticNumber { $('h3.ce-name') }
+        inputField { $('input.editable-input',0) }
     }
 
     String getRowsText() {
@@ -155,6 +154,11 @@ class DataModelPage extends Page implements InputUtils {
         waitFor(5) { policiesDropdown.$('li', 0) }
     }
 
+    void editInputField(String value) {
+        inputField.value("")
+        fillInput(inputField, value)
+    }
+
     void selectCreateNew() {
         int size = policiesDropdown.$('li').size()
         policiesDropdown.$('li', size - 1).click()
@@ -191,7 +195,7 @@ class DataModelPage extends Page implements InputUtils {
     boolean isDataModelFinalized() {
         activityList.$('td:nth-child(4) span span')*.text().join(",").contains("finalized")
     }
-  
+
     boolean defaultChecksPolicyAdded() {
         policiesList.$('a', text: 'Default Checks').displayed
     }
