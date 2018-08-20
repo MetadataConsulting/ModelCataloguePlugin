@@ -23,6 +23,7 @@ import spock.lang.*
 - check that incorrect value shows INVALID and | correct value shows VALID
 ''')
 @Stepwise
+@Ignore
 class ValidateValueAgainstDataTypeSpec extends GebSpec {
 
     @Shared
