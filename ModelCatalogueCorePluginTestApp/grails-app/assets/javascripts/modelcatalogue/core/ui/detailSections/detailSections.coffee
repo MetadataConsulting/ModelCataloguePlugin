@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'detailSections', ['catalogueProvider', (catalogueProvider) ->
+angular.module('mc.core.ui.detailSections', ['mc.core.catalogue', 'mc.util.mdxFeatures']).provider 'detailSections', ['catalogueProvider', (catalogueProvider) ->
 # detailSections gives a provider that relies on catalogueProvider
   # are these providers dependency-injected?
   isMeetingRelationshipCriteria = (owner, criteria) ->
@@ -98,12 +98,17 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
 
   detailSectionsProvider.createFakeOwner = (criteria) -> createFakeOwner(criteria)
 
-  detailSectionsProvider.$get = [ '$filter', ($filter) ->
+
+
+  detailSectionsProvider.$get = [ '$filter', 'mdxFeatures', ($filter, mdxFeatures) ->
     detailSections =
       getAvailableViews: (owner) ->
         available = []
         angular.forEach configurations, (configuration) ->
           return unless configuration.isAvailableFor(owner)
+          if (configuration.availableIfAnyFeaturesFrom)
+            return unless mdxFeatures.availableByAnyFeature(configuration.availableIfAnyFeaturesFrom)
+
           view =
             template: configuration.template
             title: configuration.title

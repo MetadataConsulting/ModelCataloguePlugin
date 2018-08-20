@@ -10,6 +10,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
 import org.modelcatalogue.core.dataimport.excel.ConfigStatelessExcelLoader
 import org.modelcatalogue.core.dataimport.excel.ExcelImportType
+import org.modelcatalogue.core.dataimport.excel.ExcelImportTypeService
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.dataimport.excel.ConfigExcelLoader
@@ -43,6 +44,7 @@ class DataImportController  {
     def dataClassService
     DataImportXmlService dataImportXmlService
     DataImportOboService dataImportOboService
+    ExcelImportTypeService excelImportTypeService
     AssetGormService assetGormService
     UserGormService userGormService
 
@@ -68,7 +70,7 @@ class DataImportController  {
         return errors
     }
     def excelImportTypesHumanReadable() {
-        Map<String, List<String>> result = ['excelImportTypes': ExcelImportType.humanReadableNames]
+        Map<String, List<String>> result = ['excelImportTypes': excelImportTypeService.filteredExcelImportTypes()*.humanReadableName]
         render result as JSON
     }
 
