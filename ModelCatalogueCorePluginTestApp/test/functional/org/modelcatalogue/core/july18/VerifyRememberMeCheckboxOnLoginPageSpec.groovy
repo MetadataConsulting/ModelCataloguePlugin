@@ -20,9 +20,10 @@ class VerifyRememberMeCheckboxOnLoginPageSpec extends GebSpec {
         at DashboardPage
     }
 
-    def "Shutdown and restart server"(){
+    def "Shutdown and restart server"() {
 
     }
+
     def "Refresh page and check for login"() {
         when:
         browser.driver.navigate().refresh()

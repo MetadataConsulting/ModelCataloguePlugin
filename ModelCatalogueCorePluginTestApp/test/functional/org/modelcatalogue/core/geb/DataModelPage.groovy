@@ -64,7 +64,7 @@ class DataModelPage extends Page implements InputUtils {
         }
         dataModelActions { $('div.contextual-actions.ng-isolate-scope.btn-toolbar') }
         dataExchangeIcon { $('span.fa.fa-fw.fa-book.fa-2x') }
-        semanticNumber { $('a.label.ng-binding.label-primary') }
+        semanticNumber { $('h3.ce-name a') }
     }
 
     String getRowsText() {
