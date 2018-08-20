@@ -103,10 +103,10 @@ class CanCreateDataElementAndCloneDataTypeSpec extends GebSpec {
         createDataElementPage.modelCatalogueId = myCatalogue
         createDataElementPage.description = myDescription
         createDataElementPage.search(dataTypeName)
+        sleep(2_000)
         createDataElementPage.selectFirstItem()
-        Thread.sleep(2000)
+        sleep(2_000)
         createDataElementPage.finish()
-        Thread.sleep(5000)
 
         then:
         at DataElementsPage

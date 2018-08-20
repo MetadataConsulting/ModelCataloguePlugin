@@ -30,6 +30,8 @@ class DataElementsPage extends Page {
         showMoreButton { $('span.fa-plus-square-o') }
         editDataElementButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
         elementsList { $('table.inf-table tbody tr') }
+        settings(wait: true) { $('#role_navigation-right_admin-menu-menu-item-link') }
+        mappingUtilityTag(wait: true) { $('#action-batches-menu-item-link') }
     }
 
     void createDataElement() {
@@ -92,5 +94,10 @@ class DataElementsPage extends Page {
 
     boolean containsElement(String value) {
         elementsList.$('a', text: value).displayed
+    }
+
+    void mappingUtility() {
+        settings.click()
+        mappingUtilityTag.click()
     }
 }

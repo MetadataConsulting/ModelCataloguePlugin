@@ -1,14 +1,8 @@
 package org.modelcatalogue.core.dataclass
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Specification
-import spock.lang.Title
-import spock.lang.Ignore
-import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
-import spock.lang.Shared
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1475')
 @Title('Max Occurs is showing in History')
@@ -47,7 +41,6 @@ import spock.lang.Shared
  - Verify that included in the history is mention of Max occurs created. like the following: Relationship testclass (AA_test 0.0.2) parent of HAEMATOLOGY - LABORATORY RESULTS - AML, ALL, HODGKIN (Cancer Outcomes and Services Dataset 6.0.0) metadata Max Occurs created | Max Occurs is showing in history
 ''')
 @Stepwise
-@Ignore
 class MaxOccursShowsInHistorySpec extends GebSpec {
 
     @Shared
@@ -336,6 +329,12 @@ class MaxOccursShowsInHistorySpec extends GebSpec {
         then:
         assert text.contains(searchDataModelName)
         assert text.contains("Max Occurs")
-    }
 
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
+    }
 }

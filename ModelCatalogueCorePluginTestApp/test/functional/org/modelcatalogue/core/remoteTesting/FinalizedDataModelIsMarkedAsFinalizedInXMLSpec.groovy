@@ -4,11 +4,7 @@ import geb.spock.GebSpec
 import org.modelcatalogue.core.geb.DashboardPage
 import org.modelcatalogue.core.geb.DataModelPage
 import org.modelcatalogue.core.geb.LoginPage
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Ignore
-import spock.lang.Title
-import spock.lang.IgnoreIf
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1561')
 @Title('Examine that finalized data model is marked as finalized in the XML')
@@ -59,7 +55,7 @@ class FinalizedDataModelIsMarkedAsFinalizedInXMLSpec extends GebSpec {
         when:
         String path = downloadPath + File.separator + "Cancer_Model.mc.xml"
         File dataModelFile = new File(path)
-
+        sleep(2_000)
         then:
         !dataModelFile.exists()
 

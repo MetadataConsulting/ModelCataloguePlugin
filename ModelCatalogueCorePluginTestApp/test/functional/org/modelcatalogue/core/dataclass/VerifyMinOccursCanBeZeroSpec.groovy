@@ -183,6 +183,7 @@ class VerifyMinOccursCanBeZeroSpec extends GebSpec {
         dataClassPage.createRelationshipClick()
         then:
         CreateRelationshipPage createRelationshipPage = browser.page CreateRelationshipPage
+        sleep(2_000)
         createRelationshipPage.matchPageHeading(dataClassName)
 
     }
@@ -226,6 +227,13 @@ class VerifyMinOccursCanBeZeroSpec extends GebSpec {
         dataClassPage = browser.page DataClassPage
         then:
         dataClassPage.occuranceStatus().contains("Max Occurs: 10")
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 
 }

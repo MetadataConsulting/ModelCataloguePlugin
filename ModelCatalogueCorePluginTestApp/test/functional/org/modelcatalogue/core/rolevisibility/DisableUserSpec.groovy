@@ -1,13 +1,8 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Ignore
-import spock.lang.Title
 import org.modelcatalogue.core.geb.*
-import spock.lang.Stepwise
-import spock.lang.Shared
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1728')
 @Title('Disable a user')
@@ -24,9 +19,9 @@ import spock.lang.Shared
  - In the disable user pop-up dialogue box, select the OK button | User is disabled
  - Log out of Metadata Exchange | Logout successful
  - Login to Metadata Exchange as curator | 'Sorry your account is disabled' appears in the login dialogue box and curator cannot login
+ - Re-enable curator as supervisor. (For following tests to work)
 ''')
 @Stepwise
-@Ignore
 class DisableUserSpec extends GebSpec {
 
     @Shared
@@ -96,7 +91,7 @@ class DisableUserSpec extends GebSpec {
     def "disable user"() {
         when:
         UserProfilePage userProfilePage = browser.page UserProfilePage
-        userProfilePage.disableUser()
+        userProfilePage.disableOrEnableUser()
         then:
         at ConfirmDisableUserPage
 
@@ -127,5 +122,47 @@ class DisableUserSpec extends GebSpec {
         loginPage.login("curator", "curator")
         then:
         loginPage.isAccountDisabled()
+    }
+
+
+    def "Enable user"() {
+        when:
+        LoginPage loginPage = to LoginPage
+        loginPage.login("supervisor", "supervisor")
+        then:
+        at DashboardPage
+
+        when:
+        DashboardPage dashboardPage = browser.page DashboardPage
+        dashboardPage.search(dataModelName)
+        dashboardPage.select(dataModelName)
+        then:
+        at DataModelPage
+
+        when:
+        DataModelPage dataModelPage = browser.page DataModelPage
+        dataModelPage.openActivityUser()
+        then:
+        at UserProfilePage
+
+        when:
+        UserProfilePage userProfilePage = browser.page UserProfilePage
+        userProfilePage.disableOrEnableUser()
+        then:
+        at ConfirmEnableUserPage
+
+        when:
+        ConfirmEnableUserPage confirmEnableUserPage = browser.page ConfirmEnableUserPage
+        confirmEnableUserPage.confirmEnableUser()
+        then:
+        at UserProfilePage
+
+        when:
+        dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+
+        then:
+        at HomePage
     }
 }

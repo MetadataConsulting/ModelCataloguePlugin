@@ -12,8 +12,8 @@ class SuggestionsPage extends Page {
         nav { $('#topmenu', 0).module(NavModule) }
         submitButton { $('input', value: "Generate") }
         cancelButton { $('a', text: "Cancel") }
-        dataModelOne { $('#dataModel1ID') }
-        dataModelTwo { $('#dataModel2ID') }
+        dataModelOne(wait: true, required: false) { $('#dataModel1ID option', text: contains(it)) }
+        dataModelTwo(wait: true, required: false) { $('#dataModel2ID option', text: contains(it)) }
     }
 
     def generateSuggestion() {
@@ -24,13 +24,15 @@ class SuggestionsPage extends Page {
         cancelButton.click()
     }
 
-    String selectDataModelOne() {
-        String modelOneValue = dataModelOne.$("option", selected: "selected").text()
+    String selectDataModelOne(String dataElementNameA) {
+        String modelOneValue = dataModelOne(dataElementNameA).text()
+        dataModelOne(dataElementNameA).click()
         return modelOneValue
     }
 
-    String selectDataModelTwo() {
-        String modelTwoValue = dataModelTwo.$("option", selected: "selected").text()
+    String selectDataModelTwo(String dataElementNameB) {
+        String modelTwoValue = dataModelTwo(dataElementNameB).text()
+        dataModelTwo(dataElementNameB).click()
         return modelTwoValue
     }
 

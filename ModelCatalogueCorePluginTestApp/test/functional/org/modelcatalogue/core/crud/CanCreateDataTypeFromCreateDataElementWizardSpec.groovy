@@ -1,21 +1,8 @@
 package org.modelcatalogue.core.crud
 
 import geb.spock.GebSpec
-import org.modelcatalogue.core.geb.CreateDataElementPage
-import org.modelcatalogue.core.geb.CreateDataModelPage
-import org.modelcatalogue.core.geb.CreateDataTypePage
-import org.modelcatalogue.core.geb.DashboardPage
-import org.modelcatalogue.core.geb.DataElementPage
-import org.modelcatalogue.core.geb.DataElementsPage
-import org.modelcatalogue.core.geb.DataModelPage
-import org.modelcatalogue.core.geb.DataTypesPage
-import org.modelcatalogue.core.geb.LoginPage
-import spock.lang.Issue
-import spock.lang.Ignore
-import spock.lang.Narrative
-import spock.lang.Shared
-import spock.lang.Stepwise
-import spock.lang.Title
+import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1623')
 @Title('Check that a user can create data type from data element')
@@ -87,21 +74,18 @@ class CanCreateDataTypeFromCreateDataElementWizardSpec extends GebSpec {
         when:
         CreateDataElementPage createDataElementPage = browser.page(CreateDataElementPage)
         createDataElementPage.name = dataElementName
+        sleep(2_000)
         createDataElementPage.search(dataTypeName)
+        createDataElementPage.createNewDataType()
 
         then:
-        at CreateDataElementPage
+        at CreateDataTypePage
     }
 
     def "create data type"() {
         when:
-        CreateDataElementPage createDataElementPage = browser.page CreateDataElementPage
-        createDataElementPage.createDataType()
-        then:
-        at DataElementsPage
-
-        when:
         CreateDataTypePage createDataTypePage = browser.page CreateDataTypePage
+        sleep(2_000)
         createDataTypePage.buttons.save()
         then:
         at CreateDataElementPage
@@ -148,5 +132,12 @@ class CanCreateDataTypeFromCreateDataElementWizardSpec extends GebSpec {
         DataElementPage dataElementPage = browser.page DataElementPage
         then:
         dataElementPage.containsDataType(dataTypeName)
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 }

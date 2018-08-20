@@ -11,15 +11,15 @@ class MappingPage extends Page {
     static content = {
         generateMappingButton { $('.page-header a', text: "Generate Mappings") }
         nav { $('#topmenu', 0).module(NavModule) }
-        mappingList { $('form tbody tr') }
+        mappingList(wait: true, required: false) { $('tr td a', text: contains(it)) }
+        mappingSuccessMesg(required: false, wait: true) { $('.alert.alert-info p') }
     }
 
     void generateMapping() {
         generateMappingButton.click()
     }
 
-    void hasMapping(String value1, String value2) {
-        mappingList.$('td a', text: contains(value1)).click()
+    void hasMapping(String value1,String value2) {
+        mappingList(value2)?.click()
     }
-
 }

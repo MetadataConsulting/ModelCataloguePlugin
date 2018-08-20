@@ -1,14 +1,8 @@
 package org.modelcatalogue.core.datatype
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Specification
-import spock.lang.Title
-import spock.lang.Ignore
-import spock.lang.Stepwise
 import org.modelcatalogue.core.geb.*
-import spock.lang.Shared
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1507')
 @Title('New Version - Check new data Type added')
@@ -38,7 +32,6 @@ import spock.lang.Shared
  - Check that new data type appears under list in Data Types main page ( 'Active Data types as title) | Data Type has been created
 ''')
 @Stepwise
-@Ignore
 class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
 
     @Shared
@@ -132,7 +125,7 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
         FinalizeDataModelPage finalizeDataModelPage = browser.page FinalizeDataModelPage
         finalizeDataModelPage.version = dataModelVersion
         finalizeDataModelPage.versionNote = dataModelVersionNote
-        Thread.sleep(1000)
+        sleep(2_000)
         finalizeDataModelPage.submit()
         then:
         at FinalizedDataModelPage
@@ -169,15 +162,15 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
         CreateDataModelNewVersionPage createDataModelNewVersionPage = browser.page CreateDataModelNewVersionPage
         createDataModelNewVersionPage.newVersion = dataModelNewVersion
         createDataModelNewVersionPage.createNewVersion()
-        Thread.sleep(1000)
+        Thread.sleep(1_000)
         then:
         at CreatedDataModelNewVersionPage
 
         when:
         CreatedDataModelNewVersionPage createdDataModelNewVersionPage = browser.page CreatedDataModelNewVersionPage
-        Thread.sleep(1000)
+        Thread.sleep(1_000)
         createdDataModelNewVersionPage.hide()
-        Thread.sleep(2000)
+        Thread.sleep(2_000)
         then:
         at DataModelPage
     }
@@ -200,6 +193,7 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
     def "create new data type"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        sleep(2_000)
         dataModelPage.treeView.dataTypes()
         then:
         at DataTypesPage
@@ -224,5 +218,12 @@ class CheckDataTypeAddedToNewVersionSpec extends GebSpec {
         DataTypesPage dataTypesPage = browser.page DataTypesPage
         then:
         dataTypesPage.hasDataType(dataTypeTwoName)
+
+        when:
+        DashboardPage dashboardPage = to DashboardPage
+        dashboardPage.nav.userMenu()
+        dashboardPage.nav.logout()
+        then:
+        at HomePage
     }
 }

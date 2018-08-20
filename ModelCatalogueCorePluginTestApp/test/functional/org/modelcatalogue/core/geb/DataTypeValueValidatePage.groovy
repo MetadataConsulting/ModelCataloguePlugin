@@ -22,6 +22,7 @@ class DataTypeValueValidatePage extends Page implements InputUtils {
     }
 
     boolean outputIsValid() {
+        sleep(2_000)
         outputField.text().contains("VALID")
     }
 

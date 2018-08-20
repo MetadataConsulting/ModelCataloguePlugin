@@ -30,11 +30,17 @@ class DataClassesPage extends AdvancedDataModelViewPage {
         showMoreButton { $('span.fa-plus-square-o') }
         editDataClassButton { $('a#role_item-detail_edit-catalogue-elementBtn') }
         titlename { $('div   h3') }
+        openDataClassTag { $('.ui-sortable tr td span a', 0) }
         checkDataClass(required: false, wait: true) { String value -> $('a', text: value) }
+        dataClassesElement(required: false, wait: true) { $('tr.inf-table-item-row a', text: it) }
     }
 
     void expandLinkClick() {
         expandLink.click()
+    }
+
+    void openDataClass() {
+        openDataClassTag.click()
     }
 
     Boolean isDeleteBttnDisable() {
@@ -88,10 +94,8 @@ class DataClassesPage extends AdvancedDataModelViewPage {
     }
 
     boolean containsDataClass(String value) {
-        if ($('a', text: value)) {
-            return true
-        }
-        false
+        sleep(2_000)
+        dataClassesElement(value)?.isDisplayed()
     }
 
 
@@ -102,10 +106,4 @@ class DataClassesPage extends AdvancedDataModelViewPage {
     boolean editDataClassDisabled() {
         waitFor { editDataClassButton.@('disabled') }
     }
-
-//    boolean containsDataClass(String value) {
-//        rows.$('a', text: value).displayed
-//    }
-
-
 }

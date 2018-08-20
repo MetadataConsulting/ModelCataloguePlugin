@@ -177,16 +177,14 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
         createDataClassPage.exit()
         then:
         at DataClassesPage
-
     }
 
     def "Select and add data elements"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
-        dataModelPage.treeView.select("Data Elements")
+        dataModelPage.treeView.dataElements()
         then:
         at DataElementsPage
-
 
         when:
         DataElementsPage dataElementsPage = browser.page DataElementsPage
@@ -329,6 +327,7 @@ class AdminUserCannotDeleteFinalizedItemsSpec extends GebSpec {
     def "finalize data model"() {
         when:
         DataModelPage dataModelPage = browser.page DataModelPage
+        sleep(2_000)
         dataModelPage.treeView.select("Assets")
         then:
         AssetsPage

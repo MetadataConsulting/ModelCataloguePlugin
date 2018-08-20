@@ -1,3 +1,4 @@
+
 package org.modelcatalogue.core.geb
 
 import geb.Page
@@ -57,7 +58,7 @@ class DataModelPage extends AdvancedDataModelViewPage implements InputUtils {
         ModelEditSaveButton(required: false, wait: true) { $('#role_item-detail_inline-edit-submitBtn') }
         finalizedStatus(required: false, wait: true) { $('div.col-md-6', text: 'Status').siblings() }
         setting { $('a#role_navigation-right_admin-menu-menu-item-link') }
-        dataModelAcl { $('a#datamodelpermission-admin-menu-item-link') }
+        dataModelAclTag { $('a#datamodelpermission-admin-menu-item-link') }
         userLink(wait: true) { $('#role_navigation-right_user-menu-menu-item-link') }
         logoutLink(wait: true) { $('#user-login-right-menu-item-link') }
         activityUser(wait: true) {
@@ -85,6 +86,7 @@ class DataModelPage extends AdvancedDataModelViewPage implements InputUtils {
     }
 
     void finalizedDataModel() {
+        sleep(2_000)
         finalizedLink.click()
     }
 
@@ -109,7 +111,7 @@ class DataModelPage extends AdvancedDataModelViewPage implements InputUtils {
     }
 
     void dataModelAcl() {
-        dataModelAcl.click()
+        dataModelAclTag.click()
     }
 
     String getDataModelTitle() {

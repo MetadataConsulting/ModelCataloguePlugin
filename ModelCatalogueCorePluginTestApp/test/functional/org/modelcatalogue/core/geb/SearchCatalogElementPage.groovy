@@ -7,7 +7,7 @@ class SearchCatalogElementPage extends Page implements InputUtils {
 
     static content = {
         search(wait: true) { $("input#value", 0) }
-        searchElementLink(wait: true) { $("h4.list-group-item-heading", text: contains(it)) }
+        searchElementLink(wait: true) { $("h4.list-group-item-heading", text: contains(it),0) }
     }
 
     void searchCatalogElement(String name) {

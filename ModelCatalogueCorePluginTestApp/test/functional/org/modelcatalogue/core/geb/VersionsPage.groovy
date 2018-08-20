@@ -51,6 +51,7 @@ class VersionsPage extends Page {
     }
 
     void deleteConfirmationBttnClick() {
+        sleep(2_000)
         deleteConfirmationBttn.click()
     }
 

@@ -1,14 +1,8 @@
 package org.modelcatalogue.core.rolevisibility
 
 import geb.spock.GebSpec
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Specification
-import spock.lang.Ignore
-import spock.lang.Title
-import spock.lang.Stepwise
-import spock.lang.Shared
 import org.modelcatalogue.core.geb.*
+import spock.lang.*
 
 @Issue('https://metadata.atlassian.net/browse/MET-1441')
 @Title('Verify that a curator is not able to delete a finalized Data Model after creation')
@@ -24,11 +18,10 @@ import org.modelcatalogue.core.geb.*
  - The data model is not deleted
 ''')
 @Stepwise
-@Ignore
 class VerifyCuratorCannotDeleteFinalizedDataModelSpec extends GebSpec {
 
     @Shared
-    String dataModelName = "TESTING_MODEL"
+    String dataModelName = UUID.randomUUID().toString()
     @Shared
     String dataModelDescription = "TESTING_MODEL_DESCRIPTION"
     @Shared
