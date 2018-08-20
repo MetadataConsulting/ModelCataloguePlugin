@@ -12,7 +12,9 @@ class UserCanCreateDataElementAndImportDataTypeSpec extends GebSpec {
     @Shared
     String dataTypeName = UUID.randomUUID().toString()
 
-    def "login as curator"() {
+
+    def "login as supervisor"() {
+
         when: 'login as a curator'
         LoginPage loginPage = to LoginPage
         loginPage.login('curator', 'curator')
