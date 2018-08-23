@@ -13,7 +13,7 @@ class GridReportXlsxStyles implements Stylesheet {
     public static final String STANDARD = 'standard'
 
     public static final Closure h1CellStyle = {
-        align center center
+        align center, center
         font {
             style bold
             size 22
@@ -21,7 +21,7 @@ class GridReportXlsxStyles implements Stylesheet {
         }
     }
     public static final Closure analysisStyle = {
-        align center center
+        align center, center
         font {
             style bold
             size 16

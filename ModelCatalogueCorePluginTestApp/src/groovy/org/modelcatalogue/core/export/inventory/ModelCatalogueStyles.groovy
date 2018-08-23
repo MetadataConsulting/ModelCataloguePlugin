@@ -45,7 +45,7 @@ class ModelCatalogueStyles implements Stylesheet {
     void declareStyles(CanDefineStyle stylable) {
         stylable.with {
             style(H1) {
-                align center center
+                align center, center
                 font {
                     make bold
                     size 22
@@ -53,7 +53,7 @@ class ModelCatalogueStyles implements Stylesheet {
                 }
             }
             style(H2) {
-                align center center
+                align center, center
                 font {
                     make bold
                     size 16
@@ -69,7 +69,7 @@ class ModelCatalogueStyles implements Stylesheet {
             }
             style(DATE) {
                 format 'dd/mm/yy'
-                align center center
+                align center, center
                 font {
                     size 12
                     color dimGray
@@ -77,26 +77,26 @@ class ModelCatalogueStyles implements Stylesheet {
             }
             style(DATE_NORMAL) {
                 format 'dd/mm/yy'
-                align center center
+                align center, center
                 font {
                     color dimGray
                 }
             }
             style(STATUS) {
-                align center center
+                align center, center
                 font {
                     size 12
                     color dimGray
                 }
             }
             style(PROPERTY_VALUE) {
-                align center center
+                align center, center
                 font {
                     color dimGray
                 }
             }
             style(MODEL_CATALOGUE_ID) {
-                align center center
+                align center, center
                 font {
                     size 12
                     color dimGray
@@ -108,13 +108,13 @@ class ModelCatalogueStyles implements Stylesheet {
                     size 12
                     color cornflowerBlue
                 }
-                align center center
+                align center, center
             }
             style(NOTE) {
                 font {
                     make italic
                     color dimGray
-                    align center center
+                    align center, center
                 }
             }
             style(PROPERTY_TITLE) {
@@ -137,7 +137,7 @@ class ModelCatalogueStyles implements Stylesheet {
                 indent 1
             }
             style(CENTER_CENTER) {
-                align center center
+                align center, center
             }
             style(BOTTOM_RIGHT) {
                 align bottom right
@@ -156,7 +156,7 @@ class ModelCatalogueStyles implements Stylesheet {
                 }
             }
             style(DATA_ELEMENT_CENTER_CENTER) {
-                align center center
+                align center, center
                 foreground whiteSmoke
                 font {
                     make bold
