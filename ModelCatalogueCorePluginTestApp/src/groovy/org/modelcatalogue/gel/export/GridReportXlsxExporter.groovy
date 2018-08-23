@@ -1,8 +1,9 @@
 package org.modelcatalogue.gel.export
 
 import static org.modelcatalogue.gel.export.GridReportXlsxStyles.*
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import com.google.common.collect.ImmutableMap
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
@@ -27,6 +28,7 @@ import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
  * @author Adam Milward
  * @version 31/03/2017
  */
+@CompileStatic
 class GridReportXlsxExporter  {
 
     final CatalogueElement element
@@ -60,12 +62,7 @@ class GridReportXlsxExporter  {
         dataClasses = getDataClasses()
 
         builder.build {
-            style(H1, h1CellStyle)
-            style(STANDARD, standardCellStyle)
-            style(ANALYSIS, analysisStyle)
-            style(TOP_BORDER, topBorderCellStyle)
-            style(TOP_LEFT_BORDER, topLeftBorderCellStyle)
-            style(LEFT_BORDER, leftBorderCellStyle)
+            apply GridReportXlsxStyles
             sheet("$element.name $element.dataModelSemanticVersion" ) { SheetDefinition sheetDefinition ->
                 row {
                     style H1
@@ -101,12 +98,13 @@ class GridReportXlsxExporter  {
         }
         children.each { Relationship relationship ->
             CatalogueElement child = relationship.destination
-            rowDepth = printClass(child, sheet, columnDepth, rowDepth, children.size(), outline)
+            rowDepth = printClass(child as DataClass, sheet, columnDepth, rowDepth, children.size(), outline)
             outline.removeElement(columnDepth)
         }
         rowDepth
     }
 
+    @CompileDynamic
     private Integer printClass(DataClass child, SheetDefinition sheet, int columnDepth, int rowDepth, int childrenSize, List outline = []) {
 
         Collection<Relationship> dataElements = child.getOutgoingRelationshipsByType(RelationshipType.containmentType)
@@ -149,8 +147,9 @@ class GridReportXlsxExporter  {
         }
     }
 
+    @CompileDynamic
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
-        DataElement dataElement = dataElementRelationship.destination
+        DataElement dataElement = dataElementRelationship.destination as DataElement
         Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
         if (relatedTo.empty && dataElement?.dataType)
             relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
@@ -178,13 +177,14 @@ class GridReportXlsxExporter  {
                     style STANDARD
                 }
             }
+
         }
     }
 
     String printDataType(DataType dataType) {
 
         if (dataType.instanceOf(EnumeratedType)) {
-            return dataType.prettyPrint()
+            return (dataType as EnumeratedType).prettyPrint()
         }
 
         return dataType.name
