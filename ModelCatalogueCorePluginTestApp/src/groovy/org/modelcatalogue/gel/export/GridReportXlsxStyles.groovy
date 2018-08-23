@@ -3,7 +3,6 @@ package org.modelcatalogue.gel.export
 import builders.dsl.spreadsheet.builder.api.CanDefineStyle
 import builders.dsl.spreadsheet.builder.api.Stylesheet
 
-@Singleton
 class GridReportXlsxStyles implements Stylesheet {
     public static final String H1 = 'h1'
     public static final String TOP_LEFT_BORDER = 'top-left-border'
