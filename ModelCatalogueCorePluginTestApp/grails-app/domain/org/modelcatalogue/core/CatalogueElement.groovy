@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.persistence.DataClassGormService
+
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import com.google.common.base.Function
 import com.google.common.collect.ImmutableSet
@@ -31,8 +33,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     transient modelCatalogueSecurityService
 
     transient dataModelAclService
-
-    transient topLevelDataClassService
 
     DataModel dataModel
     Boolean topLevel = false
@@ -451,19 +451,12 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         if ( !(this instanceof User) ) {
             auditService.logElementCreated(this)
         }
-
-        if (this instanceof DataClass) {
-            // mark top level
-            topLevelDataClassService.markTopLevel((DataClass) this) // This won't work as it reloads the dataClass as a new object...
-//            this.topLevel = true
-//            DataClass.withNewSession {
-//                final Long dataClassId = this.id
-//                topLevelDataClassService.markTopLevel(dataClassId)
-//            }
-        }
     }
 
     void beforeInsert() {
+        if (this instanceof DataClass) {
+            this.topLevel = true
+        }
         removeModelCatalogueIdIfDefault()
     }
 

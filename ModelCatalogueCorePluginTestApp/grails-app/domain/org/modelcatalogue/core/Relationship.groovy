@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.persistence.DataClassGormService
 import org.modelcatalogue.core.util.*
 
 /*
@@ -32,7 +33,7 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
     def auditService
     def relationshipService
 
-    transient topLevelDataClassService
+    transient dataClassGormService
 
     CatalogueElement source
     CatalogueElement destination
@@ -56,8 +57,9 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
         Relationship.withNewSession {
             if (relationshipType.id == RelationshipType.getHierarchyType().id) {
                 if (!destination) {throw new Exception("afterInsert of ${id}:No destination in hierarchy relationship ${id}")}
-                topLevelDataClassService.unmarkTopLevel((DataClass) destination)
-
+                if (destination instanceof DataClass) {
+                    dataClassGormService.updateTopLevel(((DataClass) destination).id, false)
+                }
             }
         }
     }
@@ -69,7 +71,9 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
         Relationship.withNewSession {
             if (relationshipType.id == RelationshipType.getHierarchyType().id) {
                 if (!destination) {throw new Exception("beforeDelete of ${id}: No destination in hierarchy relationship ${id}; may have been deleted in the process of deleting relationship")}
-                topLevelDataClassService.markTopLevel((DataClass) destination)
+                if (destination instanceof DataClass) {
+                    dataClassGormService.updateTopLevel(((DataClass) destination).id, true)
+                }
 
             }
         }
