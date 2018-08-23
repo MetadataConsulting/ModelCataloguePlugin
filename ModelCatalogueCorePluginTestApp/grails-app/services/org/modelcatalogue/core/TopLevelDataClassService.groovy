@@ -24,27 +24,6 @@ class TopLevelDataClassService {
     DataClassService dataClassService
 
     /**
-     * Marks a DataClass as Top-Level
-     * @param dataClass
-     * @return
-     */
-    @Transactional
-    def markTopLevel(DataClass dataClass) {
-        dataClass.topLevel = true
-    }
-
-    /**
-     * Unmarks a DataClass as Top-Level
-     * @param dataClass
-     * @return
-     */
-    @Transactional
-    def unmarkTopLevel(DataClass dataClass) {
-        dataClass.topLevel = false
-    }
-
-
-    /**
      * Retrieve all Top-Level DataClasses of a DataModel by their extension value, recalculating with the old query if there are none.
      * @param dataModel
      * @return
@@ -205,9 +184,10 @@ class TopLevelDataClassService {
     def calculateAndMarkTopLevelDataClassesForDataModel(DataModel dataModel) {
         DataModelFilter dataModelFilter = DataModelFilter.create(ImmutableSet.<DataModel> of(dataModel), ImmutableSet.<DataModel> of())
         ListWithTotalAndType<DataClass> topLevelDataClasses = dataClassService.getTopLevelDataClasses(dataModelFilter, [:])
-        for (DataClass dataClass : topLevelDataClasses.items) {
-            markTopLevel(dataClass)
-        }
+
+        List<Long> ids = topLevelDataClasses.items*.id as List<Long>
+        dataClassGormService.updateTopLevel(ids, true)
+
         log.info "Calculated and marked top-level DataClasses for ${dataModel.toString()}"
     }
 
