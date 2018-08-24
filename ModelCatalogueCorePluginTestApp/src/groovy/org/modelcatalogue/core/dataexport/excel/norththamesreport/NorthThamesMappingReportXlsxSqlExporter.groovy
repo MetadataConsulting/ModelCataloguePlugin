@@ -1,7 +1,16 @@
 package org.modelcatalogue.core.dataexport.excel.norththamesreport
 
+import builders.dsl.spreadsheet.api.BorderStyle
+import builders.dsl.spreadsheet.api.Color
+import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.api.Keywords
+import builders.dsl.spreadsheet.builder.api.BorderDefinition
+import builders.dsl.spreadsheet.builder.api.CellDefinition
+import builders.dsl.spreadsheet.builder.api.CellStyleDefinition
+import builders.dsl.spreadsheet.builder.api.RowDefinition
 import builders.dsl.spreadsheet.builder.api.SheetDefinition
 import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.api.WorkbookDefinition
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import grails.util.Holders
 import groovy.util.logging.Log
@@ -154,32 +163,50 @@ ORDER BY
         List mappedDataElements = getMappedDataElements(siteMap)
 //        log.info(mappedDataElements.toString())
 
-        builder.build {
-            apply ModelCatalogueStyles
-            style ('data') {
-                wrap text
-                border(left) {
-                    color black
-                    style medium
-                }
-            }
-            sheet("Mapped Elements") { SheetDefinition sheetDefinition ->
-                row {
-                    style H1
-                    for (String header in excelHeaders) {
-                        cell {
-                            value header
-                            width auto
-                        }
+        builder.build(new Configurer<WorkbookDefinition>() {
+            @Override
+            void configure(WorkbookDefinition workbookDefinition) {
+                workbookDefinition.apply(ModelCatalogueStyles)
+                workbookDefinition.style('data', new Configurer<CellStyleDefinition>() {
+                    @Override
+                    void configure(CellStyleDefinition cellStyleDefinition) {
+                        cellStyleDefinition.wrap(cellStyleDefinition.getText())
+                        cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                            @Override
+                            void configure(BorderDefinition borderDefinition) {
+                                borderDefinition.color(Color.black)
+                                borderDefinition.style(BorderStyle.MEDIUM)
+                            }
+                        })
                     }
-                }
-                for (de in mappedDataElements) {
+                })
+                workbookDefinition.sheet("Mapped Elements", new Configurer<SheetDefinition>() {
+                    @Override
+                    void configure(SheetDefinition sheetDefinition) {
+                        sheetDefinition.row(new Configurer<RowDefinition>() {
+                            @Override
+                            void configure(RowDefinition rowDefinition) {
+                                rowDefinition.style(H1)
+                                for (String header in excelHeaders) {
+                                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                                        @Override
+                                        void configure(CellDefinition cellDefinition) {
+                                            cellDefinition.value header
+                                            cellDefinition.width Keywords.Auto.AUTO
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                        for (de in mappedDataElements) {
 //                    log.info('=================')
 //                    log.info(de.toString())
-                    printMapping(siteMap.siteName, de, sheetDefinition)
-                }
+                            printMapping(siteMap.siteName, de, sheetDefinition)
+                        }
+                    }
+                })
             }
-        }
+        })
     }
 
     void printMapping(String siteName, deRow, SheetDefinition sheet){
