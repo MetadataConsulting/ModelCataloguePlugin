@@ -40,7 +40,7 @@ class GridReportXlsxStyles implements Stylesheet {
         stylable.style(TOP_BORDER, new Configurer<CellStyleDefinition>() {
             @Override
             void configure(CellStyleDefinition c) {
-                //c.wrap(text)
+                c.wrap(c.text)
                 c.border(Keywords.BorderSide.TOP, new Configurer<BorderDefinition>() {
                     @Override
                     void configure(BorderDefinition b) {
@@ -53,7 +53,7 @@ class GridReportXlsxStyles implements Stylesheet {
         stylable.style(LEFT_BORDER, new Configurer<CellStyleDefinition>() {
             @Override
             void configure(CellStyleDefinition c) {
-                //c.wrap(text)
+                c.wrap(c.text)
                 c.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
                     @Override
                     void configure(BorderDefinition b) {
@@ -66,7 +66,7 @@ class GridReportXlsxStyles implements Stylesheet {
         stylable.style(TOP_LEFT_BORDER, new Configurer<CellStyleDefinition>() {
             @Override
             void configure(CellStyleDefinition c) {
-                //c.wrap(text)
+                c.wrap(c.text)
                 c.border(Keywords.BorderSide.TOP, Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
                     @Override
                     void configure(BorderDefinition b) {
@@ -93,7 +93,7 @@ class GridReportXlsxStyles implements Stylesheet {
         stylable.style(STANDARD, new Configurer<CellStyleDefinition>() {
             @Override
             void configure(CellStyleDefinition c) {
-                //c.wrap(text)
+                c.wrap(c.text)
                 c.border(Keywords.BorderSide.TOP, new Configurer<BorderDefinition>() {
                     @Override
                     void configure(BorderDefinition b) {
