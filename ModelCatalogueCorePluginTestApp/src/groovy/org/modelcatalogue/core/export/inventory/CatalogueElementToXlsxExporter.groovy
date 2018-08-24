@@ -1,5 +1,11 @@
 package org.modelcatalogue.core.export.inventory
 
+import builders.dsl.spreadsheet.api.Sheet
+import builders.dsl.spreadsheet.builder.api.CellDefinition
+import builders.dsl.spreadsheet.builder.api.SheetDefinition
+import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.api.WorkbookDefinition
+import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import groovy.transform.CompileStatic
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.asset.MicrosoftOfficeDocument
@@ -18,12 +24,6 @@ import grails.util.GrailsNameUtils
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.mime.MimeType
-import org.modelcatalogue.spreadsheet.api.Sheet
-import org.modelcatalogue.spreadsheet.builder.api.CellDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
-import org.modelcatalogue.spreadsheet.builder.api.WorkbookDefinition
-import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.CatalogueElementService
 import org.modelcatalogue.core.DataElement
@@ -233,8 +233,8 @@ class CatalogueElementToXlsxExporter {
         log.info "Exporting Data Class ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
 
         //create spreadsheet builder and build the spreadsheet
-        SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
-        builder.build(outputStream) { WorkbookDefinition workbook ->
+        SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
+        builder.build { WorkbookDefinition workbook ->
             apply ModelCatalogueStyles
 
             //add sheets

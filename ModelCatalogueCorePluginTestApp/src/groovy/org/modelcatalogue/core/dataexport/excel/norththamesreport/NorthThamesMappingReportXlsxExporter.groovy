@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.dataexport.excel.norththamesreport
 
+import builders.dsl.spreadsheet.builder.api.SheetDefinition
+import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
@@ -7,11 +10,10 @@ import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportHeade
 import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.gel.export.GridReportXlsxExporter
-import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
-import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 
+import builders.dsl.spreadsheet.builder.api.RowDefinition
+import builders.dsl.spreadsheet.query.api.SpreadsheetCriteria
+import builders.dsl.spreadsheet.query.poi.PoiSpreadsheetCriteria
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 
 /**
@@ -76,10 +78,10 @@ class NorthThamesMappingReportXlsxExporter {
 
 
     void export(OutputStream outputStream) {
-        SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
+        SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
         getMappedDataElements()
 
-        builder.build(outputStream) {
+        builder.build {
             apply ModelCatalogueStyles
             sheet("Mapped Elements") { SheetDefinition sheetDefinition ->
                 row {

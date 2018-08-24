@@ -1,5 +1,10 @@
 package org.modelcatalogue.gel.export
 
+import builders.dsl.spreadsheet.builder.api.SheetDefinition
+import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.api.WorkbookDefinition
+import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
+
 import static java.lang.Boolean.FALSE
 import static java.lang.Boolean.TRUE
 import static java.util.Map.Entry
@@ -12,10 +17,6 @@ import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Log4j
 import org.apache.commons.lang.exception.ExceptionUtils
-import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
-import org.modelcatalogue.spreadsheet.builder.api.WorkbookDefinition
-import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
@@ -654,8 +655,8 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
 
     def exportLinesAsXls(String sheetName, List lines, OutputStream out) {
-        SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
-        builder.build(out) { WorkbookDefinition workbook ->
+        SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
+        builder.build { WorkbookDefinition workbook ->
             apply GelXlsStyles
             sheet(sheetName) { SheetDefinition sheet ->
                 buildSheet(sheet, lines)

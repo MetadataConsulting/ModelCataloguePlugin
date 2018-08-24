@@ -1,9 +1,9 @@
 package org.modelcatalogue.gel.export
 
+import builders.dsl.spreadsheet.builder.api.SheetDefinition
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService
-import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
 
 /**
  * Created by rickrees on 18/04/2016.

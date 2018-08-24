@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.dataexport.excel.norththamesreport
 
+import builders.dsl.spreadsheet.builder.api.SheetDefinition
+import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import grails.util.Holders
 import groovy.util.logging.Log
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -8,9 +11,6 @@ import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataElementService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
-import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
-import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import org.springframework.context.ApplicationContext
 
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
@@ -148,13 +148,13 @@ ORDER BY
         }
     }
     void export(OutputStream outputStream) {
-        SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
+        SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
         Map<String, String> siteMap = setModelNames(sourceModel)
         log.info("siteName:${siteMap.siteName} sourceModel:${sourceModel.name} lpcModel:${siteMap.lpcModelName} localModel:${siteMap.localModelName} loincModel:${siteMap.loincModelName} gelModel:${siteMap.gelModelName}")
         List mappedDataElements = getMappedDataElements(siteMap)
 //        log.info(mappedDataElements.toString())
 
-        builder.build(outputStream) {
+        builder.build {
             apply ModelCatalogueStyles
             style ('data') {
                 wrap text

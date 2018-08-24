@@ -1,9 +1,8 @@
 package org.modelcatalogue.core.export.inventory
 
-import org.modelcatalogue.spreadsheet.api.Color
-import org.modelcatalogue.spreadsheet.api.HTMLColorProvider
-import org.modelcatalogue.spreadsheet.builder.api.CanDefineStyle
-import org.modelcatalogue.spreadsheet.builder.api.Stylesheet
+import builders.dsl.spreadsheet.api.Color
+import builders.dsl.spreadsheet.builder.api.CanDefineStyle
+import builders.dsl.spreadsheet.builder.api.Stylesheet
 
 class ModelCatalogueStyles implements Stylesheet {
 
@@ -38,7 +37,7 @@ class ModelCatalogueStyles implements Stylesheet {
     public static final String CHANGE_REMOVAL = 'change-removal'
     public static final Color CHANGE_NEW_COLOR = new Color('#E2EFDB')
     public static final Color CHANGE_UPDATE_COLOR = new Color('#DDEBF6')
-    public static final Color CHANGE_REMOVAL_COLOR = HTMLColorProvider.mistyRose
+    public static final Color CHANGE_REMOVAL_COLOR = new Color("#FFE4E1")
 
 
     @Override
