@@ -454,7 +454,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
         if (this instanceof DataClass) {
             // mark top level
-            topLevelDataClassService.markTopLevel((DataClass) this) // This won't work as it reloads the dataClass as a new object...
+            topLevelDataClassService?.markTopLevel((DataClass) this) // This won't work as it reloads the dataClass as a new object...
 //            this.topLevel = true
 //            DataClass.withNewSession {
 //                final Long dataClassId = this.id
