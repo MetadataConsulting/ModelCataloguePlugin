@@ -1,7 +1,11 @@
 package org.modelcatalogue.core.dataexport.excel.norththamesreport
 
+import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.api.Keywords
+import builders.dsl.spreadsheet.builder.api.CellDefinition
 import builders.dsl.spreadsheet.builder.api.SheetDefinition
 import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.api.WorkbookDefinition
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
@@ -80,30 +84,36 @@ class NorthThamesMappingReportXlsxExporter {
     void export(OutputStream outputStream) {
         SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
         getMappedDataElements()
-
-        builder.build {
-            apply ModelCatalogueStyles
-            sheet("Mapped Elements") { SheetDefinition sheetDefinition ->
-                row {
-                    excelHeaders.each { header ->
-                        cell {
-                            value header
-                            width auto
-                            style H1
+        builder.build(new Configurer<WorkbookDefinition>() {
+            @Override
+            void configure(WorkbookDefinition workbookDefinition) {
+                workbookDefinition.apply ModelCatalogueStyles
+                workbookDefinition.sheet("Mapped Elements", new Configurer<SheetDefinition>() {
+                    @Override
+                    void configure(SheetDefinition sheetDefinition) {
+                        sheetDefinition.row(new Configurer<RowDefinition>() {
+                            @Override
+                            void configure(RowDefinition rowDefinition) {
+                                for (String header : excelHeaders) {
+                                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                                        @Override
+                                        void configure(CellDefinition cellDefinition) {
+                                            cellDefinition.value header
+                                            cellDefinition.width Keywords.Auto.AUTO
+                                            cellDefinition.style H1
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                        for ( CatalogueElement de : mappedSourceElements) {
+                            printMapping(de as DataElement, sheetDefinition)
                         }
                     }
-                }
-
-                mappedSourceElements.each { DataElement de ->
-                    printMapping(de, sheetDefinition)
-                }
+                })
             }
-        }
+        })
     }
-
-
-
-
 
     void getMappedDataElements(){
         //get all the data elements from the model
