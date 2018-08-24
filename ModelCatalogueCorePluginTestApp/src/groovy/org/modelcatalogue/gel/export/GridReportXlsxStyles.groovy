@@ -1,6 +1,14 @@
 package org.modelcatalogue.gel.export
 
+import builders.dsl.spreadsheet.api.BorderStyle
+import builders.dsl.spreadsheet.api.Color
+import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.api.FontStyle
+import builders.dsl.spreadsheet.api.Keywords
+import builders.dsl.spreadsheet.builder.api.BorderDefinition
 import builders.dsl.spreadsheet.builder.api.CanDefineStyle
+import builders.dsl.spreadsheet.builder.api.CellStyleDefinition
+import builders.dsl.spreadsheet.builder.api.FontDefinition
 import builders.dsl.spreadsheet.builder.api.Stylesheet
 import groovy.transform.CompileStatic
 
@@ -15,52 +23,86 @@ class GridReportXlsxStyles implements Stylesheet {
     public static final String STANDARD = 'standard'
     @Override
     void declareStyles(CanDefineStyle stylable) {
-        stylable.with {
-            style(H1) {
-                align center, center
-                font {
-                    style bold
-                    size 22
-                    color cornflowerBlue
-                }
+        stylable.style(H1, new Configurer<CellStyleDefinition>() {
+            @Override
+            void configure(CellStyleDefinition c) {
+                c.align(Keywords.VerticalAlignment.CENTER, Keywords.HorizontalAlignment.CENTER)
+                c.font(new Configurer<FontDefinition>() {
+                    @Override
+                    void configure(FontDefinition f) {
+                        f.style(FontStyle.BOLD)
+                        f.size(22)
+                        f.color(Color.cornflowerBlue)
+                    }
+                })
             }
-            style(TOP_BORDER) {
-                wrap text
-                border top, {
-                    color black
-                    style medium
-                }
+        })
+        stylable.style(TOP_BORDER, new Configurer<CellStyleDefinition>() {
+            @Override
+            void configure(CellStyleDefinition c) {
+                //c.wrap(text)
+                c.border(Keywords.BorderSide.TOP, new Configurer<BorderDefinition>() {
+                    @Override
+                    void configure(BorderDefinition b) {
+                        b.color(Color.black)
+                        b.style(BorderStyle.MEDIUM)
+                    }
+                })
             }
-            style(LEFT_BORDER) {
-                wrap text
-                border left, {
-                    color black
-                    style medium
-                }
+        })
+        stylable.style(LEFT_BORDER, new Configurer<CellStyleDefinition>() {
+            @Override
+            void configure(CellStyleDefinition c) {
+                //c.wrap(text)
+                c.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                    @Override
+                    void configure(BorderDefinition b) {
+                        b.color(Color.black)
+                        b.style(BorderStyle.MEDIUM)
+                    }
+                })
             }
-            style(TOP_LEFT_BORDER) {
-                wrap text
-                border top, left, {
-                    color black
-                    style medium
-                }
+        })
+        stylable.style(TOP_LEFT_BORDER, new Configurer<CellStyleDefinition>() {
+            @Override
+            void configure(CellStyleDefinition c) {
+                //c.wrap(text)
+                c.border(Keywords.BorderSide.TOP, Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                    @Override
+                    void configure(BorderDefinition b) {
+                        b.color(Color.black)
+                        b.style(BorderStyle.MEDIUM)
+                    }
+                })
             }
-            style(ANALYSIS) {
-                align center, center
-                font {
-                    style bold
-                    size 16
-                    color black
-                }
+        })
+        stylable.style(ANALYSIS, new Configurer<CellStyleDefinition>() {
+            @Override
+            void configure(CellStyleDefinition c) {
+                c.align(Keywords.VerticalAlignment.CENTER, Keywords.HorizontalAlignment.CENTER)
+                c.font(new Configurer<FontDefinition>() {
+                    @Override
+                    void configure(FontDefinition f) {
+                        f.style(FontStyle.BOLD)
+                        f.size(16)
+                        f.color(Color.black)
+                    }
+                })
             }
-            style(STANDARD) {
-                wrap text
-                border top, {
-                    color black
-                    style medium
-                }
+        })
+        stylable.style(STANDARD, new Configurer<CellStyleDefinition>() {
+            @Override
+            void configure(CellStyleDefinition c) {
+                //c.wrap(text)
+                c.border(Keywords.BorderSide.TOP, new Configurer<BorderDefinition>() {
+                    @Override
+                    void configure(BorderDefinition b) {
+                        b.color(Color.black)
+                        b.style(BorderStyle.MEDIUM)
+                    }
+                })
             }
-        }
+        })
     }
 
     static void debugLine(String s) {
