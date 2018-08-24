@@ -1,5 +1,6 @@
 package org.modelcatalogue.gel.export
 
+import builders.dsl.spreadsheet.api.Configurer
 import builders.dsl.spreadsheet.builder.api.SheetDefinition
 import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
 import builders.dsl.spreadsheet.builder.api.WorkbookDefinition
@@ -655,14 +656,19 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
 
     def exportLinesAsXls(String sheetName, List lines, OutputStream out) {
-        SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
-        builder.build { WorkbookDefinition workbook ->
-            apply GelXlsStyles
-            sheet(sheetName) { SheetDefinition sheet ->
-                buildSheet(sheet, lines)
+        SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(out)
+        builder.build(new Configurer<WorkbookDefinition>() {
+            @Override
+            void configure(WorkbookDefinition workbookDefinition) {
+                workbookDefinition.apply(GelXlsStyles)
+                workbookDefinition.sheet(sheetName, new Configurer<SheetDefinition>() {
+                    @Override
+                    void configure(SheetDefinition sheetDefinition) {
+                        buildSheet(sheetDefinition, lines)
+                    }
+                })
             }
-        }
-
+        })
     }
 
     void buildRows(SheetDefinition sheet, List<List<String>> lines) {
