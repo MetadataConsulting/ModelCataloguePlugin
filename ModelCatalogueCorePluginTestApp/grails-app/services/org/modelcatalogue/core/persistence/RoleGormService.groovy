@@ -2,10 +2,13 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.security.Role
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class RoleGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -27,5 +30,10 @@ class RoleGormService implements WarnGormErrors {
             warnErrors(role, messageSource)
         }
         role
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

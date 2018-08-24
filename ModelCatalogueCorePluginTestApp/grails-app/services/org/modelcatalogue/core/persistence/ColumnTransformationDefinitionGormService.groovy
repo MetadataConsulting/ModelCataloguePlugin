@@ -2,12 +2,15 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class ColumnTransformationDefinitionGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -56,5 +59,10 @@ class ColumnTransformationDefinitionGormService implements WarnGormErrors {
             return [] as List<ColumnTransformationDefinition>
         }
         queryByIds(ids).list()
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

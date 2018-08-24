@@ -3,6 +3,7 @@ package org.modelcatalogue.core.persistence
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
+import groovy.util.logging.Slf4j
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 import org.hibernate.transform.Transformers
 import org.modelcatalogue.core.WarnGormErrors
@@ -10,8 +11,10 @@ import org.modelcatalogue.core.security.LastSeen
 import org.modelcatalogue.core.security.UserAuthentication
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.SortQuery
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class UserAuthenticationGormService implements WarnGormErrors {
     MessageSource messageSource
 
@@ -53,4 +56,10 @@ class UserAuthenticationGormService implements WarnGormErrors {
             }
         } as Number
     }
+
+    @Override
+    Logger getLog() {
+        return log
+    }
+
 }

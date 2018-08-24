@@ -9,6 +9,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dashboard.SearchQuery
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
 @Slf4j
@@ -89,7 +90,6 @@ class DataClassGormService implements WarnGormErrors {
         findQueryByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery).count()
     }
 
-    @CompileStatic
     DetachedCriteria<DataClass> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         DetachedCriteria<DataClass> query = DataClass.where {}
         if ( dataModelId ) {
@@ -135,5 +135,10 @@ class DataClassGormService implements WarnGormErrors {
     @Transactional(readOnly = true)
     Integer count() {
         DataClass.count()
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

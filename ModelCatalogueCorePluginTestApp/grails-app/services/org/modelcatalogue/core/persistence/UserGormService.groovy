@@ -2,12 +2,15 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.MetadataRoles
 import org.modelcatalogue.core.security.User
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class UserGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -161,5 +164,10 @@ class UserGormService implements WarnGormErrors {
             return [] as List<User>
         }
         queryByIds(ids).list()
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

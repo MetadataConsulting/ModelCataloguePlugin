@@ -3,9 +3,12 @@ package org.modelcatalogue.core.persistence
 import grails.gorm.DetachedCriteria
 import grails.plugin.springsecurity.ui.RegistrationCode
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.WarnGormErrors
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class RegistrationCodeGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -44,5 +47,10 @@ class RegistrationCodeGormService implements WarnGormErrors {
             return [] as List<RegistrationCode>
         }
         queryByIds(ids).list()
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

@@ -2,6 +2,7 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.RelationshipType
@@ -10,8 +11,10 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.PublishedStatus
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class AssetGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -136,5 +139,10 @@ class AssetGormService implements WarnGormErrors {
 
     DetachedCriteria<Asset> findQueryByDataModelIdAndPublishedStatus(Long dataModelId, PublishedStatus status) {
         findQueryByDataModelAndPublishedStatus(DataModel.load(dataModelId), status)
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

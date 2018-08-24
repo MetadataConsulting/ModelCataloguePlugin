@@ -3,13 +3,16 @@ package org.modelcatalogue.core.persistence
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dashboard.SearchQuery
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class DataTypeGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -74,5 +77,10 @@ class DataTypeGormService implements WarnGormErrors {
             return [] as List<DataType>
         }
         queryByIds(ids).list()
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }
