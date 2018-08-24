@@ -1,5 +1,10 @@
 package org.modelcatalogue.gel.export
 
+import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.api.Keywords
+import builders.dsl.spreadsheet.builder.api.CellDefinition
+import builders.dsl.spreadsheet.builder.api.WorkbookDefinition
+
 import static org.modelcatalogue.gel.export.GridReportXlsxStyles.*
 import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileDynamic
@@ -28,7 +33,6 @@ import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
  * @author Adam Milward
  * @version 31/03/2017
  */
-@CompileStatic
 class GridReportXlsxExporter  {
 
     final CatalogueElement element
@@ -61,29 +65,44 @@ class GridReportXlsxExporter  {
         List<DataClass> dataClasses = Collections.emptyList()
         dataClasses = getDataClasses()
 
-        builder.build {
-            apply GridReportXlsxStyles
-            sheet("$element.name $element.dataModelSemanticVersion" ) { SheetDefinition sheetDefinition ->
-                row {
-                    style H1
-                    cell {
-                        value 'Class Hierarchy'
-                        colspan depth
+        builder.build(new Configurer<WorkbookDefinition>() {
+            @Override
+            void configure(WorkbookDefinition wd) {
+                wd.apply(GridReportXlsxStyles)
+                wd.sheet("$element.name $element.dataModelSemanticVersion".toString(), new Configurer<SheetDefinition>() {
+                    @Override
+                    void configure(SheetDefinition sheetDefinition) {
+                        sheetDefinition.row(new Configurer<RowDefinition>() {
+                            @Override
+                            void configure(RowDefinition r) {
+                                r.style(H1)
+                                r.cell(new Configurer<CellDefinition>() {
+                                    @Override
+                                    void configure(CellDefinition c) {
+                                        c.value('Class Hierarchy')
+                                        c.colspan(depth)
+                                    }
+                                })
+                                for (String header : excelHeaders) {
+                                    r.cell(new Configurer<CellDefinition>() {
+                                        @Override
+                                        void configure(CellDefinition c) {
+                                            c.value(header)
+                                            c.width(Keywords.Auto.AUTO)
+                                        }
+                                    })
+                                }
+                                for (DataClass dataClass : dataClasses) {
+                                    debugLine("GridReportXlsxExporter.export() dataClass: ${dataClass.name}")
+                                    List<Relationship> childRels = dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
+                                    printClass(dataClass, sheetDefinition, 1, 2, childRels.size(), [])
+                                }
+                            }
+                        })
                     }
-                    excelHeaders.each { header ->
-                        cell {
-                            value header
-                            width auto
-                        }
-                    }
-                }
-                dataClasses.each { dataClass->
-                    debugLine("GridReportXlsxExporter.export() dataClass: ${dataClass.name}")
-                    def childRels = dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
-                    printClass(dataClass, sheetDefinition, 1, 2, childRels.size(), [])
-                }
+                })
             }
-        }
+        })
     }
 
     /**
