@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.export.inventory
 
+import builders.dsl.spreadsheet.api.Configurer
 import builders.dsl.spreadsheet.api.Sheet
 import builders.dsl.spreadsheet.builder.api.CellDefinition
+import builders.dsl.spreadsheet.builder.api.RowDefinition
 import builders.dsl.spreadsheet.builder.api.SheetDefinition
 import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
 import builders.dsl.spreadsheet.builder.api.WorkbookDefinition
@@ -234,52 +236,71 @@ class CatalogueElementToXlsxExporter {
 
         //create spreadsheet builder and build the spreadsheet
         SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
-        builder.build { WorkbookDefinition workbook ->
-            apply ModelCatalogueStyles
 
-            //add sheets
-            sheet("Introduction") { SheetDefinition sheet ->
-                buildIntroduction(sheet, element)
-            }
-            sheet(CONTENT) { }
+        builder.build(new Configurer<WorkbookDefinition>() {
+            @Override
+            void configure(WorkbookDefinition workbook) {
+                workbook.apply(ModelCatalogueStyles)
 
-            //add all the sheets for classes based on the metadata
-            buildDataClassesDetails(dataClasses, previousVersionElementForDiff, workbook, null)
-
-            //fill content sheet
-            sheet(CONTENT) { SheetDefinition sheet ->
-                buildOutline(sheet, dataClasses, previousVersionElementForDiff)
-            }
-
-            log.info "Printing all changes summary."
-
-            //fill changes sheet
-            sheet(CHANGES) { SheetDefinition sheet ->
-                row {
-                    cell {
-                        style H1
-                        value 'Changes Summary'
-                        colspan 6
+                //add sheets
+                workbook.sheet("Introduction", new Configurer<SheetDefinition>() {
+                    @Override
+                    void configure(SheetDefinition sheet) {
+                        buildIntroduction(sheet, element)
                     }
-                }
+                })
+                workbook.sheet(CONTENT) { }
 
-                log.info "Sorting changes"
-                Iterable<Diff> allDiffs = Iterables.concat(computedDiffs.values().collect { it.values() })
+                //add all the sheets for classes based on the metadata
+                buildDataClassesDetails(dataClasses, previousVersionElementForDiff, workbook, null)
 
-                //load diffs by class
-                //key is the class id
-                //if a data element diff is included - it's included with the class id
+                //fill content sheet
+                workbook.sheet(CONTENT, new Configurer<SheetDefinition>() {
+                    @Override
+                    void configure(SheetDefinition sheetDefinition) {
+                        buildOutline(sheetDefinition, dataClasses, previousVersionElementForDiff)
+                    }
+                })
 
-                Map<String, Set> diffsByClass = getDiffsMapByClass(allDiffs)
+                log.info "Printing all changes summary."
 
-                diffsByClass.each { String key, Set val ->
-                    printClassDetails(key, val, sheet)
-                }
+                //fill changes sheet
+                workbook.sheet(CHANGES, new Configurer<SheetDefinition>() {
+                    @Override
+                    void configure(SheetDefinition sheet) {
+
+                        sheet.row(new Configurer<RowDefinition>() {
+                            @Override
+                            void configure(RowDefinition rowDefinition) {
+                                rowDefinition.cell(new Configurer<CellDefinition>() {
+                                    @Override
+                                    void configure(CellDefinition cellDefinition) {
+                                        cellDefinition.style H1
+                                        cellDefinition.value 'Changes Summary'
+                                        cellDefinition.colspan 6
+                                    }
+                                })
+                            }
+                        })
+
+                        log.info "Sorting changes"
+                        Iterable<Diff> allDiffs = Iterables.concat(computedDiffs.values().collect { it.values() })
+
+                        //load diffs by class
+                        //key is the class id
+                        //if a data element diff is included - it's included with the class id
+
+                        Map<String, Set> diffsByClass = getDiffsMapByClass(allDiffs)
+
+                        diffsByClass.each { String key, Set val ->
+                            printClassDetails(key, val, sheet)
+                        }
+                    }
+                })
             }
-        }
+        })
 
         log.info "Exported ${GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(element).simpleName)} ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
-
     }
 
     @CompileStatic
@@ -381,7 +402,7 @@ class CatalogueElementToXlsxExporter {
             val.each { Diff diff ->
                 printChanges(diff, sheet)
             }
-      }
+        }
 
 
     }
@@ -688,37 +709,37 @@ class CatalogueElementToXlsxExporter {
 //                }
 //            }
 
-                row {
-                    cell {
-                        value 'Children'
-                        style 'inner-table-header'
-                        colspan 2
-                        height 50
-                    }
-                    cell {
-                        value "${(dataClass.parentOf.size > 0) ? (getIfChoiceText(dataClass)) ? "${getIfChoiceText(dataClass)} \r ${dataClass.parentOf.collect { it.name }.join(", \r ")} " : "${dataClass.parentOf.collect { it.name }.join(", \r ")} " : "None"}"
-                        style 'description'
-                        colspan 3
-                    }
+            row {
+                cell {
+                    value 'Children'
+                    style 'inner-table-header'
+                    colspan 2
+                    height 50
+                }
+                cell {
+                    value "${(dataClass.parentOf.size > 0) ? (getIfChoiceText(dataClass)) ? "${getIfChoiceText(dataClass)} \r ${dataClass.parentOf.collect { it.name }.join(", \r ")} " : "${dataClass.parentOf.collect { it.name }.join(", \r ")} " : "None"}"
+                    style 'description'
+                    colspan 3
+                }
 
-                    cell {
-                        value 'Link'
-                        style 'inner-table-header'
-                    }
+                cell {
+                    value 'Link'
+                    style 'inner-table-header'
+                }
 
-                    cell {
-                        value "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
-                        style 'description'
-                       // link to url "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
-                    }
-
-
-
+                cell {
+                    value "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
+                    style 'description'
+                    // link to url "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
                 }
 
 
-             if (dataClass?.description && dataClass?.description.matches(".*\\w.*") || getIfChoiceText(dataClass)) {
-                 row {
+
+            }
+
+
+            if (dataClass?.description && dataClass?.description.matches(".*\\w.*") || getIfChoiceText(dataClass)) {
+                row {
                     cell {
                         value (getIfChoiceText(dataClass))? "$dataClass.description \r ${getIfChoiceText(dataClass)}" : dataClass.description
                         height 100
@@ -1245,10 +1266,10 @@ class CatalogueElementToXlsxExporter {
         if (relationship) {
             relDiffKeys = [Diff.keyForRelationship(relationship), Diff.keyForSelf(relationship.destination.latestVersionId ?: relationship.destination.id)] as String[]
             multiplicityRelDiffKeys = [
-                Diff.keyForRelationship(relationship),
-                Diff.keyForSelf(relationship.destination.latestVersionId ?: relationship.destination.id),
-                Diff.keyForRelationshipExtension(relationship, Metadata.MIN_OCCURS),
-                Diff.keyForRelationshipExtension(relationship, Metadata.MAX_OCCURS),
+                    Diff.keyForRelationship(relationship),
+                    Diff.keyForSelf(relationship.destination.latestVersionId ?: relationship.destination.id),
+                    Diff.keyForRelationshipExtension(relationship, Metadata.MIN_OCCURS),
+                    Diff.keyForRelationshipExtension(relationship, Metadata.MAX_OCCURS),
             ] as String[]
 
             //else if this is a top level class - so we won't have a relationship but we do want to take the parent diffs

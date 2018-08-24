@@ -1,8 +1,16 @@
 package org.modelcatalogue.core.dataimport.excel
 
+import builders.dsl.spreadsheet.api.BorderStyle
+import builders.dsl.spreadsheet.api.Color
+import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.api.Keywords
+import builders.dsl.spreadsheet.builder.api.BorderDefinition
+import builders.dsl.spreadsheet.builder.api.CellDefinition
+import builders.dsl.spreadsheet.builder.api.CellStyleDefinition
 import builders.dsl.spreadsheet.builder.api.RowDefinition
 import builders.dsl.spreadsheet.builder.api.SheetDefinition
 import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.api.WorkbookDefinition
 import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
@@ -63,42 +71,58 @@ class ExcelExporter {
         SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
         List<DataClass> dataClasses = Collections.emptyList()
         dataClasses = getDataClasses()
+        builder.build(new Configurer<WorkbookDefinition>() {
 
-        builder.build {
-            apply ModelCatalogueStyles
-            style ('standard') {
-                wrap text
-                border top, left, {
-                    color black
-                    style medium
-                }
-            }
-            sheet("$element.name $element.dataModelSemanticVersion" ) { SheetDefinition sheetDefinition ->
-                row {
-                    style H1
-                    excelHeaders.each { header ->
-                        cell {
-                            value header
-                            width auto
+            @Override
+            void configure(WorkbookDefinition workbookDefinition) {
+                workbookDefinition.apply(ModelCatalogueStyles)
+                workbookDefinition.style('standard', new Configurer<CellStyleDefinition>() {
+                    @Override
+                    void configure(CellStyleDefinition cellStyleDefinition) {
+                        cellStyleDefinition.wrap(cellStyleDefinition.getText())
+                        cellStyleDefinition.border(Keywords.BorderSide.TOP, Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                            @Override
+                            void configure(BorderDefinition borderDefinition) {
+                                borderDefinition.color(Color.black)
+                                borderDefinition.style(BorderStyle.MEDIUM)
+                            }
+                        })
+                    }
+                })
+                workbookDefinition.sheet("$element.name $element.dataModelSemanticVersion".toString(), new Configurer<SheetDefinition>() {
+                    @Override
+                    void configure(SheetDefinition sheetDefinition) {
+                        sheetDefinition.row(new Configurer<RowDefinition>() {
+                            @Override
+                            void configure(RowDefinition rowDefinition) {
+                                rowDefinition.style(H1)
+                                for (String header : excelHeaders) {
+                                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                                        @Override
+                                        void configure(CellDefinition cellDefinition) {
+                                            cellDefinition.value(header)
+                                            cellDefinition.width(Keywords.Auto.AUTO)
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                        for ( DataClass dataClass : dataClasses) {
+                            /* The original GridReportXlsxExporter had columnDepth and rowDepth...
+                            the depth parameter of the class was used for columnDepth– how far to the right the columns went. rowDepth is how far down, which row is being edited.
+                            Init: 2 is where the first row should be printed.
+                            */
+                            printClass(null, dataClass, sheetDefinition, 2)
+                            // starting at printClass lets the top level data class be printed.
+                            //buildRows(sheetDefinition, dataClass, 2)
                         }
                     }
+                })
+                sheetsAfterMainSheetExport().each { String name, Closure instructions ->
+                    workbookDefinition.sheet(name, instructions)
                 }
-                dataClasses.each { dataClass->
-                    /* The original GridReportXlsxExporter had columnDepth and rowDepth...
-                    the depth parameter of the class was used for columnDepth– how far to the right the columns went. rowDepth is how far down, which row is being edited.
-                    Init: 2 is where the first row should be printed.
-                    */
-                    printClass(null, dataClass, sheetDefinition, 2)
-                    // starting at printClass lets the top level data class be printed.
-                    //buildRows(sheetDefinition, dataClass, 2)
-                }
-
             }
-            sheetsAfterMainSheetExport().each{name, instructions ->
-                sheet(name, instructions)
-            }
-        }
-
+        })
     }
 
     /**
