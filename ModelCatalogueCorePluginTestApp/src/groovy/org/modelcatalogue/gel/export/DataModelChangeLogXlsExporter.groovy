@@ -1,5 +1,9 @@
 package org.modelcatalogue.gel.export
 
+import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.api.Keywords
+import builders.dsl.spreadsheet.builder.api.CellDefinition
+import builders.dsl.spreadsheet.builder.api.RowDefinition
 import builders.dsl.spreadsheet.builder.api.SheetDefinition
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
@@ -74,48 +78,84 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
     @Override
     void buildSheet(SheetDefinition sheet, List lines) {
-        sheet.with {
-            row(1) {
-                cell {
-                    value headers.get(1)
-                    style 'h3' //                    height 75
-                    width auto
-                }
-                cell {
-                    value headers.get(2)
-                    style 'h3'
-                    width auto
-                }
-                cell {
-                    value headers.get(3)
-                    width auto
-                    style 'h3'
-                }
-                cell {
-                    value headers.get(4)
-                    width auto
-                    style 'h3'
-                }
-                cell {
-                    value headers.get(5)
-                    width auto
-                    style 'h3'
-                }
-                cell {
-                    value headers.get(6)
-                    width 30
-                    style 'h3-wrap-thick'
-                }
-                cell {
-                    value headers.get(7)
-                    width 30
-                    style 'h3-green'
-                }
+        sheet.row(1, new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value headers.get(1)
+                        cellDefinition.style 'h3' //                    height 75
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value headers.get(2)
+                        cellDefinition.style 'h3'
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value headers.get(3)
+                        cellDefinition.width Keywords.Auto.AUTO
+                        cellDefinition.style 'h3'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value headers.get(4)
+                        cellDefinition.width Keywords.Auto.AUTO
+                        cellDefinition.style 'h3'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value headers.get(5)
+                        cellDefinition.width Keywords.Auto.AUTO
+                        cellDefinition.style 'h3'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value headers.get(6)
+                        cellDefinition.width 30
+                        cellDefinition.style 'h3-wrap-thick'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value headers.get(7)
+                        cellDefinition.width 30
+                        cellDefinition.style 'h3-green'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                    }
+                })
             }
-
-            buildRows(it, lines)
-
-        }
+        })
+        buildRows(sheet, lines)
     }
 
     @Override

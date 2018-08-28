@@ -162,28 +162,35 @@ class ExcelExporter {
      */
     private Integer printClass(DataClass parentDataClass, DataClass childDataClass, SheetDefinition sheet, int rowDepth) {
         Collection<Relationship> containmentRels = childDataClass.getOutgoingRelationshipsByType(RelationshipType.containmentType)
-        sheet.with { SheetDefinition sheetDefinition ->
-            row { RowDefinition rowDefinition ->
-                    if (containmentRels.isEmpty()) {
-                        // still want to print parentDataClass/childDataClass even if no data elements
-                        row(rowDepth) { RowDefinition rd ->
-                            printChildProbablyParentPossiblyElement(parentDataClass, childDataClass, rd, null)
-                        }
-                        rowDepth++
-                    }
-                    for (Relationship dataElementRelationship in containmentRels) {
-                        // [for loop] invariant: rowDepth is where the next row should be printed.
-                        row(rowDepth) { RowDefinition rd ->
-                            printChildProbablyParentPossiblyElement(parentDataClass, childDataClass, rd, dataElementRelationship)
-                        }
-                        rowDepth++
-                    }
-                }
 
-            rowDepth = buildRows(sheetDefinition, childDataClass, rowDepth)
-            rowDepth
-            }
+        if (containmentRels.isEmpty()) {
+            // still want to print parentDataClass/childDataClass even if no data elements
+            sheet.row(rowDepth, new Configurer<RowDefinition>() {
+                @Override
+                void configure(RowDefinition rd) {
+                    printChildProbablyParentPossiblyElement(parentDataClass, childDataClass, rd, null)
+                }
+            })
+            rowDepth++
         }
+
+        for (Relationship dataElementRelationship in containmentRels) {
+
+            // [for loop] invariant: rowDepth is where the next row should be printed.
+            sheet.row(rowDepth, new Configurer<RowDefinition>() {
+                @Override
+                void configure(RowDefinition rd) {
+                    printChildProbablyParentPossiblyElement(parentDataClass, childDataClass, rd, dataElementRelationship)
+                }
+            })
+
+            rowDepth++
+        }
+
+        rowDepth = buildRows(sheet, childDataClass, rowDepth)
+        rowDepth
+    }
+
     String blank = ''
 
     void printChildProbablyParentPossiblyElement(DataClass parent, DataClass child, RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {

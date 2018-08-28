@@ -213,72 +213,110 @@ ORDER BY
         //print a row with all the mappings form the source models to the mapped models
         //get the mapped items from the source data element
 //        log.info(deRow)
-        sheet.with { SheetDefinition sheetDefinition ->
-            row {
-                style 'data'
-                cell {
-                    value siteName
-                    width auto
-                }
-                cell {
-                    value deRow[cols.lpc_model.ordinal()]
-                    width auto
-                }
-                cell {
-                    value deRow[cols.lpc_code.ordinal()]
-                    width auto
-                }
-                cell {
-                    value deRow[cols.lpc_name.ordinal()]
-                    width auto
-                }
-
-                //mapped items local
-                cell {
-                    value deRow[cols.local_model.ordinal()]
-                    width auto
-                }
-                cell {
-                    value deRow[cols.local_code.ordinal()]
-                    width auto
-                }
-                cell {
-                    value deRow[cols.local_name.ordinal()]
-                    width auto
-                }
-
-                //mapped loinc items
-                cell {
-                    value  deRow[cols.loinc_code.ordinal()]
-                    width auto
-                }
-                cell {
-                    value deRow[cols.loinc_name.ordinal()]
-                    width auto
-                }
-                cell {
-                    value deRow[cols.loinc_system.ordinal()]
-                    width auto
-                }
-
-                //mapped gel items
-                cell {
-                    value deRow[cols.gel_code.ordinal()]
-                    width auto
-                }
-                cell {
-                    value deRow[cols.gel_name.ordinal()]
-                    width auto
-                }
-                cell {
-                    value deRow[cols.gel_openehr.ordinal()]
-                    width auto
-                }
-                cell {
-                    value deRow[cols.ref_range.ordinal()]
-                    width auto
-                }
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.style('data')
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value siteName
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.lpc_model.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.lpc_code.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.lpc_name.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.local_model.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.local_code.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.local_name.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value  deRow[cols.loinc_code.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.loinc_name.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.loinc_system.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.gel_code.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.gel_name.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.gel_openehr.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value deRow[cols.ref_range.ordinal()]
+                        cellDefinition.width Keywords.Auto.AUTO
+                    }
+                })
             }
-        }
+        })
+
     }
 }

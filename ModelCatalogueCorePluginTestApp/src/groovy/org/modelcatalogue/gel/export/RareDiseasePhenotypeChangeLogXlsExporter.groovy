@@ -1,5 +1,9 @@
 package org.modelcatalogue.gel.export
 
+import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.api.Keywords
+import builders.dsl.spreadsheet.builder.api.CellDefinition
+import builders.dsl.spreadsheet.builder.api.RowDefinition
 import builders.dsl.spreadsheet.builder.api.SheetDefinition
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
@@ -27,64 +31,93 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
 
     @Override
     void buildSheet(SheetDefinition sheet, List lines) {
-        sheet.with {
-            row(1) {
-                cell {
-                    value 'Change reference'
-                    style 'h3'
-                    height 75
-                    width 20
-                }
-                cell {
-                    value 'Level 2 Disease Group (ID)'
-                    style 'h3'
-                    width 50
-                }
-                cell {
-                    value 'Level 3 Disease Subtype (ID)'
-                    style 'h3'
-                    width 60
-                }
-                cell {
-                    value 'Level 4 Specific Disorder (ID)'
-                    width 60
-                    style 'h3'
-                }
-                cell {
-                    value 'Element hierarchy'
-                    width 20
-                    style 'h3'
-                }
-                cell {
-                    value 'Phenotype /Clinical Tests/Guidance'
-                    width 35
-                    style 'h3'
-                }
-                cell {
-                    value 'Affected Data Item'
-                    width 35
-                    style 'h3'
-                }
-                cell {
-                    value 'Change Type'
-                    width 25
-                    style 'h3'
-                }
-                cell {
-                    value 'Current version details'
-                    width 30
-                    style 'h3'
-                }
-                cell {
-                    value 'New version details'
-                    width 30
-                    style 'h3-green'
-                }
+        sheet.row(1, new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Change reference'
+                        cellDefinition.style 'h3'
+                        cellDefinition.height 75
+                        cellDefinition.width 20
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Level 2 Disease Group (ID)'
+                        cellDefinition.style 'h3'
+                        cellDefinition.width 50
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Level 3 Disease Subtype (ID)'
+                        cellDefinition.style 'h3'
+                        cellDefinition.width 60
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Level 4 Specific Disorder (ID)'
+                        cellDefinition.width 60
+                        cellDefinition.style 'h3'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Element hierarchy'
+                        cellDefinition.width 20
+                        cellDefinition.style 'h3'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Phenotype /Clinical Tests/Guidance'
+                        cellDefinition.width 35
+                        cellDefinition.style 'h3'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Affected Data Item'
+                        cellDefinition.width 35
+                        cellDefinition.style 'h3'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Change Type'
+                        cellDefinition.width 25
+                        cellDefinition.style 'h3'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Current version details'
+                        cellDefinition.width 30
+                        cellDefinition.style 'h3'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'New version details'
+                        cellDefinition.width 30
+                        cellDefinition.style 'h3-green'
+                    }
+                })
             }
-
-            buildRows(it, lines)
-
-        }
+        })
+        buildRows(sheet, lines)
     }
 
     @Override

@@ -1,6 +1,8 @@
 package org.modelcatalogue.gel.export
 
 import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.builder.api.CellDefinition
+import builders.dsl.spreadsheet.builder.api.RowDefinition
 import builders.dsl.spreadsheet.builder.api.SheetDefinition
 import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
 import builders.dsl.spreadsheet.builder.api.WorkbookDefinition
@@ -679,16 +681,26 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     }
 
     private buildRow(SheetDefinition sheet, List<String> line) {
-        sheet.row {
-            line.eachWithIndex{ String cellValue, int i ->
-                cell {
-                    value cellValue
-                    style 'property-value'
-                    if (i==7) style 'property-value-wrap'
-                    if (i==8) style 'property-value-green'
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                line.eachWithIndex { String cellValue, int i ->
+                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                        @Override
+                        void configure(CellDefinition cellDefinition) {
+                            cellDefinition.value cellValue
+                            cellDefinition.style 'property-value'
+                            if (i==7) {
+                                cellDefinition.style 'property-value-wrap'
+                            }
+                            if (i==8) {
+                                cellDefinition.style 'property-value-green'
+                            }
+                        }
+                    })
                 }
             }
-        }
+        })
     }
 
 

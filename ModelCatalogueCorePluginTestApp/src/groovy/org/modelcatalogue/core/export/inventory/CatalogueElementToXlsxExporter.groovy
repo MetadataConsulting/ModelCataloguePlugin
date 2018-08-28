@@ -102,116 +102,203 @@ class CatalogueElementToXlsxExporter {
         element.hasModelCatalogueId() && !element.modelCatalogueId.startsWith('http') ? element.modelCatalogueId : (element.getLatestVersionId()) ?: element.getId()
     }
 
+
+
     protected static void buildIntroduction(SheetDefinition sheet, CatalogueElement dataModel) {
-        sheet.with {
-            row {
-                cell {
-                    value dataModel.name
-                    colspan 4
-                    style H1
-                }
-            }
-            row {
-                cell {
-                    value "Version: $dataModel.dataModelSemanticVersion"
-                    colspan 4
-                    style H1
-                }
-            }
-            row {
-                cell {
-                    style H1
-                    colspan 4
-                }
-            }
-            row {
-                cell {
-                    value "Introduction"
-                    colspan 4
-                    style H2
-                }
-            }
-            row {
-                cell {
-                    value dataModel.description
-                    height 100
-                    colspan 4
-                    style ModelCatalogueStyles.DESCRIPTION
-                }
-            }
 
-            row()
-
-            row {
-                cell {
-                    value "Document Version History"
-                    colspan 4
-                    style H2
-                }
-            }
-
-            row()
-
-            row {
-                cell {
-                    value 'Version'
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
-                    width 12
-                }
-                cell {
-                    value 'Date Issued'
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
-                    width 12
-                }
-                cell {
-                    value 'Brief Summary of Change'
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
-                    width 40
-                }
-                cell {
-                    value 'Owner\'s Name'
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
-                    width 40
-                }
-            }
-
-            for (DataModel version in CatalogueElementService.getAllVersions(dataModel.instanceOf(DataModel) ? dataModel : dataModel.dataModel).items) {
-                row {
-                    cell {
-                        value version.semanticVersion
-                        styles ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.CENTER_CENTER
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value dataModel.name
+                        cellDefinition.colspan 4
+                        cellDefinition.style H1
                     }
-                    cell {
-                        value version.versionCreated
-                        styles ModelCatalogueStyles.DATE_NORMAL, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
-                    }
-                    cell {
-                        value version.revisionNotes
-                        styles ModelCatalogueStyles.DESCRIPTION, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
-                        height 40
-                    }
-                    cell {
-                        value version.ext[Metadata.OWNER]
-                        styles ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.CENTER_CENTER
-                    }
-                }
+                })
             }
-
-            row()
-
-            row {
-                cell {
-                    value "Date of Issue Reference"
-                    style ModelCatalogueStyles.INNER_TABLE_HEADER
-                    colspan 2
-                }
-                cell {
-                    value new Date()
-                    style ModelCatalogueStyles.DATE
-                    colspan 2
-                }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "Version: $dataModel.dataModelSemanticVersion"
+                        cellDefinition.colspan 4
+                        cellDefinition.style H1
+                    }
+                })
             }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.style H1
+                        cellDefinition.colspan 4
+                    }
+                })
+            }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "Introduction"
+                        cellDefinition.colspan 4
+                        cellDefinition.style H2
+                    }
+                })
+            }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value dataModel.description
+                        cellDefinition.height 100
+                        cellDefinition.colspan 4
+                        cellDefinition.style ModelCatalogueStyles.DESCRIPTION
+                    }
+                })
+            }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+            }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "Document Version History"
+                        cellDefinition.colspan 4
+                        cellDefinition.style H2
+
+                    }
+                })
+            }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+            }
+        })
+
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Version'
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
+                        cellDefinition.width 12
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Date Issued'
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
+                        cellDefinition.width 12
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Brief Summary of Change'
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
+                        cellDefinition.width 40
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Owner\'s Name'
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
+                        cellDefinition.width 40
+                    }
+                })
+            }
+        })
+
+        for (DataModel version in CatalogueElementService.getAllVersions(dataModel.instanceOf(DataModel) ? dataModel : dataModel.dataModel).items) {
+
+            sheet.row(new Configurer<RowDefinition>() {
+                @Override
+                void configure(RowDefinition rowDefinition) {
+                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                        @Override
+                        void configure(CellDefinition cellDefinition) {
+                            cellDefinition.value version.semanticVersion
+                            cellDefinition.styles ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.CENTER_CENTER
+                        }
+                    })
+                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                        @Override
+                        void configure(CellDefinition cellDefinition) {
+                            cellDefinition.value version.versionCreated
+                            cellDefinition.styles ModelCatalogueStyles.DATE_NORMAL, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
+                        }
+                    })
+                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                        @Override
+                        void configure(CellDefinition cellDefinition) {
+                            cellDefinition.value version.revisionNotes
+                            cellDefinition.styles ModelCatalogueStyles.DESCRIPTION, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
+                            cellDefinition.height 40
+                        }
+                    })
+                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                        @Override
+                        void configure(CellDefinition cellDefinition) {
+                            cellDefinition.value version.ext[Metadata.OWNER]
+                            cellDefinition.styles ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.CENTER_CENTER
+                        }
+                    })
+                }
+            })
         }
+
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+            }
+        })
+
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "Date of Issue Reference"
+                        cellDefinition.style ModelCatalogueStyles.INNER_TABLE_HEADER
+                        cellDefinition.colspan 2
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value new Date()
+                        cellDefinition.style ModelCatalogueStyles.DATE
+                        cellDefinition.colspan 2
+                    }
+                })
+            }
+        })
     }
 
     void export(OutputStream outputStream) {
@@ -349,102 +436,161 @@ class CatalogueElementToXlsxExporter {
 
     protected void printClassDetails(String key, Set val,  SheetDefinition sheet){
 
-        sheet.with {
-            row {
-                cell {
-                    style H1
-                    value key
-                    colspan 6
-                }
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.style H1
+                        cellDefinition.value key
+                        cellDefinition.colspan 6
+                    }
+                })
             }
-            row {
-                cell {
-                    value 'Parent ID'
-                    width 10
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                }
-                cell {
-                    value 'Parent Name'
-                    width 15
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                }
-                cell {
-                    value 'ID'
-                    width 10
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                }
-                cell {
-                    value 'Type'
-                    width 15
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                }
-                cell {
-                    value 'Name'
-                    width 25
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                }
-                cell {
-                    value 'Description'
-                    width 35
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                }
-                cell {
-                    value 'Old Value'
-                    width 35
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                }
-                cell {
-                    value 'New Value'
-                    width 35
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                }
+        })
+
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Parent ID'
+                        cellDefinition.width 10
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Parent Name'
+                        cellDefinition.width 15
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'ID'
+                        cellDefinition.width 10
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Type'
+                        cellDefinition.width 15
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Name'
+                        cellDefinition.width 25
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Description'
+                        cellDefinition.width 35
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Old Value'
+                        cellDefinition.width 35
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'New Value'
+                        cellDefinition.width 35
+                        cellDefinition.styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                })
+
             }
-            val.each { Diff diff ->
-                printChanges(diff, sheet)
+        })
+
+        for (Object obj : val) {
+            if (obj instanceof Diff) {
+                printChanges(diff as Diff, sheet)
             }
         }
-
-
     }
 
-    protected void printChanges(Diff diff, SheetDefinition sheet){
+    protected void printChanges(Diff diff, SheetDefinition sheet) {
 
-        sheet.with {
-            row {
-                cell {
-                    value "${(diff?.parentClass) ? getModelCatalogueIdToPrint(diff?.parentClass) : "Top level class, no parent"}"
-                    styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
-                }
-                cell {
-                    value "${(diff?.parentClass) ? diff?.parentClass?.name : "Top level class, no parent"}"
-                    styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
-                }
-                cell {
-                    value "${(diff?.element) ? getModelCatalogueIdToPrint(diff?.element) : getModelCatalogueIdToPrint(diff.otherValue)}"
-                    styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
-                }
-                cell {
-                    value "${(diff?.element) ? GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(diff.element).simpleName) : GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(diff.otherValue).simpleName)}"
-                    styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
-                }
-                cell {
-                    value "${(diff?.element) ? diff.element.name : diff.otherValue?.name}"
-                    styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION, ModelCatalogueStyles.CENTER_LEFT)
-                }
-                cell {
-                    value diff.changeDescription
-                    styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
-                }
-                cell {
-                    value humanReadableValue(diff.otherValue)
-                    styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
-                }
-                cell {
-                    value humanReadableValue(diff.selfValue)
-                    styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
-                }
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${(diff?.parentClass) ? getModelCatalogueIdToPrint(diff?.parentClass) : "Top level class, no parent"}"
+                        cellDefinition.styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${(diff?.parentClass) ? diff?.parentClass?.name : "Top level class, no parent"}"
+                        cellDefinition.styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${(diff?.element) ? getModelCatalogueIdToPrint(diff?.element) : getModelCatalogueIdToPrint(diff.otherValue)}"
+                        cellDefinition.styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${(diff?.element) ? GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(diff.element).simpleName) : GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(diff.otherValue).simpleName)}"
+                        cellDefinition.styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${(diff?.element) ? diff.element.name : diff.otherValue?.name}"
+                        cellDefinition.styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION, ModelCatalogueStyles.CENTER_LEFT)
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value diff.changeDescription
+                        cellDefinition.styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value humanReadableValue(diff.otherValue)
+                        cellDefinition.styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value humanReadableValue(diff.selfValue)
+                        cellDefinition.styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
+                    }
+                })
             }
-        }
+        })
     }
 
     protected void buildDataClassesDetails(Iterable<DataClass> dataClasses, CatalogueElement previousVersionElementForDiff, WorkbookDefinition workbook, SheetDefinition sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
@@ -626,131 +772,201 @@ class CatalogueElementToXlsxExporter {
 
     private void buildDataClassDetail(SheetDefinition sheet, DataClass dataClass, Relationship relationship, CatalogueElement previousVersionElementForDiff, Multimap<String, Diff> diffs, Multimap<String, Diff> parentDiffs) {
 
-        sheet.with {
-            row {
-                cell {
-                    width 10
-                }
-                cell {
-                    width 10
-                }
-                cell {
-                    width 30
-                }
-                cell {
-                    width 30
-                }
-                cell {
-                    width 10
-                }
-                cell {
-                    width 25
-                }
-                cell {
-                    width 75
-                }
-                cell {
-                    width 100
-                }
-                cell {
-                    width 100
-                }
-            }
-
-
-            row {
-                cell {
-                    value "$dataClass.name"
-
-                    String ref = getRef(sheet, dataClass)
-
-                    if (!(ref in namesPrinted)) {
-                        name getSafeName(ref)
-                        namesPrinted << ref
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.width 10
                     }
-                    styles withChangesHighlight('h1', ImmutableMultimap.builder().putAll(parentDiffs).putAll(diffs).build(), Diff.keyForRelationship(relationship), Diff.keyForSelf(relationship?.destination?.latestVersionId ?: relationship?.destination?.id))
-                    colspan 7
-                }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.width 10
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.width 30
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.width 30
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.width 10
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.width 25
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.width 75
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.width 100
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.width 100
+                    }
+                })
             }
+        })
 
-            row {
-                cell {
-                    value 'Path'
-                    style 'inner-table-header'
-                    colspan 2
-                }
-                cell {
-                    value "${(inSubsection)?(relationship?.source?.name)? "$relationship.source.name -> $dataClass.name" : "$dataClass.name": ""}"
-                    style 'description'
-                    colspan 3
-                }
-                cell {
-                    value 'Multiplicity'
-                    style 'inner-table-header'
-                }
-                cell {
-                    value "${ (!inSubsection) ? "See Content Tab" : getMultiplicity(relationship) }"
-                    style 'description'
-                }
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "$dataClass.name"
+
+                        String ref = getRef(sheet, dataClass)
+
+                        if (!(ref in namesPrinted)) {
+                            cellDefinition.name getSafeName(ref)
+                            namesPrinted << ref
+                        }
+                        cellDefinition.styles withChangesHighlight('h1', ImmutableMultimap.builder().putAll(parentDiffs).putAll(diffs).build(), Diff.keyForRelationship(relationship), Diff.keyForSelf(relationship?.destination?.latestVersionId ?: relationship?.destination?.id))
+                        cellDefinition.colspan 7
+                    }
+                })
+            }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Path'
+                        cellDefinition.style 'inner-table-header'
+                        cellDefinition.colspan 2
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${(inSubsection)?(relationship?.source?.name)? "$relationship.source.name -> $dataClass.name" : "$dataClass.name": ""}"
+                        cellDefinition.style 'description'
+                        cellDefinition.colspan 3
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Multiplicity'
+                        cellDefinition.style 'inner-table-header'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${ (!inSubsection) ? "See Content Tab" : getMultiplicity(relationship) }"
+                        cellDefinition.style 'description'
+                    }
+                })
 
             }
-
+        })
 // I don't think we need this but I'm going to leave it in whilst we test it with users
-//            row {
-//                cell {
-//                    value 'Data Model'
-//                    style 'property-title'
-//                    colspan 2
-//                }
-//                cell {
-//                    value dataClass.dataModel?.name
-//                    style 'property-value'
-//                    colspan 5
-//                }
+//        sheet.row(new Configurer<RowDefinition>() {
+//            @Override
+//            void configure(RowDefinition rowDefinition) {
+//                rowDefinition.cell(new Configurer<CellDefinition>() {
+//                    @Override
+//                    void configure(CellDefinition cellDefinition) {
+//                        cellDefinition.value 'Data Model'
+//                        cellDefinition.style 'property-title'
+//                        cellDefinition.colspan 2
+//                    }
+//                })
+//                rowDefinition.cell(new Configurer<CellDefinition>() {
+//                    @Override
+//                    void configure(CellDefinition cellDefinition) {
+//                        cellDefinition.value dataClass.dataModel?.name
+//                        cellDefinition.style 'property-value'
+//                        cellDefinition.colspan 5
+//                    }
+//                })
 //            }
+//        })
 
-            row {
-                cell {
-                    value 'Children'
-                    style 'inner-table-header'
-                    colspan 2
-                    height 50
-                }
-                cell {
-                    value "${(dataClass.parentOf.size > 0) ? (getIfChoiceText(dataClass)) ? "${getIfChoiceText(dataClass)} \r ${dataClass.parentOf.collect { it.name }.join(", \r ")} " : "${dataClass.parentOf.collect { it.name }.join(", \r ")} " : "None"}"
-                    style 'description'
-                    colspan 3
-                }
-
-                cell {
-                    value 'Link'
-                    style 'inner-table-header'
-                }
-
-                cell {
-                    value "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
-                    style 'description'
-                    // link to url "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
-                }
-
-
-
-            }
-
-
-            if (dataClass?.description && dataClass?.description.matches(".*\\w.*") || getIfChoiceText(dataClass)) {
-                row {
-                    cell {
-                        value (getIfChoiceText(dataClass))? "$dataClass.description \r ${getIfChoiceText(dataClass)}" : dataClass.description
-                        height 100
-                        styles 'description'
-                        colspan 7
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Children'
+                        cellDefinition.style 'inner-table-header'
+                        cellDefinition.colspan 2
+                        cellDefinition.height 50
                     }
-                }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${(dataClass.parentOf.size > 0) ? (getIfChoiceText(dataClass)) ? "${getIfChoiceText(dataClass)} \r ${dataClass.parentOf.collect { it.name }.join(", \r ")} " : "${dataClass.parentOf.collect { it.name }.join(", \r ")} " : "None"}"
+                        cellDefinition.style 'description'
+                        cellDefinition.colspan 3
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Link'
+                        cellDefinition.style 'inner-table-header'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
+                        cellDefinition.style 'description'
+                        // cellDefinition.link cellDefinition.to url "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
+                    }
+                })
+
             }
+        })
+
+        if (dataClass?.description && dataClass?.description.matches(".*\\w.*") || getIfChoiceText(dataClass)) {
+            sheet.row(new Configurer<RowDefinition>() {
+                @Override
+                void configure(RowDefinition rowDefinition) {
+                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                        @Override
+                        void configure(CellDefinition cellDefinition) {
+                            cellDefinition.value(getIfChoiceText(dataClass)) ? "$dataClass.description \r ${getIfChoiceText(dataClass)}" : dataClass.description
+                            cellDefinition.height 100
+                            cellDefinition.styles 'description'
+                            cellDefinition.colspan 7
+                        }
+                    })
+                }
+            })
 
             if (dataClass.countContains()) {
-
                 buildContainedElements(it, dataClass, previousVersionElementForDiff, diffs)
             }
         }
@@ -765,7 +981,6 @@ class CatalogueElementToXlsxExporter {
     private static String getRef(DataClass sheetOwner, DataClass dataClass) {
         "${getSafeSheetName(sheetOwner)}_${dataClass.id}"
     }
-
 
     private Map<String,ImmutableMultimap<String, Diff>> computedDiffs = [:]
 
@@ -799,72 +1014,103 @@ class CatalogueElementToXlsxExporter {
     }
 
     private buildContainedElements(SheetDefinition sheet, DataClass dataClass, CatalogueElement previousVersionElementForDiff, Multimap<String, Diff> dataClassDiffs) {
-        sheet.with {
-            row {
-                cell {
-                    value "${(dataClass.ext.get("http://xsd.modelcatalogue.org/section#type") == "choice")? "Choice of Data Elements" : "Contained Data Elements" }"
-                    style 'h2'
-                    colspan 7
-                }
-            }
-            row {
-                cell {
-                    value 'DE ID'
-                    style 'inner-table-header'
-                }
 
-                cell {
-                    value 'Status'
-                    style 'inner-table-header'
-                }
 
-                cell {
-                    value 'Data Element'
-                    style 'inner-table-header'
-                    colspan 2
-                }
-
-                cell {
-                    value 'Multiplicity'
-                    style 'inner-table-header'
-                }
-
-                cell {
-                    value 'Data Type'
-                    style 'inner-table-header'
-                    colspan 2
-                }
-
-                cell {
-                    value 'Measurement Unit'
-                    style 'inner-table-header'
-                }
-
-                cell {
-                    value 'Referenced Data Class'
-                    style 'inner-table-header'
-                }
-            }
-
-            int i
-            for (Relationship containsRelationship in dataClass.containsRelationships) {
-                buildDataElement(sheet, containsRelationship, previousVersionElementForDiff, dataClassDiffs)
-                if(i++ != dataClass.containsRelationships.size()-1) {
-                    if (dataClass.ext.get("http://xsd.modelcatalogue.org/section#type") == "choice") {
-                        row {
-                            cell {
-                                value 'OR'
-                                style 'inner-table-header'
-                                colspan 7
-                                height 50
-                            }
-                        }
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${(dataClass.ext.get("http://xsd.modelcatalogue.org/section#type") == "choice")? "Choice of Data Elements" : "Contained Data Elements" }"
+                        cellDefinition.style 'h2'
+                        cellDefinition.colspan 7
                     }
+                })
+            }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'DE ID'
+                        cellDefinition.style 'inner-table-header'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Status'
+                        cellDefinition.style 'inner-table-header'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Data Element'
+                        cellDefinition.style 'inner-table-header'
+                        cellDefinition.colspan 2
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Multiplicity'
+                        cellDefinition.style 'inner-table-header'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Data Type'
+                        cellDefinition.style 'inner-table-header'
+                        cellDefinition.colspan 2
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Measurement Unit'
+                        cellDefinition.style 'inner-table-header'
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Referenced Data Class'
+                        cellDefinition.style 'inner-table-header'
+                    }
+                })
+
+            }
+        })
+
+        int i
+        for (Relationship containsRelationship in dataClass.containsRelationships) {
+            buildDataElement(sheet, containsRelationship, previousVersionElementForDiff, dataClassDiffs)
+            if (i++ != dataClass.containsRelationships.size()-1) {
+                if (dataClass.ext.get("http://xsd.modelcatalogue.org/section#type") == "choice") {
+                    sheet.row(new Configurer<RowDefinition>() {
+                        @Override
+                        void configure(RowDefinition rowDefinition) {
+                            rowDefinition.cell(new Configurer<CellDefinition>() {
+                                @Override
+                                void configure(CellDefinition cellDefinition) {
+                                    cellDefinition.value 'OR'
+                                    cellDefinition.style 'inner-table-header'
+                                    cellDefinition.colspan 7
+                                    cellDefinition.height 50
+                                }
+                            })
+                        }
+                    })
                 }
             }
-            for (Relationship deleted in findDeleted(dataClass, dataClassDiffs, RelationshipType.containmentType)) {
-                buildDataElement(sheet, deleted, previousVersionElementForDiff, dataClassDiffs)
-            }
+        }
+        for (Relationship deleted in findDeleted(dataClass, dataClassDiffs, RelationshipType.containmentType)) {
+            buildDataElement(sheet, deleted, previousVersionElementForDiff, dataClassDiffs)
         }
     }
 
@@ -1180,46 +1426,73 @@ class CatalogueElementToXlsxExporter {
 
     protected void buildOutline(SheetDefinition sheet, List<DataClass> dataClasses, CatalogueElement previousVersionElementForDiff) {
         log.info "Printing outline"
-        sheet.with {
-            row {
-                cell {
-                    value "Data Classes"
-                    style  H2
-                    colspan 3
-                    name DATA_CLASSES
-                }
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "Data Classes"
+                        cellDefinition.style  H2
+                        cellDefinition.colspan 3
+                        cellDefinition.name DATA_CLASSES
+                    }
+                })
             }
-
-            row {
-                cell {
-                    value 'ID'
-                    style 'inner-table-header'
-                    width 10
-                }
-                cell {
-                    value 'Name'
-                    style 'inner-table-header'
-                    width 60
-                }
-                cell {
-                    value 'Multiplicty'
-                    style 'inner-table-header'
-                    width 10
-                }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'ID'
+                        cellDefinition.style 'inner-table-header'
+                        cellDefinition.width 10
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Name'
+                        cellDefinition.style 'inner-table-header'
+                        cellDefinition.width 60
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Multiplicty'
+                        cellDefinition.style 'inner-table-header'
+                        cellDefinition.width 10
+                    }
+                })
             }
-
-            buildDataClassesOutline(it, dataClasses, previousVersionElementForDiff)
-
-            // footer
-            row()
-            row {
-                cell {
-                    value 'Click the data class cell to show the detail'
-                    style 'note'
-                    colspan 3
-                }
+        })
+        buildDataClassesOutline(sheet, dataClasses, previousVersionElementForDiff)
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                    }
+                })
             }
-        }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value 'Click the data class cell to show the detail'
+                        cellDefinition.style 'note'
+                        cellDefinition.colspan 3
+                    }
+                })
+            }
+        })
     }
 
     private void buildDataClassesOutline(SheetDefinition sheet, List<DataClass> dataClasses, CatalogueElement previousVersionElementForDiff) {

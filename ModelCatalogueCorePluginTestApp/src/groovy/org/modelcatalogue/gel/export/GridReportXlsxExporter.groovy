@@ -95,7 +95,7 @@ class GridReportXlsxExporter  {
                                 for (DataClass dataClass : dataClasses) {
                                     debugLine("GridReportXlsxExporter.export() dataClass: ${dataClass.name}")
                                     List<Relationship> childRels = dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
-                                    printClass(dataClass, sheetDefinition, 1, 2, childRels.size(), [])
+                                    printClass(dataClass, sheetDefinition, 1, 2, childRels.size(), [] as List<Integer>)
                                 }
                             }
                         })
@@ -124,88 +124,108 @@ class GridReportXlsxExporter  {
     }
 
     @CompileDynamic
-    private Integer printClass(DataClass child, SheetDefinition sheet, int columnDepth, int rowDepth, int childrenSize, List outline = []) {
+    private Integer printClass(DataClass child, SheetDefinition sheetDefinition, int columnDepth, int rowDepth, int childrenSize, List<Integer> outline = []) {
 
         Collection<Relationship> dataElements = child.getOutgoingRelationshipsByType(RelationshipType.containmentType)
-        sheet.with { SheetDefinition sheetDefinition ->
-            row(rowDepth) { RowDefinition rowDefinition ->
-                (1..depth).each{
-                    if (it == columnDepth) {
-                        cell(columnDepth) {
-                            value child.name
-                            link to url "${child.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + child.defaultModelCatalogueId}"
-                            style TOP_LEFT_BORDER
-                        }
-                        outline.add(it)
-                    } else if (!outline.contains(it)){
-                        cell(it){
-                            style TOP_BORDER
-                        }
+        sheetDefinition.row(rowDepth, new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                for (Integer el : 1..depth) {
+                    if (el == columnDepth) {
+                        rowDefinition.cell(columnDepth, new Configurer<CellDefinition>() {
+                            @Override
+                            void configure(CellDefinition cellDefinition) {
+                                cellDefinition.value child.name
+                                cellDefinition.link cellDefinition.to url "${child.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + child.defaultModelCatalogueId}"
+                                cellDefinition.style TOP_LEFT_BORDER
+                            }
+                        })
+                        outline.add(el)
+                    } else if (!outline.contains(el)) {
+                        rowDefinition.cell(el, new Configurer<CellDefinition>() {
+                            @Override
+                            void configure(CellDefinition cellDefinition) {
+                                cellDefinition.style TOP_BORDER
+                            }
+                        })
                     }
                 }
                 if (dataElements) {
                     printDataElement(rowDefinition, dataElements.head(), outline)
                 } else {
-                    outline.each {
-                        cell(it) {
-                            style LEFT_BORDER
-                        }
+                    for (Integer el : outline) {
+                        rowDefinition.cell(el, new Configurer<CellDefinition>() {
+                            @Override
+                            void configure(CellDefinition cellDefinition) {
+                                cellDefinition.style LEFT_BORDER
+                            }
+                        })
                     }
                 }
             }
-            if (dataElements.size() > 1) {
-                for (Relationship dataElementRelationship in dataElements.tail()) {
-                    rowDepth++
-                    row(rowDepth) { RowDefinition rowDefinition ->
+        })
+        if (dataElements.size() > 1) {
+            for (Relationship dataElementRelationship in dataElements.tail()) {
+                rowDepth++
+                sheetDefinition.row(rowDepth, new Configurer<RowDefinition>() {
+                    @Override
+                    void configure(RowDefinition rowDefinition) {
                         printDataElement(rowDefinition, dataElementRelationship, outline)
                     }
-                }
+                })
             }
-            rowDepth = buildRows(sheetDefinition, child.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), columnDepth + 1, (dataElements.size() > 1)?(rowDepth + 1):rowDepth, outline)
-            rowDepth
         }
+        rowDepth = buildRows(sheetDefinition,
+                child.getOutgoingRelationshipsByType(RelationshipType.hierarchyType),
+                columnDepth + 1,
+                (dataElements.size() > 1) ? (rowDepth + 1) : rowDepth,
+                outline)
+        rowDepth
     }
 
     @CompileDynamic
-    void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
+    void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List<Integer> outline = []) {
         DataElement dataElement = dataElementRelationship.destination as DataElement
         Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
         if (relatedTo.empty && dataElement?.dataType)
             relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
         debugLine("GridReportXlsxExporter.printDataElement() dataElement: ${dataElement.name}")
-        rowDefinition.with {
 
-            outline.each {
-                cell(it){
-                    style LEFT_BORDER
+        for (Integer el : outline) {
+            rowDefinition.cell(el, new Configurer<CellDefinition>() {
+                @Override
+                void configure(CellDefinition cellDefinition) {
+                    cellDefinition.style LEFT_BORDER
                 }
-            }
+            })
+        }
 
-            cell(depth + 1) {
-                value dataElement.name
-                link to url "${getLoadURL(dataElement)}"
-                style TOP_LEFT_BORDER
+        rowDefinition.cell(depth + 1, new Configurer<CellDefinition>() {
+            @Override
+            void configure(CellDefinition cellDefinition) {
+                cellDefinition.value dataElement.name
+                cellDefinition.link cellDefinition.to url "${getLoadURL(dataElement)}"
+                cellDefinition.style TOP_LEFT_BORDER
             }
-
-            [ "${getMultiplicity(dataElementRelationship)}",
-              "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}",
-              "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}",
-              "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}"].each { cellValue ->
-                cell {
-                    value cellValue
-                    style STANDARD
+        })
+        for ( String cellValue : [ "${getMultiplicity(dataElementRelationship)}",
+                                   "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}",
+                                   "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}",
+                                   "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}"]) {
+            rowDefinition.cell(new Configurer<CellDefinition>() {
+                @Override
+                void configure(CellDefinition cellDefinition) {
+                    cellDefinition.value cellValue
+                    cellDefinition.style STANDARD
                 }
-            }
-
+            })
         }
     }
 
     String printDataType(DataType dataType) {
-
         if (dataType.instanceOf(EnumeratedType)) {
             return (dataType as EnumeratedType).prettyPrint()
         }
-
         return dataType.name
     }
 
