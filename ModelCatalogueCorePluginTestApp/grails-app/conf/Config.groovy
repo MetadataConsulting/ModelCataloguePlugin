@@ -494,6 +494,7 @@ grails.plugin.springsecurity.basic.realmName = "Metadata Exchange"
 grails.plugin.springsecurity.filterChain.chainMap = [
         '/api/dashboard/dataModels': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/api/dashboard/*/catalogueElements': 'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/api/modelCatalogue/core/catalogueElement/search' : 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/api/modelCatalogue/core/validationRule/rules': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/catalogue/upload':                    'JOINED_FILTERS,-exceptionTranslationFilter',
         '/catalogue/*/*/export':                'JOINED_FILTERS,-exceptionTranslationFilter',
