@@ -11,8 +11,6 @@ import org.modelcatalogue.core.export.inventory.DataModelToXlsxExporterSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
-import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.IgnoreIf
 
 @IgnoreIf( {
@@ -144,7 +142,7 @@ class NorthThamesMappingReportXlsxExporterSpec extends AbstractIntegrationSpec {
         NorthThamesMappingReportXlsxExporter.create(dataModel, dataClassService, dataElementService, grailsApplication, false).export(file.newOutputStream())
         FileOpener.open(file)
 
-//        SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(file)
+//        SpreadsheetCriteria query = PoiSpreadsheetCriteria.FACTORY.forFile(file)
 
         then:
         noExceptionThrown()

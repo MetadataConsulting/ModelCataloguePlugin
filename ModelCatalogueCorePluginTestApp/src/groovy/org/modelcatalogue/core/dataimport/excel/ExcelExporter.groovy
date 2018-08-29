@@ -1,5 +1,18 @@
 package org.modelcatalogue.core.dataimport.excel
 
+import builders.dsl.spreadsheet.api.BorderStyle
+import builders.dsl.spreadsheet.api.Color
+import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.api.Keywords
+import builders.dsl.spreadsheet.builder.api.BorderDefinition
+import builders.dsl.spreadsheet.builder.api.CellDefinition
+import builders.dsl.spreadsheet.builder.api.CellStyleDefinition
+import builders.dsl.spreadsheet.builder.api.RowDefinition
+import builders.dsl.spreadsheet.builder.api.SheetDefinition
+import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.api.WorkbookDefinition
+import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
+
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileStatic
@@ -7,10 +20,6 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
-import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 
 /**
  * ExcelExporter.groovy
@@ -59,45 +68,61 @@ class ExcelExporter {
     Map<String, Closure> sheetsAfterMainSheetExport() {}
 
     void export(OutputStream outputStream) {
-        SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
+        SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
         List<DataClass> dataClasses = Collections.emptyList()
         dataClasses = getDataClasses()
+        builder.build(new Configurer<WorkbookDefinition>() {
 
-        builder.build(outputStream) {
-            apply ModelCatalogueStyles
-            style ('standard') {
-                wrap text
-                border top, left, {
-                    color black
-                    style medium
-                }
-            }
-            sheet("$element.name $element.dataModelSemanticVersion" ) { SheetDefinition sheetDefinition ->
-                row {
-                    style H1
-                    excelHeaders.each { header ->
-                        cell {
-                            value header
-                            width auto
+            @Override
+            void configure(WorkbookDefinition workbookDefinition) {
+                workbookDefinition.apply(ModelCatalogueStyles)
+                workbookDefinition.style('standard', new Configurer<CellStyleDefinition>() {
+                    @Override
+                    void configure(CellStyleDefinition cellStyleDefinition) {
+                        cellStyleDefinition.wrap(cellStyleDefinition.getText())
+                        cellStyleDefinition.border(Keywords.BorderSide.TOP, Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                            @Override
+                            void configure(BorderDefinition borderDefinition) {
+                                borderDefinition.color(Color.black)
+                                borderDefinition.style(BorderStyle.MEDIUM)
+                            }
+                        })
+                    }
+                })
+                workbookDefinition.sheet("$element.name $element.dataModelSemanticVersion".toString(), new Configurer<SheetDefinition>() {
+                    @Override
+                    void configure(SheetDefinition sheetDefinition) {
+                        sheetDefinition.row(new Configurer<RowDefinition>() {
+                            @Override
+                            void configure(RowDefinition rowDefinition) {
+                                rowDefinition.style(H1)
+                                for (String header : excelHeaders) {
+                                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                                        @Override
+                                        void configure(CellDefinition cellDefinition) {
+                                            cellDefinition.value(header)
+                                            cellDefinition.width(Keywords.Auto.AUTO)
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                        for ( DataClass dataClass : dataClasses) {
+                            /* The original GridReportXlsxExporter had columnDepth and rowDepth...
+                            the depth parameter of the class was used for columnDepth– how far to the right the columns went. rowDepth is how far down, which row is being edited.
+                            Init: 2 is where the first row should be printed.
+                            */
+                            printClass(null, dataClass, sheetDefinition, 2)
+                            // starting at printClass lets the top level data class be printed.
+                            //buildRows(sheetDefinition, dataClass, 2)
                         }
                     }
+                })
+                sheetsAfterMainSheetExport().each { String name, Closure instructions ->
+                    workbookDefinition.sheet(name, instructions)
                 }
-                dataClasses.each { dataClass->
-                    /* The original GridReportXlsxExporter had columnDepth and rowDepth...
-                    the depth parameter of the class was used for columnDepth– how far to the right the columns went. rowDepth is how far down, which row is being edited.
-                    Init: 2 is where the first row should be printed.
-                    */
-                    printClass(null, dataClass, sheetDefinition, 2)
-                    // starting at printClass lets the top level data class be printed.
-                    //buildRows(sheetDefinition, dataClass, 2)
-                }
-
             }
-            sheetsAfterMainSheetExport().each{name, instructions ->
-                sheet(name, instructions)
-            }
-        }
-
+        })
     }
 
     /**
@@ -137,28 +162,35 @@ class ExcelExporter {
      */
     private Integer printClass(DataClass parentDataClass, DataClass childDataClass, SheetDefinition sheet, int rowDepth) {
         Collection<Relationship> containmentRels = childDataClass.getOutgoingRelationshipsByType(RelationshipType.containmentType)
-        sheet.with { SheetDefinition sheetDefinition ->
-            row { RowDefinition rowDefinition ->
-                    if (containmentRels.isEmpty()) {
-                        // still want to print parentDataClass/childDataClass even if no data elements
-                        row(rowDepth) { RowDefinition rd ->
-                            printChildProbablyParentPossiblyElement(parentDataClass, childDataClass, rd, null)
-                        }
-                        rowDepth++
-                    }
-                    for (Relationship dataElementRelationship in containmentRels) {
-                        // [for loop] invariant: rowDepth is where the next row should be printed.
-                        row(rowDepth) { RowDefinition rd ->
-                            printChildProbablyParentPossiblyElement(parentDataClass, childDataClass, rd, dataElementRelationship)
-                        }
-                        rowDepth++
-                    }
-                }
 
-            rowDepth = buildRows(sheetDefinition, childDataClass, rowDepth)
-            rowDepth
-            }
+        if (containmentRels.isEmpty()) {
+            // still want to print parentDataClass/childDataClass even if no data elements
+            sheet.row(rowDepth, new Configurer<RowDefinition>() {
+                @Override
+                void configure(RowDefinition rd) {
+                    printChildProbablyParentPossiblyElement(parentDataClass, childDataClass, rd, null)
+                }
+            })
+            rowDepth++
         }
+
+        for (Relationship dataElementRelationship in containmentRels) {
+
+            // [for loop] invariant: rowDepth is where the next row should be printed.
+            sheet.row(rowDepth, new Configurer<RowDefinition>() {
+                @Override
+                void configure(RowDefinition rd) {
+                    printChildProbablyParentPossiblyElement(parentDataClass, childDataClass, rd, dataElementRelationship)
+                }
+            })
+
+            rowDepth++
+        }
+
+        rowDepth = buildRows(sheet, childDataClass, rowDepth)
+        rowDepth
+    }
+
     String blank = ''
 
     void printChildProbablyParentPossiblyElement(DataClass parent, DataClass child, RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {

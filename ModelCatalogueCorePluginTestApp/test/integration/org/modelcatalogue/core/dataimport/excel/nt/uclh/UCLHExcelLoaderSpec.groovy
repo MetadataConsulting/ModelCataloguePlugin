@@ -16,8 +16,8 @@ import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
-import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
+import builders.dsl.spreadsheet.query.api.SpreadsheetCriteria
+import builders.dsl.spreadsheet.query.poi.PoiSpreadsheetCriteria
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 
@@ -98,7 +98,7 @@ class UCLHExcelLoaderSpec extends AbstractIntegrationSpec {
 //        GMCGridReportXlsxExporter.create(sourceDataModel, dataClassService, grailsApplication, 5).export(tempFile.newOutputStream())
 //        FileOpener.open(tempFile)
 //
-//        SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(tempFile)
+//        SpreadsheetCriteria query = PoiSpreadsheetCriteria.FACTORY.forFile(tempFile)
 //
 //        then:
 //        noExceptionThrown()

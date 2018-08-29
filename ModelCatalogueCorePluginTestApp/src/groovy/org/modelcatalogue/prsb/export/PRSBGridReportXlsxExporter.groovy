@@ -1,15 +1,20 @@
 package org.modelcatalogue.prsb.export
 
+import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.api.Keywords
+import builders.dsl.spreadsheet.builder.api.CellDefinition
+import builders.dsl.spreadsheet.builder.api.SheetDefinition
+import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
+
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import com.google.common.collect.ImmutableMap
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
-import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
+
+import builders.dsl.spreadsheet.builder.api.RowDefinition
 
 /**
  * GridReportXlsxExporter.groovy
@@ -38,11 +43,11 @@ class PRSBGridReportXlsxExporter {
     }
 
     void export(OutputStream outputStream) {
-        SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
+        SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
         List<DataClass> dataClasses = Collections.emptyList()
         dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(element as DataModel), ImmutableMap.of('status', 'active'), true).items
 
-        builder.build(outputStream) {
+        builder.build {
             apply ModelCatalogueStyles
             sheet("$element.name $element.dataModelSemanticVersion" ) { SheetDefinition sheetDefinition ->
                 row {
@@ -111,27 +116,37 @@ class PRSBGridReportXlsxExporter {
     private Integer printClass(DataClass child, SheetDefinition sheet, int columnDepth, int rowDepth, int childrenSize) {
 
         Collection<Relationship> dataElements = child.getOutgoingRelationshipsByType(RelationshipType.containmentType)
-        sheet.with { SheetDefinition sheetDefinition ->
-            row(rowDepth) { RowDefinition rowDefinition ->
-                cell(columnDepth) {
-                    value child.name
-                    link to url "${child.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + child.defaultModelCatalogueId}"
-                }
+
+        sheet.row(rowDepth, new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+
+                rowDefinition.cell(columnDepth, new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value child.name
+                        cellDefinition.link to url "${child.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + child.defaultModelCatalogueId}"
+                    }
+                })
                 if (dataElements) {
                     printDataElement(rowDefinition, dataElements.head())
                 }
             }
+        })
+
             if (dataElements.size() > 1) {
                 for (Relationship dataElementRelationship in dataElements.tail()) {
                     rowDepth++
-                    row(rowDepth) { RowDefinition rowDefinition ->
-                        printDataElement(rowDefinition, dataElementRelationship)
-                    }
+                    sheet.row(rowDepth, new Configurer<RowDefinition>() {
+                        @Override
+                        void configure(RowDefinition rowDefinition) {
+                            printDataElement(rowDefinition, dataElementRelationship)
+                        }
+                    })
                 }
             }
-            rowDepth = buildRows(sheetDefinition, child.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), columnDepth + 1, (childrenSize > 1 || dataElements.size() > 1) ? (rowDepth + 1) : rowDepth)
+            rowDepth = buildRows(sheet, child.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), columnDepth + 1, (childrenSize > 1 || dataElements.size() > 1) ? (rowDepth + 1) : rowDepth)
             rowDepth
-        }
     }
 
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship) {

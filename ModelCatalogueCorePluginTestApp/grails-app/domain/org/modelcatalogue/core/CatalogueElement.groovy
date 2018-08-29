@@ -451,6 +451,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         if ( !(this instanceof User) ) {
             auditService.logElementCreated(this)
         }
+
     }
 
     void beforeInsert() {

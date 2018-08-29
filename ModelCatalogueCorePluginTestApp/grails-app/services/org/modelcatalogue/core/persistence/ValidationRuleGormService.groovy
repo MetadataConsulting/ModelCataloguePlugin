@@ -3,13 +3,16 @@ package org.modelcatalogue.core.persistence
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dashboard.SearchQuery
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class ValidationRuleGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -34,7 +37,6 @@ class ValidationRuleGormService implements WarnGormErrors {
         findQueryByDataModelAndSearchStatusQuery(dataModelId, searchStatusQuery).count()
     }
 
-    @CompileStatic
     DetachedCriteria<ValidationRule> findQueryByDataModelAndSearchStatusQuery(Long dataModelId, SearchQuery searchStatusQuery) {
         DetachedCriteria<ValidationRule> query = ValidationRule.where {}
         if ( dataModelId ) {
@@ -60,5 +62,10 @@ class ValidationRuleGormService implements WarnGormErrors {
             return [] as List<ValidationRule>
         }
         queryByIds(ids).list()
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

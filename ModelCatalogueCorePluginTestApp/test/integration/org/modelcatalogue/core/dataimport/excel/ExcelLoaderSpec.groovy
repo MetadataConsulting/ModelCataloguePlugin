@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.dataimport.excel
 
+import builders.dsl.spreadsheet.query.api.SpreadsheetCriteria
+import builders.dsl.spreadsheet.query.poi.PoiSpreadsheetCriteria
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -18,8 +20,6 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
-import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Unroll
@@ -90,7 +90,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         ExcelExporter.create(dataModel1, dataClassService, grailsApplication, 5).export(file1.newOutputStream())
         FileOpener.open(file1)
 
-        SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(file1)
+        SpreadsheetCriteria query = PoiSpreadsheetCriteria.FACTORY.forFile(file1)
 
         then:
         noExceptionThrown()
@@ -112,7 +112,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         ExcelExporter.create(dataModel2, dataClassService, grailsApplication, 5).export(file2.newOutputStream())
         FileOpener.open(file2)
 
-        SpreadsheetCriteria query2 = PoiSpreadsheetQuery.FACTORY.forFile(file2)
+        SpreadsheetCriteria query2 = PoiSpreadsheetCriteria.FACTORY.forFile(file2)
 
         then:
         noExceptionThrown()

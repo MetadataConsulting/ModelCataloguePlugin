@@ -9,6 +9,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dashboard.SearchQuery
 import org.modelcatalogue.core.datamodel.DataModelRow
 import org.modelcatalogue.core.util.SortQuery
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.security.access.prepost.PreAuthorize
@@ -156,5 +157,10 @@ class DataModelGormService implements WarnGormErrors {
     @Transactional(readOnly = true)
     Integer count() {
         DataModel.count()
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

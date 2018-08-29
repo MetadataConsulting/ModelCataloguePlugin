@@ -2,11 +2,14 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionParameter
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class ActionParameterGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -31,6 +34,11 @@ class ActionParameterGormService implements WarnGormErrors {
 
     protected DetachedCriteria<ActionParameter> findQueryByNameAndExtensionValueAndBatch(String name, String extensionValue) {
 
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }
 
