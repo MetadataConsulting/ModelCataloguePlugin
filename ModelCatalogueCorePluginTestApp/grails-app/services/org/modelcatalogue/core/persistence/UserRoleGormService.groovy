@@ -2,12 +2,15 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class UserRoleGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -89,5 +92,10 @@ class UserRoleGormService implements WarnGormErrors {
     @Transactional(readOnly = true)
     Boolean hasRole(Long userId, String authority) {
         UserRole.where { user == User.load(userId) && role.authority == authority }.count() as Boolean
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

@@ -9,6 +9,7 @@ import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dashboard.SearchQuery
 import org.modelcatalogue.core.util.SortQuery
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
@@ -183,5 +184,10 @@ class DataElementGormService implements WarnGormErrors {
             return [] as List<DataElement>
         }
         queryByIds(ids).list()
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

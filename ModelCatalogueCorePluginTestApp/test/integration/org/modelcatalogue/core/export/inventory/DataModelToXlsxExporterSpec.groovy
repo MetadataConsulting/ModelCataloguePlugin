@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.export.inventory
 
+import builders.dsl.spreadsheet.query.api.Predicate
+import builders.dsl.spreadsheet.query.api.SpreadsheetCriteria
+import builders.dsl.spreadsheet.query.poi.PoiSpreadsheetCriteria
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -7,9 +10,6 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.spreadsheet.query.api.Predicate
-import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
-import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.IgnoreIf
 import spock.lang.Ignore
 
@@ -96,7 +96,7 @@ class DataModelToXlsxExporterSpec extends AbstractIntegrationSpec {
         CatalogueElementToXlsxExporter.forDataModel(dataModel, dataClassService, grailsApplication, Integer.MAX_VALUE).export(file.newOutputStream())
         FileOpener.open(file)
 
-        SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(file)
+        SpreadsheetCriteria query = PoiSpreadsheetCriteria.FACTORY.forFile(file)
 
         then:
         noExceptionThrown()

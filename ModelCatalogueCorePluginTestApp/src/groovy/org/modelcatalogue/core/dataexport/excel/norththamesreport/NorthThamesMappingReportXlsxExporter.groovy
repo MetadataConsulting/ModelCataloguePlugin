@@ -1,5 +1,16 @@
 package org.modelcatalogue.core.dataexport.excel.norththamesreport
 
+import builders.dsl.spreadsheet.api.BorderStyle
+import builders.dsl.spreadsheet.api.Color
+import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.api.Keywords
+import builders.dsl.spreadsheet.builder.api.BorderDefinition
+import builders.dsl.spreadsheet.builder.api.CellDefinition
+import builders.dsl.spreadsheet.builder.api.CellStyleDefinition
+import builders.dsl.spreadsheet.builder.api.SheetDefinition
+import builders.dsl.spreadsheet.builder.api.SpreadsheetBuilder
+import builders.dsl.spreadsheet.builder.api.WorkbookDefinition
+import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
@@ -7,11 +18,10 @@ import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportHeade
 import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.gel.export.GridReportXlsxExporter
-import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
-import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 
+import builders.dsl.spreadsheet.builder.api.RowDefinition
+import builders.dsl.spreadsheet.query.api.SpreadsheetCriteria
+import builders.dsl.spreadsheet.query.poi.PoiSpreadsheetCriteria
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 
 /**
@@ -76,32 +86,38 @@ class NorthThamesMappingReportXlsxExporter {
 
 
     void export(OutputStream outputStream) {
-        SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
+        SpreadsheetBuilder builder = PoiSpreadsheetBuilder.create(outputStream)
         getMappedDataElements()
-
-        builder.build(outputStream) {
-            apply ModelCatalogueStyles
-            sheet("Mapped Elements") { SheetDefinition sheetDefinition ->
-                row {
-                    excelHeaders.each { header ->
-                        cell {
-                            value header
-                            width auto
-                            style H1
+        builder.build(new Configurer<WorkbookDefinition>() {
+            @Override
+            void configure(WorkbookDefinition workbookDefinition) {
+                workbookDefinition.apply ModelCatalogueStyles
+                workbookDefinition.sheet("Mapped Elements", new Configurer<SheetDefinition>() {
+                    @Override
+                    void configure(SheetDefinition sheetDefinition) {
+                        sheetDefinition.row(new Configurer<RowDefinition>() {
+                            @Override
+                            void configure(RowDefinition rowDefinition) {
+                                for (String header : excelHeaders) {
+                                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                                        @Override
+                                        void configure(CellDefinition cellDefinition) {
+                                            cellDefinition.value header
+                                            cellDefinition.width Keywords.Auto.AUTO
+                                            cellDefinition.style H1
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                        for ( CatalogueElement de : mappedSourceElements) {
+                            printMapping(de as DataElement, sheetDefinition)
                         }
                     }
-                }
-
-                mappedSourceElements.each { DataElement de ->
-                    printMapping(de, sheetDefinition)
-                }
+                })
             }
-        }
+        })
     }
-
-
-
-
 
     void getMappedDataElements(){
         //get all the data elements from the model
@@ -177,183 +193,315 @@ class NorthThamesMappingReportXlsxExporter {
             }
         }
 
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "RFH"
+                        cellDefinition.width Keywords.Auto.AUTO
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value  "${(sourceDE)?sourceDE.dataModel.name:''}"
+                        cellDefinition.width Keywords.Auto.AUTO
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
 
 
-            sheet.with { SheetDefinition sheetDefinition ->
-                row {
-                    cell {
-                        value "RFH"
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${(sourceDE)?sourceDE.ext.get("Index"):''}"
+                        cellDefinition.width Keywords.Auto.AUTO
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
                             }
-                        }
+                        })
                     }
-                    cell {
-                        value  "${(sourceDE)?sourceDE.dataModel.name:''}"
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-                    cell {
-                        value "${(sourceDE)?sourceDE.ext.get("Index"):''}"
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-                    cell {
-                        value sourceDE?.name
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-
-                    //mapped items
-
-                    cell {
-                        value  "${(local2)?local2.dataModel.name:''}"
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-
-                    cell {
-                        value  "${(local2)?local2.ext.get("WinPath TFC"):''}"
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-                    cell {
-                        value local2?.name
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-
-                    //mapped items loinc
-
-                    cell {
-                        value  "${(loinc)? (loinc.modelCatalogueId)?: (loinc.latestVersionId)?:loinc.id : ''}"
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-
-                    cell {
-                        value "${(loinc)?loinc.ext.get("SYSTEM"):''}"
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-                    cell {
-                        value loinc?.name
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-
-                    //gel items
-
-                    cell {
-                        value "${(gel)? (gel.modelCatalogueId)?: (gel.latestVersionId)?:gel.id : ''}"
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-                    cell {
-                        value gel?.name
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
+                })
 
 
-                    cell {
-                        value   "${(gel)?getOpenEHR(gel):''}"
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value sourceDE?.name
+                        cellDefinition.width Keywords.Auto.AUTO
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
                             }
-                        }
+                        })
                     }
+                })
 
-                    cell {
-                        value   "${(sourceDE) ? sourceDE.ext.get("Ref Range"):''}"
-                        width auto
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value  "${(local2)?local2.dataModel.name:''}"
+                        cellDefinition.width Keywords.Auto.AUTO
+
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
                             }
-                        }
+                        })
                     }
+                })
 
-                }
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value  "${(local2)?local2.ext.get("WinPath TFC"):''}"
+                        cellDefinition.width Keywords.Auto.AUTO
+
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value local2?.name
+                        cellDefinition.width Keywords.Auto.AUTO
+
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value  "${(loinc)? (loinc.modelCatalogueId)?: (loinc.latestVersionId)?:loinc.id : ''}"
+                        cellDefinition.width Keywords.Auto.AUTO
+
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${(loinc)?loinc.ext.get("SYSTEM"):''}"
+                        cellDefinition.width Keywords.Auto.AUTO
+
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value loinc?.name
+                        cellDefinition.width Keywords.Auto.AUTO
+
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "${(gel)? (gel.modelCatalogueId)?: (gel.latestVersionId)?:gel.id : ''}"
+                        cellDefinition.width Keywords.Auto.AUTO
+
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value gel?.name
+                        cellDefinition.width Keywords.Auto.AUTO
+
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value   "${(gel)?getOpenEHR(gel):''}"
+                        cellDefinition.width Keywords.Auto.AUTO
+
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value   "${(sourceDE) ? sourceDE.ext.get("Ref Range"):''}"
+                        cellDefinition.width Keywords.Auto.AUTO
+
+                        cellDefinition.style(new Configurer<CellStyleDefinition>() {
+                            @Override
+                            void configure(CellStyleDefinition cellStyleDefinition) {
+                                cellStyleDefinition.wrap cellStyleDefinition.text
+                                cellStyleDefinition.border(Keywords.BorderSide.LEFT, new Configurer<BorderDefinition>() {
+                                    @Override
+                                    void configure(BorderDefinition borderDefinition) {
+                                        borderDefinition.color Color.black
+                                        borderDefinition.style BorderStyle.MEDIUM
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
             }
-
-        }
+        })
+    }
 
     String getOpenEHR(CatalogueElement ce){
 

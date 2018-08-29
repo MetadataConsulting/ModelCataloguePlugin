@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.dataexport.excel.gmcgridreport
 
+import builders.dsl.spreadsheet.api.Configurer
+import builders.dsl.spreadsheet.api.Keywords
+import builders.dsl.spreadsheet.builder.api.CellDefinition
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
@@ -160,27 +163,33 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
      * @param sheet the current sheet
      * @param systems - the systems that are referenced in the report
      */
-    private void writeSystemSheet(SheetDefinition sheet, String system) {
+    private void writeSystemSheet(SheetDefinition sheetDefinition, String system) {
 
-
-        sheet.with { SheetDefinition sheetDefinition ->
-
-            row {
-                excelHeaders.minus(['Multiplicity', 'Related To', 'Source System']).each { cellValue ->
-                    cell {
-                        value cellValue
-                        width auto
-                        style H1
+            sheetDefinition.row(new Configurer<RowDefinition>() {
+                @Override
+                void configure(RowDefinition rowDefinition) {
+                    for ( String  cellValue : excelHeaders.minus(['Multiplicity', 'Related To', 'Source System'])) {
+                        rowDefinition.cell(new Configurer<CellDefinition>() {
+                            @Override
+                            void configure(CellDefinition cellDefinition) {
+                                cellDefinition.value cellValue
+                                cellDefinition.width auto
+                                cellDefinition.style H1
+                            }
+                        })
                     }
                 }
+            })
+
+            systemsMap.get(system).each { DataElement de ->
+                sheetDefinition.row(new Configurer<RowDefinition>() {
+                    @Override
+                    void configure(RowDefinition rowDefinition) {
+                        printSystemDataElement(rowDefinition, de)
+                    }
+                })
             }
 
-            systemsMap.get(system).each { de ->
-                row() { RowDefinition rowDefinition ->
-                    printSystemDataElement(rowDefinition, de)
-                }
-            }
-        }
     }
     /**
      * Helper for #writeSystemSheet
@@ -224,84 +233,134 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
      * @param systems - the systems that are referenced in the report
      */
     private void writeAnalysis(SheetDefinition sheet){
-        sheet.with { SheetDefinition sheetDefinition ->
-            //source system breakdown
-            row {
-                cell {
-                    value "Source Identified"
-                    colspan 5
-                    style H1
-                }
-            }
-
-            row {
-                cell {
-                    value "System"
-                    colspan 4
-                    style ANALYSIS
-                }
-                cell {
-                    value "Count"
-                    width auto
-                    style ANALYSIS
-                }
-            }
-
-            systemsMap.each { k, v ->
-                row {
-                    cell {
-                        value "$k"
-                        colspan 4
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "Source Identified"
+                        cellDefinition.colspan 5
+                        cellDefinition.style H1
                     }
-                    cell {
-                        value "${v.size()}"
-                        width auto
+                })
+            }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "System"
+                        cellDefinition.colspan 4
+                        cellDefinition.style ANALYSIS
                     }
-                }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "Count"
+                        cellDefinition.width Keywords.Auto.AUTO
+                        cellDefinition.style ANALYSIS
+                    }
+                })
             }
+        })
+        systemsMap.each { k, v ->
+            sheet.row(new Configurer<RowDefinition>() {
+                @Override
+                void configure(RowDefinition rowDefinition) {
+                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                        @Override
+                        void configure(CellDefinition cellDefinition) {
+                            cellDefinition.value "$k"
+                            cellDefinition.colspan 4
+                        }
+                    })
+                    rowDefinition.cell(new Configurer<CellDefinition>() {
+                        @Override
+                        void configure(CellDefinition cellDefinition) {
+                            cellDefinition.value "${v.size()}"
+                            cellDefinition.width Keywords.Auto.AUTO
+                        }
+                    })
+                }
+            })
+        }
 
-            //metadata completion breakdown
-            row {
-                cell {
-                    value " "
-                    colspan 4
-                }
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value " "
+                        cellDefinition.colspan 4
+                    }
+                })
             }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "Metadata Completion"
+                        cellDefinition.colspan 5
+                        cellDefinition.style H1
+                    }
+                })
+            }
+        })
+        sheet.row(new Configurer<RowDefinition>() {
+            @Override
+            void configure(RowDefinition rowDefinition) {
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "Metadata"
+                        cellDefinition.colspan 4
+                        cellDefinition.style ANALYSIS
+                    }
+                })
+                rowDefinition.cell(new Configurer<CellDefinition>() {
+                    @Override
+                    void configure(CellDefinition cellDefinition) {
+                        cellDefinition.value "Completion"
+                        cellDefinition.width Keywords.Auto.AUTO
+                        cellDefinition.style ANALYSIS
+                    }
+                })
+            }
+        })
 
-            row {
-                cell {
-                    value "Metadata Completion"
-                    colspan 5
-                    style H1
-                }
-            }
 
-            row {
-                cell {
-                    value "Metadata"
-                    colspan 4
-                    style ANALYSIS
-                }
-                cell {
-                    value "Completion"
-                    width auto
-                    style ANALYSIS
-                }
-            }
+
 
             metadataCompletion.each { k, v ->
-                row {
-                    cell {
-                        value "$k"
-                        colspan 4
+                sheet.row(new Configurer<RowDefinition>() {
+                    @Override
+                    void configure(RowDefinition rowDefinition) {
+                        rowDefinition.cell(new Configurer<CellDefinition>() {
+                            @Override
+                            void configure(CellDefinition cellDefinition) {
+                                cellDefinition.value "$k"
+                                cellDefinition.colspan 4
+                            }
+                        })
+                        rowDefinition.cell(new Configurer<CellDefinition>() {
+                            @Override
+                            void configure(CellDefinition cellDefinition) {
+                                cellDefinition.value "${ (v.get("completed") && v.get("total")) ? Math.round(v.get("completed") / v.get("total") * 100) : "0"} %"
+                                cellDefinition.width Keywords.Auto.AUTO
+                            }
+                        })
                     }
-                    cell {
-                        value "${ (v.get("completed") && v.get("total")) ? Math.round(v.get("completed") / v.get("total") * 100) : "0"} %"
-                        width auto
-                    }
-                }
+                })
             }
-        }
+
     }
 
     /**

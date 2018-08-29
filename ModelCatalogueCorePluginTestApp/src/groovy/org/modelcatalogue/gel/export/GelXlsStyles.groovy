@@ -1,7 +1,7 @@
 package org.modelcatalogue.gel.export
 
-import org.modelcatalogue.spreadsheet.builder.api.CanDefineStyle
-import org.modelcatalogue.spreadsheet.builder.api.Stylesheet
+import builders.dsl.spreadsheet.builder.api.CanDefineStyle
+import builders.dsl.spreadsheet.builder.api.Stylesheet
 
 class GelXlsStyles implements Stylesheet {
 

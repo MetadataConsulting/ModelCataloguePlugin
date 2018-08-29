@@ -2,12 +2,15 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.api.ElementStatus
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class PrimitiveTypeGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -59,4 +62,10 @@ class PrimitiveTypeGormService implements WarnGormErrors {
         }
         queryByIds(ids).list()
     }
+
+    @Override
+    Logger getLog() {
+        return log
+    }
+
 }
