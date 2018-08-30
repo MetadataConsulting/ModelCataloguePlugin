@@ -911,6 +911,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/search/reindex", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/search/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/relationship/*/restore", 'ROLE_SUPERVISOR()', HttpMethod.POST],
+            ["/api/modelCatalogue/register", "permitAll", HttpMethod.POST],
         ])
         secureMappings(ASSET_MAPPINGS)
         secureMappings(DATA_ELEMENTS_MAPPINGS)
