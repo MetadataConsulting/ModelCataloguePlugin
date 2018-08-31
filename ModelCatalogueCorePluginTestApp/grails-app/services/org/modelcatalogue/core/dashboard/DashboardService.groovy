@@ -387,7 +387,7 @@ class DashboardService {
 
         dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, []).sort { DataModel a, DataModel b ->
             a.name <=> b.name
-        }collect { DataModel dataModel ->
+        }.collect { DataModel dataModel ->
             new IdName(id: dataModel.id,
                     name: nameForDataModel(dataModel).toString())
         }
@@ -449,14 +449,16 @@ class DashboardService {
     @Transactional(readOnly = true)
     CatalogueElementSearchResult findAllDataModelViewBySearchStatusQuery(SearchQuery searchQuery, SortQuery sortQuery, PaginationQuery paginationQuery) {
         CatalogueElementSearchResult searchResult =
-                searchResult(DataModel.class, MetadataDomain.DATA_MODEL, searchQuery, sortQuery, paginationQuery)
+                searchResult(DataModel.class, MetadataDomain.DATA_MODEL, searchQuery, sortQuery, null)
         List<Long> dataModelIds = searchResult.viewModels*.id
         List<Long> allowedDataModelIds = dataModelGormService.findAll()*.id
         dataModelIds = dataModelIds.intersect(allowedDataModelIds)
         Map<Long, List<AssetViewModel>> dataModelToAssets = findAllAssetViewModelByPublishedStatus(dataModelIds, [PublishedStatus.PUBLISHED])
         int total = countAllDataModelBySearchStatusQuery(searchQuery)
-        List<DataModelViewModel> viewModels = searchResult.viewModels.findAll { dataModelIds.contains(it.id) }
-                .collect {
+
+        List<DataModelViewModel> viewModels = MaxOffsetSublistUtils.subList(searchResult.viewModels.findAll {
+            dataModelIds.contains(it.id)
+        }, paginationQuery.toMap()).collect {
             new DataModelViewModel(
                     id: it.id,
                     name: it.name,
