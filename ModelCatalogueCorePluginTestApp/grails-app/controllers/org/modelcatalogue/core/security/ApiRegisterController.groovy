@@ -16,15 +16,13 @@ class ApiRegisterController {
 
     def register(ApiRegisterCommand command) {
         if (command.hasErrors()) {
-            respond ValidationErrorsJsonView.of(command.errors, messageSource, request.locale)
-            response.setStatus(422)
+            respond ValidationErrorsJsonView.of(command.errors, messageSource, request.locale), status: 422
             return
         }
         RegisterResult registerResult = registerService.register(command)
 
         if (registerResult.hasErrors()) {
-            respond ValidationErrorsJsonView.of(registerResult.errors, messageSource, request.locale)
-            response.setStatus(422)
+            respond ValidationErrorsJsonView.of(registerResult.errors, messageSource, request.locale), status: 422
             return
         }
         response.setStatus(200)
