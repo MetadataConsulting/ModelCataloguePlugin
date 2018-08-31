@@ -105,10 +105,10 @@ enum MetadataDomain {
     }
 
     static String lowerCamelCaseDomainName(MetadataDomain domain) {
-        return domain.lowerCamelCaseDomainName
+        return domain?.lowerCamelCaseDomainName
     }
 
     static String camelCaseDomainName(MetadataDomain domain) {
-        return domain.lowerCamelCaseDomainName.capitalize()
+        return domain?.lowerCamelCaseDomainName?.capitalize()
     }
 }
