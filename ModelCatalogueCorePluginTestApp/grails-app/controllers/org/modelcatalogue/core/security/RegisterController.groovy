@@ -35,7 +35,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         }
 
         RegisterResult registerResult = registerService.register(new RegisterRequestAdapter(command))
-        if (command.hasErrors()) {
+        if (registerResult.hasErrors()) {
             render view: 'index', model: [command: registerResult]
             return
         }

@@ -95,7 +95,7 @@ class RegisterService {
     RegisterResult register(RegisterRequest request) {
         RegisterResult registerResult = new RegisterResult(username: request.username, email: request.email)
         if (userGormService.findByUsername(request.username)) {
-            registerResult.errors.rejectValue('username', 'username.not.unique.message', 'Username not uniqe')
+            registerResult.errors.rejectValue('username', 'username.not.unique.message', 'Username not unique')
             return registerResult
         }
 
