@@ -17,6 +17,19 @@ class DataClassGormService implements WarnGormErrors {
 
     MessageSource messageSource
 
+    @Transactional
+    Number updateTopLevel(List<Long> ids, boolean topLevel) {
+        if (!ids) {
+            return 0
+        }
+        DataClass.where { id in ids }.updateAll(topLevel: topLevel)
+    }
+
+    @Transactional
+    Number updateTopLevel(Long dataClassId, boolean topLevel) {
+        updateTopLevel([dataClassId], topLevel)
+    }
+
     @Transactional(readOnly = true)
     DataClass findById(long id) {
         DataClass.get(id)
