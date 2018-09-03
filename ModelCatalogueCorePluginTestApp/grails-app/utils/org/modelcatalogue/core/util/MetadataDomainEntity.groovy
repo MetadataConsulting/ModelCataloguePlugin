@@ -134,6 +134,9 @@ class MetadataDomainEntity {
     }
 
     static String link(Long dataModelId, MetadataDomainEntity entity) {
+        if (entity == null) {
+            return null
+        }
         String name = MetadataDomain.lowerCamelCaseDomainName(entity.domain)
 
         if ( name ) {

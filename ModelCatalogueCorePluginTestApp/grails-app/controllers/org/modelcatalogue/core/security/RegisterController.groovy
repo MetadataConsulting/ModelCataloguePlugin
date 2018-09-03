@@ -12,9 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder
 
 class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
 
-    UserService userService
-
-    TransactionalEmailService transactionalEmailService
 
     RegisterService registerService
 
@@ -37,39 +34,11 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             return
         }
 
-        def supervisorEmail = System.getenv(UserService.ENV_SUPERVISOR_EMAIL)
-        boolean shouldUserBeDisabled = (supervisorEmail && command.email != supervisorEmail)
-        boolean enabled = !shouldUserBeDisabled
-        if ( shouldUserBeDisabled ) {
-            // notify admin
-            transactionalEmailService.sendEmail(supervisorEmail,
-                    conf.ui.register.emailFrom,
-                    "Metadata Registry - new user",
-                    "New user registered to your Metadata Registry. Please enable that account in user administration.")
-        }
-
-        RegistrationCode registrationCode = registerService.register(command.username, command.password, command.email, enabled)
-        if (registrationCode == null || registrationCode.hasErrors()) {
-            // null means problem creating the user
-            flash.error = message(code: 'spring.security.ui.register.miscError')
-            flash.chainedParams = params
-            redirect action: 'index'
+        RegisterResult registerResult = registerService.register(new RegisterRequestAdapter(command))
+        if (registerResult.hasErrors()) {
+            render view: 'index', model: [command: registerResult]
             return
         }
-
-        String url = generateLink('verifyRegistration', [t: registrationCode.token])
-
-        def conf = SpringSecurityUtils.securityConfig
-        def body = conf.ui.register.emailBody
-        if (body.contains('$')) {
-            body = evaluate(body, [user: command, url: url])
-        }
-
-        transactionalEmailService.sendEmail(command.email,
-                conf.ui.register.emailFrom as String,
-                conf.ui.register.emailSubject as String,
-                body.toString())
-
 
         render view: 'index', model: [emailSent: true]
     }
@@ -164,11 +133,5 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         // make sure no user is logged in
         SecurityContextHolder.clearContext()
         redirect uri: defaultTargetUrl
-    }
-
-    protected String generateLink(String action, linkParams) {
-        createLink(base: grailsApplication.config.grails.serverURL,
-                   controller: 'register', action: action,
-                   params: linkParams)
     }
 }

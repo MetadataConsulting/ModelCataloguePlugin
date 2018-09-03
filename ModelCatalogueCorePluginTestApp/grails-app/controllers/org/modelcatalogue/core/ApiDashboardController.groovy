@@ -17,7 +17,7 @@ class ApiDashboardController {
 
     def dataModels() {
         render(contentType: "application/json") {
-            [dataModels: dashboardService.findAllDataModel()]
+            [dataModels: dashboardService.findAllDataModel(false)]
         }
     }
 
