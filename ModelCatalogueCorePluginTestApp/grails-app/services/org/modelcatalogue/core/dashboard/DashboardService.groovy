@@ -379,22 +379,27 @@ class DashboardService {
 
     @CompileDynamic
     @Transactional(readOnly = true)
-    List<IdName> findAllDataModel() {
+    List<IdName> findAllDataModel(boolean truncatedName = true) {
         List<ElementStatus> statusList = findAllElementStatus()
         SearchQuery searchStatusQuery = new SearchQuery(statusList: statusList,
                 search: null,
                 metadataDomain: MetadataDomain.DATA_MODEL)
 
-        dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, []).sort { DataModel a, DataModel b ->
+        List<IdName> idNames = dataModelGormService.findAllBySearchStatusQuery(searchStatusQuery, null, []).sort { DataModel a, DataModel b ->
             a.name <=> b.name
         }collect { DataModel dataModel ->
             new IdName(id: dataModel.id,
-                    name: nameForDataModel(dataModel).toString())
+                    name: nameForDataModel(dataModel, truncatedName).toString())
         }
+        return idNames
     }
 
-    String nameForDataModel(DataModel dataModel) {
-        final String dataModelName = dataModel.name ? (dataModel.name.length() > 30 ? dataModel.name.substring(0,29) + '...' : dataModel.name ) : ''
+    String nameForDataModel(DataModel dataModel, boolean truncatedName) {
+        final String dataModelName = dataModel.name ?
+            (truncatedName ? (dataModel.name.length() > 30 ? dataModel.name.substring(0,29) + '...' : dataModel.name )
+                            : dataModel.name)
+            : ''
+
         "${dataModelName} ${dataModel.semanticVersion} (${dataModel.status})".toString()
     }
 
