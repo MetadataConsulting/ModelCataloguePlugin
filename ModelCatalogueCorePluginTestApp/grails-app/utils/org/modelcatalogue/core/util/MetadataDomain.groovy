@@ -2,77 +2,69 @@ package org.modelcatalogue.core.util
 
 import groovy.transform.CompileStatic
 import org.modelcatalogue.core.Asset
+import org.modelcatalogue.core.AssetFile
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.DataModelPolicy
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.ExtensionValue
+import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipMetadata
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 
 @CompileStatic
 enum MetadataDomain {
-    ASSET,
-    ASSET_FILE,
-    CATALOGUE_ELEMENT,
-    DATA_CLASS,
-    DATA_ELEMENT,
-    DATA_MODEL,
-    DATA_MODEL_POLICY,
-    DATA_TYPE,
-    ENUMERATED_TYPE,
-    EXTENSION_VALUE,
-    MAPPING,
-    MEASUREMENT_UNIT,
-    PRIMITIVE_TYPE,
-    REFERENCE_TYPE,
-    RELATIONSHIP,
-    RELATIONSHIP_METADATA,
-    RELATIONSHIP_TYPE,
-    RELATIONSHIP_TAG,
-    BUSINESS_RULE,
-    TAG
+    ASSET('asset', Asset),
+    ASSET_FILE('assetFile', AssetFile),
+    CATALOGUE_ELEMENT('catalogueElement', CatalogueElement),
+    DATA_CLASS('dataClass', DataClass),
+    DATA_ELEMENT('dataElement', DataElement),
+    DATA_MODEL('dataModel', DataModel),
+    DATA_MODEL_POLICY('dataModelPolicy', DataModelPolicy),
+    DATA_TYPE('dataType', DataType),
+    ENUMERATED_TYPE('enumeratedType', EnumeratedType),
+    EXTENSION_VALUE('extensionValue', ExtensionValue),
+    MAPPING('mapping', Mapping),
+    MEASUREMENT_UNIT('measurementUnit', MeasurementUnit),
+    PRIMITIVE_TYPE('primitiveType', PrimitiveType),
+    REFERENCE_TYPE('referenceType', ReferenceType),
+    RELATIONSHIP('relationship', Relationship),
+    RELATIONSHIP_METADATA('relationshipMetadata', RelationshipMetadata),
+    RELATIONSHIP_TYPE('relationshipType', RelationshipType),
+    RELATIONSHIP_TAG('relationshipTag', null),
+    BUSINESS_RULE('validationRule', ValidationRule),
+    TAG('tag', Tag)
+
+    private final String lowerCamelCaseDomainName
+    private final Class objectClass
+
+    MetadataDomain(String lowerCamelCaseDomainName, Class objectClass) {
+        this.lowerCamelCaseDomainName = lowerCamelCaseDomainName
+        this.objectClass = objectClass
+    }
+
+    MetadataDomain(String lowerCamelCaseDomainName) {
+        this.lowerCamelCaseDomainName = lowerCamelCaseDomainName
+    }
 
     static MetadataDomain ofClass(Class clazz) {
 
-        if ( clazz == Asset.class ) {
-            return ASSET
-
-        } else if ( clazz == DataClass.class ) {
-            return DATA_CLASS
-
-        } else if ( clazz == DataElement.class ) {
-            return DATA_ELEMENT
-
-        } else if ( clazz == DataModel.class ) {
-            return DATA_MODEL
-
-        } else if ( clazz == EnumeratedType.class ) {
-            return ENUMERATED_TYPE
-
-        } else if ( clazz == MeasurementUnit.class ) {
-            return MEASUREMENT_UNIT
-
-        } else if ( clazz == PrimitiveType.class ) {
-            return PRIMITIVE_TYPE
-
-        } else if ( clazz == ReferenceType.class ) {
-            return REFERENCE_TYPE
-
-        } else if ( clazz == DataType.class ) {
-            return DATA_TYPE
-
-        } else if ( clazz == ValidationRule.class ) {
-            return BUSINESS_RULE
-
-        } else if ( clazz == Tag.class ) {
-            return TAG
+        for (MetadataDomain metadataDomain: values()) {
+            if (clazz == metadataDomain.objectClass) {
+                return metadataDomain
+                break
+            }
         }
-        CATALOGUE_ELEMENT
+        return CATALOGUE_ELEMENT
     }
     static MetadataDomain of(CatalogueElement catalogueElement) {
 
@@ -113,96 +105,10 @@ enum MetadataDomain {
     }
 
     static String lowerCamelCaseDomainName(MetadataDomain domain) {
-        switch (domain) {
-            case ASSET:
-                return 'asset'
-            case ASSET_FILE:
-                return 'assetFile'
-            case CATALOGUE_ELEMENT:
-                return 'catalogueElement'
-            case DATA_CLASS:
-                return 'dataClass'
-            case DATA_ELEMENT:
-                return 'dataElement'
-            case DATA_MODEL:
-                return 'dataModel'
-            case DATA_MODEL_POLICY:
-                return 'dataModelPolicy'
-            case DATA_TYPE:
-                return 'dataType'
-            case ENUMERATED_TYPE:
-                return 'enumeratedType'
-            case EXTENSION_VALUE:
-                return 'extensionValue'
-            case MAPPING:
-                return 'mapping'
-            case MEASUREMENT_UNIT:
-                return 'measurementUnit'
-            case PRIMITIVE_TYPE:
-                return 'primitiveType'
-            case REFERENCE_TYPE:
-                return 'referenceType'
-            case RELATIONSHIP:
-                return 'relationship'
-            case RELATIONSHIP_METADATA:
-                return 'relationshipMetadata'
-            case RELATIONSHIP_TYPE:
-                return 'relationshipType'
-            case RELATIONSHIP_TAG:
-                return 'relationshipTag'
-            case BUSINESS_RULE:
-                return 'validationRule'
-            case TAG:
-                return 'tag'
-            default:
-                return null
-        }
+        return domain?.lowerCamelCaseDomainName
     }
 
     static String camelCaseDomainName(MetadataDomain domain) {
-        switch (domain) {
-            case ASSET:
-                return 'Asset'
-            case ASSET_FILE:
-                return 'AssetFile'
-            case CATALOGUE_ELEMENT:
-                return 'CatalogueElement'
-            case DATA_CLASS:
-                return 'DataClass'
-            case DATA_ELEMENT:
-                return 'DataElement'
-            case DATA_MODEL:
-                return 'DataModel'
-            case DATA_MODEL_POLICY:
-                return 'DataModelPolicy'
-            case DATA_TYPE:
-                return 'DataType'
-            case ENUMERATED_TYPE:
-                return 'EnumeratedType'
-            case EXTENSION_VALUE:
-                return 'ExtensionValue'
-            case MAPPING:
-                return 'Mapping'
-            case MEASUREMENT_UNIT:
-                return 'MeasurementUnit'
-            case PRIMITIVE_TYPE:
-                return 'PrimitiveType'
-            case REFERENCE_TYPE:
-                return 'ReferenceType'
-            case RELATIONSHIP:
-                return 'Relationship'
-            case RELATIONSHIP_METADATA:
-                return 'RelationshipMetadata'
-            case RELATIONSHIP_TYPE:
-                return 'RelationshipType'
-            case RELATIONSHIP_TAG:
-                return 'RelationshipTag'
-            case BUSINESS_RULE:
-                return 'ValidationRule'
-            case TAG:
-                return 'Tag'
-            default:
-                return null
-        }
+        return domain?.lowerCamelCaseDomainName?.capitalize()
     }
 }
