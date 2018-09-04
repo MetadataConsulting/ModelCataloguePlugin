@@ -350,6 +350,22 @@ environments {
             }
         }
 
+        if (System.getenv('MC_SECURED_REVERSE_PROXY')) {
+            // Setting of https behind load balancer (or proxy server) needs to set http header 'X-Forwarded-Proto' in order
+            // to decide if http or https should be used. Environment without load balancer is not affected.
+            grails.plugin.springsecurity.secureChannel.useHeaderCheckChannelSecurity = true
+            grails.plugin.springsecurity.portMapper.httpPort = 80
+            grails.plugin.springsecurity.portMapper.httpsPort = 443
+            grails.plugin.springsecurity.secureChannel.secureHeaderName = 'X-Forwarded-Proto'
+            grails.plugin.springsecurity.secureChannel.secureHeaderValue = 'http'
+            grails.plugin.springsecurity.secureChannel.insecureHeaderName = 'X-Forwarded-Proto'
+            grails.plugin.springsecurity.secureChannel.insecureHeaderValue = 'https'
+            grails.plugin.springsecurity.secureChannel.definition = [
+                '/**': 'REQUIRES_SECURE_CHANNEL'
+            ]
+        }
+
+
     }
 }
 
