@@ -2,10 +2,13 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class CsvTransformationGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -35,5 +38,10 @@ class CsvTransformationGormService implements WarnGormErrors {
             return [] as List<CsvTransformation>
         }
         queryByIds(ids).list()
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

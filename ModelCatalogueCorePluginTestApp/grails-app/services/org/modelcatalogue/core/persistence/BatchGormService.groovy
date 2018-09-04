@@ -2,12 +2,15 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class BatchGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -90,5 +93,10 @@ class BatchGormService implements WarnGormErrors {
         Batch.where {
             name =~ batchName
         }
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

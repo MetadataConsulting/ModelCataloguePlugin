@@ -2,6 +2,7 @@ package org.modelcatalogue.core.persistence
 
 import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
+import groovy.util.logging.Slf4j
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 import org.hibernate.transform.Transformers
 import org.modelcatalogue.core.DataModelPolicy
@@ -9,8 +10,10 @@ import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.WarnGormErrors
 import org.modelcatalogue.core.util.PaginationQuery
 import org.modelcatalogue.core.util.SortQuery
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class DataModelPolicyGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -79,6 +82,11 @@ class DataModelPolicyGormService implements WarnGormErrors {
             transactionStatus.setRollbackOnly()
         }
         dataModelPolicyInstance
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 
 }

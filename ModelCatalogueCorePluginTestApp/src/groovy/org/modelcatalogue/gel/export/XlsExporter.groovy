@@ -1,6 +1,6 @@
 package org.modelcatalogue.gel.export
 
-import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
+import builders.dsl.spreadsheet.builder.api.SheetDefinition
 import org.modelcatalogue.core.CatalogueElement
 
 /**

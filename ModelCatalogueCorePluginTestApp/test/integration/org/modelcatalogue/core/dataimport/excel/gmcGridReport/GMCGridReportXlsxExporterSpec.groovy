@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.dataimport.excel.gmcGridReport
 
+import builders.dsl.spreadsheet.query.api.SpreadsheetCriteria
+import builders.dsl.spreadsheet.query.poi.PoiSpreadsheetCriteria
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -10,8 +12,6 @@ import org.modelcatalogue.core.export.inventory.DataModelToXlsxExporterSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
-import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.IgnoreIf
 
 @IgnoreIf( {
@@ -303,7 +303,7 @@ class GMCGridReportXlsxExporterSpec extends AbstractIntegrationSpec {
         GMCGridReportXlsxExporter.create(dataModel, dataClassService, grailsApplication, 5).export(file.newOutputStream())
         FileOpener.open(file)
 
-        SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(file)
+        SpreadsheetCriteria query = PoiSpreadsheetCriteria.FACTORY.forFile(file)
 
         then:
         noExceptionThrown()

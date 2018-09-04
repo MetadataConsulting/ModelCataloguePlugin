@@ -20,10 +20,10 @@ import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
-import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.Shared
 import spock.lang.Unroll
+import builders.dsl.spreadsheet.query.api.SpreadsheetCriteria
+import builders.dsl.spreadsheet.query.poi.PoiSpreadsheetCriteria
 import spock.lang.Ignore
 
 class LoincExcelLoaderSpec extends AbstractIntegrationSpec {

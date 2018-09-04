@@ -2,11 +2,14 @@ package org.modelcatalogue.core.persistence
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.WarnGormErrors
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
+@Slf4j
 class MappingGormService implements WarnGormErrors {
 
     MessageSource messageSource
@@ -40,5 +43,10 @@ class MappingGormService implements WarnGormErrors {
             return [] as List<Mapping>
         }
         queryByIds(ids).list()
+    }
+
+    @Override
+    Logger getLog() {
+        return log
     }
 }

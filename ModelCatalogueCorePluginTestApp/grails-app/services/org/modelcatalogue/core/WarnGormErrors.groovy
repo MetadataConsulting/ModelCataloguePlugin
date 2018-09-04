@@ -1,8 +1,11 @@
 package org.modelcatalogue.core
 
+import org.slf4j.Logger
 import org.springframework.context.MessageSource
 
 trait WarnGormErrors {
+
+    abstract Logger getLog()
 
     void warnErrors(def bean, MessageSource messageSource, Locale locale = Locale.getDefault()) {
         if (!log.isWarnEnabled()) {
