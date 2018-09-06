@@ -36,6 +36,11 @@ interface DocumentSerializer<T> {
             documentSerializers[type] = serializer
         }
 
+        /**
+         * Get the serializer of the class or the lowest available one up the class hierarchy.
+         * @param clazz
+         * @return
+         */
         static <T> DocumentSerializer<? super T> get(Class<T> clazz) {
             DocumentSerializer<T> serializer = documentSerializers[clazz]
 

@@ -222,6 +222,7 @@ class MetadataSecurityService {
             ["/api/modelCatalogue/core/catalogueElement", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/catalogueElement", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/catalogueElement/search/*", 'isAuthenticated()', HttpMethod.GET],
+            ["/api/modelCatalogue/core/catalogueElement/fuzzySearch/*", 'isAuthenticated()', HttpMethod.GET],
             ["/api/modelCatalogue/core/catalogueElement/*/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/catalogueElement/validate", 'isAuthenticated()', HttpMethod.POST],
             ["/api/modelCatalogue/core/catalogueElement/*", 'isAuthenticated()', HttpMethod.GET],

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.elasticsearch
 
+import org.elasticsearch.common.unit.Fuzziness
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.api.ElementStatusUtils
 import org.modelcatalogue.core.security.DataModelAclService
@@ -364,7 +365,7 @@ class ElasticSearchService implements SearchCatalogue {
 
             // almost subset of CATALOGUE_ELEMENT_BOOSTS
             boolQuery.should(QueryBuilders.matchQuery("name_not_analyzed", search).boost(200))
-            boolQuery.should(QueryBuilders.matchQuery("name", search).boost(200))
+            boolQuery.should(QueryBuilders.matchQuery("name", search).boost(200).fuzziness(Fuzziness.AUTO))
             boolQuery.should(QueryBuilders.matchQuery("description", search).boost(10))
 
             boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))

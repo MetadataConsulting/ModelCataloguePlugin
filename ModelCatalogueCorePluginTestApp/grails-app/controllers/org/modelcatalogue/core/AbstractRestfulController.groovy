@@ -64,6 +64,18 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(search, 'UTF-8')}", results)
     }
 
+    def fuzzySearch(Integer max) {
+        String search = params.search
+        if ( !search ) {
+            respond errors: "No query string to search on"
+            return
+        }
+        ParamArgs paramArgs = instantiateParamArgs(max)
+        SearchParams searchParams = SearchParams.of(params, paramArgs)
+        ListWithTotalAndType<T> results = modelCatalogueSearchService.fuzzySearch(resource, searchParams)
+        respond Lists.wrap(params, "/${resourceName}/fuzzySearch?search=${URLEncoder.encode(search, 'UTF-8')}", results)
+    }
+
     @Override
     def index(Integer max) {
         handleParams(max)

@@ -6,6 +6,7 @@ class CatalogueElementUrlMappings {
         "/api/modelCatalogue/core/catalogueElement" (controller: 'catalogueElement', action: 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/catalogueElement" (controller: 'catalogueElement', action: 'save', method: HttpMethod.POST)
         "/api/modelCatalogue/core/catalogueElement/search/$search?" (controller: 'catalogueElement', action: 'search', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/catalogueElement/fuzzySearch/$search?" (controller: 'catalogueElement', action: 'fuzzySearch', method: HttpMethod.GET)
         "/api/modelCatalogue/core/catalogueElement/$id/validate" (controller: 'catalogueElement', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/catalogueElement/validate" (controller: 'catalogueElement', action: 'validate', method: HttpMethod.POST)
         "/api/modelCatalogue/core/catalogueElement/$id" (controller: 'catalogueElement', action: 'show', method: HttpMethod.GET)

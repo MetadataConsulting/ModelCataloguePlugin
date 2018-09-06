@@ -9,6 +9,7 @@ public interface SearchCatalogue {
 
     ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, SearchParams params)
     public <T> ListWithTotalAndType<T> search(Class<T> resource, SearchParams params)
+    public <T> ListWithTotalAndType<T> fuzzySearch(Class<T> resource, SearchParams params)
     ListWithTotalAndType<CatalogueElement> search(SearchParams params)
 
     Observable<Boolean> index(Object element)

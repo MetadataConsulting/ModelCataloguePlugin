@@ -222,6 +222,16 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         }
     }
 
+    /**
+     * Just redirects to normal search for now.
+     * @param resource
+     * @param searchParams
+     * @return
+     */
+    public <T> ListWithTotalAndType<T> fuzzySearch(Class<T> resource,
+                                              SearchParams searchParams) {
+        search(resource, searchParams) //
+    }
     ListWithTotalAndType<CatalogueElement> search(SearchParams searchParams) {
         search(CatalogueElement, searchParams)
     }
