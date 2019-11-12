@@ -6,11 +6,17 @@ Model Catalogue
 
 This introduction is taken from the [Wiki on Confluence](https://metadata.atlassian.net/wiki/display/ME/Metadata+Exchange+Home) which also includes instructions for users of the catalogue.
 The Model Catalogue Plugin (Mx) is a web-based toolkit for managing metadata.
+
 The Model Catalogue Plugin is designed to enable the easy conformance of information systems with prevailing data standards and best practise.
+
 It was originally an experimental metadata registry which was used to support an NHIC project in 2013, and later on to support clinicians at Genomics England in building and curating datasets. The Model Catalogue Plugin is an open source project, available under an Apache 2  license.  It has a modular architecture, and the core component is a dataset or "Models Catalogue", which provides a singular reference point for the creation and curation of datasets or data models.
+
 The project is aimed at automating and simplifying data and metadata management.  In particular the MC allows Data architects, Business Analysts, Scientists to centrally define datasets, formatting, business-rules, and metadata.  These models and datasets can then be used across a large user bases, inside or outside the organization, by developers to build conformant applications and to verify datasets. Different models or components can be compared, analysed and matched, data elements can be identified for tagging, for security purposes and linked to existing artefacts, such as databases or applications.
+
 The core ideas embedded in the Model Catalogue Plugin are inspired by model driven engineering (MDE) principles, and initially the design was based around ISO 11179. The design has since been refined to provide a more general and user-friendly capability.
+
 The core registry and catalogue is built using Angular 1, Bootstrap and Coffeescript on the front-end user interface, powered by a grails framework and a relational (in most cases MySQL) database on the backend. However we are currently researching the use of graph databases, in particular triple stores for usage on the backend.
+
 The Model Catalogue Plugin  allows users to define datasets as general platform-independent models or to specify more specific models as required, the core model can be output as XML, and transformed to an XML Schema, or as an Excel spreadsheet, or it has a REST-interface which can be accessed over the web to discover data elements and perform verification against the datasets as required.
 
 ## Deployment
@@ -47,5 +53,5 @@ All development, including gradle running, should be done in ModelCatalogueCoreP
 
 ## Credits
 
-This is the open-source Model Catalogue, which was maintained by [Metadata Consulting](http://www.metadataconsulting.co.uk) with the support of [Genomics England](http://www.genomicsengland.co.uk/), [the Medical Research Council](http://www.mrc.ac.uk/) and [NIHR](http://www.nihr.ac.uk/), from early 2014. A closed-source version, called the Metadata Exchange, was forked on the 4th September 2018. Metadata Consulting, now [MetadataWorks](https://metadataworks.co.uk/), continues to develop the closed-source version. MetadataWorks are fully committed to open source, but with so many things to do (and bills to pay) we can only update the community version on a semi-regular basis. Please contact info@metadataworks.co.uk for more information about the fully updated, hosted and supported MetadataExchange Enterprise Edition.
+This is the open-source community version Model Catalogue, which was maintained by [Metadata Consulting](http://www.metadataconsulting.co.uk) with the support of [Genomics England](http://www.genomicsengland.co.uk/), [the Medical Research Council](http://www.mrc.ac.uk/) and [NIHR](http://www.nihr.ac.uk/), from early 2014. MetadataWorks are fully committed to open source, but with so many things to do (and bills to pay) we can only update the community version on a semi-regular basis. Please contact info@metadataworks.co.uk for more information about the fully updated, hosted and supported MetadataExchange Enterprise Edition.
 We also wish to thank Charles Chrichton, John Cross, James Dai, Jim Davies, Sergio del Amo Caballero, Steve Harris, Matous Kucera, Adam Milward, David Milward, Vladimir Orany, Soheil Saifipour and James Welch.
