@@ -23,7 +23,6 @@ The Model Catalogue Plugin  allows users to define datasets as general platform-
 
 ## Development
 
-Note from James:
 The grails app is in the subdirectory called ModelCatalogueCorePluginTestApp. 
 All development, including gradle running, should be done in ModelCatalogueCorePluginTestApp.
 
@@ -47,6 +46,6 @@ All development, including gradle running, should be done in ModelCatalogueCoreP
  * The Model Catalogue is license under the terms of the [Apache License, Version 2.0.](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 ## Credits
-The model catalogue is maintained by [Metadata Consulting](http://www.metadataconsulting.co.uk).
-We also wish to thank [Genomics England](http://www.genomicsengland.co.uk/), [the Medical Research Council](http://www.mrc.ac.uk/) and [NIHR](http://www.nihr.ac.uk/) for their support, as well as Charles Chrichton, John Cross, James Dai, Jim Davies, Sergio del Amo Caballero, Steve Harris, Matous Kucera, Adam Milward, David Milward, Vladimir Orany, Soheil Saifipour and James Welch.
 
+This is the open-source Model Catalogue, which was maintained by [Metadata Consulting](http://www.metadataconsulting.co.uk) with the support of [Genomics England](http://www.genomicsengland.co.uk/), [the Medical Research Council](http://www.mrc.ac.uk/) and [NIHR](http://www.nihr.ac.uk/), from early 2014. A closed-source version, called the Metadata Exchange, was forked on the 4th September 2018. Metadata Consulting, now [MetadataWorks](https://metadataworks.co.uk/), continues to develop the closed-source version. MetadataWorks are fully committed to open source, but with so many things to do (and bills to pay) we can only update the community version on a semi-regular basis. Please contact info@metadataworks.co.uk for more information about the fully updated, hosted and supported MetadataExchange Enterprise Edition.
+We also wish to thank Charles Chrichton, John Cross, James Dai, Jim Davies, Sergio del Amo Caballero, Steve Harris, Matous Kucera, Adam Milward, David Milward, Vladimir Orany, Soheil Saifipour and James Welch.
